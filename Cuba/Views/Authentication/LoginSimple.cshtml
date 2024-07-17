@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Login Simple";
+    Layout = "~/Views/Shared/_SimpleLayout.cshtml";
+}
+<div class="row m-0">
+    <div class="col-12 p-0">
+        <div class="login-card">
+            <div>
+                <div class="login-main">
+                    <form class="theme-form" id="loginForm">
+                        <div><a class="logo"><img class="img-fluid for-light" width="230"
+                                    src="~/assets/images/logo/logo_pertamina.png" alt="looginpage"><img
+                                    class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png"
+                                    alt="looginpage"></a></div>
+                        <h5 class="mb-4" style="text-align: center;">Integrated Organization Management System</h5>
+                        <h4>LOGIN</h4>
+                        <p>Input Username & Password</p>
+                        <ModalPage />
+                        <div class="form-group" style="margin-top: -5px;">
+                            <label class="col-form-label">Username</label>
+                            <input class="form-control" required="" id="username" value="superadmin">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label">Password</label>
+                            <div class="form-input position-relative">
+                                <input class="form-control" type="password" id="password" name="login[password]"
+                                    required="" value="superadmin">
+                                <div class="show-hide"><span class="show"> </span></div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-0">
+                            <div class="text-end mt-3">
+                                <button class="btn btn-primary btn-block w-100 mt-3 mb-3"
+                                    id="loginButton">Login</button>
+                            </div>
+                        </div>
+                        <p class="mt-4 mb-0 text-center">Copyright &#169; 2024. PT Pertamina Patra Niaga</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const state = {
+        exampleValue: "testing",
+        username: null,
+        password: null,
+        prosbisAll: [],
+        jobAll: [],
+        filterJob: [],
+        rasciMapping: []
+    }
+
+    function onSubmit(username, password) {
+        state.username = username
+        state.password = password
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="../assets/js/login/login.js"></script>
+<script src="../assets/js/login/fiterProsbis.js"></script>
+<script src="../assets/js/login/fiterJob.js"></script>

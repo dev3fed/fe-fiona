@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Pratik\Desktop\Cuba</_PublishTargetUrl>
+    <History>True|2023-02-11T12:03:05.4991022Z;True|2023-02-11T14:43:42.3093494+05:30;True|2023-02-09T19:34:40.2329191+05:30;True|2023-02-08T20:07:04.6449012+05:30;True|2023-02-08T20:01:44.3581894+05:30;True|2023-02-08T19:21:27.2040819+05:30;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="Views/Shared/_Layout.cshtml">
+      <publishTime>02/11/2023 13:02:36</publishTime>
+    </File>
+    <File Include="Views/Shared/_Layout.cshtml.css">
+      <publishTime>12/12/2022 22:33:14</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

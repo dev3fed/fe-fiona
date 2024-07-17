@@ -1,0 +1,7 @@
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.exe
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\appsettings.Development.json
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\appsettings.json
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.dll
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.deps.json
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.runtimeconfig.json
+C:\Users\DeveloperPC\Desktop\Cuba_New\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.pdb

@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "RTL";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <partial name="_Style" />
+</head>
+<body class="rtl">
+    <partial name="_Loader" />
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <div class="page-body-wrapper sidebar-icon">
+            <partial name="_Header" />
+            <div class="page-body-wrapper">
+                <partial name="_SidePenal" />
+                    <div class="page-body">
+                    <div class="container-fluid">
+                        <div class="page-title">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h3>RTL Layout</h3>
+                                </div>
+                                <div class="col-6">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a asp-controller="Dashboard" asp-action="Index">
+                                                <svg class="stroke-icon">
+                                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item">Page Layout</li>
+                                        <li class="breadcrumb-item active"> RTL Layout</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Container-fluid starts-->
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card alert alert-primary" role="alert">
+                                    <h5>Tip!</h5>
+                                    <p>Add the dir="rtl" to the html tag to get this layout.</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>How to use it?</h5>
+                                        <div class="card-header-right">
+                                            <ul class="list-unstyled card-option">
+                                                <li><i class="fa fa-spin fa-cog"></i></li>
+                                                <li><i class="view-html fa fa-code"></i></li>
+                                                <li><i class="icofont icofont-maximize full-card"></i></li>
+                                                <li><i class="icofont icofont-minus minimize-card"></i></li>
+                                                <li><i class="icofont icofont-refresh reload-card"></i></li>
+                                                <li><i class="icofont icofont-error close-card"></i></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5>Step 1</h5>
+                                        <p>On this layout, First of all you have to add the class rtl attribute in body tag</p>
+                                        <h5>Step 2</h5>
+                                        <p>Contents are change right to left from left to right respectively</p>
+                                        <h5>Step 3</h5>
+                                        <p>when you want to change spacing left to right at that right left spacing you have to unset css and apply right spacing in css</p>
+                                        <h5>Step 4</h5>
+                                        <p>Sometimes js are not change directly with text-align css,so that time you have to copy js and change the class as rtl="true".</p>
+                                        <div class="code-box-copy">
+                                            <button class="code-box-copy__btn btn-clipboard" data-clipboard-target="#example-head" title="Copy"><i class="icofont icofont-copy-alt"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <h6 class="mb-0">Card Footer</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Container-fluid Ends-->
+                </div>
+                <partial name="IconMarkup" />
+                <partial name="_Footer" />
+            </div>
+        </div>
+    </div>
+    <partial name="_Script" />
+    <!-- Plugins JS start-->
+    <script src="../assets/js/sidebar-menu.js"></script>
+    <script src="../assets/js/slick/slick.min.js"></script>
+    <script src="../assets/js/slick/slick.js"></script>
+    <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/prism/prism.min.js"></script>
+    <script src="../assets/js/clipboard/clipboard.min.js"></script>
+    <script src="../assets/js/custom-card/custom-card.js"></script>
+    <script src="../assets/js/tooltip-init.js"></script>
+    <!-- Plugins JS Ends-->
+    <!-- Theme js-->
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

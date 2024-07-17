@@ -1,0 +1,7 @@
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.exe
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\appsettings.Development.json
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\appsettings.json
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.dll
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.deps.json
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.runtimeconfig.json
+D:\Work\Dhairya\Cuba08022023\Cuba\Cuba\obj\Release\net7.0\PubTmp\Out\Cuba.pdb

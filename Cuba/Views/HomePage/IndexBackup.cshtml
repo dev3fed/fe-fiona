@@ -1,0 +1,157 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Cuba admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+    <meta name="keywords"
+        content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
+    <meta name="author" content="pixelstrap">
+    <link rel="icon" href="~/assets/images/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="~/assets/images/favicon.png" type="image/x-icon">
+    <title>Integrated Organization Management System</title>
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/font-awesome.css">
+    <link rel="icon" href="~/assets/svg/landing-icons.svg">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/slick.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/slick-theme.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/animate.css">
+    <!-- Bootstrap css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/bootstrap.css">
+    <!-- App css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
+    <!-- Responsive css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/responsive.css">
+    <style>
+        .card {
+            width: 230px;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: #ffffff;
+            transition: transform 0.3s;
+        }
+
+        .card-container {
+            position: absolute;
+            top: 350px;
+            /* Adjust this value to move the cards up or down */
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1600px;
+            z-index: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card img {
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-card h3 {
+            color: #FFFFFF;
+            margin-top: 20px;
+        }
+
+        .username-section {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .username-section img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .buttons a {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: 1px solid #006CA9;
+            border-radius: 5px;
+            color: #006CA9;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .buttons a:hover {
+            background-color: #006CA9;
+            color: #ffffff;
+        }
+    </style>
+
+</head>
+
+<body class="page-body">
+    <div class="header-card">
+        <div class="username-section">
+            <img src="~/assets/images/homepage/user_profile.png" alt="User Profile">
+            <div>
+                <p>Username</p>
+                <p>Superadmin</p>
+            </div>
+        </div>
+        <img src="~/assets/images/homepage/logo.png" alt="Logo" style="max-height: 80px;">
+        <h3>INTEGRATED ORGANIZATION MANAGEMENT SYSTEM XXXXXXXXX</h3>
+    </div>
+    <div class="content-card">
+        <div class="container">
+            <div class="card-container">
+                <div class="card">
+                    <img src="~/assets/images/homepage/org_structure.svg" alt="Organization Structure">
+                </div>
+                <div class="card">
+                    <img src="~/assets/images/homepage/rasci_matrix.svg" alt="RASCI Matrix">
+                </div>
+                <div class="card">
+                    <img src="~/assets/images/homepage/competency.svg" alt="Competency">
+                </div>
+                <div class="card">
+                    <img src="~/assets/images/homepage/lead_indicator.svg" alt="Lead Indicator">
+                </div>
+                <div class="card">
+                    <img src="~/assets/images/homepage/job_description.svg" alt="Job Description">
+                </div>
+            </div>
+            <div class="buttons">
+                <a href="#">Master Data</a>
+                <a href="#">User Management</a>
+            </div>
+        </div>
+    </div>
+    @* <div class="footer">
+    <p>Copyright © 2024 PT Pertamina Patra Niaga</p>
+    </div> *@
+</body>
+
+</html>

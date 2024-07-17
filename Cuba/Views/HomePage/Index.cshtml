@@ -1,0 +1,231 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Cuba admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+    <meta name="keywords"
+        content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
+    <meta name="author" content="pixelstrap">
+    <link rel="icon" href="~/assets/images/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="~/assets/images/favicon.png" type="image/x-icon">
+    <title>Integrated Organization Management System</title>
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/font-awesome.css">
+    <link rel="icon" href="~/assets/svg/landing-icons.svg">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/slick.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/slick-theme.css">
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/animate.css">
+    <!-- Bootstrap css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/bootstrap.css">
+    <!-- App css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
+    <!-- Responsive css-->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/responsive.css">
+
+    <!-- themify icon css -->
+    <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/themify.css">
+
+
+    </link>
+    <style>
+        .card {
+            width: 230px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .card-container {
+            position: absolute;
+            top: 275px;
+            justify-content: space-around;
+            z-index: 1;
+
+        }
+
+        .profile-nav {
+            position: relative;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            margin-top: -30px;
+            /* Adjust this value */
+            background: white;
+            /* Set desired width */
+            border-radius: 4px;
+            z-index: 1000;
+        }
+
+        .profile-nav:hover .profile-dropdown,
+        .profile-dropdown:hover {
+            display: block;
+        }
+
+        .profile-dropdown li {
+            padding: 10px
+        }
+
+        .profile-dropdown li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .profile-dropdown li a:hover {
+            background-color: #f5f5f5;
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+
+        }
+
+        .card-body img {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: -100px;
+
+        }
+
+        .header-card h3 {
+            color: #FFFFFF;
+            margin-top: 20px;
+        }
+
+        .footer-content {
+            position: absolute;
+            top: 220px;
+            width: 100%;
+            text-align: center;
+
+        }
+    </style>
+
+</head>
+
+<body class="page-body">
+    <div class="header-card">
+        <div class="profile-nav onhover-dropdown pe-0 py-0" style="position: absolute; top: 20px; right: 20px;">
+            <div class="media profile-media" style="margin-right:10px">
+                <img src="~/assets/images/homepage/user_profile.png" alt="User Profile"
+                    style="border-radius: 50%; width: 40px; height: 40px;margin-right:10px">
+                <div class="media-body">
+                    <span style="color:#ffffff">Superadmin</span>
+                    <p class="mb-0 font-roboto" style="color:#ffffff">Superadmin <i class="middle fa fa-angle-down"></i>
+                    </p>
+                </div>
+            </div>
+            <ul class="profile-dropdown onhover-show-div">
+                <li><a href="#"><i data-feather="user"></i><span>Account</span></a></li>
+                <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
+                <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
+                <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
+                <li><a asp-controller="Authentication" asp-action="LoginSimple"><i data-feather="log-in"></i><span>Log
+                            out</span></a></li>
+            </ul>
+        </div>
+        <img src="~/assets/images/homepage/logo.png" alt="Logo" style="max-height: 80px; margin-top:-20px">
+        <h3>INTEGRATED ORGANIZATION MANAGEMENT SYSTEM</h3>
+    </div>
+    <div class="content-card">
+        <div class="row card-container">
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="~/assets/images/homepage/org_structure.svg" alt="Organization Structure" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="~/assets/images/homepage/rasci_matrix.svg" alt="RASCI Matrix" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="~/assets/images/homepage/competency.svg" alt="Competency" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="~/assets/images/homepage/lead_indicator.svg" alt="Lead Indicator" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="card">
+                    <div class="card-body">
+                        <img src="~/assets/images/homepage/job_description.svg" alt="Job Description" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="button-group">
+                    <button class="btn btn-outline-primary" style="margin-right:10px;width:180px">
+                        <i class="icon-server" style="margin-right:5px;margin-top:-3px"></i>
+                        <span>Master</span>
+                        Data</button>
+                    <button class="btn btn-outline-primary " style="padding:15px;margin-left:10px;width:180px">
+                        <i data-feather="users" style="height:17px;padding-top:1px"></i><span>User
+                            Management</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="footer-content">
+                    <p>Copyright © 2024 PT Pertamina Patra Niaga</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace()
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileNav = document.querySelector('.profile-nav');
+            const dropdown = profileNav.querySelector('.profile-dropdown');
+
+            profileNav.addEventListener('click', function () {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!profileNav.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
