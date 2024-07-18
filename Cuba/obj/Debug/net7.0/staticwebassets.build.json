@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "49I7jafqkG0w+tpZb9c/pp4yCb9xYAeNzDoiblE4xhM=",
+  "Hash": "5p1M/G6sFMLPEqtR6knipJadldUbOogwQ5XYO9Wx5gU=",
   "Source": "Cuba",
   "BasePath": "_content/Cuba",
   "Mode": "Default",
@@ -17457,6 +17457,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\assets\\images\\favicon.png"
+    },
+    {
+      "Identity": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\images\\favicon.svg",
+      "SourceId": "Cuba",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\",
+      "BasePath": "_content/Cuba",
+      "RelativePath": "assets/images/favicon.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\assets\\images\\favicon.svg"
     },
     {
       "Identity": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\images\\giftools.gif",

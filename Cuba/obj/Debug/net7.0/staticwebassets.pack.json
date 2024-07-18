@@ -3669,6 +3669,10 @@
       "PackagePath": "staticwebassets\\assets\\images\\favicon.png"
     },
     {
+      "Id": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\images\\favicon.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\favicon.svg"
+    },
+    {
       "Id": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\images\\giftools.gif",
       "PackagePath": "staticwebassets\\assets\\images\\giftools.gif"
     },

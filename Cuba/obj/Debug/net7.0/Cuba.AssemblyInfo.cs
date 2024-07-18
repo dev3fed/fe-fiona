@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Cuba")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c05ac5412bb6b0cca919f16c523835e91fa570e1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+24cb04d1eedec244bc950c9765f641a017d4ccfb")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cuba")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cuba")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

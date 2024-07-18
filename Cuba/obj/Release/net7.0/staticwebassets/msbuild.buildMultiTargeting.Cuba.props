@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Cuba.props" />
-</Project>
