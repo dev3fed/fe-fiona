@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "cZNAMkcHaJtnqKWf3VMUg024+ks4WdHu1XYOM9Uruxc=",
+  "Hash": "49I7jafqkG0w+tpZb9c/pp4yCb9xYAeNzDoiblE4xhM=",
   "Source": "Cuba",
   "BasePath": "_content/Cuba",
   "Mode": "Default",
@@ -22359,6 +22359,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\assets\\images\\logo\\logo-icon.svg"
+    },
+    {
+      "Identity": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\images\\logo\\logo-icon1.svg",
+      "SourceId": "Cuba",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\",
+      "BasePath": "_content/Cuba",
+      "RelativePath": "assets/images/logo/logo-icon1.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\assets\\images\\logo\\logo-icon1.svg"
     },
     {
       "Identity": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\images\\logo\\logo-icon2.svg",

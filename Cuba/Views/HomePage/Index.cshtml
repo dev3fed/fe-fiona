@@ -13,8 +13,8 @@
     <meta name="keywords"
         content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="pixelstrap">
-    <link rel="icon" href="~/assets/images/favicon.png" type="image/x-icon">
-    <link rel="shortcut icon" href="~/assets/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="~/assets/images/favicon.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="~/assets/images/favicon.svg" type="image/x-icon">
     <title>RASCI APP</title>
     <!-- Google font-->
     <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap"
@@ -153,35 +153,40 @@
     <div class="content-card ">
         <div class="row card-container ">
             <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY">
+                <div class="card wow animate__animated animate__flipInY"
+                    onclick="location.href='@Url.Action("Index", "Organization")'">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/org_structure.svg" alt="Organization Structure" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY">
+                <div class="card wow animate__animated animate__flipInY"
+                    onclick="location.href='@Url.Action("Index", "Rasci")'">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/rasci_matrix.svg" alt="RASCI Matrix" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY">
+                <div class="card wow animate__animated animate__flipInY"
+                    onclick="location.href='@Url.Action("Index", "Competency")'">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/competency.svg" alt="Competency" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY">
+                <div class="card wow animate__animated animate__flipInY"
+                    onclick="location.href='@Url.Action("Index", "LeadIndicator")'">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/lead_indicator.svg" alt="Lead Indicator" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY">
+                <div class="card wow animate__animated animate__flipInY"
+                    onclick="location.href='@Url.Action("Index", "JobDescription")'">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/job_description.svg" alt="Job Description" />
                     </div>
