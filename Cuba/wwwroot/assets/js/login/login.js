@@ -5,8 +5,8 @@ $(document).ready(function () {
     var password = $("#password").val();
     state.username = username;
     state.password = password;
-    // onSubmit(username, password);
     window.location.href = "/HomePage/Index";
+    onSubmit(username, password);
     console.log("username", username, password, state);
   });
 });

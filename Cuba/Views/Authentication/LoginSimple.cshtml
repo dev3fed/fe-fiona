@@ -6,10 +6,10 @@
     <div class="col-12 p-0">
         <div class="login-card">
             <div>
-                <div class="login-main">
+                <div class="login-main wow animate__animated animate__zoomIn">
                     <form class="theme-form" id="loginForm">
                         <div><a class="logo"><img class="img-fluid for-light" width="230"
-                                    src="~/assets/images/logo/logo_pertamina.png" alt="looginpage"><img
+                                    src="~/assets/images/logo/logo_pertamina.svg" alt="looginpage"><img
                                     class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png"
                                     alt="looginpage"></a></div>
                         <h5 class="mb-4" style="text-align: center;">Integrated Organization Management System</h5>
@@ -41,7 +41,15 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="../assets/js/login/login.js"></script>
 <script>
+    feather.replace();
+    new WOW().init();
+
     const state = {
         exampleValue: "testing",
         username: null,
@@ -57,7 +65,3 @@
         state.password = password
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="../assets/js/login/login.js"></script>
-<script src="../assets/js/login/fiterProsbis.js"></script>
-<script src="../assets/js/login/fiterJob.js"></script>

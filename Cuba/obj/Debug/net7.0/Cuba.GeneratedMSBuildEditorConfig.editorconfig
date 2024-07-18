@@ -302,6 +302,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29taW5nU29vblxDb21pbmdXaXRoQmdWaWRlby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Competency/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGV0ZW5jeVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Contacts/Contacts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFjdHNcQ29udGFjdHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -598,6 +602,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW50ZXJuYXRpb25hbGl6YXRpb25cSW50ZXJuYXRpb25hbGl6YXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JobDescription/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iRGVzY3JpcHRpb25cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JobSearch/Apply.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iU2VhcmNoXEFwcGx5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -630,6 +638,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcbGFuZGluZ1BhZ2VcbGFuZGluZ1BhZ2VzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/LeadIndicator/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZEluZGljYXRvclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Learning/DetailedCourse.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhcm5pbmdcRGV0YWlsZWRDb3Vyc2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -644,6 +656,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Maps/VectorMaps.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFwc1xWZWN0b3JNYXBzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/MasterData/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyRGF0YVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Organization/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JnYW5pemF0aW9uXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/BoxLayout.cshtml]
@@ -680,6 +700,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Project/projects.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxwcm9qZWN0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Rasci/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmFzY2lcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/SamplePage/SamplePage.cshtml]
@@ -720,6 +744,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_SidePenal.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlUGVuYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_SidePenalBackup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlUGVuYWxCYWNrdXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_SimpleLayout.cshtml]
