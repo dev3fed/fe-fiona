@@ -1,4 +1,5 @@
 /Cuba/obj
 /Cuba/bin
-/Cuba/vs
-/Cuba/config
+/Cuba/.vs
+/Cuba/.config
+
