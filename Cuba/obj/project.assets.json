@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\Cuba.csproj",
+      "projectUniqueName": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\Cuba.csproj",
       "projectName": "Cuba",
-      "projectPath": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\Cuba.csproj",
+      "projectPath": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\Cuba.csproj",
       "packagesPath": "C:\\Users\\habib\\.nuget\\packages\\",
-      "outputPath": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\obj\\",
+      "outputPath": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\habib\\AppData\\Roaming\\NuGet\\NuGet.Config",

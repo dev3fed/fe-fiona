@@ -15,7 +15,7 @@
     <meta name="author" content="pixelstrap">
     <link rel="icon" href="~/assets/images/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="~/assets/images/favicon.png" type="image/x-icon">
-    <title>Integrated Organization Management System</title>
+    <title>RASCI APP</title>
     <!-- Google font-->
     <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap"
         rel="stylesheet">
@@ -39,18 +39,19 @@
     <!-- themify icon css -->
     <link rel="stylesheet" type="text/css" href="~/assets/css/vendors/themify.css">
 
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     </link>
     <style>
         .card {
-            width: 230px;
+            width: 26vh;
             text-align: center;
             cursor: pointer;
         }
 
         .card-container {
             position: absolute;
-            top: 275px;
+            top: 33vh;
             justify-content: space-around;
             z-index: 1;
 
@@ -132,55 +133,55 @@
                 <img src="~/assets/images/homepage/user_profile.png" alt="User Profile"
                     style="border-radius: 50%; width: 40px; height: 40px;margin-right:10px">
                 <div class="media-body">
-                    <span style="color:#ffffff">Superadmin</span>
-                    <p class="mb-0 font-roboto" style="color:#ffffff">Superadmin <i class="middle fa fa-angle-down"></i>
+                    <span style="color:#ffffff;font-weight:bold;font-size:14px">Superadmin</span>
+                    <p class="mb-0 font-roboto" style="color:#ffffff;font-size:12px">Superadmin <i
+                            class="middle fa fa-angle-down"></i>
                     </p>
                 </div>
             </div>
             <ul class="profile-dropdown onhover-show-div">
-                <li><a href="#"><i data-feather="user"></i><span>Account</span></a></li>
-                <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
-                <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
-                <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-                <li><a asp-controller="Authentication" asp-action="LoginSimple"><i data-feather="log-in"></i><span>Log
-                            out</span></a></li>
+                <li><a href="#"><i data-feather="user" width="18" style="margin-right:5px"></i><span>My
+                            Profile</span></a></li>
+                <li><a asp-controller="Authentication" asp-action="LoginSimple">
+                        <i data-feather="log-in" width="18" style="margin-right:5px"></i><span>Logout</span></a>
+                </li>
             </ul>
         </div>
-        <img src="~/assets/images/homepage/logo.png" alt="Logo" style="max-height: 80px; margin-top:-20px">
+        <img src="~/assets/images/homepage/logo.svg" alt="Logo" style="max-height: 80px; margin-top:-20px">
         <h3>INTEGRATED ORGANIZATION MANAGEMENT SYSTEM</h3>
     </div>
-    <div class="content-card">
-        <div class="row card-container">
+    <div class="content-card ">
+        <div class="row card-container ">
             <div class="col-2">
-                <div class="card">
+                <div class="card wow animate__animated animate__flipInY">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/org_structure.svg" alt="Organization Structure" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card">
+                <div class="card wow animate__animated animate__flipInY">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/rasci_matrix.svg" alt="RASCI Matrix" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card">
+                <div class="card wow animate__animated animate__flipInY">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/competency.svg" alt="Competency" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card">
+                <div class="card wow animate__animated animate__flipInY">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/lead_indicator.svg" alt="Lead Indicator" />
                     </div>
                 </div>
             </div>
             <div class="col-2">
-                <div class="card">
+                <div class="card wow animate__animated animate__flipInY">
                     <div class="card-body">
                         <img src="~/assets/images/homepage/job_description.svg" alt="Job Description" />
                     </div>
@@ -190,12 +191,13 @@
         <div class="row">
             <div class="col-12">
                 <div class="button-group">
-                    <button class="btn btn-outline-primary" style="margin-right:10px;width:180px">
+                    <button class="btn btn-outline-primary" style="margin-right:10px;width:200px"
+                        onclick="location.href='@Url.Action("Index", "MasterData")'">
                         <i class="icon-server" style="margin-right:5px;margin-top:-3px"></i>
                         <span>Master</span>
                         Data</button>
-                    <button class="btn btn-outline-primary " style="padding:15px;margin-left:10px;width:180px">
-                        <i data-feather="users" style="height:17px;padding-top:1px"></i><span>User
+                    <button class="btn btn-outline-primary " style="padding:15px;margin-left:10px;width:200px">
+                        <i data-feather="users" style="height:17px;padding-top:1px"></i><span>Access
                             Management</span>
                     </button>
                 </div>
@@ -209,8 +211,11 @@
     </div>
 
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
     <script>
-        feather.replace()
+        feather.replace();
+        new WOW().init();
         document.addEventListener('DOMContentLoaded', function () {
             const profileNav = document.querySelector('.profile-nav');
             const dropdown = profileNav.querySelector('.profile-dropdown');

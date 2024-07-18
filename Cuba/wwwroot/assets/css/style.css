@@ -5794,6 +5794,10 @@ body.modal-open .select2-container--open .select2-dropdown {
   letter-spacing: 0.5px;
   border-radius: 15px;
   box-shadow: 0px 9px 20px rgba(46, 35, 94, 0.07);
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
 }
 
 .card:hover {
@@ -40277,6 +40281,7 @@ button[data-toggle="dropdown"]:hover ~ .dropdown-menu {
   align-items: center;
   padding: 22px 30px;
   position: relative;
+  background:#006ca9;
 }
 
 @media (max-width: 1399px) {

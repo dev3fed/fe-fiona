@@ -1,5 +1,5 @@
 :root {
-  --theme-deafult: #3949ab;
+  --theme-deafult: #006ca9;
   --theme-secondary: #4fc3f7;
   --light-background: rgba(242, 243, 247, 0.7);
   --body-font-color: #2F2F3B;
@@ -27398,6 +27398,7 @@ body[class*=dark-] .for-light {
   align-items: center;
   padding: 22px 30px;
   position: relative;
+  background:#006CA9;
 }
 @media (max-width: 1399px) {
   .page-wrapper .page-header .header-wrapper {
