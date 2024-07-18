@@ -9,827 +9,827 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Cuba
 build_property.RootNamespace = Cuba
-build_property.ProjectDir = D:\project-fed\project-cnt\fe_cnt\Cuba\
+build_property.ProjectDir = D:\OneDrive\Desktop\WORK\CNT\fe-cnt-rasci\Cuba\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 7.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\project-fed\project-cnt\fe_cnt\Cuba
+build_property.MSBuildProjectDirectory = D:\OneDrive\Desktop\WORK\CNT\fe-cnt-rasci\Cuba
 build_property._RazorSourceGeneratorDebug = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Animation/Animate.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Animation/Animate.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5pbWF0aW9uXEFuaW1hdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Animation/AOSAnimation.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Animation/AOSAnimation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5pbWF0aW9uXEFPU0FuaW1hdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Animation/ScrollReveal.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Animation/ScrollReveal.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5pbWF0aW9uXFNjcm9sbFJldmVhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Animation/TiltAnimation.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Animation/TiltAnimation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5pbWF0aW9uXFRpbHRBbmltYXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Animation/WowAnimation.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Animation/WowAnimation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5pbWF0aW9uXFdvd0FuaW1hdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/ForgetPassword.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/ForgetPassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cRm9yZ2V0UGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/LoginSimple.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/LoginSimple.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTG9naW5TaW1wbGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/LoginWithBgImage.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/LoginWithBgImage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTG9naW5XaXRoQmdJbWFnZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/LoginWithImageTwo.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/LoginWithImageTwo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTG9naW5XaXRoSW1hZ2VUd28uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/LoginWithSweetalert.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/LoginWithSweetalert.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTG9naW5XaXRoU3dlZXRhbGVydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/LoginWithTooltip.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/LoginWithTooltip.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTG9naW5XaXRoVG9vbHRpcC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/LoginWithValidation.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/LoginWithValidation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTG9naW5XaXRoVmFsaWRhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/Maintenance.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/Maintenance.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cTWFpbnRlbmFuY2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/RegisterSimple.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/RegisterSimple.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cUmVnaXN0ZXJTaW1wbGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/RegisterWithBgImage.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/RegisterWithBgImage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cUmVnaXN0ZXJXaXRoQmdJbWFnZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/RegisterWithBgImageTwo.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/RegisterWithBgImageTwo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cUmVnaXN0ZXJXaXRoQmdJbWFnZVR3by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/RegisterWizard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/RegisterWizard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cUmVnaXN0ZXJXaXphcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/ResetPassword.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/ResetPassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cUmVzZXRQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Authentication/UnlockUser.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Authentication/UnlockUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aGVudGljYXRpb25cVW5sb2NrVXNlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Blog/AddPost.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Blog/AddPost.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xBZGRQb3N0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Blog/BlogDetails.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Blog/BlogDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xCbG9nRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Blog/BlogSingle.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Blog/BlogSingle.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xCbG9nU2luZ2xlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/AnimatedModal.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/AnimatedModal.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxBbmltYXRlZE1vZGFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/BasicCard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/BasicCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxCYXNpY0NhcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/BootstrapNotify.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/BootstrapNotify.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxCb290c3RyYXBOb3RpZnkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Breadcrumb.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Breadcrumb.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxCcmVhZGNydW1iLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/CreativeCard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/CreativeCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxDcmVhdGl2ZUNhcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/DraggableCard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/DraggableCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxEcmFnZ2FibGVDYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/dropzone.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/dropzone.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxkcm9wem9uZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/ImageCropper.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/ImageCropper.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxJbWFnZUNyb3BwZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/OwlCarousel.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/OwlCarousel.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxPd2xDYXJvdXNlbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Pagination.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Pagination.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxQYWdpbmF0aW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/RangeSlider.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/RangeSlider.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxSYW5nZVNsaWRlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Rating.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Rating.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxSYXRpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Ribbons.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Ribbons.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxSaWJib25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Scrollable.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Scrollable.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxTY3JvbGxhYmxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Sticky.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Sticky.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxTdGlja3kuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/SweetAlert2.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/SweetAlert2.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxTd2VldEFsZXJ0Mi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/TabbedCard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/TabbedCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxUYWJiZWRDYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Timeline1.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Timeline1.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxUaW1lbGluZTEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Timeline2.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Timeline2.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxUaW1lbGluZTIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/Tour.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/Tour.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxUb3VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BonusUi/TreeView.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BonusUi/TreeView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9udXNVaVxUcmVlVmlldy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Bookmark/Bookmark.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Bookmark/Bookmark.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va21hcmtcQm9va21hcmsuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BootstrapTables/BasicTables.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BootstrapTables/BasicTables.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9vdHN0cmFwVGFibGVzXEJhc2ljVGFibGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/BootstrapTables/TableComponents.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/BootstrapTables/TableComponents.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9vdHN0cmFwVGFibGVzXFRhYmxlQ29tcG9uZW50cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Builders/ButtonBuilder.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Builders/ButtonBuilder.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVpbGRlcnNcQnV0dG9uQnVpbGRlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Builders/FormBuilder1.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Builders/FormBuilder1.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVpbGRlcnNcRm9ybUJ1aWxkZXIxLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Builders/FormBuilder2.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Builders/FormBuilder2.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVpbGRlcnNcRm9ybUJ1aWxkZXIyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Builders/PageBuilder.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Builders/PageBuilder.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVpbGRlcnNcUGFnZUJ1aWxkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Buttons/ButtonGroup.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Buttons/ButtonGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV0dG9uc1xCdXR0b25Hcm91cC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Buttons/DefaultStyle.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Buttons/DefaultStyle.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV0dG9uc1xEZWZhdWx0U3R5bGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Buttons/EdgeStyle.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Buttons/EdgeStyle.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV0dG9uc1xFZGdlU3R5bGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Buttons/FlatStyle.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Buttons/FlatStyle.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV0dG9uc1xGbGF0U3R5bGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Buttons/RaisedStyle.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Buttons/RaisedStyle.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnV0dG9uc1xSYWlzZWRTdHlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Calender/Calender.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Calender/Calender.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FsZW5kZXJcQ2FsZW5kZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/ApexChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/ApexChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXEFwZXhDaGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/ChartistChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/ChartistChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXENoYXJ0aXN0Q2hhcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/ChatjsChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/ChatjsChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXENoYXRqc0NoYXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/Echarts.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/Echarts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXEVjaGFydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/FlotChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/FlotChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXEZsb3RDaGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/GoogleChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/GoogleChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXEdvb2dsZUNoYXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/KnobChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/KnobChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXEtub2JDaGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/MorrisChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/MorrisChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXE1vcnJpc0NoYXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/PeityChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/PeityChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXFBlaXR5Q2hhcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Charts/SparklineChart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Charts/SparklineChart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhcnRzXFNwYXJrbGluZUNoYXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Chat/ChatApp.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Chat/ChatApp.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhdFxDaGF0QXBwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Chat/VideoChat.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Chat/VideoChat.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhdFxWaWRlb0NoYXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ComingSoon/ComingSoon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ComingSoon/ComingSoon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29taW5nU29vblxDb21pbmdTb29uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ComingSoon/ComingwithBgImage.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ComingSoon/ComingwithBgImage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29taW5nU29vblxDb21pbmd3aXRoQmdJbWFnZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ComingSoon/ComingWithBgVideo.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ComingSoon/ComingWithBgVideo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29taW5nU29vblxDb21pbmdXaXRoQmdWaWRlby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Contacts/Contacts.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Contacts/Contacts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFjdHNcQ29udGFjdHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Dashboard/Crypto.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Dashboard/Crypto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXENyeXB0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Dashboard/Ecommerce.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Dashboard/Ecommerce.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEVjb21tZXJjZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Dashboard/Index.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Dashboard/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Dashboard/OnlineCourse.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Dashboard/OnlineCourse.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXE9ubGluZUNvdXJzZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Dashboard/Social.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Dashboard/Social.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXFNvY2lhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/DataTable/API.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/DataTable/API.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGF0YVRhYmxlXEFQSS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/DataTable/BasicInit.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/DataTable/BasicInit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGF0YVRhYmxlXEJhc2ljSW5pdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/DataTable/DataSource.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/DataTable/DataSource.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGF0YVRhYmxlXERhdGFTb3VyY2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/Cart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/Cart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXENhcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/Checkout.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/Checkout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXENoZWNrb3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/InvoiceTemplete.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/InvoiceTemplete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXEludm9pY2VUZW1wbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/OrderHistory.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/OrderHistory.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXE9yZGVySGlzdG9yeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/PaymentDetails.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/PaymentDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXFBheW1lbnREZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/Pricing.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/Pricing.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXFByaWNpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/product.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/product.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXHByb2R1Y3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/ProductList.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/ProductList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXFByb2R1Y3RMaXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/ProductPage.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/ProductPage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXFByb2R1Y3RQYWdlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Ecommerce/WishList.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Ecommerce/WishList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWNvbW1lcmNlXFdpc2hMaXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Editor/ACECodeEditor.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Editor/ACECodeEditor.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWRpdG9yXEFDRUNvZGVFZGl0b3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Editor/CkEditor.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Editor/CkEditor.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWRpdG9yXENrRWRpdG9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Editor/MDEEditor.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Editor/MDEEditor.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWRpdG9yXE1ERUVkaXRvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Editor/SummerNote.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Editor/SummerNote.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRWRpdG9yXFN1bW1lck5vdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/EmailTemplates/BasicEmail.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/EmailTemplates/BasicEmail.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxUZW1wbGF0ZXNcQmFzaWNFbWFpbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/EmailTemplates/BasicWithHeader.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/EmailTemplates/BasicWithHeader.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxUZW1wbGF0ZXNcQmFzaWNXaXRoSGVhZGVyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/EmailTemplates/EcomerceTemplate.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/EmailTemplates/EcomerceTemplate.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxUZW1wbGF0ZXNcRWNvbWVyY2VUZW1wbGF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/EmailTemplates/EcommerceEmail.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/EmailTemplates/EcommerceEmail.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxUZW1wbGF0ZXNcRWNvbW1lcmNlRW1haWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/EmailTemplates/EmailTemplate2.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/EmailTemplates/EmailTemplate2.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxUZW1wbGF0ZXNcRW1haWxUZW1wbGF0ZTIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/EmailTemplates/OrderSuccess.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/EmailTemplates/OrderSuccess.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxUZW1wbGF0ZXNcT3JkZXJTdWNjZXNzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Email/EmailApp.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Email/EmailApp.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxcRW1haWxBcHAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Email/EmailCompose.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Email/EmailCompose.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxcRW1haWxDb21wb3NlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ErrorPage/ErrorPage400.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ErrorPage/ErrorPage400.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JQYWdlXEVycm9yUGFnZTQwMC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ErrorPage/ErrorPage401.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ErrorPage/ErrorPage401.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JQYWdlXEVycm9yUGFnZTQwMS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ErrorPage/ErrorPage403.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ErrorPage/ErrorPage403.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JQYWdlXEVycm9yUGFnZTQwMy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ErrorPage/ErrorPage404.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ErrorPage/ErrorPage404.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JQYWdlXEVycm9yUGFnZTQwNC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ErrorPage/ErrorPage500.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ErrorPage/ErrorPage500.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JQYWdlXEVycm9yUGFnZTUwMC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ErrorPage/ErrorPage503.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ErrorPage/ErrorPage503.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3JQYWdlXEVycm9yUGFnZTUwMy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ExDataTable/AutoFill.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ExDataTable/AutoFill.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXhEYXRhVGFibGVcQXV0b0ZpbGwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FAQ/FAQ.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FAQ/FAQ.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRkFRXEZBUS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FileManager/FileManager.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FileManager/FileManager.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmlsZU1hbmFnZXJcRmlsZU1hbmFnZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormLayout/DefaultForm.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormLayout/DefaultForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybUxheW91dFxEZWZhdWx0Rm9ybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormLayout/FormWizard1.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormLayout/FormWizard1.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybUxheW91dFxGb3JtV2l6YXJkMS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormLayout/FormWizard2.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormLayout/FormWizard2.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybUxheW91dFxGb3JtV2l6YXJkMi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormLayout/FormWizard3.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormLayout/FormWizard3.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybUxheW91dFxGb3JtV2l6YXJkMy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/Clipboard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/Clipboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcQ2xpcGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/DatePicker.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/DatePicker.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcRGF0ZVBpY2tlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/DaterangePicker.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/DaterangePicker.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcRGF0ZXJhbmdlUGlja2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/DateTimePicker.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/DateTimePicker.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcRGF0ZVRpbWVQaWNrZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/Select2.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/Select2.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcU2VsZWN0Mi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/Switch.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/Switch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcU3dpdGNoLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/TimePicker.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/TimePicker.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcVGltZVBpY2tlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/Touchspin.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/Touchspin.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcVG91Y2hzcGluLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/FormWidgets/Typehead.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/FormWidgets/Typehead.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVdpZGdldHNcVHlwZWhlYWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Form/BaseInput.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Form/BaseInput.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVxCYXNlSW5wdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Form/CheckboxAndRadio.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Form/CheckboxAndRadio.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVxDaGVja2JveEFuZFJhZGlvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Form/FormValidation.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Form/FormValidation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVxGb3JtVmFsaWRhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Form/InputGroups.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Form/InputGroups.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVxJbnB1dEdyb3Vwcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Form/MegaOptions.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Form/MegaOptions.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRm9ybVxNZWdhT3B0aW9ucy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Gallery/GalleryGrid.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Gallery/GalleryGrid.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FsbGVyeVxHYWxsZXJ5R3JpZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Gallery/GalleryGridDesc.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Gallery/GalleryGridDesc.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FsbGVyeVxHYWxsZXJ5R3JpZERlc2MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Gallery/HoverEffects.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Gallery/HoverEffects.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FsbGVyeVxIb3ZlckVmZmVjdHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Gallery/MasonryGallery.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Gallery/MasonryGallery.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FsbGVyeVxNYXNvbnJ5R2FsbGVyeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Gallery/MasonryWithDesc.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Gallery/MasonryWithDesc.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FsbGVyeVxNYXNvbnJ5V2l0aERlc2MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/HomePage/Index.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/HomePage/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVBhZ2VcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/HomePage/IndexBackup.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/HomePage/IndexBackup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVBhZ2VcSW5kZXhCYWNrdXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Home/Index.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Home/Privacy.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Icons/FeatherIcon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Icons/FeatherIcon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSWNvbnNcRmVhdGhlckljb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Icons/FlagIcon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Icons/FlagIcon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSWNvbnNcRmxhZ0ljb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Icons/FontawesomeIcon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Icons/FontawesomeIcon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSWNvbnNcRm9udGF3ZXNvbWVJY29uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Icons/IcoIcon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Icons/IcoIcon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSWNvbnNcSWNvSWNvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Icons/ThimifyIcon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Icons/ThimifyIcon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSWNvbnNcVGhpbWlmeUljb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Icons/WhetherIcon.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Icons/WhetherIcon.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSWNvbnNcV2hldGhlckljb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Internationalization/Internationalization.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Internationalization/Internationalization.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW50ZXJuYXRpb25hbGl6YXRpb25cSW50ZXJuYXRpb25hbGl6YXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/JobSearch/Apply.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JobSearch/Apply.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iU2VhcmNoXEFwcGx5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/JobSearch/CardsView.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JobSearch/CardsView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iU2VhcmNoXENhcmRzVmlldy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/JobSearch/JobDetails.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JobSearch/JobDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iU2VhcmNoXEpvYkRldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/JobSearch/ListView.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JobSearch/ListView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSm9iU2VhcmNoXExpc3RWaWV3LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/JsGridTable/JsGridTable.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/JsGridTable/JsGridTable.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSnNHcmlkVGFibGVcSnNHcmlkVGFibGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/KanbanBoard/KanbanBoard.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/KanbanBoard/KanbanBoard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2FuYmFuQm9hcmRcS2FuYmFuQm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Knowledge/Knowledgebase.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Knowledge/Knowledgebase.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS25vd2xlZGdlXEtub3dsZWRnZWJhc2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/landingPage/landingPages.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/landingPage/landingPages.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcbGFuZGluZ1BhZ2VcbGFuZGluZ1BhZ2VzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Learning/DetailedCourse.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Learning/DetailedCourse.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhcm5pbmdcRGV0YWlsZWRDb3Vyc2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Learning/LearningList.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Learning/LearningList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhcm5pbmdcTGVhcm5pbmdMaXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Maps/MapJS.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Maps/MapJS.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFwc1xNYXBKUy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Maps/VectorMaps.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Maps/VectorMaps.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFwc1xWZWN0b3JNYXBzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/BoxLayout.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/BoxLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcQm94TGF5b3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/Dark.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/Dark.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcRGFyay5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/FooterDark.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/FooterDark.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcRm9vdGVyRGFyay5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/FooterFixed.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/FooterFixed.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcRm9vdGVyRml4ZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/FooterLight.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/FooterLight.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcRm9vdGVyTGlnaHQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/HideNav.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/HideNav.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcSGlkZU5hdi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Page_Layout/RTL.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Page_Layout/RTL.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZV9MYXlvdXRcUlRMLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Project/ProjectCreate.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Project/ProjectCreate.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxQcm9qZWN0Q3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Project/projects.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Project/projects.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvamVjdFxwcm9qZWN0cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/SamplePage/SamplePage.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/SamplePage/SamplePage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2FtcGxlUGFnZVxTYW1wbGVQYWdlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Search/Search.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Search/Search.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VhcmNoXFNlYXJjaC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/FixFooter.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/FixFooter.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEZpeEZvb3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/IconMarkup.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/IconMarkup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25NYXJrdXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_Footer.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_Footer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Gb290ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_FooterDark.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_FooterDark.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Gb290ZXJEYXJrLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_Header.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_Header.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9IZWFkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_Loader.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_Loader.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2FkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_Script.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_Script.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TY3JpcHQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_SidePenal.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_SidePenal.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlUGVuYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_SimpleLayout.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_SimpleLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaW1wbGVMYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_Style.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_Style.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TdHlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/SocialApp/SocialApp.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/SocialApp/SocialApp.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU29jaWFsQXBwXFNvY2lhbEFwcC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/SupportTicket/SupportTicket.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/SupportTicket/SupportTicket.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VwcG9ydFRpY2tldFxTdXBwb3J0VGlja2V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Task/Task.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Task/Task.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xUYXNrLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/ToDo/ToDo.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/ToDo/ToDo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVG9Eb1xUb0RvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Accordion.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Accordion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXEFjY29yZGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Alert.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Alert.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXEFsZXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Avatars.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Avatars.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXEF2YXRhcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/BootstrapTabs.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/BootstrapTabs.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXEJvb3RzdHJhcFRhYnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Dropdown.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Dropdown.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXERyb3Bkb3duLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Grid.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Grid.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXEdyaWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/HelperClasses.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/HelperClasses.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXEhlbHBlckNsYXNzZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Lists.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Lists.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXExpc3RzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Modal.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Modal.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXE1vZGFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Popover.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Popover.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXFBvcG92ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Progress.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Progress.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXFByb2dyZXNzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/TagAndPills.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/TagAndPills.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXFRhZ0FuZFBpbGxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Tooltip.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Tooltip.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXFRvb2x0aXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/UIKits/Typography.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/UIKits/Typography.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVUlLaXRzXFR5cG9ncmFwaHkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/User/UserCards.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/User/UserCards.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxVc2VyQ2FyZHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/User/UserEdit.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/User/UserEdit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxVc2VyRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/User/UserProfile.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/User/UserProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxVc2VyUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Widgets/Chart_widget.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Widgets/Chart_widget.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV2lkZ2V0c1xDaGFydF93aWRnZXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Widgets/Index.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Widgets/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV2lkZ2V0c1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/_ViewImports.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/_ViewStart.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/project-fed/project-cnt/fe_cnt/Cuba/Views/Shared/_Layout.cshtml]
+[D:/OneDrive/Desktop/WORK/CNT/fe-cnt-rasci/Cuba/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-2x3v2csmt6
