@@ -1,0 +1,272 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-width {
+        max-width: 95%;
+        margin: 30px auto;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-outline-light .icon-arrow-left {
+        font-size: 12px;
+        margin-right: 8px;
+    }
+
+    .reset-label {
+        color: #D02138;
+        cursor: pointer;
+    }
+
+    .custom-card {
+        height: 300px;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px
+    }
+
+    .scrollable {
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    /* Custom scrollbar styles */
+    .scrollable::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .scrollable::-webkit-scrollbar-track {
+    @*box-shadow:inset005pxgrey;*@border-radius: 10px;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb {
+        background: #DEDEE0;
+        border-radius: 10px;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb:hover {
+        background: #DEDEE0;
+    }
+</style>
+
+<!-- Modal Definition (from RasciFilter.cshtml) -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog custom-width bounceInDown  animated" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Rasci Matrix Filter</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center">
+                                <label class="switch m-0">
+                                    <input type="checkbox" checked=""><span class="switch-state"></span>
+                                </label>
+                                <label class="col-form-label mb-0"
+                                    style="margin-top: -4px; margin-left: 5px;">All</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0"
+                                        style="margin-top: -4px; margin-left: 5px;">Director</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">Vice
+                                        President</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0"
+                                        style="margin-top: -4px; margin-left: 5px;">Manager</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0"
+                                        style="margin-top: -4px; margin-left: 5px;">Assistant
+                                        Manager</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0"
+                                        style="margin-top: -4px; margin-left: 5px;">Analyst</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">Jr.
+                                        Analyst</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <div class="custom-card">
+                            <input class="form-control" type="text" placeholder="Search">
+                            <div class="animate-chk mt-3 scrollable">
+                                <label class="d-block" for="chk-ani">
+                                    <input class="checkbox_animated" id="chk-ani" type="checkbox" checked="">
+                                    Option 1
+                                </label>
+                                <label class="d-block" for="chk-ani1">
+                                    <input class="checkbox_animated" id="chk-ani1" type="checkbox"> Option 2
+                                </label>
+                                <label class="d-block" for="chk-ani2">
+                                    <input class="checkbox_animated" id="chk-ani2" type="checkbox" checked="">
+                                    Option 3
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 4
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 5
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 6
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 7
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 8
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 9
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 10
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 11
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 12
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 13
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 14
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 15
+                                </label>
+                                <label class="d-block" for="chk-ani3">
+                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 16
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="custom-card">
+                            <!-- Card content goes here -->
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="custom-card">
+                            <!-- Card content goes here -->
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="custom-card">
+                            <!-- Card content goes here -->
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="custom-card">
+                            <!-- Card content goes here -->
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="custom-card">
+                            <!-- Card content goes here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Left aligned button -->
+                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                    <i class="icon-arrow-left"></i> Back
+                </button>
+                <!-- Right aligned buttons -->
+                <div>
+                    <button class="btn btn-outline-primary" type="button"><i class="icon-close"
+                            style="font-size: 12px; margin-right: 8px;"></i> Reset Filter</button>
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
+                        <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon" style="margin-right: 8px;">
+                        Apply Filter Rasci
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,6 +2,34 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .btn-icon {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+    }
+
+    .btn-icon img {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+    }
+
+    .custom-border-table {
+        border-left: 1px solid #B0D1E4;
+        border-right: 1px solid #B0D1E4;
+        border-bottom: 1px solid #B0D1E4;
+        border-collapse: collapse;
+    }
+
+    .custom-border-table th,
+    .custom-border-table td {
+        border-top: 1px solid #B0D1E4;
+        border-left: 1px solid #B0D1E4;
+        border-right: 1px solid #B0D1E4;
+        border-bottom: 1px solid #B0D1E4;
+    }
+</style>
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -27,14 +55,143 @@
     <!-- Container-fluid starts-->
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-12">
                 <div class="card" style="border-radius:8px">
                     <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                        <div class="row">
+                            <div class="col-12">
+                                <partial name="RasciFilter" />
+                            </div>
+                            <div class="col-5">
+                                <div class="btn-group w-100" role="group" style="margin-top: -2px;"
+                                    aria-label="Button group with nested dropdown">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-light dropdown-toggle" id="btnGroupDrop1" type="button"
+                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">RASCI
+                                            by Job</button>
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                            <a class="dropdown-item" href="#">RASCI by Job</a>
+                                            <a class="dropdown-item" href="#">RASCI by Business Process</a>
+                                            <a class="dropdown-item" href="#">Business Process</a>
+                                        </div>
+                                    </div>
+                                    <input class="form-control" type="text" placeholder="Search"
+                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                </div>
+                            </div>
+                            <div class="col-3" style="padding-left: 0;">
+                                <button class="btn btn-primary" type="button" data-bs-toggle="tooltip"
+                                    title="btn btn-primary">Search</button>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="tooltip"
+                                    title="btn btn-outline-primary">Clear</button>
+                            </div>
+                            <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
+                                <button class="btn btn-primary me-2 btn-icon" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal" data-bs-toggle="tooltip" title="Filter">
+                                    <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
+                                    Filter
+                                </button>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
+                                        id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false"><img
+                                            src="~/assets/images/rasci/plus.svg" alt="Filter Icon"
+                                            style="margin-top: -1px;">Add</button>
+                                    <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1"><a
+                                            class="dropdown-item" href="#">Dropdown link</a><a class="dropdown-item"
+                                            href="#">Dropdown link</a></div>
+                                </div>
+                                <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="tooltip"
+                                    title="btn btn-primary"> <img src="~/assets/images/rasci/vector.svg"
+                                        alt="Filter Icon" style="margin-top: -5px;">Export</button>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="table-responsive">
+                                    <table class="table table-hover custom-border-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="text-align: center;">Id</th>
+                                                <th scope="col">Signal Name</th>
+                                                <th scope="col"
+                                                    style="border-top:5px solid red; position: relative; padding-right: 30px;">
+                                                    Security
+                                                    <button
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
+                                                    </button>
+                                                </th>
+                                                <th scope="col"
+                                                    style="border-top:5px solid yellow; position: relative; padding-right: 30px;">
+                                                    Stage
+                                                    <button
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
+                                                    </button>
+                                                </th>
+                                                <th scope="col"
+                                                    style="border-top:5px solid blue; position: relative; padding-right: 30px;">
+                                                    Schedule
+                                                    <button
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
+                                                    </button>
+                                                </th>
+                                                <th scope="col"
+                                                    style="border-top:5px solid green; position: relative; padding-right: 30px;">
+                                                    Team Lead
+                                                    <button
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
+                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row" style="text-align: center;">1</th>
+                                                <td>Astrid: NE Shared managed</td>
+                                                <td>Medium</td>
+                                                <td>Triaged</td>
+                                                <td>0.33</td>
+                                                <td>Chase Nguyen</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" style="text-align: center;">2</th>
+                                                <td>Astrid: NE Shared managed</td>
+                                                <td>Huge</td>
+                                                <td>Triaged</td>
+                                                <td>0.39</td>
+                                                <td>Brie Furman</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" style="text-align: center;">3</th>
+                                                <td>Phoenix: prod shared lyra-lists</td>
+                                                <td>Minor</td>
+                                                <td>No Triaged</td>
+                                                <td>3.12</td>
+                                                <td>Jeremy Lake</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" style="text-align: center;">4</th>
+                                                <td>Phoenix: prod shared lyra-lists</td>
+                                                <td>Negligible</td>
+                                                <td>Triaged</td>
+                                                <td>13.18</td>
+                                                <td>Angelica Howards</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" style="text-align: center;">5</th>
+                                                <td>Phoenix: prod shared lyra-lists</td>
+                                                <td>Medium</td>
+                                                <td>No Triaged</td>
+                                                <td>5.33</td>
+                                                <td>Diane Okuma</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,6 +199,8 @@
     </div>
     <!-- Container-fluid Ends-->
 </div>
+
+
 @section Script {
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
