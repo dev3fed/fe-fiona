@@ -1,14 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\project-fed\\project-cnt\\fe_cnt\\",
+  "WorkspaceRootPath": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|d:\\project-fed\\project-cnt\\fe_cnt\\cuba\\wwwroot\\assets\\js\\login\\login.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|solutionrelative:cuba\\wwwroot\\assets\\js\\login\\login.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+      "AbsoluteMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|d:\\project-fed\\project-cnt\\fe-cnt-rasci\\cuba\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|solutionrelative:cuba\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|d:\\project-fed\\project-cnt\\fe_cnt\\cuba\\views\\authentication\\loginsimple.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|d:\\project-fed\\project-cnt\\fe-cnt-rasci\\cuba\\views\\authentication\\loginsimple.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|solutionrelative:cuba\\views\\authentication\\loginsimple.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|d:\\project-fed\\project-cnt\\fe-cnt-rasci\\cuba\\wwwroot\\assets\\js\\login\\login.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{DF04733B-9755-4C70-A3C9-5B67CFB8FFBD}|Cuba\\Cuba.csproj|solutionrelative:cuba\\wwwroot\\assets\\js\\login\\login.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,12 +27,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\Program.cs",
+              "RelativeDocumentMoniker": "Cuba\\Program.cs",
+              "ToolTip": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\Program.cs",
+              "RelativeToolTip": "Cuba\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-30T03:47:59.392Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "login.js",
-              "DocumentMoniker": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\wwwroot\\assets\\js\\login\\login.js",
+              "DocumentMoniker": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\js\\login\\login.js",
               "RelativeDocumentMoniker": "Cuba\\wwwroot\\assets\\js\\login\\login.js",
-              "ToolTip": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\wwwroot\\assets\\js\\login\\login.js",
+              "ToolTip": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\wwwroot\\assets\\js\\login\\login.js",
               "RelativeToolTip": "Cuba\\wwwroot\\assets\\js\\login\\login.js",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAA+wAkAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2024-07-15T02:12:21.689Z",
               "EditorCaption": ""
@@ -37,13 +54,14 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "LoginSimple.cshtml",
-              "DocumentMoniker": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\Views\\Authentication\\LoginSimple.cshtml",
+              "DocumentMoniker": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\Views\\Authentication\\LoginSimple.cshtml",
               "RelativeDocumentMoniker": "Cuba\\Views\\Authentication\\LoginSimple.cshtml",
-              "ToolTip": "D:\\project-fed\\project-cnt\\fe_cnt\\Cuba\\Views\\Authentication\\LoginSimple.cshtml",
+              "ToolTip": "D:\\project-fed\\project-cnt\\fe-cnt-rasci\\Cuba\\Views\\Authentication\\LoginSimple.cshtml",
               "RelativeToolTip": "Cuba\\Views\\Authentication\\LoginSimple.cshtml",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAABUAAABbAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAIBZwBUAAAAeAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-07-12T10:28:11.283Z"
+              "WhenOpened": "2024-07-12T10:28:11.283Z",
+              "EditorCaption": ""
             }
           ]
         }

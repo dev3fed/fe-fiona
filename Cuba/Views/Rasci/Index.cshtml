@@ -2,34 +2,7 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<style>
-    .btn-icon {
-        display: flex;
-        align-items: center;
-        padding: 8px 16px;
-    }
-
-    .btn-icon img {
-        width: 20px;
-        height: 20px;
-        margin-right: 8px;
-    }
-
-    .custom-border-table {
-        border-left: 1px solid #B0D1E4;
-        border-right: 1px solid #B0D1E4;
-        border-bottom: 1px solid #B0D1E4;
-        border-collapse: collapse;
-    }
-
-    .custom-border-table th,
-    .custom-border-table td {
-        border-top: 1px solid #B0D1E4;
-        border-left: 1px solid #B0D1E4;
-        border-right: 1px solid #B0D1E4;
-        border-bottom: 1px solid #B0D1E4;
-    }
-</style>
+<link rel="stylesheet" type="text/css" href="~/assets/css/rasci-matrix.css">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -60,7 +33,21 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
+                                <!-- Starts Modal Filter-->
                                 <partial name="RasciFilter" />
+                                <!-- Ends Modal Filter-->
+
+                                <!-- Start Modal Search -->
+                                <partial name="ModalSearch" />
+                                <!-- End Modal Search -->
+
+                                <!-- Start Modal Add Business Process -->
+                                <partial name="ModalAddBp" />
+                                <!-- End Modal Add Business Process -->
+
+                                <!-- Start Modal business Process -->
+                                <partial name="ModalBusinessProcess" />
+                                <!-- End Modal business Process -->
                             </div>
                             <div class="col-5">
                                 <div class="btn-group w-100" role="group" style="margin-top: -2px;"
@@ -70,24 +57,27 @@
                                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">RASCI
                                             by Job</button>
                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                            <a class="dropdown-item" href="#">RASCI by Job</a>
-                                            <a class="dropdown-item" href="#">RASCI by Business Process</a>
-                                            <a class="dropdown-item" href="#">Business Process</a>
+                                            <a class="dropdown-item" onclick="setSelectedText('RASCI by Job')">RASCI by
+                                                Job</a>
+                                            <a class="dropdown-item" onclick="setSelectedText('RASCI by Bus...')">RASCI
+                                                by Business
+                                                Process</a>
+                                            <a class="dropdown-item"
+                                                onclick="setSelectedText('Business Pro...')">Business Process</a>
                                         </div>
                                     </div>
-                                    <input class="form-control" type="text" placeholder="Search"
+                                    <input class="form-control" type="text" placeholder="Search" id="inputText"
                                         style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                 </div>
                             </div>
                             <div class="col-3" style="padding-left: 0;">
-                                <button class="btn btn-primary" type="button" data-bs-toggle="tooltip"
-                                    title="btn btn-primary">Search</button>
-                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="tooltip"
-                                    title="btn btn-outline-primary">Clear</button>
+                                <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                                <button class="btn btn-outline-primary" type="button" id="clearButton"
+                                    onclick="clearInput()">Clear</button>
                             </div>
                             <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
                                 <button class="btn btn-primary me-2 btn-icon" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal" data-bs-toggle="tooltip" title="Filter">
+                                    data-bs-target="#exampleModal">
                                     <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
                                     Filter
                                 </button>
@@ -97,98 +87,31 @@
                                         aria-haspopup="true" aria-expanded="false"><img
                                             src="~/assets/images/rasci/plus.svg" alt="Filter Icon"
                                             style="margin-top: -1px;">Add</button>
-                                    <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1"><a
-                                            class="dropdown-item" href="#">Dropdown link</a><a class="dropdown-item"
-                                            href="#">Dropdown link</a></div>
+                                    <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
+                                        <a class="dropdown-item" onclick="onModalAddBp()">
+                                            <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon"
+                                                style="margin-top: -1px;">Add Business Process
+                                        </a>
+                                        <a class="dropdown-item">
+                                            <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon"
+                                                style="margin-top: -1px;">Add RASCI Notation
+                                        </a>
+                                    </div>
                                 </div>
-                                <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="tooltip"
-                                    title="btn btn-primary"> <img src="~/assets/images/rasci/vector.svg"
-                                        alt="Filter Icon" style="margin-top: -5px;">Export</button>
+                                <button class="btn btn-primary btn-icon" type="button"> <img
+                                        src="~/assets/images/rasci/vector.svg" alt="Filter Icon"
+                                        style="margin-top: -5px;">Export</button>
                             </div>
                             <div class="col-12 mt-3">
-                                <div class="table-responsive">
-                                    <table class="table table-hover custom-border-table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" style="text-align: center;">Id</th>
-                                                <th scope="col">Signal Name</th>
-                                                <th scope="col"
-                                                    style="border-top:5px solid red; position: relative; padding-right: 30px;">
-                                                    Security
-                                                    <button
-                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
-                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
-                                                    </button>
-                                                </th>
-                                                <th scope="col"
-                                                    style="border-top:5px solid yellow; position: relative; padding-right: 30px;">
-                                                    Stage
-                                                    <button
-                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
-                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
-                                                    </button>
-                                                </th>
-                                                <th scope="col"
-                                                    style="border-top:5px solid blue; position: relative; padding-right: 30px;">
-                                                    Schedule
-                                                    <button
-                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
-                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
-                                                    </button>
-                                                </th>
-                                                <th scope="col"
-                                                    style="border-top:5px solid green; position: relative; padding-right: 30px;">
-                                                    Team Lead
-                                                    <button
-                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer;">
-                                                        <i class="fas fa-ellipsis-v" style="font-size: 16px;"></i>
-                                                    </button>
-                                                </th>
-                                            </tr>
+                                <div class=" scrollable-table table-wrapper" style=" max-height: 500px;">
+                                    <!-- begin :: List RASCI Matrix Table -->
+                                    <table class="table  custom-border-table rasci-matrix" style="table-layout: fixed;">
+                                        <thead id="table-header">
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <th scope="row" style="text-align: center;">1</th>
-                                                <td>Astrid: NE Shared managed</td>
-                                                <td>Medium</td>
-                                                <td>Triaged</td>
-                                                <td>0.33</td>
-                                                <td>Chase Nguyen</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="text-align: center;">2</th>
-                                                <td>Astrid: NE Shared managed</td>
-                                                <td>Huge</td>
-                                                <td>Triaged</td>
-                                                <td>0.39</td>
-                                                <td>Brie Furman</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="text-align: center;">3</th>
-                                                <td>Phoenix: prod shared lyra-lists</td>
-                                                <td>Minor</td>
-                                                <td>No Triaged</td>
-                                                <td>3.12</td>
-                                                <td>Jeremy Lake</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="text-align: center;">4</th>
-                                                <td>Phoenix: prod shared lyra-lists</td>
-                                                <td>Negligible</td>
-                                                <td>Triaged</td>
-                                                <td>13.18</td>
-                                                <td>Angelica Howards</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" style="text-align: center;">5</th>
-                                                <td>Phoenix: prod shared lyra-lists</td>
-                                                <td>Medium</td>
-                                                <td>No Triaged</td>
-                                                <td>5.33</td>
-                                                <td>Diane Okuma</td>
-                                            </tr>
+                                        <tbody id="table-body" class="clusterize-content rasci-matrix-body">
                                         </tbody>
                                     </table>
+                                    <!-- end :: List RASCI Matrix Table -->
                                 </div>
                             </div>
                         </div>
@@ -200,8 +123,17 @@
     <!-- Container-fluid Ends-->
 </div>
 
-
 @section Script {
+    <script>
+        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+        }
+        function onModalAddBp() {
+            const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
+            modal.show();
+        }
+    </script>
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
@@ -210,4 +142,7 @@
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/rasci-matrix/store.js"></script>
+    <script src="../assets/js/rasci-matrix/index.js"></script>
+    <script src="../assets/js/rasci-matrix/table-list.js"></script>
 }

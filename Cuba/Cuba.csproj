@@ -1806,4 +1806,8 @@
     <None Include="wwwroot\assets\svg\landing-icons.svg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="3.0.0" />
+  </ItemGroup>
+
 </Project>

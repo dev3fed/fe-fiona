@@ -31,19 +31,28 @@
         margin-top: 10px
     }
 
+    .custom-card-Bottom {
+        height: 45px;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px
+    }
+
     .scrollable {
-        max-height: 200px;
+        max-height: 220px;
         overflow-y: auto;
         padding-right: 10px;
     }
 
-    /* Custom scrollbar styles */
     .scrollable::-webkit-scrollbar {
         width: 10px;
+        height: 8px;
     }
 
     .scrollable::-webkit-scrollbar-track {
-    @*box-shadow:inset005pxgrey;*@border-radius: 10px;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
     }
 
     .scrollable::-webkit-scrollbar-thumb {
@@ -54,13 +63,19 @@
     .scrollable::-webkit-scrollbar-thumb:hover {
         background: #DEDEE0;
     }
+
+    .tooltip-inner {
+        background-color: #ffffff !important;
+        color: #000000;
+        border: 1px solid #cccccc;
+    }
 </style>
 
 <!-- Modal Definition (from RasciFilter.cshtml) -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog custom-width bounceInDown  animated" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Rasci Matrix Filter</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -79,6 +94,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Row switch button filter starts-->
                 <div class="row">
                     <div class="col-2">
                         <div class="media">
@@ -167,11 +184,15 @@
                         </div>
                     </div>
                 </div>
+                <!-- Row switch button filter ends-->
+
+                <!-- Row Filter job position starts-->
                 <div class="row">
                     <div class="col-2">
                         <div class="custom-card">
                             <input class="form-control" type="text" placeholder="Search">
                             <div class="animate-chk mt-3 scrollable">
+                                <label style="font-size: 12px;color:#85858C">Direktur Utama</label>
                                 <label class="d-block" for="chk-ani">
                                     <input class="checkbox_animated" id="chk-ani" type="checkbox" checked="">
                                     Option 1
@@ -222,6 +243,7 @@
                                 <label class="d-block" for="chk-ani3">
                                     <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 16
                                 </label>
+                                <hr />
                             </div>
                         </div>
                     </div>
@@ -251,6 +273,92 @@
                         </div>
                     </div>
                 </div>
+                <!-- Row Filter job position ends-->
+
+                <hr />
+                <!-- Row Filter Prosses business starts-->
+                <div class="row">
+                    <div class="col-6">
+                        <div class="switch-sm d-flex align-items-center justify-content-between w-100">
+                            <label class="form-label">Prosses Business</label>
+                            <label class="reset-label mb-0">Reset</label>
+                        </div>
+                        <div class="custom-card-Bottom">
+                            <div class="animate-chk">
+                                <label class="d-inline-block" for="chk-ani-1" style="width: 190px;">
+                                    <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+                                    All
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    L1
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    L2
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    L3
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    L4
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 50px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    L5
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="switch-sm d-flex align-items-center justify-content-between w-100">
+                            <label class="form-label">RASCI Matrix Notation</label>
+                            <label class="reset-label mb-0">Reset</label>
+                        </div>
+                        <div class="custom-card-Bottom">
+                            <div class="animate-chk">
+                                <label class="d-inline-block" for="chk-ani-1" style="width: 140px;">
+                                    <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+                                    All
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    R
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    A
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    S
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    C
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    I
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 80px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    &#8800; R/A
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 80px;">
+                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                    N/A
+                                    <img src="~/assets/images/rasci/danger-circle.svg" alt="Filter Icon"
+                                        class="example-popover" style="margin-top:-2px;" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Tidak Ada Notasi RASCI">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Row Filter Prosses business ends-->
             </div>
             <div class="modal-footer">
                 <!-- Left aligned button -->
@@ -270,3 +378,15 @@
         </div>
     </div>
 </div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+<script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>

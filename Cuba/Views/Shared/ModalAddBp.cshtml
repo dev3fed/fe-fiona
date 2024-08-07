@@ -1,0 +1,70 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-modal-bp {
+        max-width: 40% !important;
+        margin: 30px auto;
+    }
+</style>
+
+
+<div class="modal fade" id="modalAddBp" tabindex="-1" role="dialog" aria-labelledby="modalAddBpLabel"
+    aria-hidden="true">
+    <div class="modal-dialog custom-modal-bp bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddBpTitle">Add Business Process</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBodyContent">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="mb-3">
+                            <label class="form-label">Level</label>
+                            <select class="form-select digits">
+                                <option>Choose</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <div class="mb-3">
+                            <label class="form-label">Parent</label>
+                            <select class="form-select digits">
+                                <option>Choose</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div>
+                            <label class="form-label">Business Process Name</label>
+                            <textarea class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i>
+                        Back</button>
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
+                        <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon" style="margin-right: 8px;">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
