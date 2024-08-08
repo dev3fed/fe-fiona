@@ -5,7 +5,7 @@ const appState = new Proxy(
     allDataProsbis: [],
     resultProsbis: null,
     idProsbis: [],
-    resetIdProsbis: [],
+    resultRasciMapping: [],
   },
   {
     set(target, property, value) {
@@ -54,22 +54,34 @@ async function getJobTitleList() {
   }
 }
 
+async function getrasciMappingList() {
+  try {
+    const result = await $.ajax({
+      type: "GET",
+      url: `${url_api}/api/rascimapping`,
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
 async function fetchData() {
   try {
-    const [prosbisData, jobTitleData] = await Promise.all([
+    const [prosbisData, jobTitleData, rasciMappingData] = await Promise.all([
       getProsbisList(),
       getJobTitleList(),
+      getrasciMappingList(),
     ]);
-
-    // appState.resultProsbis = prosbisData?.data.filter(
-    //   (item) => item.level === 1,
-    // );
     appState.resultJabatan = jobTitleData.data;
     appState.allDataProsbis = prosbisData?.data;
     appState.resultProsbis = prosbisData?.data.filter(
       (item) => item.level === 1,
     );
     appState.resultJabatan = jobTitleData.data;
+    appState.resultRasciMapping = rasciMappingData.data;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

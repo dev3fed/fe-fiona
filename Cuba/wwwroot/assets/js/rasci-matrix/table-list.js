@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function loadTableHeader() {
   const jobTitleList = appState.resultJabatan;
-
   const headerContent = `
           <tr style="height:30px">
               <th scope="col" class="level-col head-cell">Level</th>
@@ -58,12 +57,26 @@ function loadTableHeader() {
 
 function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
+  console.log("resultRasciMapping", appState.resultRasciMapping);
+  const jobTitleList = appState.resultJabatan;
   const bodyContent = prosbisList
     ?.map((val, i) => {
       const levelClass = val.level ? `level-${val.level}` : "";
       const isExpanded = expandedRows.includes(val.indexGroup)
         ? "chevron-up"
         : "chevron-down";
+      const rasciMapping = appState.resultRasciMapping;
+      // Mencari kode RASCI untuk setiap kombinasi businessProcessId dan jobTitleId
+      const rasciCells = jobTitleList
+        ?.map((jobTitle) => {
+          const rasci = rasciMapping.find(
+            (rm) =>
+              rm.businessProcessId === val.id && rm.jobTitleId === jobTitle.id,
+          );
+          return `<td>${rasci ? rasci.rasciCode : ""}</td>`;
+        })
+        .join("");
+      console.log("rasciCells", rasciCells);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
           <td scope="row" class="level-col" style="font-size:10px;font-weight: 500 !important;">
@@ -100,9 +113,7 @@ function loadTableBody(prosbisList) {
               </div>
            </div>
           </td>
-          <td></td>
-          <td></td>
-          <td></td>
+          ${rasciCells}
         </tr>`;
     })
     .join("");
@@ -110,14 +121,13 @@ function loadTableBody(prosbisList) {
   const tableBody = document.getElementById("table-body");
   if (tableBody) {
     tableBody.innerHTML = bodyContent;
-    feather.replace(); // Ensure feather icons are replaced after DOM update
+    feather.replace();
   } else {
     console.error("Table body element not found");
   }
 }
 
 function onModalProsbis() {
-  // Show the modal
   const modal = new bootstrap.Modal(
     document.getElementById("modalBusinessPro"),
   );
@@ -141,7 +151,7 @@ function handleCollapse(id) {
       renderDataProsbis(result);
     }
 
-    feather.replace(); // Update the feather icons
+    feather.replace();
   }
 }
 
@@ -166,7 +176,6 @@ function filterData(data, selectedId) {
 function traverse(data, filters) {
   let result = [];
   let addedItems = new Set();
-
   function helper(parentId) {
     data.forEach((item) => {
       if (item.parentId === parentId && !addedItems.has(item.indexGroup)) {
@@ -178,7 +187,6 @@ function traverse(data, filters) {
       }
     });
   }
-
   filters.forEach((filter) => {
     data.forEach((item) => {
       if (
@@ -192,7 +200,6 @@ function traverse(data, filters) {
       }
     });
   });
-
   // Menambahkan semua elemen level 1 (parentId === null) tanpa duplikasi
   data.forEach((item) => {
     if (item.parentId === null && !addedItems.has(item.indexGroup)) {
@@ -200,7 +207,6 @@ function traverse(data, filters) {
       addedItems.add(item.indexGroup);
     }
   });
-
   // Mengurutkan berdasarkan indexGroup
   result.sort((a, b) => {
     const indexGroupA = a.indexGroup.split(".").map(Number);
@@ -216,4 +222,10 @@ function traverse(data, filters) {
   });
 
   return result;
+}
+
+function clearInput() {
+  appState.idProsbis = [];
+  renderDataProsbis(appState.resultProsbis);
+  document.getElementById("inputText").value = "";
 }

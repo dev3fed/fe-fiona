@@ -126,9 +126,6 @@
 @section Script {
     <script>
         const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
-        function clearInput() {
-            document.getElementById('inputText').value = '';
-        }
         function onModalAddBp() {
             const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
             modal.show();
