@@ -57,7 +57,6 @@ function loadTableHeader() {
 
 function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
-  console.log("resultRasciMapping", appState.resultRasciMapping);
   const jobTitleList = appState.resultJabatan;
   const bodyContent = prosbisList
     ?.map((val, i) => {
@@ -69,14 +68,42 @@ function loadTableBody(prosbisList) {
       // Mencari kode RASCI untuk setiap kombinasi businessProcessId dan jobTitleId
       const rasciCells = jobTitleList
         ?.map((jobTitle) => {
-          const rasci = rasciMapping.find(
+          const rasciItems = rasciMapping.filter(
             (rm) =>
               rm.businessProcessId === val.id && rm.jobTitleId === jobTitle.id,
           );
-          return `<td>${rasci ? rasci.rasciCode : ""}</td>`;
+          let rasciIcons = "";
+          let comments = [];
+          rasciItems.forEach((item) => {
+            switch (item.rasciCode) {
+              case "R":
+                rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
+                break;
+              case "A":
+                rasciIcons += `<img src="/assets/images/rasci/a.svg" alt="A Icon" style="padding-right:2px">`;
+                break;
+              case "S":
+                rasciIcons += `<img src="/assets/images/rasci/s.svg" alt="S Icon" style="padding-right:2px">`;
+                break;
+              case "C":
+                rasciIcons += `<img src="/assets/images/rasci/c.svg" alt="C Icon" style="padding-right:2px">`;
+                break;
+              case "I":
+                rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
+                break;
+            }
+            if (item.comment) {
+              comments.push(`<li>${item.rasciCode}: ${item.comment}</li>`);
+            }
+          });
+
+          if (comments.length > 0) {
+            const commentTooltip = `<ul>${comments.join("")}</ul>`;
+            rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-html="true" title="${commentTooltip}">`;
+          }
+          return `<td><div style="text-align:center">${rasciIcons}</div></td>`;
         })
         .join("");
-      console.log("rasciCells", rasciCells);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
           <td scope="row" class="level-col" style="font-size:10px;font-weight: 500 !important;">
@@ -122,6 +149,13 @@ function loadTableBody(prosbisList) {
   if (tableBody) {
     tableBody.innerHTML = bodyContent;
     feather.replace();
+    // Inisialisasi ulang tooltips
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+    );
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
   } else {
     console.error("Table body element not found");
   }
