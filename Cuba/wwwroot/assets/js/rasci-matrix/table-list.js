@@ -79,22 +79,13 @@ function loadTableHeader() {
           </tr>
           `;
   document.getElementById("table-header").innerHTML = headerContent;
-
-  // Inisialisasi ulang tooltips
-  var tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
-  );
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
+  initializeTooltips();
 }
 
-let currentVisibleRows = 50;
-function loadTableBody(prosbisList, append = false) {
+function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
   const jobTitleList = appState.resultJabatan;
-  const visibleProsbis = prosbisList?.slice(0, currentVisibleRows); // Load only the visible rows initially
-
+  const visibleProsbis = prosbisList;
   const bodyContent = visibleProsbis
     ?.map((val, i) => {
       const levelClass = val.level ? `level-${val.level}` : "";
@@ -145,41 +136,14 @@ function loadTableBody(prosbisList, append = false) {
 
   const tableBody = document.getElementById("table-body");
   if (tableBody) {
-    if (append) {
-      tableBody.innerHTML += bodyContent;
-    } else {
-      tableBody.innerHTML = bodyContent;
-    }
+    tableBody.innerHTML = bodyContent;
     feather.replace();
     initializeTooltips();
-    // Inisialisasi ulang tooltips
-    var tooltipTriggerList = [].slice.call(
-      document.querySelectorAll('[data-bs-toggle="tooltip"]'),
-    );
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
   } else {
     console.error("Table body element not found");
   }
 }
 
-function loadMoreRows() {
-  currentVisibleRows += 50; // Increment the number of visible rows by 50
-  loadTableBody(appState.resultProsbis, true); // Load the next set of rows
-}
-document
-  .querySelector(".scrollable-table")
-  .addEventListener("scroll", function () {
-    const tableWrapper = this;
-    if (
-      tableWrapper.scrollTop + tableWrapper.clientHeight >=
-      tableWrapper.scrollHeight
-    ) {
-      loadMoreRows();
-    }
-  });
-  
 // Map RASCI Cells (Memoized)
 const mapRasciCellsCache = new Map();
 function mapRasciCells(businessProcessId, jobTitleList) {
