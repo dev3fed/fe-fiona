@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" type="text/css" href="~/assets/css/rasci-matrix.css">
+<link href="~/assets/css/clusterize.css" rel="stylesheet">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -103,6 +104,13 @@
                                         style="margin-top: -5px;">Export</button>
                             </div>
                             <div class="col-12 mt-3">
+                                <div class="loading-container">
+                                    @* <div class="loading-icon">🔄</div> *@
+                                    <div id="icon-container" class="loading-icon"></div>
+                                    <div>Please wait, loading data</div>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
                                 <div class=" scrollable-table table-wrapper" style=" max-height: 500px;">
                                     <!-- begin :: List RASCI Matrix Table -->
                                     <table class="table  custom-border-table rasci-matrix" style="table-layout: fixed;">
@@ -136,6 +144,8 @@
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+    <script src="../assets/js/rasci-matrix/clusterize.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>

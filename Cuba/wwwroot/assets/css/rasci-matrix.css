@@ -340,6 +340,7 @@ th {
   white-space: nowrap;
   border: 1px solid #b0d1e4;
   background-color: #f0f0f0;
+  display: none; /* Hidden by default */
 }
 
 /* Tooltip styles */
@@ -374,3 +375,30 @@ th {
 }
 
 /* end Custom scrollbar styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 450px;
+  background-color: #eaeaeb;
+  color: black;
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  flex-direction: column;
+  width: 100%; /* Pastikan loading container mengambil seluruh lebar tabel */
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.loading-icon {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+#icon-container {
+  width: 250px; /* Atur lebar sesuai kebutuhan */
+  margin-right: 50px;
+  margin-top: -80px;
+  height: 150px; /* Atur tinggi sesuai kebutuhan */
+}

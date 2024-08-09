@@ -1,6 +1,12 @@
 document.addEventListener("dataLoaded", function () {
-  loadTableHeader(appState.resultJabatan);
-  loadTableBody(appState.resultProsbis);
+  showLoading();
+  if (appState.resultJabatan.length > 0 && appState.resultProsbis.length > 0) {
+    setTimeout(() => {
+      hideLoading();
+      loadTableHeader(appState.resultJabatan);
+      loadTableBody(appState.resultProsbis);
+    }, 1000);
+  }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -9,6 +15,34 @@ document.addEventListener("DOMContentLoaded", function () {
   feather.replace();
 });
 
+function showLoading() {
+  const loadingContainer = document.querySelector(".loading-container");
+  const tableWrapper = document.querySelector(".scrollable-table");
+  const animation = lottie.loadAnimation({
+    container: document.getElementById("icon-container"),
+    path: "../assets/json/loading-rasci-matrix.json",
+    renderer: "svg",
+    loop: true,
+    autoplay: true,
+    name: "Demo Animation",
+  });
+  if (loadingContainer && tableWrapper) {
+    loadingContainer.style.display = "flex";
+    tableWrapper.style.display = "none";
+  }
+}
+
+function hideLoading() {
+  const loadingContainer = document.querySelector(".loading-container");
+  const tableWrapper = document.querySelector(".scrollable-table");
+
+  if (loadingContainer && tableWrapper) {
+    loadingContainer.style.display = "none";
+    tableWrapper.style.display = "block";
+  } else {
+    console.error("Loading container or table wrapper not found in the DOM.");
+  }
+}
 function loadTableHeader() {
   const jobTitleList = appState.resultJabatan;
   const headerContent = `
@@ -55,55 +89,19 @@ function loadTableHeader() {
   });
 }
 
-function loadTableBody(prosbisList) {
+let currentVisibleRows = 50;
+function loadTableBody(prosbisList, append = false) {
   const expandedRows = appState.idProsbis;
   const jobTitleList = appState.resultJabatan;
-  const bodyContent = prosbisList
+  const visibleProsbis = prosbisList?.slice(0, currentVisibleRows); // Load only the visible rows initially
+
+  const bodyContent = visibleProsbis
     ?.map((val, i) => {
       const levelClass = val.level ? `level-${val.level}` : "";
       const isExpanded = expandedRows.includes(val.indexGroup)
         ? "chevron-up"
         : "chevron-down";
-      const rasciMapping = appState.resultRasciMapping;
-      // Mencari kode RASCI untuk setiap kombinasi businessProcessId dan jobTitleId
-      const rasciCells = jobTitleList
-        ?.map((jobTitle) => {
-          const rasciItems = rasciMapping.filter(
-            (rm) =>
-              rm.businessProcessId === val.id && rm.jobTitleId === jobTitle.id,
-          );
-          let rasciIcons = "";
-          let comments = [];
-          rasciItems.forEach((item) => {
-            switch (item.rasciCode) {
-              case "R":
-                rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
-                break;
-              case "A":
-                rasciIcons += `<img src="/assets/images/rasci/a.svg" alt="A Icon" style="padding-right:2px">`;
-                break;
-              case "S":
-                rasciIcons += `<img src="/assets/images/rasci/s.svg" alt="S Icon" style="padding-right:2px">`;
-                break;
-              case "C":
-                rasciIcons += `<img src="/assets/images/rasci/c.svg" alt="C Icon" style="padding-right:2px">`;
-                break;
-              case "I":
-                rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
-                break;
-            }
-            if (item.comment) {
-              comments.push(`<li>${item.rasciCode}: ${item.comment}</li>`);
-            }
-          });
-
-          if (comments.length > 0) {
-            const commentTooltip = `<ul>${comments.join("")}</ul>`;
-            rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-html="true" title="${commentTooltip}">`;
-          }
-          return `<td><div style="text-align:center">${rasciIcons}</div></td>`;
-        })
-        .join("");
+      const rasciCells = mapRasciCells(val.id, jobTitleList);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
           <td scope="row" class="level-col" style="font-size:10px;font-weight: 500 !important;">
@@ -147,8 +145,13 @@ function loadTableBody(prosbisList) {
 
   const tableBody = document.getElementById("table-body");
   if (tableBody) {
-    tableBody.innerHTML = bodyContent;
+    if (append) {
+      tableBody.innerHTML += bodyContent;
+    } else {
+      tableBody.innerHTML = bodyContent;
+    }
     feather.replace();
+    initializeTooltips();
     // Inisialisasi ulang tooltips
     var tooltipTriggerList = [].slice.call(
       document.querySelectorAll('[data-bs-toggle="tooltip"]'),
@@ -161,6 +164,84 @@ function loadTableBody(prosbisList) {
   }
 }
 
+function loadMoreRows() {
+  currentVisibleRows += 50; // Increment the number of visible rows by 50
+  loadTableBody(appState.resultProsbis, true); // Load the next set of rows
+}
+document
+  .querySelector(".scrollable-table")
+  .addEventListener("scroll", function () {
+    const tableWrapper = this;
+    if (
+      tableWrapper.scrollTop + tableWrapper.clientHeight >=
+      tableWrapper.scrollHeight
+    ) {
+      loadMoreRows();
+    }
+  });
+  
+// Map RASCI Cells (Memoized)
+const mapRasciCellsCache = new Map();
+function mapRasciCells(businessProcessId, jobTitleList) {
+  const cacheKey = `${businessProcessId}-${jobTitleList.length}`;
+  if (mapRasciCellsCache.has(cacheKey)) {
+    return mapRasciCellsCache.get(cacheKey);
+  }
+
+  const rasciMapping = appState.resultRasciMapping;
+  const rasciCells = jobTitleList
+    .map((jobTitle) => {
+      const rasciItems = rasciMapping.filter(
+        (rm) =>
+          rm.businessProcessId === businessProcessId &&
+          rm.jobTitleId === jobTitle.id,
+      );
+      let rasciIcons = "",
+        comments = [];
+
+      rasciItems.forEach((item) => {
+        switch (item.rasciCode) {
+          case "R":
+            rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
+            break;
+          case "A":
+            rasciIcons += `<img src="/assets/images/rasci/a.svg" alt="A Icon" style="padding-right:2px">`;
+            break;
+          case "S":
+            rasciIcons += `<img src="/assets/images/rasci/s.svg" alt="S Icon" style="padding-right:2px">`;
+            break;
+          case "C":
+            rasciIcons += `<img src="/assets/images/rasci/c.svg" alt="C Icon" style="padding-right:2px">`;
+            break;
+          case "I":
+            rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
+            break;
+        }
+        if (item.comment) {
+          comments.push(`<li>${item.rasciCode}: ${item.comment}</li>`);
+        }
+      });
+      if (comments.length > 0) {
+        const commentTooltip = `<ul>${comments.join("")}</ul>`;
+        rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip"  data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
+      }
+      return `<td><div style="text-align:center">${rasciIcons}</div></td>`;
+    })
+    .join("");
+
+  mapRasciCellsCache.set(cacheKey, rasciCells);
+  return rasciCells;
+}
+
+// Initialize tooltips after rendering
+function initializeTooltips() {
+  const tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+  );
+  tooltipTriggerList.map(
+    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+  );
+}
 function onModalProsbis() {
   const modal = new bootstrap.Modal(
     document.getElementById("modalBusinessPro"),
