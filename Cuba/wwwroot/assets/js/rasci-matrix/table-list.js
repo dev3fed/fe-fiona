@@ -1,5 +1,4 @@
 document.addEventListener("dataLoaded", function () {
-  showLoading();
   if (appState.resultJabatan.length > 0 && appState.resultProsbis.length > 0) {
     setTimeout(() => {
       hideLoading();
@@ -10,6 +9,7 @@ document.addEventListener("dataLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  showLoading();
   loadTableHeader(appState.resultJabatan);
   loadTableBody(appState.resultProsbis);
   feather.replace();
@@ -121,7 +121,7 @@ function loadTableBody(prosbisList) {
                   <i class="fas fa-ellipsis-v"></i>
                   </button>
                   <ul class="dropdown-menu " aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
+                    <li onclick="onModalProsbis()"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
                     <li><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
                     <li><a class="dropdown-item"><img src="/assets/images/rasci/trash.svg" alt="Filter Icon">Delete</a></li>
                   </ul>
@@ -189,7 +189,14 @@ function mapRasciCells(businessProcessId, jobTitleList) {
         const commentTooltip = `<ul>${comments.join("")}</ul>`;
         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip"  data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
-      return `<td><div style="text-align:center">${rasciIcons}</div></td>`;
+      return `<td>
+        <div class="rasci-container">
+          <div class="rasci-icons">
+            ${rasciIcons}
+          </div>
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon">
+        </div>
+        </td>`;
     })
     .join("");
 
@@ -207,6 +214,54 @@ function initializeTooltips() {
   );
 }
 function onModalProsbis() {
+  const toalJob = `<p>Total Job : 5 |
+  <img src="/assets/images/rasci/r.svg" alt="R Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
+  <img src="/assets/images/rasci/a.svg" alt="A Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
+  <img src="/assets/images/rasci/s.svg" alt="S Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
+  <img src="/assets/images/rasci/c.svg" alt="C Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
+  <img src="/assets/images/rasci/i.svg" alt="I Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
+  <img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label>
+  </p>`;
+  theadContent = `<tr>
+          <th scope="col" style="width: 50px;text-align:center">
+          No 
+          </th>
+          <th scope="col" style="width: 80px">Job Title</th>
+          <th scope="col" style="width: 80px">Directorate</th>
+          <th scope="col">Division</th>
+          <th scope="col">Work Unit</th>
+          <th scope="col">RASCI Notation</th>
+        </tr>`;
+  bodyContent = `<tr>
+        <th scope="row">
+        </th>
+        <td>Mark</td>
+        <td>Otto</td>
+        <td>Otto</td>
+        <td>Otto</td>
+        <td>Otto</td>
+    </tr>
+    <tr>
+        <th scope="row">
+        </th>
+        <td>Mark</td>
+        <td>Otto</td>
+        <td>Otto</td>
+        <td>Otto</td>
+        <td>Otto</td>
+    </tr>
+    <tr>
+      <th scope="row">
+      </th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>Otto</td>
+      <td>Otto</td>
+      <td>Otto</td>
+    </tr>`;
+  document.getElementById("prosbis-details-header").innerHTML = theadContent;
+  document.getElementById("prosbis-details-body").innerHTML = bodyContent;
+  document.getElementById("total-job").innerHTML = toalJob;
   const modal = new bootstrap.Modal(
     document.getElementById("modalBusinessPro"),
   );

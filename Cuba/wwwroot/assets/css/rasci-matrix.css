@@ -379,13 +379,13 @@ th {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 450px;
+  height: 420px;
   background-color: #eaeaeb;
   color: black;
   font-family: Arial, sans-serif;
   font-size: 18px;
   flex-direction: column;
-  width: 100%; /* Pastikan loading container mengambil seluruh lebar tabel */
+  width: 100%;
   border: none;
   margin: 0;
   padding: 0;
@@ -397,8 +397,31 @@ th {
 }
 
 #icon-container {
-  width: 250px; /* Atur lebar sesuai kebutuhan */
+  width: 250px;
   margin-right: 50px;
   margin-top: -80px;
-  height: 150px; /* Atur tinggi sesuai kebutuhan */
+  height: 150px;
+}
+
+.rasci-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.rasci-icons {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.pencil-icon {
+  opacity: 0;
+  padding-right: 5px;
+  transition: opacity 0.3s ease;
+}
+
+.rasci-container:hover .pencil-icon {
+  opacity: 1;
+  cursor: pointer;
 }

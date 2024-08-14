@@ -31,95 +31,177 @@
         <div class="row">
             <div class="col-12">
                 <div class="card" style="border-radius:8px">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <!-- Starts Modal Filter-->
-                                <partial name="RasciFilter" />
-                                <!-- Ends Modal Filter-->
+                    <div style="padding:10px">
+                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="pills-matrix-tab" data-bs-toggle="pill"
+                                    href="#pills-matrix" role="tab" aria-controls="pills-matrix"
+                                    aria-selected="true">Matrix</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-request-tab" data-bs-toggle="pill"
+                                    href="#pills-request" role="tab" aria-controls="pills-request"
+                                    aria-selected="false">Request List
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-log-history-tab" data-bs-toggle="pill"
+                                    href="#pills-log-history" role="tab" aria-controls="pills-log-history"
+                                    aria-selected="false">Log History
+                                </a></li>
+                        </ul>
+                        <div class="tab-content" id="pills-rasci-tabcontent">
+                            <div class="tab-pane fade show active" id="pills-matrix" role="tabpanel"
+                                aria-labelledby="pills-matrix-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <!-- Starts Modal Filter-->
+                                            <partial name="RasciFilter" />
+                                            <!-- Ends Modal Filter-->
 
-                                <!-- Start Modal Search -->
-                                <partial name="ModalSearch" />
-                                <!-- End Modal Search -->
+                                            <!-- Start Modal Search -->
+                                            <partial name="ModalSearch" />
+                                            <!-- End Modal Search -->
 
-                                <!-- Start Modal Add Business Process -->
-                                <partial name="ModalAddBp" />
-                                <!-- End Modal Add Business Process -->
+                                            <!-- Start Modal Add Business Process -->
+                                            <partial name="ModalAddBp" />
+                                            <!-- End Modal Add Business Process -->
 
-                                <!-- Start Modal business Process -->
-                                <partial name="ModalBusinessProcess" />
-                                <!-- End Modal business Process -->
-                            </div>
-                            <div class="col-5">
-                                <div class="btn-group w-100" role="group" style="margin-top: -2px;"
-                                    aria-label="Button group with nested dropdown">
-                                    <div class="btn-group" role="group">
-                                        <button class="btn btn-light dropdown-toggle" id="btnGroupDrop1" type="button"
-                                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">RASCI
-                                            by Job</button>
-                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                            <a class="dropdown-item" onclick="setSelectedText('RASCI by Job')">RASCI by
-                                                Job</a>
-                                            <a class="dropdown-item" onclick="setSelectedText('RASCI by Bus...')">RASCI
-                                                by Business
-                                                Process</a>
-                                            <a class="dropdown-item"
-                                                onclick="setSelectedText('Business Pro...')">Business Process</a>
+                                            <!-- Start Modal business Process -->
+                                            <partial name="ModalBusinessProcess" />
+                                            <!-- End Modal business Process -->
+                                        </div>
+                                        <div class="col-5">
+                                            <div class="btn-group w-100" role="group"
+                                                aria-label="Button group with nested dropdown">
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-light dropdown-toggle" id="btnGroupDrop1"
+                                                        type="button" data-bs-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">RASCI
+                                                        by Job</button>
+                                                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                        <a class="dropdown-item"
+                                                            onclick="setSelectedText('RASCI by Job')">RASCI by
+                                                            Job</a>
+                                                        <a class="dropdown-item"
+                                                            onclick="setSelectedText('RASCI by Bus...')">RASCI
+                                                            by Business
+                                                            Process</a>
+                                                        <a class="dropdown-item"
+                                                            onclick="setSelectedText('Business Pro...')">Business
+                                                            Process</a>
+                                                    </div>
+                                                </div>
+                                                <input class="form-control" type="text" placeholder="Search"
+                                                    id="inputText"
+                                                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                            </div>
+                                        </div>
+                                        <div class="col-3" style="padding-left: 0;">
+                                            <button class="btn btn-primary" type="button" id="searchButton"
+                                                disabled>Search</button>
+                                            <button class="btn btn-outline-primary" type="button" id="clearButton"
+                                                onclick="clearInput()">Clear</button>
+                                        </div>
+                                        <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
+                                                Filter
+                                            </button>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
+                                                    id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false"><img
+                                                        src="~/assets/images/rasci/plus.svg" alt="Filter Icon"
+                                                        style="margin-top: -1px;">Add</button>
+                                                <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
+                                                    <a class="dropdown-item" onclick="onModalAddBp()">
+                                                        <img src="~/assets/images/rasci/plus-black.svg"
+                                                            alt="Filter Icon" style="margin-top: -1px;">Add Business
+                                                        Process
+                                                    </a>
+                                                    <a class="dropdown-item">
+                                                        <img src="~/assets/images/rasci/plus-black.svg"
+                                                            alt="Filter Icon" style="margin-top: -1px;">Add RASCI
+                                                        Notation
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary btn-icon" type="button"> <img
+                                                    src="~/assets/images/rasci/vector.svg" alt="Filter Icon"
+                                                    style="margin-top: -5px;">Export</button>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <div class="loading-container">
+                                                <div id="icon-container" class="loading-icon"></div>
+                                                <div>Please wait, loading data</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <div class=" scrollable-table table-wrapper" style=" max-height: 450px;">
+                                                <!-- begin :: List RASCI Matrix Table -->
+                                                <table class="table  custom-border-table rasci-matrix"
+                                                    style="table-layout: fixed;">
+                                                    <thead id="table-header">
+                                                    </thead>
+                                                    <tbody id="table-body" class="clusterize-content rasci-matrix-body">
+                                                    </tbody>
+                                                </table>
+                                                <!-- end :: List RASCI Matrix Table -->
+                                            </div>
                                         </div>
                                     </div>
-                                    <input class="form-control" type="text" placeholder="Search" id="inputText"
-                                        style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                 </div>
                             </div>
-                            <div class="col-3" style="padding-left: 0;">
-                                <button class="btn btn-primary" type="button" id="searchButton">Search</button>
-                                <button class="btn btn-outline-primary" type="button" id="clearButton"
-                                    onclick="clearInput()">Clear</button>
-                            </div>
-                            <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
-                                <button class="btn btn-primary me-2 btn-icon" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal">
-                                    <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
-                                    Filter
-                                </button>
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
-                                        id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false"><img
-                                            src="~/assets/images/rasci/plus.svg" alt="Filter Icon"
-                                            style="margin-top: -1px;">Add</button>
-                                    <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                                        <a class="dropdown-item" onclick="onModalAddBp()">
-                                            <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon"
-                                                style="margin-top: -1px;">Add Business Process
-                                        </a>
-                                        <a class="dropdown-item">
-                                            <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon"
-                                                style="margin-top: -1px;">Add RASCI Notation
-                                        </a>
+                            <div class="tab-pane fade" id="pills-request" role="tabpanel"
+                                aria-labelledby="pills-request-tab">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
+                                                typesetting
+                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
+                                                since the
+                                                1500s,
+                                                when an unknown printer took a galley of type and scrambled it to make a
+                                                type
+                                                specimen
+                                                book. It has survived not only five centuries, but also the leap into
+                                                electronic
+                                                typesetting, remaining essentially unchanged. It was popularised in the
+                                                1960s with
+                                                the
+                                                release of Letraset sheets containing Lorem Ipsum passages, and more
+                                                recently with
+                                                desktop publishing software like Aldus PageMaker including versions of
+                                                Lorem Ipsum
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary btn-icon" type="button"> <img
-                                        src="~/assets/images/rasci/vector.svg" alt="Filter Icon"
-                                        style="margin-top: -5px;">Export</button>
                             </div>
-                            <div class="col-12 mt-3">
-                                <div class="loading-container">
-                                    @* <div class="loading-icon">🔄</div> *@
-                                    <div id="icon-container" class="loading-icon"></div>
-                                    <div>Please wait, loading data</div>
-                                </div>
-                            </div>
-                            <div class="col-12 mt-3">
-                                <div class=" scrollable-table table-wrapper" style=" max-height: 500px;">
-                                    <!-- begin :: List RASCI Matrix Table -->
-                                    <table class="table  custom-border-table rasci-matrix" style="table-layout: fixed;">
-                                        <thead id="table-header">
-                                        </thead>
-                                        <tbody id="table-body" class="clusterize-content rasci-matrix-body">
-                                        </tbody>
-                                    </table>
-                                    <!-- end :: List RASCI Matrix Table -->
+                            <div class="tab-pane fade" id="pills-log-history" role="tabpanel"
+                                aria-labelledby="pills-log-history-tab">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
+                                                typesetting
+                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
+                                                since the
+                                                1500s,
+                                                when an unknown printer took a galley of type and scrambled it to make a
+                                                type
+                                                specimen
+                                                book. It has survived not only five centuries, but also the leap into
+                                                electronic
+                                                typesetting, remaining essentially unchanged. It was popularised in the
+                                                1960s with
+                                                the
+                                                release of Letraset sheets containing Lorem Ipsum passages, and more
+                                                recently with
+                                                desktop publishing software like Aldus PageMaker including versions of
+                                                Lorem Ipsum
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -138,6 +220,15 @@
             const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
             modal.show();
         }
+        $(document).ready(function () {
+            $('#inputText').keyup(function () {
+                if ($(this).val() == '') {
+                    $('#searchButton').prop('disabled', true);
+                } else {
+                    $('#searchButton').prop('disabled', false);
+                }
+            });
+        });
     </script>
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>

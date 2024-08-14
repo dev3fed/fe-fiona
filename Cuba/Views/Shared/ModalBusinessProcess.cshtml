@@ -10,6 +10,31 @@
     .icon-small {
         font-size: 10px;
     }
+
+    .tbl-border {
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .tbl-border th {
+        color: #FFFFFF
+    }
+
+    .tbl-border th,
+    .tbl-border td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+    }
 </style>
 
 <div class="modal fade" id="modalBusinessPro" tabindex="-1" role="dialog" aria-labelledby="modalBusinessProLabel"
@@ -21,33 +46,36 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalBodyContent">
-                <div class="mb-4">
+                <div class="mb-2">
                     <h6 class="mb-2">Mengelola kajian dan analisis data strategi</h6>
                     <label>Level1 | Index 1</label>
                 </div>
                 <div>
-                    <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" id="pills-warninghome-tab" data-bs-toggle="pill"
-                                href="#pills-warninghome" role="tab" aria-controls="pills-warninghome"
+                    <ul class="nav nav-tabs nav-primary" id="pills-business-tab" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" id="pills-related-tab" data-bs-toggle="pill"
+                                href="#pills-related" role="tab" aria-controls="pills-related"
                                 aria-selected="true">Related Job</a></li>
-                        <li class="nav-item"><a class="nav-link" id="pills-warningprofile-tab" data-bs-toggle="pill"
-                                href="#pills-warningprofile" role="tab" aria-controls="pills-warningprofile"
+                        <li class="nav-item"><a class="nav-link" id="pills-related-business-tab" data-bs-toggle="pill"
+                                href="#pills-related-business" role="tab" aria-controls="pills-related-business"
                                 aria-selected="false">Related Business
                                 Process</a></li>
                     </ul>
-                    <div class="tab-content" id="pills-warningtabContent">
-                        <div class="tab-pane fade show active" id="pills-warninghome" role="tabpanel"
-                            aria-labelledby="pills-warninghome-tab">
-                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                when an unknown printer took a galley of type and scrambled it to make a type specimen
-                                book. It has survived not only five centuries, but also the leap into electronic
-                                typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
-                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with
-                                desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                    <div class="tab-content" id="pills-businessContent">
+                        <div class="tab-pane fade show active" id="pills-related" role="tabpanel"
+                            aria-labelledby="pills-related-tab">
+                            <div class="mb-0 m-t-10" id="total-job">
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table tbl-border">
+                                    <thead id="prosbis-details-header" style="background-color: #006CA9;">
+                                    </thead>
+                                    <tbody id="prosbis-details-body">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="tab-pane fade" id="pills-warningprofile" role="tabpanel"
-                            aria-labelledby="pills-warningprofile-tab">
+                        <div class="tab-pane fade" id="pills-related-business" role="tabpanel"
+                            aria-labelledby="pills-related-business-tab">
                             <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and typesetting
                                 industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
                                 when an unknown printer took a galley of type and scrambled it to make a type specimen

@@ -68,13 +68,30 @@ async function getrasciMappingList() {
   }
 }
 
+async function SearchMatrix(params) {
+  try {
+    const result = await $.ajax({
+      type: "GET",
+      url: `http://192.168.0.126:5095/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`,
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
 async function fetchData() {
   try {
-    const [prosbisData, jobTitleData, rasciMappingData] = await Promise.all([
-      getProsbisList(),
-      getJobTitleList(),
-      getrasciMappingList(),
-    ]);
+    const [prosbisData, jobTitleData, rasciMappingData, resultSearch] =
+      await Promise.all([
+        getProsbisList(),
+        getJobTitleList(),
+        getrasciMappingList(),
+        SearchMatrix({ type: "businessprocess", search: "kajian" }),
+      ]);
+
+    console.log("resultSearch", resultSearch);
     appState.resultJabatan = jobTitleData.data;
     appState.allDataProsbis = prosbisData?.data;
     appState.resultProsbis = prosbisData?.data.filter(
