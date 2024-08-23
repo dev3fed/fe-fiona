@@ -1,6 +1,5 @@
 document.addEventListener("dataLoaded", function () {
   if (appState.resultJabatan.length > 0 && appState.resultProsbis.length > 0) {
-    console.log("appState.resultProsbis", appState.resultProsbis);
     setTimeout(() => {
       hideLoading();
       loadTableHeader(appState.resultJabatan);
@@ -87,7 +86,6 @@ function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
   const jobTitleList = appState.resultJabatan;
   const visibleProsbis = prosbisList;
-  console.log("visibleProsbis", visibleProsbis);
   const bodyContent = visibleProsbis
     ?.map((val, i) => {
       const levelClass = val.level ? `level-${val.level}` : "";
@@ -225,27 +223,26 @@ async function handleCollapse(id) {
   if (parentRow) {
     if (!appState.idProsbis.includes(parentId)) {
       appState.idProsbis = [...appState.idProsbis, parentId.toString()];
-      appState.resetIdProsbis = appState.idProsbis;
-      const payload = { parentId: appState.idProsbis.join(",") };
+      appState.resetIdProsbis = appState.resetIdProsbis.filter(
+        (item) => !parentId.toString().includes(item),
+      );
+      const selectId = filterChild(appState.idProsbis, appState.resetIdProsbis);
+      const payload = { parentId: selectId.join(",") };
       const resultMatrix = await fetchDataMatrix(payload);
-      console.log("insert appState.idProsbis", appState.idProsbis);
-      console.log("inser appState.resetIdProsbis", appState.resetIdProsbis);
       // const result = traverse(appState.allDataProsbis, appState.idProsbis);
       resultAllData(resultMatrix?.data);
     } else {
-      const listSelectedId = appState.resetIdProsbis;
+      const listSelectedId = appState.idProsbis;
       const index = appState.idProsbis.indexOf(parentId.toString());
       // const idFiltered = filterData(listSelectedId, parentId.toString());
-      console.log("listSelectedId", listSelectedId);
+      appState.resetIdProsbis = [
+        ...appState.resetIdProsbis,
+        parentId.toString(),
+      ];
       // resetIdProsbis
-      const hideId = filterArray(parentRow.id, listSelectedId);
-      console.log("hideId", hideId);
-      appState.resetIdProsbis = hideId;
-      console.log("appState.resetIdProsbis", appState.resetIdProsbis);
-      if (index > -1) appState.idProsbis.splice(index, 1);
-      console.log("reset appState.idProsbis", appState.idProsbis);
-      const payload = { parentId: appState.resetIdProsbis.join(",") };
-      console.log("payload", payload);
+      const idFiltered = filterArray(appState.resetIdProsbis, listSelectedId);
+      if (idFiltered && index > -1) appState.idProsbis.splice(index, 1);
+      const payload = { parentId: idFiltered.join(",") };
       const resultMatrix = await fetchDataMatrix(payload);
       // const result = traverse(appState.allDataProsbis, idFiltered);
       resultAllData(resultMatrix?.data);
@@ -254,16 +251,25 @@ async function handleCollapse(id) {
     feather.replace();
   }
 }
-function filterArray(input, array) {
+function filterChild(array, input) {
+  const inputSet = new Set(input);
+  return array.filter((item) => {
+    return ![...inputSet].some((val) => item.startsWith(val + "."));
+  });
+}
+function filterArray(inputs, array) {
   // Helper function to determine if a value is a descendant of another
   function isDescendant(parent, child) {
     return child.startsWith(parent + ".") || child === parent;
   }
 
-  // Filter the array to exclude descendants of the input value
+  // Filter the array to exclude descendants of any input value
   const result = array.filter((value) => {
-    // Include value if it is not a descendant of the input
-    return !isDescendant(input, value) && value !== input;
+    // Check if value is not a descendant of any of the inputs
+    return (
+      !inputs.some((input) => isDescendant(input, value)) &&
+      !inputs.includes(value)
+    );
   });
 
   // Sort the result array
@@ -352,6 +358,7 @@ function traverse(data, filters) {
 
 async function clearInput() {
   appState.idProsbis = [];
+  appState.resetIdProsbis = [];
   // resultAllData(appState.resultProsbis);
   const resultMatrix = await fetchDataMatrix();
   // const result = traverse(appState.allDataProsbis, appState.idProsbis);
