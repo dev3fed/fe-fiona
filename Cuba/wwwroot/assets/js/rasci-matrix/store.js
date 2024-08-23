@@ -5,18 +5,20 @@ const appState = new Proxy(
     allDataProsbis: [],
     resultProsbis: null,
     idProsbis: [],
+    resetIdProsbis: [],
     resultRasciMapping: [],
   },
   {
     set(target, property, value) {
       if (property === "resultJabatan") {
         target[property] = value;
-        renderDataJob(value); // Call renderData when resultJabatan is updated
+        loadTableHeader(target.resultJabatan);
       } else if (property === "resultProsbis") {
         target[property] = value;
-      } else if (property === "idProsbis") {
+        loadTableBody(target.resultProsbis);
+      } else if (property === "resultRasciMapping") {
         target[property] = value;
-      } else if (property === "allDataProsbis") {
+      } else if (property === "idProsbis") {
         target[property] = value;
       } else {
         target[property] = value;
@@ -26,53 +28,53 @@ const appState = new Proxy(
   },
 );
 
-async function getProsbisList() {
-  try {
-    const result = await $.ajax({
-      type: "GET",
-      url: `${url_api}/api/BusinessProcess`,
-    });
-    return result;
-  } catch (error) {
-    console.log("Error fetching Prosbis data from API");
-    $("#resultProsbis").html("Error fetching data from API");
-    throw error;
-  }
-}
+// async function getProsbisList() {
+//   try {
+//     const result = await $.ajax({
+//       type: "GET",
+//       url: `${url_api}/api/BusinessProcess`,
+//     });
+//     return result;
+//   } catch (error) {
+//     console.log("Error fetching Prosbis data from API");
+//     $("#resultProsbis").html("Error fetching data from API");
+//     throw error;
+//   }
+// }
 
-async function getJobTitleList() {
-  try {
-    const result = await $.ajax({
-      type: "GET",
-      url: `${url_api}/api/jobtitle`,
-    });
-    return result;
-  } catch (error) {
-    console.log("Error fetching Job Title data from API");
-    $("#resultJabatan").html("Error fetching data from API");
-    throw error;
-  }
-}
+// async function getJobTitleList() {
+//   try {
+//     const result = await $.ajax({
+//       type: "GET",
+//       url: `${url_api}/api/jobtitle`,
+//     });
+//     return result;
+//   } catch (error) {
+//     console.log("Error fetching Job Title data from API");
+//     $("#resultJabatan").html("Error fetching data from API");
+//     throw error;
+//   }
+// }
 
-async function getrasciMappingList() {
-  try {
-    const result = await $.ajax({
-      type: "GET",
-      url: `${url_api}/api/rascimapping`,
-    });
-    return result;
-  } catch (error) {
-    console.log("Error fetching Job Title data from API");
-    $("#resultJabatan").html("Error fetching data from API");
-    throw error;
-  }
-}
+// async function getrasciMappingList() {
+//   try {
+//     const result = await $.ajax({
+//       type: "GET",
+//       url: `${url_api}/api/rascimapping`,
+//     });
+//     return result;
+//   } catch (error) {
+//     console.log("Error fetching Job Title data from API");
+//     $("#resultJabatan").html("Error fetching data from API");
+//     throw error;
+//   }
+// }
 
 async function SearchMatrix(params) {
   try {
     const result = await $.ajax({
       type: "GET",
-      url: `http://192.168.0.126:5095/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`,
+      url: `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`,
     });
     return result;
   } catch (error) {
@@ -81,24 +83,30 @@ async function SearchMatrix(params) {
     throw error;
   }
 }
+
+async function fetchDataMatrix(params) {
+  try {
+    const result = await $.ajax({
+      type: "POST",
+      url: `${url_api}/api/RasciMapping/testAll`,
+      contentType: "application/json",
+      data: JSON.stringify(params),
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
 async function fetchData() {
   try {
-    const [prosbisData, jobTitleData, rasciMappingData, resultSearch] =
-      await Promise.all([
-        getProsbisList(),
-        getJobTitleList(),
-        getrasciMappingList(),
-        SearchMatrix({ type: "businessprocess", search: "kajian" }),
-      ]);
-
-    console.log("resultSearch", resultSearch);
-    appState.resultJabatan = jobTitleData.data;
-    appState.allDataProsbis = prosbisData?.data;
-    appState.resultProsbis = prosbisData?.data.filter(
-      (item) => item.level === 1,
-    );
-    appState.resultJabatan = jobTitleData.data;
-    appState.resultRasciMapping = rasciMappingData.data;
+    const [dataMatrix] = await Promise.all([fetchDataMatrix()]);
+    appState.resultJabatan = dataMatrix?.data.jobTitle;
+    appState.allDataProsbis = dataMatrix?.data.rasciMatrix;
+    appState.resultProsbis = dataMatrix?.data.businessProcess;
+    appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);
@@ -108,9 +116,11 @@ async function fetchData() {
 // Initial data fetch
 fetchData();
 
-function renderDataJob(data) {
-  // console.log(data);
-}
-function renderDataProsbis(data) {
-  loadTableBody(data);
+function resultAllData(val) {
+  // console.log(val);
+  appState.resultJabatan = val.jobTitle;
+  appState.resultProsbis = val.businessProcess;
+  appState.resultRasciMapping = val.rasciMatrix;
+
+  //
 }

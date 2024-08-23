@@ -1,8 +1,10 @@
 let selectedText = "RASCI by Job";
 document.addEventListener("dataLoaded", function () {});
+document.addEventListener("DOMContentLoaded", function () {});
 function setSelectedText(text) {
   selectedText = text;
   document.getElementById("btnGroupDrop1").innerText = text;
+  document.getElementById("inputText").value = "";
 }
 
 document
@@ -41,8 +43,8 @@ document
         searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblJob?.length} result)`;
         theadContent = `<tr>
           <th scope="col" style="width: 50px">
-            <label class="checkbox-label" for="chk-ani-1">
-              <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+            <label class="checkbox-label" for="checked-head-job">
+              <input class="checkbox_animated" id="checked-head-job" type="checkbox" onchange="selectAllJob(event)">
             </label>
           </th>
           <th scope="col">Job Level</th>
@@ -52,8 +54,8 @@ document
           ?.map((item, i) => {
             return `<tr>
             <th scope="row">
-             <label class="checkbox-label" for="chk-ani-1">
-              <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+             <label class="checkbox-label" for="checked-body-job">
+              <input class="checkbox_animated" id="checked-body-job" type="checkbox" value="${item.id}">
             </label>
             </th>
             <td>${item.level}</td>
@@ -63,17 +65,15 @@ document
           .join("");
         break;
       case "RASCI by Bus...":
-        console.log(resultTblRbp);
-
         modalSearchTitle = "Search RASCI by Business Process";
         searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblRbp?.length} result)`;
         theadContent = `<tr>
           <th scope="col" style="width: 50px"> 
-            <label class="checkbox-label" for="chk-ani-1">
-              <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+            <label class="checkbox-label" for="checked-head-rbp">
+              <input class="checkbox_animated" id="checked-head-rbp" type="checkbox">
             </label>
           </th>
-          <th scope="col" style="width: 80px">Level</th>
+          <th scope="col" style="width: 50px">Level</th>
           <th scope="col" style="width: 80px">Index</th>
           <th scope="col">Business Process</th>
         </tr>`;
@@ -81,8 +81,8 @@ document
           ?.map((item, i) => {
             return `<tr>
             <th scope="row">
-              <label class="checkbox-label" for="chk-ani-1">
-              <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+              <label class="checkbox-label" for="checked-body-rbp">
+              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox">
             </label>
             </th>
             <td>${item.level}</td>
@@ -99,16 +99,16 @@ document
           <th scope="col" style="width: 50px">
           Choose
           </th>
-           <th scope="col" style="width: 80px">Level</th>
+           <th scope="col" style="width: 50px">Level</th>
           <th scope="col" style="width: 80px">Index</th>
           <th scope="col">Business Process</th>
         </tr>`;
         bodyContent = resultTblBp
           ?.map((item, i) => {
-            `<tr>
+            return `<tr>
             <th scope="row">
-              <label class="radio-label" for="edo-ani-1">
-                <input class="radio_animated" id="edo-ani-1" type="radio" name="rdo-ani" checked="">
+              <label class="radio-label" for="checked-body-bp">
+                <input class="radio_animated" id="checked-body-bp" type="radio" name="rdo-ani">
               </label>
             </th>
                <td>${item.level}</td>
@@ -130,3 +130,18 @@ document
     const modal = new bootstrap.Modal(document.getElementById("modalSearch"));
     modal.show();
   });
+
+function selectAllJob(event) {
+  // Access the checkbox element using event.target
+  const checkbox = event.target;
+
+  // Get the checked state of the checkbox
+  const isChecked = checkbox.checked;
+
+  // You can now use this value to perform any desired actions
+  console.log(`Checkbox is ${isChecked ? "checked" : "unchecked"}`);
+
+  // If you need to check all other checkboxes, you could do something like this:
+  const allCheckboxes = document.querySelectorAll("#checked-body-job");
+  allCheckboxes.forEach((cb) => (cb.checked = isChecked));
+}

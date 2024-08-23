@@ -1,5 +1,6 @@
 document.addEventListener("dataLoaded", function () {
   if (appState.resultJabatan.length > 0 && appState.resultProsbis.length > 0) {
+    console.log("appState.resultProsbis", appState.resultProsbis);
     setTimeout(() => {
       hideLoading();
       loadTableHeader(appState.resultJabatan);
@@ -86,6 +87,7 @@ function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
   const jobTitleList = appState.resultJabatan;
   const visibleProsbis = prosbisList;
+  console.log("visibleProsbis", visibleProsbis);
   const bodyContent = visibleProsbis
     ?.map((val, i) => {
       const levelClass = val.level ? `level-${val.level}` : "";
@@ -214,81 +216,71 @@ function initializeTooltips() {
   );
 }
 function onModalProsbis() {
-  const toalJob = `<p>Total Job : 5 |
-  <img src="/assets/images/rasci/r.svg" alt="R Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
-  <img src="/assets/images/rasci/a.svg" alt="A Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
-  <img src="/assets/images/rasci/s.svg" alt="S Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
-  <img src="/assets/images/rasci/c.svg" alt="C Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
-  <img src="/assets/images/rasci/i.svg" alt="I Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label> 
-  <img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">0</label>
-  </p>`;
-  theadContent = `<tr>
-          <th scope="col" style="width: 50px;text-align:center">
-          No 
-          </th>
-          <th scope="col" style="width: 80px">Job Title</th>
-          <th scope="col" style="width: 80px">Directorate</th>
-          <th scope="col">Division</th>
-          <th scope="col">Work Unit</th>
-          <th scope="col">RASCI Notation</th>
-        </tr>`;
-  bodyContent = `<tr>
-        <th scope="row">
-        </th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>Otto</td>
-        <td>Otto</td>
-        <td>Otto</td>
-    </tr>
-    <tr>
-        <th scope="row">
-        </th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>Otto</td>
-        <td>Otto</td>
-        <td>Otto</td>
-    </tr>
-    <tr>
-      <th scope="row">
-      </th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>Otto</td>
-      <td>Otto</td>
-      <td>Otto</td>
-    </tr>`;
-  document.getElementById("prosbis-details-header").innerHTML = theadContent;
-  document.getElementById("prosbis-details-body").innerHTML = bodyContent;
-  document.getElementById("total-job").innerHTML = toalJob;
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalBusinessPro"),
-  );
-  modal.show();
+  detailsProsbis();
 }
 
-function handleCollapse(id) {
+async function handleCollapse(id) {
   const parentId = id;
   const parentRow = document.getElementById(parentId);
   if (parentRow) {
     if (!appState.idProsbis.includes(parentId)) {
       appState.idProsbis = [...appState.idProsbis, parentId.toString()];
-      const result = traverse(appState.allDataProsbis, appState.idProsbis);
-      renderDataProsbis(result);
+      appState.resetIdProsbis = appState.idProsbis;
+      const payload = { parentId: appState.idProsbis.join(",") };
+      const resultMatrix = await fetchDataMatrix(payload);
+      console.log("insert appState.idProsbis", appState.idProsbis);
+      console.log("inser appState.resetIdProsbis", appState.resetIdProsbis);
+      // const result = traverse(appState.allDataProsbis, appState.idProsbis);
+      resultAllData(resultMatrix?.data);
     } else {
-      const listSelectedId = appState.idProsbis;
+      const listSelectedId = appState.resetIdProsbis;
       const index = appState.idProsbis.indexOf(parentId.toString());
-      const idFiltered = filterData(listSelectedId, parentId.toString());
-      if (idFiltered && index > -1) appState.idProsbis.splice(index, 1);
-      const result = traverse(appState.allDataProsbis, idFiltered);
-      renderDataProsbis(result);
+      // const idFiltered = filterData(listSelectedId, parentId.toString());
+      console.log("listSelectedId", listSelectedId);
+      // resetIdProsbis
+      const hideId = filterArray(parentRow.id, listSelectedId);
+      console.log("hideId", hideId);
+      appState.resetIdProsbis = hideId;
+      console.log("appState.resetIdProsbis", appState.resetIdProsbis);
+      if (index > -1) appState.idProsbis.splice(index, 1);
+      console.log("reset appState.idProsbis", appState.idProsbis);
+      const payload = { parentId: appState.resetIdProsbis.join(",") };
+      console.log("payload", payload);
+      const resultMatrix = await fetchDataMatrix(payload);
+      // const result = traverse(appState.allDataProsbis, idFiltered);
+      resultAllData(resultMatrix?.data);
     }
 
     feather.replace();
   }
 }
+function filterArray(input, array) {
+  // Helper function to determine if a value is a descendant of another
+  function isDescendant(parent, child) {
+    return child.startsWith(parent + ".") || child === parent;
+  }
 
+  // Filter the array to exclude descendants of the input value
+  const result = array.filter((value) => {
+    // Include value if it is not a descendant of the input
+    return !isDescendant(input, value) && value !== input;
+  });
+
+  // Sort the result array
+  return result.sort((a, b) => {
+    const aParts = a.split(".").map(Number);
+    const bParts = b.split(".").map(Number);
+
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+      const aPart = aParts[i] || 0;
+      const bPart = bParts[i] || 0;
+      if (aPart !== bPart) {
+        return aPart - bPart;
+      }
+    }
+    return 0;
+  });
+}
 function filterData(data, selectedId) {
   // Memisahkan selectedId menjadi array parts
   const selectedParts = selectedId.split(".");
@@ -358,8 +350,11 @@ function traverse(data, filters) {
   return result;
 }
 
-function clearInput() {
+async function clearInput() {
   appState.idProsbis = [];
-  renderDataProsbis(appState.resultProsbis);
+  // resultAllData(appState.resultProsbis);
+  const resultMatrix = await fetchDataMatrix();
+  // const result = traverse(appState.allDataProsbis, appState.idProsbis);
+  resultAllData(resultMatrix?.data);
   document.getElementById("inputText").value = "";
 }
