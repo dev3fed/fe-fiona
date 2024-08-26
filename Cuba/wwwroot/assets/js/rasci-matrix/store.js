@@ -104,9 +104,9 @@ async function fetchData() {
   try {
     const [dataMatrix] = await Promise.all([fetchDataMatrix()]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
-    appState.allDataProsbis = dataMatrix?.data.rasciMatrix;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
+
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

@@ -146,13 +146,20 @@ function loadTableBody(prosbisList) {
 
 // Map RASCI Cells (Memoized)
 const mapRasciCellsCache = new Map();
+
 function mapRasciCells(businessProcessId, jobTitleList) {
   const cacheKey = `${businessProcessId}-${jobTitleList.length}`;
+
   if (mapRasciCellsCache.has(cacheKey)) {
     return mapRasciCellsCache.get(cacheKey);
   }
 
-  const rasciMapping = appState.resultRasciMapping;
+  const rasciMapping = appState.resultRasciMapping || [];
+
+  if (rasciMapping.length === 0) {
+    return "";
+  }
+
   const rasciCells = jobTitleList
     .map((jobTitle) => {
       const rasciItems = rasciMapping.filter(
@@ -160,6 +167,7 @@ function mapRasciCells(businessProcessId, jobTitleList) {
           rm.businessProcessId === businessProcessId &&
           rm.jobTitleId === jobTitle.id,
       );
+
       let rasciIcons = "",
         comments = [];
 
@@ -185,10 +193,12 @@ function mapRasciCells(businessProcessId, jobTitleList) {
           comments.push(`<li>${item.rasciCode}: ${item.comment}</li>`);
         }
       });
+
       if (comments.length > 0) {
         const commentTooltip = `<ul>${comments.join("")}</ul>`;
         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip"  data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
+
       return `<td>
         <div class="rasci-container">
           <div class="rasci-icons">
@@ -200,7 +210,11 @@ function mapRasciCells(businessProcessId, jobTitleList) {
     })
     .join("");
 
-  mapRasciCellsCache.set(cacheKey, rasciCells);
+  // Cache the result only if it's valid
+  if (rasciCells) {
+    mapRasciCellsCache.set(cacheKey, rasciCells);
+  }
+
   return rasciCells;
 }
 
