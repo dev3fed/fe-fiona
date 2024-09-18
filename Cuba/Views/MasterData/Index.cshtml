@@ -30,11 +30,32 @@
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
                     <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                        <div class="card-body">
+                            <h6 class="mb-4">Please upload all the following data files and click the submit button.</h6>
+                            @* row *@
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="tableMasterData table table-hover w-100" id="examplee">
+                                            @* <tr>
+                                                <th>Id</th>
+                                                <th>Code</th>
+                                                <th>Name</th>
+                                                <th>Actions</th>
+                                            </tr> *@
+                                        </table>
+                                    </div>
+                                    @* button reset and submit *@
+                                        <div class="col-md-12 mt-4">
+                                            <div class="
+                                                text-end">
+                                                <button type="button" class="btn btn-lg btn-outline-light" style="margin-right: 10px;"><i class="fa fa-times-circle"></i> Reset</button>
+                                                <button type="button" class="btn btn-lg btn-outline-primary" ><i class="icofont icofont-upload-alt"></i> Submit</button>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,7 +69,16 @@
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+
+
+    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/datatable/datatables/datatable-custom-cnt.js"></script>
     <!-- Plugins JS Ends-->
+    <script src="../assets/js/master-data/custom.js"></script>
+
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
+
+    <script src="../assets/js/icons/icons-notify.js"></script>
+    <script src="../assets/js/icons/feather-icon/feather-icon-clipart.js"></script>
 }
