@@ -4,7 +4,7 @@ document.addEventListener("dataLoaded", function () {
       hideLoading();
       loadTableHeader(appState.resultJabatan);
       loadTableBody(appState.resultProsbis);
-    }, 1000);
+    }, 300);
   }
 });
 

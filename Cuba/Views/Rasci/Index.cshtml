@@ -36,9 +36,13 @@
                             <li class="nav-item"><a class="nav-link active" id="pills-matrix-tab" data-bs-toggle="pill"
                                     href="#pills-matrix" role="tab" aria-controls="pills-matrix"
                                     aria-selected="true">Matrix</a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-request-tab" data-bs-toggle="pill"
-                                    href="#pills-request" role="tab" aria-controls="pills-request"
-                                    aria-selected="false">Request List
+                            <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
+                                    href="#pills-draft" role="tab" aria-controls="pills-draft"
+                                    aria-selected="false">Draft
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-approval-tab" data-bs-toggle="pill"
+                                    href="#pills-approval" role="tab" aria-controls="pills-approval"
+                                    aria-selected="false">Approval List
                                 </a></li>
                             <li class="nav-item"><a class="nav-link" id="pills-log-history-tab" data-bs-toggle="pill"
                                     href="#pills-log-history" role="tab" aria-controls="pills-log-history"
@@ -93,17 +97,22 @@
                                                     style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                             </div>
                                         </div>
-                                        <div class="col-3" style="padding-left: 0;">
-                                            <button class="btn btn-primary" type="button" id="searchButton"
+                                        <div class="col-2" style="padding-left: 0;">
+                                            <button class="btn btn-primary " type="button" id="searchButton"
                                                 disabled>Search</button>
                                             <button class="btn btn-outline-primary" type="button" id="clearButton"
                                                 onclick="clearInput()">Clear</button>
                                         </div>
-                                        <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
+                                        <div class="col-5 d-flex justify-content-end" style="padding-left: 0;">
                                             <button class="btn btn-primary me-2 btn-icon" type="button"
                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">
                                                 <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
                                                 Filter
+                                            </button>
+                                            <button class="btn btn-primary me-2 btn-icon" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
+                                                Job Compare
                                             </button>
                                             <div class="btn-group" role="group">
                                                 <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
@@ -150,12 +159,41 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-request" role="tabpanel"
-                                aria-labelledby="pills-request-tab">
+                            <div class="tab-pane fade" id="pills-draft" role="tabpanel"
+                                aria-labelledby="pills-draft-tab">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
+                                            <p class="mb-0 m-t-30">Draft Lorem Ipsum is simply dummy text of the
+                                                printing and
+                                                typesetting
+                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
+                                                since the
+                                                1500s,
+                                                when an unknown printer took a galley of type and scrambled it to make a
+                                                type
+                                                specimen
+                                                book. It has survived not only five centuries, but also the leap into
+                                                electronic
+                                                typesetting, remaining essentially unchanged. It was popularised in the
+                                                1960s with
+                                                the
+                                                release of Letraset sheets containing Lorem Ipsum passages, and more
+                                                recently with
+                                                desktop publishing software like Aldus PageMaker including versions of
+                                                Lorem Ipsum
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-approval" role="tabpanel"
+                                aria-labelledby="pills-approval-tab">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-0 m-t-30">Approval Lorem Ipsum is simply dummy text of the
+                                                printing and
                                                 typesetting
                                                 industry. Lorem Ipsum has been the industry's standard dummy text ever
                                                 since the
@@ -182,7 +220,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
+                                            <p class="mb-0 m-t-30">Log History Lorem Ipsum is simply dummy text of the
+                                                printing and
                                                 typesetting
                                                 industry. Lorem Ipsum has been the industry's standard dummy text ever
                                                 since the
@@ -219,6 +258,12 @@
         function onModalAddBp() {
             const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
             modal.show();
+        }
+        function handleCloseModal() {
+            const applyButton = document.getElementById("apply-search");
+            if (applyButton) {
+                applyButton.disabled = true;
+            }
         }
         $(document).ready(function () {
             $('#inputText').keyup(function () {

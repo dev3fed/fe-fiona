@@ -88,7 +88,7 @@ async function fetchDataMatrix(params) {
   try {
     const result = await $.ajax({
       type: "POST",
-      url: `${url_api}/api/RasciMapping/testAll`,
+      url: `${url_api}/api/RasciMapping/testall`,
       contentType: "application/json",
       data: JSON.stringify(params),
     });
