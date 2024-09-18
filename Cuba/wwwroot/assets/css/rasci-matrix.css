@@ -1,0 +1,427 @@
+/* Basic button styles */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.btn-icon img {
+  width: 15px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+/* Dropdown menu item styles */
+.dropdown-menu {
+  z-index: 999;
+}
+
+.dropdown-menu .dropdown-item {
+  color: #000 !important;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #e6f6fe !important;
+  color: rgb(0, 0, 0) !important;
+}
+
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:focus {
+  background-color: #e6f6fe !important;
+  color: rgb(0, 0, 0) !important;
+}
+
+/* Dropdown button styles */
+.dropright {
+  cursor: pointer;
+  margin-right: 100px;
+}
+
+.dropdown-btn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+/* Dropdown item styles */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px !important;
+}
+
+.dropdown-item img {
+  margin-right: 8px;
+}
+
+/* Color variables */
+:root {
+  --level-1-color: #d8260e;
+  --level-2-color: #d78e00;
+  --level-3-color: #1072e7;
+  --level-4-color: #c840ff;
+  --level-5-color: #697380;
+  --level-6-color: #000000;
+  --job-level-1-color: #980000;
+  --job-level-2-color: #ffbf00;
+  --job-level-3-color: #002060;
+  --job-level-4-color: #06b0f0;
+  --job-level-5-color: #ffe699;
+}
+
+/* Level-specific styles */
+.level-1 .level-col,
+.level-1 .index-col,
+.level-1 .headcol,
+.level-1 .hierarchy-icon {
+  color: var(--level-1-color);
+}
+
+.level-2 .level-col,
+.level-2 .index-col,
+.level-2 .headcol,
+.level-2 .hierarchy-icon {
+  color: var(--level-2-color);
+}
+
+.level-3 .level-col,
+.level-3 .index-col,
+.level-3 .headcol,
+.level-3 .hierarchy-icon {
+  color: var(--level-3-color);
+}
+
+.level-4 .level-col,
+.level-4 .index-col,
+.level-4 .headcol,
+.level-4 .hierarchy-icon {
+  color: var(--level-4-color);
+}
+
+.level-5 .level-col,
+.level-5 .index-col,
+.level-5 .headcol,
+.level-5 .hierarchy-icon {
+  color: var(--level-5-color);
+}
+
+.level-6 .level-col,
+.level-6 .index-col,
+.level-6 .headcol,
+.level-6 .hierarchy-icon {
+  color: var(--level-6-color);
+}
+
+.ellipsis-menu {
+  width: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ellipsis-menu.prosbis-row-ellipsis .dropdown-menu {
+  left: 12px !important;
+  top: -8px !important;
+}
+
+.ellipsis-menu.jabatan-col-ellipsis .dropdown-menu {
+  top: 14px !important;
+}
+
+.ellipsis-menu.prosbis-row-ellipsis .dropdown-menu {
+  left: 12px !important;
+  top: -8px !important;
+}
+
+.prosbis-cell-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.prosbis-cell-wrapper > span {
+  flex: 1;
+}
+
+.hierarchy-icon {
+  width: 24px;
+  padding-right: 10px;
+  font-size: 8px;
+  display: block;
+  cursor: pointer;
+}
+
+.hierarchy-icon-wrapper {
+  width: 8px;
+  margin-right: 20px;
+  padding-left: 5px;
+}
+
+/* .expanded .hierarchy-icon {
+  transform: rotate(180deg);
+} */
+
+/* Font size and padding for headcol */
+.level-1 .prosbis-name,
+.level-1 .hierarchy-icon {
+  font-size: 11px;
+}
+
+.level-2 .prosbis-cell-wrapper {
+  padding-left: 16px;
+}
+
+.level-3 .prosbis-cell-wrapper {
+  padding-left: 21px;
+}
+
+.level-4 .prosbis-cell-wrapper {
+  padding-left: 26px;
+}
+
+.level-5 .prosbis-cell-wrapper {
+  padding-left: 31px;
+}
+
+.level-6 .prosbis-cell-wrapper {
+  padding-left: 36px;
+}
+
+.jabatan-level-1 .jabatan-cell-outer-wrapper {
+  border-top: 5px solid var(--job-level-1-color) !important;
+}
+
+.jabatan-level-2 .jabatan-cell-outer-wrapper {
+  border-top: 5px solid var(--job-level-2-color) !important;
+}
+
+.jabatan-level-3 .jabatan-cell-outer-wrapper {
+  border-top: 5px solid var(--job-level-3-color) !important;
+}
+
+.jabatan-level-4 .jabatan-cell-outer-wrapper {
+  border-top: 5px solid var(--job-level-4-color) !important;
+}
+
+.jabatan-level-5 .jabatan-cell-outer-wrapper {
+  border-top: 5px solid var(--job-level-5-color) !important;
+}
+
+/* Custom border styles for table */
+.custom-border-table {
+  border-right: 1px solid #b0d1e4;
+  border-bottom: 1px solid #b0d1e4;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.custom-border-table th,
+.custom-border-table td {
+  border-right: 1px solid #b0d1e4;
+  border-bottom: 1px solid #b0d1e4;
+}
+
+td,
+th {
+  padding: 0px !important;
+}
+
+.hidden {
+  display: none;
+}
+
+.prosbis-name {
+  width: 10px;
+}
+
+.prosbis-name:hover {
+  text-decoration: underline;
+}
+
+/* Table cell styles */
+.rasci-matrix td,
+.rasci-matrix th {
+  margin: 0;
+  white-space: nowrap;
+  background-color: #fff;
+}
+
+.rasci-matrix td:hover {
+  background-color: #f5f5f5;
+}
+
+/* Sticky header styles */
+.jabatan-cell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Sticky columns with borders */
+.rasci-matrix .level-col {
+  width: 50px;
+  position: sticky;
+  text-align: center;
+  left: 0;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 500 !important;
+  border-right: 1px solid #b0d1e4;
+  background: #fff;
+}
+
+.rasci-matrix .index-col {
+  width: 80px;
+  position: sticky;
+  text-align: center;
+  left: 50px;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 500 !important;
+  border-right: 1px solid #b0d1e4;
+  background: #fff;
+}
+
+.rasci-matrix .headcol {
+  width: 350px;
+  position: sticky;
+  text-align: left;
+  text-wrap: wrap;
+  left: 130px;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 500 !important;
+  background: #fff;
+}
+
+.rasci-matrix .head-cell {
+  z-index: 3;
+  position: sticky;
+  vertical-align: middle !important;
+  font-size: 11px !important;
+  top: 0;
+}
+
+.jabatan-cell-outer-wrapper {
+  border-top: 5px solid #d9e1f2;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  height: 47px;
+  padding-right: 20px;
+}
+
+.jabatan-cell-wrapper {
+  max-height: 35px;
+  padding-left: 10px;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  flex: 1;
+}
+
+/* Table wrapper for scrolling */
+.table-wrapper {
+  width: 100%;
+  overflow: auto;
+  max-height: calc(100vh - 200px);
+  position: relative;
+  white-space: nowrap;
+  border: 1px solid #b0d1e4;
+  background-color: #f0f0f0;
+  display: none; /* Hidden by default */
+}
+
+/* Tooltip styles */
+.tooltip-inner {
+  background-color: #ffffff !important;
+  color: #000000;
+  border: 1px solid #cccccc;
+}
+
+/* Custom scrollbar styles */
+.scrollable-table {
+  overflow-y: auto;
+}
+
+.scrollable-table::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+.scrollable-table::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb {
+  background: #006ca9;
+  border-radius: 10px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb:hover {
+  background: #006ca9;
+}
+
+/* end Custom scrollbar styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 470px;
+  background-color: #eaeaeb;
+  color: black;
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  flex-direction: column;
+  width: 100%;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.loading-icon {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+#icon-container {
+  width: 250px;
+  margin-right: 50px;
+  margin-top: -80px;
+  height: 150px;
+}
+
+.rasci-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.rasci-icons {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.pencil-icon {
+  opacity: 0;
+  padding-right: 5px;
+  transition: opacity 0.3s ease;
+}
+
+.rasci-container:hover .pencil-icon {
+  opacity: 1;
+  cursor: pointer;
+}

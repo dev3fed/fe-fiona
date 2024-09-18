@@ -1487,12 +1487,12 @@ svg.f-light {
 }
 
 .btn-light {
-  background-color: rgba(115, 102, 255, 0.06) !important;
+  /* background-color: rgba(115, 102, 255, 0.06) !important; */
   border-color: rgba(115, 102, 255, 0.06) !important;
 }
 
 .btn-light:hover {
-  background-color: rgba(115, 102, 255, 0.1) !important;
+  /* background-color: rgba(115, 102, 255, 0.1) !important; */
   border-color: rgba(115, 102, 255, 0.1) !important;
 }
 
@@ -1743,7 +1743,7 @@ svg.f-light {
 }
 
 .btn-outline-light {
-  border-color: #f4f4f4;
+  border-color: #9f9fa5;
   color: #f4f4f4;
   background-color: transparent;
   color: #2f2f3b;
@@ -2748,7 +2748,7 @@ button:focus {
 body {
   font-size: 14px;
   overflow-x: hidden;
-  font-family: Rubik, sans-serif;
+  font-family: "Public Sans", sans-serif;
   color: #2f2f3b;
 }
 
@@ -3122,7 +3122,7 @@ fieldset .input-group-lg .touchspin {
 /* Firefox */
 * {
   scrollbar-width: auto;
-  scrollbar-color: #f1e6f5 #ffffff;
+  /* scrollbar-color: #dedee0 #ffffff; */
 }
 
 table tbody tr {
@@ -5461,9 +5461,9 @@ body.modal-open .select2-container--open .select2-dropdown {
   ) !important;
 }
 
-.btn {
+/* .btn {
   padding: 0.375rem 1.75rem;
-}
+} */
 
 .btn-lg {
   font-size: 18px;
@@ -11474,13 +11474,13 @@ th {
 }
 
 .table > :not(:last-child) > :last-child > * {
-  border-bottom-color: #ecf3fa;
+  border-bottom: 1px solid #b0d1e4;
 }
 
-.table th,
+/* .table th,
 .table td {
   padding: 0.75rem;
-}
+} */
 
 .table.table-primary th {
   color: #fff;
@@ -28971,7 +28971,7 @@ body.dark-only
   > li
   a.active
   svg.stroke-icon {
-  stroke: var(--theme-deafult);
+  stroke: #ffffff;
 }
 
 body.dark-only
@@ -39192,7 +39192,6 @@ body[class*="dark-"] .for-light {
 
 .dropdown-menu .dropdown-item {
   color: #2b2b2b;
-  opacity: 0.6;
   font-size: 13px;
   padding: 6px 12px;
   border-top: 1px solid #efefef;
@@ -41383,7 +41382,7 @@ button[data-toggle="dropdown"]:hover ~ .dropdown-menu {
   > li
   a.active
   svg.stroke-icon {
-  stroke: var(--theme-deafult);
+  stroke: #ffffff;
 }
 
 .page-wrapper
@@ -43723,7 +43722,7 @@ button[data-toggle="dropdown"]:hover ~ .dropdown-menu {
 }
 
 .page-wrapper.compact-wrapper .page-body-wrapper .page-body {
-  min-height: calc(100vh - 80px);
+  min-height: calc(93h - 80px);
   margin-top: 80px;
   margin-left: 265px;
 }

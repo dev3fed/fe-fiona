@@ -2,12 +2,18 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .os-container {
+        height: 480px;
+        background-color: #F5F5F5;
+    }
+</style>
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Master Data</h3>
+                    <h3>Organization Structure</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,7 +24,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Master Data</li>
+                        <li class="breadcrumb-item active">Organization Structure</li>
                     </ol>
                 </div>
             </div>
@@ -29,12 +35,125 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
-                    <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                    <div style="padding:10px">
+                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="pills-matrix-tab" data-bs-toggle="pill"
+                                    href="#pills-matrix" role="tab" aria-controls="pills-matrix"
+                                    aria-selected="true">Organization Chart</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-request-tab" data-bs-toggle="pill"
+                                    href="#pills-request" role="tab" aria-controls="pills-request"
+                                    aria-selected="false">Request List
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-log-history-tab" data-bs-toggle="pill"
+                                    href="#pills-log-history" role="tab" aria-controls="pills-log-history"
+                                    aria-selected="false">Log History
+                                </a></li>
+                        </ul>
+                        <div class="tab-content" id="pills-rasci-tabcontent">
+                            <div class="tab-pane fade show active" id="pills-matrix" role="tabpanel"
+                                aria-labelledby="pills-matrix-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <input class="form-control" type="text" placeholder="Search" id="inputText"
+                                                style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                        </div>
+                                        <div class="col-3" style="padding-left: 0;">
+                                            <button class="btn btn-primary" type="button"
+                                                id="searchButton">Search</button>
+                                        </div>
+                                        <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button"
+                                                data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
+                                                Filter
+                                            </button>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
+                                                    id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false"><img
+                                                        src="~/assets/images/rasci/plus.svg" alt="Filter Icon"
+                                                        style="margin-top: -1px;">Add</button>
+                                                <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
+                                                    <a class="dropdown-item">
+                                                        <img src="~/assets/images/rasci/plus-black.svg"
+                                                            alt="Filter Icon" style="margin-top: -1px;">Add Business
+                                                        Process
+                                                    </a>
+                                                    <a class="dropdown-item">
+                                                        <img src="~/assets/images/rasci/plus-black.svg"
+                                                            alt="Filter Icon" style="margin-top: -1px;">Add RASCI
+                                                        Notation
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary btn-icon" type="button"> <img
+                                                    src="~/assets/images/rasci/vector.svg" alt="Filter Icon"
+                                                    style="margin-top: -5px;">Export</button>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <div class="os-container">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-request" role="tabpanel"
+                                aria-labelledby="pills-request-tab">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
+                                                typesetting
+                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
+                                                since the
+                                                1500s,
+                                                when an unknown printer took a galley of type and scrambled it to make a
+                                                type
+                                                specimen
+                                                book. It has survived not only five centuries, but also the leap into
+                                                electronic
+                                                typesetting, remaining essentially unchanged. It was popularised in the
+                                                1960s with
+                                                the
+                                                release of Letraset sheets containing Lorem Ipsum passages, and more
+                                                recently with
+                                                desktop publishing software like Aldus PageMaker including versions of
+                                                Lorem Ipsum
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-log-history" role="tabpanel"
+                                aria-labelledby="pills-log-history-tab">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
+                                                typesetting
+                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
+                                                since the
+                                                1500s,
+                                                when an unknown printer took a galley of type and scrambled it to make a
+                                                type
+                                                specimen
+                                                book. It has survived not only five centuries, but also the leap into
+                                                electronic
+                                                typesetting, remaining essentially unchanged. It was popularised in the
+                                                1960s with
+                                                the
+                                                release of Letraset sheets containing Lorem Ipsum passages, and more
+                                                recently with
+                                                desktop publishing software like Aldus PageMaker including versions of
+                                                Lorem Ipsum
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
