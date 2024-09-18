@@ -244,6 +244,7 @@ async function handleCollapse(id) {
       const payload = { parentId: selectId.join(",") };
       const resultMatrix = await fetchDataMatrix(payload);
       // const result = traverse(appState.allDataProsbis, appState.idProsbis);
+      console.log("appState.idProsbis", appState.idProsbis);
       resultAllData(resultMatrix?.data);
     } else {
       const listSelectedId = appState.idProsbis;
@@ -272,21 +273,16 @@ function filterChild(array, input) {
   });
 }
 function filterArray(inputs, array) {
-  // Helper function to determine if a value is a descendant of another
   function isDescendant(parent, child) {
     return child.startsWith(parent + ".") || child === parent;
   }
-
-  // Filter the array to exclude descendants of any input value
   const result = array.filter((value) => {
-    // Check if value is not a descendant of any of the inputs
     return (
       !inputs.some((input) => isDescendant(input, value)) &&
       !inputs.includes(value)
     );
   });
 
-  // Sort the result array
   return result.sort((a, b) => {
     const aParts = a.split(".").map(Number);
     const bParts = b.split(".").map(Number);
@@ -302,19 +298,15 @@ function filterArray(inputs, array) {
   });
 }
 function filterData(data, selectedId) {
-  // Memisahkan selectedId menjadi array parts
   const selectedParts = selectedId.split(".");
   const selectedDepth = selectedParts.length;
   return data.filter((item) => {
     const itemParts = item.split(".");
-    // Menyaring elemen yang berada di luar cabang yang dipilih
     for (let i = 0; i < selectedDepth; i++) {
-      // Jika item memiliki kedalaman yang sama atau lebih dalam, dan tidak sama dengan selectedId, sertakan item
       if (itemParts[i] !== selectedParts[i]) {
         return true;
       }
     }
-    // Jika elemen berada dalam cabang yang dipilih, jangan sertakan
     return false;
   });
 }
@@ -346,14 +338,12 @@ function traverse(data, filters) {
       }
     });
   });
-  // Menambahkan semua elemen level 1 (parentId === null) tanpa duplikasi
   data.forEach((item) => {
     if (item.parentId === null && !addedItems.has(item.indexGroup)) {
       result.push(item);
       addedItems.add(item.indexGroup);
     }
   });
-  // Mengurutkan berdasarkan indexGroup
   result.sort((a, b) => {
     const indexGroupA = a.indexGroup.split(".").map(Number);
     const indexGroupB = b.indexGroup.split(".").map(Number);

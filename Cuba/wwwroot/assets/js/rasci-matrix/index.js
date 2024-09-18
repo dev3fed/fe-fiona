@@ -1,6 +1,7 @@
 let selectedText = "RASCI by Job";
 let selectedJobIds = [];
 let SelectedProsbisId = [];
+let selectedSingleId = "";
 document.addEventListener("dataLoaded", function () {});
 document.addEventListener("DOMContentLoaded", function () {});
 function setSelectedText(text) {
@@ -84,7 +85,7 @@ document
             return `<tr>
             <th scope="row">
               <label class="checkbox-label" for="checked-body-rbp">
-              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.id}">
+              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.indexGroup}">
             </label>
             </th>
             <td>${item.level}</td>
@@ -110,7 +111,7 @@ document
             return `<tr>
             <th scope="row">
               <label class="radio-label" for="checked-body-bp">
-                <input class="radio_animated" id="checked-body-bp" type="radio" name="rdo-ani" onchange="selectProsbisId(event)" value="${item.id}">
+                <input class="radio_animated" id="checked-body-bp" type="radio" name="rdo-ani" onchange="selectProsbisId(event)" value="${item.indexGroup}">
               </label>
             </th>
                <td>${item.level}</td>
@@ -165,7 +166,7 @@ document
 
 function selectProsbisId(event) {
   const jobId = event.target.value;
-  console.log(jobId);
+  selectedSingleId = jobId;
   const applyButton = document.getElementById("apply-search");
   if (applyButton) {
     applyButton.disabled = !jobId;
@@ -184,7 +185,6 @@ function selectSingleJob(event) {
   }
 
   updateHeaderCheckboxJob();
-  console.log(selectedJobIds);
 }
 
 function selectAllJob(event) {
@@ -208,7 +208,6 @@ function selectAllJob(event) {
   if (applyButton) {
     applyButton.disabled = selectedJobIds.length === 0;
   }
-  console.log(selectedJobIds);
 }
 
 function selectSingleProsbis(event) {
@@ -224,7 +223,6 @@ function selectSingleProsbis(event) {
   }
 
   updateHeaderCheckboxProsbis();
-  console.log(SelectedProsbisId);
 }
 
 function selectAllProsbis(event) {
@@ -248,7 +246,6 @@ function selectAllProsbis(event) {
   if (applyButton) {
     applyButton.disabled = SelectedProsbisId.length === 0;
   }
-  console.log(SelectedProsbisId);
 }
 
 function updateHeaderCheckboxJob() {
@@ -276,5 +273,74 @@ function updateHeaderCheckboxProsbis() {
 
   if (applyButton) {
     applyButton.disabled = SelectedProsbisId.length === 0;
+  }
+}
+
+async function applySearch() {
+  switch (selectedText) {
+    case "RASCI by Job":
+      const payload = {
+        type: "job",
+        parentId: selectedJobIds.join(","), // Menggabungkan ID job
+      };
+      try {
+        const resultMatrix = await fetchDataMatrix(payload); // Memanggil data
+        if (resultMatrix.status === 200) {
+          // Mendapatkan instance modal dan menutup modal
+          resultAllData(resultMatrix?.data);
+          const modalElement = document.getElementById("modalSearch");
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          if (modal) {
+            modal.hide(); // Menutup modal jika ada instance yang valid
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data matrix", error);
+      }
+      break;
+
+    case "RASCI by Bus...":
+      console.log("selectedJobIds", SelectedProsbisId);
+      const payloadProsbis = {
+        type: "bybusinessprocess",
+        parentId: SelectedProsbisId.join(","), // Menggabungkan ID job
+      };
+      try {
+        const resultMatrix = await fetchDataMatrix(payloadProsbis); // Memanggil data
+        if (resultMatrix.status === 200) {
+          // Mendapatkan instance modal dan menutup modal
+          resultAllData(resultMatrix?.data);
+          const modalElement = document.getElementById("modalSearch");
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          if (modal) {
+            modal.hide(); // Menutup modal jika ada instance yang valid
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data matrix", error);
+      }
+      break;
+
+    default:
+      console.log("selectedSingleId");
+      const payloadSingleProsbis = {
+        type: "bybusinessprocess",
+        parentId: selectedSingleId, // Menggabungkan ID job
+      };
+      try {
+        const resultMatrix = await fetchDataMatrix(payloadSingleProsbis); // Memanggil data
+        if (resultMatrix.status === 200) {
+          // Mendapatkan instance modal dan menutup modal
+          resultAllData(resultMatrix?.data);
+          const modalElement = document.getElementById("modalSearch");
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          if (modal) {
+            modal.hide(); // Menutup modal jika ada instance yang valid
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data matrix", error);
+      }
+      break;
   }
 }
