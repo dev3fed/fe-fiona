@@ -291,6 +291,7 @@ async function applySearch() {
           selectedJobIds = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
+          setState("isSearchMatrix", true);
           if (modal) {
             modal.hide(); // Menutup modal jika ada instance yang valid
           }
@@ -313,6 +314,8 @@ async function applySearch() {
           SelectedProsbisId = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
+          setState("isSearchMatrix", true);
+          appState.isSearchMatrix = true;
           if (modal) {
             modal.hide(); // Menutup modal jika ada instance yang valid
           }
@@ -324,7 +327,7 @@ async function applySearch() {
 
     default:
       const payloadSingleProsbis = {
-        type: "bybusinessprocess",
+        type: "businessprocess",
         parentId: selectedSingleId, // Menggabungkan ID job
       };
       try {
@@ -335,6 +338,7 @@ async function applySearch() {
           selectedSingleId = "";
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
+          setState("isSearchMatrix", true);
           if (modal) {
             modal.hide(); // Menutup modal jika ada instance yang valid
           }

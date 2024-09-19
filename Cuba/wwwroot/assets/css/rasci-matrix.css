@@ -244,6 +244,14 @@ th {
 }
 
 /* Table cell styles */
+.rasci-matrix {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: fit-content;
+  table-layout: fixed;
+  margin-bottom: 0;
+  font-family: "Public Sans", sans-serif;
+}
 .rasci-matrix td,
 .rasci-matrix th {
   margin: 0;
@@ -306,7 +314,10 @@ th {
   font-size: 11px !important;
   top: 0;
 }
-
+.rasci-matrix tr.highlight td {
+  /* background color green light */
+  background-color: #daf4fe !important;
+}
 .jabatan-cell-outer-wrapper {
   border-top: 5px solid #d9e1f2;
   align-items: center;
@@ -333,14 +344,12 @@ th {
 
 /* Table wrapper for scrolling */
 .table-wrapper {
-  width: 100%;
   overflow: auto;
   max-height: calc(100vh - 200px);
   position: relative;
   white-space: nowrap;
   border: 1px solid #b0d1e4;
   background-color: #f0f0f0;
-  display: none; /* Hidden by default */
 }
 
 /* Tooltip styles */
