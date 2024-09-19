@@ -43,8 +43,8 @@ function hideLoading() {
     console.error("Loading container or table wrapper not found in the DOM.");
   }
 }
-function loadTableHeader() {
-  const jobTitleList = appState.resultJabatan;
+function loadTableHeader(jobTitleList) {
+  // const jobTitleList = appState.resultJabatan;
   const headerContent = `
           <tr style="height:30px">
               <th scope="col" class="level-col head-cell">Level</th>
@@ -86,13 +86,14 @@ function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
   const jobTitleList = appState.resultJabatan;
   const visibleProsbis = prosbisList;
+  const rasciMapping = appState.resultRasciMapping || [];
   const bodyContent = visibleProsbis
     ?.map((val, i) => {
       const levelClass = val.level ? `level-${val.level}` : "";
       const isExpanded = expandedRows.includes(val.indexGroup)
         ? "chevron-up"
         : "chevron-down";
-      const rasciCells = mapRasciCells(val.id, jobTitleList);
+      const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
           <td scope="row" class="level-col" style="font-size:10px;font-weight: 500 !important;">
@@ -147,14 +148,83 @@ function loadTableBody(prosbisList) {
 // Map RASCI Cells (Memoized)
 const mapRasciCellsCache = new Map();
 
-function mapRasciCells(businessProcessId, jobTitleList) {
-  const cacheKey = `${businessProcessId}-${jobTitleList.length}`;
+// function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
+//   const cacheKey = `${businessProcessId}-${jobTitleList.length}`;
+
+//   if (mapRasciCellsCache.has(cacheKey)) {
+//     return mapRasciCellsCache.get(cacheKey);
+//   }
+
+//   if (rasciMapping.length === 0) {
+//     return "";
+//   }
+
+//   const rasciCells = jobTitleList
+//     .map((jobTitle) => {
+//       const rasciItems = rasciMapping.filter(
+//         (rm) =>
+//           rm.businessProcessId === businessProcessId &&
+//           rm.jobTitleId === jobTitle.id,
+//       );
+
+//       let rasciIcons = "",
+//         comments = [];
+
+//       rasciItems.forEach((item) => {
+//         switch (item.rasciCode) {
+//           case "R":
+//             rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
+//             break;
+//           case "A":
+//             rasciIcons += `<img src="/assets/images/rasci/a.svg" alt="A Icon" style="padding-right:2px">`;
+//             break;
+//           case "S":
+//             rasciIcons += `<img src="/assets/images/rasci/s.svg" alt="S Icon" style="padding-right:2px">`;
+//             break;
+//           case "C":
+//             rasciIcons += `<img src="/assets/images/rasci/c.svg" alt="C Icon" style="padding-right:2px">`;
+//             break;
+//           case "I":
+//             rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
+//             break;
+//         }
+//         if (item.comment) {
+//           comments.push(`<li>${item.rasciCode}: ${item.comment}</li>`);
+//         }
+//       });
+
+//       if (comments.length > 0) {
+//         const commentTooltip = `<ul>${comments.join("")}</ul>`;
+//         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip"  data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
+//       }
+
+//       return `<td>
+//         <div class="rasci-container">
+//           <div class="rasci-icons">
+//             ${rasciIcons}
+//           </div>
+//           <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon">
+//         </div>
+//         </td>`;
+//     })
+//     .join("");
+
+//   // Cache the result only if it's valid
+//   if (rasciCells) {
+//     mapRasciCellsCache.set(cacheKey, rasciCells);
+//   }
+
+//   return rasciCells;
+// }
+
+function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
+  // Tambahkan timestamp atau versi data ke cacheKey
+  const timestamp = new Date().toISOString();
+  const cacheKey = `${businessProcessId}-${jobTitleList.length}-${timestamp}`;
 
   if (mapRasciCellsCache.has(cacheKey)) {
     return mapRasciCellsCache.get(cacheKey);
   }
-
-  const rasciMapping = appState.resultRasciMapping || [];
 
   if (rasciMapping.length === 0) {
     return "";
@@ -244,7 +314,6 @@ async function handleCollapse(id) {
       const payload = { parentId: selectId.join(",") };
       const resultMatrix = await fetchDataMatrix(payload);
       // const result = traverse(appState.allDataProsbis, appState.idProsbis);
-      console.log("appState.idProsbis", appState.idProsbis);
       resultAllData(resultMatrix?.data);
     } else {
       const listSelectedId = appState.idProsbis;

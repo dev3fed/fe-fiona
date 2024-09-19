@@ -18,6 +18,7 @@ const appState = new Proxy(
         loadTableBody(target.resultProsbis);
       } else if (property === "resultRasciMapping") {
         target[property] = value;
+        loadTableBody(target.resultProsbis);
       } else if (property === "idProsbis") {
         target[property] = value;
       } else {

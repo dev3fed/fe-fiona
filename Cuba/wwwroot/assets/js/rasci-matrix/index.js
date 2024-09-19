@@ -288,6 +288,7 @@ async function applySearch() {
         if (resultMatrix.status === 200) {
           // Mendapatkan instance modal dan menutup modal
           resultAllData(resultMatrix?.data);
+          selectedJobIds = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
           if (modal) {
@@ -300,7 +301,6 @@ async function applySearch() {
       break;
 
     case "RASCI by Bus...":
-      console.log("selectedJobIds", SelectedProsbisId);
       const payloadProsbis = {
         type: "bybusinessprocess",
         parentId: SelectedProsbisId.join(","), // Menggabungkan ID job
@@ -310,6 +310,7 @@ async function applySearch() {
         if (resultMatrix.status === 200) {
           // Mendapatkan instance modal dan menutup modal
           resultAllData(resultMatrix?.data);
+          SelectedProsbisId = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
           if (modal) {
@@ -322,7 +323,6 @@ async function applySearch() {
       break;
 
     default:
-      console.log("selectedSingleId");
       const payloadSingleProsbis = {
         type: "bybusinessprocess",
         parentId: selectedSingleId, // Menggabungkan ID job
@@ -332,6 +332,7 @@ async function applySearch() {
         if (resultMatrix.status === 200) {
           // Mendapatkan instance modal dan menutup modal
           resultAllData(resultMatrix?.data);
+          selectedSingleId = "";
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
           if (modal) {
