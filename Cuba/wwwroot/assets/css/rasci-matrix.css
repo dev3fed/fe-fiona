@@ -151,7 +151,7 @@
 .hierarchy-icon {
   width: 24px;
   padding-right: 10px;
-  font-size: 8px;
+  font-size: 10px;
   display: block;
   cursor: pointer;
 }
@@ -169,7 +169,7 @@
 /* Font size and padding for headcol */
 .level-1 .prosbis-name,
 .level-1 .hierarchy-icon {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .level-2 .prosbis-cell-wrapper {
@@ -217,7 +217,7 @@
   border-right: 1px solid #b0d1e4;
   border-bottom: 1px solid #b0d1e4;
   border-collapse: collapse;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .custom-border-table th,
@@ -277,7 +277,7 @@ th {
   text-align: center;
   left: 0;
   z-index: 2;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500 !important;
   border-right: 1px solid #b0d1e4;
   background: #fff;
@@ -289,7 +289,7 @@ th {
   text-align: center;
   left: 50px;
   z-index: 2;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500 !important;
   border-right: 1px solid #b0d1e4;
   background: #fff;
@@ -302,7 +302,7 @@ th {
   text-wrap: wrap;
   left: 130px;
   z-index: 1;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500 !important;
   background: #fff;
 }
@@ -311,7 +311,7 @@ th {
   z-index: 3;
   position: sticky;
   vertical-align: middle !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   top: 0;
 }
 .rasci-matrix tr.highlight td {

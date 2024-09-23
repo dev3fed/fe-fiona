@@ -8,6 +8,7 @@ const appState = new Proxy(
     resetIdProsbis: [],
     resultRasciMapping: [],
     isSearchMatrix: false,
+    idSearchProsbis: "",
   },
   {
     set(target, property, value) {

@@ -59,6 +59,10 @@
                                             <partial name="RasciFilter" />
                                             <!-- Ends Modal Filter-->
 
+                                            <!-- Starts Modal Job Compare-->
+                                            <partial name="ModalJobCompare" />
+                                            <!-- Ends Modal Job Compare-->
+
                                             <!-- Start Modal Search -->
                                             <partial name="ModalSearch" />
                                             <!-- End Modal Search -->
@@ -110,8 +114,8 @@
                                                 Filter
                                             </button>
                                             <button class="btn btn-primary me-2 btn-icon" type="button"
-                                                data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                                <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
+                                                data-bs-toggle="modal" data-bs-target="#modalJobCompare">
+                                                <img src="~/assets/images/rasci/job-compare.svg" alt="Filter Icon">
                                                 Job Compare
                                             </button>
                                             <div class="btn-group" role="group">
@@ -125,6 +129,11 @@
                                                         <img src="~/assets/images/rasci/plus-black.svg"
                                                             alt="Filter Icon" style="margin-top: -1px;">Add Business
                                                         Process
+                                                    </a>
+                                                    <a class="dropdown-item">
+                                                        <img src="~/assets/images/rasci/plus-black.svg"
+                                                            alt="Filter Icon" style="margin-top: -1px;">Add Business
+                                                        Process from Reference
                                                     </a>
                                                     <a class="dropdown-item">
                                                         <img src="~/assets/images/rasci/plus-black.svg"
@@ -255,10 +264,6 @@
 @section Script {
     <script>
         const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
-        function onModalAddBp() {
-            const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
-            modal.show();
-        }
         function handleCloseModal() {
             const applyButton = document.getElementById("apply-search");
             if (applyButton) {
@@ -287,5 +292,7 @@
     <script src="../assets/js/rasci-matrix/store.js"></script>
     <script src="../assets/js/rasci-matrix/index.js"></script>
     <script src="../assets/js/rasci-matrix/table-list.js"></script>
+    <script src="../assets/js/rasci-matrix/job-compare.js"></script>
     <script src="../assets/js/rasci-matrix/detail-prosbis.js"></script>
+    <script src="../assets/js/rasci-matrix/add-prosbis.js"></script>
 }
