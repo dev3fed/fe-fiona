@@ -7,68 +7,44 @@ const appState = new Proxy(
     idProsbis: [],
     resetIdProsbis: [],
     resultRasciMapping: [],
+    isSearchMatrix: false,
+    idSearchProsbis: "",
   },
   {
     set(target, property, value) {
-      if (property === "resultJabatan") {
+      if (target[property] !== value) {
+        // Set the new value
         target[property] = value;
         loadTableHeader(target.resultJabatan);
-      } else if (property === "resultProsbis") {
-        target[property] = value;
         loadTableBody(target.resultProsbis);
-      } else if (property === "resultRasciMapping") {
-        target[property] = value;
-      } else if (property === "idProsbis") {
-        target[property] = value;
-      } else {
-        target[property] = value;
+        // if (
+        //   property === "resultJabatan" ||
+        //   property === "resultProsbis" ||
+        //   property === "resultRasciMapping"
+        // ) {
+        //   target[property] = value;
+        //   loadTableHeader(target.resultJabatan);
+        //   loadTableBody(target.resultProsbis);
+        // } else if (property === "idProsbis") {
+        //   target[property] = value;
+        // } else {
+        //   target[property] = value;
+        // }
       }
       return true;
     },
   },
 );
+function setState(key, value) {
+  appState[key] = value; // This will trigger the Proxy set handler
+}
 
-// async function getProsbisList() {
-//   try {
-//     const result = await $.ajax({
-//       type: "GET",
-//       url: `${url_api}/api/BusinessProcess`,
-//     });
-//     return result;
-//   } catch (error) {
-//     console.log("Error fetching Prosbis data from API");
-//     $("#resultProsbis").html("Error fetching data from API");
-//     throw error;
-//   }
-// }
-
-// async function getJobTitleList() {
-//   try {
-//     const result = await $.ajax({
-//       type: "GET",
-//       url: `${url_api}/api/jobtitle`,
-//     });
-//     return result;
-//   } catch (error) {
-//     console.log("Error fetching Job Title data from API");
-//     $("#resultJabatan").html("Error fetching data from API");
-//     throw error;
-//   }
-// }
-
-// async function getrasciMappingList() {
-//   try {
-//     const result = await $.ajax({
-//       type: "GET",
-//       url: `${url_api}/api/rascimapping`,
-//     });
-//     return result;
-//   } catch (error) {
-//     console.log("Error fetching Job Title data from API");
-//     $("#resultJabatan").html("Error fetching data from API");
-//     throw error;
-//   }
-// }
+// Fungsi untuk mendapatkan nilai state saat ini
+function getState(key) {
+  return appState[key];
+}
+window.setState = setState;
+window.getState = getState;
 
 async function SearchMatrix(params) {
   try {
@@ -88,7 +64,7 @@ async function fetchDataMatrix(params) {
   try {
     const result = await $.ajax({
       type: "POST",
-      url: `${url_api}/api/RasciMapping/testall`,
+      url: `${url_api}/api/RasciMapping`,
       contentType: "application/json",
       data: JSON.stringify(params),
     });

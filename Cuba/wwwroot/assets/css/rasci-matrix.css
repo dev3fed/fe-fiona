@@ -151,7 +151,7 @@
 .hierarchy-icon {
   width: 24px;
   padding-right: 10px;
-  font-size: 8px;
+  font-size: 10px;
   display: block;
   cursor: pointer;
 }
@@ -169,7 +169,7 @@
 /* Font size and padding for headcol */
 .level-1 .prosbis-name,
 .level-1 .hierarchy-icon {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .level-2 .prosbis-cell-wrapper {
@@ -217,7 +217,7 @@
   border-right: 1px solid #b0d1e4;
   border-bottom: 1px solid #b0d1e4;
   border-collapse: collapse;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .custom-border-table th,
@@ -244,6 +244,14 @@ th {
 }
 
 /* Table cell styles */
+.rasci-matrix {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: fit-content;
+  table-layout: fixed;
+  margin-bottom: 0;
+  font-family: "Public Sans", sans-serif;
+}
 .rasci-matrix td,
 .rasci-matrix th {
   margin: 0;
@@ -269,7 +277,7 @@ th {
   text-align: center;
   left: 0;
   z-index: 2;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500 !important;
   border-right: 1px solid #b0d1e4;
   background: #fff;
@@ -281,7 +289,7 @@ th {
   text-align: center;
   left: 50px;
   z-index: 2;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500 !important;
   border-right: 1px solid #b0d1e4;
   background: #fff;
@@ -294,7 +302,7 @@ th {
   text-wrap: wrap;
   left: 130px;
   z-index: 1;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500 !important;
   background: #fff;
 }
@@ -303,10 +311,13 @@ th {
   z-index: 3;
   position: sticky;
   vertical-align: middle !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   top: 0;
 }
-
+.rasci-matrix tr.highlight td {
+  /* background color green light */
+  background-color: #daf4fe !important;
+}
 .jabatan-cell-outer-wrapper {
   border-top: 5px solid #d9e1f2;
   align-items: center;
@@ -333,14 +344,12 @@ th {
 
 /* Table wrapper for scrolling */
 .table-wrapper {
-  width: 100%;
   overflow: auto;
   max-height: calc(100vh - 200px);
   position: relative;
   white-space: nowrap;
   border: 1px solid #b0d1e4;
   background-color: #f0f0f0;
-  display: none; /* Hidden by default */
 }
 
 /* Tooltip styles */

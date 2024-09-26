@@ -43,8 +43,8 @@ function hideLoading() {
     console.error("Loading container or table wrapper not found in the DOM.");
   }
 }
-function loadTableHeader() {
-  const jobTitleList = appState.resultJabatan;
+function loadTableHeader(jobTitleList) {
+  // const jobTitleList = appState.resultJabatan;
   const headerContent = `
           <tr style="height:30px">
               <th scope="col" class="level-col head-cell">Level</th>
@@ -86,34 +86,40 @@ function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
   const jobTitleList = appState.resultJabatan;
   const visibleProsbis = prosbisList;
+  const rasciMapping = appState.resultRasciMapping || [];
+  const isSearch = getState("isSearchMatrix");
+  const idProsbisSelected = getState("idSearchProsbis");
+  // console.log("idProsbisSelected", idProsbisSelected);
   const bodyContent = visibleProsbis
     ?.map((val, i) => {
-      const levelClass = val.level ? `level-${val.level}` : "";
-      const isExpanded = expandedRows.includes(val.indexGroup)
-        ? "chevron-up"
-        : "chevron-down";
-      const rasciCells = mapRasciCells(val.id, jobTitleList);
+      const levelClass =
+        val.level && idProsbisSelected == val.indexGroup
+          ? `level-${val.level} highlight`
+          : val.level
+          ? `level-${val.level}`
+          : "";
+      const isExpanded = expandedRows.includes(val.indexGroup) ? "chevron-up" : "chevron-down";
+      const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
-          <td scope="row" class="level-col" style="font-size:10px;font-weight: 500 !important;">
+          <td scope="row" class="level-col" style="font-size:12px;font-weight: 500 !important;">
             L${val.level}
           </td>
-          <td class="index-col" style="text-align:left;font-size:10px;font-weight: 500 !important;"><span style="padding-left:5px;">${
+          <td class="index-col" style="text-align:left;font-size:12px;font-weight: 500 !important;"><span style="padding-left:5px;">${
             val.indexGroup
           }</span></td>
-          <td class="headcol" style="font-size:10px;font-weight: 500 !important;">
+          <td class="headcol" style="font-size:12px;font-weight: 500 !important;">
            <div class="prosbis-cell-wrapper">
-              <div class="hierarchy-icon-wrapper">
+              
+           <div class="hierarchy-icon-wrapper">
                 ${
-                  val.hasChild
+                  isSearch == false && val.hasChild
                     ? `<i data-feather="${isExpanded}" class="hierarchy-icon"
                     style="width:24px;" onclick="handleCollapse('${val.indexGroup}')"></i>`
                     : ``
                 }
               </div>
-              <div class="flex-fill prosbis-name" onclick="onModalProsbis()">${
-                val.description
-              }</div>
+              <div class="flex-fill prosbis-name" onclick="onModalProsbis()">${val.description}</div>
               <div class="ellipsis-menu prosbis-row-ellipsis">
                 <div class="dropright">
                   <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
@@ -147,14 +153,14 @@ function loadTableBody(prosbisList) {
 // Map RASCI Cells (Memoized)
 const mapRasciCellsCache = new Map();
 
-function mapRasciCells(businessProcessId, jobTitleList) {
-  const cacheKey = `${businessProcessId}-${jobTitleList.length}`;
+function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
+  // Tambahkan timestamp atau versi data ke cacheKey
+  const timestamp = new Date().toISOString();
+  const cacheKey = `${businessProcessId}-${jobTitleList.length}-${timestamp}`;
 
   if (mapRasciCellsCache.has(cacheKey)) {
     return mapRasciCellsCache.get(cacheKey);
   }
-
-  const rasciMapping = appState.resultRasciMapping || [];
 
   if (rasciMapping.length === 0) {
     return "";
@@ -163,9 +169,7 @@ function mapRasciCells(businessProcessId, jobTitleList) {
   const rasciCells = jobTitleList
     .map((jobTitle) => {
       const rasciItems = rasciMapping.filter(
-        (rm) =>
-          rm.businessProcessId === businessProcessId &&
-          rm.jobTitleId === jobTitle.id,
+        (rm) => rm.businessProcessId === businessProcessId && rm.jobTitleId === jobTitle.id,
       );
 
       let rasciIcons = "",
@@ -220,12 +224,8 @@ function mapRasciCells(businessProcessId, jobTitleList) {
 
 // Initialize tooltips after rendering
 function initializeTooltips() {
-  const tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
-  );
-  tooltipTriggerList.map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
-  );
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 function onModalProsbis() {
   detailsProsbis();
@@ -237,9 +237,7 @@ async function handleCollapse(id) {
   if (parentRow) {
     if (!appState.idProsbis.includes(parentId)) {
       appState.idProsbis = [...appState.idProsbis, parentId.toString()];
-      appState.resetIdProsbis = appState.resetIdProsbis.filter(
-        (item) => !parentId.toString().includes(item),
-      );
+      appState.resetIdProsbis = appState.resetIdProsbis.filter((item) => !parentId.toString().includes(item));
       const selectId = filterChild(appState.idProsbis, appState.resetIdProsbis);
       const payload = { parentId: selectId.join(",") };
       const resultMatrix = await fetchDataMatrix(payload);
@@ -249,10 +247,7 @@ async function handleCollapse(id) {
       const listSelectedId = appState.idProsbis;
       const index = appState.idProsbis.indexOf(parentId.toString());
       // const idFiltered = filterData(listSelectedId, parentId.toString());
-      appState.resetIdProsbis = [
-        ...appState.resetIdProsbis,
-        parentId.toString(),
-      ];
+      appState.resetIdProsbis = [...appState.resetIdProsbis, parentId.toString()];
       // resetIdProsbis
       const idFiltered = filterArray(appState.resetIdProsbis, listSelectedId);
       if (idFiltered && index > -1) appState.idProsbis.splice(index, 1);
@@ -272,21 +267,13 @@ function filterChild(array, input) {
   });
 }
 function filterArray(inputs, array) {
-  // Helper function to determine if a value is a descendant of another
   function isDescendant(parent, child) {
     return child.startsWith(parent + ".") || child === parent;
   }
-
-  // Filter the array to exclude descendants of any input value
   const result = array.filter((value) => {
-    // Check if value is not a descendant of any of the inputs
-    return (
-      !inputs.some((input) => isDescendant(input, value)) &&
-      !inputs.includes(value)
-    );
+    return !inputs.some((input) => isDescendant(input, value)) && !inputs.includes(value);
   });
 
-  // Sort the result array
   return result.sort((a, b) => {
     const aParts = a.split(".").map(Number);
     const bParts = b.split(".").map(Number);
@@ -302,19 +289,15 @@ function filterArray(inputs, array) {
   });
 }
 function filterData(data, selectedId) {
-  // Memisahkan selectedId menjadi array parts
   const selectedParts = selectedId.split(".");
   const selectedDepth = selectedParts.length;
   return data.filter((item) => {
     const itemParts = item.split(".");
-    // Menyaring elemen yang berada di luar cabang yang dipilih
     for (let i = 0; i < selectedDepth; i++) {
-      // Jika item memiliki kedalaman yang sama atau lebih dalam, dan tidak sama dengan selectedId, sertakan item
       if (itemParts[i] !== selectedParts[i]) {
         return true;
       }
     }
-    // Jika elemen berada dalam cabang yang dipilih, jangan sertakan
     return false;
   });
 }
@@ -335,25 +318,19 @@ function traverse(data, filters) {
   }
   filters.forEach((filter) => {
     data.forEach((item) => {
-      if (
-        item.indexGroup === filter &&
-        item.parentId === null &&
-        !addedItems.has(item.indexGroup)
-      ) {
+      if (item.indexGroup === filter && item.parentId === null && !addedItems.has(item.indexGroup)) {
         result.push(item);
         addedItems.add(item.indexGroup);
         helper(item.indexGroup);
       }
     });
   });
-  // Menambahkan semua elemen level 1 (parentId === null) tanpa duplikasi
   data.forEach((item) => {
     if (item.parentId === null && !addedItems.has(item.indexGroup)) {
       result.push(item);
       addedItems.add(item.indexGroup);
     }
   });
-  // Mengurutkan berdasarkan indexGroup
   result.sort((a, b) => {
     const indexGroupA = a.indexGroup.split(".").map(Number);
     const indexGroupB = b.indexGroup.split(".").map(Number);
@@ -377,5 +354,9 @@ async function clearInput() {
   const resultMatrix = await fetchDataMatrix();
   // const result = traverse(appState.allDataProsbis, appState.idProsbis);
   resultAllData(resultMatrix?.data);
+  setState("isSearchMatrix", false);
+  setState("idSearchProsbis", "");
   document.getElementById("inputText").value = "";
+  document.getElementById("inputSearchCompare").value = "";
+  handleCloseModal();
 }

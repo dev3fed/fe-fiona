@@ -47,8 +47,6 @@ function detailsProsbis() {
   document.getElementById("prosbis-details-header").innerHTML = theadContent;
   document.getElementById("prosbis-details-body").innerHTML = bodyContent;
   document.getElementById("total-job").innerHTML = toalJob;
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalBusinessPro"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("modalBusinessPro"));
   modal.show();
 }
