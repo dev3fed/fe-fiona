@@ -51827,14 +51827,3 @@ html[dir="rtl"]
     63. Box-layout CSS ends
 ==========================**/
 
-/* tableMasterData */
-/* tableMasterData header */
-.tableMasterData thead th {
-  background-color: #f8f8f8;
-  border: 1px solid #f8f8f8;
-  padding: 10px 15px;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}

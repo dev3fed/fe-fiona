@@ -23,7 +23,7 @@
       },
       function () {
         $(this).removeClass("hoverd");
-      },
+      }
     );
     $(window).on("scroll", function () {
       if ($(this).scrollTop() < 600) {
@@ -106,7 +106,6 @@
     }
   });
   $(".search-full input").keyup(function (e) {
-    console.log(e.target.value);
     if (e.target.value) {
       $("body").addClass("offcanvas");
     } else {
@@ -141,10 +140,10 @@
     }
   });
   $("body").addClass(
-    localStorage.getItem("mode") ? localStorage.getItem("mode") : "light",
+    localStorage.getItem("mode") ? localStorage.getItem("mode") : "light"
   );
   $(".mode").addClass(
-    localStorage.getItem("mode") === "dark-only" ? "active" : " ",
+    localStorage.getItem("mode") === "dark-only" ? "active" : " "
   );
 
   // sidebar filter
@@ -170,7 +169,7 @@ $(".tap-top").click(function () {
     {
       scrollTop: 0,
     },
-    600,
+    600
   );
   return false;
 });
@@ -193,7 +192,7 @@ $(".tap-top").click(function () {
     "animationend webkitAnimationEnd oanimationend MSAnimationEnd",
     function (e) {
       $(this).removeClass("is-active");
-    },
+    }
   );
 })(jQuery, window, document);
 

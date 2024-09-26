@@ -2,6 +2,7 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link rel="stylesheet" type="text/css" href="~/assets/css/master-data.css">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -32,25 +33,19 @@
                     <div class="card-body">
                         <div class="card-body">
                             <h6 class="mb-4">Please upload all the following data files and click the submit button.</h6>
-                            @* row *@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="table-responsive">
-                                        <table class="tableMasterData table table-hover w-100" id="examplee">
-                                            @* <tr>
-                                                <th>Id</th>
-                                                <th>Code</th>
-                                                <th>Name</th>
-                                                <th>Actions</th>
-                                            </tr> *@
+                                        <table class="tableMasterData table table-hover w-100" id="masterDataList">
                                         </table>
                                     </div>
-                                    @* button reset and submit *@
                                         <div class="col-md-12 mt-4">
                                             <div class="
                                                 text-end">
-                                                <button type="button" class="btn btn-lg btn-outline-light" style="margin-right: 10px;"><i class="fa fa-times-circle"></i> Reset</button>
-                                                <button type="button" class="btn btn-lg btn-outline-primary" ><i class="icofont icofont-upload-alt"></i> Submit</button>
+                                                <button type="button" id="reset-button" class="btn btn-lg btn-outline-light" style="margin-right: 10px;"><i class="fa fa-times-circle"></i> Reset</button>
+                                                <button type="button"  
+                                                id="submit-button"
+                                                class="btn btn-lg btn-outline-primary" ><i class="icofont icofont-upload-alt"></i> Submit</button>
                                             </div>
                                         </div>
                                 </div>
@@ -60,8 +55,13 @@
                 </div>
             </div>
         </div>
+        
+    <partial name="~/Views/MasterData/Modal.cshtml" />
     </div>
+   
     <!-- Container-fluid Ends-->
+    @* partial *@
+    @* end partial *@
 </div>
 @section Script {
     <!-- Plugins JS start-->
@@ -69,12 +69,18 @@
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+
 
 
     <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/datatable/datatables/datatable-custom-cnt.js"></script>
-    <!-- Plugins JS Ends-->
+
+
+    @* custom js *@
+    <script src="../assets/js/master-data/main.js"></script>
+    <script src="../assets/js/master-data/datatable-custom.js"></script>
     <script src="../assets/js/master-data/custom.js"></script>
+    <!-- Plugins JS Ends-->
 
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>

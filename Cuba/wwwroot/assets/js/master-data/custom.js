@@ -1,23 +1,85 @@
+// const asik =
+let dataSet = [];
+
 $(document).ready(function () {
-  //  on click inside table example where class is false_input
-  $("#examplee").on("click", ".false_input", function () {
-    var id = $(this).attr("id");
-    $("#" + id.replace("falseinput_", "fileinput_")).trigger("click");
+  getDataMasterData()
+    .then(function (data) {
+      dataSet = data.data;
+      getTable(dataSet);
+    })
+    .catch(function (error) {
+      console.error("Error:", error); // Handle any errors that occur
+    });
+
+  // reset Button
+  $("#reset-button").click(function () {
+    // swal fire
+    swal({
+      title: "Confirm Reset",
+      text: "All your selected data will be deleted",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        $(".fileinput").val("");
+        $(".labelfile").text("");
+        $(".cancelfile").hide();
+        $("div[id^='div_']").hide();
+        swal("Reset Success", {
+          icon: "success",
+        });
+      } else {
+        swal("Reset Cancelled");
+      }
+    });
   });
 
-  $("#examplee").on("change", ".fileinput", function () {
-    var id = $(this).attr("id");
-    $("#" + id.replace("fileinput_", "div_")).show();
-    // labelfile_ is the id of the label that will show the file name, onlu the file name
-    $("#" + id.replace("fileinput_", "labelfile_")).text(
-      $(this).val().split("\\").pop()
-    );
-  });
-  //  cancelfile_ is the id of the cancel icon
-  $("#examplee").on("click", ".cancelfile", function () {
-    var id = $(this).attr("id");
-    $("#" + id.replace("cancelfile_", "div_")).hide();
-    $("#" + id.replace("cancelfile_", "labelfile_")).text("");
-    $("#" + id.replace("cancelfile_", "fileinput_")).val("");
+  $("#submit-button").click(function () {
+    // swal fire for confirmation
+    swal({
+      title: "Are you sure?",
+      text: "Once submitted, you will not be able to recover this data!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willSubmit) => {
+      if (willSubmit) {
+        // swal fire for success
+        let formData = new FormData();
+        $("input[id^='fileinput_']").each(function () {
+          if ($(this).val() !== "") {
+            const file = this.files[0];
+            formData.append("Files", file);
+            formData.append("Name", $(this).next().val());
+          }
+        });
+
+        uploadMasterDataFile(formData)
+          .then(function (data) {
+            if (data.status === 200) {
+              swal("Upload Success", {
+                icon: "success",
+              });
+              // refresh page
+              setTimeout(() => {
+                location.reload();
+              }, 1000);
+              // swal("Upload Success, Please wait for the process to complete", {
+              //   icon: "success",
+              // });
+
+              // location.reload();
+            } else {
+              console.log("error");
+            }
+          })
+          .catch(function (error) {
+            console.error("Error:", error); // Handle any errors that occur
+          });
+      } else {
+        swal("Submission Cancelled");
+      }
+    });
   });
 });
