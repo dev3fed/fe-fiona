@@ -9,16 +9,24 @@
         display: none;
     }
 
+    #header-detail-draft {
+        display: none;
+    }
+
+    #approval-detail {
+        display: none;
+    }
+
+    #header-detail-approval {
+        display: none;
+    }
+
     #main-matrix {
         display: block;
     }
 
     #header-matrix {
         display: block;
-    }
-
-    #header-detail-draft {
-        display: none;
     }
 </style>
 <div class="page-body">
@@ -53,6 +61,19 @@
                         <li class="breadcrumb-item active">Detail Draft</li>
                     </ol>
                 </div>
+                <div class="col-6" id="header-detail-approval">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="HomePage" asp-action="Index">
+                                <svg class="stroke-icon">
+                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">RASCI Matrix</li>
+                        <li class="breadcrumb-item active">Detail Approval</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
@@ -62,6 +83,9 @@
             <div class="col-12" id="draft-detail">
                 <partial name="ModalEditBp" />
                 <partial name="DetailDraft" />
+            </div>
+            <div class="col-12" id="approval-detail">
+                <partial name="DetailApproval" />
             </div>
             <div class="col-12" id="main-matrix">
                 <div class="card" style="border-radius:8px">
@@ -212,57 +236,17 @@
                             </div>
                             <div class="tab-pane fade" id="pills-approval" role="tabpanel"
                                 aria-labelledby="pills-approval-tab">
-                                <div class="card-body">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
-                                        <div class="col-12">
-                                            <p class="mb-0 m-t-30">Approval Lorem Ipsum is simply dummy text of the
-                                                printing and
-                                                typesetting
-                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
-                                                since the
-                                                1500s,
-                                                when an unknown printer took a galley of type and scrambled it to make a
-                                                type
-                                                specimen
-                                                book. It has survived not only five centuries, but also the leap into
-                                                electronic
-                                                typesetting, remaining essentially unchanged. It was popularised in the
-                                                1960s with
-                                                the
-                                                release of Letraset sheets containing Lorem Ipsum passages, and more
-                                                recently with
-                                                desktop publishing software like Aldus PageMaker including versions of
-                                                Lorem Ipsum
-                                            </p>
-                                        </div>
+                                        <partial name="RasciApproval" />
                                     </div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-log-history" role="tabpanel"
                                 aria-labelledby="pills-log-history-tab">
-                                <div class="card-body">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
-                                        <div class="col-12">
-                                            <p class="mb-0 m-t-30">Log History Lorem Ipsum is simply dummy text of the
-                                                printing and
-                                                typesetting
-                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
-                                                since the
-                                                1500s,
-                                                when an unknown printer took a galley of type and scrambled it to make a
-                                                type
-                                                specimen
-                                                book. It has survived not only five centuries, but also the leap into
-                                                electronic
-                                                typesetting, remaining essentially unchanged. It was popularised in the
-                                                1960s with
-                                                the
-                                                release of Letraset sheets containing Lorem Ipsum passages, and more
-                                                recently with
-                                                desktop publishing software like Aldus PageMaker including versions of
-                                                Lorem Ipsum
-                                            </p>
-                                        </div>
+                                        <partial name="RasciHistory" />
                                     </div>
                                 </div>
                             </div>
@@ -317,4 +301,5 @@
     <script src="../assets/js/rasci-matrix/add-prosbis.js"></script>
     <script src="../assets/js/rasci-matrix/edit-prosbis.js"></script>
     <script src="../assets/js/rasci-matrix/rasci-draft.js"></script>
+    <script src="../assets/js/rasci-matrix/rasci-approval.js"></script>
 }

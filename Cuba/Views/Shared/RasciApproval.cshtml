@@ -1,0 +1,182 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-modal-bp {
+        max-width: 60% !important;
+        margin: 30px auto;
+    }
+
+    .tbl-border-add-prosbis {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-add-prosbis th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-add-prosbis thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-add-prosbis th,
+    .tbl-border-add-prosbis td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+    }
+
+    .checkbox_animated {
+        width: 12px;
+        height: 12px;
+        transform: scale(0.8);
+        margin-right: 5px;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+        text-align: center;
+    }
+
+    .radio_animated {
+        margin-right: 5px;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+
+    .empty-body-approval {
+        background-color: #EAEAEB;
+        height: 400px;
+        background-image: url("/assets/images/rasci/empty_approval.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-size: 150px;
+    }
+
+    #table-approval {
+        display: none;
+    }
+
+    #empty-approval {
+        display: block;
+    }
+</style>
+<div class="col-12 " id="empty-approval">
+    <div class="empty-body-approval" onclick="handleApprovalList()">
+
+    </div>
+</div>
+<div class="col-12" id="table-approval">
+    <partial name="ModalDeleteNotif" />
+
+    <div class="row">
+        <div class="col-3">
+            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                        data-feather="calendar" style="width: 20px;"></i></div>
+                <input class="datepicker-here form-control digits" type="text" data-language="en"
+                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date">
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                        data-feather="calendar" style="width: 20px;"></i></div>
+                <input class="datepicker-here form-control digits" type="text" data-language="en"
+                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date">
+            </div>
+        </div>
+
+        <div class="col-2">
+            <select class="form-select digits">
+                <option>Status</option>
+                <option>L1</option>
+                <option>L2</option>
+                <option>L3</option>
+                <option>L4</option>
+                <option>L5</option>
+                <option>L6</option>
+            </select>
+        </div>
+        <div class="col-4">
+            <div class="faq-form">
+                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                    data-feather="search"></i>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="table-responsive" style=" max-height: 450px;">
+                <table class="table tbl-border-add-prosbis">
+                    <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
+                        <tr>
+                            <th scope="col" style="width: 50px;text-align:center">
+                                No
+                            </th>
+                            <th scope="col" style="width: 200px">Request ID</th>
+                            <th scope="col" style="width: 150px">Type</th>
+                            <th scope="col" style="width: 150px">Requestor</th>
+                            <th scope="col" style="width: 150px">Approver</th>
+                            <th scope="col" style="width: 120px;text-align: center;">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-add-prosbis-body">
+                        <tr>
+                            <th scope="row">
+
+                            </th>
+                            <td style="text-align:center">
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td style="width: 100px;text-align:center">
+                                <button class="btn btn-outline-primary" type="button"
+                                    onclick="handleDetailApproval()"><i class="icon-eye"></i>
+                                    Detail</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

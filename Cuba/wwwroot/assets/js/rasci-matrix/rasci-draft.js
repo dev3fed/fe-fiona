@@ -26,6 +26,10 @@ function handleBack() {
   if (headerMatrix) {
     headerMatrix.style.display = "block";
   }
+  // Remove ?id=1 from the URL
+  const url = new URL(window.location);
+  url.searchParams.delete("id"); // Remove the 'id' parameter
+  window.history.pushState({}, "", url); // Update the URL without reloading the page
 }
 function handleOpenDetail() {
   const draftDetail = document.getElementById("draft-detail");
@@ -44,4 +48,8 @@ function handleOpenDetail() {
   if (headerMatrix) {
     headerMatrix.style.display = "none";
   }
+  // Add or update ?id=1 in the current URL without refreshing
+  const url = new URL(window.location);
+  url.searchParams.set("id", 1); // Set id=1
+  window.history.pushState({}, "", url); // Update the URL without reloading the page
 }

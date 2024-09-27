@@ -1,0 +1,151 @@
+<style>
+    .custom-card-approval {
+        height: auto;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 20px 10px 10px 15px;
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .header-card-approval {
+        background-color: #F5F5F5;
+        height: 35px;
+        padding-left: 15px;
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        position: absolute;
+        top: -5px;
+        left: 0;
+        right: 0;
+        border-radius: 4px 4px 0 0;
+        border: 1px solid #BFBFC2;
+        border-bottom: none;
+        width: calc(100% + 2px);
+        font-size: 14px;
+        margin-left: -1px;
+    }
+
+
+    .custom-col {
+        border-right: 1px solid #BFBFC2;
+        padding-right: 10px;
+        text-align: center;
+    }
+
+    .custom-col:last-child {
+        border-right: none;
+    }
+
+    .custom-col label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .custom-row-full:first-child {
+        border-top: none;
+    }
+
+    .custom-row-full {
+        border-top: 1px solid #BFBFC2;
+        padding-right: 10px;
+        padding-top: 10px;
+        text-align: left;
+
+    }
+
+    .custom-row-full label {
+        display: block;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .btn-outline-light:hover img {
+        filter: brightness(0) invert(1);
+    }
+</style>
+
+<div class="card" style="border-radius:8px">
+    <div style="padding:15px">
+        <h6 class="f-w-600">Draft Detail</h6>
+        <!-- Card info start-->
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Info
+            </div>
+            <div class="row" style="padding-top: 20px;">
+                <div class="col-2 custom-col">
+                    <label style="color:#9F9FA5">Request ID</label>
+                    <label style="font-weight: 600;font-size: 14px"> Req/090924/001</label>
+                </div>
+                <div class="col-3 custom-col">
+                    <label style="color:#9F9FA5">Requestor</label>
+                    <label style="font-weight: 600;font-size: 14px">Gaiman Hutagalung</label>
+                    <label>Submitted at 09/09/2025, 15:30</label>
+                </div>
+                <div class="col-3 custom-col">
+                    <label style="color:#9F9FA5">Approver</label>
+                    <label style="font-weight: 600;font-size: 14px">Dasa</label>
+                    <label>Approved at 09/09/2025, 15:30</label>
+                </div>
+                <div class="col-2 custom-col">
+                    <label style="color:#9F9FA5">Type</label>
+                    <label style="font-weight: 600;font-size: 14px">Add RASCI Notation</label>
+                </div>
+                <div class="col-2 custom-col">
+                    <label style="color:#9F9FA5">Status</label>
+                    <label style="font-weight: 600;font-size: 14px">Approved</label>
+                </div>
+            </div>
+        </div>
+        <!-- Card info end-->
+
+        <!-- Card detail start-->
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Detail
+            </div>
+            @* <div class="row" style="padding-top: 20px;">
+            <div class="col-4 custom-col" style="text-align: left;">
+            <label>Business Process Name</label>
+            <label style="font-weight: 600;font-size: 14px">Menyusun laporan dan rekomendasi XXXX</label>
+            </div>
+            <div class="col-1 custom-col">
+            <label>Level</label>
+            <label style=" font-weight: 600;font-size: 14px">5</label>
+            </div>
+            <div class="col-7 custom-col" style="text-align: left;">
+            <label>Business Process Parent</label>
+            <label style="font-weight: 600;font-size: 14px">1.1.1.1 - Melakukan Kajian (Assess)/analisis
+            eksternal</label>
+            </div>
+            </div> *@
+            <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                    <label>Job Title</label>
+                    <label style="font-weight: 600;font-size: 14px;padding-bottom: 10px;">Jabatan ABCD</label>
+                </div>
+                <div class=" custom-row-full">
+                    <label>Rasci Notasi</label>
+                    <label style="font-weight: 600;font-size: 14px">. A</label>
+                </div>
+            </div>
+        </div>
+        <!-- Card detail end-->
+
+        <!-- card footer start-->
+        <div class="text-end mt-4 mb-2">
+            <button class="btn btn-outline-light" type="button" onclick="handleApprovalBack()">
+                <i class="icon-arrow-left"></i> Back
+            </button>
+            <button class="btn btn-outline-light" type="button">
+                <i class="icon-close" style="font-size: 0.8em;margin-right: 5px;"></i>Reject
+            </button>
+            <button class="btn btn-primary" type="button">Approve<i class="icon-arrow-right"
+                    style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+        </div>
+        <!-- card footer end-->
+    </div>
+</div>
