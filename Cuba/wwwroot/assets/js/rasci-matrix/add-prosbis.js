@@ -125,12 +125,6 @@ function onModalAddBp() {
   if (bodyContent) {
     bodyContent.innerHTML = formContent;
   }
-  $(document).ready(function () {
-    $("#mySelect").select2({
-      placeholder: "Select an option",
-      allowClear: true,
-    });
-  });
 }
 
 function onSelect(event) {

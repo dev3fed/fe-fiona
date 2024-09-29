@@ -59,12 +59,28 @@ async function SearchMatrix(params) {
     throw error;
   }
 }
-
+// /Utilities/selection?Page=1&Type=level&Level=2
 async function fetchDataMatrix(params) {
   try {
     const result = await $.ajax({
       type: "POST",
       url: `${url_api}/api/RasciMapping`,
+      contentType: "application/json",
+      data: JSON.stringify(params),
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function fetchSelectJob(params) {
+  try {
+    const result = await $.ajax({
+      type: "POST",
+      url: `${url_api}/api/Utilities/selection?Page=1&Type=level&Level=2`,
       contentType: "application/json",
       data: JSON.stringify(params),
     });
