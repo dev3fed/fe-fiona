@@ -10,6 +10,37 @@ const appState = new Proxy(
     isSearchMatrix: false,
     idSearchProsbis: "",
     prosbisLevel: [],
+    selectedLevel: 0,
+    insertProsbis: {
+      parentId: null,
+      rasciNotation: [
+        {
+          rasciCode: "R",
+          comment: "",
+          isChecked: false,
+        },
+        {
+          rasciCode: "A",
+          comment: "",
+          isChecked: false,
+        },
+        {
+          rasciCode: "S",
+          comment: "",
+          isChecked: false,
+        },
+        {
+          rasciCode: "C",
+          comment: "",
+          isChecked: false,
+        },
+        {
+          rasciCode: "I",
+          comment: "",
+          isChecked: false,
+        },
+      ],
+    },
   },
   {
     set(target, property, value) {
@@ -18,6 +49,9 @@ const appState = new Proxy(
         target[property] = value;
         loadTableHeader(target.resultJabatan);
         loadTableBody(target.resultProsbis);
+        updateSelect2ByProsbis();
+        updateSelect2ByJob();
+        formValidation();
         // if (
         //   property === "resultJabatan" ||
         //   property === "resultProsbis" ||
@@ -86,21 +120,21 @@ async function fetchSelectLevel() {
     return result;
   } catch (error) {
     console.log("Error fetching Job Title data from API");
-    $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
 }
 
-async function fetchSelectProsbis() {
+async function submitDraftProsbis(payload) {
   try {
     const result = await $.ajax({
-      type: "GET",
-      url: `${url_api}/api/Utilities/selection?Page=1&Type=prosbis&Level=1`,
+      type: "POST",
+      url: `${url_api}/api/BusinessProcess`,
+      contentType: "application/json",
+      data: JSON.stringify(payload),
     });
     return result;
   } catch (error) {
     console.log("Error fetching Job Title data from API");
-    $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
 }
