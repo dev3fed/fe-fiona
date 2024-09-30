@@ -17,13 +17,7 @@ function onModalAddBp() {
     <div class="col-10">
       <div class="mb-3">
         <label class="form-label">Parent</label>
-        <select class="form-select digits" id="selecttParent" disabled>
-          <option>Choose</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-        </select>
+        <select class="form-control" name="parentId" id="parentId"></select>
       </div>
     </div>
     <div class="col-12">
@@ -82,12 +76,51 @@ function onModalAddBp() {
 
   // Initialize Bootstrap Select
   $(".selectpicker").selectpicker();
+
+  $("#parentId")
+    .select2({
+      dropdownParent: $("#modalAddBp"),
+      placeholder: "Choose ParentId",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "prosbis",
+            level: 4,
+          };
+        },
+        processResults: function (data) {
+          if (data.data && data.data.result) {
+            page++;
+            return {
+              results: data.data.result,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
 }
 
 function onSelect(event) {
   const value = event.target.value;
   const parentSelect = document.querySelector("#selecttParent");
-  parentSelect.disabled = value === "Choose" || value == 1;
+  parentSelect.disabled = value === "Choose";
 
   console.log("value", value);
 }
