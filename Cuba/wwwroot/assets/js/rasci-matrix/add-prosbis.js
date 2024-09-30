@@ -17,7 +17,13 @@ function onModalAddBp() {
     <div class="col-10">
       <div class="mb-3">
         <label class="form-label">Parent</label>
-        <select class="js-data-example-ajax" id="mySelect2" style="width: 100%"></select>
+        <select class="form-select digits" id="selecttParent" disabled>
+          <option>Choose</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
       </div>
     </div>
     <div class="col-12">
@@ -76,30 +82,12 @@ function onModalAddBp() {
 
   // Initialize Bootstrap Select
   $(".selectpicker").selectpicker();
-  $("#mySelect2").select2({
-    allowClear: true,
-    ajax: {
-      url: `${url_api}/api/Utilities/selection`,
-      dataType: "json",
-      data: function (params) {
-        var query = {
-          search: params.term,
-          page: params.page || 1,
-          type: "prosbis",
-          Level: 2,
-        };
-
-        // Query parameters will be ?search=[term]&type=public
-        return query;
-      },
-    },
-  });
 }
 
 function onSelect(event) {
   const value = event.target.value;
   const parentSelect = document.querySelector("#selecttParent");
-  parentSelect.disabled = value === "Choose";
+  parentSelect.disabled = value === "Choose" || value == 1;
 
   console.log("value", value);
 }
