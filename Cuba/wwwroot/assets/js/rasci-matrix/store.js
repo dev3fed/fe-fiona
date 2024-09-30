@@ -9,6 +9,7 @@ const appState = new Proxy(
     resultRasciMapping: [],
     isSearchMatrix: false,
     idSearchProsbis: "",
+    prosbisLevel: [],
   },
   {
     set(target, property, value) {
@@ -76,13 +77,25 @@ async function fetchDataMatrix(params) {
   }
 }
 
-async function fetchSelectJob(params) {
+async function fetchSelectLevel() {
   try {
     const result = await $.ajax({
-      type: "POST",
-      url: `${url_api}/api/Utilities/selection?Page=1&Type=level&Level=2`,
-      contentType: "application/json",
-      data: JSON.stringify(params),
+      type: "GET",
+      url: `${url_api}/api/Utilities/selection?Page=1&Type=level`,
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function fetchSelectProsbis() {
+  try {
+    const result = await $.ajax({
+      type: "GET",
+      url: `${url_api}/api/Utilities/selection?Page=1&Type=prosbis&Level=1`,
     });
     return result;
   } catch (error) {
@@ -94,10 +107,11 @@ async function fetchSelectJob(params) {
 
 async function fetchData() {
   try {
-    const [dataMatrix] = await Promise.all([fetchDataMatrix()]);
+    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
+    appState.prosbisLevel = prosbisLvl?.data.result;
 
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
