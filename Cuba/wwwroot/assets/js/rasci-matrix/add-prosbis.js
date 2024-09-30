@@ -1,8 +1,8 @@
 function onModalAddBp() {
-  const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
-  modal.show();
-  const prosbisLevel = getState("prosbisLevel");
-  console.log("prosbisLevel", prosbisLevel);
+  const modal = new bootstrap.Modal(document.getElementById('modalAddBp'))
+  modal.show()
+  const prosbisLevel = getState('prosbisLevel')
+  console.log('prosbisLevel', prosbisLevel)
 
   const formContent = `
     <div class="col-2">
@@ -17,7 +17,7 @@ function onModalAddBp() {
     <div class="col-10">
       <div class="mb-3">
         <label class="form-label">Parent</label>
-        <select class="js-data-example-ajax" id="mySelect2" style="width: 100%"></select>
+        <select class="form-control" name="parentId" id="parentId"></select>
       </div>
     </div>
     <div class="col-12">
@@ -36,15 +36,15 @@ function onModalAddBp() {
           <option>Option 5</option>
         </select>
       </div>
-    </div>`;
+    </div>`
 
   theadContent = `<tr>
         <th scope="col" style="width: 50px">Check</th>
         <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
         <th scope="col">Comment (Optional)</th>
-        </tr>`;
+        </tr>`
 
-  const rasciRows = ["R", "A", "S", "C", "I"]
+  const rasciRows = ['R', 'A', 'S', 'C', 'I']
     .map(
       (letter) => `
     <tr>
@@ -60,52 +60,90 @@ function onModalAddBp() {
         <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter}" disabled>
       </td>
     </tr>
-  `,
+  `
     )
-    .join("");
+    .join('')
 
-  tdBody = rasciRows;
+  tdBody = rasciRows
 
-  document.getElementById("tbl-add-prosbis-header").innerHTML = theadContent;
-  document.getElementById("tbl-add-prosbis-body").innerHTML = tdBody;
+  document.getElementById('tbl-add-prosbis-header').innerHTML = theadContent
+  document.getElementById('tbl-add-prosbis-body').innerHTML = tdBody
 
-  const bodyContent = document.getElementById("form-content");
+  const bodyContent = document.getElementById('form-content')
   if (bodyContent) {
-    bodyContent.innerHTML = formContent;
+    bodyContent.innerHTML = formContent
   }
 
   // Initialize Bootstrap Select
-  $(".selectpicker").selectpicker();
-  $("#mySelect2").select2({
-    allowClear: true,
-    ajax: {
-      url: `${url_api}/api/Utilities/selection`,
-      dataType: "json",
-      data: function (params) {
-        var query = {
-          search: params.term,
-          page: params.page || 1,
-          type: "prosbis",
-          Level: 2,
-        };
+  // $('.selectpicker').selectpicker()
+  // $('#parentId').select2({
+  //   allowClear: true,
+  //   ajax: {
+  //     url: `${url_api}/api/Utilities/selection`,
+  //     dataType: 'json',
+  //     data: function (params) {
+  //       var query = {
+  //         search: params.term,
+  //         page: params.page || 1,
+  //         type: 'prosbis',
+  //         Level: 2,
+  //       }
 
-        // Query parameters will be ?search=[term]&type=public
-        return query;
+  //       // Query parameters will be ?search=[term]&type=public
+  //       return query
+  //     },
+  //   },
+  // })
+  $('#parentId')
+    .select2({
+      dropdownParent: $('#modalAddBp'),
+      placeholder: 'Choose ParentId',
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: 'json',
+        data: function (params) {
+          return {
+            search: params.term || '',
+            page: params.page || 1,
+            type: 'prosbis',
+            level: 1,
+          }
+        },
+        processResults: function (data) {
+          if (data.data && data.data.result) {
+            page++ // Increment the page number for the next request
+            return {
+              results: data.data.result, // Return the result array
+              pagination: {
+                more: data.data.pagination.more, // Indicate if more results are available
+              },
+            }
+          }
+          return { results: [] } // Kembalikan array kosong jika tidak ada data
+        },
+        cache: true,
       },
-    },
-  });
+      templateResult: function (item) {
+        return item.text // Customize how options are displayed
+      },
+    })
+    .on('select2:open', function () {
+      page = 1
+    })
 }
 
 function onSelect(event) {
-  const value = event.target.value;
-  const parentSelect = document.querySelector("#selecttParent");
-  parentSelect.disabled = value === "Choose";
+  const value = event.target.value
+  const parentSelect = document.querySelector('#selecttParent')
+  parentSelect.disabled = value === 'Choose'
 
-  console.log("value", value);
+  console.log('value', value)
 }
 
 function onCheck(event, commentId) {
-  const isChecked = event.target.checked;
-  const comment = document.getElementById(commentId);
-  comment.disabled = !isChecked;
+  const isChecked = event.target.checked
+  const comment = document.getElementById(commentId)
+  comment.disabled = !isChecked
 }
