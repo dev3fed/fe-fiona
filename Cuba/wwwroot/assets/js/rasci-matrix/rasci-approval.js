@@ -1,15 +1,16 @@
 document.addEventListener("dataLoaded", async function () {
   try {
     const payload = {
-      type: "approval",
-      pageNumber: 1,
-      limit: 10,
+      Type: "approval",
+      Page: 1,
+      Limit: 10,
     };
-    const dataApproval = await fetchDraftProsbis(payload);
+    const queryString = new URLSearchParams(payload).toString();
+    const dataApproval = await fetchDraftProsbis(queryString);
     if (dataApproval && dataApproval.data && Array.isArray(dataApproval.data.data)) {
       const IsNotEmpty = dataApproval.data.data.length;
       handleApprovalList(IsNotEmpty);
-      // loadTableBodyApproval(dataApproval.data.data);
+      loadTableBodyApproval(dataApproval.data.data);
       feather.replace();
     } else {
       console.error("No data found or invalid data structure");
@@ -22,15 +23,16 @@ document.addEventListener("dataLoaded", async function () {
 document.addEventListener("DOMContentLoaded", async function () {
   try {
     const payload = {
-      type: "approval",
-      pageNumber: 1,
-      limit: 10,
+      Type: "approval",
+      Page: 1,
+      Limit: 10,
     };
-    const dataApproval = await fetchDraftProsbis(payload);
+    const queryString = new URLSearchParams(payload).toString();
+    const dataApproval = await fetchDraftProsbis(queryString);
     if (dataApproval && dataApproval.data && Array.isArray(dataApproval.data.data)) {
       const IsNotEmpty = dataApproval.data.data.length;
       handleApprovalList(IsNotEmpty);
-      // loadTableBodyApproval(dataApproval.data.data);
+      loadTableBodyApproval(dataApproval.data.data);
       feather.replace();
     } else {
       console.error("No data found or invalid data structure");
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.error("Error fetching or loading data:", error);
   }
 });
+
 function handleApprovalList(length) {
   const tableApproval = document.getElementById("table-approval");
   const emptyCard = document.getElementById("empty-approval");
@@ -50,6 +53,44 @@ function handleApprovalList(length) {
   }
 }
 
+function loadTableBodyApproval(dataList) {
+  if (!dataList || dataList.length === 0) {
+    document.getElementById(
+      "body-approval",
+    ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+    return;
+  }
+  const statusLabel = {
+    2: "approval",
+    3: "approve",
+    4: "Rejected",
+  };
+  const bodyContent = dataList
+    .map((val, i) => {
+      return `
+      <tr>
+        <th scope="row" style="text-align:center">${i + 1}</th>
+        <td style="width:150px">${val.reqId || "-"}</td>
+        <td  style="width:120px">${val.typeDetail || "-"}</td>
+        <td>${val.createBy ? val.createBy : "-"}</td>
+        <td>${val.approveBy || "-"}</td>
+        <td style="width: 60px;text-align:center">
+            ${val.status ? `<span class="badge badge-success custom-badge">${statusLabel[val.status]}</span>` : "-"} 
+        </td>
+       <td style="width: 100px;text-align:center">
+            <button class="btn btn-outline-primary" type="button"
+                onclick="handleDetailApproval()"><i class="icon-eye"></i>
+                Detail</button>
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  const tableBody = document.getElementById("body-approval");
+  if (tableBody) {
+    tableBody.innerHTML = bodyContent;
+  }
+}
 function handleApprovalBack() {
   const approvalDetail = document.getElementById("approval-detail");
   const mainMatrix = document.getElementById("main-matrix");

@@ -264,11 +264,12 @@ async function saveAsDraft() {
           }
           backFromModalBp();
           const payload = {
-            type: "draft",
-            pageNumber: 1,
-            limit: 10,
+            Type: "draft",
+            Page: 1,
+            Limit: 10,
           };
-          const dataDraft = await fetchDraftProsbis(payload);
+          const queryString = new URLSearchParams(payload).toString();
+          const dataDraft = await fetchDraftProsbis(queryString);
           loadTableBodyDraft(dataDraft.data.data);
           $("#pills-draft-tab").tab("show");
         });
@@ -310,11 +311,19 @@ async function saveApproval() {
               innerHTML: `<div style="text-align: center;">Your request has been submitted successfully. You can check your request in approval list tab.</div>`,
             },
           },
-        }).then(() => {
+        }).then(async () => {
           if (modalAdd) {
             modalAdd.hide();
           }
           backFromModalBp();
+          const payload = {
+            Type: "approval",
+            Page: 1,
+            Limit: 10,
+          };
+          const queryString = new URLSearchParams(payload).toString();
+          const dataApproval = await fetchDraftProsbis(queryString);
+          loadTableBodyApproval(dataApproval.data.data);
           $("#pills-approval-tab").tab("show");
         });
       }, 100);

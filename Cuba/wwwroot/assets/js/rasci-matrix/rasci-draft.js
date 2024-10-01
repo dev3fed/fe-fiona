@@ -1,11 +1,12 @@
 document.addEventListener("dataLoaded", async function () {
   try {
     const payload = {
-      type: "draft",
-      pageNumber: 1,
-      limit: 10,
+      Type: "draft",
+      Page: 1,
+      Limit: 10,
     };
-    const dataDraft = await fetchDraftProsbis(payload);
+    const queryString = new URLSearchParams(payload).toString();
+    const dataDraft = await fetchDraftProsbis(queryString);
     if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data.data)) {
       const IsNotEmpty = dataDraft.data.data.length;
       handleClickCard(IsNotEmpty);
@@ -22,11 +23,12 @@ document.addEventListener("dataLoaded", async function () {
 document.addEventListener("DOMContentLoaded", async function () {
   try {
     const payload = {
-      type: "draft",
-      pageNumber: 1,
-      limit: 10,
+      Type: "draft",
+      Page: 1,
+      Limit: 10,
     };
-    const dataDraft = await fetchDraftProsbis(payload);
+    const queryString = new URLSearchParams(payload).toString();
+    const dataDraft = await fetchDraftProsbis(queryString);
     if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data.data)) {
       const IsNotEmpty = dataDraft.data.data.length;
       handleClickCard(IsNotEmpty);

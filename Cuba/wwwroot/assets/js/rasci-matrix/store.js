@@ -136,9 +136,7 @@ async function fetchSelectLevel() {
 async function fetchDraftProsbis(payload) {
   try {
     const result = await $.ajax({
-      url: `${url_api}/api/BusinessProcess/draft?Page=${payload.pageNumber ? payload.pageNumber : 1}&Limit=${
-        payload.limit
-      }`,
+      url: `${url_api}/api/BusinessProcess/draft?${payload}`,
       type: "GET",
       headers: {
         Authorization: "Bearer " + token,
