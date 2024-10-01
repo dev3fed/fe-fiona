@@ -1,10 +1,51 @@
-function handleApprovalList() {
+document.addEventListener("dataLoaded", async function () {
+  try {
+    const payload = {
+      type: "approval",
+      pageNumber: 1,
+      limit: 10,
+    };
+    const dataApproval = await fetchDraftProsbis(payload);
+    if (dataApproval && dataApproval.data && Array.isArray(dataApproval.data.data)) {
+      const IsNotEmpty = dataApproval.data.data.length;
+      handleApprovalList(IsNotEmpty);
+      // loadTableBodyApproval(dataApproval.data.data);
+      feather.replace();
+    } else {
+      console.error("No data found or invalid data structure");
+    }
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const payload = {
+      type: "approval",
+      pageNumber: 1,
+      limit: 10,
+    };
+    const dataApproval = await fetchDraftProsbis(payload);
+    if (dataApproval && dataApproval.data && Array.isArray(dataApproval.data.data)) {
+      const IsNotEmpty = dataApproval.data.data.length;
+      handleApprovalList(IsNotEmpty);
+      // loadTableBodyApproval(dataApproval.data.data);
+      feather.replace();
+    } else {
+      console.error("No data found or invalid data structure");
+    }
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+});
+function handleApprovalList(length) {
   const tableApproval = document.getElementById("table-approval");
   const emptyCard = document.getElementById("empty-approval");
-  if (tableApproval) {
+  if (tableApproval && length > 0) {
     tableApproval.style.display = "block";
   }
-  if (emptyCard) {
+  if (emptyCard && length > 0) {
     emptyCard.style.display = "none";
   }
 }

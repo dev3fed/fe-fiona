@@ -258,11 +258,18 @@ async function saveAsDraft() {
               innerHTML: `<div style="text-align: center;">Your request has been submitted successfully. You can check your request in the approval list tab.</div>`,
             },
           },
-        }).then(() => {
+        }).then(async () => {
           if (modalAdd) {
             modalAdd.hide();
           }
           backFromModalBp();
+          const payload = {
+            type: "draft",
+            pageNumber: 1,
+            limit: 10,
+          };
+          const dataDraft = await fetchDraftProsbis(payload);
+          loadTableBodyDraft(dataDraft.data.data);
           $("#pills-draft-tab").tab("show");
         });
       }, 100);

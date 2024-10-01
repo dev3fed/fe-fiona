@@ -1,14 +1,89 @@
-function handleClickCard() {
+document.addEventListener("dataLoaded", async function () {
+  try {
+    const payload = {
+      type: "draft",
+      pageNumber: 1,
+      limit: 10,
+    };
+    const dataDraft = await fetchDraftProsbis(payload);
+    if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data.data)) {
+      const IsNotEmpty = dataDraft.data.data.length;
+      handleClickCard(IsNotEmpty);
+      loadTableBodyDraft(dataDraft.data.data);
+      feather.replace();
+    } else {
+      console.error("No data found or invalid data structure");
+    }
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const payload = {
+      type: "draft",
+      pageNumber: 1,
+      limit: 10,
+    };
+    const dataDraft = await fetchDraftProsbis(payload);
+    if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data.data)) {
+      const IsNotEmpty = dataDraft.data.data.length;
+      handleClickCard(IsNotEmpty);
+      loadTableBodyDraft(dataDraft.data.data);
+      feather.replace();
+    } else {
+      console.error("No data found or invalid data structure");
+    }
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+});
+function handleClickCard(length) {
   const tableDraft = document.getElementById("table-draft");
   const emptyCard = document.getElementById("empty-draft");
-  if (tableDraft) {
+  if (tableDraft && length > 0) {
     tableDraft.style.display = "block";
   }
-  if (emptyCard) {
+  if (emptyCard && length > 0) {
     emptyCard.style.display = "none";
   }
 }
+function loadTableBodyDraft(dataList) {
+  if (!dataList || dataList.length === 0) {
+    document.getElementById(
+      "tbl-add-prosbis-body",
+    ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+    return;
+  }
 
+  const bodyContent = dataList
+    .map((val, i) => {
+      return `
+      <tr>
+        <th scope="row" style="text-align:center">${i + 1}</th>
+        <td>${val.reqId || "-"}</td>
+        <td>${val.draftName || "-"}</td>
+        <td>${val.createBy ? val.createBy : "-"}</td>
+        <td>${val.createdAt ? new Date(val.createdAt).toLocaleDateString() : "-"}</td>
+        <td>${val.typeDetail || "-"}</td>
+        <td style="width: 200px;text-align:center">
+          <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail()">
+            <i class="icon-eye"></i> Detail
+          </button>
+          <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete">
+            <i class="icon-trash"></i> Delete
+          </button>
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  const tableBody = document.getElementById("body-draft");
+  if (tableBody) {
+    tableBody.innerHTML = bodyContent;
+  }
+}
 function handleBack() {
   const draftDetail = document.getElementById("draft-detail");
   const mainMatrix = document.getElementById("main-matrix");
@@ -26,10 +101,10 @@ function handleBack() {
   if (headerMatrix) {
     headerMatrix.style.display = "block";
   }
-  // Remove ?id=1 from the URL
+
   const url = new URL(window.location);
-  url.searchParams.delete("id"); // Remove the 'id' parameter
-  window.history.pushState({}, "", url); // Update the URL without reloading the page
+  url.searchParams.delete("id");
+  window.history.pushState({}, "", url);
 }
 function handleOpenDetail() {
   const draftDetail = document.getElementById("draft-detail");
@@ -48,8 +123,7 @@ function handleOpenDetail() {
   if (headerMatrix) {
     headerMatrix.style.display = "none";
   }
-  // Add or update ?id=1 in the current URL without refreshing
   const url = new URL(window.location);
-  url.searchParams.set("id", 1); // Set id=1
-  window.history.pushState({}, "", url); // Update the URL without reloading the page
+  url.searchParams.set("id", 1);
+  window.history.pushState({}, "", url);
 }

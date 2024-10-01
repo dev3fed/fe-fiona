@@ -133,6 +133,24 @@ async function fetchSelectLevel() {
   }
 }
 
+async function fetchDraftProsbis(payload) {
+  try {
+    const result = await $.ajax({
+      url: `${url_api}/api/BusinessProcess/draft?Page=${payload.pageNumber ? payload.pageNumber : 1}&Limit=${
+        payload.limit
+      }`,
+      type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    throw error;
+  }
+}
+
 async function submitDraftProsbis(payload) {
   // token
   try {

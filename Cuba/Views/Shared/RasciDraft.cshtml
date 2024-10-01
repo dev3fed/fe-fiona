@@ -91,7 +91,7 @@
     }
 </style>
 <div class="col-12 " id="empty-draft">
-    <div class="empty-body" onclick="handleClickCard()">
+    <div class="empty-body">
 
     </div>
 </div>
@@ -126,33 +126,10 @@
                             <th scope="col" style="width: 150px">Created By</th>
                             <th scope="col" style="width: 150px">Created Date</th>
                             <th scope="col">Type</th>
-                            <th scope="col">Action</th>
+                            <th scope="col" style="text-align: center;">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="tbl-add-prosbis-body">
-                        <tr>
-                            <th scope="row">
-
-                            </th>
-                            <td style="text-align:center">
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td style="width: 200px;text-align:center">
-                                <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail()"><i
-                                        class="icon-eye"></i>
-                                    Detail</button>
-                                <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#modalDelete"><i class="icon-trash"></i>
-                                    Delete</button>
-                            </td>
-                        </tr>
+                    <tbody id="body-draft">
                     </tbody>
                 </table>
             </div>
