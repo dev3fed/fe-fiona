@@ -86,7 +86,7 @@ function updateSelect2ByProsbis() {
   $("#parentId")
     .select2({
       dropdownParent: $("#modalAddBp"),
-      placeholder: "Choose ParentId",
+      placeholder: "Choose",
       allowClear: true,
       delay: 250,
       ajax: {
@@ -226,7 +226,6 @@ function updateComment(rasciCode, value) {
 async function saveAsDraft() {
   try {
     const draftName = document.getElementById("draftName").value;
-    console.log("Draft Name:", draftName);
 
     const dataProsbis = getState("insertProsbis");
 
@@ -244,10 +243,8 @@ async function saveAsDraft() {
       const modalSave = bootstrap.Modal.getInstance(modalSaveDraft);
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
-      if (modalSave && modalAdd) {
+      if (modalSave) {
         modalSave.hide();
-        modalAdd.hide();
-        $("#pills-draft-tab").tab("show");
       }
       setTimeout(() => {
         swal({
@@ -262,7 +259,56 @@ async function saveAsDraft() {
             },
           },
         }).then(() => {
-          console.log("Swal closed, performing additional actions...");
+          if (modalAdd) {
+            modalAdd.hide();
+          }
+          backFromModalBp();
+          $("#pills-draft-tab").tab("show");
+        });
+      }, 100);
+    }
+  } catch (error) {
+    console.error("Error saving draft:", error);
+  }
+}
+async function saveApproval() {
+  try {
+    const dataProsbis = getState("insertProsbis");
+
+    const inputValue = {
+      ...dataProsbis,
+      category: "add",
+      type: "submission",
+    };
+
+    const result = await submitDraftProsbis(inputValue);
+
+    if (result.status === 200) {
+      const modalAprroval = document.getElementById("modalAprroval");
+      const mdlApproval = bootstrap.Modal.getInstance(modalAprroval);
+      const modalAddBp = document.getElementById("modalAddBp");
+      const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
+      if (mdlApproval) {
+        mdlApproval.hide();
+      }
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">Your request has been submitted successfully. You can check your request in approval list tab.</div>`,
+            },
+          },
+        }).then(() => {
+          if (modalAdd) {
+            modalAdd.hide();
+          }
+          backFromModalBp();
+          $("#pills-approval-tab").tab("show");
         });
       }, 100);
     }
@@ -274,6 +320,10 @@ async function saveAsDraft() {
 function handleInputDraftName(value) {
   const btnSave = document.getElementById(`btnSaveDraft`);
   btnSave.disabled = value.length > 3 ? false : true;
+}
+function openModalConfrim() {
+  const openModal = new bootstrap.Modal(document.getElementById("modalAprroval"));
+  openModal.show();
 }
 function backFromModalBp() {
   const dataProsbis = getState("insertProsbis");

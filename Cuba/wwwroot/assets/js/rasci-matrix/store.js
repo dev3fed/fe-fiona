@@ -84,8 +84,11 @@ window.getState = getState;
 async function SearchMatrix(params) {
   try {
     const result = await $.ajax({
-      type: "GET",
       url: `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`,
+      type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     });
     return result;
   } catch (error) {
@@ -98,9 +101,12 @@ async function SearchMatrix(params) {
 async function fetchDataMatrix(params) {
   try {
     const result = await $.ajax({
-      type: "POST",
       url: `${url_api}/api/RasciMapping`,
+      type: "POST",
       contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       data: JSON.stringify(params),
     });
     return result;
@@ -114,8 +120,11 @@ async function fetchDataMatrix(params) {
 async function fetchSelectLevel() {
   try {
     const result = await $.ajax({
-      type: "GET",
       url: `${url_api}/api/Utilities/selection?Page=1&Type=level`,
+      type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     });
     return result;
   } catch (error) {
@@ -125,11 +134,15 @@ async function fetchSelectLevel() {
 }
 
 async function submitDraftProsbis(payload) {
+  // token
   try {
     const result = await $.ajax({
       type: "POST",
       url: `${url_api}/api/BusinessProcess`,
       contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       data: JSON.stringify(payload),
     });
     return result;

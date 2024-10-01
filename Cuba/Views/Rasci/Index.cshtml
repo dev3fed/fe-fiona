@@ -128,9 +128,14 @@
                                             <!-- Start Modal Add Business Process -->
                                             <partial name="ModalAddBp" />
                                             <!-- End Modal Add Business Process -->
+
                                             <!-- Start Modal save as draft  -->
                                             <partial name="ModalSaveDraft" />
                                             <!-- End Modal save as draft  -->
+
+                                            <!-- Start Modal Approval  -->
+                                            <partial name="ModalApproval" />
+                                            <!-- End Modal Approval  -->
 
                                             <!-- Start Modal business Process -->
                                             <partial name="ModalBusinessProcess" />
@@ -265,6 +270,7 @@
 @section Script {
     <script>
         const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        const token = '@(Environment.GetEnvironmentVariable("API_TOKEN"))'
         function handleCloseModal() {
             const applyButton = document.getElementById("apply-search");
             if (applyButton) {
