@@ -61,8 +61,8 @@ function loadTableBodyApproval(dataList) {
     return;
   }
   const statusLabel = {
-    2: "approval",
-    3: "approve",
+    2: "Approval",
+    3: "Approve",
     4: "Rejected",
   };
   const bodyContent = dataList

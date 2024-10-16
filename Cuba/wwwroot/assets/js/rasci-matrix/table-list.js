@@ -98,7 +98,9 @@ function loadTableBody(prosbisList) {
           : val.level
           ? `level-${val.level}`
           : "";
-      const isExpanded = expandedRows.includes(val.indexGroup) ? "chevron-up" : "chevron-down";
+      const isExpanded = expandedRows.includes(val.indexGroup)
+        ? "chevron-up"
+        : "chevron-down";
       const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
@@ -119,7 +121,9 @@ function loadTableBody(prosbisList) {
                     : ``
                 }
               </div>
-              <div class="flex-fill prosbis-name" onclick="onModalProsbis()">${val.description}</div>
+              <div class="flex-fill prosbis-name" onclick="onModalProsbis()">${
+                val.description
+              }</div>
               <div class="ellipsis-menu prosbis-row-ellipsis">
                 <div class="dropright">
                   <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
@@ -128,8 +132,8 @@ function loadTableBody(prosbisList) {
                   </button>
                   <ul class="dropdown-menu " aria-labelledby="dropdownMenuButton">
                     <li onclick="onModalProsbis()"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
-                    <li><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
-                    <li><a class="dropdown-item"><img src="/assets/images/rasci/trash.svg" alt="Filter Icon">Delete</a></li>
+                    <li onclick="openModalEditBusinesspro()"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
+                    <li onclick="openModalDeleteBusinesspro()"><a class="dropdown-item"><img src="/assets/images/rasci/trash.svg" alt="Filter Icon">Delete</a></li>
                   </ul>
                 </div>
               </div>
@@ -169,7 +173,9 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
   const rasciCells = jobTitleList
     .map((jobTitle) => {
       const rasciItems = rasciMapping.filter(
-        (rm) => rm.businessProcessId === businessProcessId && rm.jobTitleId === jobTitle.id,
+        (rm) =>
+          rm.businessProcessId === businessProcessId &&
+          rm.jobTitleId === jobTitle.id,
       );
 
       let rasciIcons = "",
@@ -208,7 +214,8 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
           <div class="rasci-icons">
             ${rasciIcons}
           </div>
-          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon">
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" 
+          onclick="openModalNotRow(${jobTitle.id}, ${businessProcessId})">
         </div>
         </td>`;
     })
@@ -224,8 +231,12 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
 
 // Initialize tooltips after rendering
 function initializeTooltips() {
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+  const tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+  );
+  tooltipTriggerList.map(
+    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+  );
 }
 function onModalProsbis() {
   detailsProsbis();
@@ -237,7 +248,9 @@ async function handleCollapse(id) {
   if (parentRow) {
     if (!appState.idProsbis.includes(parentId)) {
       appState.idProsbis = [...appState.idProsbis, parentId.toString()];
-      appState.resetIdProsbis = appState.resetIdProsbis.filter((item) => !parentId.toString().includes(item));
+      appState.resetIdProsbis = appState.resetIdProsbis.filter(
+        (item) => !parentId.toString().includes(item),
+      );
       const selectId = filterChild(appState.idProsbis, appState.resetIdProsbis);
       const payload = { parentId: selectId.join(",") };
       const resultMatrix = await fetchDataMatrix(payload);
@@ -247,7 +260,10 @@ async function handleCollapse(id) {
       const listSelectedId = appState.idProsbis;
       const index = appState.idProsbis.indexOf(parentId.toString());
       // const idFiltered = filterData(listSelectedId, parentId.toString());
-      appState.resetIdProsbis = [...appState.resetIdProsbis, parentId.toString()];
+      appState.resetIdProsbis = [
+        ...appState.resetIdProsbis,
+        parentId.toString(),
+      ];
       // resetIdProsbis
       const idFiltered = filterArray(appState.resetIdProsbis, listSelectedId);
       if (idFiltered && index > -1) appState.idProsbis.splice(index, 1);
@@ -271,7 +287,10 @@ function filterArray(inputs, array) {
     return child.startsWith(parent + ".") || child === parent;
   }
   const result = array.filter((value) => {
-    return !inputs.some((input) => isDescendant(input, value)) && !inputs.includes(value);
+    return (
+      !inputs.some((input) => isDescendant(input, value)) &&
+      !inputs.includes(value)
+    );
   });
 
   return result.sort((a, b) => {
@@ -318,7 +337,11 @@ function traverse(data, filters) {
   }
   filters.forEach((filter) => {
     data.forEach((item) => {
-      if (item.indexGroup === filter && item.parentId === null && !addedItems.has(item.indexGroup)) {
+      if (
+        item.indexGroup === filter &&
+        item.parentId === null &&
+        !addedItems.has(item.indexGroup)
+      ) {
         result.push(item);
         addedItems.add(item.indexGroup);
         helper(item.indexGroup);
@@ -359,4 +382,9 @@ async function clearInput() {
   document.getElementById("inputText").value = "";
   document.getElementById("inputSearchCompare").value = "";
   handleCloseModal();
+}
+
+async function openModalDeleteBusinesspro() {
+  const modal = new bootstrap.Modal(document.getElementById("modalDeleteBp"));
+  modal.show();
 }

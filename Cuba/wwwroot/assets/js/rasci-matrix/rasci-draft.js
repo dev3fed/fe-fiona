@@ -67,7 +67,9 @@ function loadTableBodyDraft(dataList) {
         <td>${val.reqId || "-"}</td>
         <td>${val.draftName || "-"}</td>
         <td>${val.createBy ? val.createBy : "-"}</td>
-        <td>${val.createdAt ? new Date(val.createdAt).toLocaleDateString() : "-"}</td>
+        <td>${
+          val.createdAt ? new Date(val.createdAt).toLocaleDateString() : "-"
+        }</td>
         <td>${val.typeDetail || "-"}</td>
         <td style="width: 200px;text-align:center">
           <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail()">
@@ -80,10 +82,40 @@ function loadTableBodyDraft(dataList) {
       </tr>`;
     })
     .join("");
-
+  const bodyTotalPage = `
+  <div class="row">
+      <div class="col-2"> 
+      <select class="form-select digits" style="width:52%;">
+        <option> 5</option>
+        <option> 10</option>
+        <option> 15</option>
+        <option> 20</option>
+      </select>
+    </div>
+    <div class="col-10">
+      <label style="padding-top:7px;margin-left:-80px">Showing 1 to ${dataList.length} of 1 records</label>
+    </div>
+  </div>
+`;
+  const bodyListPage = `
+    <nav aria-label="Page navigation example">
+      <ul class="pagination pagination-primary">
+          <li class="page-item"><a class="page-link" href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">«</span><span class="sr-only">Previous</span></a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
+          <li class="page-item"><a class="page-link" href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">»</span><span class="sr-only">Next</span></a></li>
+      </ul>
+    </nav>`;
   const tableBody = document.getElementById("body-draft");
   if (tableBody) {
     tableBody.innerHTML = bodyContent;
+  }
+  const totalPage = document.getElementById("total-page");
+  const listPage = document.getElementById("list-page");
+  if (totalPage && listPage) {
+    totalPage.innerHTML = bodyTotalPage;
+    listPage.innerHTML = bodyListPage;
   }
 }
 function handleBack() {

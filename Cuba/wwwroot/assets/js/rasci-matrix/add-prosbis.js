@@ -8,27 +8,28 @@ function onModalAddBp() {
         <label class="form-label">Level</label>
         <select class="form-select digits" onclick="onSelect(event)">
           <option>Choose</option>
-          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
+          ${prosbisLevel.map(
+            (opt) => `<option value="${opt.id}">${opt.text}</option>`,
+          )}
         </select>
       </div>
     </div>
-   <div class="col-10">
-  <div class="mb-3">
-    <label class="form-label">Parent</label>
-     <select class="form-select digits" name="parentId" id="parentId" disabled onchange="onSelectParentId(event)">
-    </select>
-  </div>
-</div>
-
+    <div class="col-10">
+        <div class="mb-3">
+          <label class="form-label">Parent</label>
+          <select class="form-select digits" name="parentId" id="parentId" disabled onchange="onSelectParentId(event)">
+          </select>
+        </div>
+    </div>
     <div class="col-12">
       <div>
         <label class="form-label">Business Process Name</label>
         <textarea class="form-control" oninput="onInputProsbis(event)"></textarea>
       </div>
       <div class="mt-4">
-        <label class="form-label">Job</label>
-        <select class="form-select digits" name="jobId" id="jobId"  onchange="onSelectJobId(event)">
-    </select>
+          <label class="form-label">Job</label>
+          <select class="form-select digits" name="jobId" id="jobId"  onchange="onSelectJobId(event)">
+          </select>
       </div>
     </div>`;
 
@@ -58,7 +59,9 @@ function onModalAddBp() {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
+          letter.rasciCode
+        }" 
                value="${letter.comment || ""}" 
                ${!letter.isChecked ? "disabled" : ""} 
                oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -163,6 +166,7 @@ function updateSelect2ByJob() {
 
 function onSelect(event) {
   const value = event.target.value;
+  console.log("value", value);
   const parentSelect = document.querySelector("#parentId");
   if (value === "Choose" || value == 1) {
     parentSelect.disabled = true;
@@ -203,12 +207,19 @@ function onCheck(event, rasciCode) {
   const dataProsbis = getState("insertProsbis");
   const updatedRasciNotation = dataProsbis.rasciNotation.map((letter) => {
     if (letter.rasciCode === rasciCode) {
-      return { ...letter, isChecked, comment: isChecked ? commentInput.value : "" };
+      return {
+        ...letter,
+        isChecked,
+        comment: isChecked ? commentInput.value : "",
+      };
     }
     return letter;
   });
 
-  setState("insertProsbis", { ...dataProsbis, rasciNotation: updatedRasciNotation });
+  setState("insertProsbis", {
+    ...dataProsbis,
+    rasciNotation: updatedRasciNotation,
+  });
 }
 
 function updateComment(rasciCode, value) {
@@ -220,7 +231,10 @@ function updateComment(rasciCode, value) {
     return letter;
   });
 
-  setState("insertProsbis", { ...dataProsbis, rasciNotation: updatedRasciNotation });
+  setState("insertProsbis", {
+    ...dataProsbis,
+    rasciNotation: updatedRasciNotation,
+  });
 }
 
 async function saveAsDraft() {
@@ -338,7 +352,9 @@ function handleInputDraftName(value) {
   btnSave.disabled = value.length > 3 ? false : true;
 }
 function openModalConfrim() {
-  const openModal = new bootstrap.Modal(document.getElementById("modalAprroval"));
+  const openModal = new bootstrap.Modal(
+    document.getElementById("modalAprroval"),
+  );
   openModal.show();
 }
 function backFromModalBp() {
@@ -347,7 +363,10 @@ function backFromModalBp() {
     return { ...letter, comment: "", isChecked: false };
   });
 
-  setState("insertProsbis", { ...dataProsbis, rasciNotation: updatedRasciNotation });
+  setState("insertProsbis", {
+    ...dataProsbis,
+    rasciNotation: updatedRasciNotation,
+  });
 }
 
 function formValidation() {

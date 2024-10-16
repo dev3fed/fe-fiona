@@ -1,0 +1,39 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.delete-bp {
+        max-width: 35% !important;
+        margin: 80px auto;
+    }
+</style>
+
+
+<div class="modal fade" id="modalDeleteBp" tabindex="-1" role="dialog" aria-labelledby="modalDeleteBpLabel"
+    aria-hidden="true">
+    <div class="modal-dialog delete-bp bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDeleteBpTitle">Delete Business Process</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <div class="row mb-4" id="form-deletebp">
+                    <label>Are you sure want to delete this business process?</label>
+                    <h6 style="font-weight: bold;">Menentukan metode kajian lingkungan eksternal</h6>
+                </div>
+            </div>
+            <div class="modal-footer  ">
+                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                        class="icon-arrow-left"></i>
+                    Back</button>
+                <div>
+                    <button class="btn btn-outline-primary" type="button"> Save as draft</button>
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
+                        Submit to Approval
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

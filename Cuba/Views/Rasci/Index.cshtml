@@ -125,9 +125,33 @@
                                             <partial name="ModalSearch" />
                                             <!-- End Modal Search -->
 
+                                            <!-- Start Modal business Process -->
+                                            <partial name="ModalBusinessProcess" />
+                                            <!-- End Modal business Process -->
+
                                             <!-- Start Modal Add Business Process -->
                                             <partial name="ModalAddBp" />
                                             <!-- End Modal Add Business Process -->
+
+                                             <!-- Start Modal Add Business Process from reference -->
+                                            <partial name="ModalAddBpref" />
+                                            <!-- End Modal Add Business Process  from reference-->
+
+                                            <!-- Start Modal add notification -->
+                                            <partial name="ModalAddNotation" />
+                                            <!-- End Modal add notification -->
+
+                                            <!-- Start Modal add notification by row column-->
+                                            <partial name="ModalNotationRow" />
+                                            <!-- End Modal add notification by row column-->
+
+                                            <!-- Start Modal edit business process-->
+                                            <partial name="ModalEditBusinessProcess" />
+                                            <!-- End Modal edit business process-->
+
+                                            <!-- Start Modal delete business process-->
+                                            <partial name="ModalDeleteBp" />
+                                            <!-- End Modal delete business process-->
 
                                             <!-- Start Modal save as draft  -->
                                             <partial name="ModalSaveDraft" />
@@ -136,10 +160,6 @@
                                             <!-- Start Modal Approval  -->
                                             <partial name="ModalApproval" />
                                             <!-- End Modal Approval  -->
-
-                                            <!-- Start Modal business Process -->
-                                            <partial name="ModalBusinessProcess" />
-                                            <!-- End Modal business Process -->
                                         </div>
                                         <div class="col-5">
                                             <div class="btn-group w-100" role="group"
@@ -196,7 +216,7 @@
                                                             alt="Filter Icon" style="margin-top: -1px;">Add Business
                                                         Process
                                                     </a>
-                                                    <a class="dropdown-item">
+                                                    <a class="dropdown-item" onclick="onModalAddBpref()">
                                                         <img src="~/assets/images/rasci/plus-black.svg"
                                                             alt="Filter Icon" style="margin-top: -1px;">Add Business
                                                         Process from Reference
@@ -268,48 +288,52 @@
 </div>
 
 @section Script {
-    <script>
-        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
-        const token = '@(Environment.GetEnvironmentVariable("API_TOKEN"))'
-        function handleCloseModal() {
-            const applyButton = document.getElementById("apply-search");
-            if (applyButton) {
-                applyButton.disabled = true;
-            }
-        }
-        $(document).ready(function () {
-            $('#inputText').keyup(function () {
-                if ($(this).val() == '') {
-                    $('#searchButton').prop('disabled', true);
-                } else {
-                    $('#searchButton').prop('disabled', false);
+            <script>
+                const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+                const token = '@(Environment.GetEnvironmentVariable("API_TOKEN"))'
+                function handleCloseModal() {
+                    const applyButton = document.getElementById("apply-search");
+                    if (applyButton) {
+                        applyButton.disabled = true;
+                    }
                 }
-            });
-        });
+                $(document).ready(function () {
+                    $('#inputText').keyup(function () {
+                        if ($(this).val() == '') {
+                            $('#searchButton').prop('disabled', true);
+                        } else {
+                            $('#searchButton').prop('disabled', false);
+                        }
+                    });
+                });
 
-    </script>
-    <!-- Plugins JS start-->
-    <script src="../assets/js/sidebar-menu.js"></script>
-    <script src="../assets/js/slick/slick.min.js"></script>
-    <script src="../assets/js/slick/slick.js"></script>
-    <script src="../assets/js/header-slick.js"></script>
-    <script src="../assets/js/datepicker/date-picker/datepicker.js"></script>
-    <script src="../assets/js/datepicker/date-picker/datepicker.en.js"></script>
-    <script src="../assets/js/datepicker/date-picker/datepicker.custom.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
-    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/datatable/datatables/datatable.custom.js"></script>
-    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
-    <!-- Plugins JS Ends-->
-    <!-- Theme js-->
-    <script src="../assets/js/script.js"></script>
-    <script src="../assets/js/rasci-matrix/store.js"></script>
-    <script src="../assets/js/rasci-matrix/index.js"></script>
-    <script src="../assets/js/rasci-matrix/table-list.js"></script>
-    <script src="../assets/js/rasci-matrix/job-compare.js"></script>
-    <script src="../assets/js/rasci-matrix/detail-prosbis.js"></script>
-    <script src="../assets/js/rasci-matrix/add-prosbis.js"></script>
-    <script src="../assets/js/rasci-matrix/edit-prosbis.js"></script>
-    <script src="../assets/js/rasci-matrix/rasci-draft.js"></script>
-    <script src="../assets/js/rasci-matrix/rasci-approval.js"></script>
+            </script>
+            <!-- Plugins JS start-->
+            <script src="../assets/js/sidebar-menu.js"></script>
+            <script src="../assets/js/slick/slick.min.js"></script>
+            <script src="../assets/js/slick/slick.js"></script>
+            <script src="../assets/js/header-slick.js"></script>
+            <script src="../assets/js/datepicker/date-picker/datepicker.js"></script>
+            <script src="../assets/js/datepicker/date-picker/datepicker.en.js"></script>
+            <script src="../assets/js/datepicker/date-picker/datepicker.custom.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+            <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+            <script src="../assets/js/datatable/datatables/datatable.custom.js"></script>
+            <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+            <!-- Plugins JS Ends-->
+            <!-- Theme js-->
+            <script src="../assets/js/script.js"></script>
+            <script src="../assets/js/rasci-matrix/store.js"></script>
+            <script src="../assets/js/rasci-matrix/index.js"></script>
+            <script src="../assets/js/rasci-matrix/table-list.js"></script>
+            <script src="../assets/js/rasci-matrix/job-compare.js"></script>
+            <script src="../assets/js/rasci-matrix/detail-prosbis.js"></script>
+            <script src="../assets/js/rasci-matrix/add-prosbis.js"></script>
+            <script src="../assets/js/rasci-matrix/edit-prosbis.js"></script>
+            <script src="../assets/js/rasci-matrix/rasci-draft.js"></script>
+            <script src="../assets/js/rasci-matrix/rasci-approval.js"></script>
+            <script src="../assets/js/rasci-matrix/add-notation.js"></script>
+            <script src="../assets/js/rasci-matrix/edit-businesspro.js"></script>
+            <script src="../assets/js/rasci-matrix/add-prosbisref.js"></script>
+
 }

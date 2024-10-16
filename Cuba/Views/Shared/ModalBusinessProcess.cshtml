@@ -55,10 +55,12 @@
                         <li class="nav-item"><a class="nav-link active" id="pills-related-tab" data-bs-toggle="pill"
                                 href="#pills-related" role="tab" aria-controls="pills-related"
                                 aria-selected="true">Related Job</a></li>
-                        <li class="nav-item"><a class="nav-link" id="pills-related-business-tab" data-bs-toggle="pill"
-                                href="#pills-related-business" role="tab" aria-controls="pills-related-business"
-                                aria-selected="false">Related Business
-                                Process</a></li>
+                        <li class="nav-item"><a class="nav-link" id="pills-hierarchy-tab" data-bs-toggle="pill"
+                                href="#pills-hierarchy" role="tab" aria-controls="pills-hierarchy"
+                                aria-selected="false">Business Process Hierarchy</a></li>
+                        <li class="nav-item"><a class="nav-link" id="pills-competencies-tab" data-bs-toggle="pill"
+                                href="#pills-competencies" role="tab" aria-controls="pills-competencies"
+                                aria-selected="false">Competencies</a></li>
                     </ul>
                     <div class="tab-content" id="pills-businessContent">
                         <div class="tab-pane fade show active" id="pills-related" role="tabpanel"
@@ -74,8 +76,18 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="pills-related-business" role="tabpanel"
-                            aria-labelledby="pills-related-business-tab">
+                        <div class="tab-pane fade" id="pills-hierarchy" role="tabpanel"
+                            aria-labelledby="pills-hierarchy-tab">
+                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and typesetting
+                                industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                                when an unknown printer took a galley of type and scrambled it to make a type specimen
+                                book. It has survived not only five centuries, but also the leap into electronic
+                                typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
+                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with
+                                desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                        </div>
+                        <div class="tab-pane fade" id="pills-competencies" role="tabpanel"
+                            aria-labelledby="pills-competencies-tab">
                             <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and typesetting
                                 industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
                                 when an unknown printer took a galley of type and scrambled it to make a type specimen
@@ -93,10 +105,10 @@
                     <i class="icon-arrow-left"></i> Back
                 </button>
                 <div>
-                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                    <button class="btn btn-outline-light" type="button" onclick="openModalDeleteBusinesspro()"><i
                             class="icon-trash"></i>
                         Delete</button>
-                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                    <button class="btn btn-outline-light" type="button" onclick="openModalEditBusinesspro()">
                         <i class="icon-marker-alt"></i>
                         Edit
                     </button>

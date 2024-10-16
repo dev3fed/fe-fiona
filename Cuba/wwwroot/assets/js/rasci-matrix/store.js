@@ -149,6 +149,22 @@ async function fetchDraftProsbis(payload) {
   }
 }
 
+async function fetchDraftProsbisByid(payload) {
+  try {
+    const result = await $.ajax({
+      url: `${url_api}/api/BusinessProcess/draft-detail/${payload}`,
+      type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching Job Title data from API");
+    throw error;
+  }
+}
+
 async function submitDraftProsbis(payload) {
   // token
   try {
@@ -170,7 +186,10 @@ async function submitDraftProsbis(payload) {
 
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
+    const [dataMatrix, prosbisLvl] = await Promise.all([
+      fetchDataMatrix(),
+      fetchSelectLevel(),
+    ]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;

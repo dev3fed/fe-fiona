@@ -1,0 +1,118 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-bpref {
+        max-width: 60% !important;
+        margin: 30px auto;
+    }
+
+    .tbl-border-prosbisref {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-prosbisref th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-prosbisref thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-prosbisref th,
+    .tbl-border-prosbisref td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+    }
+
+    .checkbox_animated {
+        width: 12px;
+        height: 12px;
+        transform: scale(0.8);
+        margin-right: 5px;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+        text-align: center;
+    }
+
+    .radio_animated {
+        margin-right: 5px;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+</style>
+
+
+<div class="modal fade" id="modalAddBpref" tabindex="-1" role="dialog" aria-labelledby="modalAddBprefLabel"
+    aria-hidden="true">
+    <div class="modal-dialog custom-bpref bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddBprefTitle">Add Business Process from Reference</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <div class="row mb-4" id="form-bpref">
+
+                </div>
+                <div class="table-responsive" style=" max-height: 450px;">
+                    <table class="table tbl-border-prosbisref">
+                        <thead id="tbl-prosbisref-header" style="background-color: #006CA9;">
+                        </thead>
+                        <tbody id="tbl-prosbisref-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer  ">
+                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                    onclick="backFromModalBp()"><i class="icon-arrow-left"></i>
+                    Back</button>
+                <div>
+                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
+                        data-bs-target="#modalSaveDraft" id="saveDraftBtn" disabled> Save as
+                        draft</button>
+                    <button class="btn btn-primary" type="button" id="submitApprovalBtn" onclick="openModalConfrim()"
+                        disabled>
+                        Submit to Approval
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
