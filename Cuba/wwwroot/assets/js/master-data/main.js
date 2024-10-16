@@ -1,5 +1,6 @@
 const url = "http://localhost:5095/";
 const token = localStorage.getItem("token");
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const endPoint = "api/MasterData";
 async function getDataMasterData() {

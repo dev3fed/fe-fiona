@@ -58,7 +58,9 @@ function getTable(dataSet) {
         data: null,
         render: function (data, type, row) {
           // choose file with icon
-          return data?.uploadDate;
+          if (data?.uploadDate === null) return "";
+          const date = new Date(data?.uploadDate);
+          return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
         },
       },
       {
@@ -122,8 +124,9 @@ function getTableUploadLog(dataSet) {
         width: "30%",
         data: null,
         render: function (data, type, row) {
-          // choose file with icon
-          return data?.createdDate;
+          if (data?.createdDate === null) return "";
+          const date = new Date(data?.createdDate);
+          return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
         },
       },
       {
@@ -168,9 +171,7 @@ $(document).ready(function () {
   $("#masterDataList").on("change", ".fileinput", function () {
     var id = $(this).attr("id");
     $("#" + id.replace("fileinput_", "div_")).show();
-    $("#" + id.replace("fileinput_", "labelfile_")).text(
-      $(this).val().split("\\").pop()
-    );
+    $("#" + id.replace("fileinput_", "labelfile_")).text($(this).val().split("\\").pop());
   });
 
   // cancel file input
