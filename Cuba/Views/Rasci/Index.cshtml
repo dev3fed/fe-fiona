@@ -295,13 +295,16 @@
 @section Script {
     <script>
         const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
-        const token = '@(Environment.GetEnvironmentVariable("API_TOKEN"))'
+        @* const token = '@(Environment.GetEnvironmentVariable("API_TOKEN"))' *@
+            const token = localStorage.getItem("token");
+
         function handleCloseModal() {
             const applyButton = document.getElementById("apply-search");
             if (applyButton) {
                 applyButton.disabled = true;
             }
         }
+
         $(document).ready(function () {
             $('#inputText').keyup(function () {
                 if ($(this).val() == '') {

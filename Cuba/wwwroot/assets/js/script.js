@@ -2,10 +2,7 @@
   "use strict";
   $(document).on("click", function (e) {
     var outside_space = $(".outside");
-    if (
-      !outside_space.is(e.target) &&
-      outside_space.has(e.target).length === 0
-    ) {
+    if (!outside_space.is(e.target) && outside_space.has(e.target).length === 0) {
       $(".menu-to-be-close").removeClass("d-block");
       $(".menu-to-be-close").css("display", "none");
     }
@@ -23,7 +20,7 @@
       },
       function () {
         $(this).removeClass("hoverd");
-      }
+      },
     );
     $(window).on("scroll", function () {
       if ($(this).scrollTop() < 600) {
@@ -51,10 +48,7 @@
   $('form button[type="submit"]').on("click", function () {
     console.log("first111");
     $(".show-hide span").addClass("show");
-    $(".show-hide")
-      .parent()
-      .find('input[name="login[password]"]')
-      .attr("type", "password");
+    $(".show-hide").parent().find('input[name="login[password]"]').attr("type", "password");
   });
 
   /*=====================
@@ -139,12 +133,8 @@
       $("body").addClass("light");
     }
   });
-  $("body").addClass(
-    localStorage.getItem("mode") ? localStorage.getItem("mode") : "light"
-  );
-  $(".mode").addClass(
-    localStorage.getItem("mode") === "dark-only" ? "active" : " "
-  );
+  $("body").addClass(localStorage.getItem("mode") ? localStorage.getItem("mode") : "light");
+  $(".mode").addClass(localStorage.getItem("mode") === "dark-only" ? "active" : " ");
 
   // sidebar filter
   $(".md-sidebar .md-sidebar-toggle ").on("click", function (e) {
@@ -169,7 +159,7 @@ $(".tap-top").click(function () {
     {
       scrollTop: 0,
     },
-    600
+    600,
   );
   return false;
 });
@@ -188,12 +178,9 @@ $(".tap-top").click(function () {
     });
     $this.addClass("is-active");
   });
-  $ripple.on(
-    "animationend webkitAnimationEnd oanimationend MSAnimationEnd",
-    function (e) {
-      $(this).removeClass("is-active");
-    }
-  );
+  $ripple.on("animationend webkitAnimationEnd oanimationend MSAnimationEnd", function (e) {
+    $(this).removeClass("is-active");
+  });
 })(jQuery, window, document);
 
 // active link
@@ -374,3 +361,8 @@ $("#flip-btn").click(function () {
 $("#flip-back").click(function () {
   $(".flip-card-inner").removeClass("flipped");
 });
+
+function handleLogout() {
+  localStorage.clear();
+  window.location.href = "/";
+}
