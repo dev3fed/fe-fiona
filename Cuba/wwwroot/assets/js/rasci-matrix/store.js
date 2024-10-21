@@ -11,6 +11,11 @@ const appState = new Proxy(
     idSearchProsbis: "",
     prosbisLevel: [],
     selectedLevel: 0,
+    dataDetailDraft: {},
+    editDrafProsbis: {
+      rasciNotation: [],
+    },
+    idDeleteProsbisdraft: 0,
     insertProsbis: {
       parentId: null,
       rasciNotation: [
@@ -52,6 +57,11 @@ const appState = new Proxy(
         updateSelect2ByProsbis();
         updateSelect2ByJob();
         formValidation();
+        if (property === "dataDetailDraft") {
+          detailDraft();
+        } else if (property === "editDrafProsbis") {
+          updateSelectEditProsbis();
+        }
         // if (
         //   property === "resultJabatan" ||
         //   property === "resultProsbis" ||
@@ -92,7 +102,7 @@ async function SearchMatrix(params) {
     });
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.log("Error fetching data from API");
     $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
@@ -111,7 +121,7 @@ async function fetchDataMatrix(params) {
     });
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.log("Error fetching data from API");
     $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
@@ -128,7 +138,7 @@ async function fetchSelectLevel() {
     });
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.log("Error fetching data from API");
     throw error;
   }
 }
@@ -144,7 +154,7 @@ async function fetchDraftProsbis(payload) {
     });
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.log("Error fetching data from API");
     throw error;
   }
 }
@@ -160,13 +170,12 @@ async function fetchDraftProsbisByid(payload) {
     });
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.log("Error fetching data from API");
     throw error;
   }
 }
 
 async function submitDraftProsbis(payload) {
-  // token
   try {
     const result = await $.ajax({
       type: "POST",
@@ -179,17 +188,64 @@ async function submitDraftProsbis(payload) {
     });
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.log("Error fetching data from API");
     throw error;
   }
 }
-
+async function updateDraftProsbis(payload, id) {
+  try {
+    const result = await $.ajax({
+      type: "PUT",
+      url: `${url_api}/api/BusinessProcess/draft/${id}`,
+      contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      data: JSON.stringify(payload),
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching data from API");
+    throw error;
+  }
+}
+async function draftSubmittoApproval(payload, id) {
+  try {
+    const result = await $.ajax({
+      type: "PUT",
+      url: `${url_api}/api/BusinessProcess/draft-submission/${id}`,
+      contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      data: JSON.stringify(payload),
+    });
+    return result;
+  } catch (error) {
+    console.log("Error fetching  data from API");
+    throw error;
+  }
+}
+async function deleteProsbisDraft(id) {
+  try {
+    const result = await $.ajax({
+      type: "DELETE",
+      url: `${url_api}/api/BusinessProcess/draft/${id}`,
+      contentType: "application/json",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+    return result;
+  } catch (error) {
+    console.log("error", error);
+    console.log("Error fetching  data from API");
+    throw error;
+  }
+}
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl] = await Promise.all([
-      fetchDataMatrix(),
-      fetchSelectLevel(),
-    ]);
+    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;

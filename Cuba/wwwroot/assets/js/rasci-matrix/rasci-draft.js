@@ -3,7 +3,7 @@ document.addEventListener("dataLoaded", async function () {
     const payload = {
       Type: "draft",
       Page: 1,
-      Limit: 10,
+      Limit: 5,
     };
     const queryString = new URLSearchParams(payload).toString();
     const dataDraft = await fetchDraftProsbis(queryString);
@@ -58,7 +58,6 @@ function loadTableBodyDraft(dataList) {
     ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
     return;
   }
-
   const bodyContent = dataList
     .map((val, i) => {
       return `
@@ -67,15 +66,15 @@ function loadTableBodyDraft(dataList) {
         <td>${val.reqId || "-"}</td>
         <td>${val.draftName || "-"}</td>
         <td>${val.createBy ? val.createBy : "-"}</td>
-        <td>${
-          val.createdAt ? new Date(val.createdAt).toLocaleDateString() : "-"
-        }</td>
+        <td>${val.createdAt ? new Date(val.createdAt).toLocaleDateString() : "-"}</td>
         <td>${val.typeDetail || "-"}</td>
         <td style="width: 200px;text-align:center">
-          <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail()">
+          <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail(${val.id})">
             <i class="icon-eye"></i> Detail
           </button>
-          <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete">
+          <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="handleDeleteProsbisDraft(${
+            val.id
+          })">
             <i class="icon-trash"></i> Delete
           </button>
         </td>
@@ -135,12 +134,8 @@ function handleBack() {
   if (headerMatrix) {
     headerMatrix.style.display = "block";
   }
-
-  const url = new URL(window.location);
-  url.searchParams.delete("id");
-  window.history.pushState({}, "", url);
 }
-function handleOpenDetail() {
+async function handleOpenDetail(id) {
   const draftDetail = document.getElementById("draft-detail");
   const mainMatrix = document.getElementById("main-matrix");
   const headerMatrix = document.getElementById("header-matrix");
@@ -157,7 +152,49 @@ function handleOpenDetail() {
   if (headerMatrix) {
     headerMatrix.style.display = "none";
   }
-  const url = new URL(window.location);
-  url.searchParams.set("id", 1);
-  window.history.pushState({}, "", url);
+  const dataDraft = await fetchDraftProsbisByid(id);
+  if (dataDraft.status === 200) {
+    const dataDetail = dataDraft.data.draftDetail[0];
+    const dataInfo = dataDraft.data.draftInfo;
+    const notation = JSON.parse(dataDetail.rasciNotation);
+    setState("editDrafProsbis", {
+      draftName: dataInfo.draftName,
+      type: dataInfo.typeDetail,
+      rasciNotation: notation,
+      level: dataDetail.level,
+      name: dataDetail.busProsNameAfter,
+      jobTitleId: dataDetail?.jobTitle.id,
+      parentId: dataDetail?.parentId,
+      parentIndex: dataDetail?.parentIndex,
+      name: dataDetail?.busProsNameBefore,
+    });
+    setState("dataDetailDraft", dataDraft.data);
+  }
+}
+
+function handleDeleteProsbisDraft(id) {
+  setState("deleteDraftProsbis", id);
+}
+
+async function confirmDeleteProsbisDraft() {
+  const id = getState("deleteDraftProsbis");
+  try {
+    const result = await deleteProsbisDraft(id);
+    if (result.status === 200) {
+      const modalDelDraft = document.getElementById("modalDelete");
+      const modal = bootstrap.Modal.getInstance(modalDelDraft);
+      if (modal) {
+        modal.hide();
+      }
+      setState("deleteDraftProsbis", 0);
+      const payload = {
+        Type: "draft",
+        Page: 1,
+        Limit: 5,
+      };
+      const queryString = new URLSearchParams(payload).toString();
+      const dataDraft = await fetchDraftProsbis(queryString);
+      loadTableBodyDraft(dataDraft.data.data);
+    }
+  } catch (error) {}
 }
