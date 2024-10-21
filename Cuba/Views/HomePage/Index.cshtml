@@ -218,6 +218,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script src="../assets/js/authentication.js"></script>
     <script>
         feather.replace();
         new WOW().init();
@@ -235,10 +236,7 @@
                 }
             });
         });
-        function handleLogout() {
-            localStorage.clear();
-            window.location.href = "@Url.Action("LoginSimple", "Authentication")";
-        }
+
     </script>
 </body>
 

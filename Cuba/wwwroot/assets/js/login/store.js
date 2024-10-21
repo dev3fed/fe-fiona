@@ -1,5 +1,4 @@
 async function loginApi(payload) {
-  console.log("first", payload);
   try {
     const result = await $.ajax({
       type: "POST",
@@ -14,3 +13,16 @@ async function loginApi(payload) {
     throw error;
   }
 }
+
+// async function loginApi(payload) {
+//   const url = `${url_api}/api/Auth/authenticate`;
+
+//   try {
+
+//     const result = await ajaxRequest(url, "POST", payload);
+//     return result;
+//   } catch (error) {
+//     console.error("Error fetching data from API", error);
+//     throw error;
+//   }
+// }
