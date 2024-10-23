@@ -1,0 +1,54 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.modal-draftapproval {
+        max-width: 35%;
+        margin: 190px auto;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+
+<div class="modal fade" id="modalDraftAprroval" tabindex="-1" role="dialog" aria-labelledby="modalDraftAprrovalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-draftapproval bounceInDown  animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDraftAprrovalLabel"><img src="~/assets/images/rasci/warning_icon.svg"
+                        alt="Filter Icon" style="margin-right: 8px;margin-top:-5px">Submit to Approval</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" data-bs-target="#modalDraftAprroval"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Row Filter job position starts-->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label">Are you sure want to submit this add new business process
+                                draft?</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Row Filter job position ends-->
+
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                        data-bs-target="#modalDraftAprroval"> Back</button>
+                    <button class="btn btn-primary" type="button" id="btnSaveDraft" onclick="handleSubmitApproval()">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

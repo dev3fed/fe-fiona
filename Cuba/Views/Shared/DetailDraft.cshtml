@@ -71,24 +71,7 @@
             <div class="header-card-draft">
                 Info
             </div>
-            <div class="row" style="padding-top: 20px;">
-                <div class="col-3 custom-col">
-                    <label style="color:#9F9FA5">Draft Name</label>
-                    <label style="font-weight: 600;font-size: 14px">Tambah prosbis baru</label>
-                    <label>Req/090924/001</label>
-                </div>
-                <div class="col-3 custom-col">
-                    <label style="color:#9F9FA5">Created by</label>
-                    <label style="font-weight: 600;font-size: 14px">Gaiman Hutagalung</label>
-                </div>
-                <div class="col-3 custom-col">
-                    <label style="color:#9F9FA5">Created Date</label>
-                    <label style="font-weight: 600;font-size: 14px">T09/09/2024, 15:30</label>
-                </div>
-                <div class="col-3 custom-col">
-                    <label style="color:#9F9FA5">Type</label>
-                    <label style="font-weight: 600;font-size: 14px">Add new Business Proses</label>
-                </div>
+            <div class="row" style="padding-top: 20px;" id="draft-info">
             </div>
         </div>
         <!-- Card info end-->
@@ -98,30 +81,9 @@
             <div class="header-card-draft">
                 Detail
             </div>
-            <div class="row" style="padding-top: 20px;">
-                <div class="col-4 custom-col" style="text-align: left;">
-                    <label>Business Process Name</label>
-                    <label style="font-weight: 600;font-size: 14px">Menyusun laporan dan rekomendasi XXXX</label>
-                </div>
-                <div class="col-1 custom-col">
-                    <label>Level</label>
-                    <label style=" font-weight: 600;font-size: 14px">5</label>
-                </div>
-                <div class="col-7 custom-col" style="text-align: left;">
-                    <label>Business Process Parent</label>
-                    <label style="font-weight: 600;font-size: 14px">1.1.1.1 - Melakukan Kajian (Assess)/analisis
-                        eksternal</label>
-                </div>
+            <div class="row" style="padding-top: 20px;" id="detail-prosbis">
             </div>
-            <div style="padding-top: 20px;">
-                <div class=" custom-row-full">
-                    <label>Job Title</label>
-                    <label style="font-weight: 600;font-size: 14px;padding-bottom: 10px;">Jabatan ABCD</label>
-                </div>
-                <div class=" custom-row-full">
-                    <label>Rasci Notasi</label>
-                    <label style="font-weight: 600;font-size: 14px">. A</label>
-                </div>
+            <div style="padding-top: 20px;" id="detail-job">
             </div>
         </div>
         <!-- Card detail end-->
@@ -131,14 +93,14 @@
             <button class="btn btn-outline-light" type="button" onclick="handleBack()">
                 <i class="icon-arrow-left"></i> Back
             </button>
-            <button class="btn btn-outline-light" type="button">
+            <button class="btn btn-outline-light" type="button" onclick="deleteDraftFromdetail()">
                 <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
             </button>
             <button class=" btn btn-outline-light" type="button" onclick="handleOpenDetailBp()">
                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit Draft
             </button>
-            <button class="btn btn-primary" type="button"> Submit to Approval<i class="icon-arrow-right"
-                    style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+            <button class="btn btn-primary" type="button" onclick="openDetailApproval()"> Submit to Approval<i
+                    class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
         </div>
         <!-- card footer end-->
     </div>

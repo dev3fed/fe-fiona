@@ -1,8 +1,6 @@
 // start section add notation by column row
 function onModalAddNotation() {
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalAddNotation"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("modalAddNotation"));
   modal.show();
   const prosbisLevel = getState("prosbisLevel");
   console.log("prosbisLevel", prosbisLevel);
@@ -26,9 +24,7 @@ function onModalAddNotation() {
         <label class="form-label">Bussiness Process Level</label>
         <select class="form-select digits">
           <option>Choose</option>
-          ${prosbisLevel.map(
-            (opt) => `<option value="${opt.id}">${opt.text}</option>`,
-          )}
+          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
       </div>
     </div>
@@ -104,9 +100,7 @@ function onModalAddNotation() {
 // start section add notation by column row
 async function openModalNotRow(jobId, prosbisId) {
   console.log("cek", jobId, prosbisId);
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalNotationRow"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("modalNotationRow"));
   modal.show();
   const prosbisLevel = getState("prosbisLevel");
   console.log("prosbisLevel", prosbisLevel);

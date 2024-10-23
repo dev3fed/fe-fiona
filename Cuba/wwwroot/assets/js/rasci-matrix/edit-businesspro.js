@@ -1,8 +1,6 @@
 // start section add notation by column row
 function openModalEditBusinesspro() {
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalEditBusinesspro"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("modalEditBusinesspro"));
   modal.show();
   const prosbisLevel = getState("prosbisLevel");
   console.log("prosbisLevel", prosbisLevel);
@@ -13,9 +11,7 @@ function openModalEditBusinesspro() {
         <label class="form-label">Level</label>
         <select class="form-select digits" disabled>
           <option>Choose</option>
-          ${prosbisLevel.map(
-            (opt) => `<option value="${opt.id}">${opt.text}</option>`,
-          )}
+          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
       </div>
     </div>

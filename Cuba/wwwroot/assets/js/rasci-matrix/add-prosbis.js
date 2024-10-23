@@ -8,9 +8,7 @@ function onModalAddBp() {
         <label class="form-label">Level</label>
         <select class="form-select digits" onclick="onSelect(event)">
           <option>Choose</option>
-          ${prosbisLevel.map(
-            (opt) => `<option value="${opt.id}">${opt.text}</option>`,
-          )}
+          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
       </div>
     </div>
@@ -59,14 +57,12 @@ function onModalAddBp() {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
-          letter.rasciCode
-        }" 
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
                value="${letter.comment || ""}" 
                ${!letter.isChecked ? "disabled" : ""} 
                oninput="updateComment('${letter.rasciCode}', this.value)">
       </td>
-    </tr
+    </tr>
 `,
     )
     .join("");
@@ -166,7 +162,6 @@ function updateSelect2ByJob() {
 
 function onSelect(event) {
   const value = event.target.value;
-  console.log("value", value);
   const parentSelect = document.querySelector("#parentId");
   if (value === "Choose" || value == 1) {
     parentSelect.disabled = true;
@@ -348,13 +343,15 @@ async function saveApproval() {
 }
 
 function handleInputDraftName(value) {
-  const btnSave = document.getElementById(`btnSaveDraft`);
+  const btnSave = document.getElementById("prosbisSavedraft");
+  if (!btnSave) {
+    console.error("Button not found");
+    return;
+  }
   btnSave.disabled = value.length > 3 ? false : true;
 }
 function openModalConfrim() {
-  const openModal = new bootstrap.Modal(
-    document.getElementById("modalAprroval"),
-  );
+  const openModal = new bootstrap.Modal(document.getElementById("modalAprroval"));
   openModal.show();
 }
 function backFromModalBp() {

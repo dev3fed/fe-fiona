@@ -142,7 +142,7 @@
             <ul class="profile-dropdown onhover-show-div">
                 <li><a href="#"><i data-feather="user" width="18" style="margin-right:5px"></i><span>My
                             Profile</span></a></li>
-                <li><a asp-controller="Authentication" asp-action="LoginSimple">
+                <li onclick="handleLogout()"><a>
                         <i data-feather="log-in" width="18" style="margin-right:5px"></i><span>Logout</span></a>
                 </li>
             </ul>
@@ -218,6 +218,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script src="../assets/js/authentication.js"></script>
     <script>
         feather.replace();
         new WOW().init();
@@ -235,6 +236,7 @@
                 }
             });
         });
+
     </script>
 </body>
 

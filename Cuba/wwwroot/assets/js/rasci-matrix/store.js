@@ -11,6 +11,11 @@ const appState = new Proxy(
     idSearchProsbis: "",
     prosbisLevel: [],
     selectedLevel: 0,
+    dataDetailDraft: {},
+    editDrafProsbis: {
+      rasciNotation: [],
+    },
+    idDeleteProsbisdraft: 0,
     insertProsbis: {
       parentId: null,
       rasciNotation: [
@@ -52,6 +57,11 @@ const appState = new Proxy(
         updateSelect2ByProsbis();
         updateSelect2ByJob();
         formValidation();
+        if (property === "dataDetailDraft") {
+          detailDraft();
+        } else if (property === "editDrafProsbis") {
+          updateSelectEditProsbis();
+        }
         // if (
         //   property === "resultJabatan" ||
         //   property === "resultProsbis" ||
@@ -82,114 +92,109 @@ window.setState = setState;
 window.getState = getState;
 
 async function SearchMatrix(params) {
+  const url = `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`;
   try {
-    const result = await $.ajax({
-      url: `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`,
-      type: "GET",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.error("Error fetching data from API");
     $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
 }
-// /Utilities/selection?Page=1&Type=level&Level=2
+
 async function fetchDataMatrix(params) {
+  const url = `${url_api}/api/RasciMapping`;
   try {
-    const result = await $.ajax({
-      url: `${url_api}/api/RasciMapping`,
-      type: "POST",
-      contentType: "application/json",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-      data: JSON.stringify(params),
-    });
+    const result = await ajaxRequest(url, "POST", params); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.error("Error fetching data from API");
     $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
 }
 
 async function fetchSelectLevel() {
+  const url = `${url_api}/api/Utilities/selection?Page=1&Type=level`;
   try {
-    const result = await $.ajax({
-      url: `${url_api}/api/Utilities/selection?Page=1&Type=level`,
-      type: "GET",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.error("Error fetching data from API");
     throw error;
   }
 }
 
 async function fetchDraftProsbis(payload) {
+  const url = `${url_api}/api/BusinessProcess/draft?${payload}`;
   try {
-    const result = await $.ajax({
-      url: `${url_api}/api/BusinessProcess/draft?${payload}`,
-      type: "GET",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.error("Error fetching data from API");
     throw error;
   }
 }
 
 async function fetchDraftProsbisByid(payload) {
+  const url = `${url_api}/api/BusinessProcess/draft-detail/${payload}`;
   try {
-    const result = await $.ajax({
-      url: `${url_api}/api/BusinessProcess/draft-detail/${payload}`,
-      type: "GET",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.error("Error fetching data from API");
     throw error;
   }
 }
 
 async function submitDraftProsbis(payload) {
-  // token
+  const url = `${url_api}/api/BusinessProcess`;
   try {
-    const result = await $.ajax({
-      type: "POST",
-      url: `${url_api}/api/BusinessProcess`,
-      contentType: "application/json",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-      data: JSON.stringify(payload),
-    });
+    const result = await ajaxRequest(url, "POST", payload); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    console.log("Error fetching Job Title data from API");
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function updateDraftProsbis(payload, id) {
+  const url = `${url_api}/api/BusinessProcess/draft/${id}`;
+  try {
+    const result = await ajaxRequest(url, "PUT", payload); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function draftSubmittoApproval(payload, id) {
+  const url = `${url_api}/api/BusinessProcess/draft-submission/${id}`;
+  try {
+    const result = await ajaxRequest(url, "PUT", payload); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function deleteProsbisDraft(id) {
+  const url = `${url_api}/api/BusinessProcess/draft/${id}`;
+  try {
+    const result = await ajaxRequest(url, "DELETE"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
     throw error;
   }
 }
 
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl] = await Promise.all([
-      fetchDataMatrix(),
-      fetchSelectLevel(),
-    ]);
+    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
