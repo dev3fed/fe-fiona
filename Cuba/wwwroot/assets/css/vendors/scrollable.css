@@ -1,5 +1,6 @@
 /*=============Scrollable css start=============*/
-.ps-container.ps-active-y > .ps-scrollbar-y-rail, .ps-container.ps-active-x > .ps-scrollbar-x-rail {
+.ps-container.ps-active-y > .ps-scrollbar-y-rail,
+.ps-container.ps-active-x > .ps-scrollbar-x-rail {
   background-color: transparent;
   display: block;
 }
@@ -9,8 +10,9 @@
   position: relative;
   border: 1px solid #f4f4f4;
   overflow: auto;
-  height: 300px;
+  height: 450px;
 }
+
 .scroll-demo .horz-scroll-content {
   width: 1600px;
 }
