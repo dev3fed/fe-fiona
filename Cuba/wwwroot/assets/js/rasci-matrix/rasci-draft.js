@@ -51,6 +51,16 @@ function handleClickCard(length) {
     emptyCard.style.display = "none";
   }
 }
+function changeemptyPageDraft(length) {
+  const tableDraft = document.getElementById("table-draft");
+  const emptyCard = document.getElementById("empty-draft");
+  if (tableDraft && length === 0) {
+    tableDraft.style.display = "none";
+  }
+  if (emptyCard && length === 0) {
+    emptyCard.style.display = "block";
+  }
+}
 function loadTableBodyDraft(dataList) {
   if (!dataList || dataList.length === 0) {
     document.getElementById(
@@ -194,6 +204,9 @@ async function confirmDeleteProsbisDraft() {
       };
       const queryString = new URLSearchParams(payload).toString();
       const dataDraft = await fetchDraftProsbis(queryString);
+      const IsNotEmpty = dataDraft.data.data.length;
+      console.log("is not empty", IsNotEmpty);
+      changeemptyPageDraft(IsNotEmpty);
       loadTableBodyDraft(dataDraft.data.data);
     }
   } catch (error) {}

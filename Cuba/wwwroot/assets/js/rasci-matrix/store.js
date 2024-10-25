@@ -94,7 +94,7 @@ window.getState = getState;
 async function SearchMatrix(params) {
   const url = `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -106,7 +106,7 @@ async function SearchMatrix(params) {
 async function fetchDataMatrix(params) {
   const url = `${url_api}/api/RasciMapping`;
   try {
-    const result = await ajaxRequest(url, "POST", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "POST", params);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -118,7 +118,7 @@ async function fetchDataMatrix(params) {
 async function fetchSelectLevel() {
   const url = `${url_api}/api/Utilities/selection?Page=1&Type=level`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -129,7 +129,7 @@ async function fetchSelectLevel() {
 async function fetchDraftProsbis(payload) {
   const url = `${url_api}/api/BusinessProcess/draft?${payload}`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -140,7 +140,7 @@ async function fetchDraftProsbis(payload) {
 async function fetchDraftProsbisByid(payload) {
   const url = `${url_api}/api/BusinessProcess/draft-detail/${payload}`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -151,7 +151,7 @@ async function fetchDraftProsbisByid(payload) {
 async function submitDraftProsbis(payload) {
   const url = `${url_api}/api/BusinessProcess`;
   try {
-    const result = await ajaxRequest(url, "POST", payload); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "POST", payload);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -162,7 +162,7 @@ async function submitDraftProsbis(payload) {
 async function updateDraftProsbis(payload, id) {
   const url = `${url_api}/api/BusinessProcess/draft/${id}`;
   try {
-    const result = await ajaxRequest(url, "PUT", payload); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "PUT", payload);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -173,7 +173,7 @@ async function updateDraftProsbis(payload, id) {
 async function draftSubmittoApproval(payload, id) {
   const url = `${url_api}/api/BusinessProcess/draft-submission/${id}`;
   try {
-    const result = await ajaxRequest(url, "PUT", payload); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "PUT", payload);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -184,7 +184,7 @@ async function draftSubmittoApproval(payload, id) {
 async function deleteProsbisDraft(id) {
   const url = `${url_api}/api/BusinessProcess/draft/${id}`;
   try {
-    const result = await ajaxRequest(url, "DELETE"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "DELETE");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
