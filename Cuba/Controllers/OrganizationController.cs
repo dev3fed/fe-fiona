@@ -2,14 +2,23 @@
 
 namespace Cuba.Controllers
 {
+    [Route("organization")]
     public class OrganizationController : Controller
     {
+        [HttpGet("index")] 
         public IActionResult Index()
         {
             return View();
         }
     
+        [HttpGet("detail")] 
         public IActionResult Detail()
+        {
+            return View();
+        }
+
+        [HttpGet("new-subordinate")] 
+        public IActionResult NewSubordinate()
         {
             return View();
         }
