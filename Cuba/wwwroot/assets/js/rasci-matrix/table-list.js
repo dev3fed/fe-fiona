@@ -110,8 +110,7 @@ function loadTableBody(prosbisList) {
           }</span></td>
           <td class="headcol" style="font-size:12px;font-weight: 500 !important;">
            <div class="prosbis-cell-wrapper">
-              
-           <div class="hierarchy-icon-wrapper">
+              <div class="hierarchy-icon-wrapper">
                 ${
                   isSearch == false && val.hasChild
                     ? `<i data-feather="${isExpanded}" class="hierarchy-icon"

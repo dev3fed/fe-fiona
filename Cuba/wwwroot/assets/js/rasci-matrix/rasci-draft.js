@@ -64,7 +64,7 @@ function changeemptyPageDraft(length) {
 function loadTableBodyDraft(dataList) {
   if (!dataList || dataList.length === 0) {
     document.getElementById(
-      "tbl-add-prosbis-body",
+      "body-draft",
     ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
     return;
   }

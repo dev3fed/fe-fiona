@@ -423,6 +423,8 @@ async function confirmDeleteDetailDraft() {
       };
       const queryString = new URLSearchParams(payload).toString();
       const dataDraft = await fetchDraftProsbis(queryString);
+      const IsNotEmpty = dataDraft.data.data.length;
+      changeemptyPageDraft(IsNotEmpty);
       loadTableBodyDraft(dataDraft.data.data);
     }
   } catch (error) {}

@@ -1,12 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Show menu items based on localStorage
   checkMenuVisibility();
-  // Check token validity and expiration on page load
   checkTokenValidity();
   checkTokenExpiration();
 });
 
-// Show menu items by checking against localStorage
 function checkMenuVisibility() {
   const listMenu = JSON.parse(localStorage.getItem("listMenu"));
   if (Array.isArray(listMenu)) {
@@ -21,7 +18,6 @@ function checkMenuVisibility() {
   }
 }
 
-// Decode JWT token and retrieve its payload
 function decodeToken() {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -38,7 +34,6 @@ function decodeToken() {
   }
 }
 
-// Check if the token has expired
 function checkTokenExpiration() {
   const decodedToken = decodeToken();
   if (decodedToken) {
@@ -50,7 +45,6 @@ function checkTokenExpiration() {
   }
 }
 
-// Verify token existence and validity
 function checkTokenValidity() {
   const decodedToken = decodeToken();
   if (!decodedToken) {
@@ -59,7 +53,6 @@ function checkTokenValidity() {
   }
 }
 
-// Unified AJAX request function with token-based authentication
 async function ajaxRequest(url, method, data = null) {
   try {
     const response = await $.ajax({
@@ -82,7 +75,6 @@ async function ajaxRequest(url, method, data = null) {
   }
 }
 
-// Clear storage and redirect to login on logout
 function handleLogout() {
   localStorage.clear();
   window.location.href = "/";

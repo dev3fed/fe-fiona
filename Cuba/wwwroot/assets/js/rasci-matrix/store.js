@@ -15,7 +15,7 @@ const appState = new Proxy(
     editDrafProsbis: {
       rasciNotation: [],
     },
-    idDeleteProsbisdraft: 0,
+    deleteDraftProsbis: 0,
     insertProsbis: {
       parentId: null,
       rasciNotation: [
