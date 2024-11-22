@@ -186,8 +186,13 @@ const openModalEditDepth = (jobId, competencyId) => {
 
       return radioButtons;
     };
-
+    console.log("compeCategory", compeCategory);
     // Isi konten form secara dinamis
+    const category = {
+      mandatory: "Mandatory",
+      general: "General",
+      specific: "Specific",
+    };
     const formContent = `
         <div class="col-12">
             <div class="mb-2">
@@ -197,10 +202,10 @@ const openModalEditDepth = (jobId, competencyId) => {
         </div>
         <div class="col-12">
             <div class="mt-3">
-              <label style="color:#9F9FA5">General Competency</label>
-              <h6 style="color:#03A9F4; cursor: pointer" onclick="handleDetailCompetency(${
-                compeCategory.id
-              })">Norm & Conditions to work</h6>
+              <label style="color:#9F9FA5">${category[compeCategory.category]} Competency</label>
+              <h6 style="color:#03A9F4; cursor: pointer" onclick="handleDetailCompetency(${compeCategory.id})">${
+      compeCategory.competency_name
+    }</h6>
             </div>
         </div>
         <div class="col-12">
@@ -351,7 +356,9 @@ const handleDetailCompetency = (id) => {
   console.log("id", id);
   // open modal dengan id modalDetailCompe
   const competencyDetailList = getState("competencyDetailList");
+  const competencyList = getState("competencyList");
   const dataDetail = competencyDetailList.find((compe) => compe.idcompetency === id);
+  const findcompetencyList = competencyList.find((compe) => compe.id === dataDetail.idcompetency);
   console.log("dataDetail", dataDetail);
   const modal = new bootstrap.Modal(document.getElementById("modalDetailCompe"));
   modal.show();
@@ -359,7 +366,7 @@ const handleDetailCompetency = (id) => {
   const formContent = `
   <div class="col-12 scrollable-content" style="min-height: 620px;">
       <div class="mb-2">
-        <h6>Norm & Conditions to Work </h6>
+        <h6>${findcompetencyList.competency_name} </h6>
       </div>
              
       <div class="custom-card-approval">

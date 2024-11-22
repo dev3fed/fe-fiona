@@ -10,7 +10,15 @@ const appState = new Proxy(
     isSearchMatrix: false,
     idSearchProsbis: "",
     prosbisLevel: [],
+    filterJobList: [],
+    checkedParentId: [],
     selectedLevel: 0,
+    //start filter rasci matrix
+    rasciNotationFilter: [],
+    levelFilter: [],
+    levelJobFilter: [],
+    jobFilter: [],
+    //end filter rasci matrix
     dataDetailDraft: {},
     editDrafProsbis: {
       rasciNotation: [],
@@ -61,6 +69,8 @@ const appState = new Proxy(
           detailDraft();
         } else if (property === "editDrafProsbis") {
           updateSelectEditProsbis();
+        } else if (property === "checkedParentId") {
+          dataListJobChecked();
         }
         // if (
         //   property === "resultJabatan" ||
@@ -137,6 +147,17 @@ async function fetchDraftProsbis(payload) {
   }
 }
 
+async function fetchFilterJobList() {
+  const url = `${url_api}/api/RasciMapping/list-rasci-filter`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
 async function fetchDraftProsbisByid(payload) {
   const url = `${url_api}/api/BusinessProcess/draft-detail/${payload}`;
   try {
@@ -194,12 +215,16 @@ async function deleteProsbisDraft(id) {
 
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
+    const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
+      fetchDataMatrix(),
+      fetchSelectLevel(),
+      fetchFilterJobList(),
+    ]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
     appState.prosbisLevel = prosbisLvl?.data.result;
-
+    appState.filterJobList = filterJobList?.data;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

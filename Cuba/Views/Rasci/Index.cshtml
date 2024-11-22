@@ -295,8 +295,7 @@
 @section Script {
     <script>
         const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
-        @* const token = '@(Environment.GetEnvironmentVariable("API_TOKEN"))' *@
-            const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
         function handleCloseModal() {
             const applyButton = document.getElementById("apply-search");
@@ -343,6 +342,7 @@
     <script src="../assets/js/rasci-matrix/edit-businesspro.js"></script>
     <script src="../assets/js/rasci-matrix/add-prosbisref.js"></script>
     <script src="../assets/js/rasci-matrix/detail-draft.js"></script>
+    <script src="../assets/js/rasci-matrix/filter-rasci.js"></script>
 
 
 }

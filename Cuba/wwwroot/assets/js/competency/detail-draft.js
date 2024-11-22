@@ -3,6 +3,11 @@ async function detailDraft() {
     const dataDraft = getState("dataDetailDraft");
     if (dataDraft) {
       console.log("dataDraft", dataDraft);
+      const category = {
+        mandatory: "Mandatory",
+        general: "General",
+        specific: "Specific",
+      };
       const bodyInfo = `
         <div class="col-3 custom-col">
           <label style="color:#9F9FA5">Draft Name</label>
@@ -31,8 +36,12 @@ async function detailDraft() {
           <label style="font-weight: 600;font-size: 14px">${dataDraft?.jobTitle.job_name}</label>
         </div>
         <div class="col-3 custom-col" style="text-align: left;">
-          <label style="color:#9F9FA5">General Competency Name</label>
-          <label onclick="handleDraftDetailCompetency(${dataDraft?.GeneralCompeName.id})" style="color:#03A9F4;cursor:pointer; font-weight: 600;font-size: 14px">${dataDraft?.GeneralCompeName.competency_name}</label>
+          <label style="color:#9F9FA5">${category[dataDraft?.GeneralCompeName.category]} Competency Name</label>
+          <label onclick="handleDraftDetailCompetency(${
+            dataDraft?.GeneralCompeName.id
+          })" style="color:#03A9F4;cursor:pointer; font-weight: 600;font-size: 14px">${
+        dataDraft?.GeneralCompeName.competency_name
+      }</label>
         </div>
         <div class="col-3 custom-col" style="text-align: left;">
           <label style="color:#9F9FA5">Depth Level (before edit)</label>
@@ -55,6 +64,8 @@ async function detailDraft() {
 const handleDraftDetailCompetency = (id) => {
   console.log("id", id);
   const competencyDetailList = getState("competencyDetailList");
+  const competencyList = getState("competencyList");
+  const findcompetencyList = competencyList.find((compe) => compe.id === id);
   const dataDetail = competencyDetailList.find((compe) => compe.idcompetency === id);
   console.log("dataDetail", dataDetail);
   const modal = new bootstrap.Modal(document.getElementById("modalDraftDetailCompe"));
@@ -63,7 +74,7 @@ const handleDraftDetailCompetency = (id) => {
   const formContent = `
     <div class="col-12 scrollable-content" style="min-height: 620px;">
         <div class="mb-2">
-          <h6>Norm & Conditions to Work </h6>
+          <h6>${findcompetencyList.competency_name} </h6>
         </div>
                
         <div class="custom-card-approval">

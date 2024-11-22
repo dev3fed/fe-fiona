@@ -86,7 +86,7 @@
                         <div class="media">
                             <div class="media-body switch-sm d-flex align-items-center">
                                 <label class="switch m-0">
-                                    <input type="checkbox" checked=""><span class="switch-state"></span>
+                                    <input type="checkbox" id="switch-all" checked><span class="switch-state"></span>
                                 </label>
                                 <label class="col-form-label mb-0"
                                     style="margin-top: -4px; margin-left: 5px;">All</label>
@@ -102,10 +102,11 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="switch m-0">
-                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                        <input type="checkbox" id="switch-level1" checked><span
+                                            class="switch-state"></span>
                                     </label>
                                     <label class="col-form-label mb-0"
-                                        style="margin-top: -4px; margin-left: 5px;">Director</label>
+                                        style="margin-top: -4px; margin-left: 5px;">Direktur Utama</label>
                                 </div>
                                 <label class="reset-label mb-0">Reset</label>
                             </div>
@@ -117,7 +118,23 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="switch m-0">
-                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                        <input type="checkbox" id="switch-level2" checked><span
+                                            class="switch-state"></span>
+                                    </label>
+                                    <label class="col-form-label mb-0"
+                                        style="margin-top: -4px; margin-left: 5px;">Direktur Teknis</label>
+                                </div>
+                                <label class="reset-label mb-0">Reset</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="media">
+                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <label class="switch m-0">
+                                        <input type="checkbox" id="switch-level3" checked><span
+                                            class="switch-state"></span>
                                     </label>
                                     <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">Vice
                                         President</label>
@@ -131,10 +148,12 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="switch m-0">
-                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                        <input type="checkbox" id="switch-level4" checked><span
+                                            class="switch-state"></span>
                                     </label>
                                     <label class="col-form-label mb-0"
-                                        style="margin-top: -4px; margin-left: 5px;">Manager</label>
+                                        style="margin-top: -4px; margin-left: 5px;">Manager
+                                    </label>
                                 </div>
                                 <label class="reset-label mb-0">Reset</label>
                             </div>
@@ -145,10 +164,10 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="switch m-0">
-                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                        <input type="checkbox" id="switch-level5" checked><span
+                                            class="switch-state"></span>
                                     </label>
-                                    <label class="col-form-label mb-0"
-                                        style="margin-top: -4px; margin-left: 5px;">Assistant
+                                    <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">Ast.
                                         Manager</label>
                                 </div>
                                 <label class="reset-label mb-0">Reset</label>
@@ -160,24 +179,11 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="switch m-0">
-                                        <input type="checkbox" checked=""><span class="switch-state"></span>
+                                        <input type="checkbox" id="switch-level6" checked><span
+                                            class="switch-state"></span>
                                     </label>
                                     <label class="col-form-label mb-0"
                                         style="margin-top: -4px; margin-left: 5px;">Analyst</label>
-                                </div>
-                                <label class="reset-label mb-0">Reset</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2">
-                        <div class="media">
-                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
-                                <div class="d-flex align-items-center">
-                                    <label class="switch m-0">
-                                        <input type="checkbox" checked=""><span class="switch-state"></span>
-                                    </label>
-                                    <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">Jr.
-                                        Analyst</label>
                                 </div>
                                 <label class="reset-label mb-0">Reset</label>
                             </div>
@@ -189,87 +195,69 @@
                 <!-- Row Filter job position starts-->
                 <div class="row">
                     <div class="col-2">
-                        <div class="custom-card">
-                            <input class="form-control" type="text" placeholder="Search">
-                            <div class="animate-chk mt-3 scrollable">
-                                <label style="font-size: 12px;color:#85858C">Direktur Utama</label>
-                                <label class="d-block" for="chk-ani">
-                                    <input class="checkbox_animated" id="chk-ani" type="checkbox" checked="">
-                                    Option 1
-                                </label>
-                                <label class="d-block" for="chk-ani1">
-                                    <input class="checkbox_animated" id="chk-ani1" type="checkbox"> Option 2
-                                </label>
-                                <label class="d-block" for="chk-ani2">
-                                    <input class="checkbox_animated" id="chk-ani2" type="checkbox" checked="">
-                                    Option 3
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 4
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 5
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 6
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 7
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 8
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 9
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 10
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 11
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 12
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 13
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 14
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 15
-                                </label>
-                                <label class="d-block" for="chk-ani3">
-                                    <input class="checkbox_animated" id="chk-ani3" type="checkbox"> Option 16
-                                </label>
-                                <hr />
+                        <div class="custom-card" id="card-level1">
+                            <input class="form-control" type="text" placeholder="Search" id="search-joblevel1">
+                            <div class="animate-chk mt-3 scrollable" id="chk-job-level1">
+                                <!-- List unchecked -->
+                            </div>
+                            <div class="animate-chk mt-3 scrollable bg-light" id="checked-job-level1">
+                                <!-- List checked -->
                             </div>
                         </div>
                     </div>
                     <div class="col-2">
-                        <div class="custom-card">
-                            <!-- Card content goes here -->
+                        <div class="custom-card" id="card-level2">
+                            <input class="form-control" type="text" placeholder="Search" id="search-joblevel2">
+                            <div class="animate-chk mt-3 scrollable" id="chk-job-level2">
+                                <!-- List unchecked -->
+                            </div>
+                            <div class="animate-chk mt-3 scrollable bg-light" id="checked-job-level2">
+                                <!-- List checked -->
+                            </div>
                         </div>
                     </div>
                     <div class="col-2">
-                        <div class="custom-card">
-                            <!-- Card content goes here -->
+                        <div class="custom-card" id="card-level3">
+                            <input class="form-control" type="text" placeholder="Search" id="search-joblevel3">
+                            <div class="animate-chk mt-3 scrollable" id="chk-job-level3">
+                                <!-- List unchecked -->
+                            </div>
+                            <div class="animate-chk mt-3 scrollable bg-light" id="checked-job-level3">
+                                <!-- List checked -->
+                            </div>
                         </div>
                     </div>
                     <div class="col-2">
-                        <div class="custom-card">
-                            <!-- Card content goes here -->
+                        <div class="custom-card" id="card-level4">
+                            <input class="form-control" type="text" placeholder="Search" id="search-joblevel4">
+                            <div class="animate-chk mt-3 scrollable" id="chk-job-level4">
+                                <!-- List unchecked -->
+                            </div>
+                            <div class="animate-chk mt-3 scrollable bg-light" id="checked-job-level4">
+                                <!-- List checked -->
+                            </div>
                         </div>
                     </div>
                     <div class="col-2">
-                        <div class="custom-card">
-                            <!-- Card content goes here -->
+                        <div class="custom-card" id="card-level5">
+                            <input class="form-control" type="text" placeholder="Search" id="search-joblevel5">
+                            <div class="animate-chk mt-3 scrollable" id="chk-job-level5">
+                                <!-- List unchecked -->
+                            </div>
+                            <div class="animate-chk mt-3 scrollable bg-light" id="checked-job-level5">
+                                <!-- List checked -->
+                            </div>
                         </div>
                     </div>
                     <div class="col-2">
-                        <div class="custom-card">
-                            <!-- Card content goes here -->
+                        <div class="custom-card" id="card-level6">
+                            <input class="form-control" type="text" placeholder="Search" id="search-joblevel6">
+                            <div class="animate-chk mt-3 scrollable" id="chk-job-level6">
+                                <!-- List unchecked -->
+                            </div>
+                            <div class="animate-chk mt-3 scrollable bg-light" id="checked-job-level6">
+                                <!-- List checked -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -281,33 +269,37 @@
                     <div class="col-6">
                         <div class="switch-sm d-flex align-items-center justify-content-between w-100">
                             <label class="form-label">Prosses Business</label>
-                            <label class="reset-label mb-0">Reset</label>
+                            <label class="reset-label mb-0" onclick="resetProssesBusiness()">Reset</label>
                         </div>
                         <div class="custom-card-Bottom">
                             <div class="animate-chk">
-                                <label class="d-inline-block" for="chk-ani-1" style="width: 190px;">
-                                    <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-1" style="width: 180px;">
+                                    <input class="checkbox_animated" id="level-lall" type="checkbox">
                                     All
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-2" style="width: 80px;">
+                                    <input class="checkbox_animated" id="level-l1" type="checkbox">
                                     L1
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-3" style="width: 80px;">
+                                    <input class="checkbox_animated" id="level-l2" type="checkbox">
                                     L2
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-4" style="width: 80px;">
+                                    <input class="checkbox_animated" id="level-l3" type="checkbox">
                                     L3
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 100px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-5" style="width: 80px;">
+                                    <input class="checkbox_animated" id="level-l4" type="checkbox">
                                     L4
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 50px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-6" style="width: 80px;">
+                                    <input class="checkbox_animated" id="level-l5" type="checkbox">
                                     L5
+                                </label>
+                                <label class="d-inline-block" for="chk-ani-7" style="width: 50px;">
+                                    <input class="checkbox_animated" id="level-l6" type="checkbox">
+                                    L6
                                 </label>
                             </div>
                         </div>
@@ -315,40 +307,40 @@
                     <div class="col-6">
                         <div class="switch-sm d-flex align-items-center justify-content-between w-100">
                             <label class="form-label">RASCI Matrix Notation</label>
-                            <label class="reset-label mb-0">Reset</label>
+                            <label class="reset-label mb-0" onclick="resetRasciNotation()">Reset</label>
                         </div>
                         <div class="custom-card-Bottom">
                             <div class="animate-chk">
-                                <label class="d-inline-block" for="chk-ani-1" style="width: 140px;">
-                                    <input class="checkbox_animated" id="chk-ani-1" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationAll" style="width: 140px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-all">
                                     All
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationR" style="width: 65px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-r">
                                     R
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationA" style="width: 65px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-a">
                                     A
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationS" style="width: 65px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-s">
                                     S
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationC" style="width: 65px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-c">
                                     C
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 65px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationI" style="width: 65px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-i">
                                     I
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 80px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationRA" style="width: 80px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-ra">
                                     &#8800; R/A
                                 </label>
-                                <label class="d-inline-block" for="chk-ani-2" style="width: 80px;">
-                                    <input class="checkbox_animated" id="chk-ani-2" type="checkbox" checked="">
+                                <label class="d-inline-block" for="chk-ani-notationna" style="width: 80px;">
+                                    <input class="checkbox_animated" type="checkbox" id="notation-na">
                                     N/A
                                     <img src="~/assets/images/rasci/danger-circle.svg" alt="Filter Icon"
                                         class="example-popover" style="margin-top:-2px;" data-bs-toggle="tooltip"
@@ -369,7 +361,7 @@
                 <div>
                     <button class="btn btn-outline-primary" type="button"><i class="icon-close"
                             style="font-size: 12px; margin-right: 8px;"></i> Reset Filter</button>
-                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
+                    <button class="btn btn-primary" type="button" onclick="applyFilterRasci()">
                         <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon" style="margin-right: 8px;">
                         Apply Filter Rasci
                     </button>

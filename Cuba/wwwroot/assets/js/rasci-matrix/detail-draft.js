@@ -389,6 +389,8 @@ async function handleSubmitApproval() {
           const queryString = new URLSearchParams(payload).toString();
           const dataApproval = await fetchDraftProsbis(queryString);
           handleBack();
+          const IsNotEmpty = dataApproval.data.data.length;
+          handleApprovalList(IsNotEmpty);
           loadTableBodyApproval(dataApproval.data.data);
           $("#pills-approval-tab").tab("show");
         });
