@@ -1,4 +1,10 @@
-document.addEventListener("dataLoaded", function () {});
+document.addEventListener("dataLoaded", function () {
+  const jobList = getState("jobList");
+  const competencyList = getState("competencyList");
+  loadTableHeader(competencyList);
+  loadTableBody(jobList);
+  feather.replace();
+});
 
 document.addEventListener("DOMContentLoaded", function () {
   const jobList = getState("jobList");
@@ -14,7 +20,7 @@ function loadTableHeader(competencyList) {
   const totalSpecific = competencyList.filter((item) => item.category === "specific").length;
   const headerContent = `
         <tr style="height: 30px;">
-            <th rowspan="2" class="headcol head-cell" style="vertical-align: middle;text-align: center;">
+            <th rowspan="2" class="headcol head-cell" style="position:sticky;top:0; z-index:1 vertical-align: middle;text-align: center;">
                 <span style="padding-left:10px;">Job Title</span>
             </th>
             <th class="tg-baqh competency-cell color-mandatory " colspan="${totalMandatory}">
@@ -352,14 +358,11 @@ async function saveAsDraft() {
   }
 }
 
-const handleDetailCompetency = (id) => {
-  console.log("id", id);
+const handleDetailCompetency = async (id) => {
   // open modal dengan id modalDetailCompe
-  const competencyDetailList = getState("competencyDetailList");
   const competencyList = getState("competencyList");
-  const dataDetail = competencyDetailList.find((compe) => compe.idcompetency === id);
-  const findcompetencyList = competencyList.find((compe) => compe.id === dataDetail.idcompetency);
-  console.log("dataDetail", dataDetail);
+  const dataDetail = await fetchCompetencyDetail(id);
+  const findcompetencyList = competencyList.find((compe) => compe.id === dataDetail.data.idcompetency);
   const modal = new bootstrap.Modal(document.getElementById("modalDetailCompe"));
   modal.show();
 
@@ -375,7 +378,7 @@ const handleDetailCompetency = (id) => {
           </div>
           <div>
               <div class=" custom-row-full">
-                  <label>${dataDetail.definition}</label>
+                  <label>${dataDetail?.data.definition}</label>
               </div>
           </div>
       </div>
@@ -386,7 +389,7 @@ const handleDetailCompetency = (id) => {
           <div style="padding-top: 10px;">
               <div class=" custom-row-full">
                   <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.level1.map((item) => `<li> ${item}</li>`).join("")}
+                  ${dataDetail?.data.level1.map((item) => `<li> ${item}</li>`).join("")}
                   </ul>
               </div>
           </div>
@@ -398,7 +401,7 @@ const handleDetailCompetency = (id) => {
           <div style="padding-top: 10px;">
               <div class=" custom-row-full">
                   <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.level2.map((item) => `<li> ${item}</li>`).join("")}
+                  ${dataDetail?.data.level2.map((item) => `<li> ${item}</li>`).join("")}
                   </ul>
               </div>
           </div>
@@ -410,7 +413,7 @@ const handleDetailCompetency = (id) => {
           <div style="padding-top: 10px;">
               <div class=" custom-row-full">
                  <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.level3.map((item) => `<li> ${item}</li>`).join("")}
+                  ${dataDetail?.data.level3.map((item) => `<li> ${item}</li>`).join("")}
                   </ul>
               </div>
           </div>
@@ -422,7 +425,7 @@ const handleDetailCompetency = (id) => {
           <div style="padding-top: 10px;">
               <div class=" custom-row-full">
                   <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.level4.map((item) => `<li> ${item}</li>`).join("")}
+                  ${dataDetail?.data.level4.map((item) => `<li> ${item}</li>`).join("")}
                   </ul>
               </div>
           </div>

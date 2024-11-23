@@ -61,12 +61,11 @@ async function detailDraft() {
   } catch (error) {}
 }
 
-const handleDraftDetailCompetency = (id) => {
+const handleDraftDetailCompetency = async (id) => {
   console.log("id", id);
-  const competencyDetailList = getState("competencyDetailList");
   const competencyList = getState("competencyList");
-  const findcompetencyList = competencyList.find((compe) => compe.id === id);
-  const dataDetail = competencyDetailList.find((compe) => compe.idcompetency === id);
+  const dataDetail = await fetchCompetencyDetail(id);
+  const findcompetencyList = competencyList.find((compe) => compe.id === dataDetail.data.idcompetency);
   console.log("dataDetail", dataDetail);
   const modal = new bootstrap.Modal(document.getElementById("modalDraftDetailCompe"));
   modal.show();
@@ -83,7 +82,7 @@ const handleDraftDetailCompetency = (id) => {
             </div>
             <div>
                 <div class=" custom-row-full">
-                    <label>${dataDetail.definition}</label>
+                    <label>${dataDetail?.data.definition}</label>
                 </div>
             </div>
         </div>
@@ -94,7 +93,7 @@ const handleDraftDetailCompetency = (id) => {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.level1.map((item) => `<li> ${item}</li>`).join("")}
+                    ${dataDetail?.data.level1.map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -106,7 +105,7 @@ const handleDraftDetailCompetency = (id) => {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.level2.map((item) => `<li> ${item}</li>`).join("")}
+                    ${dataDetail?.data.level2.map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -118,7 +117,7 @@ const handleDraftDetailCompetency = (id) => {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.level3.map((item) => `<li> ${item}</li>`).join("")}
+                    ${dataDetail?.data.level3.map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -130,7 +129,7 @@ const handleDraftDetailCompetency = (id) => {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.level4.map((item) => `<li> ${item}</li>`).join("")}
+                    ${dataDetail?.data.level4.map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>

@@ -159,6 +159,11 @@
     <!-- Container-fluid Ends-->
 </div>
 @section Script {
+    <script>
+        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        const token = localStorage.getItem("token");
+
+    </script>
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>

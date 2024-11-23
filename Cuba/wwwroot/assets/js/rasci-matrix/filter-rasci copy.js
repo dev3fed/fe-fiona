@@ -45,29 +45,44 @@ document.addEventListener("dataLoaded", async function () {
 
       const levelProsbis = ["l1", "l2", "l3", "l4", "l5", "l6"];
       const checkboxAll = document.getElementById("level-lall");
+
+      // Peta untuk mengonversi string menjadi angka
+      const levelMapping = {
+        l1: 1,
+        l2: 2,
+        l3: 3,
+        l4: 4,
+        l5: 5,
+        l6: 6,
+      };
+
       function syncCheckboxes() {
         const levelFilter = [];
         levelProsbis.forEach((level) => {
           const checkbox = document.getElementById(`level-${level}`);
           if (checkbox && checkbox.checked) {
-            levelFilter.push(level);
+            // Ubah dari string menjadi angka berdasarkan levelMapping
+            levelFilter.push(levelMapping[level]);
           }
         });
         setState("levelFilter", levelFilter);
         const areAllChecked = levelProsbis.every((level) => document.getElementById(`level-${level}`)?.checked);
         checkboxAll.checked = areAllChecked;
       }
+
       checkboxAll.addEventListener("change", function () {
         const isChecked = this.checked;
+        const levelFilter = isChecked ? levelProsbis.map((level) => levelMapping[level]) : [];
+        setState("levelFilter", levelFilter);
+
         levelProsbis.forEach((level) => {
           const checkbox = document.getElementById(`level-${level}`);
           if (checkbox) {
             checkbox.checked = isChecked;
           }
         });
-        const levelFilter = isChecked ? [...levelProsbis] : [];
-        setState("levelFilter", levelFilter);
       });
+
       levelProsbis.forEach((level) => {
         const checkbox = document.getElementById(`level-${level}`);
         if (checkbox) {
@@ -82,26 +97,31 @@ document.addEventListener("dataLoaded", async function () {
       function syncRasciCheckboxes() {
         const notationFilter = [];
         const checkboxes = ["r", "a", "s", "c", "i", "na"];
+
         checkboxes.forEach((notation) => {
           const checkbox = document.getElementById(`notation-${notation}`);
           if (checkbox.checked) {
-            notationFilter.push(notation);
+            notationFilter.push(notation.toUpperCase()); // Ubah ke huruf besar
           }
         });
+
         setState("rasciNotationFilter", notationFilter);
+
         const allChecked = checkboxes.every((notation) => document.getElementById(`notation-${notation}`).checked);
         const notationAll = document.getElementById("notation-all");
         const raChecked = document.getElementById("notation-ra").checked;
+
         if (allChecked) {
           notationAll.checked = allChecked;
         }
+
         if (raChecked) {
           ["r", "a", "s", "c", "i"].forEach((notation) => {
             const checkbox = document.getElementById(`notation-${notation}`);
             checkbox.disabled = true;
             checkbox.checked = false;
           });
-          notationFilter.push("ra");
+          notationFilter.push("RA"); // Pastikan juga "ra" diubah menjadi huruf besar
           setState("rasciNotationFilter", notationFilter);
         } else {
           ["r", "a", "s", "c", "i"].forEach((notation) => {
@@ -110,46 +130,56 @@ document.addEventListener("dataLoaded", async function () {
           });
         }
       }
+
       document.getElementById("notation-all").addEventListener("change", function () {
         const isChecked = this.checked;
         const checkboxes = ["r", "a", "s", "c", "i", "na"];
         const checkboxRa = document.getElementById(`notation-ra`);
+
         if (isChecked) {
           checkboxRa.checked = false;
         }
+
         checkboxes.forEach((notation) => {
           const checkbox = document.getElementById(`notation-${notation}`);
           if (notation !== "ra") {
             checkbox.checked = isChecked;
           }
         });
+
         if (!isChecked) {
           setState("rasciNotationFilter", []);
         }
+
         syncRasciCheckboxes();
       });
+
       document.getElementById("notation-ra").addEventListener("change", function () {
         const isChecked = this.checked;
         const checkbox = document.getElementById(`notation-all`);
-        console.log("ischecked", isChecked);
+
         if (isChecked) {
           checkbox.checked = false;
         }
       });
+
       ["r", "a", "s", "c", "i", "na"].forEach((notation) => {
         document.getElementById(`notation-${notation}`).addEventListener("change", function () {
           const isChecked = this.checked;
           if (!isChecked) {
             document.getElementById("notation-all").checked = false;
           }
+
           const allChecked = ["r", "a", "s", "c", "i", "na"].every(
             (notation) => document.getElementById(`notation-${notation}`).checked,
           );
+
           if (allChecked) {
             document.getElementById("notation-all").checked = true;
           }
         });
       });
+
       ["r", "a", "s", "c", "i", "na", "ra"].forEach((notation) => {
         const checkbox = document.getElementById(`notation-${notation}`);
         checkbox.addEventListener("change", syncRasciCheckboxes);
@@ -425,4 +455,15 @@ const applyFilterRasci = async () => {
   console.log("first levelFilter", getState("levelFilter"));
   console.log("rasciNotationFilter", getState("rasciNotationFilter"));
   console.log("jobFilter", getState("jobFilter"));
+
+  const payload = {
+    parentId: null,
+    type: "filter",
+    jobId: getState("jobFilter"),
+    busProsLevel: getState("levelFilter"),
+    rasciNotation: getState("rasciNotationFilter"),
+  };
+
+  const resultMatrix = await fetchDataMatrix(payload);
+  console.log("first", resultMatrix);
 };
