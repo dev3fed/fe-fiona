@@ -255,11 +255,11 @@ async function saveAsDraft() {
       document.getElementById("draftName").value = "";
       const btnSave = document.getElementById("prosbisSavedraft");
       const btnDraft = document.getElementById("saveDraftBtn");
-      const btnApproval = document.getElementById("submitApprovalBtn");
+      // const btnApproval = document.getElementById("submitApprovalBtn");
 
       btnSave.disabled = true;
       btnDraft.disabled = true;
-      btnApproval.disabled = true;
+      // btnApproval.disabled = true;
 
       if (modalSave) {
         modalSave.hide();
@@ -316,9 +316,9 @@ async function saveApproval() {
       const mdlApproval = bootstrap.Modal.getInstance(modalAprroval);
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
-      const btnApproval = document.getElementById("submitApprovalBtn");
+      // const btnApproval = document.getElementById("submitApprovalBtn");
       const btnDraft = document.getElementById("saveDraftBtn");
-      btnApproval.disabled = true;
+      // btnApproval.disabled = true;
       btnDraft.disabled = true;
       if (mdlApproval) {
         mdlApproval.hide();
@@ -387,7 +387,7 @@ function formValidation() {
   const { level, name, jobTitleId } = getState("insertProsbis");
   const isValid = level && name && jobTitleId;
   document.getElementById("saveDraftBtn").disabled = !isValid;
-  document.getElementById("submitApprovalBtn").disabled = !isValid;
+  // document.getElementById("submitApprovalBtn").disabled = !isValid;
 }
 
 document.querySelectorAll("input, select, textarea").forEach((input) => {

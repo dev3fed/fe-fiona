@@ -106,7 +106,10 @@ const handleCheckboxChange = async (event) => {
       }
     });
   }
+  listChecked(selectedId);
+};
 
+const listChecked = (selectedId) => {
   selectedId.forEach((id) => {
     const childCheckbox = document.querySelector(`input[type="checkbox"][value="${id}"]`);
     if (childCheckbox) {
@@ -114,7 +117,6 @@ const handleCheckboxChange = async (event) => {
     }
   });
 };
-
 const traverseHierarchy = (parentId, data, selectedId, visited = new Set()) => {
   if (visited.has(parentId)) return;
   visited.add(parentId);
@@ -143,25 +145,33 @@ const addSearchEventListeners = () => {
   levels.forEach((lvl) => {
     const searchInput = document.getElementById(`search-joblevel${lvl}`);
     if (searchInput) {
-      searchInput.addEventListener("input", (event) => searchJob(event, `level${lvl}`));
+      searchInput.addEventListener("input", (event) => searchJob(event, lvl));
     }
   });
 };
 
-// Simpan status pencarian untuk setiap level
-const searchStatus = {
-  level1: "",
-  level2: "",
-  level3: "",
-  level4: "",
-  level5: "",
-  level6: "",
-};
 const searchJob = async (event, level) => {
   const query = event.target.value.toLowerCase();
-  const levelContainer = document.getElementById(`chk-job-${level}`);
-  searchStatus[level] = query; // Simpan status pencarian untuk level yang sedang dicari
+  let selectedId = (await getState("selectedJobId")) || [];
+  const lowerCaseQuery = query.toLowerCase();
   const result = await getState("filterJobList");
-  console.log("level", level);
-  console.log("query", query);
+  if (query.length > 4) {
+    const filteredResult = result.filter((item) => item.name.toLowerCase().includes(lowerCaseQuery));
+    if (selectedId.length > 0) {
+      const findDataSelected = filteredResult.filter((value) => selectedId.includes(value.id));
+      if (findDataSelected.length > 0) {
+        updateLevels([level], filteredResult);
+        listChecked(selectedId);
+      } else {
+        updateLevels([level], filteredResult);
+        listChecked(selectedId);
+      }
+    } else {
+      updateLevels([level], filteredResult);
+    }
+  } else {
+    const findJobList = result.filter((value) => selectedId.includes(value.id));
+    updateLevels([level], findJobList);
+    listChecked(selectedId);
+  }
 };

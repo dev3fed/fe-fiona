@@ -234,52 +234,6 @@ function toggleLevelElements(level, isDisabled) {
   }
 }
 
-// const addSearchEventListeners = () => {
-//   const levels = [1, 2, 3, 4, 5, 6];
-//   levels.forEach((lvl) => {
-//     const searchInput = document.getElementById(`search-joblevel${lvl}`);
-//     if (searchInput) {
-//       searchInput.addEventListener("input", (event) => searchJob(event, `level${lvl}`));
-//     }
-//   });
-// };
-// // Simpan status pencarian untuk setiap level
-// const searchStatus = {
-//   level1: "",
-//   level2: "",
-//   level3: "",
-//   level4: "",
-//   level5: "",
-//   level6: "",
-// };
-// const searchJob = async (event, level) => {
-//   const query = event.target.value.toLowerCase();
-//   const levelContainer = document.getElementById(`chk-job-${level}`);
-//   searchStatus[level] = query; // Simpan status pencarian untuk level yang sedang dicari
-//   const result = await getState("filterJobList");
-
-//   if (!levelContainer) return;
-
-//   const groups = levelContainer.querySelectorAll(`[id^="group"]`);
-//   const rowItems = levelContainer.querySelectorAll(".row-item");
-//   rowItems.forEach((rowItem) => {
-//     const itemName = rowItem.querySelector(".column-item-name")?.textContent.toLowerCase();
-//     rowItem.style.display = itemName.includes(query) ? "" : "none";
-//   });
-//   if (query.length > 3) {
-//     const findParent = result.find(
-//       (item) => item.name.toLowerCase().includes(query.toLowerCase()) && item.type === level,
-//     );
-//     groups.forEach((group) => {
-//       group.style.display = group.id === `group${findParent?.reportToId}` ? "" : "none";
-//     });
-//   } else if (query.length <= 3) {
-//     groups.forEach((group) => {
-//       group.style.display = "";
-//     });
-//   }
-// };
-
 const applyFilterRasci = async () => {
   console.log("first levelFilter", getState("levelFilter"));
   console.log("rasciNotationFilter", getState("rasciNotationFilter"));
