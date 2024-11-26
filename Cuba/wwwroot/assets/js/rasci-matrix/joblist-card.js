@@ -7,11 +7,13 @@ document.addEventListener("dataLoaded", async function () {
       chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, result, lvl === 1 ? "hide" : "show");
     }
   });
+  addSearchEventListeners();
 });
-const createParentLabel = (parentId, combinedData) => {
-  const parent = combinedData.find((item) => item.id === parentId);
-  if (parent) {
-    return `<label data-parent="${parentId}" style="font-size: 12px; color:#85858C">${parent.name}</label><br/>`;
+const createParentLabel = (parentId) => {
+  const result = getState("filterJobList");
+  const getParent = result.find((item) => item.id === parentId);
+  if (getParent) {
+    return `<label data-parent="${parentId}" style="font-size: 12px; color:#85858C">${getParent.name}</label><br/>`;
   }
   return "";
 };
@@ -21,14 +23,12 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
   let bodyJobLevel = "";
 
   const filteredData = combinedData.filter((item) => item.type === level);
-
   filteredData.forEach((item, index) => {
     let label = "";
     let borderBottom = "";
-
     if (item.reportToId !== currentReportToId) {
       currentReportToId = item.reportToId;
-      label = displayLabel === "show" ? createParentLabel(item.reportToId, combinedData) : "";
+      label = displayLabel === "show" ? createParentLabel(item.reportToId) : "";
     }
 
     if (index === filteredData.length - 1 || filteredData[index + 1]?.reportToId !== item.reportToId) {
@@ -136,4 +136,32 @@ const updateLevels = (levels, result) => {
       chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, result, "show");
     }
   });
+};
+
+const addSearchEventListeners = () => {
+  const levels = [1, 2, 3, 4, 5, 6];
+  levels.forEach((lvl) => {
+    const searchInput = document.getElementById(`search-joblevel${lvl}`);
+    if (searchInput) {
+      searchInput.addEventListener("input", (event) => searchJob(event, `level${lvl}`));
+    }
+  });
+};
+
+// Simpan status pencarian untuk setiap level
+const searchStatus = {
+  level1: "",
+  level2: "",
+  level3: "",
+  level4: "",
+  level5: "",
+  level6: "",
+};
+const searchJob = async (event, level) => {
+  const query = event.target.value.toLowerCase();
+  const levelContainer = document.getElementById(`chk-job-${level}`);
+  searchStatus[level] = query; // Simpan status pencarian untuk level yang sedang dicari
+  const result = await getState("filterJobList");
+  console.log("level", level);
+  console.log("query", query);
 };
