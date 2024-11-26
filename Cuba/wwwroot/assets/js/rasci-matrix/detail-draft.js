@@ -47,8 +47,9 @@ async function detailDraft() {
         <div class=" custom-row-full">
             <span style="color:#9F9FA5">Rasci Notasi</span>
           <ul style="list-style-type:disc;padding-left:20px">
-          ${notation.map((item) => `<li>${item.RasciCode}</li>`).join("")}
+          ${notation.map((item) => `<li>${item.RasciCode} &nbsp : &nbsp ${item.Comment}</li>`).join("")}
           </ul>
+         
         </div>
       `;
       const draftInfo = document.getElementById("draft-info");
