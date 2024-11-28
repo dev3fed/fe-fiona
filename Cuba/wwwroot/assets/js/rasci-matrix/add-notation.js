@@ -107,23 +107,24 @@ async function openModalNotRow(jobId, prosbisId) {
 
   const formContent = `
       <div class="col-12">
-      <div class="mb-2">
-        <label class="form-label">Job</label>
-       <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+        <div class="mb-2">
+          <label class="form-label">Job</label>
+        <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+        </div>
       </div>
-    </div>
-    <div class="col-3">
-      <div class="mt-2">
-        <label class="form-label">Bussiness Process Level</label>
-         <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+      <div class="col-3">
+        <div class="mt-2">
+          <label class="form-label">Bussiness Process Level</label>
+          <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+        </div>
       </div>
-    </div>
-    <div class="col-9">
-      <div class="mt-2">
-        <label class="form-label">Business Process</label>
-         <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+      <div class="col-9">
+        <div class="mt-2">
+          <label class="form-label">Business Process</label>
+          <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+        </div>
       </div>
-    </div>`;
+    `;
 
   theadContent = `<tr>
         <th scope="col" style="width: 50px">Check</th>

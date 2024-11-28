@@ -8,21 +8,6 @@ namespace Cuba.Controllers
         {
             return View();
         }
-        public IActionResult Ecommerce()
-        {
-            return View();
-        }
-        public IActionResult OnlineCourse()
-        {
-            return View();
-        }
-        public IActionResult Crypto()
-        {
-            return View();
-        }
-        public IActionResult Social()
-        {
-            return View();
-        }
+       
     }
 }

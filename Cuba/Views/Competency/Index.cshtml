@@ -2,14 +2,34 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link rel="stylesheet" type="text/css" href="~/assets/css/competency.css">
+<link href="~/assets/css/clusterize.css" rel="stylesheet">
+
+<style>
+    #draft-detail {
+        display: none;
+    }
+
+    #header-detail-draft {
+        display: none;
+    }
+
+    #main-competency {
+        display: block;
+    }
+
+    #header-competency {
+        display: block;
+    }
+</style>
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Master Data</h3>
+                    <h3>Competency</h3>
                 </div>
-                <div class="col-6">
+                <div class="col-6" id="header-competency">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a asp-controller="HomePage" asp-action="Index">
@@ -18,7 +38,20 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Master Data</li>
+                        <li class="breadcrumb-item active">Competency</li>
+                    </ol>
+                </div>
+                <div class="col-6" id="header-detail-draft">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="HomePage" asp-action="Index">
+                                <svg class="stroke-icon">
+                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Competency</li>
+                        <li class="breadcrumb-item active">Detail Draft</li>
                     </ol>
                 </div>
             </div>
@@ -27,14 +60,97 @@
     <!-- Container-fluid starts-->
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-12" id="draft-detail">
+                <partial name="~/Views/Competency/ModalDraftDetailCompe.cshtml" />
+                <partial name="~/Views/Competency/ModalEditDraftDepth.cshtml" />
+                <partial name="~/Views/Competency/ModalDraftDeleteNotif.cshtml" />
+                <partial name="~/Views/Competency/DetailDraft.cshtml" />
+            </div>
+
+            <div class="col-sm-12" id="main-competency">
                 <div class="card" style="border-radius:8px">
-                    <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                    <div style="padding:10px">
+                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="pills-kkj-tab" data-bs-toggle="pill"
+                                    href="#pills-kkj" role="tab" aria-controls="pills-kkj"
+                                    aria-selected="true">Requirement (KKJ)</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-dictionary-tab" data-bs-toggle="pill"
+                                    href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
+                                    aria-selected="false">Dictionary
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-new-tab" data-bs-toggle="pill"
+                                    href="#pills-new" role="tab" aria-controls="pills-new" aria-selected="false">New
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
+                                    href="#pills-draft" role="tab" aria-controls="pills-draft"
+                                    aria-selected="false">Draft
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-approval-tab" data-bs-toggle="pill"
+                                    href="#pills-approval" role="tab" aria-controls="pills-approval"
+                                    aria-selected="false">Approval List
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-history-tab" data-bs-toggle="pill"
+                                    href="#pills-history" role="tab" aria-controls="pills-history"
+                                    aria-selected="false">Log History
+                                </a></li>
+                        </ul>
+                        <div class="tab-content" id="pills-competency-tabcontent">
+                            <div class="tab-pane fade show active" id="pills-kkj" role="tabpanel"
+                                aria-labelledby="pills-kkj-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <partial name="~/Views/Competency/ModalEditDepthLevel.cshtml" />
+                                            <partial name="~/Views/Competency/ModalWarning.cshtml" />
+                                            <partial name="~/Views/Competency/ModalSaveDraft.cshtml" />
+                                            <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
+
+                                        </div>
+                                        <partial name="~/Views/Competency/KkjPage.cshtml" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-dictionary" role="tabpanel"
+                                aria-labelledby="pills-dictionary-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <p>Halaman Dictionary</p>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <p>Halaman New</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-draft" role="tabpanel"
+                                aria-labelledby="pills-draft-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <partial name="~/Views/Competency/DraftPage.cshtml" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-approval" role="tabpanel"
+                                aria-labelledby="pills-approval-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <p>Halaman Approval</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-history" role="tabpanel"
+                                aria-labelledby="pills-history-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <p>Halaman Log History</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -43,12 +159,24 @@
     <!-- Container-fluid Ends-->
 </div>
 @section Script {
+    <script>
+        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        const token = localStorage.getItem("token");
+
+    </script>
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/competency/store.js"></script>
+    <script src="../assets/js/competency/competeny-list.js"></script>
+    <script src="../assets/js/competency/competency-draft.js"></script>
+    <script src="../assets/js/competency/detail-draft.js"></script>
+
+
 }

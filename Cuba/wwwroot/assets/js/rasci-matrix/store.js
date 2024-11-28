@@ -10,12 +10,21 @@ const appState = new Proxy(
     isSearchMatrix: false,
     idSearchProsbis: "",
     prosbisLevel: [],
+    filterJobList: [],
+    checkedParentId: [],
     selectedLevel: 0,
+    //start filter rasci matrix
+    rasciNotationFilter: [],
+    levelFilter: [],
+    visibleJobs: [],
+    selectedJobId: [],
+    disabledJobId: [],
+    //end filter rasci matrix
     dataDetailDraft: {},
     editDrafProsbis: {
       rasciNotation: [],
     },
-    idDeleteProsbisdraft: 0,
+    deleteDraftProsbis: 0,
     insertProsbis: {
       parentId: null,
       rasciNotation: [
@@ -61,6 +70,8 @@ const appState = new Proxy(
           detailDraft();
         } else if (property === "editDrafProsbis") {
           updateSelectEditProsbis();
+        } else if (property === "checkedParentId") {
+          dataListJobChecked();
         }
         // if (
         //   property === "resultJabatan" ||
@@ -94,7 +105,7 @@ window.getState = getState;
 async function SearchMatrix(params) {
   const url = `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -106,7 +117,7 @@ async function SearchMatrix(params) {
 async function fetchDataMatrix(params) {
   const url = `${url_api}/api/RasciMapping`;
   try {
-    const result = await ajaxRequest(url, "POST", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "POST", params);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -118,7 +129,7 @@ async function fetchDataMatrix(params) {
 async function fetchSelectLevel() {
   const url = `${url_api}/api/Utilities/selection?Page=1&Type=level`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -129,7 +140,18 @@ async function fetchSelectLevel() {
 async function fetchDraftProsbis(payload) {
   const url = `${url_api}/api/BusinessProcess/draft?${payload}`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function fetchFilterJobList() {
+  const url = `${url_api}/api/RasciMapping/list-rasci-filter`;
+  try {
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -140,7 +162,7 @@ async function fetchDraftProsbis(payload) {
 async function fetchDraftProsbisByid(payload) {
   const url = `${url_api}/api/BusinessProcess/draft-detail/${payload}`;
   try {
-    const result = await ajaxRequest(url, "GET"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "GET");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -151,7 +173,7 @@ async function fetchDraftProsbisByid(payload) {
 async function submitDraftProsbis(payload) {
   const url = `${url_api}/api/BusinessProcess`;
   try {
-    const result = await ajaxRequest(url, "POST", payload); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "POST", payload);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -162,7 +184,7 @@ async function submitDraftProsbis(payload) {
 async function updateDraftProsbis(payload, id) {
   const url = `${url_api}/api/BusinessProcess/draft/${id}`;
   try {
-    const result = await ajaxRequest(url, "PUT", payload); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "PUT", payload);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -173,7 +195,7 @@ async function updateDraftProsbis(payload, id) {
 async function draftSubmittoApproval(payload, id) {
   const url = `${url_api}/api/BusinessProcess/draft-submission/${id}`;
   try {
-    const result = await ajaxRequest(url, "PUT", payload); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "PUT", payload);
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -184,7 +206,7 @@ async function draftSubmittoApproval(payload, id) {
 async function deleteProsbisDraft(id) {
   const url = `${url_api}/api/BusinessProcess/draft/${id}`;
   try {
-    const result = await ajaxRequest(url, "DELETE"); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(url, "DELETE");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -194,12 +216,24 @@ async function deleteProsbisDraft(id) {
 
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
+    const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
+      fetchDataMatrix(),
+      fetchSelectLevel(),
+      fetchFilterJobList(),
+    ]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
     appState.prosbisLevel = prosbisLvl?.data.result;
-
+    const combinedData = [
+      ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
+      ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
+      ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
+      ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
+      ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
+      ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
+    ];
+    appState.filterJobList = combinedData;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

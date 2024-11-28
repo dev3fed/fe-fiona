@@ -252,6 +252,15 @@ async function saveAsDraft() {
       const modalSave = bootstrap.Modal.getInstance(modalSaveDraft);
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
+      document.getElementById("draftName").value = "";
+      const btnSave = document.getElementById("prosbisSavedraft");
+      const btnDraft = document.getElementById("saveDraftBtn");
+      // const btnApproval = document.getElementById("submitApprovalBtn");
+
+      btnSave.disabled = true;
+      btnDraft.disabled = true;
+      // btnApproval.disabled = true;
+
       if (modalSave) {
         modalSave.hide();
       }
@@ -279,6 +288,8 @@ async function saveAsDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
+          const IsNotEmpty = dataDraft.data.data.length;
+          handleClickCard(IsNotEmpty);
           loadTableBodyDraft(dataDraft.data.data);
           $("#pills-draft-tab").tab("show");
         });
@@ -305,6 +316,10 @@ async function saveApproval() {
       const mdlApproval = bootstrap.Modal.getInstance(modalAprroval);
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
+      // const btnApproval = document.getElementById("submitApprovalBtn");
+      const btnDraft = document.getElementById("saveDraftBtn");
+      // btnApproval.disabled = true;
+      btnDraft.disabled = true;
       if (mdlApproval) {
         mdlApproval.hide();
       }
@@ -332,6 +347,8 @@ async function saveApproval() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataApproval = await fetchDraftProsbis(queryString);
+          const IsNotEmpty = dataApproval.data.data.length;
+          handleApprovalList(IsNotEmpty);
           loadTableBodyApproval(dataApproval.data.data);
           $("#pills-approval-tab").tab("show");
         });
@@ -370,7 +387,7 @@ function formValidation() {
   const { level, name, jobTitleId } = getState("insertProsbis");
   const isValid = level && name && jobTitleId;
   document.getElementById("saveDraftBtn").disabled = !isValid;
-  document.getElementById("submitApprovalBtn").disabled = !isValid;
+  // document.getElementById("submitApprovalBtn").disabled = !isValid;
 }
 
 document.querySelectorAll("input, select, textarea").forEach((input) => {

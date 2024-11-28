@@ -5,6 +5,8 @@ document.addEventListener("dataLoaded", function () {
       loadTableHeader(appState.resultJabatan);
       loadTableBody(appState.resultProsbis);
     }, 300);
+  } else {
+    showDataEmpty();
   }
 });
 
@@ -15,8 +17,16 @@ document.addEventListener("DOMContentLoaded", function () {
   feather.replace();
 });
 
+const showDataEmpty = () => {
+  const textInfo = document.getElementById("text-info");
+  const loadingIcon = document.getElementById("icon-container");
+  textInfo.textContent = "Oops! There's nothing here yet.";
+  loadingIcon.style.display = "none";
+};
 function showLoading() {
   const loadingContainer = document.querySelector(".loading-container");
+  const textInfo = document.getElementById("text-info");
+  textInfo.textContent = "Please wait, loading data";
   const tableWrapper = document.querySelector(".scrollable-table");
   const animation = lottie.loadAnimation({
     container: document.getElementById("icon-container"),
@@ -110,11 +120,10 @@ function loadTableBody(prosbisList) {
           }</span></td>
           <td class="headcol" style="font-size:12px;font-weight: 500 !important;">
            <div class="prosbis-cell-wrapper">
-              
-           <div class="hierarchy-icon-wrapper">
+              <div class="hierarchy-icon-wrapper">
                 ${
                   isSearch == false && val.hasChild
-                    ? `<i data-feather="${isExpanded}" class="hierarchy-icon"
+                    ? `<i data-feather="${isExpanded}" class="hierarchy-icon" id="icon-${val.indexGroup}"
                     style="width:24px;" onclick="handleCollapse('${val.indexGroup}')"></i>`
                     : ``
                 }
@@ -235,6 +244,8 @@ function onModalProsbis() {
 async function handleCollapse(id) {
   const parentId = id;
   const parentRow = document.getElementById(parentId);
+  const icon = document.getElementById(`icon-${id}`);
+
   if (parentRow) {
     if (!appState.idProsbis.includes(parentId)) {
       appState.idProsbis = [...appState.idProsbis, parentId.toString()];
@@ -360,6 +371,7 @@ async function clearInput() {
   document.getElementById("inputText").value = "";
   document.getElementById("inputSearchCompare").value = "";
   handleCloseModal();
+  resetAllFilterRasci();
 }
 
 async function openModalDeleteBusinesspro() {

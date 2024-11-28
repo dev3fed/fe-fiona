@@ -122,6 +122,22 @@
             text-align: center;
 
         }
+
+        .custom-icon path {
+            fill: currentColor;
+            stroke-width: 1;
+        }
+
+        .sidebar-link:hover .custom-icon path {
+            fill: #006CA9;
+            stroke-width: 0.1;
+        }
+
+        .sidebar-link.active .custom-icon path {
+            fill: #fff;
+            stroke: #fff;
+            stroke-width: 0.1;
+        }
     </style>
 
 </head>
@@ -151,60 +167,12 @@
         <h3>INTEGRATED ORGANIZATION MANAGEMENT SYSTEM</h3>
     </div>
     <div class="content-card ">
-        <div class="row card-container ">
-            <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY"
-                    onclick="location.href='@Url.Action("Index", "Organization")'">
-                    <div class="card-body">
-                        <img src="~/assets/images/homepage/org_structure.svg" alt="Organization Structure" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY"
-                    onclick="location.href='@Url.Action("Index", "Rasci")'">
-                    <div class="card-body">
-                        <img src="~/assets/images/homepage/rasci_matrix.svg" alt="RASCI Matrix" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY"
-                    onclick="location.href='@Url.Action("Index", "Competency")'">
-                    <div class="card-body">
-                        <img src="~/assets/images/homepage/competency.svg" alt="Competency" />
-                    </div>
-                </div>
-            </div>
-            @* <div class="col-2">
-            <div class="card wow animate__animated animate__flipInY"
-            onclick="location.href='@Url.Action("Index", "LeadIndicator")'">
-            <div class="card-body">
-            <img src="~/assets/images/homepage/lead_indicator.svg" alt="Lead Indicator" />
-            </div>
-            </div>
-            </div> *@
-            <div class="col-2">
-                <div class="card wow animate__animated animate__flipInY"
-                    onclick="location.href='@Url.Action("Index", "JobDescription")'">
-                    <div class="card-body">
-                        <img src="~/assets/images/homepage/job_description.svg" alt="Job Description" />
-                    </div>
-                </div>
-            </div>
+        <div class="row card-container" id="mainMenu">
+
         </div>
         <div class="row">
-            <div class="col-12">
-                <div class="button-group">
-                    <button class="btn btn-outline-primary" style="margin-right:10px;width:200px"
-                        onclick="location.href='@Url.Action("Index", "MasterData")'">
-                        <i class="icon-server" style="margin-right:5px;margin-top:-3px"></i>
-                        <span>Master</span>
-                        Data</button>
-                    <button class="btn btn-outline-primary " style="padding:15px;margin-left:10px;width:200px">
-                        <i data-feather="users" style="height:17px;padding-top:1px"></i><span>Access
-                            Management</span>
-                    </button>
+            <div class=" col-12">
+                <div class="button-group" id="setting">
                 </div>
             </div>
             <div class="col-12">
@@ -214,12 +182,11 @@
             </div>
         </div>
     </div>
-
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
-    <script src="../assets/js/authentication.js"></script>
     <script>
+        const baseImageUrl = '@Url.Content("~/assets/images/homepage/")';
         feather.replace();
         new WOW().init();
         document.addEventListener('DOMContentLoaded', function () {
@@ -238,6 +205,8 @@
         });
 
     </script>
+    <script src="../assets/js/authentication.js"></script>
+    <script src="../assets/js/homepage.js"></script>
 </body>
 
 </html>
