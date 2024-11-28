@@ -4,10 +4,61 @@
 }
 <style>
     .os-container {
-        height: 480px;
         background-color: #F5F5F5;
     }
+
+    #orgThree .no-children .jstree-icon {
+        display: none !important; /* Use !important to ensure it overrides other styles */
+    }
+
 </style>
+
+<style id="myStyle">
+    [data-l-id] path {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-n-id] circle {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-n-id] rect {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-ctrl-ec-id] circle,
+    [data-ctrl-ec-id] line {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-l-id].direktur > path {
+        stroke-dasharray: 3, 3;
+    }
+
+    @* class edit *@
+    [data-n-id].edit rect {
+        fill: #FFD700;
+    }
+    .match rect:nth-child(2){
+        fill: #F57C00;
+        stroke: #F57C00;
+    }
+
+    .match path, .match circle{
+        stroke: #F57C00;
+    }
+
+    [data-n-id].bracket_4_edit rect {
+        fill: #FFD700;
+    }
+</style>
+<script src="../assets/js/balkan/orgchart.js"></script>
+<script src="../assets/js/organization-structure/data_cnt.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
+@* style link *@
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -37,35 +88,35 @@
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" id="pills-matrix-tab" data-bs-toggle="pill"
-                                    href="#pills-matrix" role="tab" aria-controls="pills-matrix"
+                            <li class="nav-item"><a class="nav-link active" id="pills-chart" data-bs-toggle="pill"
+                                    href="#chart" role="tab" aria-controls="pills-matrix"
                                     aria-selected="true">Chart</a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
-                                    href="#pills-draft" role="tab" aria-controls="pills-draft"
+                            <li class="nav-item"><a class="nav-link" id="pills-draft" data-bs-toggle="pill"
+                                    href="#draft" role="tab" aria-controls="pills-draft"
                                     aria-selected="false">Draft
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-request-tab" data-bs-toggle="pill"
-                                    href="#pills-request" role="tab" aria-controls="pills-request"
+                            <li class="nav-item"><a class="nav-link" id="pills-request" data-bs-toggle="pill"
+                                    href="#request" role="tab" aria-controls="pills-request"
                                     aria-selected="false">Request List
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-log-history-tab" data-bs-toggle="pill"
-                                    href="#pills-log-history" role="tab" aria-controls="pills-log-history"
+                            <li class="nav-item"><a class="nav-link" id="pills-log" data-bs-toggle="pill"
+                                    href="#log" role="tab" aria-controls="pills-log"
                                     aria-selected="false">Log History
                                 </a></li>
                         </ul>
                         <div class="tab-content" id="pills-rasci-tabcontent">
-                            <div class="tab-pane fade show active" id="pills-matrix" role="tabpanel"
-                                aria-labelledby="pills-matrix-tab">
+                            <div class="tab-pane fade show active" id="chart" role="tabpanel"
+                                aria-labelledby="pills-chart">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
-                                        <div class="col-5">
+                                        @* <div class="col-5">
                                             <input class="form-control" type="text" placeholder="Search" id="inputText" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                         </div>
                                         <div class="col-2" style="padding-left: 0;">
                                             <button class="btn btn-primary" type="button" id="searchButton">Search</button>
-                                        </div>
-                                        <div class="col-5 d-flex justify-content-end" style="padding-left: 0;">
-                                            <div class="btn-group" role="group">
+                                        </div> *@
+                                        <div class="col-5 offset-7 d-flex justify-content-end" style="padding-left: 0;">
+                                            @* <div class="btn-group" role="group">
                                                 <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
                                                     id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
                                                     aria-haspopup="true" aria-expanded="false">
@@ -73,16 +124,18 @@
                                                         src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2"
                                                         style="margin-top: -1px;margin-right :5px;">Create Job</button>
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                                                    <a class="dropdown-item">
+                                                    <a class="dropdown-item" id="newJob">
                                                         New Job
                                                     </a>
-                                                    <a class="dropdown-item">
+                                                    <a class="dropdown-item" id="duplicateJob">
                                                         Duplicate Job
                                                     </a>
                                                 </div>
-                                            </div>
-                                            <button class="btn btn-primary me-2 btn-icon" type="button"
-                                                data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                            </div> *@
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="duplicateJob">
+                                                Create Job
+                                            </button>
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="viewOrgTree">
                                                 View Org Tree
                                             </button>
                                             <button class="btn btn-primary me-2 btn-icon" type="button"> <img
@@ -91,90 +144,64 @@
 
                                             <button class="btn btn-outline-primary btn-icon" type="button"> Reset</button>
                                         </div>
+                                        <div class="col-12 mt-2" style="text-align: right;">
+                                            <div class="checkbox checkbox-primary"">
+                                                <input id="checkbox1" type="checkbox">
+                                                <label for="checkbox1">Show employee name</label>
+                                            </div>
+                                        </div>
                                         <div class="col-12 mt-2">
-                                            <div class="os-container">
+                                            <div id="os-container" id="os-container" style="width: 100%; height: 100%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="draft" role="tabpanel"
+                                aria-labelledby="pills-draft">
+                                <div class="card-body">
+                                    @* 3 button *@
+                                    <div class="row">
+                                        <div class="col-12 m-t-10-10 m-b-15">
+                                            <div class="d-flex justify-content-start">
+                                                <button class="btn btn-outline-primary me-2 btn-icon rounded-3
+                                                " type="button"> Create Job</button>
+                                                <button class="btn btn-outline-primary me-2 btn-icon" type="button"> Edit Job</button>
+                                                <button class="btn btn-outline-primary me-2 btn-icon" type="button"> Delete Job</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="draftList">
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-draft" role="tabpanel"
-                                aria-labelledby="pills-draft-tab">
+                            <div class="tab-pane fade" id="request" role="tabpanel"
+                                aria-labelledby="pills-request">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
-                                                typesetting
-                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
-                                                since the
-                                                1500s,
-                                                when an unknown printer took a galley of type and scrambled it to make a
-                                                type
-                                                specimen
-                                                book. It has survived not only five centuries, but also the leap into
-                                                electronic
-                                                typesetting, remaining essentially unchanged. It was popularised in the
-                                                1960s with
-                                                the
-                                                release of Letraset sheets containing Lorem Ipsum passages, and more
-                                                recently with
-                                                desktop publishing software like Aldus PageMaker including versions of
-                                                Lorem Ipsum
-                                            </p>
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="requestList">
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-request" role="tabpanel"
-                                aria-labelledby="pills-request-tab">
+                            <div class="tab-pane fade" id="log" role="tabpanel"
+                                aria-labelledby="pills-log">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
-                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
-                                                typesetting
-                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
-                                                since the
-                                                1500s,
-                                                when an unknown printer took a galley of type and scrambled it to make a
-                                                type
-                                                specimen
-                                                book. It has survived not only five centuries, but also the leap into
-                                                electronic
-                                                typesetting, remaining essentially unchanged. It was popularised in the
-                                                1960s with
-                                                the
-                                                release of Letraset sheets containing Lorem Ipsum passages, and more
-                                                recently with
-                                                desktop publishing software like Aldus PageMaker including versions of
-                                                Lorem Ipsum
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-log-history" role="tabpanel"
-                                aria-labelledby="pills-log-history-tab">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and
-                                                typesetting
-                                                industry. Lorem Ipsum has been the industry's standard dummy text ever
-                                                since the
-                                                1500s,
-                                                when an unknown printer took a galley of type and scrambled it to make a
-                                                type
-                                                specimen
-                                                book. It has survived not only five centuries, but also the leap into
-                                                electronic
-                                                typesetting, remaining essentially unchanged. It was popularised in the
-                                                1960s with
-                                                the
-                                                release of Letraset sheets containing Lorem Ipsum passages, and more
-                                                recently with
-                                                desktop publishing software like Aldus PageMaker including versions of
-                                                Lorem Ipsum
-                                            </p>
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="logList">
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -185,28 +212,62 @@
             </div>
         </div>
     </div>
-    <!-- Container-fluid Ends-->
+
+
+    
+@* <div class="modal fade" id="modalOrgTree" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Organization Tree</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="padding:5px">
+                    <div id="orgThree">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-end ">
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                        Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> *@
+    <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
+    <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
+    <partial name="~/Views/Organization/ModalDetailJob.cshtml" />
 </div>
 @section Script {
     <!-- Plugins JS start-->
+
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/tree/jstree.min.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+
+    @* <script src="../assets/js/tree/tree.js"></script> *@
     <!-- Plugins JS Ends-->
-    <!-- Theme js-->
+        @* datatable *@
+    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
+
+    @* custom js *@
+    <script src="../assets/js/organization-structure/constant.js"></script>
+    <script src="../assets/js/organization-structure/table-custom.js"></script>
+    <script src="../assets/js/authentication.js"></script>
+    <script src="../assets/js/organization-structure/helper.js"></script>
+    <script src="../assets/js/organization-structure/endpoint.js"></script>
+    <script src="../assets/js/organization-structure/balkan.js"></script>
+    <script src="../assets/js/organization-structure/index.js"></script>
+
     <script src="../assets/js/script.js"></script>
-    <script src="../assets/js/script.js"></script>
-    @* <script src="../assets/js/organization-structure/index.js"></script> *@
-    @* <script src="../assets/js/organization-structure/store.js"></script>
-    <script src="../assets/js/organization-structure/table-list.js"></script>
-    <script src="../assets/js/organization-structure/job-compare.js"></script>
-    <script src="../assets/js/organization-structure/detail-prosbis.js"></script>
-    <script src="../assets/js/organization-structure/add-prosbis.js"></script>
-    <script src="../assets/js/organization-structure/edit-prosbis.js"></script>
-    <script src="../assets/js/organization-structure/rasci-draft.js"></script>
-    <script src="../assets/js/organization-structure/rasci-approval.js"></script>
-    <script src="../assets/js/organization-structure/add-notation.js"></script>
-    <script src="../assets/js/organization-structure/edit-businesspro.js"></script>
-    <script src="../assets/js/organization-structure/add-prosbisref.js"></script> *@
+    @* <script src="../assets/js/script.js"></script> *@
+
 }

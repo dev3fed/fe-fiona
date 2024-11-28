@@ -17,6 +17,12 @@ namespace Cuba.Controllers
             return View();
         }
 
+        [HttpGet("draft-detail")] 
+        public IActionResult DraftDetail()
+        {
+            return View();
+        }
+
         [HttpGet("new-subordinate")] 
         public IActionResult NewSubordinate()
         {

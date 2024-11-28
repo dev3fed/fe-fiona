@@ -2,12 +2,28 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .os-container {
+        height: 700px;
+        background-color: #F5F5F5;
+    }
+
+    #orgThree .no-children .jstree-icon {
+        display: none !important; /* Use !important to ensure it overrides other styles */
+    }
+
+
+    /* Hide the node icons */
+</style>
+<link rel="stylesheet" type="text/css" href="~/assets/css/job-description.css">
+@* style link *@
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Master Data</h3>
+                    <h3>Job Description</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,7 +34,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Master Data</li>
+                        <li class="breadcrumb-item active">Job Description</li>
                     </ol>
                 </div>
             </div>
@@ -29,18 +45,122 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
-                    <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                    <div style="padding:10px">
+                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="pills-jobdesc" data-bs-toggle="pill"
+                                    href="#jobdesc" role="tab" aria-controls="pills-matrix"
+                                    aria-selected="true">Job Desc List</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-draft" data-bs-toggle="pill"
+                                    href="#draft" role="tab" aria-controls="pills-draft"
+                                    aria-selected="false">Draft
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-request" data-bs-toggle="pill"
+                                    href="#request" role="tab" aria-controls="pills-request"
+                                    aria-selected="false">Request List
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-log" data-bs-toggle="pill"
+                                    href="#log" role="tab" aria-controls="pills-log"
+                                    aria-selected="false">Log History
+                                </a></li>
+                        </ul>
+                        <div class="tab-content" id="pills-rasci-tabcontent">
+                            <div class="tab-pane fade show active" id="jobdesc" role="tabpanel"
+                                aria-labelledby="pills-jobdesc">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <input class="form-control" type="text" placeholder="Search" id="searchJobDesc" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                        </div>
+                                        <div class="col-3" style="padding-left: 0;">
+                                            <select class="form-select digits" name="selectStatusJobDesc" id="selectStatusJobDesc" >
+                                            @* <select class="form-select digits" name="selectStatusJobDesc" id="selectStatusJobDesc" states="[]" multiple="multiple"> *@
+                                                <option value="">All Status</option>
+                                                <option value="not available">Not Available</option>
+                                                <option value="on progress">On Progress</option>
+                                                <option value="available">Available</option>
+                                                <option value="waiting approval">Waiting Approval</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-1" style="padding-left: 0;">
+                                            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                                        </div>
+                                        <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createJobDesc">
+                                                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2" style="margin-top: -1px;margin-right :5px;">Create Job Desc
+                                            </button>
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="downloadJobDesc"><img src="~/assets/images/rasci/vector.svg" alt="Filter Icon" style="margin-top: -5px;margin-right: 7px;">Download</button>
+                                        </div>
+                                        <div class="col-12 mt-4">
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="jobdescList">
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="draft" role="tabpanel"
+                                aria-labelledby="pills-draft">
+                                <div class="card-body">
+                                    @* 3 button *@
+                                    <div class="row">
+                                        <div class="col-12 m-t-10-10 m-b-15">
+                                            <div class="d-flex justify-content-start">
+                                                <button class="btn btn-outline-primary me-2 btn-icon rounded-3
+                                                " type="button"> Create Job</button>
+                                                <button class="btn btn-outline-primary me-2 btn-icon" type="button"> Edit Job</button>
+                                                <button class="btn btn-outline-primary me-2 btn-icon" type="button"> Delete Job</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="draftList">
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="request" role="tabpanel"
+                                aria-labelledby="pills-request">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="requestList">
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="log" role="tabpanel"
+                                aria-labelledby="pills-log">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-responsive">
+                                                <table class="tableMasterData table table-hover w-100" id="logList">
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Container-fluid Ends-->
+
+
+    
+    <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
+    <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
+    <partial name="~/Views/Organization/ModalDetailJob.cshtml" />
 </div>
 @section Script {
     <!-- Plugins JS start-->
@@ -48,7 +168,24 @@
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/tree/jstree.min.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+
+    @* <script src="../assets/js/tree/tree.js"></script> *@
     <!-- Plugins JS Ends-->
-    <!-- Theme js-->
+        @* datatable *@
+    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
+
+    @* custom js *@
+    <script src="../assets/js/job-description/constant.js"></script>
+    <script src="../assets/js/job-description/table-custom.js"></script>
+    <script src="../assets/js/authentication.js"></script>
+    <script src="../assets/js/job-description/helper.js"></script>
+    <script src="../assets/js/job-description/endpoint.js"></script>
+    <script src="../assets/js/job-description/index.js"></script>
+
     <script src="../assets/js/script.js"></script>
+    @* <script src="../assets/js/script.js"></script> *@
+
 }

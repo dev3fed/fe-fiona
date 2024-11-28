@@ -63,7 +63,7 @@ function onModalAddBp() {
                oninput="updateComment('${letter.rasciCode}', this.value)">
       </td>
     </tr>
-`,
+`
     )
     .join("");
   tdBody = rasciRows;
