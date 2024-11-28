@@ -69,6 +69,11 @@
         color: #000000;
         border: 1px solid #cccccc;
     }
+
+    .spinner-border {
+        height: 16px;
+        width: 16px;
+    }
 </style>
 
 <!-- Modal Definition (from RasciFilter.cshtml) -->
@@ -340,11 +345,14 @@
                 </button>
                 <!-- Right aligned buttons -->
                 <div>
-                    <button class="btn btn-outline-primary" type="button"><i class="icon-close"
-                            style="font-size: 12px; margin-right: 8px;"></i> Reset Filter</button>
-                    <button class="btn btn-primary" type="button" onclick="applyFilterRasci()">
-                        <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon" style="margin-right: 8px;">
-                        Apply Filter Rasci
+                    <button class="btn btn-outline-primary" type="button" onclick="resetAllFilterRasci()"><i
+                            class="icon-close" style="font-size: 12px; margin-right: 8px;"></i> Reset Filter</button>
+                    <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="applyFilterRasci()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingSpinner" role="status"></div>
+                            <span class="btn-text">Apply Filter Rasci</span>
+                        </div>
                     </button>
                 </div>
             </div>

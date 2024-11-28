@@ -4,6 +4,7 @@ document.addEventListener("dataLoaded", async function () {
     //============================ section start switch btn for card job list ============================//
     const levels = [1, 2, 3, 4, 5, 6];
     const switchAll = document.getElementById("switch-all");
+    let disabledJobIds = []; // Array untuk melacak level yang dinonaktifkan
     switchAll.addEventListener("change", function () {
       const isDisabled = !this.checked;
 
@@ -13,13 +14,35 @@ document.addEventListener("dataLoaded", async function () {
           switchLevel.checked = this.checked;
         }
         toggleLevelElements(lvl, isDisabled);
+        // Perbarui daftar ID level yang dinonaktifkan
+        if (isDisabled) {
+          if (!disabledJobIds.includes(lvl)) {
+            disabledJobIds.push(lvl);
+          }
+        } else {
+          disabledJobIds = disabledJobIds.filter((id) => id !== lvl);
+        }
       });
+      // Perbarui state dengan ID level yang dinonaktifkan
+      setState("disabledJobId", disabledJobIds);
     });
     levels.forEach((lvl) => {
       const switchLevel = document.getElementById(`switch-level${lvl}`);
       switchLevel.addEventListener("change", function () {
         const isDisabled = !this.checked;
         toggleLevelElements(lvl, isDisabled);
+        // Perbarui daftar ID level yang dinonaktifkan
+        if (isDisabled) {
+          if (!disabledJobIds.includes(lvl)) {
+            disabledJobIds.push(lvl);
+          }
+        } else {
+          disabledJobIds = disabledJobIds.filter((id) => id !== lvl);
+        }
+
+        // Perbarui state dengan ID level yang dinonaktifkan
+        setState("disabledJobId", disabledJobIds);
+
         const allLevelsChecked = levels.every((level) => {
           const levelSwitch = document.getElementById(`switch-level${level}`);
           return levelSwitch.checked;
@@ -212,6 +235,27 @@ function resetRasciNotation() {
   setState("rasciNotationFilter", []);
 }
 //==================== end reset all rasci matrix notation ===========================//
+
+//==================== start reset all filter rasci matrix ===========================//
+const resetAllFilterRasci = async () => {
+  const result = await getState("filterJobList");
+  updateLevels([1, 2, 3, 4, 5, 6], result);
+  const switchAll = document.getElementById("switch-all");
+  switchAll.checked = true;
+  ["1", "2", "3", "4", "5", "6"].forEach((lvl) => {
+    const switchElement = document.getElementById(`switch-level${lvl}`);
+    if (switchElement) {
+      switchElement.checked = true; // Set the switch to "on" state
+      toggleLevelElements(lvl, false);
+    }
+  });
+
+  resetRasciNotation();
+  resetProssesBusiness();
+  setState("disabledJobId", []);
+  setState("selectedJobId", []);
+};
+//==================== end reset all filter rasci matrix ===========================//
 function toggleLevelElements(level, isDisabled) {
   const searchInput = document.getElementById(`search-joblevel${level}`);
   const checkboxes = document.querySelectorAll(`#chk-job-level${level} input[type="checkbox"]`);
@@ -235,14 +279,24 @@ function toggleLevelElements(level, isDisabled) {
 }
 
 const applyFilterRasci = async () => {
-  console.log("first levelFilter", getState("levelFilter"));
-  console.log("rasciNotationFilter", getState("rasciNotationFilter"));
-  console.log("selectedJobId", getState("selectedJobId"));
-
+  const spinner = document.getElementById("loadingSpinner");
+  spinner.style.display = "inline-block";
+  const isDisabledJobLevel = getState("disabledJobId");
+  const selectedId = getState("selectedJobId") || [];
+  const jobList = getState("filterJobList");
+  let finalSelectedId = [];
+  const result = jobList.filter((item) => selectedId.includes(item.id));
+  const cekLevel = result.filter((value) => isDisabledJobLevel.includes(value.level));
+  if (cekLevel.length > 0) {
+    const filteredId = selectedId.filter((id) => !cekLevel.some((item) => item.id === id));
+    finalSelectedId = filteredId;
+  } else {
+    finalSelectedId = selectedId;
+  }
   const payload = {
     parentId: null,
     type: "filter",
-    jobId: getState("selectedJobId"),
+    jobId: finalSelectedId,
     busProsLevel: getState("levelFilter"),
     rasciNotation: getState("rasciNotationFilter"),
   };
@@ -250,15 +304,19 @@ const applyFilterRasci = async () => {
   const resultMatrix = await fetchDataMatrix(payload);
 
   if (resultMatrix.status === 200) {
-    // Mendapatkan instance modal dan menutup modal
     resultAllData(resultMatrix?.data);
+    setTimeout(() => {
+      spinner.style.display = "none";
+    }, 3000);
     const modalElement = document.getElementById("exampleModal");
     const modal = bootstrap.Modal.getInstance(modalElement);
     setState("isSearchMatrix", true);
     if (modal) {
-      modal.hide(); // Menutup modal jika ada instance yang valid
+      modal.hide();
     }
+  } else {
+    setTimeout(() => {
+      spinner.style.display = "none";
+    }, 3000);
   }
-
-  console.log("first", resultMatrix);
 };

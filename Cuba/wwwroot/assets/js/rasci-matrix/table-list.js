@@ -359,6 +359,7 @@ async function clearInput() {
   document.getElementById("inputText").value = "";
   document.getElementById("inputSearchCompare").value = "";
   handleCloseModal();
+  resetAllFilterRasci();
 }
 
 async function openModalDeleteBusinesspro() {

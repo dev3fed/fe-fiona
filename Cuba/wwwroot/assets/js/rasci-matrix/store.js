@@ -14,17 +14,11 @@ const appState = new Proxy(
     checkedParentId: [],
     selectedLevel: 0,
     //start filter rasci matrix
-    jobLevel1: [],
-    jobLevel2: [],
-    jobLevel3: [],
-    jobLevel4: [],
-    jobLevel5: [],
-    jobLevel6: [],
     rasciNotationFilter: [],
     levelFilter: [],
-    levelJobFilter: [],
     visibleJobs: [],
     selectedJobId: [],
+    disabledJobId: [],
     //end filter rasci matrix
     dataDetailDraft: {},
     editDrafProsbis: {
@@ -240,12 +234,6 @@ async function fetchData() {
       ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
     ];
     appState.filterJobList = combinedData;
-    appState.jobLevel1 = filterJobList?.data.level1;
-    appState.jobLevel2 = filterJobList?.data.level2;
-    appState.jobLevel3 = filterJobList?.data.level3;
-    appState.jobLevel4 = filterJobList?.data.level4;
-    appState.jobLevel5 = filterJobList?.data.level5;
-    appState.jobLevel6 = filterJobList?.data.level6;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

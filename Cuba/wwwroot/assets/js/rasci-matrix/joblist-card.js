@@ -170,8 +170,23 @@ const searchJob = async (event, level) => {
       updateLevels([level], filteredResult);
     }
   } else {
-    const findJobList = result.filter((value) => selectedId.includes(value.id));
-    updateLevels([level], findJobList);
-    listChecked(selectedId);
+    if (selectedId.length > 0) {
+      const findJobList = result.filter((value) => selectedId.includes(value.id));
+      const cekLevelParent = findJobList.filter((value) => value.level === level - 1);
+      if (cekLevelParent.length === 0) {
+        updateLevels([level], result);
+        listChecked(selectedId);
+        return;
+      }
+      if (level === 1) {
+        updateLevels([level], result);
+        listChecked(selectedId);
+      } else {
+        updateLevels([level], findJobList);
+        listChecked(selectedId);
+      }
+    } else {
+      updateLevels([level], result);
+    }
   }
 };
