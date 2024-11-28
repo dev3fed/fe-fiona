@@ -5,6 +5,8 @@ document.addEventListener("dataLoaded", function () {
       loadTableHeader(appState.resultJabatan);
       loadTableBody(appState.resultProsbis);
     }, 300);
+  } else {
+    showDataEmpty();
   }
 });
 
@@ -15,8 +17,16 @@ document.addEventListener("DOMContentLoaded", function () {
   feather.replace();
 });
 
+const showDataEmpty = () => {
+  const textInfo = document.getElementById("text-info");
+  const loadingIcon = document.getElementById("icon-container");
+  textInfo.textContent = "Oops! There's nothing here yet.";
+  loadingIcon.style.display = "none";
+};
 function showLoading() {
   const loadingContainer = document.querySelector(".loading-container");
+  const textInfo = document.getElementById("text-info");
+  textInfo.textContent = "Please wait, loading data";
   const tableWrapper = document.querySelector(".scrollable-table");
   const animation = lottie.loadAnimation({
     container: document.getElementById("icon-container"),

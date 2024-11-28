@@ -245,7 +245,7 @@ const resetAllFilterRasci = async () => {
   ["1", "2", "3", "4", "5", "6"].forEach((lvl) => {
     const switchElement = document.getElementById(`switch-level${lvl}`);
     if (switchElement) {
-      switchElement.checked = true; // Set the switch to "on" state
+      switchElement.checked = true;
       toggleLevelElements(lvl, false);
     }
   });
@@ -254,6 +254,12 @@ const resetAllFilterRasci = async () => {
   resetProssesBusiness();
   setState("disabledJobId", []);
   setState("selectedJobId", []);
+  ["1", "2", "3", "4", "5", "6"].forEach((level) => {
+    const searchInput = document.getElementById(`search-joblevel${level}`);
+    if (searchInput) {
+      searchInput.value = "";
+    }
+  });
 };
 //==================== end reset all filter rasci matrix ===========================//
 function toggleLevelElements(level, isDisabled) {
@@ -307,7 +313,7 @@ const applyFilterRasci = async () => {
     resultAllData(resultMatrix?.data);
     setTimeout(() => {
       spinner.style.display = "none";
-    }, 3000);
+    }, 2000);
     const modalElement = document.getElementById("exampleModal");
     const modal = bootstrap.Modal.getInstance(modalElement);
     setState("isSearchMatrix", true);
@@ -317,6 +323,6 @@ const applyFilterRasci = async () => {
   } else {
     setTimeout(() => {
       spinner.style.display = "none";
-    }, 3000);
+    }, 2000);
   }
 };
