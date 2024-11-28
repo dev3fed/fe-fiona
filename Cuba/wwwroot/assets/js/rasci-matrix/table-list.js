@@ -123,7 +123,7 @@ function loadTableBody(prosbisList) {
               <div class="hierarchy-icon-wrapper">
                 ${
                   isSearch == false && val.hasChild
-                    ? `<i data-feather="${isExpanded}" class="hierarchy-icon"
+                    ? `<i data-feather="${isExpanded}" class="hierarchy-icon" id="icon-${val.indexGroup}"
                     style="width:24px;" onclick="handleCollapse('${val.indexGroup}')"></i>`
                     : ``
                 }
@@ -244,6 +244,8 @@ function onModalProsbis() {
 async function handleCollapse(id) {
   const parentId = id;
   const parentRow = document.getElementById(parentId);
+  const icon = document.getElementById(`icon-${id}`);
+
   if (parentRow) {
     if (!appState.idProsbis.includes(parentId)) {
       appState.idProsbis = [...appState.idProsbis, parentId.toString()];
