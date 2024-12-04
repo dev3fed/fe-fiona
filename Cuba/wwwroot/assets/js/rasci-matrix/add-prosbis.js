@@ -3,6 +3,15 @@ function onModalAddBp() {
   modal.show();
   const prosbisLevel = getState("prosbisLevel");
   const formContent = `
+    <div class="col-12">
+      <div>
+        <label class="form-label">RASCI Matrix Draft Name</label>
+        <select class="form-select digits" >
+          <option>Choose</option>
+        </select>
+      </div>
+      <hr style="margin-top:25px;margin-bottom:20px"/>
+    </div>
     <div class="col-2">
       <div class="mb-3">
         <label class="form-label">Level</label>
@@ -24,16 +33,15 @@ function onModalAddBp() {
         <label class="form-label">Business Process Name</label>
         <textarea class="form-control" oninput="onInputProsbis(event)"></textarea>
       </div>
-      <div class="mt-4">
-          <label class="form-label">Job</label>
-          <select class="form-select digits" name="jobId" id="jobId"  onchange="onSelectJobId(event)">
-          </select>
-      </div>
     </div>`;
-
+  const bodySelectJob = `
+    <select class="form-select digits" name="jobId" id="jobId"
+        onchange="onSelectJobId(event)">
+    </select>
+    `;
   theadContent = `<tr>
         <th scope="col" style="width: 50px">Check</th>
-        <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
+        <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
         <th scope="col">Comment (Optional)</th>
         </tr>`;
   const rasciNotation = getState("insertProsbis").rasciNotation || [];
@@ -63,11 +71,11 @@ function onModalAddBp() {
                oninput="updateComment('${letter.rasciCode}', this.value)">
       </td>
     </tr>
-`
+`,
     )
     .join("");
   tdBody = rasciRows;
-
+  document.getElementById("select-job").innerHTML = bodySelectJob;
   document.getElementById("tbl-add-prosbis-header").innerHTML = theadContent;
   document.getElementById("tbl-add-prosbis-body").innerHTML = tdBody;
 
