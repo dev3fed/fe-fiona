@@ -25,35 +25,36 @@ const appState = new Proxy(
       rasciNotation: [],
     },
     deleteDraftProsbis: 0,
+    rasciNotation: [
+      {
+        rasciCode: "R",
+        comment: "",
+        isChecked: false,
+      },
+      {
+        rasciCode: "A",
+        comment: "",
+        isChecked: false,
+      },
+      {
+        rasciCode: "S",
+        comment: "",
+        isChecked: false,
+      },
+      {
+        rasciCode: "C",
+        comment: "",
+        isChecked: false,
+      },
+      {
+        rasciCode: "I",
+        comment: "",
+        isChecked: false,
+      },
+    ],
     insertProsbis: {
       parentId: null,
-      rasciNotation: [
-        {
-          rasciCode: "R",
-          comment: "",
-          isChecked: false,
-        },
-        {
-          rasciCode: "A",
-          comment: "",
-          isChecked: false,
-        },
-        {
-          rasciCode: "S",
-          comment: "",
-          isChecked: false,
-        },
-        {
-          rasciCode: "C",
-          comment: "",
-          isChecked: false,
-        },
-        {
-          rasciCode: "I",
-          comment: "",
-          isChecked: false,
-        },
-      ],
+      jobMapped: [],
     },
   },
   {
