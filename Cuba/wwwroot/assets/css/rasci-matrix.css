@@ -370,8 +370,11 @@ th {
 /* Custom scrollbar styles */
 .scrollable-table {
   overflow-y: auto;
+  max-height: 470px;
 }
-
+.clusterize-content tr {
+  border-bottom: 1px solid #ddd;
+}
 .scrollable-table::-webkit-scrollbar {
   width: 10px;
   height: 8px;

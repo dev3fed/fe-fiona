@@ -1,16 +1,173 @@
-function onModalAddBp() {
-  const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
+async function onModalChoose(type, jobId, prosbisId) {
+  const modal = new bootstrap.Modal(document.getElementById("modalChoosedraft"));
   modal.show();
-  const prosbisLevel = getState("prosbisLevel");
-  const rasciNotation = getState("rasciNotation") || [];
-  const dataProsbis = getState("insertProsbis");
+  const body = document.getElementById("body-choosedraft");
+  body.innerHTML = `
+  <div class="col mb-3">
+    <div class="m-t-15 m-checkbox-inline custom-radio-ml">
+        <div class="form-check form-check-inline radio radio-primary">
+            <input class="form-check-input" id="radionewdraft" type="radio" name="optradio" value="optNewdraft" onchange="onSelectDraft(event)" checked>
+            <label class="form-check-label mb-0" for="radionewdraft">New draft</label>
+        </div>
+        <div class="form-check form-check-inline radio radio-primary">
+            <input class="form-check-input" id="radioexisting" type="radio" name="optradio" value="optExisting" onchange="onSelectDraft(event)">
+            <label class="form-check-label mb-0" for="radioexisting">Existing draft</label>
+        </div>
+    </div>
+  </div>
+  <div class="row">
+        <input class="form-control" type="text" id="type-action" value="${type}" hidden>
+        <input class="form-control" type="text" id="jobid-action" value="${jobId}" hidden>
+        <input class="form-control" type="text" id="prosbisid-action" value="${prosbisId}" hidden>
+    <div class="col-12">
+        <label class="form-label">Organization Data Source</label>
+        <select class="form-select">
+            <option selected="" disabled="" value="">Choose organization data source</option>
+            <option>...</option>
+        </select>
+    </div>
+    <div class="col-12 mt-3" id="draft-name-container">
+        <label class="form-label">Draft Name</label>
+        <input class="form-control" type="text" id="input-draftname" placeholder="Input draft name">
+    </div>
+  </div>`;
+}
 
-  const formContent = `
+function onSelectDraft(event) {
+  const draftNameContainer = document.getElementById("draft-name-container");
+  if (event.target.value === "optExisting") {
+    draftNameContainer.innerHTML = `
+      <label class="form-label">Draft Name</label>
+      <select class="form-select" id="select-draftname">
+         
+      </select>`;
+  } else if (event.target.value === "optNewdraft") {
+    draftNameContainer.innerHTML = `
+      <label class="form-label">Draft Name</label>
+      <input class="form-control" type="text" id="input-draftname" placeholder="Input draft name">`;
+  }
+  // Initialize Bootstrap Select
+  $(".selectpicker").selectpicker();
+  updateSelect2DraftList();
+}
+
+async function handleContinue() {
+  const typeAction = document.getElementById("type-action");
+  const typeJob = document.getElementById("jobid-action");
+  const typeProsbis = document.getElementById("prosbisid-action");
+  const radionewdraft = document.getElementById("radionewdraft").checked;
+  const spinner = document.getElementById("loadingChoose");
+  const dataProsbis = getState("insertProsbis");
+  // Tampilkan animasi loading
+  spinner.style.display = "inline-block";
+  // radioexisting
+  console.log("radionewdraft", radionewdraft);
+  try {
+    if (radionewdraft === true) {
+      const inputDraftName = document.getElementById("input-draftname").value;
+      const payload = {
+        draftName: inputDraftName,
+        draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+      };
+
+      const result = await createDraftRasci(payload);
+      if (result.success === true) {
+        const dataResult = result?.data.data;
+        const dataSend = {
+          ...dataProsbis,
+          draftId: dataResult.draftId,
+          draftName: dataResult.draftName,
+          draftSOId: dataResult.draftSOId,
+        };
+        setState("insertProsbis", dataSend);
+        const modalChoose = document.getElementById("modalChoosedraft");
+        const hideModalChoose = bootstrap.Modal.getInstance(modalChoose);
+        if (hideModalChoose) {
+          hideModalChoose.hide();
+        }
+        setTimeout(() => {
+          swal({
+            title: "SUCCESS",
+            icon: "success",
+            buttons: false,
+            timer: 2000,
+            content: {
+              element: "div",
+              attributes: {
+                innerHTML: `<div style="text-align: center;">${dataResult.draftName} draft has been saved</div>`,
+              },
+            },
+          }).then(async () => {
+            const type = typeAction.value;
+            spinner.style.display = "none";
+            if (type === "addNewBp") {
+              onModalAddBp();
+            } else if (type === "addNotation") {
+              onModalAddNotation();
+            } else if (type === "editNotation") {
+              openModalNotRow(typeJob.value, typeProsbis.value);
+            } else if (type === "editProsbis") {
+              openModalEditBusinesspro();
+            } else if (type === "deleteProsbis") {
+              openModalDeleteBusinesspro();
+            }
+          });
+        }, 200);
+      }
+    } else {
+      const modalChoose = document.getElementById("modalChoosedraft");
+      const hideModalChoose = bootstrap.Modal.getInstance(modalChoose);
+      // get element value from select by id select-draftname
+      const selectDraftName = document.getElementById("select-draftname");
+      const draftId = selectDraftName.value;
+      //  get text from select by id select-draftname
+      const textDraftName = selectDraftName.options[selectDraftName.selectedIndex].text;
+      console.log("textDraftName", textDraftName);
+      console.log("draftId", draftId);
+      const dataSend = {
+        ...dataProsbis,
+        draftId: draftId,
+        draftName: textDraftName,
+        draftSOId: "",
+      };
+      setState("insertProsbis", dataSend);
+      if (hideModalChoose) {
+        hideModalChoose.hide();
+      }
+      spinner.style.display = "none";
+      const type = typeAction.value;
+      if (type === "addNewBp") {
+        onModalAddBp();
+      } else if (type === "addNotation") {
+        onModalAddNotation();
+      } else if (type === "editNotation") {
+        openModalNotRow(typeJob.value, typeProsbis.value);
+      } else if (type === "editProsbis") {
+        openModalEditBusinesspro();
+      } else if (type === "deleteProsbis") {
+        openModalDeleteBusinesspro();
+      }
+    }
+  } catch (error) {}
+}
+async function onModalAddBp() {
+  try {
+    const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
+    modal.show();
+    const prosbisLevel = getState("prosbisLevel");
+    const rasciNotation = getState("rasciNotation") || [];
+    const dataProsbis = getState("insertProsbis");
+    console.log("dataProsbis", dataProsbis);
+    console.log("prosbisLevel", prosbisLevel);
+    const resultLevel = await fetchSelectLevel(dataProsbis.draftId);
+    console.log("resultLevel", resultLevel.data.res);
+    const listLevel = resultLevel?.data.res;
+    const formContent = `
     <div class="col-12">
       <div>
         <label class="form-label">RASCI Matrix Draft Name</label>
-        <select class="form-select digits" >
-          <option>Choose</option>
+        <select class="form-select digits" disabled>
+          <option value="${dataProsbis.draftId}">${dataProsbis.draftName}</option>
         </select>
       </div>
       <hr style="margin-top:25px;margin-bottom:20px"/>
@@ -20,7 +177,7 @@ function onModalAddBp() {
         <label class="form-label">Level</label>
         <select class="form-select digits" onchange="onSelect(event)">
           <option>Choose</option>
-          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
+          ${listLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
       </div>
     </div>
@@ -37,30 +194,31 @@ function onModalAddBp() {
         <textarea class="form-control" oninput="onInputProsbis(event)"></textarea>
       </div>
     </div>`;
-  const bodySelectJob = `
+    const bodySelectJob = `
     <select class="form-select digits" name="jobId" id="jobId">
     </select>
     `;
-  theadContent = `<tr>
+    theadContent = `<tr>
         <th scope="col" style="width: 50px">Check</th>
         <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
         <th scope="col">Comment (Optional)</th>
         </tr>`;
 
-  tblNotation(rasciNotation);
-  cardSelectedJoblist(dataProsbis);
-  document.getElementById("select-job").innerHTML = bodySelectJob;
-  document.getElementById("tbl-add-prosbis-header").innerHTML = theadContent;
+    tblNotation(rasciNotation);
+    cardSelectedJoblist(dataProsbis);
+    document.getElementById("select-job").innerHTML = bodySelectJob;
+    document.getElementById("tbl-add-prosbis-header").innerHTML = theadContent;
 
-  const bodyContent = document.getElementById("form-content");
-  if (bodyContent) {
-    bodyContent.innerHTML = formContent;
-  }
+    const bodyContent = document.getElementById("form-content");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
 
-  // Initialize Bootstrap Select
-  $(".selectpicker").selectpicker();
-  updateSelect2ByProsbis();
-  updateSelect2ByJob();
+    // Initialize Bootstrap Select
+    $(".selectpicker").selectpicker();
+    updateSelect2ByProsbis();
+    updateSelect2ByJob();
+  } catch (error) {}
 }
 
 const cardSelectedJoblist = (param) => {
@@ -138,10 +296,11 @@ const tblNotation = (rasciNotation) => {
   tdBody = rasciRows;
   document.getElementById("tbl-add-prosbis-body").innerHTML = tdBody;
 };
-function updateSelect2ByProsbis() {
-  $("#parentId")
+
+function updateSelect2DraftList() {
+  $("#select-draftname")
     .select2({
-      dropdownParent: $("#modalAddBp"),
+      dropdownParent: $("#modalChoosedraft"),
       placeholder: "Choose",
       allowClear: true,
       delay: 250,
@@ -152,12 +311,12 @@ function updateSelect2ByProsbis() {
           return {
             search: params.term || "",
             page: params.page || 1,
-            type: "prosbis",
-            level: appState.selectedLevel,
+            type: "draft-rasci",
+            draftId: "ad24a853-5f57-40a0-a367-3b46c2f3b2b0",
           };
         },
         processResults: function (data) {
-          if (data.data && data.data.result) {
+          if (data && data.data) {
             return {
               results: data.data.result,
               pagination: {
@@ -178,7 +337,50 @@ function updateSelect2ByProsbis() {
     });
 }
 
+function updateSelect2ByProsbis() {
+  const dataProsbis = getState("insertProsbis");
+  $("#parentId")
+    .select2({
+      dropdownParent: $("#modalAddBp"),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "business-process",
+            level: appState.selectedLevel,
+            draftId: dataProsbis.draftId,
+          };
+        },
+        processResults: function (data) {
+          if (data.data && data.data.res) {
+            return {
+              results: data.data.res,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
+}
+
 function updateSelect2ByJob() {
+  const dataProsbis = getState("insertProsbis");
   $("#jobId")
     .select2({
       dropdownParent: $("#modalAddBp"),
@@ -192,13 +394,14 @@ function updateSelect2ByJob() {
           return {
             search: params.term || "",
             page: params.page || 1,
-            type: "jobtitle",
+            type: "job",
+            draftId: dataProsbis.draftId,
           };
         },
         processResults: function (data) {
-          if (data.data && data.data.result) {
+          if (data && data.data) {
             return {
-              results: data.data.result,
+              results: data.data.res,
               pagination: {
                 more: data.data.pagination.more,
               },
@@ -240,7 +443,7 @@ function onSelect(event) {
 function onInputProsbis(event) {
   const value = event.target.value;
   const dataProsbis = getState("insertProsbis");
-  setState("insertProsbis", { ...dataProsbis, name: value });
+  setState("insertProsbis", { ...dataProsbis, businessProcessName: value });
 }
 function onCheck(event, rasciCode) {
   const isChecked = event.target.checked;
@@ -299,8 +502,8 @@ const triggleSelectJob = () => {
   setTimeout(() => {
     selectedJobId.val(null).trigger("change");
     // disabled btn id btn-selectedjob
-    const btnSelectedJob = document.getElementById("btn-selectedjob");
-    btnSelectedJob.disabled = true;
+    // const btnSelectedJob = document.getElementById("btn-selectedjob");
+    // btnSelectedJob.disabled = true;
     const updatedRasciNotation = rasciNotation.map((letter) => {
       return { ...letter, comment: "", isChecked: false };
     });
@@ -312,15 +515,11 @@ const triggleSelectJob = () => {
 
 async function saveAsDraft() {
   try {
-    const draftName = document.getElementById("draftName").value;
     const dataProsbis = getState("insertProsbis");
     const inputValue = {
       ...dataProsbis,
-      draftName,
-      category: "add",
-      type: "draft",
+      draftType: "Add New Business Process",
     };
-
     const result = await submitDraftProsbis(inputValue);
 
     if (result.status === 200) {
@@ -358,15 +557,14 @@ async function saveAsDraft() {
           }
           backFromModalBp();
           const payload = {
-            Type: "draft",
             Page: 1,
-            Limit: 10,
+            PageSize: 5,
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          const IsNotEmpty = dataDraft.data.data.length;
+          const IsNotEmpty = dataDraft.data.length;
           handleClickCard(IsNotEmpty);
-          loadTableBodyDraft(dataDraft.data.data);
+          loadTableBodyDraft(dataDraft);
           $("#pills-draft-tab").tab("show");
         });
       }, 100);
@@ -398,13 +596,13 @@ function backFromModalBp() {
 }
 
 function formValidation() {
-  const { level, name, jobMapped } = getState("insertProsbis");
-  const isValid = level && name;
-  console.log("jobMapped", jobMapped);
+  const { level, businessProcessName, jobMapped } = getState("insertProsbis");
+  const isValid = level && businessProcessName && jobMapped.length > 0;
+  // console.log("jobMapped", jobMapped);
   // get value from select id jobId
   const selectedJobId = $("#jobId");
   const selectedValue = selectedJobId.val();
-  console.log("selectedValue", selectedValue);
+  // console.log("selectedValue", selectedValue);
   // const btnSelectedJob = document.getElementById("btn-selectedjob");
   // btnSelectedJob.disabled = true;
   document.getElementById("saveDraftBtn").disabled = !isValid;
@@ -414,3 +612,61 @@ function formValidation() {
 document.querySelectorAll("input, select, textarea").forEach((input) => {
   input.addEventListener("input", formValidation);
 });
+
+function handleClickAlert() {
+  const modal = new bootstrap.Modal(document.getElementById("modalAddmapping"));
+  modal.show();
+
+  let bodyContent = `
+    <div class="row">
+        <div class="col-12">
+            <div class="mapping-alert">
+              <span class="alert-text">
+                  Please mapping RASCI to the positions below by clicking "Add RASCI" button.
+              </span>
+          </div>
+        </div>
+        <div class="col-12 mt-2"> 
+           <input class="form-control" type="text" placeholder="Search">
+        </div>
+          <div class="col-12 mt-2"> 
+          <div class="table-responsive mt-2" style=" max-height: 450px;">
+              <table class="table tbl-border-add-prosbis">
+                  <thead>
+                      <tr>
+                      <th scope="col" style="width: 50px;text-align:center">No</th>
+                        <th scope="col" style="width: 150px">ID Position</th>
+                        <th scope="col" style="width: 380px">Position</th>
+                        <th scope="col" style="width: 100px">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <th scope="row">
+        
+                      </th>
+                      <td style="text-align:center">
+
+                      </td>
+                      <td style="text-align:center">
+
+                      </td>
+                      <td>
+                    <button class="btn btn-primary" style="width: 100%;"
+                       type="button" onclick="handleAddRasci()">Add RASCI</button>
+                      </td>
+                    </tbody>
+              </table>
+          </div>
+
+        </div>
+        `;
+
+  document.getElementById("body-addmapping").innerHTML = bodyContent;
+}
+
+function handleAddRasci() {
+  const modalMapping = document.getElementById("modalAddmapping");
+  const modal = bootstrap.Modal.getInstance(modalMapping);
+  modal.hide();
+  onModalAddNotation();
+}

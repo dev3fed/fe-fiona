@@ -3,12 +3,21 @@ function onModalAddNotation() {
   const modal = new bootstrap.Modal(document.getElementById("modalAddNotation"));
   modal.show();
   const prosbisLevel = getState("prosbisLevel");
-  console.log("prosbisLevel", prosbisLevel);
+  const rasciNotation = getState("rasciNotation") || [];
 
   const formContent = `
       <div class="col-12">
+      <div>
+        <label class="form-label">RASCI Matrix Draft Name</label>
+        <select class="form-select digits" disabled>
+          <option>Choose</option>
+        </select>
+      </div>
+      <hr style="margin-top:25px;margin-bottom:20px"/>
+    </div>
+    <div class="col-12">
       <div class="mb-2">
-        <label class="form-label">Job</label>
+        <label class="form-label">Position</label>
         <select class="selectpicker form-control digits" data-live-search="true">
           <option>Choose</option>
           <option>Option 1</option>
@@ -19,18 +28,31 @@ function onModalAddNotation() {
         </select>
       </div>
     </div>
-    <div class="col-3">
-      <div class="mt-2">
-        <label class="form-label">Bussiness Process Level</label>
+    <div class="col-12">
+      <div class="col mb-3">
+        <div class="m-t-15 m-checkbox-inline custom-radio-ml">
+            <div class="form-check form-check-inline radio radio-primary">
+                <input class="form-check-input" id="radioNonreference" type="radio" name="optradio" value="nonReference" onchange="handleRadioChange(event)" checked>
+                <label class="form-check-label mb-0" for="radioNonreference">Add RASCI Notation</label>
+            </div>
+            <div class="form-check form-check-inline radio radio-primary">
+                <input class="form-check-input" id="radioReference" type="radio" name="optradio" value="reference"  onchange="handleRadioChange(event)">
+                <label class="form-check-label mb-0" for="radioReference">Add RASCI Notation from reference</label>
+            </div>
+        </div>
+      </div>
+    </div>
+`;
+
+  const bodySelectBusiness = `
+    <div class="row">
+      <div class="col-3">
         <select class="form-select digits">
-          <option>Choose</option>
+          <option>Level</option>
           ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
       </div>
-    </div>
-    <div class="col-9">
-      <div class="mt-2">
-        <label class="form-label">Business Process</label>
+      <div class="col-9">
         <select class="form-select digits"  disabled>
           <option>Choose</option>
           <option>2</option>
@@ -39,38 +61,17 @@ function onModalAddNotation() {
           <option>5</option>
         </select>
       </div>
-    </div>`;
-
+    </div>
+    `;
   theadContent = `<tr>
         <th scope="col" style="width: 50px">Check</th>
-        <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
+        <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
         <th scope="col">Comment (Optional)</th>
         </tr>`;
 
-  const rasciRows = ["R", "A", "S", "C", "I"]
-    .map(
-      (letter) => `
-    <tr>
-      <th scope="row">
-        <label class="radio-label" for="checked-body-bp">
-          <input class="checkbox_animated" id="checked-${letter.toLowerCase()}" type="checkbox" onclick="onCheck(event, 'comment${letter}')">
-        </label>
-      </th>
-      <td style="text-align:center">
-        <img src="/assets/images/rasci/${letter.toLowerCase()}.svg" alt="${letter} Icon" style="padding-right:2px">
-      </td>
-      <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter}" disabled>
-      </td>
-    </tr>
-  `,
-    )
-    .join("");
-
-  tdBody = rasciRows;
-
+  tblRasciNotation(rasciNotation);
+  document.getElementById("select-business").innerHTML = bodySelectBusiness;
   document.getElementById("tbl-notation-header").innerHTML = theadContent;
-  document.getElementById("tbl-notation-body").innerHTML = tdBody;
 
   const bodyContent = document.getElementById("form-notation");
   if (bodyContent) {
@@ -79,6 +80,70 @@ function onModalAddNotation() {
 
   // Initialize Bootstrap Select
   $(".selectpicker").selectpicker();
+}
+
+const handleRadioChange = (event) => {
+  const value = event.target.value;
+  if (value === "reference") {
+    const elementPosref = document.getElementById("posref");
+    const elementBispro = document.getElementById("bispro");
+    const elementSelectedBispro = document.getElementById("selectedBispro");
+    elementPosref.style.display = "block";
+    elementBispro.style.display = "none";
+    elementSelectedBispro.style.display = "none";
+  } else if (value === "nonReference") {
+    const elementPosref = document.getElementById("posref");
+    const elementBispro = document.getElementById("bispro");
+    const elementSelectedBispro = document.getElementById("selectedBispro");
+    elementPosref.style.display = "none";
+    elementBispro.style.display = "block";
+    elementSelectedBispro.style.display = "block";
+  }
+};
+const tblRasciNotation = (rasciNotation) => {
+  const rasciRows = rasciNotation
+    .map(
+      (letter) => `
+  <tr>
+      <th scope="row">
+        <label class="radio-label" for="checked-body-bp">
+          <input class="checkbox_animated" 
+                 id="checked-${letter.rasciCode.toLowerCase()}" 
+                 type="checkbox" 
+                 data-rasci="${letter.rasciCode}" 
+                 ${letter.isChecked ? "checked" : ""} 
+                 onclick="onCheck(event, '${letter.rasciCode}')">
+        </label>
+      </th>
+      <td style="text-align:center">
+        <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
+        letter.rasciCode
+      } Icon" style="padding-right:2px">
+      </td>
+      <td>
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
+               value="${letter.comment || ""}" 
+               ${!letter.isChecked ? "disabled" : ""} 
+               oninput="updateRasciComment('${letter.rasciCode}', this.value)">
+      </td>
+    </tr>
+`,
+    )
+    .join("");
+  tdBody = rasciRows;
+  document.getElementById("tbl-notation-body").innerHTML = tdBody;
+};
+
+function updateRasciComment(rasciCode, value) {
+  const rasciNotation = getState("rasciNotation");
+  const updatedRasciNotation = rasciNotation.map((letter) => {
+    if (letter.rasciCode === rasciCode) {
+      return { ...letter, comment: value };
+    }
+    return letter;
+  });
+
+  setState("rasciNotation", updatedRasciNotation);
 }
 
 // function onSelect(event) {
@@ -107,21 +172,24 @@ async function openModalNotRow(jobId, prosbisId) {
 
   const formContent = `
       <div class="col-12">
-        <div class="mb-2">
-          <label class="form-label">Job</label>
-        <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+        <div >
+          <label class="form-label" style="width:19%">RASCI Matrix Draft</label>
+          <label> : </label>
+        <b class="form-label">RASCI Evaluasi Struktur Organisasi 2025 versi Citra</b>
         </div>
       </div>
-      <div class="col-3">
-        <div class="mt-2">
-          <label class="form-label">Bussiness Process Level</label>
-          <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:19%">Position</label>
+             <label> : </label>
+        <b class="form-label">321405689 - Direktur Keuangan</b>
         </div>
       </div>
-      <div class="col-9">
-        <div class="mt-2">
-          <label class="form-label">Business Process</label>
-          <input class="form-control" type="text" placeholder="Type Comment"  disabled>
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:19%">Business Process</label>
+             <label> : </label>
+        <b class="form-label">Market, Sell, and Commercialization Products and Services</b>
         </div>
       </div>
     `;

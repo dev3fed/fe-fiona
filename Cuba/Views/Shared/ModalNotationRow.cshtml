@@ -79,11 +79,11 @@
     <div class="modal-dialog custom-notatrow bounceInDown animated" role="document">
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalNotationRowTitle">Add RASCI Notation</h5>
+                <h5 class="modal-title" id="modalNotationRowTitle">Edit RASCI</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modal-body-content">
-                <div class="row mb-4" id="form-notatrow">
+                <div class="row mb-2" id="form-notatrow">
 
                 </div>
                 <div class="table-responsive" style=" max-height: 450px;">
@@ -95,15 +95,13 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer  ">
+            <div class="modal-footer  d-flex justify-content-end">
                 <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
                         class="icon-arrow-left"></i>
                     Back</button>
                 <div>
-                    <button class="btn btn-outline-primary" type="button"> Save as draft</button>
-                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
-                        Submit to Approval
-                    </button>
+                    <button class="btn btn btn-primary" type="button" data-bs-toggle="modal"
+                        data-bs-target="#modalSaveDraft" id="saveDraftBtn" disabled> Save Change</button>
                 </div>
             </div>
         </div>

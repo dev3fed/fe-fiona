@@ -19,12 +19,20 @@ const appState = new Proxy(
     visibleJobs: [],
     selectedJobId: [],
     disabledJobId: [],
+    payloadDraftList: {
+      Page: 1,
+      PageSize: 5,
+    },
+    payloadDetailDraftPage: {
+      Page: 1,
+      PageSize: 5,
+    },
     //end filter rasci matrix
     dataDetailDraft: {},
     editDrafProsbis: {
       rasciNotation: [],
     },
-    deleteDraftProsbis: 0,
+    deleteDraftProsbis: "",
     rasciNotation: [
       {
         rasciCode: "R",
@@ -104,7 +112,7 @@ window.setState = setState;
 window.getState = getState;
 
 async function SearchMatrix(params) {
-  const url = `${url_api}/api/RasciMapping/searchBy?type=${params.type}&search=${params.search}`;
+  const url = `${url_api}/api/RasciMatrix/searchBy?type=${params.type}&search=${params.search}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -116,7 +124,7 @@ async function SearchMatrix(params) {
 }
 
 async function fetchDataMatrix(params) {
-  const url = `${url_api}/api/RasciMapping`;
+  const url = `${url_api}/api/RasciMatrix`;
   try {
     const result = await ajaxRequest(url, "POST", params);
     return result;
@@ -127,8 +135,8 @@ async function fetchDataMatrix(params) {
   }
 }
 
-async function fetchSelectLevel() {
-  const url = `${url_api}/api/Utilities/selection?Page=1&Type=level`;
+async function fetchSelectLevel(draftId) {
+  const url = `${url_api}/api/Utilities/selection?Page=1&Type=level&DraftId=${draftId}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -138,11 +146,22 @@ async function fetchSelectLevel() {
   }
 }
 
-async function fetchDraftProsbis(payload) {
-  const url = `${url_api}/api/BusinessProcess/draft?${payload}`;
+async function fetchDraftProsbis(params) {
+  const url = `${url_api}/api/RasciMatrix/draft/list?${params}`;
   try {
     const result = await ajaxRequest(url, "GET");
-    return result;
+    return result.data;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function fetchDraftListProsbis(idDraft, query) {
+  const url = `${url_api}/api/RasciMatrix/draft/list/${idDraft}?${query}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return result.data;
   } catch (error) {
     console.error("Error fetching data from API");
     throw error;
@@ -150,7 +169,7 @@ async function fetchDraftProsbis(payload) {
 }
 
 async function fetchFilterJobList() {
-  const url = `${url_api}/api/RasciMapping/list-rasci-filter`;
+  const url = `${url_api}/api/RasciMatrix/list-rasci-filter`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -161,7 +180,7 @@ async function fetchFilterJobList() {
 }
 
 async function fetchDraftProsbisByid(payload) {
-  const url = `${url_api}/api/BusinessProcess/draft-detail/${payload}`;
+  const url = `${url_api}/api/RasciMatrix/draft/detail/${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -172,7 +191,7 @@ async function fetchDraftProsbisByid(payload) {
 }
 
 async function submitDraftProsbis(payload) {
-  const url = `${url_api}/api/BusinessProcess`;
+  const url = `${url_api}/api/RasciMatrix/draft/save`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     return result;
@@ -205,7 +224,7 @@ async function draftSubmittoApproval(payload, id) {
 }
 
 async function deleteProsbisDraft(id) {
-  const url = `${url_api}/api/BusinessProcess/draft/${id}`;
+  const url = `${url_api}/api/RasciMatrix/draft/delete?draftId=${id}`;
   try {
     const result = await ajaxRequest(url, "DELETE");
     return result;
@@ -214,27 +233,77 @@ async function deleteProsbisDraft(id) {
     throw error;
   }
 }
+async function createDraftRasci(payload) {
+  const url = `${url_api}/api/RasciMatrix/draft/create`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function endpointRenameDraft(params, payload) {
+  const url = `${url_api}/api/RasciMatrix/draft/rename/${params}`;
+  try {
+    const result = await ajaxRequest(url, "PUT", payload);
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchDetailDraftActivity(id) {
+  const url = `${url_api}/api/RasciMatrix/draft/detail-list/${id}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
-      fetchDataMatrix(),
-      fetchSelectLevel(),
-      fetchFilterJobList(),
-    ]);
+    // const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
+    //   fetchDataMatrix(),
+    //   fetchSelectLevel(),
+    //   fetchFilterJobList(),
+    // ]);
+    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
     appState.prosbisLevel = prosbisLvl?.data.result;
-    const combinedData = [
-      ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
-      ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
-      ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
-      ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
-      ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
-      ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
-    ];
-    appState.filterJobList = combinedData;
+    // const combinedData = [
+    //   ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
+    //   ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
+    //   ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
+    //   ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
+    //   ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
+    //   ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
+    // ];
+    // appState.filterJobList = combinedData;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

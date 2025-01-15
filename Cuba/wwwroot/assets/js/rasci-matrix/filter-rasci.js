@@ -306,11 +306,9 @@ const applyFilterRasci = async () => {
     busProsLevel: getState("levelFilter"),
     rasciNotation: getState("rasciNotationFilter"),
   };
-
   const resultMatrix = await fetchDataMatrix(payload);
 
   if (resultMatrix.status === 200) {
-    console.log("first", resultMatrix);
     resultAllData(resultMatrix?.data);
     setTimeout(() => {
       spinner.style.display = "none";

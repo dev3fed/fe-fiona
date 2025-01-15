@@ -76,11 +76,17 @@
         background-color: #EAEAEB;
         height: 400px;
         background-image: url("/assets/images/rasci/empty_draft.svg");
-        background-position: center;
+        background-position: center 100px;
         background-repeat: no-repeat;
-        background-size: contain;
         background-size: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 235px;
     }
+
+
 
     #table-draft {
         display: none;
@@ -90,12 +96,19 @@
         display: block;
     }
 </style>
-<div class="col-12 " id="empty-draft">
-    <div class="empty-body">
 
+<div class="col-12" id="empty-draft">
+    <partial name="ModalAddEmptyDraft" />
+    <div class="empty-body">
+        <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="modal"
+            data-bs-target="#modalformEmptydraft">
+            <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon">
+            Created Draft RASCI Matrix
+        </button>
     </div>
 </div>
 <div class="col-12" id="table-draft">
+    <partial name="ModalAddDraft" />
     <partial name="ModalDeleteNotif" />
 
     <div class="row">
@@ -113,19 +126,25 @@
                     data-feather="search"></i>
             </div>
         </div>
+        <div class="col-5 d-flex justify-content-end">
+            <button class="btn btn-primary  btn-icon" type="button" data-bs-toggle="modal" style="margin-right:10px"
+                data-bs-target="#modalformDraft">
+                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;">
+                Created Draft RASCI Matrix
+            </button>
+        </div>
         <div class="col-12 mt-3">
-            <div class="table-responsive" style=" max-height: 450px;">
-                <table class="table tbl-border-add-prosbis">
+            <div class="table-responsive scrollable" style=" max-height: 420px;">
+                <table class="table tbl-border-add-prosbis ">
                     <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
                         <tr>
                             <th scope="col" style="width: 50px;text-align:center">
                                 No
                             </th>
-                            <th scope="col" style="width: 200px">Request ID</th>
-                            <th scope="col">Draft Name</th>
+                            <th scope="col" style="width: 300px">Draft Name</th>
+                            <th scope="col" style="width: 250px">Organization Data Source</th>
                             <th scope="col" style="width: 150px">Created By</th>
-                            <th scope="col" style="width: 150px">Created Date</th>
-                            <th scope="col">Type</th>
+                            <th scope="col" style="width: 150px">Updated By</th>
                             <th scope="col" style="text-align: center;">Action</th>
                         </tr>
                     </thead>
@@ -134,11 +153,11 @@
                 </table>
             </div>
         </div>
-        <div class="col-10 mt-3">
+        <div class="col-9 mt-3">
             <div id="total-page">
             </div>
         </div>
-        <div class="col-2 mt-3">
+        <div class="col-3 mt-3 d-flex justify-content-end">
             <div id="list-page">
             </div>
         </div>

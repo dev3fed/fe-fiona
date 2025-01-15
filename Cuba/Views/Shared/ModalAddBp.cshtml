@@ -85,7 +85,7 @@
         height: auto;
         border: 1px solid #BFBFC2;
         border-radius: 4px;
-        padding: 5px;
+        padding: 15px;
     }
 
     /* Custom scrollbar styles */
@@ -173,7 +173,7 @@
                             </div>
                             <div class="d-flex mt-2 justify-content-end">
                                 <button class="btn btn btn-primary" type="button" id="btn-selectedjob"
-                                    onclick="triggleSelectJob()" disabled>
+                                    onclick="triggleSelectJob()">
                                     Selected
                                     Job</button>
                             </div>
@@ -191,9 +191,8 @@
                 <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal" onclick="backFromModalBp()">
                     Back</button>
                 <div>
-                    <button class="btn btn btn-primary" type="button" data-bs-toggle="modal"
-                        data-bs-target="#modalSaveDraft" id="saveDraftBtn" disabled> Save as
-                        draft</button>
+                    <button class="btn btn btn-primary" type="button" id="saveDraftBtn" onclick="saveAsDraft()"> Save
+                    </button>
                 </div>
             </div>
         </div>

@@ -61,9 +61,53 @@
     .btn-outline-light:hover img {
         filter: brightness(0) invert(1);
     }
+
+    .btn-small-icon {
+        padding: 2px 5px;
+        font-size: 12px;
+    }
+
+    .btn-small-icon img {
+        font-size: 10px;
+    }
+
+    .btn-rounded {
+        border-radius: 26px;
+        margin: 5px;
+    }
+
+    .icon-svg {
+        stroke: #000;
+        /* Warna default stroke */
+        transition: stroke 0.3s ease;
+        /* Transisi untuk efek halus */
+    }
+
+    .btn:hover .icon-svg {
+        stroke: #fffff;
+        /* Warna stroke tetap saat tombol di-hover */
+    }
+
+    .long-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        white-space: normal;
+        flex: 1;
+    }
 </style>
 
 <div class="card" style="border-radius:8px">
+    <!-- Start Modal Rename Draft  -->
+    <partial name="ModalRenameDraft" />
+    <!-- End Modal Rename Draft  -->
+
+    <!-- Start Modal Activity Detail  -->
+    <partial name="ModalActivityDetail" />
+    <!-- End Modal Activity Detail  -->
+
     <div style="padding:15px">
         <h6 class="f-w-600">Draft Detail</h6>
         <!-- Card info start-->
@@ -93,12 +137,12 @@
             <button class="btn btn-outline-light" type="button" onclick="handleBack()">
                 <i class="icon-arrow-left"></i> Back
             </button>
-            <button class="btn btn-outline-light" type="button" onclick="deleteDraftFromdetail()">
+            <button class="btn btn-outline-danger" type="button" onclick="deleteDraftFromdetail()">
                 <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
             </button>
-            <button class=" btn btn-outline-light" type="button" onclick="handleOpenDetailBp()">
+            @* <button class=" btn btn-outline-light" type="button" onclick="handleOpenDetailBp()">
                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit Draft
-            </button>
+            </button> *@
             <button class="btn btn-primary" type="button" onclick="openDetailApproval()"> Submit to Approval<i
                     class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
         </div>

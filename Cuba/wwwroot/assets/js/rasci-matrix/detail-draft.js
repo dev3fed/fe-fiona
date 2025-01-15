@@ -1,69 +1,396 @@
 async function detailDraft() {
   try {
     const dataDraft = getState("dataDetailDraft");
+    const payload = {
+      Page: 1,
+      PageSize: 5,
+    };
+    const queryString = new URLSearchParams(payload).toString();
+    const listData = await fetchDraftListProsbis(dataDraft.draftId, queryString);
     if (dataDraft) {
-      const dataInfo = dataDraft.draftInfo;
-      const dataDetail = dataDraft.draftDetail[0];
-      const notation = JSON.parse(dataDetail.rasciNotation).filter((item) => item.IsChecked === true);
       const bodyInfo = `
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Draft Name</label>
-        <label style="font-weight: 600;font-size: 14px">${dataInfo.draftName}</label>
-        <label>${dataInfo.reqId}</label>
+        <div style="display: flex; align-items: center; font-weight: 600; font-size: 14px;">
+          <span style="flex-grow: 1; text-align: center; padding-left: 10px">${dataDraft.draftName}</span>
+             <button class=" btn btn-outline-light btn-small-icon" type="button" onclick="handleRename()">
+              <img src="/assets/images/rasci/icon_pencil.svg" alt="Filter Icon">
+          </button>
+        </div>
+      </div>
+      <div class="col-3 custom-col">
+        <label style="color:#9F9FA5">Organization Data Source</label>
+        <label style="font-weight: 600;font-size: 14px">${dataDraft.draftName}</label>
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Created by</label>
-        <label style="font-weight: 600;font-size: 14px">${dataInfo.createdBy ? dataInfo.createdBy : "-"}</label>
-      </div>
-      <div class="col-3 custom-col">
-        <label style="color:#9F9FA5">Created Date</label>
-        <label style="font-weight: 600;font-size: 14px">${
-          dataInfo.createdAt ? new Date(dataInfo.createdAt).toLocaleDateString() : "-"
+        <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
+        <label style="color:#9F9FA5">${
+          dataDraft.createdDate ? new Date(dataDraft.createdDate).toLocaleDateString() : "-"
         }</label>
       </div>
       <div class="col-3 custom-col">
-        <label style="color:#9F9FA5">Type</label>
-        <label style="font-weight: 600;font-size: 14px">${dataInfo.typeDetail}</label>
-      </div>`;
-      const bodyDetail = `
-       <div class="col-4 custom-col" style="text-align: left;">
-            <span style="color:#9F9FA5">Business Process Name</span>
-            <label style="font-weight: 600;font-size: 14px">${dataDetail.busProsNameAfter}</label>
-        </div>
-        <div class="col-1 custom-col">
-            <span style="color:#9F9FA5">Level</span>
-            <label style=" font-weight: 600;font-size: 14px">${dataDetail.level}</label>
-        </div>
-        <div class="col-7 custom-col" style="text-align: left;">
-            <span style="color:#9F9FA5">Business Process Parent</span>
-            <label style="font-weight: 600;font-size: 14px">${dataDetail.parentIndex} - ${dataDetail.busProsNameBefore}</label>
-        </div>
-      `;
-      const bodyJob = `
-        <div class=" custom-row-full">
-            <span style="color:#9F9FA5">Job Title</span>
-            <label style="font-weight: 600;font-size: 14px;padding-bottom: 10px;">${dataDetail?.jobTitle.name}</label>
-        </div>
-        <div class=" custom-row-full">
-            <span style="color:#9F9FA5">Rasci Notasi</span>
-          <ul style="list-style-type:disc;padding-left:20px">
-          ${notation.map((item) => `<li>${item.RasciCode} &nbsp : &nbsp ${item.Comment}</li>`).join("")}
-          </ul>
-         
-        </div>
-      `;
+        <label style="color:#9F9FA5">Updated by</label>
+        <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
+        <label style="color:#9F9FA5">${
+          dataDraft.createdDate ? new Date(dataDraft.createdDate).toLocaleDateString() : "-"
+        }</label>
+      </div>
+    `;
       const draftInfo = document.getElementById("draft-info");
-      const draftDetail = document.getElementById("detail-prosbis");
-      const draftJob = document.getElementById("detail-job");
-      if (draftInfo && draftDetail && draftJob) {
-        draftInfo.innerHTML = bodyInfo;
-        draftDetail.innerHTML = bodyDetail;
-        draftJob.innerHTML = bodyJob;
-      }
+      if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
+    renderTableActivity(listData);
   } catch (error) {}
 }
 
+async function renderTableActivity(listData) {
+  try {
+    const bodyDetail = `
+        <div class="col-12" style="text-align: left;">
+           <span style="font-size:13px">Activity Type :</span>
+           <button class="btn btn-outline-light btn-rounded" style="width:60px" type="button">
+              All
+            </button>
+            <button class="btn btn-outline-light btn-rounded" type="button">
+              Add New Business Process
+            </button>
+            <button class="btn btn-outline-light btn-rounded" type="button">
+              Add/Edit RASCI
+            </button>
+            <button class="btn btn-outline-light btn-rounded" type="button">
+              Edit Business Process
+            </button>
+            <button class="btn btn-outline-light btn-rounded" type="button">
+              Delete Business Process
+            </button>
+       </div>
+       <div class="col-4  mt-3" style="text-align: left;">
+          <div class="faq-form">
+                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                    data-feather="search"></i>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+          <div class="table-responsive scrollable" style=" max-height: 350px;">
+              <table class="table tbl-border-add-prosbis">
+                  <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
+                      <tr>
+                          <th scope="col" style="width: 50px;text-align:center">
+                              No
+                          </th>
+                          <th scope="col" style="width: 180px">Activity Type</th>
+                          <th scope="col" style="width: 230px">Position</th>
+                          <th scope="col" style="width: 250px">Business Process</th>
+                          <th scope="col" style="width: 150px">Created By</th>
+                          <th scope="col" style="width: 150px">Updated By</th>
+                          <th scope="col" style="width: 100px;text-align: center;">Action</th>
+
+                      </tr>
+                  </thead>
+                  <tbody id="body-draft">
+                      ${
+                        listData.data.length === 0
+                          ? `<tr>
+                            <td colspan="7" style="text-align: center; color: #9F9FA5;">
+                              Data not available
+                            </td>
+                          </tr>`
+                          : listData.data
+                              .map(
+                                (data, index) =>
+                                  `
+                              <tr>
+                                  <td style="width: 50px;text-align:center">
+                                      ${index + 1}
+                                  </td>
+                                  <td>
+                                      ${data.draftType ? data.draftType : "-"}
+                                  </td>
+                                  <td>
+                                      ${
+                                        data.jobPosition.length === 0
+                                          ? ""
+                                          : data.jobPosition.length === 1
+                                          ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}">${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}</div>`
+                                          : `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
+                                              data.jobPosition[0].jobCode
+                                            } - ${data.jobPosition[0].jobName}">${data.jobPosition[0].jobCode} - ${
+                                              data.jobPosition[0].jobName
+                                            }</div>
+                                              <small style="color:#9F9FA5;cursor: pointer">+${
+                                                data.jobPosition.length - 1
+                                              } more</small>`
+                                      }
+                                  </td>
+                                  <td>
+                                      ${
+                                        data.businessProcessName.length === 0
+                                          ? ""
+                                          : data.businessProcessName.length === 1
+                                          ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}">${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}</div>`
+                                          : `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
+                                              data.businessProcessName[0].indexGroup
+                                            } - ${data.businessProcessName[0].description}">${
+                                              data.businessProcessName[0].indexGroup
+                                            } - ${data.businessProcessName[0].description}</div>
+                                              <small style="color:#9F9FA5;cursor: pointer">+${
+                                                data.businessProcessName.length - 1
+                                              } more</small>`
+                                      }
+                                    </td>
+                                  <td>
+                                      ${data.createdBy ? data.createdBy : "-"}
+                                      <br>
+                                      <small style="color:#9F9FA5">${
+                                        data.createdDate ? "at " + new Date(data.createdDate).toLocaleDateString() : "-"
+                                      }</small>
+                                  </td>
+                                  <td>
+                                      ${data.modifiedBy ? data.modifiedBy : "-"}
+                                      <br>
+                                      <small style="color:#9F9FA5">${
+                                        data.modifiedDate
+                                          ? "at " + new Date(data.modifiedDate).toLocaleDateString()
+                                          : "-"
+                                      }</small>
+                                  </td>
+                                  <td style="text-align: center;">
+                                    <button class=" btn btn-outline-light btn-small-icon" type="button" onclick="triggleDetailActivity('${
+                                      data.draftListId
+                                    }')">
+                                      <img src="/assets/images/rasci/icon_detail.svg" alt="Filter Icon">
+                                    </button>  
+                                    <button class=" btn btn-outline-light btn-small-icon" type="button">
+                                      <img src="/assets/images/rasci/icon_pencil.svg" alt="Filter Icon">
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-small-icon" type="button">
+                                      <img src="/assets/images/rasci/icon_delete.svg" alt="Filter Icon" class="icon-svg">
+                                    </button>
+                                  </td>
+                              </tr>
+                              `,
+                              )
+                              .join("")
+                      }
+                    </tbody>
+              </table>
+            </div>
+        </div>
+        <div class="col-9 mt-3">
+            <div id="total-pagedraft">
+            </div>
+        </div>
+        <div class="col-3 mt-3 d-flex justify-content-end" style="padding-right: 20px;">
+            <div id="list-pagedraft">
+            </div>
+        </div>
+     `;
+
+    const draftDetail = document.getElementById("detail-prosbis");
+    if (draftDetail) {
+      draftDetail.innerHTML = bodyDetail;
+    }
+    const itemsPerPage = listData.pageSize;
+    const totalPages = Math.ceil(listData.total / itemsPerPage);
+    const currentPage = listData.page;
+    const start = (listData.page - 1) * itemsPerPage + 1;
+    renderPaginationDetailDraft(currentPage, totalPages);
+    const totalPage = document.getElementById("total-pagedraft");
+
+    if (totalPage) {
+      totalPage.innerHTML = `
+          <div class="row">
+            <div class="col-2">
+              <select class="form-select digits"  style="width:62%;" id="limitDetailPage" onchange="handleChangeIDetailItemsPerPage(event)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="col-10">
+              <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
+        listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
+      } of ${listData.total} records</label>
+            </div>
+          </div>
+        `;
+    }
+    let selectElement = document.getElementById("limitDetailPage");
+    selectElement.value = listData.pageSize;
+
+    initializeTooltips();
+    // Inisialisasi Feather Icons
+    feather.replace();
+  } catch (error) {}
+}
+function renderPaginationDetailDraft(currentPage, totalPages) {
+  const paginationContainer = document.getElementById("list-pagedraft");
+  if (!paginationContainer) return;
+
+  let pagesToShow = 3;
+  let startPage = Math.max(currentPage - Math.floor(pagesToShow / 2), 1);
+  let endPage = Math.min(startPage + pagesToShow - 1, totalPages);
+
+  if (endPage - startPage + 1 < pagesToShow) {
+    startPage = Math.max(endPage - pagesToShow + 1, 1);
+  }
+
+  const paginationButtons = [];
+  paginationButtons.push(`
+    <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+      <a 
+        class="page-link" 
+        href="javascript:void(0)"  
+        ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${1})"`}
+      >
+      ←
+      </a>
+    </li>
+  `);
+
+  paginationButtons.push(`
+      <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+        <a 
+          class="page-link" 
+          href="javascript:void(0)"  
+          ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${currentPage - 1})"`}
+        >
+          «
+        </a>
+      </li>
+    `);
+  for (let i = startPage; i <= endPage; i++) {
+    paginationButtons.push(`
+      <li class="page-item ${i === currentPage ? "active" : ""}">
+        <a class="page-link" href="javascript:void(0)" onclick="handleDetailPageChange(${i})">${i}</a>
+      </li>
+    `);
+  }
+
+  paginationButtons.push(`
+      <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+        <a 
+          class="page-link" 
+          href="javascript:void(0)" 
+          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${currentPage + 1})"`}
+        >
+          » 
+        </a>
+      </li>
+    `);
+  paginationButtons.push(`
+      <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+        <a 
+          class="page-link" 
+          href="javascript:void(0)" 
+          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${totalPages})"`}
+        >
+          →
+        </a>
+      </li>
+    `);
+
+  paginationContainer.innerHTML = `
+    <nav aria-label="Page navigation">
+      <ul class="pagination id="pagination-list" pagination-primary">
+        ${paginationButtons.join("")}
+      </ul>
+    </nav>
+  `;
+}
+
+async function handleDetailPageChange(pageNumber) {
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+  setState("payloadDetailDraftPage", { ...payloadDetailDraftPage, Page: pageNumber });
+  const payload = {
+    Page: pageNumber,
+    PageSize: payloadDetailDraftPage.PageSize,
+  };
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = new URLSearchParams(payload).toString();
+  const listData = await fetchDraftListProsbis(dataDraft.draftId, queryString);
+  renderTableActivity(listData);
+}
+async function handleChangeIDetailItemsPerPage(event) {
+  const itemsPerPage = parseInt(event.target.value, 10);
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+  setState("payloadDetailDraftPage", { ...payloadDetailDraftPage, PageSize: itemsPerPage });
+  const payload = {
+    Page: payloadDetailDraftPage.Page,
+    PageSize: itemsPerPage,
+  };
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = new URLSearchParams(payload).toString();
+  const listData = await fetchDraftListProsbis(dataDraft.draftId, queryString);
+  renderTableActivity(listData);
+}
+async function handleRename() {
+  const modal = new bootstrap.Modal(document.getElementById("modalRenameDraft"));
+  modal.show();
+  const dataDraft = getState("dataDetailDraft");
+  const draftRename = document.getElementById("draftRename");
+  if (draftRename && dataDraft) {
+    draftRename.value = dataDraft.draftName || "";
+  }
+}
+async function handleSubmitRenameDraft() {
+  const draftRename = document.getElementById("draftRename");
+  const spinner = document.getElementById("loadingRenameDraft");
+  spinner.style.display = "inline-block";
+  const dataDraft = getState("dataDetailDraft");
+  const payload = {
+    draftName: draftRename.value,
+  };
+  const result = await endpointRenameDraft(dataDraft.draftId, payload);
+  const modalRenameDraft = document.getElementById("modalRenameDraft");
+  const modal = bootstrap.Modal.getInstance(modalRenameDraft);
+  if (modal) modal.hide();
+  if (result.success === true) {
+    setTimeout(() => {
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">${result?.data.data.draftName} has been change</div>`,
+          },
+        },
+      }).then(async () => {
+        spinner.style.display = "none";
+        const id = result.data.data.draftId;
+        const dataDraft = await fetchDraftProsbisByid(id);
+        setState("dataDetailDraft", dataDraft.data);
+      });
+    }, 200);
+  } else {
+    setTimeout(() => {
+      swal({
+        title: "FAILED",
+        icon: "error",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">${draftRename.value} draft is already exist, please change to another draft name</div>`,
+          },
+        },
+      }).then(async () => {
+        spinner.style.display = "none";
+        const id = result.data.data.draftId;
+        const dataDraft = await fetchDraftProsbisByid(id);
+        setState("dataDetailDraft", dataDraft.data);
+      });
+    }, 200);
+  }
+}
 async function handleOpenDetailBp() {
   const modal = new bootstrap.Modal(document.getElementById("modalEdit"));
   modal.show();
@@ -338,13 +665,12 @@ async function saveEditDraft() {
       const afterSave = await fetchDraftProsbisByid(dataDraft.draftInfo.id);
       setState("dataDetailDraft", afterSave.data);
       const payload = {
-        Type: "draft",
         Page: 1,
-        Limit: 5,
+        PageSize: 5,
       };
       const queryString = new URLSearchParams(payload).toString();
       const dataTableDraft = await fetchDraftProsbis(queryString);
-      loadTableBodyDraft(dataTableDraft.data.data);
+      loadTableBodyDraft(dataTableDraft);
     }
   } catch (error) {
     console.log(error);
@@ -420,15 +746,14 @@ async function confirmDeleteDetailDraft() {
       handleBack();
       setState("deleteDraftProsbis", 0);
       const payload = {
-        Type: "draft",
         Page: 1,
-        Limit: 5,
+        PageSize: 5,
       };
       const queryString = new URLSearchParams(payload).toString();
       const dataDraft = await fetchDraftProsbis(queryString);
-      const IsNotEmpty = dataDraft.data.data.length;
+      const IsNotEmpty = dataDraft.data.length;
       changeemptyPageDraft(IsNotEmpty);
-      loadTableBodyDraft(dataDraft.data.data);
+      loadTableBodyDraft(dataDraft);
     }
   } catch (error) {}
 }

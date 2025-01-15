@@ -72,10 +72,10 @@ async function applyCompare() {
     id: item.id.replace("selected-job-", ""),
     name: item.textContent.trim(),
   }));
-  const sentId = selectedItems.map((item) => item.id).join(",");
+  const sentId = selectedItems.map((item) => item.id);
   const payload = {
     type: "job",
-    parentId: sentId,
+    jobId: sentId,
   };
   try {
     const resultMatrix = await fetchDataMatrix(payload);
