@@ -3,7 +3,7 @@
 
 <style>
     .modal-dialog.modal-activitydetail {
-        max-width: 62%;
+        max-width: 68%;
         margin: 60px auto;
     }
 
@@ -38,31 +38,6 @@
         margin-top: 10px
     }
 
-    .scrollable {
-        max-height: 220px;
-        overflow-y: auto;
-        padding-right: 10px;
-    }
-
-    .scrollable::-webkit-scrollbar {
-        width: 10px;
-        height: 8px;
-    }
-
-    .scrollable::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-        border-radius: 10px;
-    }
-
-    .scrollable::-webkit-scrollbar-thumb {
-        background: #006ca9;
-        border-radius: 10px;
-    }
-
-    .scrollable::-webkit-scrollbar-thumb:hover {
-        background: #006ca9;
-    }
-
     .tooltip-inner {
         background-color: #ffffff !important;
         color: #000000;
@@ -91,6 +66,34 @@
         color: red;
         margin-top: 5px;
     }
+
+    /* Custom scrollbar styles */
+    .scrollable-detailDraft::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-detailDraft::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-detailDraft::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-detailDraft::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+
+    .scrollable-detailDraft {
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-right: 1px;
+        margin-top: 15px;
+    }
 </style>
 
 <div class="modal fade" id="modalActivityDetail" tabindex="-1" role="dialog" aria-labelledby="modalActivityDetailLabel"
@@ -109,11 +112,11 @@
                     <div class="row" style="padding-top: 20px;" id="header-avtivity-detail">
                     </div>
                 </div>
-                <div class="custom-card-draft">
+                <div class="custom-card-draft" style="padding-top:30px">
                     <div class="header-card-draft" id="label-position">
                     </div>
-                    <div class="row scrollable" style="padding-top: 10px;max-height: 320px;"
-                        id="footer-activity-detail">
+
+                    <div class="row scrollable-detailDraft" id="footer-activity-detail">
                     </div>
 
                 </div>

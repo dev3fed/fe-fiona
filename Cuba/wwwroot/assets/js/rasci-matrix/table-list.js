@@ -137,7 +137,11 @@ function loadTableBody(prosbisList) {
                   <ul class="dropdown-menu " aria-labelledby="dropdownMenuButton">
                     <li onclick="onModalProsbis()"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
                     <li onclick="onModalChoose('editProsbis')"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
-                    <li onclick="onModalChoose('deleteProsbis')"><a class="dropdown-item"><img src="/assets/images/rasci/trash.svg" alt="Filter Icon">Delete</a></li>
+                    <li onclick="onModalChoose('deleteProsbis'); setState('dataDeleteProsbis', ${JSON.stringify(
+                      val,
+                      null,
+                      2,
+                    )});" ><a class="dropdown-item" style="color: red !important;"><img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete</a></li>
                   </ul>
                 </div>
               </div>
@@ -376,4 +380,6 @@ async function clearInput() {
 async function openModalDeleteBusinesspro() {
   const modal = new bootstrap.Modal(document.getElementById("modalDeleteBp"));
   modal.show();
+  const dataProsbis = getState("dataDeleteProsbis");
+  console.log("dataProsbis", dataProsbis);
 }

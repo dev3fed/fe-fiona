@@ -19,6 +19,7 @@ const appState = new Proxy(
     visibleJobs: [],
     selectedJobId: [],
     disabledJobId: [],
+    dataDeleteProsbis: {},
     payloadDraftList: {
       Page: 1,
       PageSize: 5,
@@ -169,7 +170,7 @@ async function fetchDraftListProsbis(idDraft, query) {
 }
 
 async function fetchFilterJobList() {
-  const url = `${url_api}/api/RasciMatrix/list-rasci-filter`;
+  const url = `${url_api}/api/JobTitle`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -285,25 +286,25 @@ async function fetchDetailDraftActivity(id) {
 
 async function fetchData() {
   try {
-    // const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
-    //   fetchDataMatrix(),
-    //   fetchSelectLevel(),
-    //   fetchFilterJobList(),
-    // ]);
-    const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
+    const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
+      fetchDataMatrix(),
+      fetchSelectLevel(),
+      fetchFilterJobList(),
+    ]);
+    // const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
     appState.resultJabatan = dataMatrix?.data.jobTitle;
     appState.resultProsbis = dataMatrix?.data.businessProcess;
     appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
     appState.prosbisLevel = prosbisLvl?.data.result;
-    // const combinedData = [
-    //   ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
-    //   ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
-    //   ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
-    //   ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
-    //   ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
-    //   ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
-    // ];
-    // appState.filterJobList = combinedData;
+    const combinedData = [
+      ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
+      ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
+      ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
+      ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
+      ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
+      ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
+    ];
+    appState.filterJobList = combinedData;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

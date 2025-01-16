@@ -91,6 +91,11 @@
         color: red;
         margin-top: 5px;
     }
+
+    .spinner-border {
+        height: 16px;
+        width: 16px;
+    }
 </style>
 
 <div class="modal fade" id="modalformDraft" tabindex="-1" role="dialog" aria-labelledby="modalformDraftLabel"
@@ -121,8 +126,12 @@
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
                             class="icon-arrow-left"></i> Back</button>
-                    <button class="btn btn-primary" type="button" onclick="handleSaveDraft()">
-                        Save Draft
+                    <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="handleSaveDraft()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingSavedraft" role="status"></div>
+                            <span class="btn-text">Save Draft</span>
+                        </div>
                     </button>
                 </div>
             </div>

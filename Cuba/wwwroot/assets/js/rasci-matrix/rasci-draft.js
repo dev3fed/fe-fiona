@@ -342,6 +342,8 @@ async function confirmDeleteProsbisDraft() {
 
 async function handleSaveDraft() {
   const draftNameInput = document.getElementById("input-draftname").value;
+  const spinner = document.getElementById("loadingSavedraft");
+  spinner.style.display = "inline-block";
   const payload = {
     draftName: draftNameInput,
     draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
@@ -365,17 +367,18 @@ async function handleSaveDraft() {
           content: {
             element: "div",
             attributes: {
-              innerHTML: `<div style="text-align: center;">${result?.data.data.draftName} draft has been saved</div>`,
+              innerHTML: `<div style="text-align: center;">${result?.data.draftName} draft has been saved</div>`,
             },
           },
         }).then(async () => {
+          spinner.style.display = "none";
           const payload = {
             Page: 1,
             PageSize: 5,
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data)) {
+          if (dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
             loadTableBodyDraft(dataDraft);
@@ -389,14 +392,15 @@ async function handleSaveDraft() {
 
 async function handleSaveEmptyDraft() {
   const emptydraftNameInput = document.getElementById("input-emptydraftname").value;
+  const spinner = document.getElementById("loadingEmptysavedraft");
+  spinner.style.display = "inline-block";
   const payload = {
     draftName: emptydraftNameInput,
     draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
   };
   try {
     const result = await createDraftRasci(payload);
-    console.log("first", result);
-    if (result.status === 200) {
+    if (result.success === true) {
       const modaldraft = document.getElementById("modalformEmptydraft");
       const modal = bootstrap.Modal.getInstance(modaldraft);
       if (modal) {
@@ -416,6 +420,7 @@ async function handleSaveEmptyDraft() {
             },
           },
         }).then(async () => {
+          spinner.style.display = "none";
           const payload = {
             Page: 1,
             PageSize: 5,

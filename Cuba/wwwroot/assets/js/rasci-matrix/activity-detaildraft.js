@@ -20,17 +20,19 @@ async function triggleDetailActivity(id) {
           <label style="font-weight: 600;font-size: 14px">5</label>
         </div>
          <div class="col-12 custom-col" style="text-align: left">
-         <hr>
+         <hr style="margin-right: 10px">
           <label style="color:#9F9FA5">Parent</label>
-          <label style="font-weight: 600;font-size: 14px">${dataHeader.parentId} - ${dataHeader.parentName}</label>
+          <label style="font-weight: 600;font-size: 14px">${dataHeader.parentId} - ${
+      dataHeader.parentName ? dataHeader.parentName : "-"
+    }</label>
         </div>
       `;
     const elementLabel = `<span>Selected Position (total: ${dataFooter.length})</span>`;
 
     const elementFooter = dataFooter
-      .map((item) => {
+      .map((item, index) => {
         return `
-        <div class="custom-row-full">
+         ${index !== 0 ? "<div><hr></div>" : " "}
         <span class="mb-2" style="display: flex; font-weight: 600; font-size: 14px;">
         ${item.jobCode} - ${item.jobName}
         </span>
@@ -51,8 +53,6 @@ async function triggleDetailActivity(id) {
             `,
           )
           .join("")}
-
-        </div>
         `;
       })
       .join("");

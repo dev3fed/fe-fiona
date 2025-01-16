@@ -136,9 +136,11 @@ async function handleContinue() {
       }
       spinner.style.display = "none";
       const type = typeAction.value;
+      console.log("first", type);
       if (type === "addNewBp") {
         onModalAddBp();
       } else if (type === "addNotation") {
+        console.log("first", type);
         onModalAddNotation();
       } else if (type === "editNotation") {
         openModalNotRow(typeJob.value, typeProsbis.value);

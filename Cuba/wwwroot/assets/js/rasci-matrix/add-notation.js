@@ -1,6 +1,7 @@
 // start section add notation by column row
 function onModalAddNotation() {
   const modal = new bootstrap.Modal(document.getElementById("modalAddNotation"));
+  console.log("modal", modal);
   modal.show();
   const prosbisLevel = getState("prosbisLevel");
   const rasciNotation = getState("rasciNotation") || [];
@@ -18,14 +19,8 @@ function onModalAddNotation() {
     <div class="col-12">
       <div class="mb-2">
         <label class="form-label">Position</label>
-        <select class="selectpicker form-control digits" data-live-search="true">
-          <option>Choose</option>
-          <option>Option 1</option>
-          <option>Option 2</option>
-          <option>Option 3</option>
-          <option>Option 4</option>
-          <option>Option 5</option>
-        </select>
+         <select class="form-select digits" name="jobIdNotation" id="jobIdNotation">
+    </select>
       </div>
     </div>
     <div class="col-12">
@@ -44,34 +39,34 @@ function onModalAddNotation() {
     </div>
 `;
 
-  const bodySelectBusiness = `
-    <div class="row">
-      <div class="col-3">
-        <select class="form-select digits">
-          <option>Level</option>
-          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
-        </select>
-      </div>
-      <div class="col-9">
-        <select class="form-select digits"  disabled>
-          <option>Choose</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-        </select>
-      </div>
-    </div>
-    `;
-  theadContent = `<tr>
-        <th scope="col" style="width: 50px">Check</th>
-        <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
-        <th scope="col">Comment (Optional)</th>
-        </tr>`;
+  // const bodySelectBusiness = `
+  //   <div class="row">
+  //     <div class="col-3">
+  //       <select class="form-select digits">
+  //         <option>Level</option>
+  //         ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
+  //       </select>
+  //     </div>
+  //     <div class="col-9">
+  //       <select class="form-select digits"  disabled>
+  //         <option>Choose</option>
+  //         <option>2</option>
+  //         <option>3</option>
+  //         <option>4</option>
+  //         <option>5</option>
+  //       </select>
+  //     </div>
+  //   </div>
+  //   `;
+  // theadContent = `<tr>
+  //       <th scope="col" style="width: 50px">Check</th>
+  //       <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
+  //       <th scope="col">Comment (Optional)</th>
+  //       </tr>`;
 
   tblRasciNotation(rasciNotation);
-  document.getElementById("select-business").innerHTML = bodySelectBusiness;
-  document.getElementById("tbl-notation-header").innerHTML = theadContent;
+  // document.getElementById("select-business").innerHTML = bodySelectBusiness;
+  // document.getElementById("tbl-notation-header").innerHTML = theadContent;
 
   const bodyContent = document.getElementById("form-notation");
   if (bodyContent) {
@@ -80,6 +75,48 @@ function onModalAddNotation() {
 
   // Initialize Bootstrap Select
   $(".selectpicker").selectpicker();
+  selectJobNotation();
+}
+
+function selectJobNotation() {
+  const dataProsbis = getState("insertProsbis");
+  $("#jobIdNotation")
+    .select2({
+      dropdownParent: $("#modalAddNotation"),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "job",
+            draftId: dataProsbis.draftId,
+          };
+        },
+        processResults: function (data) {
+          if (data && data.data) {
+            return {
+              results: data.data.res,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
 }
 
 const handleRadioChange = (event) => {
