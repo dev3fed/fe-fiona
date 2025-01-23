@@ -20,6 +20,11 @@ const selectedData = {
   selectedJobReference: null,
 };
 
+const organizationAttribute = {
+  orgUnitId: null,
+  orgUnitName: null,
+};
+
 const dataJobDesc = [
   {
     identifikasi: {
@@ -5943,50 +5948,91 @@ const dataJobDescCompare = [
   // },
 ];
 
-const dataListJobDescription = [
+// const dataListJobDescription = [
+//   {
+//     id: 1,
+//     jobName: "Manager Internal Communication",
+//     jobStatus: "not available",
+//   },
+//   {
+//     id: 2,
+//     jobName: "SBM Sumsel VI Gas",
+//     jobStatus: "not available",
+//   },
+//   {
+//     id: 3,
+//     jobName: "Manager Stakeholder Relation & Management",
+//     jobStatus: "available",
+//   },
+//   {
+//     id: 4,
+//     jobName: "Manager Corporate Communication",
+//     jobStatus: "available",
+//   },
+//   {
+//     id: 5,
+//     jobName: "Manager CSR & SMEPP Management",
+//     jobStatus: "waiting approval",
+//   },
+//   {
+//     id: 6,
+//     jobName: "SBM Sumsel V Gas",
+//     jobStatus: "waiting approval",
+//   },
+//   {
+//     id: 9,
+//     jobName: "Manager Corporate Governance & Board Support",
+//     jobStatus: "available",
+//   },
+//   {
+//     id: 13,
+//     jobName: "SBM Jambi III Gas",
+//     jobStatus: "available",
+//   },
+//   {
+//     id: 14,
+//     jobName: "SBM Jambi IV Gas",
+//     jobStatus: "available",
+//   },
+// ];
+
+const dataListJobDescription = myData.map((data) => ({
+  id: data.id_position,
+  jobName: data.position,
+  jobStatus: "available",
+}));
+
+const listDraft = [
   {
-    id: 1,
-    jobName: "Manager Internal Communication",
-    jobStatus: "not available",
+    draftId: 1,
+    draftName: "Master Data SO",
+    createdBy: "Superadmin",
+    createdDate: "05/05/2021",
+    modifiedDate: "05/05/2021",
+    modifiedBy: "Superadmin",
   },
   {
-    id: 2,
-    jobName: "SBM Sumsel VI Gas",
-    jobStatus: "not available",
-  },
-  {
-    id: 3,
-    jobName: "Manager Stakeholder Relation & Management",
-    jobStatus: "available",
-  },
-  {
-    id: 4,
-    jobName: "Manager Corporate Communication",
-    jobStatus: "available",
-  },
-  {
-    id: 5,
-    jobName: "Manager CSR & SMEPP Management",
-    jobStatus: "waiting approval",
-  },
-  {
-    id: 6,
-    jobName: "SBM Sumsel V Gas",
-    jobStatus: "waiting approval",
-  },
-  {
-    id: 9,
-    jobName: "Manager Corporate Governance & Board Support",
-    jobStatus: "available",
-  },
-  {
-    id: 13,
-    jobName: "SBM Jambi III Gas",
-    jobStatus: "available",
-  },
-  {
-    id: 14,
-    jobName: "SBM Jambi IV Gas",
-    jobStatus: "available",
+    draftId: 2,
+    draftName: "Draft Usulan Perubahan VP IT",
+    createdBy: "Superadmin",
+    createdDate: "05/05/2021",
+    modifiedDate: "05/05/2021",
+    modifiedBy: "Superadmin",
   },
 ];
+
+let initializeLocalStorage = (key, defaultValue) => {
+  let value = localStorage.getItem(key);
+  if (!value) {
+    localStorage.setItem(key, JSON.stringify(defaultValue));
+    return defaultValue;
+  }
+  return JSON.parse(value);
+};
+
+let lsListDraft = initializeLocalStorage("listDraft", listDraft);
+let lsListOrgNode = initializeLocalStorage("listOrgNode", myData);
+// let lsListPosition = initializeLocalStorage("listPosition", positionDetail);
+// let lsListDetailDraft = initializeLocalStorage("listDraftDetail", []);
+// let lsListDraftOrgNode = initializeLocalStorage("listDraftOrgNode", []);
+// let lsListApproval = initializeLocalStorage("listApproval", []);
