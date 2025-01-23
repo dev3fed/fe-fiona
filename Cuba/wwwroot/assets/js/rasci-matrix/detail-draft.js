@@ -20,7 +20,7 @@ async function detailDraft() {
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Organization Data Source</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.draftName}</label>
+        <label style="font-weight: 600;font-size: 14px">Usulan Perubahan Fungsi Marketing</label>
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Created by</label>
@@ -110,7 +110,7 @@ async function renderTableActivity(listData) {
                                   <td>
                                       ${
                                         data.jobPosition.length === 0
-                                          ? ""
+                                          ? "-"
                                           : data.jobPosition.length === 1
                                           ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}">${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}</div>`
                                           : `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
@@ -126,7 +126,7 @@ async function renderTableActivity(listData) {
                                   <td>
                                       ${
                                         data.businessProcessName.length === 0
-                                          ? ""
+                                          ? "-"
                                           : data.businessProcessName.length === 1
                                           ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}">${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}</div>`
                                           : `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
@@ -158,7 +158,7 @@ async function renderTableActivity(listData) {
                                   <td style="text-align: center;">
                                     <button class=" btn btn-outline-light btn-small-icon" type="button" onclick="triggleDetailActivity('${
                                       data.draftListId
-                                    }')">
+                                    }', '${data.draftType}')">
                                       <img src="/assets/images/rasci/icon_detail.svg" alt="Filter Icon">
                                     </button>  
                                     <button class=" btn btn-outline-light btn-small-icon" type="button">
@@ -361,6 +361,9 @@ async function handleSubmitRenameDraft() {
           attributes: {
             innerHTML: `<div style="text-align: center;">${result?.data.data.draftName} has been change</div>`,
           },
+        },
+        customClass: {
+          popup: "swal-custom-popup",
         },
       }).then(async () => {
         spinner.style.display = "none";

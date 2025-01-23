@@ -96,12 +96,16 @@
                 </div>
             </div>
             <div class="modal-footer  d-flex justify-content-end">
-                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
-                        class="icon-arrow-left"></i>
-                    Back</button>
                 <div>
-                    <button class="btn btn btn-primary" type="button" data-bs-toggle="modal"
-                        data-bs-target="#modalSaveDraft" id="saveDraftBtn" disabled> Save Change</button>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                        onclick="backChangeNotationRow()"><i class="icon-arrow-left"></i> Back</button>
+                    <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="saveNotationRow()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingEditnotation" role="status"></div>
+                            <span class="btn-text">Save Change</span>
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>

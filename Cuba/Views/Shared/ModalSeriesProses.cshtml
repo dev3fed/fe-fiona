@@ -1,0 +1,41 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.series-proses {
+        max-width: 40% !important;
+        margin: 120px auto;
+    }
+</style>
+
+
+<div class="modal fade" id="ModalSeriesProses" tabindex="-1" role="dialog" aria-labelledby="ModalSeriesProsesLabel"
+    aria-hidden="true">
+    <div class="modal-dialog series-proses bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalSeriesProsesTitle">Series of Business Process</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4" id="series-proses">
+
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i> Back</button>
+                    <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="applySeriesProses()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="applySeries" role="status"></div>
+                            <span class="btn-text"> Apply</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

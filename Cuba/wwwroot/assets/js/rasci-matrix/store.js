@@ -16,10 +16,15 @@ const appState = new Proxy(
     //start filter rasci matrix
     rasciNotationFilter: [],
     levelFilter: [],
+    levelSeries: [],
     visibleJobs: [],
     selectedJobId: [],
     disabledJobId: [],
     dataDeleteProsbis: {},
+    dataDetailProsbis: {},
+    dataChangeNotasi: {
+      busProsMapped: [],
+    },
     payloadDraftList: {
       Page: 1,
       PageSize: 5,
@@ -76,6 +81,7 @@ const appState = new Proxy(
         updateSelect2ByProsbis();
         updateSelect2ByJob();
         formValidation();
+        formValidationNotation();
         if (property === "dataDetailDraft") {
           detailDraft();
         } else if (property === "editDrafProsbis") {
@@ -269,6 +275,40 @@ async function endpointRenameDraft(params, payload) {
 
 async function fetchDetailDraftActivity(id) {
   const url = `${url_api}/api/RasciMatrix/draft/detail-list/${id}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchDetailRasci(param) {
+  const url = `${url_api}/api/RasciMatrix/box-rasci/detail?parentId=${param.indexGroup}&jobId=${param.jobId}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchRelatedJob(id) {
+  const url = `${url_api}/api/RasciMatrix/business-process/detail/${id}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {

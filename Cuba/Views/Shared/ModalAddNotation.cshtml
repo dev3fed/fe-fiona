@@ -182,7 +182,8 @@
                                 </table>
                             </div>
                             <div class="d-flex mt-2 justify-content-end">
-                                <button class="btn btn btn-primary" type="button" id="btn-selectedbusiness">
+                                <button class="btn btn btn-primary" type="button" id="btn-selectedbusiness"
+                                    onclick="triggleSelectBusiness()">
                                     Select Business Process</button>
                             </div>
                         </div>
@@ -196,10 +197,12 @@
                 </div>
             </div>
             <div class="modal-footer  d-flex justify-content-end">
-                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                    onclick="backChangeNotation()">
                     Back</button>
                 <div>
-                    <button class="btn btn btn-primary" type="button" disabled> Save </button>
+                    <button class="btn btn btn-primary" type="button" id="btnDraftnotation"
+                        onclick="saveDraftnotation()"> Save </button>
                 </div>
             </div>
         </div>

@@ -1,6 +1,18 @@
-// action detail activity table
-async function triggleDetailActivity(id) {
-  console.log("first", id);
+async function triggleDetailActivity(id, draftType) {
+  console.log("cek", id, draftType);
+  try {
+    if (draftType === "Add New Business Process") {
+      detailAddprosbis(id);
+    } else if (draftType === "Delete Business Process") {
+      detailDeleteBp(id);
+    } else if (draftType === "Edit Business Process") {
+      console.log("cek edit business");
+      detailEditBp(id);
+    }
+  } catch (error) {}
+}
+
+async function detailAddprosbis(id) {
   try {
     const modal = new bootstrap.Modal(document.getElementById("modalActivityDetail"));
     modal.show();
@@ -12,7 +24,7 @@ async function triggleDetailActivity(id) {
         <div class="col-7 custom-col" style="text-align: left">
           <label style="color:#9F9FA5">Business Process Name</label>
           <div style="display: flex;  font-weight: 600; font-size: 14px;">
-            <span>${dataHeader.indexGroup} - ${dataHeader.businessProcessName} XXXX</span>
+            <span>${dataHeader.indexGroup} - ${dataHeader.businessProcessName}</span>
           </div>
         </div>
         <div class="col-5 custom-col" style="text-align: left; border-right:none">
@@ -56,16 +68,6 @@ async function triggleDetailActivity(id) {
         `;
       })
       .join("");
-    // const elementFooter = `
-    //     <div class=" custom-row-full">
-    //         <span style="color:#9F9FA5">Rasci Notasi</span>
-    //       <ul style="list-style-type:disc;padding-left:20px">
-    //       ${notation.map((item) => `<li>${item.RasciCode} &nbsp : &nbsp ${item.Comment}</li>`).join("")}
-    //       </ul>
-
-    //     </div>
-    //   `;
-
     const bodyheader = document.getElementById("header-avtivity-detail");
     if (bodyheader) bodyheader.innerHTML = elementHeader;
     const bodyLabel = document.getElementById("label-position");
@@ -74,4 +76,62 @@ async function triggleDetailActivity(id) {
     const bodyfooter = document.getElementById("footer-activity-detail");
     if (bodyfooter) bodyfooter.innerHTML = elementFooter;
   } catch (error) {}
+}
+
+async function detailDeleteBp(id) {
+  try {
+    const modal = new bootstrap.Modal(document.getElementById("modalDetailDeletebp"));
+    modal.show();
+    const dataActivity = await fetchDetailDraftActivity(id);
+    const dataInfo = dataActivity.data.businessProcess;
+    const formContent = `
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Parent</label>
+             <label> : </label>
+            <b class="form-label">${dataInfo.parentId} - ${dataInfo.parentName}</b>
+
+        </div>
+      </div>
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Level</label>
+             <label> : </label>
+            <b class="form-label">${dataInfo.level}</b>
+
+        </div>
+      </div>
+       <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Index</label>
+             <label> : </label>
+            <b class="form-label">${dataInfo.indexGroup}</b>
+
+        </div>
+      </div>
+     <div class="col-12 mt-2">
+      <div>
+        <label class="form-label" style="width:25%">Business Process Name</label>
+             <label> : </label>
+              <b class="form-label">${dataInfo.description}</b>
+      </div>
+    </div>
+    `;
+
+    const bodyContent = document.getElementById("list-detaildeletebp");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+
+    // Initialize Bootstrap Select
+    $(".selectpicker").selectpicker();
+  } catch (error) {}
+}
+
+async function detailEditBp(id) {
+  const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
+  modal.show();
+  const dataActivity = await fetchDetailDraftActivity(id);
+  console.log("dataActivity", dataActivity);
+  // const dataInfo = dataActivity.data.businessProcess;
 }

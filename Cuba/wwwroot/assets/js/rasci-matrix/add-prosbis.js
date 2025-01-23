@@ -52,27 +52,23 @@ function onSelectDraft(event) {
 }
 
 async function handleContinue() {
-  const typeAction = document.getElementById("type-action");
-  const typeJob = document.getElementById("jobid-action");
-  const typeProsbis = document.getElementById("prosbisid-action");
-  const radionewdraft = document.getElementById("radionewdraft").checked;
-  const spinner = document.getElementById("loadingChoose");
-  const dataProsbis = getState("insertProsbis");
-  // Tampilkan animasi loading
-  spinner.style.display = "inline-block";
-  // radioexisting
-  console.log("radionewdraft", radionewdraft);
   try {
+    const typeAction = document.getElementById("type-action");
+    const typeJob = document.getElementById("jobid-action");
+    const typeProsbis = document.getElementById("prosbisid-action");
+    const radionewdraft = document.getElementById("radionewdraft").checked;
+    const spinner = document.getElementById("loadingChoose");
+    const dataProsbis = getState("insertProsbis");
+    spinner.style.display = "inline-block";
     if (radionewdraft === true) {
       const inputDraftName = document.getElementById("input-draftname").value;
       const payload = {
         draftName: inputDraftName,
-        draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+        draftSOId: "",
       };
-
       const result = await createDraftRasci(payload);
       if (result.success === true) {
-        const dataResult = result?.data.data;
+        const dataResult = result?.data;
         const dataSend = {
           ...dataProsbis,
           draftId: dataResult.draftId,
@@ -103,12 +99,44 @@ async function handleContinue() {
             if (type === "addNewBp") {
               onModalAddBp();
             } else if (type === "addNotation") {
+              const dataChangeNotasi = getState("dataChangeNotasi");
+              const dataSend = {
+                ...dataChangeNotasi,
+                draftId: dataResult.draftId,
+                draftName: dataResult.draftName,
+                draftSOId: "",
+              };
+              setState("dataChangeNotasi", dataSend);
               onModalAddNotation();
             } else if (type === "editNotation") {
+              const dataDetailProsbis = getState("dataDetailProsbis");
+              const dataSend = {
+                ...dataDetailProsbis,
+                draftId: dataResult.draftId,
+                draftName: dataResult.draftName,
+                draftSOId: "",
+              };
+              setState("dataDetailProsbis", dataSend);
               openModalNotRow(typeJob.value, typeProsbis.value);
             } else if (type === "editProsbis") {
+              const dataDetailProsbis = getState("dataDetailProsbis");
+              const dataSend = {
+                ...dataDetailProsbis,
+                draftId: dataResult.draftId,
+                draftName: dataResult.draftName,
+                draftSOId: "",
+              };
+              setState("dataDetailProsbis", dataSend);
               openModalEditBusinesspro();
             } else if (type === "deleteProsbis") {
+              const dataDelete = getState("dataDeleteProsbis");
+              const dataSend = {
+                ...dataDelete,
+                draftId: dataResult.draftId,
+                draftName: dataResult.draftName,
+                draftSOId: "",
+              };
+              setState("dataDeleteProsbis", dataSend);
               openModalDeleteBusinesspro();
             }
           });
@@ -117,13 +145,9 @@ async function handleContinue() {
     } else {
       const modalChoose = document.getElementById("modalChoosedraft");
       const hideModalChoose = bootstrap.Modal.getInstance(modalChoose);
-      // get element value from select by id select-draftname
       const selectDraftName = document.getElementById("select-draftname");
       const draftId = selectDraftName.value;
-      //  get text from select by id select-draftname
       const textDraftName = selectDraftName.options[selectDraftName.selectedIndex].text;
-      console.log("textDraftName", textDraftName);
-      console.log("draftId", draftId);
       const dataSend = {
         ...dataProsbis,
         draftId: draftId,
@@ -136,17 +160,47 @@ async function handleContinue() {
       }
       spinner.style.display = "none";
       const type = typeAction.value;
-      console.log("first", type);
       if (type === "addNewBp") {
         onModalAddBp();
       } else if (type === "addNotation") {
-        console.log("first", type);
+        const dataChangeNotasi = getState("dataChangeNotasi");
+        const dataSend = {
+          ...dataChangeNotasi,
+          draftId: draftId,
+          draftName: textDraftName,
+          draftSOId: "",
+        };
+        setState("dataChangeNotasi", dataSend);
         onModalAddNotation();
       } else if (type === "editNotation") {
+        const dataDetailProsbis = getState("dataDetailProsbis");
+        const dataSend = {
+          ...dataDetailProsbis,
+          draftId: draftId,
+          draftName: textDraftName,
+          draftSOId: "",
+        };
+        setState("dataDetailProsbis", dataSend);
         openModalNotRow(typeJob.value, typeProsbis.value);
       } else if (type === "editProsbis") {
+        const dataDetailProsbis = getState("dataDetailProsbis");
+        const dataSend = {
+          ...dataDetailProsbis,
+          draftId: draftId,
+          draftName: textDraftName,
+          draftSOId: "",
+        };
+        setState("dataDetailProsbis", dataSend);
         openModalEditBusinesspro();
       } else if (type === "deleteProsbis") {
+        const dataDelete = getState("dataDeleteProsbis");
+        const dataSend = {
+          ...dataDelete,
+          draftId: draftId,
+          draftName: textDraftName,
+          draftSOId: "",
+        };
+        setState("dataDeleteProsbis", dataSend);
         openModalDeleteBusinesspro();
       }
     }
@@ -156,13 +210,9 @@ async function onModalAddBp() {
   try {
     const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
     modal.show();
-    const prosbisLevel = getState("prosbisLevel");
     const rasciNotation = getState("rasciNotation") || [];
     const dataProsbis = getState("insertProsbis");
-    console.log("dataProsbis", dataProsbis);
-    console.log("prosbisLevel", prosbisLevel);
     const resultLevel = await fetchSelectLevel(dataProsbis.draftId);
-    console.log("resultLevel", resultLevel.data.res);
     const listLevel = resultLevel?.data.res;
     const formContent = `
     <div class="col-12">
@@ -355,7 +405,7 @@ function updateSelect2ByProsbis() {
             search: params.term || "",
             page: params.page || 1,
             type: "business-process",
-            level: appState.selectedLevel,
+            level: appState.selectedLevel - 1,
             draftId: dataProsbis.draftId,
           };
         },
@@ -518,6 +568,8 @@ const triggleSelectJob = () => {
 async function saveAsDraft() {
   try {
     const dataProsbis = getState("insertProsbis");
+    const spinner = document.getElementById("saveDraftBtn");
+    spinner.style.display = "inline-block";
     const inputValue = {
       ...dataProsbis,
       draftType: "Add New Business Process",
@@ -525,22 +577,19 @@ async function saveAsDraft() {
     const result = await submitDraftProsbis(inputValue);
 
     if (result.status === 200) {
-      const modalSaveDraft = document.getElementById("modalSaveDraft");
-      const modalSave = bootstrap.Modal.getInstance(modalSaveDraft);
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
       document.getElementById("draftName").value = "";
-      const btnSave = document.getElementById("prosbisSavedraft");
       const btnDraft = document.getElementById("saveDraftBtn");
       // const btnApproval = document.getElementById("submitApprovalBtn");
 
-      btnSave.disabled = true;
+      // btnSave.disabled = true;
       btnDraft.disabled = true;
       // btnApproval.disabled = true;
 
-      if (modalSave) {
-        modalSave.hide();
-      }
+      // if (modalSave) {
+      //   modalSave.hide();
+      // }
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -550,10 +599,14 @@ async function saveAsDraft() {
           content: {
             element: "div",
             attributes: {
-              innerHTML: `<div style="text-align: center;">Your request has been submitted successfully. You can check your request in the approval list tab.</div>`,
+              innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+              <br>
+              <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
+              `,
             },
           },
         }).then(async () => {
+          spinner.style.display = "none";
           if (modalAdd) {
             modalAdd.hide();
           }
@@ -593,7 +646,7 @@ function backFromModalBp() {
   const updatedRasciNotation = rasciNotation.map((letter) => {
     return { ...letter, comment: "", isChecked: false };
   });
-
+  setState("insertProsbis", { parentId: null, jobMapped: [] });
   setState("rasciNotation", updatedRasciNotation);
 }
 
