@@ -1,0 +1,49 @@
+<link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
+<div class="modal fade" id="modalPreviewOrgChart" tabindex="-1" role="dialog" aria-labelledby="modalPreviewOrgChart" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="">Preview Org Chart</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mt-4">
+                    <div class="col-4 align-content-center">
+                        <select class="form-select digits" name="searchOrgNode" id="searchOrgNode">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col-1" style="padding-left: 0">
+                        <button class="btn btn-primary w-100" type="button" id="searchOrgNodeButton">Search</button>
+                    </div>
+                    <div class="col-5 offset-2 d-flex gap-3 justify-content-end" style="padding-left: 0;">
+                        @* span *@
+                        <div class="d-flex gap-2 align-items-center align-self-center"> 
+                            <div class="square bg-primary-outline-custom"></div>
+                            <span>New Position</span>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center align-self-center"> 
+                            <div class="square bg-warning-outline-custom"></div>
+                            <span>Edited Position</span>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center align-self-center"> 
+                            <div class="square bg-danger-outline-custom"></div>
+                            <span>Deleted Position</span>
+                        </div>
+                            
+                    </div>
+                    <div class="col-12 mt-2">
+                        <div id="os-container" id="os-container" style=""></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" >
+                <div class="text-end " id="">
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                        Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
