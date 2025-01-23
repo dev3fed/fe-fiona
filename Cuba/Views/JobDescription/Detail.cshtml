@@ -16,7 +16,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create New Job Description</h3>
+                    <h3>Create New Position Description</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -28,7 +28,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item ">Job Description</li>
-                        <li class="breadcrumb-item active">Create New Job Description </li>
+                        <li class="breadcrumb-item active">Create New Position Description </li>
                     </ol>
                 </div>
             </div>
@@ -303,6 +303,9 @@
                     </div>
                     @* button save as draft *@
                     <div class="card-footer d-flex justify-content-end">
+                        <button class="btn btn-outline-primary m-r-10" type="button" id="downloadJobDesc">
+                            download
+                        </button>
                         <button class="btn btn-primary" type="button" id="saveDraft">
                             Save as Draft
                         </button>
@@ -336,6 +339,15 @@
     <script src="../assets/js/select2/select2-custom.js"></script>
     <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
 
+    @* <script src="https://cdn.jsdelivr.net/npm/docx@9.1.0/build/index.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> *@
+    @* <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.20.0/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> *@
+
+    <script src="https://cdn.jsdelivr.net/npm/docx@9.1.0/build/index.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
 
     @* datatable *@
     <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
@@ -349,6 +361,8 @@
     <script src="../assets/js/job-description/constant.js"></script>
     <script src="../assets/js/job-description/endpoint.js"></script>
     <script src="../assets/js/job-description/detail.js"></script>
+    <script type="module" src="../assets/js/job-description/detail-bundle.js"></script>
     <script src="../assets/js/script.js"></script>
+
 }
 

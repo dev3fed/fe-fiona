@@ -32,6 +32,7 @@ const baseNodeBinding = {
   prl: "prl",
   jumlah_formasi: "jumlah_formasi",
   org_unit: "org_unit_name",
+  level: "level",
 };
 
 function bracketTemplateGenerator(bracketSize) {
@@ -65,12 +66,15 @@ function bracketTemplateGenerator(bracketSize) {
       `<rect x="140" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
       `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="160" y="${yTextPosition + 4}">{val}</text>` +
       `</g>`;
+    template[`bc_${i}_level`] =
+      `<g>` +
+      `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="transparent" stroke-width="1" stroke="#000"></rect>` +
+      // `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+      `</g>`;
     template[`bc_${i}_jumlah_formasi`] =
       `<g>` +
-      `<rect x="180" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
       `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="200" y="${yTextPosition + 4}">{val}</text>` +
       `</g>`;
-    console.log("template", template);
   }
 
   return template;
@@ -90,7 +94,6 @@ const tags = {};
 
 for (let i = 1; i <= bracketLimit; i++) {
   for (let key in baseNodeBinding) {
-    console.log("key", `bc_${i}_${key}`);
     nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
   }
   tags[`bracket_${i}`] = {
@@ -108,12 +111,14 @@ let chart = new OrgChart(document.getElementById("os-container"), {
   },
   template: "default_t",
   nodeBinding,
+  enableSearch: false,
   assistantSeparation: 10,
   levelSeparation: 30,
   scaleInitial: OrgChart.match.boundary,
   layout: OrgChart.treeRightOffset,
   nodes: myData,
   align: OrgChart.ORIENTATION,
+  movable: OrgChart.movable.node, // moves the node
   // mixedHierarchyNodesSeparation: 5,
   nodeMouseClick: false,
   menu: {
@@ -151,7 +156,6 @@ chart.on("init", function (sender) {
     chart.load(myData);
   });
   chart.element.appendChild(title);
-  console.log(sender.toolbarUI);
 });
 
 chart.onExportStart((args) => {
@@ -179,20 +183,26 @@ chart.on("click", async (sender, node) => {
 });
 
 chart.on("searchclick", (sender, node) => {
-  focusNode(node);
   return false;
 });
 
+$("#searchOrgNodeButton").on("click", function () {
+  const searchValue = $("#searchOrgNode").val();
+  focusNode(searchValue);
+});
+
 function focusNode(nodeId) {
+  alert("masok");
   let data = myData.find((item) => item.id == nodeId);
   let parentNode = myData.find((item) => item.id == data?.pid) || {};
   let grandParentNode = myData.find((item) => item.id == parentNode?.pid) || {};
+  let childrenNode = myData.filter((item) => item.pid == nodeId);
 
-  const dataDated = [grandParentNode, parentNode, data];
+  const dataDated = [grandParentNode, parentNode, data, childrenNode];
   chart.load(dataDated);
   data = {
     ...data,
-    tags: [...data.tags, "edit"],
+    tags: [...data.tags],
   };
   setTimeout(() => {
     chart.updateNode(data);
@@ -211,119 +221,3 @@ function getOptions() {
   }
   return { enableSearch, scaleInitial };
 }
-// OrgChart.templates.base.field_0 =
-//   '<text data-width="230" style="font-size: 18px;" fill="#aeaeae" x="125" y="95" text-anchor="middle">{val}</text>';
-
-// var chart = new OrgChart(document.getElementById("os-container"), {
-//   layout: OrgChart.mixed,
-//   scaleInitial: 0.5,
-//   mouseScrool: OrgChart.action.ctrlZoom,
-//   template: "base",
-//   enableSearch: false,
-//   nodeBinding: {
-//     field_0: "id",
-//   },
-// });
-
-// chart.on("node-layout", async function (sender, args) {
-//   orgs
-// });
-
-// chart.on("init", function () {
-//   // chart.expandCollapse(1); // Ensu
-// });
-// // chart.load(myData);
-// chart.load([
-//   { id: 1, pid: 0 },
-//   { id: 2, pid: 1 },
-//   { id: 3, pid: 1 },
-//   { id: 4, pid: 1 },
-//   { id: 5, pid: 2 },
-//   { id: 6, pid: 2 },
-//   { id: 7, pid: 3 },
-//   { id: 8, pid: 3 },
-//   { id: 9, pid: 4 },
-//   { id: 10, pid: 4 },
-//   { id: 11, pid: 5 },
-//   { id: 12, pid: 5 },
-//   { id: 13, pid: 6 },
-//   { id: 14, pid: 6 },
-//   { id: 15, pid: 7 },
-//   { id: 16, pid: 7 },
-//   { id: 17, pid: 8 },
-//   { id: 18, pid: 8 },
-//   { id: 19, pid: 9 },
-//   { id: 20, pid: 9 },
-//   { id: 21, pid: 10 },
-//   { id: 22, pid: 10 },
-//   { id: 23, pid: 11 },
-//   { id: 24, pid: 11 },
-//   { id: 25, pid: 12 },
-//   { id: 26, pid: 12 },
-//   { id: 27, pid: 13 },
-//   { id: 28, pid: 13 },
-//   { id: 29, pid: 14 },
-//   { id: 30, pid: 14 },
-//   { id: 31, pid: 15 },
-//   { id: 32, pid: 15 },
-//   { id: 33, pid: 16 },
-//   { id: 34, pid: 16 },
-//   { id: 35, pid: 17 },
-//   { id: 36, pid: 17 },
-//   { id: 37, pid: 18 },
-//   { id: 38, pid: 18 },
-//   { id: 39, pid: 19 },
-//   { id: 40, pid: 19 },
-//   { id: 41, pid: 20 },
-// ]);
-
-//JavaScript
-// var chart = new OrgChart(document.getElementById("os-container"), {
-//   // mode: "dark",
-//   // mouseScrool: OrgChart.none,
-//   collapse: {
-//     level: 2,
-//     allChildren: true,
-//   },
-//   nodeBinding: {
-//     field_0: "name",
-//   },
-// });
-
-// function iterate(c, n, nodesToExpand) {
-//   if (Array.isArray(n)) {
-//     for (var i = 0; i < n.length; i++) {
-//       iterate(c, n[i]);
-//     }
-//     return;
-//   }
-
-//   nodesToExpand.push(n.id);
-//   for (var i = 0; i < n.stChildrenIds.length; i++) {
-//     iterate(c, c.getNode(n.stChildrenIds[i]), nodesToExpand);
-//   }
-
-//   for (var i = 0; i < n.childrenIds.length; i++) {
-//     iterate(c, c.getNode(n.childrenIds[i]), nodesToExpand);
-//   }
-// }
-
-// chart.searchUI.on("searchclick", function (sender, args) {
-//   var node = sender.instance.getNode(args.nodeId);
-//   var nodesToExpand = [];
-//   iterate(sender.instance, node, nodesToExpand);
-//   chart.expand(args.nodeId, nodesToExpand, function () {
-//     sender.instance.center(args.nodeId);
-//   });
-//   return false;
-// });
-
-// chart.on("node-layout", function (sender, args) {
-//   console.log("masuk");
-//   args.layout = OrgChart.treeRightOffset;
-
-//   // var nodeElement = args.content.querySelector(".title");
-//   // nodeElement.innerHTML = args.data.name;
-// });
-
-// chart.load(myData);

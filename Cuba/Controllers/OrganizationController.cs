@@ -11,13 +11,14 @@ namespace Cuba.Controllers
             return View();
         }
     
-        [HttpGet("detail")] 
-        public IActionResult Detail()
+        [HttpGet("form-position")] 
+        public IActionResult FormPosition()
         {
             return View();
         }
 
-        [HttpGet("draft-detail")] 
+        [HttpGet("draft-detail")]
+        [HttpGet("approval-detail")]
         public IActionResult DraftDetail()
         {
             return View();

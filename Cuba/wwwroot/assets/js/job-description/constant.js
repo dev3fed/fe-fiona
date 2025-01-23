@@ -1,9 +1,11 @@
-const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))';
+const url = {
+  baseUrl: "http://localhost:5095",
+  "api-organization": "api/organization-structure",
+};
 const tabArray = ["inputAttribute", "inputSubordinate", "inputSgSsg", "preview"];
 const tabArrayIndex = ["chart", "draft", "2", "3"];
 let statusAction = "add";
 let dataAvailable = true;
-const url = "http://localhost:5095";
 const token = localStorage.getItem("token");
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const urlParams = new URLSearchParams(window.location.search);

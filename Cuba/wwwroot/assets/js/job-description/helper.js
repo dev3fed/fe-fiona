@@ -867,8 +867,6 @@ async function saveReference() {
     localStorage.setItem("spesifik", JSON.stringify(getLocalSpesifik));
   }
 
-  // hide modal
-  // swal confirmation
   swal({
     title: "Are you sure?",
     text: "You will save this reference to your job description",

@@ -7,87 +7,62 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-4">
-                        <label class="form-label" for="ModalInputOrgUnitName">Org Unit Name</label>
-                        <input class="form-control" id="modalInputOrgUnitName" type="text" placeholder="Insert Position Name"  >
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label" for="modalInputCareerType">Career Type</label>
-                        <input class="form-control" id="modalInputCareerType" type="text" placeholder=""  >
-                        @* <select class="form-select digits" name="modalSelectCareerType" id="modalSelectCareerType">
-                        </select> *@
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label" for="">Career Level</label>
-                        <select class="form-select digits" name="modalSelectCareerLevel" id="modalSelectCareerLevel">
-                        </select>
-                    </div>
-
-                    <div class="col-md-6  p-t-10">
-                        <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
-                            <label class="new-switch mb-0" for="inputClassAbbrvPosition">Abbrv Position</label>
-                            <div class="d-flex align-items-center">
-                                <label class="switch m-0" for="">
-                                    <input type="checkbox" onchange="onChangeSwith(event,'AbbrvPosition')" ><span class="switch-state"></span>
-                                </label>
-                                <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;" for="">New</label>
-                            </div>
-                        </div>
-                        <select class="form-select digits" class="select-class" id="modalSelectAbbrvPosition" name="modalSelectAbbrvPosition" > 
-                        </select>
-                        <input class="form-control" style="display: none;" class="select-class" id="modalInputAbbrvPosition" type="text" placeholder="Input Abbrv Position" >
-                    </div>
-
-                    <div class="col-md-6 p-t-10">
-                        <label class="form-label" for="modalInputSubPositionName">Sub Position Name</label>
-                        <input class="form-control" id="modalInputSubPositionName" type="text" placeholder="Insert Sub Position Name"  >
-                    </div>
-
-                    <div class="col-md-6 p-t-10">
-                        <label class="form-label" for="positionCode">Sub Position Level</label>
-                        <div class="m-t-15 m-checkbox-inline custom-radio-ml">
-                            <div class="form-check form-check-inline radio radio-primary">
-                                <input class="form-check-input" id="subPos1" type="radio" name="radio1" value=1>
-                                <label class="form-check-label mb-0" for="subPos1"> I</span></label>
-                            </div>
-                            <div class="form-check form-check-inline radio radio-primary">
-                                <input class="form-check-input" id="subPos2" type="radio" name="radio1" value=2>
-                                <label class="form-check-label mb-0" for="subPos2"> II</span></label>
-                            </div>
-                            <div class="form-check form-check-inline radio radio-primary">
-                                <input class="form-check-input" id="subPos3" type="radio" name="radio1" value=3>
-                                <label class="form-check-label mb-0" for="subPos3"> III</span></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 p-t-10">
+                    <div class="col-md-7 p-t-10">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label" for="prlOrg">PRL Org</label>
                                 <select class="form-select digits" class="select-class" id="modalSelectPrlOrgSubPos" name="prlOrg" id="prlOrg" > 
                                 </select>
                             </div>  
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <label class="form-label" for="prlOrg">PRL Org To</label>
+                                <select class="form-select digits" class="select-class" id="modalSelectPrlOrgToSubPos" name="prlOrg" id="prlOrg" > 
+                                </select>
+                            </div>  
+                            <div class="col-md-4">
                                 <label class="form-label" for="modalInputFormation">Formation</label>
                                 <input class="form-control" id="modalInputFormation" type="text" placeholder="Insert Formation"  >
                             </div>    
                         </div>
                     </div>
-
-                    <div class="col-md-12 p-t-20" id="">
-                        <input class="form-check-input" id="joinFormation" type="checkbox">
-                        <label class="form-check-label" for="joinFormation">Join Formation with another sub position</label>
-                    </div>
-                    <div class="col-md-12 p-t-20" id="joinFormationDiv">
-                        <div class="col-md-12">
-                            <label class="form-label">Another Sub Position</label>
-                            <select class="form-select digits" name="modalSelectAnother" id="modalSelectAnother">
-                            </select>
+                    <div class="col-md-12 p-t-10" id="subPosDiv">
+                        <div class="row p-b-10" id="subPosCard">
+                            <div class="col-md-11">
+                                <div class="sub-pos-card">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="">Career Level</label>
+                                            <select class="form-select digits" name="modalSelectCareerLevel" id="modalSelectCareerLevel">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
+                                                <label class="new-switch mb-0" for="inputClassAbbrvPosition">Abbrv Position (max 12 characters)</label>
+                                                <div class="d-flex align-items-center">
+                                                    <label class="switch m-0" for="">
+                                                        <input type="checkbox" onchange="onChangeSwith(event,'AbbrvPosition')" ><span class="switch-state"></span>
+                                                    </label>
+                                                    <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;" for="">New</label>
+                                                </div>
+                                            </div>
+                                            <select class="form-select digits" class="select-class" id="modalSelectAbbrvPosition" name="modalSelectAbbrvPosition" > 
+                                            </select>
+                                            <input class="form-control" style="display: none;" class="select-class" id="modalInputAbbrvPosition" type="text" placeholder="Input Abbrv Position" >
+                                        </div>
+                                        <div class="col-md-12 p-t-10">
+                                            <label class="form-label" for="modalInputSubPositionName">Sub Position Name</label>
+                                            <input class="form-control" id="modalInputSubPositionName" type="text" placeholder="Insert Sub Position Name"  >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="add-sub-pos align-content-center" onClick="addSubPos()" id="addSubPos"><img src="/assets/images/rasci/plus.svg" id="imageIcon" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"></div>
+                            </div>
                         </div>
+
                     </div>
-                    
+
                 </div>
                     
                 @* <div class="table-responsive">
