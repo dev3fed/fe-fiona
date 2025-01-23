@@ -275,7 +275,7 @@ async function applySearch() {
     case "RASCI by Job":
       const payload = {
         type: "job",
-        parentId: selectedJobIds.join(","), // Menggabungkan ID job
+        jobId: selectedJobIds, // Menggabungkan ID job
       };
       try {
         const resultMatrix = await fetchDataMatrix(payload); // Memanggil data

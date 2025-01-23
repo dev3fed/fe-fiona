@@ -12,15 +12,27 @@
     }
 
     .tbl-border {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
         border-right: 1px solid #b0d1e4;
         border-bottom: 1px solid #b0d1e4;
         border-left: 1px solid #b0d1e4;
         border-collapse: collapse;
-        font-size: 14px;
+        font-size: 12px !important;
     }
 
     .tbl-border th {
-        color: #FFFFFF
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
     }
 
     .tbl-border th,
@@ -69,7 +81,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table tbl-border">
-                                    <thead id="prosbis-details-header" style="background-color: #006CA9;">
+                                    <thead id="prosbis-details-header">
                                     </thead>
                                     <tbody id="prosbis-details-body">
                                     </tbody>
@@ -78,23 +90,25 @@
                         </div>
                         <div class="tab-pane fade" id="pills-hierarchy" role="tabpanel"
                             aria-labelledby="pills-hierarchy-tab">
-                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                when an unknown printer took a galley of type and scrambled it to make a type specimen
-                                book. It has survived not only five centuries, but also the leap into electronic
-                                typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
-                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with
-                                desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                            <div class="table-responsive m-t-15">
+                                <table class="table tbl-border">
+                                    <thead id="prosbis-hierarchy-header">
+                                    </thead>
+                                    <tbody id="prosbis-hierarchy-body">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="pills-competencies" role="tabpanel"
                             aria-labelledby="pills-competencies-tab">
-                            <p class="mb-0 m-t-30">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                when an unknown printer took a galley of type and scrambled it to make a type specimen
-                                book. It has survived not only five centuries, but also the leap into electronic
-                                typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
-                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with
-                                desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
+                            <div class="table-responsive m-t-15">
+                                <table class="table tbl-border">
+                                    <thead id="prosbis-competencies-header">
+                                    </thead>
+                                    <tbody id="prosbis-competencies-body">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -105,7 +119,7 @@
                     <i class="icon-arrow-left"></i> Back
                 </button>
                 <div>
-                    <button class="btn btn-outline-light" type="button" onclick="openModalDeleteBusinesspro()"><i
+                    <button class="btn btn-outline-danger" type="button" onclick="openModalDeleteBusinesspro()"><i
                             class="icon-trash"></i>
                         Delete</button>
                     <button class="btn btn-outline-light" type="button" onclick="openModalEditBusinesspro()">

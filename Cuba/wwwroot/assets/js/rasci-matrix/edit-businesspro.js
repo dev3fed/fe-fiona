@@ -6,23 +6,35 @@ function openModalEditBusinesspro() {
   console.log("prosbisLevel", prosbisLevel);
 
   const formContent = `
-    <div class="col-3">
-      <div class="mb-3">
-        <label class="form-label">Level</label>
-        <select class="form-select digits" disabled>
-          <option>Choose</option>
-          ${prosbisLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
-        </select>
+      <div class="col-12">
+        <div >
+          <label class="form-label" style="width:25%">RASCI Matrix Draft</label>
+          <label> : </label>
+        <b class="form-label">RASCI Evaluasi Struktur Organisasi 2025 versi Citra</b>
+        </div>
       </div>
-    </div>
-    <div class="col-9">
-      <div class="mb-3">
-        <label class="form-label">Parent</label>
-        <select class="form-select digits" name="parentId" id="parentId" disabled>
-        </select>
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Parent</label>
+             <label> : </label>
+        <b class="form-label">321405689 - Direktur Keuangan</b>
+        </div>
       </div>
-    </div>
-     <div class="col-12">
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Level</label>
+             <label> : </label>
+        <b class="form-label">Market, Sell, and Commercialization Products and Services</b>
+        </div>
+      </div>
+       <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Index</label>
+             <label> : </label>
+        <b class="form-label">Market, Sell, and Commercialization Products and Services</b>
+        </div>
+      </div>
+     <div class="col-12 mt-3">
       <div>
         <label class="form-label">Business Process Name</label>
         <textarea class="form-control"></textarea>

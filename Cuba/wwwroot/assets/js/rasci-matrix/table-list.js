@@ -4,7 +4,7 @@ document.addEventListener("dataLoaded", function () {
       hideLoading();
       loadTableHeader(appState.resultJabatan);
       loadTableBody(appState.resultProsbis);
-    }, 300);
+    }, 100);
   } else {
     showDataEmpty();
   }
@@ -77,9 +77,8 @@ function loadTableHeader(jobTitleList) {
                   </button>
                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                       <li><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
-                      <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
                       <li><a class="dropdown-item"><img src="/assets/images/rasci/document.svg" alt="Filter Icon">Competency</a></li>
-                      <li><a class="dropdown-item"><img src="/assets/images/rasci/chart.svg" alt="Filter Icon">Lead Indicator</a></li>
+                      <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
                   </ul>
                   </div>
               </th>
@@ -137,8 +136,12 @@ function loadTableBody(prosbisList) {
                   </button>
                   <ul class="dropdown-menu " aria-labelledby="dropdownMenuButton">
                     <li onclick="onModalProsbis()"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
-                    <li onclick="openModalEditBusinesspro()"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
-                    <li onclick="openModalDeleteBusinesspro()"><a class="dropdown-item"><img src="/assets/images/rasci/trash.svg" alt="Filter Icon">Delete</a></li>
+                    <li onclick="onModalChoose('editProsbis')"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
+                    <li onclick="onModalChoose('deleteProsbis'); setState('dataDeleteProsbis', ${JSON.stringify(
+                      val,
+                      null,
+                      2,
+                    )});" ><a class="dropdown-item" style="color: red !important;"><img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete</a></li>
                   </ul>
                 </div>
               </div>
@@ -149,6 +152,11 @@ function loadTableBody(prosbisList) {
     })
     .join("");
 
+  // var clusterize = new Clusterize({
+  //   rows: bodyContent,
+  //   scrollId: "table-container",
+  //   contentId: "table-body",
+  // });
   const tableBody = document.getElementById("table-body");
   if (tableBody) {
     tableBody.innerHTML = bodyContent;
@@ -163,9 +171,7 @@ function loadTableBody(prosbisList) {
 const mapRasciCellsCache = new Map();
 
 function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
-  // Tambahkan timestamp atau versi data ke cacheKey
-  const timestamp = new Date().toISOString();
-  const cacheKey = `${businessProcessId}-${jobTitleList.length}-${timestamp}`;
+  const cacheKey = `${businessProcessId}-${jobTitleList.length}-${JSON.stringify(rasciMapping)}`;
 
   if (mapRasciCellsCache.has(cacheKey)) {
     return mapRasciCellsCache.get(cacheKey);
@@ -181,8 +187,8 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
         (rm) => rm.businessProcessId === businessProcessId && rm.jobTitleId === jobTitle.id,
       );
 
-      let rasciIcons = "",
-        comments = [];
+      let rasciIcons = "";
+      let comments = [];
 
       rasciItems.forEach((item) => {
         switch (item.rasciCode) {
@@ -202,6 +208,7 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
             rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
             break;
         }
+
         if (item.comment) {
           comments.push(`<li>${item.rasciCode}: ${item.comment}</li>`);
         }
@@ -209,22 +216,18 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
 
       if (comments.length > 0) {
         const commentTooltip = `<ul>${comments.join("")}</ul>`;
-        rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip"  data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
+        rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
 
       return `<td>
         <div class="rasci-container">
-          <div class="rasci-icons">
-            ${rasciIcons}
-          </div>
-          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" 
-          onclick="openModalNotRow(${jobTitle.id}, ${businessProcessId})">
+          <div class="rasci-icons">${rasciIcons}</div>
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, ${businessProcessId})" ">
         </div>
-        </td>`;
+      </td>`;
     })
     .join("");
 
-  // Cache the result only if it's valid
   if (rasciCells) {
     mapRasciCellsCache.set(cacheKey, rasciCells);
   }
@@ -377,4 +380,6 @@ async function clearInput() {
 async function openModalDeleteBusinesspro() {
   const modal = new bootstrap.Modal(document.getElementById("modalDeleteBp"));
   modal.show();
+  const dataProsbis = getState("dataDeleteProsbis");
+  console.log("dataProsbis", dataProsbis);
 }

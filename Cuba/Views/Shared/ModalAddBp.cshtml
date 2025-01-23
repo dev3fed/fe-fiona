@@ -3,7 +3,7 @@
 
 <style>
     .modal-dialog.custom-bp {
-        max-width: 55% !important;
+        max-width: 70% !important;
         margin: 30px auto;
     }
 
@@ -72,6 +72,74 @@
         vertical-align: middle;
         padding: 0;
     }
+
+    .card-tbljob {
+        height: 420px;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 5px
+    }
+
+    .card-listjob {
+        height: auto;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 15px;
+    }
+
+    /* Custom scrollbar styles */
+    .scrollable-addbusiness::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-addbusiness::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-addbusiness::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-addbusiness::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+
+    .scrollable-addbusiness {
+        max-height: 620px;
+        overflow-y: auto;
+        margin-right: 5px;
+        margin-top: 5px;
+        margin-bottom: 5px
+    }
+
+
+    .scrollable-cardjoblist::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-cardjoblist::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-cardjoblist::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-cardjoblist::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+
+    .scrollable-cardjoblist {
+        max-height: 520px;
+        overflow-y: auto;
+    }
 </style>
 
 
@@ -83,31 +151,48 @@
                 <h5 class="modal-title" id="modalAddBpTitle">Add New Business Process</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="modal-body-content">
-                <div class="row mb-4" id="form-content">
+            <div class="modal-body scrollable-addbusiness" id="modal-body-content">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row" id="form-content">
 
-                </div>
-                <div class="table-responsive" style=" max-height: 450px;">
-                    <table class="table tbl-border-add-prosbis">
-                        <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
-                        </thead>
-                        <tbody id="tbl-add-prosbis-body">
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mt-3">Job</label>
+                        <div class="card-tbljob">
+                            <div id="select-job">
+                            </div>
+                            <div class="table-responsive mt-2" style=" max-height: 450px;">
+                                <table class="table tbl-border-add-prosbis">
+                                    <thead id="tbl-add-prosbis-header">
+                                    </thead>
+                                    <tbody id="tbl-add-prosbis-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex mt-2 justify-content-end">
+                                <button class="btn btn btn-primary" type="button" id="btn-selectedjob"
+                                    onclick="triggleSelectJob()">
+                                    Selected
+                                    Job</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mt-3">Selected Job</label>
+                        <div class="card-tbljob scrollable-cardjoblist" id="selected-job">
+
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer  ">
-                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
-                    onclick="backFromModalBp()"><i class="icon-arrow-left"></i>
+            <div class="modal-footer  d-flex justify-content-end">
+                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal" onclick="backFromModalBp()">
                     Back</button>
                 <div>
-                    <button class="btn btn btn-primary" type="button" data-bs-toggle="modal"
-                        data-bs-target="#modalSaveDraft" id="saveDraftBtn" disabled> Save as
-                        draft</button>
-                    @* <button class="btn btn-primary" type="button" id="submitApprovalBtn" onclick="openModalConfrim()"
-                        disabled>
-                        Submit to Approval
-                    </button> *@
+                    <button class="btn btn btn-primary" type="button" id="saveDraftBtn" onclick="saveAsDraft()"> Save
+                    </button>
                 </div>
             </div>
         </div>
