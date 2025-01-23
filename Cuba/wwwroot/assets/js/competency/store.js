@@ -54,7 +54,7 @@ window.setState = setState;
 window.getState = getState;
 
 async function fetchDataCompetency(params) {
-  const url = `${url_api}/api/TechnicalCompetency`;
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency`;
   try {
     const result = await ajaxRequest(url, "GET", params);
     return result;
@@ -66,7 +66,7 @@ async function fetchDataCompetency(params) {
 }
 
 async function fetchCompetencyDetail(payload) {
-  const url = `${url_api}/api/TechnicalCompetency/kkj-detail/${payload}`;
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/kkj-detail/${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
