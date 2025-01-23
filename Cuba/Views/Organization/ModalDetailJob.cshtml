@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <div style="padding:5px">
                     <h5 class="f-w-600" id="jobName">Job Name</h5>
-                    <input type="text" class="form-control" id="positionCode" hidden>
+                    <input type="text" class="form-control" id="positionId" hidden>
                     <!-- Card info start-->
                     <div class="custom-card-draft">
                         <div class="header-card-draft">
@@ -198,12 +198,14 @@
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
                         Back
                     </button>
-                    <button class="btn btn-outline-light" type="button" onclick="handleDeleteJob()">
+                    <button class="btn btn-outline-light" type="button" id="deleteJob" onclick="handleDeleteJob()">
                         <i class="icon-trash" style="font-size: 1em;"></i> Delete
                     </button>
-                    <button class=" btn btn-outline-light" type="button" onclick="handleEditJob()">
+                    <button class=" btn btn-outline-light" type="button" id="editJob" onclick="handleEditJob()">
                         <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit
                     </button>
+                    <button class="btn btn-primary" type="button" id="handleExport">Export</button>
+                    <button class="btn btn-primary" type="button" id="duplicateJob" onclick="handleDuplicate()">Duplicate</button>
                     <button class="btn btn-primary" type="button" onclick="showJobDesc()"> Show Jobdesc </button>
                     <button class="btn btn-primary" type="button" onclick="showRasciMatrix()"> Show Rasci Matrix </button>
                 </div>

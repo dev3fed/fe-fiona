@@ -5,6 +5,13 @@
 <style>
     .os-container {
         background-color: #F5F5F5;
+        height: 400px;
+    }
+
+    .empty-data-container{
+        background-color: #F5F5F5;
+        height: 400px;
+
     }
 
     #orgThree .no-children .jstree-icon {
@@ -37,7 +44,20 @@
 
     @* class edit *@
     [data-n-id].edit rect {
-        fill: #FFD700;
+        fill: #fff3cd;
+        stroke: #ffc107;
+    }
+    [data-n-id].create rect {
+        fill: #e6f6fe;
+        stroke: #03a9f4;
+    }
+    [data-n-id].delete rect {
+        fill: #f8d7da;
+        stroke: #dc3545;
+    }
+    [data-n-id].pointed rect {
+        stroke: #03A9F4;
+        stroke-width: 3;
     }
     .match rect:nth-child(2){
         fill: #F57C00;
@@ -51,8 +71,11 @@
     [data-n-id].bracket_4_edit rect {
         fill: #FFD700;
     }
+
+    
 </style>
 <script src="../assets/js/balkan/orgchart.js"></script>
+<script src="../assets/js/organization-structure/data_detail_position.js"></script>
 <script src="../assets/js/organization-structure/data_cnt.js"></script>
 
 
@@ -60,7 +83,10 @@
 @* style link *@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
-    <div class="container-fluid">
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+    <div class="container-fluid content">
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
@@ -85,6 +111,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
+            
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
@@ -97,7 +124,7 @@
                                 </a></li>
                             <li class="nav-item"><a class="nav-link" id="pills-request" data-bs-toggle="pill"
                                     href="#request" role="tab" aria-controls="pills-request"
-                                    aria-selected="false">Request List
+                                    aria-selected="false">Approval List
                                 </a></li>
                             <li class="nav-item"><a class="nav-link" id="pills-log" data-bs-toggle="pill"
                                     href="#log" role="tab" aria-controls="pills-log"
@@ -108,50 +135,67 @@
                             <div class="tab-pane fade show active" id="chart" role="tabpanel"
                                 aria-labelledby="pills-chart">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    @* <div class="row mt-2">
+                                    </div> *@
                                     <div class="row">
-                                        @* <div class="col-5">
-                                            <input class="form-control" type="text" placeholder="Search" id="inputText" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                        <div class="col-4">
+                                            <label for="">Organization Data Source</label>
+                                            <select class="form-select digits" name="selectDraftOrganization" id="selectDraftOrganization">
+                                                <option></option>
+                                            </select>
                                         </div>
-                                        <div class="col-2" style="padding-left: 0;">
-                                            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
-                                        </div> *@
-                                        <div class="col-5 offset-7 d-flex justify-content-end" style="padding-left: 0;">
-                                            @* <div class="btn-group" role="group">
-                                                <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
-                                                    id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <img
-                                                        src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2"
-                                                        style="margin-top: -1px;margin-right :5px;">Create Job</button>
-                                                <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                                                    <a class="dropdown-item" id="newJob">
-                                                        New Job
-                                                    </a>
-                                                    <a class="dropdown-item" id="duplicateJob">
-                                                        Duplicate Job
-                                                    </a>
-                                                </div>
-                                            </div> *@
-                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="duplicateJob">
-                                                Create Job
+                                        <div class="col-3 align-content-center">
+                                            <label for="">Search Position</label>
+                                            <select class="form-select digits" name="searchOrgNode" id="searchOrgNode">
+                                                @* <option value="30263384">VP IT</option> *@
+                                            </select>
+                                        </div>
+                                        <div class="col-1" style="margin-bottom: 4px;align-self: end;">
+                                            <button class="btn btn-primary w-100" type="button" id="searchOrgNodeButton">Search</button>
+                                        </div>
+                                        <div class="col-4" style="margin-bottom: 4px;align-self: end; justify-content: end;text-align:end">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createDraft">
+                                                <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Draft
                                             </button>
                                             <button class="btn btn-primary me-2 btn-icon" type="button" id="viewOrgTree">
+                                                <img
+                                                        src="~/assets/images/rasci/org-tree.svg" alt="Filter Icon" class="pr-2"
+                                                        style="margin-top: -1px;">
                                                 View Org Tree
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon" type="button"> <img
-                                                    src="~/assets/images/rasci/vector.svg" alt="Filter Icon"
-                                                    style="margin-top: -5px;margin-right: 7px;">Export</button>
-
-                                            <button class="btn btn-outline-primary btn-icon" type="button"> Reset</button>
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="designCost">
+                                                <img
+                                                        src="~/assets/images/rasci/design-cost.svg" alt="Filter Icon" class="pr-2"
+                                                        style="margin-top: -1px;">
+                                                Design Cost
+                                            </button>
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createJob">
+                                                <img
+                                                        src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2"
+                                                        style="margin-top: -1px;">
+                                                Add Position
+                                            </button>
                                         </div>
-                                        <div class="col-12 mt-2" style="text-align: right;">
-                                            <div class="checkbox checkbox-primary"">
-                                                <input id="checkbox1" type="checkbox">
-                                                <label for="checkbox1">Show employee name</label>
+                                        <div class="col-5 m-t-10 p-l-15">
+                                            <div class="d-flex gap-3" id="labelChart" style="display: none !important;">
+                                            @* span *@
+                                            <div class="d-flex gap-2 align-items-center align-self-center"> 
+                                                <div class="square bg-primary-outline-custom"></div>
+                                                <span>New Position</span>
+                                            </div>
+                                            <div class="d-flex gap-2 align-items-center align-self-center"> 
+                                                <div class="square bg-warning-outline-custom"></div>
+                                                <span>Edited Position</span>
+                                            </div>
+                                            <div class="d-flex gap-2 align-items-center align-self-center"> 
+                                                <div class="square bg-danger-outline-custom"></div>
+                                                <span>Deleted Position</span>
+                                            </div>
+                                                
                                             </div>
                                         </div>
                                         <div class="col-12 mt-2">
-                                            <div id="os-container" id="os-container" style="width: 100%; height: 100%"></div>
+                                            <div id="os-container" style=""></div>
                                         </div>
                                     </div>
                                 </div>
@@ -159,17 +203,6 @@
                             <div class="tab-pane fade" id="draft" role="tabpanel"
                                 aria-labelledby="pills-draft">
                                 <div class="card-body">
-                                    @* 3 button *@
-                                    <div class="row">
-                                        <div class="col-12 m-t-10-10 m-b-15">
-                                            <div class="d-flex justify-content-start">
-                                                <button class="btn btn-outline-primary me-2 btn-icon rounded-3
-                                                " type="button"> Create Job</button>
-                                                <button class="btn btn-outline-primary me-2 btn-icon" type="button"> Edit Job</button>
-                                                <button class="btn btn-outline-primary me-2 btn-icon" type="button"> Delete Job</button>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="table-responsive">
@@ -184,9 +217,41 @@
                                 aria-labelledby="pills-request">
                                 <div class="card-body">
                                     <div class="row">
+                                        <div class="col-2">
+                                            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                                                        data-feather="calendar" style="width: 20px;"></i></div>
+                                                    <input class="form-control" type="text" name="datePicker" id="createDate"  placeholder="Submitted Date">
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                                                        data-feather="calendar" style="width: 20px;"></i></div>
+                                                    <input class="form-control" type="text" name="datePicker"  placeholder="Approved/Reject Date">
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            @* select *@
+                                            <select class="form-select digits" name="selectDraftOrganizationNew" id="selectDraftOrganizationNew" placeholder="Organization">
+                                                <option value="0">Choose</option>
+                                                <option value="1">Status 1</option>
+                                                <option value="2">Status 2</option>
+                                                <option value="3">Status 3</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="faq-form">
+                                                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                                                    data-feather="search"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-t-10">
                                         <div class="col-12">
                                             <div class="table-responsive">
-                                                <table class="tableMasterData table table-hover w-100" id="requestList">
+                                                <table class="tableMasterData table table-hover w-100" id="approvalList">
                                                 </table>
                                             </div>
                                         </div>
@@ -197,12 +262,34 @@
                                 aria-labelledby="pills-log">
                                 <div class="card-body">
                                     <div class="row">
+                                        <div class="col-3">
+                                            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                                                        data-feather="calendar" style="width: 20px;"></i></div>
+                                                    <input class="form-control" type="text" name="datePicker"  placeholder="Date">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="faq-form">
+                                                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                                                    data-feather="search"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-t-10">
                                         <div class="col-12">
                                             <div class="table-responsive">
                                                 <table class="tableMasterData table table-hover w-100" id="logList">
                                                 </table>
                                             </div>
                                         </div>
+                                        @* <div class="col-12">
+                                            <div id="empty-data-container" class="empty-data-container text-center align-content-center " style="">
+                                                <img src="../assets/images/organization-structure/Vector.png" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">
+                                                <br>
+                                                <h5 class="text-black-50 m-t-10">Coming Soon</h5>
+                                            </div>
+                                        </div> *@
                                     </div>
                                 </div>
                             </div>
@@ -213,33 +300,10 @@
         </div>
     </div>
 
-
-    
-@* <div class="modal fade" id="modalOrgTree" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Organization Tree</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div style="padding:5px">
-                    <div id="orgThree">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="text-end ">
-                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
-                        Back
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> *@
     <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
-    <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
+    <partial name="~/Views/Organization/ModalConfirm.cshtml" />
+    <partial name="~/Views/Organization/ModalPreviewDesignCost.cshtml" />
+    <partial name="~/Views/Organization/ModalCreateDraftSO.cshtml" />
     <partial name="~/Views/Organization/ModalDetailJob.cshtml" />
 </div>
 @section Script {
@@ -251,6 +315,11 @@
     <script src="../assets/js/header-slick.js"></script>
     <script src="../assets/js/tree/jstree.min.js"></script>
     <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <script src="../assets/js/datepicker/daterange-picker/moment.min.js"></script>
+    <script src="../assets/js/datepicker/daterange-picker/daterangepicker.js"></script>
+    @* <script src="../assets/js/datepicker/daterange-picker/daterange-picker.custom.js"></script> *@
+
+
 
     @* <script src="../assets/js/tree/tree.js"></script> *@
     <!-- Plugins JS Ends-->
@@ -259,12 +328,13 @@
     <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
 
     @* custom js *@
+    <script src="../assets/js/organization-structure/multiple-select.js"></script>
     <script src="../assets/js/organization-structure/constant.js"></script>
     <script src="../assets/js/organization-structure/table-custom.js"></script>
     <script src="../assets/js/authentication.js"></script>
     <script src="../assets/js/organization-structure/helper.js"></script>
     <script src="../assets/js/organization-structure/endpoint.js"></script>
-    <script src="../assets/js/organization-structure/balkan.js"></script>
+    @* <script src="../assets/js/organization-structure/balkan.js"></script> *@
     <script src="../assets/js/organization-structure/index.js"></script>
 
     <script src="../assets/js/script.js"></script>

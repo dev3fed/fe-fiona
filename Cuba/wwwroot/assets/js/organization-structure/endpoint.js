@@ -1,3 +1,16 @@
+async function listDraftSO() {
+  console.log(url.baseUrl, url["api-organization"]);
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/draft/list`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
 async function postInputAttribute(params) {
   const api = `${url}/api/JobTitle/create-draft-job`;
   try {

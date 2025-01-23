@@ -1,244 +1,3 @@
-function getTable(dataSet) {
-  // $("#masterDataList").DataTable({
-  //   dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-  //   buttons: [
-  //     {
-  //       text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Duplicate Subordinate',
-  //       className: "btn btn-primary tet-white asik dt-custom-btn",
-  //       action: function (e, dt, node, config) {
-  //         skidipi("Custom Button Clicked!");
-  //       },
-  //     },
-  //     {
-  //       text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add New Subordinate',
-  //       className: "btn btn-primary tet-white asik dt-custom-btn",
-  //       action: function (e, dt, node, config) {
-  //         alert("Custom Button Clicked!");
-  //       },
-  //     },
-  //   ],
-  //   data: dataSet,
-  //   sort: false,
-  //   columns: [
-  //     {
-  //       title: "No",
-  //       data: "id",
-  //       width: "5%",
-  //       render: function (data, type, row, meta) {
-  //         return meta.row + 1;
-  //       },
-  //     },
-  //     {
-  //       title: "File Name",
-  //       width: "20%",
-  //       data: "name",
-  //     },
-  //     {
-  //       title: "Upload",
-  //       width: "20%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         return (
-  //           `
-  //           <div style="">
-  //             <a id="falseinput_` +
-  //           data?.subName +
-  //           `" class="btn btn-outline-primary mb-2 false_input"> <i class="icofont icofont-upload-alt"></i> Choose File</a>
-  //             <input name="file" style="display:none" class="fileinput"  id="fileinput_` +
-  //           data?.subName +
-  //           `" type="file"  value=""/>
-  //             <input type="hidden" name="name" value="` +
-  //           data?.subName +
-  //           `"/>
-  //           <br/>
-  //             <div class="" style="display:none;align-self:center" id="div_` +
-  //           data?.subName +
-  //           `">
-  //                   <span class="labelfile" id="labelfile_` +
-  //           data?.subName +
-  //           `"></span>
-  //                     <i class="fa fa-times-circle cancelfile" style="color:red" id="cancelfile_` +
-  //           data?.subName +
-  //           `"
-  //               ></i>
-  //             </div>
-  //           </div>
-  //           `
-  //         );
-  //       },
-  //     },
-  //     {
-  //       title: "Upload Date",
-  //       width: "15%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         if (data?.uploadDate === null) return "";
-  //         const date = new Date(data?.uploadDate);
-  //         return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
-  //       },
-  //     },
-  //     {
-  //       title: "Upload By",
-  //       width: "10%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         return data?.uploadBy;
-  //       },
-  //     },
-  //     {
-  //       title: "Download",
-  //       width: "15%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         // <i class="icofont icofont-download"></i>
-  //         let link = data?.fileDownload
-  //           ? `<a href="` +
-  //             data?.fileDownload +
-  //             `" class=" mb-2">
-  //              ` +
-  //             data?.fileName +
-  //             `</a>`
-  //           : "";
-  //         return link;
-  //       },
-  //     },
-  //     {
-  //       title: "History",
-  //       data: null,
-  //       width: "15%",
-  //       render: function (data) {
-  //         return `
-  //         <span class="txt-primary detail" id=""> Detail </span>
-  //         `;
-  //       },
-  //     },
-  //   ],
-  // });
-  // $("#subPositionList").DataTable({
-  //   dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-  //   buttons: [
-  //     {
-  //       text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Duplicate Subordinate',
-  //       className: "btn btn-primary tet-white asik dt-custom-btn",
-  //       action: function (e, dt, node, config) {
-  //         skidipi("Custom Button Clicked!");
-  //       },
-  //     },
-  //     {
-  //       text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add New Subordinate',
-  //       className: "btn btn-primary tet-white asik dt-custom-btn",
-  //       action: function (e, dt, node, config) {
-  //         alert("Custom Button Clicked!");
-  //       },
-  //     },
-  //   ],
-  //   data: dataSet,
-  //   sort: false,
-  //   columns: [
-  //     {
-  //       title: "No",
-  //       data: "id",
-  //       width: "5%",
-  //       render: function (data, type, row, meta) {
-  //         return meta.row + 1;
-  //       },
-  //     },
-  //     {
-  //       title: "File Name",
-  //       width: "20%",
-  //       data: "name",
-  //     },
-  //     {
-  //       title: "Upload",
-  //       width: "20%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         return (
-  //           `
-  //           <div style="">
-  //             <a id="falseinput_` +
-  //           data?.subName +
-  //           `" class="btn btn-outline-primary mb-2 false_input"> <i class="icofont icofont-upload-alt"></i> Choose File</a>
-  //             <input name="file" style="display:none" class="fileinput"  id="fileinput_` +
-  //           data?.subName +
-  //           `" type="file"  value=""/>
-  //             <input type="hidden" name="name" value="` +
-  //           data?.subName +
-  //           `"/>
-  //           <br/>
-  //             <div class="" style="display:none;align-self:center" id="div_` +
-  //           data?.subName +
-  //           `">
-  //                   <span class="labelfile" id="labelfile_` +
-  //           data?.subName +
-  //           `"></span>
-  //                     <i class="fa fa-times-circle cancelfile" style="color:red" id="cancelfile_` +
-  //           data?.subName +
-  //           `"
-  //               ></i>
-  //             </div>
-  //           </div>
-  //           `
-  //         );
-  //       },
-  //     },
-  //     {
-  //       title: "Upload Date",
-  //       width: "15%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         if (data?.uploadDate === null) return "";
-  //         const date = new Date(data?.uploadDate);
-  //         return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
-  //       },
-  //     },
-  //     {
-  //       title: "Upload By",
-  //       width: "10%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         return data?.uploadBy;
-  //       },
-  //     },
-  //     {
-  //       title: "Download",
-  //       width: "15%",
-  //       data: null,
-  //       render: function (data, type, row) {
-  //         // choose file with icon
-  //         // <i class="icofont icofont-download"></i>
-  //         let link = data?.fileDownload
-  //           ? `<a href="` +
-  //             data?.fileDownload +
-  //             `" class=" mb-2">
-  //              ` +
-  //             data?.fileName +
-  //             `</a>`
-  //           : "";
-  //         return link;
-  //       },
-  //     },
-  //     {
-  //       title: "History",
-  //       data: null,
-  //       width: "15%",
-  //       render: function (data) {
-  //         return `
-  //         <span class="txt-primary detail" id=""> Detail </span>
-  //         `;
-  //       },
-  //     },
-  //   ],
-  // });
-}
-
 function getTablePositionList(dataSet, status) {
   if ($.fn.DataTable.isDataTable("#subPositionList")) {
     $("#subPositionList").DataTable().destroy();
@@ -246,13 +5,13 @@ function getTablePositionList(dataSet, status) {
   $("#subPositionList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
     buttons: [
-      {
-        text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Duplicate Sub Position',
-        className: "btn btn-primary tet-white asik dt-custom-btn",
-        action: function (e, dt, node, config) {
-          skidipi("Custom Button Clicked!");
-        },
-      },
+      // {
+      //   text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Duplicate Sub Position',
+      //   className: "btn btn-primary tet-white asik dt-custom-btn",
+      //   action: function (e, dt, node, config) {
+      //     skidipi("Custom Button Clicked!");
+      //   },
+      // },
       {
         text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add New Sub Position',
         className: "btn btn-primary tet-white asik dt-custom-btn",
@@ -265,6 +24,7 @@ function getTablePositionList(dataSet, status) {
       },
     ],
     data: dataSet,
+    autoWidth: false,
     sort: false,
     columns: [
       {
@@ -277,34 +37,39 @@ function getTablePositionList(dataSet, status) {
       },
       {
         title: "Sub Position Name",
-        width: "20%",
-        data: "positionName",
+        width: "30%",
+        data: "subPositionName",
       },
       {
         title: "Career Level",
-        width: "20%",
+        width: "30%",
         data: "careerLevel",
       },
       {
         title: "PRL Org",
-        width: "10%",
-        data: "prlOrg",
+        width: "15%",
+        data: null,
+        render: function (data) {
+          if (data.prlOrg === data.prlOrgTo) {
+            return data.prlOrg;
+          }
+          return `${data.prlOrg} - ${data.prlOrgTo}`;
+        },
       },
       {
         title: "Formation",
-        width: "20%",
+        width: "5%",
         data: "formation",
       },
       {
         title: "Action",
         data: null,
-        width: "25%",
+        width: "15%",
         render: function (data) {
           // button action edit and delete
-          return `
-          <button class="btn btn-dark btn-sm" onclick="editSubPosition('${data.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteSubPosition('${data.id}')">Delete</button>
-          `;
+          const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editSubPosition('${data.id}')"> <i class="icon-pencil f-16"></i></button>`;
+          const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteSubPosition('${data.id}')"><i class="icon-trash f-16"></i></button>`;
+          return `${editPositionDraft} ${deletePositionDraft}`;
         },
       },
     ],
@@ -445,7 +210,6 @@ function getTableSubordinateList(dataSet) {
 }
 
 async function getTableListDraft(params) {
-  const data = await listDraftOrganizationStructure(params);
   if ($.fn.DataTable.isDataTable("#draftList")) {
     $("#draftList").DataTable().destroy();
   }
@@ -453,68 +217,60 @@ async function getTableListDraft(params) {
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
     buttons: [
       {
-        text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Duplicate Job',
+        text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Draft Organization Structure',
         className: "btn btn-primary tet-white asik dt-custom-btn",
         action: function (e, dt, node, config) {
-          localStorage.removeItem("uniqueCode");
-          window.location.href = "/organization/detail?duplicate=true";
-        },
-      },
-      {
-        text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add New Job',
-        className: "btn btn-primary tet-white asik dt-custom-btn",
-        action: function (e, dt, node, config) {
-          localStorage.removeItem("uniqueCode");
-          window.location.href = "/organization/detail";
+          $("#modalCreateDraftSO").modal("show");
         },
       },
     ],
     autoWidth: false,
-    data: data.data,
+    data: params,
     sort: false,
     columns: [
       {
         title: "No",
         data: "id",
-        width: "2%",
+        width: "5%",
         render: function (data, type, row, meta) {
           return meta.row + 1;
         },
       },
       {
-        title: "Request ID",
-        width: "18%",
-        data: "reqId",
-      },
-      {
         title: "Draft Name",
-        width: "15%",
         data: "draftName",
+        width: "50%",
       },
       {
         title: "Created By",
         width: "15%",
-        data: "name",
+        data: null,
+        render: function (data) {
+          return `
+          <span>${data?.createdBy}</span>
+          <br/>
+          <span class="text-muted f-12">${data.createdDate}</span>
+          `;
+        },
       },
       {
-        title: "Created Date",
+        title: "Updated By",
         width: "15%",
-        data: "createdAt",
-      },
-      {
-        title: "Type",
-        width: "15%",
-        data: "typeDetail",
+        data: null,
+        render: function (data) {
+          return `
+          <span>${data?.modifiedBy}</span>
+          <br/>
+          <span class="text-muted f-12">${data?.modifiedDate}</span>
+          `;
+        },
       },
       {
         title: "Action",
         width: "15%",
         data: null,
         render: function (data) {
-          return `
-          <button class="" style="background:transparent;color:black;padding:4px 12px;font-size:12px;border:1px solid black;"  onclick="detailDraft('${data.id}')"> <i class="icon-eye p-r-5"></i>Detail</button>
-          <button class="" style="background:transparent;color:red;padding:4px 12px;font-size:12px;border:1px solid red;"  onclick="deleteDraft('${data.id}')"><i class="icon-trash p-r-5"></i> Delete</button>
-          `;
+          return checkButtonTable("draftList", data.draftId, lastPath);
         },
       },
     ],
@@ -525,7 +281,7 @@ async function getTableListDraft(params) {
   $("#requestList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
     buttons: [],
-    data: data.data,
+    data: listDraft,
     sort: false,
     responsive: true,
     columns: [
@@ -538,28 +294,24 @@ async function getTableListDraft(params) {
         },
       },
       {
-        title: "Request ID",
-        data: "reqId",
+        title: "Draft Name",
+        data: "draft-name",
+        width: "30%",
       },
       {
-        title: "Type",
-        data: "typeDetail",
+        title: "Created By",
+        data: "created-by",
+        width: "30%",
       },
       {
-        title: "Requester",
-        data: "name",
-      },
-      {
-        title: "Approver",
-        data: "name",
-      },
-      {
-        title: "Status",
-        data: "name",
+        title: "Updated By",
+        data: "updated-by",
+        width: "30%",
       },
       {
         title: "Action",
         data: null,
+        width: "8%",
         render: function (data) {
           return `
           <button class="btn btn-dark" style="padding:4px 12px;font-size:12px;"  onclick="editDraft('${data.id}')">Edit</button>
@@ -571,15 +323,173 @@ async function getTableListDraft(params) {
   });
 }
 
-async function getTableListLog(params) {
-  const data = await listDraftOrganizationStructure(params);
+function getTableListApproval(params) {
+  if ($.fn.DataTable.isDataTable("#approvalList")) {
+    $("#approvalList").DataTable().destroy();
+  }
+  $("#approvalList").DataTable({
+    dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
+    buttons: [],
+    autoWidth: false,
+    data: params,
+    sort: false,
+    searching: false, // Disable the search box
+    columns: [
+      {
+        title: "No",
+        data: "id",
+        width: "5%",
+        render: function (data, type, row, meta) {
+          return meta.row + 1;
+        },
+      },
+      {
+        title: "Request ID",
+        data: "request-id",
+        width: "15%",
+      },
+      {
+        title: "Draft Name",
+        data: "draft-name",
+        width: "20%",
+      },
+      {
+        title: "Submitted Date",
+        data: "submitted-date",
+        width: "15%",
+      },
+      {
+        title: "Approval/Reject Date",
+        data: "approval-reject-date",
+        width: "15%",
+      },
+      {
+        title: "Status",
+        data: null,
+        width: "15%",
+        render: function (data) {
+          return `<span class="p-2 b-r-8 ${statusApprovalClass[data.status]}">${statusApproval[data.status]}</span>`;
+        },
+      },
+      {
+        title: "Action",
+        width: "25%",
+        className: "text-center",
+        data: null,
+        render: function (data) {
+          return checkButtonTable("approvalList", data.id, lastPath);
+        },
+      },
+    ],
+  });
+}
+
+function getTableListDraftDetail(params, lastPath) {
+  if ($.fn.DataTable.isDataTable("#draftListDetail")) {
+    $("#draftListDetail").DataTable().destroy();
+  }
+  const buttons =
+    lastPath === "draft-detail"
+      ? [
+          {
+            text: '<img src="/assets/images/rasci/plus.svg" alt="" style="margin-top: -1px;margin-right: 2px;"> Add Job Title',
+            className: "btn btn-primary tet-white asik dt-custom-btn",
+            action: function (e, dt, node, config) {
+              addJobTitle();
+            },
+          },
+          {
+            text: '<img src="/assets/images/rasci/download.svg" alt="download icon" style="margin-top: -1px;margin-right: 2px;"> Import',
+            className: "btn btn-primary tet-white asik dt-custom-btn",
+            action: function (e, dt, node, config) {
+              importDraft();
+            },
+          },
+          {
+            text: '<img src="/assets/images/rasci/upload.svg" alt="upload icon" style="margin-top: -1px;margin-right: 2px;"> Export',
+            className: "btn btn-primary tet-white asik dt-custom-btn",
+            action: function (e, dt, node, config) {
+              exportDraft();
+            },
+          },
+        ]
+      : [];
+
+  $("#draftListDetail").DataTable({
+    dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
+    buttons: buttons,
+    autoWidth: false,
+    data: params,
+    sort: false,
+    columns: [
+      {
+        title: "No",
+        data: "id",
+        width: "5%",
+        render: function (data, type, row, meta) {
+          return meta.row + 1;
+        },
+      },
+      {
+        title: "Activity Type",
+        data: "type",
+        width: "15%",
+      },
+      {
+        title: "ID Org Unit",
+        data: "orgUnitId",
+        width: "10%",
+      },
+      {
+        title: "ID Pos",
+        data: "positionId",
+        width: "10%",
+      },
+      {
+        title: "Job Title",
+        data: "positionName",
+        width: "20%",
+      },
+      {
+        title: "PRL",
+        data: "prlOrg",
+        width: "5%",
+      },
+      {
+        title: "Direct Report",
+        data: "directReport",
+        width: "20%",
+      },
+      {
+        title: "Action",
+        width: "25%",
+        data: null,
+        render: function (data) {
+          return checkButtonTable("positionList", data.positionId, window.location.pathname.split("/").pop());
+        },
+      },
+    ],
+  });
+}
+
+function getTableListLog(params) {
   if ($.fn.DataTable.isDataTable("#logList")) {
     $("#logList").DataTable().destroy();
   }
   $("#logList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
+    layout: {
+      topStart: {
+        div: {
+          className: "warn",
+          id: "warn-btn",
+          html: "Click button to acknowledge: <button>Ack</button>",
+        },
+      },
+    },
     buttons: [],
-    data: data.data,
+    data: listLog,
+    searching: false, // Disable the search box
     sort: false,
     columns: [
       {
@@ -593,25 +503,55 @@ async function getTableListLog(params) {
       {
         title: "Date Time",
         width: "23%",
-        data: "reqId",
+        data: "date-time",
       },
       {
         title: "User",
         width: "25%",
-        data: "draftName",
+        data: "user-name",
       },
       {
-        title: "Activity",
+        title: "Draft Name",
         width: "25%",
-        data: "name",
+        data: "draft-name",
       },
       {
         title: "Detail",
         width: "25%",
-        data: "createdAt",
+        data: "detail",
       },
     ],
   });
 }
 
-// editSubPosition button on table subPositionList
+function getDeleteMoveVariousTable(params) {
+  if ($.fn.DataTable.isDataTable("#deleteMoveVariousTable")) {
+    $("#deleteMoveVariousTable").DataTable().destroy();
+  }
+  $("#deleteMoveVariousTable").DataTable({
+    dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
+    layout: {
+      topStart: {
+        div: {
+          className: "warn",
+          id: "warn-btn",
+          html: "Click button to acknowledge: <button>Ack</button>",
+        },
+      },
+    },
+    buttons: [],
+    data: deleteSubordinateList,
+    searching: false, // Disable the search box
+    sort: false,
+    columns: [
+      {
+        title: "Suborinate",
+        width: "100%",
+        data: null,
+        render: function (data) {
+          return checkButtonTable("deleteMoveVariousTable", data?.["subordinate-name"]);
+        },
+      },
+    ],
+  });
+}

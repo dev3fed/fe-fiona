@@ -1,0 +1,231 @@
+<link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
+<div class="modal fade" id="modalDetailJobDraft" tabindex="-1" role="dialog" aria-labelledby="modalDetailJobDraft" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalJobInfoHeader">Detail Activity Position</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="padding:5px">
+                    <h5 class="f-w-600" id="jobName">Job Name (PRL : <span id="prlOrg"></span>)</h5>
+                    <input type="text" class="form-control" id="positionId" hidden>
+                    <!-- Card info start-->
+                    <div class="custom-card-draft">
+                        <div class="header-card-draft">
+                            Info
+                        </div>
+                        <div class="row" style="margin-top:20px">
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <span id="" class="" style="font-size: 13px;">Position Name</span>
+                                <br>
+                                <span id="positionName" class="f-w-600" style="font-size: 16px;"></span>
+                                <br>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label for="" class="" style="font-size: 13px;">Abbrv Position</label>
+                                <br>
+                                <span id="abbrvPosition" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label for="" class="" style="font-size: 13px;">Org Unit Name</label>
+                                <br>
+                                <span id="orgUnitName" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px">
+                                <label for="" class="" style="font-size: 13px;">Org PRIL</label>
+                                <br>
+                                <span id="orgPrl" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <hr class="m-t-20 m-r-5">
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <span id="" class="" style="font-size: 13px;">Formation</span>
+                                <br>
+                                <span id="formation" class="f-w-600" style="font-size: 16px;"></span>
+                                <br>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Career Type</label>
+                                <br>
+                                <span id="careerType" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Career Level</label>
+                                <br>
+                                <span id="careerLevel" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px">
+                                <label id="" class="" style="font-size: 13px;">Basket</label>
+                                <br>
+                                <span id="basket" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <hr class="m-t-20 m-r-5">
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <span id="" class="" style="font-size: 13px;">Direct Report</span>
+                                <br>
+                                <span id="directReport" class="f-w-600" style="font-size: 16px;"></span>
+                                <br>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Fungi Leher</label>
+                                <br>
+                                <span id="neckFunction" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Project/Non Project</label>
+                                <br>
+                                <span id="isProject" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;">
+                                <span id="" class="" style="font-size: 13px;">Coordination</span>
+                                <br>
+                                <span id="coordination" class="f-w-600" style="font-size: 16px;"></span>
+                                <br>
+                            </div>
+                            <hr class="m-t-20 m-r-5">
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Coordination With</label>
+                                <br>
+                                <span id="coordinationWith" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Directorate</label>
+                                <br>
+                                <span id="directorate" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Division</label>
+                                <br>
+                                <span id="division" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px">
+                                <span id="" class="" style="font-size: 13px;">Sub Division</span>
+                                <br>
+                                <span id="subDivision" class="f-w-600" style="font-size: 16px;"></span>
+                                <br>
+                            </div>
+                            <hr class="m-t-20 m-r-5">
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Department</label>
+                                <br>
+                                <span id="department" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Section</label>
+                                <br>
+                                <span id="section" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                            <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="" style="font-size: 13px;">Personnel Area Name</label>
+                                <br>
+                                <span id="personnelAreaName" class="f-w-600" style="font-size: 16px;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card info end-->
+
+                    <div class="custom-card-draft">
+                        <div class="header-card-draft">
+                            Skill Group & Sub Skill Group
+                        </div>
+                        <div style="padding-top: 20px;display:flex" >
+                            <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
+                                <div style="margin: 10px;">
+                                    <span style="font-size: 12px;">Main Skill Group</span>
+                                    <br>
+                                    <span 
+                                    id="modalMainSkillGroup"
+                                    class="f-w-600" style="font-size: 16px;">-</span>
+                                    <br>
+                                </div>
+                                <div style="margin: 10px;">
+                                    <span style="font-size: 12px;">Main Sub Skill Group</span>
+                                    <br>
+                                    <span 
+                                    id="modalMainSubSkillGroup"
+                                    class="f-w-600" style="font-size: 16px;">-</span>
+                                    <br>
+                                </div>
+                            </div>
+                            <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
+                                <div style="margin: 10px;">
+                                    <span style="font-size: 12px;">Second Skill Group</span>
+                                    <br>
+                                    <span 
+                                    id="modalSecondSkillGroup"
+                                    class="f-w-600" style="font-size: 16px;">-</span>
+                                    <br>
+                                </div>
+                                <div style="margin: 10px;">
+                                    <span style="font-size: 12px;">Second Sub Skill Group</span>
+                                    <br>
+                                    <span 
+                                    id="modalSecondSubSkillGroup"
+                                    class="f-w-600" style="font-size: 16px;">-</span>
+                                    <br>
+                                </div>
+                            </div>
+                            <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
+                                <div style="margin: 10px;">
+                                    <span style="font-size: 12px;">Third Skill Group</span>
+                                    <br>
+                                    <span 
+                                    id="modalThirdSkillGroup"
+                                    class="f-w-600" style="font-size: 16px;">-</span>
+                                    <br>
+                                </div>
+                                <div style="margin: 10px;">
+                                    <span style="font-size: 12px;">Third Sub Skill Group</span>
+                                    <br>
+                                    <span 
+                                    id="modalThirdSubSkillGroup"
+                                    class="f-w-600" style="font-size: 16px;">-</span>
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="text-end ">
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                        Back
+                    </button>
+                    @* <button class="btn btn-outline-danger" type="button" onclick="handleDeleteJob()">
+                        <i class="icon-trash" style="font-size: 1em;"></i> Delete
+                    </button>
+                    <button class=" btn btn-outline-light" type="button" onclick="handleEditJob()">
+                        <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit
+                    </button> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@* <div class="modal fade" id="modalDetailJob" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div> *@
+<!-- Bootstrap JS and Popper.js -->
+
+    @* <div class="modal fade" id="modalOrgTree" tabindex="-1" aria-labelledby="modalOrgTreeHeader" aria-hidden="true">
+    <!-- content -->
+</div> *@
