@@ -3,12 +3,12 @@ $(document).ready(function () {
     window.location.href = "/job-description/detail";
   });
 
-  localStorage.getItem("statusManager")
-    ? localStorage.getItem("statusManager")
-    : localStorage.setItem("statusManager", "not available");
-  localStorage.getItem("statusSbm")
-    ? localStorage.getItem("statusSbm")
-    : localStorage.setItem("statusSbm", "not available");
+  // localStorage.getItem("statusManager")
+  //   ? localStorage.getItem("statusManager")
+  //   : localStorage.setItem("statusManager", "not available");
+  // localStorage.getItem("statusSbm")
+  //   ? localStorage.getItem("statusSbm")
+  //   : localStorage.setItem("statusSbm", "not available");
 
   getDataList([
     {
@@ -19,8 +19,8 @@ $(document).ready(function () {
   checkDataOrganization();
 
   let dataList = dataListJobDescription;
-  dataList[0].jobStatus = localStorage.getItem("statusManager");
-  dataList[1].jobStatus = localStorage.getItem("statusSbm");
+  // dataList[0].jobStatus = localStorage.getItem("statusManager");
+  // dataList[1].jobStatus = localStorage.getItem("statusSbm");
   getTableListJobDes(dataList);
 
   $("#selectStatusJobDesc").on("change", function () {

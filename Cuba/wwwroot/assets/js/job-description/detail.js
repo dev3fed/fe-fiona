@@ -109,6 +109,6 @@ $(document).ready(async function () {
     }
   });
 
-  dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
-  dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
+  // dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
+  // dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 });
