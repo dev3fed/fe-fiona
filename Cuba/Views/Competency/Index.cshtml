@@ -78,9 +78,9 @@
                                     href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
                                     aria-selected="false">Dictionary
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-new-tab" data-bs-toggle="pill"
+                            @* <li class="nav-item"><a class="nav-link" id="pills-new-tab" data-bs-toggle="pill"
                                     href="#pills-new" role="tab" aria-controls="pills-new" aria-selected="false">New
-                                </a></li>
+                                </a></li> *@
                             <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
                                     href="#pills-draft" role="tab" aria-controls="pills-draft"
                                     aria-selected="false">Draft
@@ -119,13 +119,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab">
+                            @* <div class="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
                                         <p>Halaman New</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> *@
                             <div class="tab-pane fade" id="pills-draft" role="tabpanel"
                                 aria-labelledby="pills-draft-tab">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
@@ -161,6 +161,7 @@
 @section Script {
     <script>
         const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))'
         const token = localStorage.getItem("token");
 
     </script>

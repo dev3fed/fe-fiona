@@ -324,6 +324,22 @@ async function fetchRelatedJob(id) {
   }
 }
 
+async function fetchProsbisByJob(param) {
+  const url = `${url_api}/api/RasciMatrix/reference-from-position?jobId=${param.jobId}&draftId=${param.draftId}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 async function fetchData() {
   try {
     const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([

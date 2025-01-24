@@ -56,7 +56,6 @@ function loadTableBodyDraft(response) {
     ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
     return;
   }
-  console.log("dataList", dataList);
   const bodyContent = dataList
     .map((val, i) => {
       const startIndex = (page - 1) * pageSize;
@@ -211,14 +210,12 @@ function renderPagination(currentPage, totalPages) {
 }
 
 function handlePageChange(pageNumber) {
-  console.log(`Change to page ${pageNumber}`);
   const payloadDraftList = getState("payloadDraftList");
   setState("payloadDraftList", { ...payloadDraftList, Page: pageNumber });
   const payload = {
     Page: pageNumber,
     PageSize: payloadDraftList.PageSize,
   };
-  console.log("payload", payload);
   serviceDraftList(payload);
 }
 
@@ -350,7 +347,6 @@ async function handleSaveDraft() {
   };
   try {
     const result = await createDraftRasci(payload);
-    console.log(result);
     if (result.success === true) {
       const modaldraft = document.getElementById("modalformDraft");
       const modal = bootstrap.Modal.getInstance(modaldraft);

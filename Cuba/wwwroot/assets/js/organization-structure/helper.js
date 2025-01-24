@@ -519,6 +519,15 @@ async function saveInputAttribut(type, data) {
   payload.type = type;
   saveEmployeeDetails(payload, data);
   saveOrgDetails(payload);
+  if (payload.type == "edit") {
+    data = lsListPosition.find((item) => item.positionId == payload.positionId);
+    swal("Saved", "Save as Draft", "success");
+    window.location.href = "/organization/index?focusNode=" + payload.positionId;
+  } else {
+    swal("Saved", "Save as Draft", "success");
+    const getDirectReport = payload.positionId;
+    window.location.href = "/organization/index?focusNode=" + getDirectReport;
+  }
 }
 
 function saveEmployeeDetails(payload, data) {

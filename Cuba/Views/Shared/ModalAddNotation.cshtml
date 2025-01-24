@@ -158,22 +158,17 @@
 
                         </div>
                     </div>
-                    <div class="col-12 mb-2" style="display: none;" id="posref">
-                        <label class="form-label">position Reference</label>
-                        <select class="form-select digits">
-                            <option>Choose position reference</option>
-                            <option>Position 1</option>
-                            <option>Position 2</option>
-                            <option>Position 3</option>
-                        </select>
-                        <hr style="margin-top:25px;margin-bottom:20px" />
+                    <div class="col-12" style="display: none;" id="posref">
+
+                    </div>
+                    <div class="col-12" style="display: none;" id="table-prosbisref">
                     </div>
                     <div class="col-6" style="display: block;" id="bispro">
                         <label class="form-label">Business Process</label>
                         <div class="card-tblbusiness">
                             <div id="select-business">
                             </div>
-                            <div class="table-responsive mt-2" style=" max-height: 450px;">
+                            <div class="table-responsive  mt-2" style=" max-height: 450px;">
                                 <table class="table tbl-border-notation">
                                     <thead id="tbl-notation-header">
                                     </thead>
@@ -197,13 +192,18 @@
                 </div>
             </div>
             <div class="modal-footer  d-flex justify-content-end">
-                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
-                    onclick="backChangeNotation()">
-                    Back</button>
                 <div>
-                    <button class="btn btn btn-primary" type="button" id="btnDraftnotation"
-                        onclick="saveDraftnotation()"> Save </button>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                        onclick="backChangeNotation()"><i class="icon-arrow-left"></i> Back</button>
+                    <button id="btnDraftnotation" class="btn btn-primary" type="button" onclick="saveDraftnotation()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="spinBtnNotation" role="status"></div>
+                            <span class="btn-text"> Save</span>
+                        </div>
+                    </button>
                 </div>
+
             </div>
         </div>
     </div>

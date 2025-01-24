@@ -192,10 +192,9 @@ const handleDetailEditbp = () => {
   sendDetailbp(dataDetailProsbis);
 };
 
-let selectedLevels = getState("levelSeries") || [];
-
 const handleCheckSeriesLevel = (event) => {
   const level = parseInt(event.target.id.replace("prosbis-l", ""));
+  let selectedLevels = getState("levelSeries") || [];
 
   if (event.target.checked) {
     if (!selectedLevels.includes(level)) {
@@ -256,6 +255,7 @@ const applySeriesProses = async () => {
     const spinner = document.getElementById("applySeries");
     const dataDetailProsbis = getState("dataDetailProsbis");
     spinner.style.display = "inline-block";
+    console.log("levelSeries", levelSeries);
     const payload = {
       type: "seriesOfProcess",
       busProsLevel: levelSeries,

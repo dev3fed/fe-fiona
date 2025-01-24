@@ -20,7 +20,7 @@ async function onModalAddNotation() {
       <div class="col-12">
         <div class="mb-2">
           <label class="form-label">Position</label>
-           <select class="form-select digits" name="jobIdNotation" id="jobIdNotation">
+           <select class="form-select digits" name="jobIdPosition" id="jobIdPosition">
       </select>
         </div>
       </div>
@@ -39,7 +39,12 @@ async function onModalAddNotation() {
         </div>
       </div>
   `;
-
+    const bodyJobRef = `
+    <label class="form-label">position Reference</label>
+      <select class="form-select digits" name="jobIdRef" id="jobIdRef" onchange="onSelectJobRef(event)">
+      </select>
+    <hr style="margin-top:25px;margin-bottom:20px" />
+    `;
     const bodySelectBusiness = `
       <div class="row">
         <div class="col-3">
@@ -59,11 +64,11 @@ async function onModalAddNotation() {
           <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
           <th scope="col">Comment (Optional)</th>
           </tr>`;
-
     tblChangeNotation(rasciNotation);
     cardSelectedNotasilist(dataChangeNotasi);
     document.getElementById("select-business").innerHTML = bodySelectBusiness;
     document.getElementById("tbl-notation-header").innerHTML = theadContent;
+    document.getElementById("posref").innerHTML = bodyJobRef;
 
     const bodyContent = document.getElementById("form-notation");
     if (bodyContent) {
@@ -73,7 +78,9 @@ async function onModalAddNotation() {
     // Initialize Bootstrap Select
     $(".selectpicker").selectpicker();
     updateSelectProsbis();
-    selectJobNotation();
+    selectJobPosition();
+    selectJobReference();
+    initializeTooltips();
   } catch (error) {}
 }
 
@@ -161,6 +168,143 @@ function updateSelectProsbis() {
       page = 1;
     });
 }
+
+async function onSelectJobRef(event) {
+  const jobId = event.target.value;
+  const dataChangeNotasi = getState("dataChangeNotasi");
+  try {
+    const reset = {
+      ...dataChangeNotasi,
+      busProsMapped: [],
+    };
+    setState("dataChangeNotasi", reset);
+    if (jobId) {
+      const payload = { draftId: dataChangeNotasi.draftId, jobId: jobId };
+      const result = await fetchProsbisByJob(payload);
+      if (result.success === true) {
+        const dataTbl = result.data;
+        const elementSelectedBispro = document.getElementById("table-prosbisref");
+        elementSelectedBispro.style.display = "block";
+        const contentRefProsbis = `
+        <div class="table-responsive scrollable mt-2" style=" max-height: 220px;">
+            <table class="table tbl-border-notation">
+                <thead>
+                <tr>
+                <th scope="col" style="width: 50px"></th>
+              <th scope="col" style="width: 80px">Level</th>
+              <th scope="col" style="width: 100px;text-align:center">Index</th>
+              <th scope="col" >Business Process</th>
+              <th scope="col" style="width: 120px;text-align:center">RASCI</th>
+              </tr>
+                </thead>
+                <tbody>
+                <tr>
+                ${dataTbl
+                  .map((item, index) => {
+                    let rasciIcons = "";
+                    let comments = [];
+                    item.rasciNotation.forEach((value) => {
+                      switch (value.notation) {
+                        case "R":
+                          rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
+                          break;
+                        case "A":
+                          rasciIcons += `<img src="/assets/images/rasci/a.svg" alt="A Icon" style="padding-right:2px">`;
+                          break;
+                        case "S":
+                          rasciIcons += `<img src="/assets/images/rasci/s.svg" alt="S Icon" style="padding-right:2px">`;
+                          break;
+                        case "C":
+                          rasciIcons += `<img src="/assets/images/rasci/c.svg" alt="C Icon" style="padding-right:2px">`;
+                          break;
+                        case "I":
+                          rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
+                          break;
+                      }
+
+                      if (value.comment) {
+                        comments.push(`<li>${value.notation}: ${value.comment}</li>`);
+                      }
+                    });
+
+                    if (comments.length > 0) {
+                      const commentTooltip = `<ul>${comments.join("")}</ul>`;
+                      rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
+                    }
+                    return `
+                   <th scope="row">
+                    <label class="radio-label" for="checked-body-bp">
+                      <input class="checkbox_animated" id="checked-prosbisref-${item.indexNo}" 
+                        type="checkbox" value="${item.indexNo}" 
+                        onclick="onSelectProsbisRef(${JSON.stringify(item).replace(/"/g, "&quot;")})">
+
+                    </label>
+                  </th>
+                  <td>
+                    ${item.level}
+                  </td>
+                  <td style="text-align:center">
+                  ${item.indexNo}
+                  </td>
+                  <td>
+                  ${item.process}
+                  </td>
+                  <td>
+                      <div class="rasci-container">
+                        <div class="rasci-icons">${rasciIcons}</div>
+                      </div>
+                  </td>
+                </tr>
+                  `;
+                  })
+                  .join("")}
+                </tbody>
+            </table>
+        </div>`;
+        elementSelectedBispro.innerHTML = contentRefProsbis;
+      }
+    } else {
+      $("#table-prosbisref").hide();
+      return;
+    }
+  } catch (error) {}
+}
+
+function onSelectProsbisRef(item) {
+  const elementChecked = document.getElementById(`checked-prosbisref-${item.indexNo}`);
+  const isChecked = elementChecked.checked;
+  const selectedJobId = document.getElementById("jobIdPosition");
+  const dataChangeNotasi = getState("dataChangeNotasi") || { busProsMapped: [] };
+
+  if (isChecked) {
+    const notation = item.rasciNotation.map((notation) => ({
+      rasciCode: notation.notation,
+      comment: notation.comment,
+      isChecked: isChecked,
+    }));
+
+    const updatedPayload = {
+      ...dataChangeNotasi,
+      jobId: selectedJobId.value,
+      busProsMapped: [
+        ...dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNo),
+        {
+          parentId: item.indexNo,
+          rasciNotation: notation,
+        },
+      ],
+    };
+    setState("dataChangeNotasi", updatedPayload);
+  } else {
+    const updatedPayload = {
+      ...dataChangeNotasi,
+      busProsMapped: dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNo),
+    };
+
+    setState("dataChangeNotasi", updatedPayload);
+  }
+}
+
 function onSelectLevel(event) {
   const value = event.target.value;
   const parentSelect = document.querySelector("#businessId");
@@ -183,7 +327,7 @@ function onSelectLevel(event) {
 async function triggleSelectBusiness() {
   const selectedBusinessId = $("#businessId");
   const selectedLevel = $("#levelId");
-  const selectedJobId = document.getElementById("jobIdNotation");
+  const selectedJobId = document.getElementById("jobIdPosition");
   const selectedValue = selectedBusinessId.val();
   const selectedJobValue = selectedJobId.value;
   const businessName = selectedBusinessId.find(":selected").text();
@@ -213,9 +357,50 @@ async function triggleSelectBusiness() {
     cardSelectedNotasilist(payload);
   }, 200);
 }
-function selectJobNotation() {
+function selectJobPosition() {
   const dataProsbis = getState("insertProsbis");
-  $("#jobIdNotation")
+  $("#jobIdPosition")
+    .select2({
+      dropdownParent: $("#modalAddNotation"),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "job",
+            draftId: dataProsbis.draftId,
+          };
+        },
+        processResults: function (data) {
+          if (data && data.data) {
+            return {
+              results: data.data.res,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
+}
+
+function selectJobReference() {
+  const dataProsbis = getState("insertProsbis");
+  $("#jobIdRef")
     .select2({
       dropdownParent: $("#modalAddNotation"),
       placeholder: "Choose",
@@ -256,20 +441,23 @@ function selectJobNotation() {
 
 const handleRadioChange = (event) => {
   const value = event.target.value;
+  const jobSelect = $("#jobIdRef");
+  const dataChangeNotasi = getState("dataChangeNotasi");
+  const reset = {
+    ...dataChangeNotasi,
+    busProsMapped: [],
+  };
   if (value === "reference") {
-    const elementPosref = document.getElementById("posref");
-    const elementBispro = document.getElementById("bispro");
-    const elementSelectedBispro = document.getElementById("selectedBispro");
-    elementPosref.style.display = "block";
-    elementBispro.style.display = "none";
-    elementSelectedBispro.style.display = "none";
+    $("#posref").show();
+    $("#bispro, #selectedBispro").hide();
+    cardSelectedNotasilist(reset);
+    setState("dataChangeNotasi", reset);
   } else if (value === "nonReference") {
-    const elementPosref = document.getElementById("posref");
-    const elementBispro = document.getElementById("bispro");
-    const elementSelectedBispro = document.getElementById("selectedBispro");
-    elementPosref.style.display = "none";
-    elementBispro.style.display = "block";
-    elementSelectedBispro.style.display = "block";
+    jobSelect.val(null).trigger("change");
+    $("#table-prosbisref").hide();
+    $("#posref").hide();
+    $("#bispro, #selectedBispro").show();
+    setState("dataChangeNotasi", reset);
   }
 };
 const tblRasciNotation = (rasciNotation) => {
@@ -325,6 +513,11 @@ function backChangeNotation() {
   });
   setState("dataChangeNotasi", { busProsMapped: [] });
   setState("rasciNotation", updatedRasciNotation);
+  const jobSelect = $("#jobIdRef");
+  jobSelect.val(null).trigger("change");
+  $("#table-prosbisref").hide();
+  $("#posref").hide();
+  $("#bispro, #selectedBispro").show();
 }
 
 function formValidationNotation() {
@@ -530,10 +723,7 @@ async function saveNotationRow() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          const IsNotEmpty = dataDraft.data.length;
-          handleClickCard(IsNotEmpty);
           loadTableBodyDraft(dataDraft);
-          $("#pills-draft-tab").tab("show");
         });
       }, 100);
     }
@@ -541,6 +731,8 @@ async function saveNotationRow() {
 }
 async function saveDraftnotation() {
   try {
+    const spinner = document.getElementById("spinBtnNotation");
+    spinner.style.display = "inline-block";
     const dataChangeNotasi = getState("dataChangeNotasi");
     const inputValue = {
       draftName: dataChangeNotasi.draftName,
@@ -574,20 +766,18 @@ async function saveDraftnotation() {
             },
           },
         }).then(async () => {
+          spinner.style.display = "none";
           if (modal) {
             modal.hide();
           }
-          backFromModalBp();
+          backChangeNotation();
           const payload = {
             Page: 1,
             PageSize: 5,
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          const IsNotEmpty = dataDraft.data.length;
-          handleClickCard(IsNotEmpty);
           loadTableBodyDraft(dataDraft);
-          $("#pills-draft-tab").tab("show");
         });
       }, 100);
     }

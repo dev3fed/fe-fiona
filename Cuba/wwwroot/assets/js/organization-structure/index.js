@@ -256,8 +256,8 @@ function confirmEditJob() {
     window.location.href = "/organization/form-position?positionId=" + positionId;
   } else {
     console.log("masuk sini");
-    const table = $("#editMoveVariousTable").DataTable();
-    const data = table.rows().data();
+    const table = $("#editMoveVariousTable");
+    const data = table.DataTable().rows().data().toArray();
     // get data select inside table
     const dataSelect = data.map((item) => ({
       positionId: item[0],
@@ -272,15 +272,89 @@ function confirmEditJob() {
       alert("Please select direct report");
       return;
     }
-    // console.log($(`#editSelect0`).val());
-    // console.log($(`#editSelect0`).text());
-    //   {
-    //   positionId: item[0],
-    //   directReportId: $(`#editSelect${item[0]}`).val(),
-    // }));
-    // console.log(dataSelect);
+    dataSelectFiltered.forEach((item) => {
+      console.log("item", item);
+      const position = lsListPosition.find((x) => x.positionId == item.positionId);
+      const directReport = lsListPosition.find((x) => x.positionId == item.directReportId);
+      console.log("position", position);
+      console.log("directReport", directReport);
+
+      // update listPosition
+      // update directReportId
+      const indexPosition = lsListPosition.findIndex((x) => x.positionId == item.positionId);
+      lsListPosition[indexPosition].directReportId = parseInt(item.directReportId);
+      lsListPosition[indexPosition].directReport = directReport.positionName;
+
+      lsListPosition[indexPosition].draftId = organizationAttribute.orgUnitId;
+      lsListPosition[indexPosition].type = "edit";
+
+      const payload = {
+        positionId: item.positionId,
+        draftId: organizationAttribute.orgUnitId,
+        // add other necessary properties here
+      };
+
+      console.log("item.directReportId", item.directReportId);
+      const checkData = lsListDetailDraft.find(
+        (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+      );
+
+      if (checkData) {
+        const index = lsListDetailDraft.findIndex(
+          (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+        );
+        lsListDetailDraft[index] = lsListPosition[indexPosition];
+      } else {
+        lsListDetailDraft.push(lsListPosition[indexPosition]);
+      }
+
+      // update listDraftOrgNode and listOrgNode
+      const indexOrgNode = lsListOrgNode.findIndex((x) => x.id_position == item.positionId);
+      console.log(indexOrgNode);
+      lsListOrgNode[indexOrgNode].id_position_atasan_langsung = parseInt(item.directReportId);
+      lsListOrgNode[indexOrgNode].pid = parseInt(item.directReportId);
+      lsListOrgNode[indexOrgNode].tags.push("edit");
+      lsListOrgNode[indexOrgNode].draft_id = organizationAttribute.orgUnitId;
+      lsListOrgNode[indexOrgNode].type = "edit";
+
+      const checkData2 = lsListDraftOrgNode.find(
+        (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
+      );
+      if (checkData2) {
+        const index = lsListDraftOrgNode.findIndex(
+          (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
+        );
+        lsListDraftOrgNode[index] = lsListOrgNode[indexOrgNode];
+      } else {
+        lsListDraftOrgNode.push(lsListOrgNode[indexOrgNode]);
+      }
+      // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
+      localStorage.setItem("listDraftDetail", JSON.stringify(lsListDetailDraft));
+      // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
+      localStorage.setItem("listDraftOrgNode", JSON.stringify(lsListDraftOrgNode));
+    });
+
+    // return;
+
+    changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
+    getDataOrganization(organizationAttribute.orgUnitId);
+    $("#modalConfirm").modal("hide");
+    swal("Success", "Job has been edited", "success");
+    focusNode(positionId);
+    // const checkData = lsListDetailDraft.find(
+    //   (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    // );
+    // console.log("checkData 1", checkData, payload.draftId);
+
+    // if (checkData) {
+    //   const index = lsListDetailDraft.findIndex(
+    //     (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    //   );
+    //   lsListDetailDraft[index] = payload;
+    // } else {
+    //   lsListDetailDraft.push(payload);
+    // }
   }
-  // alert("masok");
 }
 
 async function handleEditJob() {
@@ -292,6 +366,11 @@ async function handleEditJob() {
   //   window.location.href = "/organization/form-position?positionId=" + getPositionById;
   // }
   const findChildren = lsListPosition.filter((x) => x.directReportId == getPositionById);
+  //  have no children then straght redirect
+  if (!findChildren.length) {
+    window.location.href = "/organization/form-position?positionId=" + getPositionById;
+    return;
+  }
   const option = lsListPosition.map((item) => ({ id: item.positionId, text: item.positionName }));
   // create table editMoveVariousTable
   let table = ` <table class="tableMasterData table table-hover w-100" id="editMoveVariousTable">`;
@@ -322,10 +401,7 @@ async function handleEditJob() {
 
   table += `</table>`;
 
-  console.log(findChildren);
-
-  const divEditSpesific = `<span>Are you sure want to delete <b>Manager Strategic Planning</b> position?</span>
-    <br/>
+  const divEditSpesific = `
     <div class="col">
         <div class="mb-3 m-t-15 custom-radio-ml">
             <div class="form-check radio radio-primary">
