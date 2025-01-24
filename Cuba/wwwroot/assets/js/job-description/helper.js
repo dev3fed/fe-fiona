@@ -233,7 +233,7 @@ async function searchJobCompare(event, isPercentage) {
     const findData = dataJobDescCompare.filter((item) => item.identifikasi.percentage >= value);
     const urlParams = new URLSearchParams(window.location.search);
     const idPos = urlParams.get("id");
-    const selectedIdPos = dataJobDesc.find((item) => item.identifikasi.id == idPos);
+    const selectedIdPos = dataJobDesc.find((item) => item.identifikasi.id_position == idPos);
     // if selectedIdPos?.identifikasi?.jobName include manager
     let include = "sbm";
     if (selectedIdPos?.identifikasi?.jobName.toLowerCase().includes("manager")) {
@@ -357,7 +357,7 @@ async function addJobReference() {
 
 async function applySelectedData(id) {
   $("#detailJob").empty();
-  let data = dataJobDescCompare.filter((item) => item.identifikasi.id === id);
+  let data = dataJobDescCompare.filter((item) => item.identifikasi.id_position === id);
   selectedData.selectedJobDesc = data[0];
   let row = "<div class='row'>";
   for (const item of data) {

@@ -13,15 +13,26 @@ $(document).ready(async function () {
   const isCrete = urlParams.get("create");
   if (idPos) {
     if (isCrete) {
-      const findData = dataJobDesc.find((item) => item.identifikasi.id == idPos);
-      $("#selectJobReference").val(findData.identifikasi.id);
+      // $("#addJobReference").show();
+      $("#selectJobReference").attr("disabled", false);
+      // remove created CSS clas as follow to tugas Ha table
+      removeJobDescViewCss();
+      const findData = dataJobDesc.find((item) => item.identifikasi.id_position == idPos);
+      $("#selectJobReference").val(findData.identifikasi.id_position);
       getJobReference(findData);
     } else {
-      const findData = await dataJobDescCompare.find((item) => item.identifikasi.id == idPos);
+      const findData = await dataJobDescCompare.find((item) => item.identifikasi.id_position == idPos);
       $("#selectJobReference").append(
-        `<option value="${findData.identifikasi.id}">${findData.identifikasi.jobName}</option>`
+        `<option value="${findData.identifikasi.id_position}">${findData.identifikasi.jobName}</option>`
       );
-      $("#selectJobReference").val(findData.identifikasi.id);
+      $("#selectJobReference").val(findData.identifikasi.id_position);
+      // disable selectJobReference
+      $("#selectJobReference").attr("disabled", true);
+      // $("#addJobReference").hide();
+      // add created CSS clas as follow to tugas Ha table
+
+      injectViewModeCss();
+
       let dataFungsi = [{ fungsi: findData.fungsi }];
       let tugasHa = findData.tugasHa;
       let koordinasi = findData.koordinasi;
@@ -67,8 +78,7 @@ $(document).ready(async function () {
   $("#selectJobReference").on("change", function (e) {
     const data = e.target.value;
     console.log("data", data);
-    const findData = dataJobDesc.find((item) => item.identifikasi.id == data);
-    console.log("findData", findData);
+    const findData = dataJobDesc.find((item) => item.identifikasi.id_position == data);
     getJobReference(findData);
     isDisableButton(false);
     $(".summernote").summernote("enable");
@@ -112,3 +122,90 @@ $(document).ready(async function () {
   // dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
   // dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 });
+
+const viewCss = css`
+  table#tugasHaTable td:nth-child(5),
+  table#tugasHaTable th:nth-child(5) {
+    display: none;
+  }
+
+  table#koordinasiTable td:nth-child(4),
+  table#koordinasiTable th:nth-child(4) {
+    display: none;
+  }
+
+  table#relationTable td:nth-child(4),
+  table#relationTable th:nth-child(4) {
+    display: none;
+  }
+
+  #addJobReference {
+    display: none;
+  }
+
+  #addJobKoordinasi {
+    display: none;
+  }
+
+  #editDataKoordinasi {
+    display: none;
+  }
+
+  #addJobRelasi {
+    display: none;
+  }
+
+  #editDataRelasi {
+    display: none;
+  }
+
+  #addJobPersyaratan {
+    display: none;
+  }
+
+  #editDataPersyaratan {
+    display: none;
+  }
+
+  #addJobKhusus {
+    display: none;
+  }
+
+  #editDataKhusus {
+    display: none;
+  }
+
+  #addJobKompetensi {
+    display: none;
+  }
+
+  #editDataKompetensi {
+    display: none;
+  }
+`;
+
+function removeJobDescViewCss() {
+  const style = document.getElementById("jobDescViewCss");
+  if (style) {
+    style.remove();
+  }
+}
+
+function injectViewModeCss() {
+  let style = document.getElementById("jobDescViewCss");
+  if (style) {
+    return;
+  }
+  style = document.createElement("style");
+  style.id = "jobDescViewCss";
+  style.innerHTML = viewCss;
+  document.head.appendChild(style);
+}
+
+function css(strings, ...values) {
+  let str = "";
+  strings.forEach((string, i) => {
+    str += string + (values[i] || "");
+  });
+  return str;
+}
