@@ -25,7 +25,7 @@ const organizationAttribute = {
   orgUnitName: null,
 };
 
-const dataListJobDescription = jobDescListRaw.map((data) => ({
+const dataListJobDescription = myData.map((data) => ({
   id: data.id_position,
   jobName: data.position,
   jobStatus: "available",
