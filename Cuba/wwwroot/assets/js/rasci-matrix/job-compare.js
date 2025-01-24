@@ -1,6 +1,6 @@
 async function searchJobCompare(event) {
   const inputSearch = event.target.value;
-  if (inputSearch.length <= 3) return;
+  if (inputSearch.length < 3) return;
 
   try {
     const { status, data } = await SearchMatrix({ type: "job", search: inputSearch });

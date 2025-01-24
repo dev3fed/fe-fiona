@@ -76,7 +76,7 @@ function loadTableHeader(jobTitleList) {
                       <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
                   </button>
                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                      <li><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
+                      <li onclick="triggleDetailJob(${val.id})"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
                       <li><a class="dropdown-item"><img src="/assets/images/rasci/document.svg" alt="Filter Icon">Competency</a></li>
                       <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
                   </ul>
@@ -98,7 +98,6 @@ function loadTableBody(prosbisList) {
   const rasciMapping = appState.resultRasciMapping || [];
   const isSearch = getState("isSearchMatrix");
   const idProsbisSelected = getState("idSearchProsbis");
-  // console.log("idProsbisSelected", idProsbisSelected);
   const bodyContent = visibleProsbis
     ?.map((val, i) => {
       const levelClass =
@@ -108,7 +107,7 @@ function loadTableBody(prosbisList) {
           ? `level-${val.level}`
           : "";
       const isExpanded = expandedRows.includes(val.indexGroup) ? "chevron-up" : "chevron-down";
-      const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping);
+      const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping, val.indexGroup);
       return `
         <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
           <td scope="row" class="level-col" style="font-size:12px;font-weight: 500 !important;">
@@ -127,7 +126,10 @@ function loadTableBody(prosbisList) {
                     : ``
                 }
               </div>
-              <div class="flex-fill prosbis-name" onclick="onModalProsbis()">${val.description}</div>
+              <div class="flex-fill prosbis-name" onclick="onModalProsbis(${JSON.stringify(val).replace(
+                /"/g,
+                "&quot;",
+              )})">${val.description}</div>
               <div class="ellipsis-menu prosbis-row-ellipsis">
                 <div class="dropright">
                   <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
@@ -135,13 +137,18 @@ function loadTableBody(prosbisList) {
                   <i class="fas fa-ellipsis-v"></i>
                   </button>
                   <ul class="dropdown-menu " aria-labelledby="dropdownMenuButton">
-                    <li onclick="onModalProsbis()"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
-                    <li onclick="onModalChoose('editProsbis')"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
-                    <li onclick="onModalChoose('deleteProsbis'); setState('dataDeleteProsbis', ${JSON.stringify(
-                      val,
-                      null,
-                      2,
-                    )});" ><a class="dropdown-item" style="color: red !important;"><img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete</a></li>
+                    <li onclick="onModalProsbis(${JSON.stringify(val).replace(
+                      /"/g,
+                      "&quot;",
+                    )})"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
+                    <li onclick="sendDetailbp(${JSON.stringify(val).replace(
+                      /"/g,
+                      "&quot;",
+                    )})"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
+                    <li onclick="checkChildrenProsbis(${JSON.stringify(val).replace(
+                      /"/g,
+                      "&quot;",
+                    )})" ><a class="dropdown-item" style="color: red !important;"><img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete</a></li>
                   </ul>
                 </div>
               </div>
@@ -170,7 +177,7 @@ function loadTableBody(prosbisList) {
 // Map RASCI Cells (Memoized)
 const mapRasciCellsCache = new Map();
 
-function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
+function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroupId) {
   const cacheKey = `${businessProcessId}-${jobTitleList.length}-${JSON.stringify(rasciMapping)}`;
 
   if (mapRasciCellsCache.has(cacheKey)) {
@@ -222,7 +229,7 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping) {
       return `<td>
         <div class="rasci-container">
           <div class="rasci-icons">${rasciIcons}</div>
-          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, ${businessProcessId})" ">
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, '${indexGroupId}')">
         </div>
       </td>`;
     })
@@ -240,7 +247,8 @@ function initializeTooltips() {
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 }
-function onModalProsbis() {
+function onModalProsbis(data) {
+  setState("dataDetailProsbis", data);
   detailsProsbis();
 }
 
@@ -377,9 +385,89 @@ async function clearInput() {
   resetAllFilterRasci();
 }
 
+function sendDetailbp(data) {
+  setState("dataDetailProsbis", data);
+  onModalChoose("editProsbis");
+}
+function checkChildrenProsbis(data) {
+  if (data.hasChild !== true) {
+    setState("dataDeleteProsbis", data);
+    onModalChoose("deleteProsbis");
+  } else {
+    setTimeout(() => {
+      swal({
+        title: "CAN’T DELETE",
+        icon: "error",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">Cannot delete business processes that have child processes.</div>`,
+          },
+        },
+      }).then(async () => {});
+    }, 200);
+  }
+}
 async function openModalDeleteBusinesspro() {
+  const dataDeleteProsbis = getState("dataDeleteProsbis");
   const modal = new bootstrap.Modal(document.getElementById("modalDeleteBp"));
   modal.show();
-  const dataProsbis = getState("dataDeleteProsbis");
-  console.log("dataProsbis", dataProsbis);
+
+  const bodyLabel = `<label>Are you sure want to delete this business process?</label>
+                    <h6 class="mt-2" style="font-weight: bold;">
+                        ${dataDeleteProsbis.indexGroup} ${dataDeleteProsbis.description}
+                    </h6>`;
+  document.getElementById("form-deletebp").innerHTML = bodyLabel;
+}
+
+async function handleSaveDeletebp() {
+  const dataDeleteProsbis = getState("dataDeleteProsbis");
+  const spinner = document.getElementById("loadingDeletebp");
+  spinner.style.display = "inline-block";
+  const payload = {
+    draftId: dataDeleteProsbis.draftId,
+    draftType: "Delete Business Process",
+    draftName: dataDeleteProsbis.draftName,
+    parentId: dataDeleteProsbis.indexGroup,
+  };
+  const result = await submitDraftProsbis(payload);
+  if (result.status === 200) {
+    const modalDeleteBp = document.getElementById("modalDeleteBp");
+    const modalDelete = bootstrap.Modal.getInstance(modalDeleteBp);
+    document.getElementById("draftName").value = "";
+    if (modalDelete) {
+      modalDelete.hide();
+    }
+    setTimeout(() => {
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2500,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+            <br>
+            <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
+            `,
+          },
+        },
+      }).then(async () => {
+        spinner.style.display = "none";
+        const payload = {
+          Page: 1,
+          PageSize: 5,
+        };
+        const queryString = new URLSearchParams(payload).toString();
+        const dataDraft = await fetchDraftProsbis(queryString);
+        const IsNotEmpty = dataDraft.data.length;
+        handleClickCard(IsNotEmpty);
+        loadTableBodyDraft(dataDraft);
+        $("#pills-draft-tab").tab("show");
+      });
+    }, 100);
+  }
 }

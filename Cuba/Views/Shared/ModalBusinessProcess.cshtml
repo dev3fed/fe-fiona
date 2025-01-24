@@ -3,8 +3,8 @@
 
 <style>
     .modal-dialog.custom-modal-detail {
-        max-width: 65% !important;
-        margin: 80px auto;
+        max-width: 80% !important;
+        margin: 50px auto;
     }
 
     .icon-small {
@@ -58,9 +58,8 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalBodyContent">
-                <div class="mb-2">
-                    <h6 class="mb-2">Mengelola kajian dan analisis data strategi</h6>
-                    <label>Level1 | Index 1</label>
+                <div class="mb-2" id="prosbis-title">
+
                 </div>
                 <div>
                     <ul class="nav nav-tabs nav-primary" id="pills-business-tab" role="tablist">
@@ -79,8 +78,8 @@
                             aria-labelledby="pills-related-tab">
                             <div class="mb-0 m-t-10" id="total-job">
                             </div>
-                            <div class="table-responsive">
-                                <table class="table tbl-border">
+                            <div class="table-responsive scrollable" style=" max-height: 300px;">
+                                <table class="table tbl-border ">
                                     <thead id="prosbis-details-header">
                                     </thead>
                                     <tbody id="prosbis-details-body">
@@ -91,7 +90,7 @@
                         <div class="tab-pane fade" id="pills-hierarchy" role="tabpanel"
                             aria-labelledby="pills-hierarchy-tab">
                             <div class="table-responsive m-t-15">
-                                <table class="table tbl-border">
+                                <table class="table tbl-border rasci-matrix">
                                     <thead id="prosbis-hierarchy-header">
                                     </thead>
                                     <tbody id="prosbis-hierarchy-body">
@@ -119,14 +118,14 @@
                     <i class="icon-arrow-left"></i> Back
                 </button>
                 <div>
-                    <button class="btn btn-outline-danger" type="button" onclick="openModalDeleteBusinesspro()"><i
+                    <button class="btn btn-outline-danger" type="button" onclick="handleDetailDeletebp()"><i
                             class="icon-trash"></i>
                         Delete</button>
-                    <button class="btn btn-outline-light" type="button" onclick="openModalEditBusinesspro()">
+                    <button class="btn btn-outline-light" type="button" onclick="handleDetailEditbp()">
                         <i class="icon-marker-alt"></i>
                         Edit
                     </button>
-                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
+                    <button class="btn btn-primary" type="button" onclick="openSeiesOfProcess()">
                         Series of Process
                         <i class="icon-arrow-right icon-small"></i>
                     </button>

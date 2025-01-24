@@ -20,17 +20,19 @@
             </div>
             <div class="modal-body" id="modal-body-content">
                 <div class="row mb-4" id="form-deletebp">
-                    <label>Are you sure want to delete this business process?</label>
-                    <h6 style="font-weight: bold;">Menentukan metode kajian lingkungan eksternal</h6>
+
                 </div>
             </div>
-            <div class="modal-footer  ">
-                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
-                        class="icon-arrow-left"></i>
-                    Back</button>
+            <div class="modal-footer  d-flex justify-content-end">
                 <div>
-                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
-                        Yes, Delete
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i> Back</button>
+                    <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="handleSaveDeletebp()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingDeletebp" role="status"></div>
+                            <span class="btn-text"> Yes, Delete</span>
+                        </div>
                     </button>
                 </div>
             </div>

@@ -308,6 +308,7 @@ const applyFilterRasci = async () => {
   };
   const resultMatrix = await fetchDataMatrix(payload);
 
+  console.log("resultMatrix", resultMatrix);
   if (resultMatrix.status === 200) {
     resultAllData(resultMatrix?.data);
     setTimeout(() => {

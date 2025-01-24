@@ -54,6 +54,12 @@
     .hover-style:hover {
         text-decoration: underline;
     }
+
+    .swal-custom-popup {
+        top: 10% !important;
+        /* Atur nilai sesuai keinginan Anda */
+        transform: translate(-50%, -10%) !important;
+    }
 </style>
 <div class="page-body">
     <div class="container-fluid">
@@ -158,6 +164,14 @@
                                             <partial name="ModalBusinessProcess" />
                                             <!-- End Modal business Process -->
 
+                                            <!-- Start Modal series process -->
+                                            <partial name="ModalSeriesProses" />
+                                            <!-- End Modal series process -->
+
+                                            <!-- Start Modal Detail job -->
+                                            <partial name="ModalDetailJob" />
+                                            <!-- End Modal Detail job -->
+
                                             <!-- Start Modal choose RASCI Matrix Draft -->
                                             <partial name="ModalChooseDraft" />
                                             <!-- End Modal choose RASCI Matrix Draft -->
@@ -198,13 +212,12 @@
                                         </div>
                                         <div class="col-12 d-flex align-items-center mb-3">
                                             <span class="me-3" style="min-width: 130px;">RASCI data source</span>
-                                            <select class="form-select digits" name="parentId">
-                                                <option value="" selected>Pilih opsi</option>
-                                                <option value="1">Opsi 1</option>
-                                                <option value="2">Opsi 2</option>
+                                            <select class="form-select digits">
+                                                <option value="" selected>Master data RASCI</option>
+                                                <option value="1">Usulan Perubahan Fungsi Marketing</option>
                                             </select>
                                         </div>
-                                        <div class="row">
+                                        @* <div class="row">
                                             <div class="col-9 d-flex align-items-center mb-3 organization-alert">
                                                 <span class="alert-text">
                                                     Organization Data Source is from draft Evaluasi Struktur Organisasi
@@ -213,7 +226,7 @@
                                                         details]</b>
                                                 </span>
                                             </div>
-                                        </div>
+                                        </div> *@
                                         <div class="col-5">
                                             <div class="btn-group w-100" role="group"
                                                 aria-label="Button group with nested dropdown">
@@ -388,5 +401,6 @@
     <script src="../assets/js/rasci-matrix/joblist-card.js"></script>
     <script src="../assets/js/rasci-matrix/filter-rasci.js"></script>
     <script src="../assets/js/rasci-matrix/activity-detaildraft.js"></script>
+    <script src="../assets/js/rasci-matrix/detail-job.js"></script>
 
 }

@@ -345,6 +345,9 @@ async function saveAsDraft() {
               innerHTML: `<div style="text-align: center;">Your activity has been saved as a draft. You can check in the draft tab.</div>`,
             },
           },
+          customClass: {
+            popup: "swal-custom-popup",
+          },
         }).then(async () => {
           const IsNotEmpty = draftListAfter.length;
           handleClickCard(IsNotEmpty);

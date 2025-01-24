@@ -2,42 +2,33 @@
 function openModalEditBusinesspro() {
   const modal = new bootstrap.Modal(document.getElementById("modalEditBusinesspro"));
   modal.show();
-  const prosbisLevel = getState("prosbisLevel");
-  console.log("prosbisLevel", prosbisLevel);
-
+  const dataDetailProsbis = getState("dataDetailProsbis");
   const formContent = `
       <div class="col-12">
         <div >
           <label class="form-label" style="width:25%">RASCI Matrix Draft</label>
           <label> : </label>
-        <b class="form-label">RASCI Evaluasi Struktur Organisasi 2025 versi Citra</b>
-        </div>
-      </div>
-      <div class="col-12">
-        <div >
-            <label class="form-label" style="width:25%">Business Process Parent</label>
-             <label> : </label>
-        <b class="form-label">321405689 - Direktur Keuangan</b>
+        <b class="form-label">${dataDetailProsbis.draftName}</b>
         </div>
       </div>
       <div class="col-12">
         <div >
             <label class="form-label" style="width:25%">Business Process Level</label>
              <label> : </label>
-        <b class="form-label">Market, Sell, and Commercialization Products and Services</b>
+        <b class="form-label">${dataDetailProsbis.level}</b>
         </div>
       </div>
        <div class="col-12">
         <div >
             <label class="form-label" style="width:25%">Business Process Index</label>
              <label> : </label>
-        <b class="form-label">Market, Sell, and Commercialization Products and Services</b>
+        <b class="form-label">${dataDetailProsbis.indexGroup}</b>
         </div>
       </div>
-     <div class="col-12 mt-3">
+     <div class="col-12 mt-2">
       <div>
         <label class="form-label">Business Process Name</label>
-        <textarea class="form-control"></textarea>
+        <textarea class="form-control" id="prosbisName">${dataDetailProsbis.description}</textarea>
       </div>
     </div>
     `;
@@ -49,6 +40,60 @@ function openModalEditBusinesspro() {
 
   // Initialize Bootstrap Select
   $(".selectpicker").selectpicker();
+}
+
+async function handleEditbp() {
+  const dataDetailProsbis = getState("dataDetailProsbis");
+  const prosbisName = document.getElementById("prosbisName").value;
+  const spinner = document.getElementById("loadingRenamebp");
+  spinner.style.display = "inline-block";
+
+  const payload = {
+    draftId: dataDetailProsbis.draftId,
+    draftType: "Edit Business Process",
+    draftName: dataDetailProsbis.draftName,
+    parentId: dataDetailProsbis.indexGroup,
+    businessProcessName: prosbisName,
+  };
+  console.log("payload", payload);
+  const result = await submitDraftProsbis(payload);
+  if (result.status === 200) {
+    const modalEditBusinesspro = document.getElementById("modalEditBusinesspro");
+    const modalEditbp = bootstrap.Modal.getInstance(modalEditBusinesspro);
+    document.getElementById("draftName").value = "";
+    if (modalEditbp) {
+      modalEditbp.hide();
+    }
+    setTimeout(() => {
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2500,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+            <br>
+            <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
+            `,
+          },
+        },
+      }).then(async () => {
+        spinner.style.display = "none";
+        const payload = {
+          Page: 1,
+          PageSize: 5,
+        };
+        const queryString = new URLSearchParams(payload).toString();
+        const dataDraft = await fetchDraftProsbis(queryString);
+        const IsNotEmpty = dataDraft.data.length;
+        handleClickCard(IsNotEmpty);
+        loadTableBodyDraft(dataDraft);
+        $("#pills-draft-tab").tab("show");
+      });
+    }, 100);
+  }
 }
 
 // function onSelect(event) {
