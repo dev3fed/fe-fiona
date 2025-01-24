@@ -60,10 +60,15 @@ function saveAsDraft() {
   if (positionId) {
     type = "edit";
     data = lsListPosition.find((item) => item.positionId == positionId);
+    saveInputAttribut(type, data);
+    // swal("Saved", "Save as Draft", "success");
+    // window.location.href = "/organization/index?focusNode=" + positionId;
+  } else {
+    // swal("Saved", "Save as Draft", "success");
+    saveInputAttribut(type, data);
+    // const getDirectReport = $("#selectDirectReport").val();
+    // window.location.href = "/organization/index?focusNode=" + getDirectReport;
   }
-  saveInputAttribut(type, data);
-  swal("Saved", "Save as Draft", "success");
-  window.location.href = "/organization/index?focusNode=" + positionId;
 }
 
 function addSubPos() {

@@ -44,8 +44,10 @@
 
     @* class edit *@
     [data-n-id].edit rect {
-        fill: #fff3cd;
-        stroke: #ffc107;
+        @* fill: #fff3cd;
+        stroke: #ffc107; *@
+        fill: #e6f6fe;
+        stroke: #03a9f4;
     }
     [data-n-id].create rect {
         fill: #e6f6fe;
@@ -138,7 +140,7 @@
                                     @* <div class="row mt-2">
                                     </div> *@
                                     <div class="row">
-                                        <div class="col-4">
+                                        <div class="col-3">
                                             <label for="">Organization Data Source</label>
                                             <select class="form-select digits" name="selectDraftOrganization" id="selectDraftOrganization">
                                                 <option></option>
@@ -153,7 +155,7 @@
                                         <div class="col-1" style="margin-bottom: 4px;align-self: end;">
                                             <button class="btn btn-primary w-100" type="button" id="searchOrgNodeButton">Search</button>
                                         </div>
-                                        <div class="col-4" style="margin-bottom: 4px;align-self: end; justify-content: end;text-align:end">
+                                        <div class="col-5" style="margin-bottom: 4px;align-self: end; justify-content: end;text-align:end">
                                             <button class="btn btn-primary me-2 btn-icon" type="button" id="createDraft">
                                                 <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Draft
                                             </button>
@@ -181,12 +183,12 @@
                                             @* span *@
                                             <div class="d-flex gap-2 align-items-center align-self-center"> 
                                                 <div class="square bg-primary-outline-custom"></div>
-                                                <span>New Position</span>
+                                                <span>New / Edited Position</span>
                                             </div>
-                                            <div class="d-flex gap-2 align-items-center align-self-center"> 
+                                            @* <div class="d-flex gap-2 align-items-center align-self-center"> 
                                                 <div class="square bg-warning-outline-custom"></div>
                                                 <span>Edited Position</span>
-                                            </div>
+                                            </div> *@
                                             <div class="d-flex gap-2 align-items-center align-self-center"> 
                                                 <div class="square bg-danger-outline-custom"></div>
                                                 <span>Deleted Position</span>
