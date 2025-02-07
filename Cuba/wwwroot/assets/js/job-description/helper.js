@@ -15,6 +15,32 @@ function checkLocalStorage() {
   localStorage.getItem("spesifik") ? localStorage.getItem("spesifik") : localStorage.setItem("spesifik", "");
 }
 
+async function checkDataOrganization() {
+  localStorage.getItem("organizationAttribute") ??
+    localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
+  const data = JSON.parse(localStorage.getItem("organizationAttribute"));
+  Object.keys(organizationAttribute).forEach((key) => {
+    if (data[key]) {
+      organizationAttribute[key] = data[key];
+    }
+  });
+  // append value to input
+  $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+}
+
+function changeOrganization(value, text) {
+  organizationAttribute.orgUnitId = value;
+  organizationAttribute.orgUnitName = text;
+  localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
+  const buttons = ["#createJobDesc"];
+  buttons.forEach((button) => $(button).toggle(organizationAttribute.orgUnitId !== "1"));
+  if (organizationAttribute.orgUnitId == "1") {
+    $("#pills-warningtab").attr("style", "display:none !important");
+  } else {
+    $("#pills-warningtab").show();
+  }
+}
+
 function updateIdentifikasiJob(params) {
   $("#function").text(params.function);
   $("#location").text(params.location);
@@ -207,7 +233,7 @@ async function searchJobCompare(event, isPercentage) {
     const findData = dataJobDescCompare.filter((item) => item.identifikasi.percentage >= value);
     const urlParams = new URLSearchParams(window.location.search);
     const idPos = urlParams.get("id");
-    const selectedIdPos = dataJobDesc.find((item) => item.identifikasi.id == idPos);
+    const selectedIdPos = dataJobDesc.find((item) => item.identifikasi.id_position == idPos);
     // if selectedIdPos?.identifikasi?.jobName include manager
     let include = "sbm";
     if (selectedIdPos?.identifikasi?.jobName.toLowerCase().includes("manager")) {
@@ -331,7 +357,7 @@ async function addJobReference() {
 
 async function applySelectedData(id) {
   $("#detailJob").empty();
-  let data = dataJobDescCompare.filter((item) => item.identifikasi.id === id);
+  let data = dataJobDescCompare.filter((item) => item.identifikasi.id_position === id);
   selectedData.selectedJobDesc = data[0];
   let row = "<div class='row'>";
   for (const item of data) {

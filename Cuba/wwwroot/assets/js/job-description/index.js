@@ -3,19 +3,25 @@ $(document).ready(function () {
     window.location.href = "/job-description/detail";
   });
 
-  localStorage.getItem("statusManager")
-    ? localStorage.getItem("statusManager")
-    : localStorage.setItem("statusManager", "not available");
-  localStorage.getItem("statusSbm")
-    ? localStorage.getItem("statusSbm")
-    : localStorage.setItem("statusSbm", "not available");
+  // localStorage.getItem("statusManager")
+  //   ? localStorage.getItem("statusManager")
+  //   : localStorage.setItem("statusManager", "not available");
+  // localStorage.getItem("statusSbm")
+  //   ? localStorage.getItem("statusSbm")
+  //   : localStorage.setItem("statusSbm", "not available");
+
+  getDataList([
+    {
+      dataId: "selectDraftOrganization",
+      data: lsListDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
+    },
+  ]);
+  checkDataOrganization();
 
   let dataList = dataListJobDescription;
-  dataList[0].jobStatus = localStorage.getItem("statusManager");
-  dataList[1].jobStatus = localStorage.getItem("statusSbm");
-  console.log("dataList", localStorage.getItem("statusManager"));
+  // dataList[0].jobStatus = localStorage.getItem("statusManager");
+  // dataList[1].jobStatus = localStorage.getItem("statusSbm");
   getTableListJobDes(dataList);
-  // $("#selectStatusJobDesc").select2({});
 
   $("#selectStatusJobDesc").on("change", function () {
     const value = $(this).val() ?? "";
@@ -28,4 +34,8 @@ $(document).ready(function () {
     const search = $(this).val() ?? "";
     filterListJobDesc(value, search);
   });
+});
+
+$("#selectDraftOrganization").change(function () {
+  changeOrganization($("#selectDraftOrganization").val(), $("#selectDraftOrganization option:selected").text());
 });
