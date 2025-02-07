@@ -1,7 +1,7 @@
 async function triggleDetailJob(id) {
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailJob"));
   modal.show();
-  console.log("cek", id);
+  setState("detailJob", id);
   const cardAttribute = `
     <div class="col-3">
         <label style="color:#9F9FA5;fonti-size:12px">Directorate</label><br/>
@@ -123,4 +123,31 @@ async function triggleDetailJob(id) {
   }
 
   //
+}
+
+async function handleShowRasci() {
+  const detailJob = getState("detailJob");
+  const spinner = document.getElementById("btnShowrasci");
+  spinner.style.display = "inline-block";
+
+  const payload = {
+    type: "job",
+    jobId: [detailJob],
+  };
+  try {
+    const resultMatrix = await fetchDataMatrix(payload);
+    if (resultMatrix.status === 200) {
+      resultAllData(resultMatrix?.data);
+      selectedJobIds = [];
+      const modalElement = document.getElementById("ModalDetailJob");
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      setState("isSearchMatrix", true);
+      spinner.style.display = "none";
+      if (modal) {
+        modal.hide();
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching data matrix", error);
+  }
 }

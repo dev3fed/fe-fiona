@@ -39,7 +39,6 @@ document.addEventListener("dataLoaded", async function () {
         } else {
           disabledJobIds = disabledJobIds.filter((id) => id !== lvl);
         }
-
         // Perbarui state dengan ID level yang dinonaktifkan
         setState("disabledJobId", disabledJobIds);
 
@@ -288,29 +287,46 @@ const applyFilterRasci = async () => {
   const spinner = document.getElementById("loadingSpinner");
   spinner.style.display = "inline-block";
   const isDisabledJobLevel = getState("disabledJobId");
-  const selectedId = getState("selectedJobId") || [];
-  const jobList = getState("filterJobList");
-  let finalSelectedId = [];
-  const result = jobList.filter((item) => selectedId.includes(item.id));
-  const cekLevel = result.filter((value) => isDisabledJobLevel.includes(value.level));
-  if (cekLevel.length > 0) {
-    const filteredId = selectedId.filter((id) => !cekLevel.some((item) => item.id === id));
-    finalSelectedId = filteredId;
-  } else {
-    finalSelectedId = selectedId;
-  }
+  // const selectedId = getState("selectedJobId") || [];
+  // const jobList = getState("filterJobList");
+  // let finalSelectedId = [];
+  // console.log("jobList", jobList);
+  console.log("isDisabledJobLevel", isDisabledJobLevel);
+  // const result = jobList.filter((item) => selectedId.includes(item.id));
+  // const cekLevel = result.filter((value) => isDisabledJobLevel.includes(value.level));
+  // console.log("cekLevel", cekLevel);
+  let jobIdFinal = [];
+  $('input[name="check_job"]:checked').each(function () {
+    const levelJob = parseInt($(this).attr("leveljob"), 10);
+    if (!isDisabledJobLevel.includes(levelJob)) {
+      jobIdFinal.push(Number(this.value));
+    }
+  });
+  console.log("jobIdFinal", jobIdFinal);
+  // if (cekLevel.length > 0) {
+  //   const filteredId = selectedId.filter((id) => !cekLevel.some((item) => item.id === id));
+  //   finalSelectedId = filteredId;
+  // } else {
+  //   finalSelectedId = selectedId;
+  // }
+  // console.log("finalSelectedId", finalSelectedId);
   const payload = {
     parentId: null,
     type: "filter",
-    jobId: finalSelectedId,
+    jobId: jobIdFinal,
     busProsLevel: getState("levelFilter"),
     rasciNotation: getState("rasciNotationFilter"),
   };
   const resultMatrix = await fetchDataMatrix(payload);
-
-  console.log("resultMatrix", resultMatrix);
+  // const firstPart = resultMatrix?.data.rasciMatrix.slice(0, 250);
+  // const outputTbl = {
+  //   businessProcess: resultMatrix?.data.businessProcess.slice(0, 300),
+  //   jobTitle: resultMatrix?.data.jobTitle,
+  //   rasciMatrix: firstPart,
+  // };
   if (resultMatrix.status === 200) {
     resultAllData(resultMatrix?.data);
+    // resultAllData(outputTbl);
     setTimeout(() => {
       spinner.style.display = "none";
     }, 2000);

@@ -1,0 +1,116 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-notatationref {
+        max-width: 58% !important;
+        margin: 30px auto;
+    }
+
+    .tbl-border-notatationref {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-notatationref th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-notatationref thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+    }
+
+    .tbl-border-notatationref th,
+    .tbl-border-notatationref td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+    }
+
+    .checkbox_animated {
+        width: 12px;
+        height: 12px;
+        transform: scale(0.8);
+        margin-right: 5px;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+        text-align: center;
+    }
+
+    .radio_animated {
+        margin-right: 5px;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+</style>
+
+
+<div class="modal fade" id="modalNotationRef" tabindex="-1" role="dialog" aria-labelledby="modalNotationRefLabel"
+    aria-hidden="true">
+    <div class="modal-dialog custom-notatationref bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNotationRefTitle">Edit RASCI</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <div class="row mb-2" id="form-notatationref">
+
+                </div>
+                <div class="table-responsive" style=" max-height: 450px;">
+                    <table class="table tbl-border-notatationref">
+                        <thead id="tbl-notatationref-header" style="background-color: #006CA9;">
+                        </thead>
+                        <tbody id="tbl-notatationref-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                        onclick="backChangeNotationRow()"><i class="icon-arrow-left"></i> Back</button>
+                    <button class="btn btn-primary" type="button" onclick="saveNotationRef()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingEditnotationref" role="status"></div>
+                            <span class="btn-text">Save Change</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

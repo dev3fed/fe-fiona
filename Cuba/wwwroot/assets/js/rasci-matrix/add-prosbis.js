@@ -517,6 +517,7 @@ function onCheck(event, rasciCode) {
     return letter;
   });
   setState("rasciNotation", updatedRasciNotation);
+  tblChangeNotationRef(updatedRasciNotation);
 }
 
 function updateComment(rasciCode, value) {

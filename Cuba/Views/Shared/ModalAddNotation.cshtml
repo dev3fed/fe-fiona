@@ -3,7 +3,7 @@
 
 <style>
     .modal-dialog.custom-notation {
-        max-width: 70% !important;
+        max-width: 85% !important;
         margin: 30px auto;
     }
 
@@ -140,6 +140,19 @@
         max-height: 520px;
         overflow-y: auto;
     }
+
+    .warning-alert {
+        display: inline-block;
+        padding: 4px;
+        margin-right: 4px;
+        border: solid 1px #D53C50;
+        background-color: #FAE9EB;
+        border-radius: 4px;
+        width: auto;
+        word-wrap: break-word;
+        color: #D02138;
+        font-size: 10px;
+    }
 </style>
 
 
@@ -161,8 +174,12 @@
                     <div class="col-12" style="display: none;" id="posref">
 
                     </div>
-                    <div class="col-12" style="display: none;" id="table-prosbisref">
+                    <div class="col-6" style="display: none;" id="table-prosbisref">
                     </div>
+                    <div class="col-6" style="display: none;" id="selectedBisproref">
+
+                    </div>
+
                     <div class="col-6" style="display: block;" id="bispro">
                         <label class="form-label">Business Process</label>
                         <div class="card-tblbusiness">
