@@ -22,6 +22,9 @@ const appState = new Proxy(
     disabledJobId: [],
     dataDeleteProsbis: {},
     dataDetailProsbis: {},
+    editRasciNotation: {},
+    detailJob: {},
+    listSelectedProsbisref: [],
     dataChangeNotasi: {
       busProsMapped: [],
     },

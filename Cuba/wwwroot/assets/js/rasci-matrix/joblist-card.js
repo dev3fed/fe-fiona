@@ -1,5 +1,6 @@
 document.addEventListener("dataLoaded", async function () {
   const result = await getState("filterJobList");
+  console.log("result", result);
   const levels = [1, 2, 3, 4, 5, 6];
   levels.forEach((lvl) => {
     const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
@@ -40,7 +41,7 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
           ${label}
           <div class="row-item" data-name="${item.name}" data-type="${level}" data-parent-id="${item.reportToId}">
             <div class="column-checkbox">
-              <input class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" levelJob="${item.level}" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}">
+              <input name="check_job" class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" levelJob="${item.level}" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}">
             </div>
             <div class="column-item-name" style="font-size:12px">${item.name}</div>
           </div>
@@ -60,6 +61,8 @@ const handleCheckboxChange = async (event) => {
   const levelJob = checkbox.getAttribute("levelJob");
   let selectedId = (await getState("selectedJobId")) || [];
 
+  console.log("jobId", jobId);
+  console.log("combinedData", combinedData);
   const hierarchyIds = [];
   traverseHierarchy(jobId, combinedData, hierarchyIds);
 
@@ -72,12 +75,12 @@ const handleCheckboxChange = async (event) => {
   } else {
     selectedId = selectedId.filter((id) => !hierarchyIds.includes(id));
   }
+  console.log("selectedId", selectedId);
 
   await setState("selectedJobId", selectedId);
 
   const jobList = await getState("filterJobList");
   const result = jobList.filter((item) => selectedId.includes(item.id));
-
   if (result.length > 0) {
     switch (levelJob) {
       case "1":

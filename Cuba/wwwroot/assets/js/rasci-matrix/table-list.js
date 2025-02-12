@@ -184,10 +184,6 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
     return mapRasciCellsCache.get(cacheKey);
   }
 
-  if (rasciMapping.length === 0) {
-    return "";
-  }
-
   const rasciCells = jobTitleList
     .map((jobTitle) => {
       const rasciItems = rasciMapping.filter(
@@ -196,7 +192,6 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
 
       let rasciIcons = "";
       let comments = [];
-
       rasciItems.forEach((item) => {
         switch (item.rasciCode) {
           case "R":
@@ -226,6 +221,14 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
 
+      if (rasciMapping.length === 0) {
+        return `<td style="background-color: #F8D7DA;">
+        <div class="rasci-container">
+          <div class="rasci-icons"></div>
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, '${indexGroupId}')">
+        </div>
+      </td>`;
+      }
       return `<td>
         <div class="rasci-container">
           <div class="rasci-icons">${rasciIcons}</div>

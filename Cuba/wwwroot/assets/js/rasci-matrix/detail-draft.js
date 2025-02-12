@@ -97,80 +97,73 @@ async function renderTableActivity(listData) {
                             </td>
                           </tr>`
                           : listData.data
-                              .map(
-                                (data, index) =>
-                                  `
+                              .map((data, index) => {
+                                const startIndex = (listData.page - 1) * listData.pageSize;
+                                return `
                               <tr>
-                                  <td style="width: 50px;text-align:center">
-                                      ${index + 1}
-                                  </td>
-                                  <td>
-                                      ${data.draftType ? data.draftType : "-"}
-                                  </td>
-                                  <td>
-                                      ${
-                                        data.jobPosition.length === 0
-                                          ? "-"
-                                          : data.jobPosition.length === 1
-                                          ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}">${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}</div>`
-                                          : `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
-                                              data.jobPosition[0].jobCode
-                                            } - ${data.jobPosition[0].jobName}">${data.jobPosition[0].jobCode} - ${
-                                              data.jobPosition[0].jobName
-                                            }</div>
-                                              <small style="color:#9F9FA5;cursor: pointer">+${
-                                                data.jobPosition.length - 1
-                                              } more</small>`
-                                      }
-                                  </td>
-                                  <td>
-                                      ${
-                                        data.businessProcessName.length === 0
-                                          ? "-"
-                                          : data.businessProcessName.length === 1
-                                          ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}">${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}</div>`
-                                          : `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${
-                                              data.businessProcessName[0].indexGroup
-                                            } - ${data.businessProcessName[0].description}">${
-                                              data.businessProcessName[0].indexGroup
-                                            } - ${data.businessProcessName[0].description}</div>
-                                              <small style="color:#9F9FA5;cursor: pointer">+${
-                                                data.businessProcessName.length - 1
-                                              } more</small>`
-                                      }
-                                    </td>
-                                  <td>
-                                      ${data.createdBy ? data.createdBy : "-"}
-                                      <br>
-                                      <small style="color:#9F9FA5">${
-                                        data.createdDate ? "at " + new Date(data.createdDate).toLocaleDateString() : "-"
-                                      }</small>
-                                  </td>
-                                  <td>
-                                      ${data.modifiedBy ? data.modifiedBy : "-"}
-                                      <br>
-                                      <small style="color:#9F9FA5">${
-                                        data.modifiedDate
-                                          ? "at " + new Date(data.modifiedDate).toLocaleDateString()
-                                          : "-"
-                                      }</small>
-                                  </td>
-                                  <td style="text-align: center;">
-                                    <button class=" btn btn-outline-light btn-small-icon" type="button" onclick="triggleDetailActivity('${
-                                      data.draftListId
-                                    }', '${data.draftType}')">
-                                      <img src="/assets/images/rasci/icon_detail.svg" alt="Filter Icon">
-                                    </button>  
-                                    <button class=" btn btn-outline-light btn-small-icon" type="button">
-                                      <img src="/assets/images/rasci/icon_pencil.svg" alt="Filter Icon">
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-small-icon" type="button">
-                                      <img src="/assets/images/rasci/icon_delete.svg" alt="Filter Icon" class="icon-svg">
-                                    </button>
-                                  </td>
+                                <td style="width: 50px;text-align:center">
+                                  ${startIndex + index + 1}
+                                </td>
+                                <td>
+                                  ${data.draftType || "-"}
+                                </td>
+                                <td>
+                                  ${
+                                    data.jobPosition?.length
+                                      ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                         title="${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}">
+                                         ${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}
+                                         </div>` +
+                                        (data.jobPosition.length > 1
+                                          ? `<small style="color:#9F9FA5;cursor: pointer">+${
+                                              data.jobPosition.length - 1
+                                            } more</small>`
+                                          : "")
+                                      : "-"
+                                  }
+                                </td>
+                                <td>
+                                  ${
+                                    data.businessProcessName?.length
+                                      ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                                         title="${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}">
+                                         ${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}
+                                         </div>` +
+                                        (data.businessProcessName.length > 1
+                                          ? `<small style="color:#9F9FA5;cursor: pointer">+${
+                                              data.businessProcessName.length - 1
+                                            } more</small>`
+                                          : "")
+                                      : "-"
+                                  }
+                                </td>
+                                <td>
+                                  ${data.createdBy || "-"}<br>
+                                  <small style="color:#9F9FA5">
+                                    ${data.createdDate ? "at " + new Date(data.createdDate).toLocaleString() : "-"}
+                                  </small>
+                                </td>
+                                <td>
+                                  ${data.modifiedBy || "-"}<br>
+                                  <small style="color:#9F9FA5">
+                                    ${data.modifiedDate ? "at " + new Date(data.modifiedDate).toLocaleString() : "-"}
+                                  </small>
+                                </td>
+                                <td style="text-align: center;">
+                                  <button class="btn btn-outline-light btn-small-icon" type="button" 
+                                    onclick="triggleDetailActivity('${data.draftListId}', '${data.draftType}')">
+                                    <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon">
+                                  </button>  
+                                  <button class="btn btn-outline-light btn-small-icon" type="button">
+                                    <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
+                                  </button>
+                                  <button class="btn btn-outline-danger btn-small-icon" type="button">
+                                    <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
+                                  </button>
+                                </td>
                               </tr>
-                              `,
-                              )
+                            `;
+                              })
                               .join("")
                       }
                     </tbody>

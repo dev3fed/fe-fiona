@@ -286,3 +286,29 @@ const applySeriesProses = async () => {
     }
   } catch (error) {}
 };
+
+const showRasciMatrixBybp = async () => {
+  const dataDetailProsbis = getState("dataDetailProsbis");
+  try {
+    const payloadProsbis = {
+      type: "bybusinessprocess",
+      parentId: dataDetailProsbis.indexGroup,
+    };
+    try {
+      const resultMatrix = await fetchDataMatrix(payloadProsbis);
+      if (resultMatrix.status === 200) {
+        resultAllData(resultMatrix?.data);
+        SelectedProsbisId = [];
+        const modalElement = document.getElementById("modalBusinessPro");
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        setState("isSearchMatrix", true);
+        appState.isSearchMatrix = true;
+        if (modal) {
+          modal.hide();
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data matrix", error);
+    }
+  } catch (error) {}
+};
