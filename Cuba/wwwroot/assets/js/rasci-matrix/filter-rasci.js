@@ -318,15 +318,15 @@ const applyFilterRasci = async () => {
     rasciNotation: getState("rasciNotationFilter"),
   };
   const resultMatrix = await fetchDataMatrix(payload);
-  // const firstPart = resultMatrix?.data.rasciMatrix.slice(0, 250);
-  // const outputTbl = {
-  //   businessProcess: resultMatrix?.data.businessProcess.slice(0, 300),
-  //   jobTitle: resultMatrix?.data.jobTitle,
-  //   rasciMatrix: firstPart,
-  // };
+  const firstPart = resultMatrix?.data.rasciMatrix.slice(0, 250);
+  const outputTbl = {
+    businessProcess: resultMatrix?.data.businessProcess.slice(0, 300),
+    jobTitle: resultMatrix?.data.jobTitle,
+    rasciMatrix: firstPart,
+  };
   if (resultMatrix.status === 200) {
-    resultAllData(resultMatrix?.data);
-    // resultAllData(outputTbl);
+    // resultAllData(resultMatrix?.data);
+    resultAllData(outputTbl);
     setTimeout(() => {
       spinner.style.display = "none";
     }, 2000);

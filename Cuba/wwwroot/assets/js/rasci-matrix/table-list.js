@@ -11,10 +11,35 @@ document.addEventListener("dataLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  const tableContainer = document.querySelector(".scrollable-table");
+  let page = 1; // Halaman API
+  let columnPage = 1; // Halaman untuk tambahan kolom
+  const limit = 10; // Data per batch
+  let isLoadingY = false; // Scroll ke bawah
+  let isLoadingX = false; // Scroll ke kanan
+  let extraColumns = 0; // Hitung jumlah kolom tambahan
+
   showLoading();
   loadTableHeader(appState.resultJabatan);
   loadTableBody(appState.resultProsbis);
   feather.replace();
+
+  // Event listener untuk infinite scroll
+  tableContainer.addEventListener("scroll", function () {
+    const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
+    const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
+
+    if (bottomReached) {
+      console.log("scroll buttom");
+      // fetchRows(); // Ambil data baru saat scroll ke bawah
+    }
+
+    if (rightReached) {
+      console.log("scroll right");
+
+      // fetchColumns(); // Ambil data baru saat scroll ke kanan
+    }
+  });
 });
 
 const showDataEmpty = () => {

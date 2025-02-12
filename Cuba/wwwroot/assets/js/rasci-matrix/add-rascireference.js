@@ -8,7 +8,18 @@ async function handleEditComment(data) {
     openModalEditRascinotation(dataChangeNotasi, data);
   } catch (error) {}
 }
-
+async function handleDeleteProsbis(param) {
+  try {
+    const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
+    const deleted = listSelectedProsbisref.filter((item) => item.indexNo !== param.indexNo);
+    const checkbox = document.getElementById(`checked-prosbisref-${param.indexNo}`);
+    if (checkbox) {
+      checkbox.checked = false;
+    }
+    setState("listSelectedProsbisref", deleted);
+    cardSelectedProsbisref();
+  } catch (error) {}
+}
 // end section edit commentar & notation pada modal add rasci reference
 
 async function openModalEditRascinotation(result, dataProsbis) {
@@ -42,6 +53,13 @@ async function openModalEditRascinotation(result, dataProsbis) {
                 <label class="form-label" style="width:19%">Business Process</label>
                  <label> : </label>
             <b class="form-label">${dataProsbis.indexNo} - ${dataProsbis.process}</b>
+            </div>
+          </div>
+          <div class="col-12">
+            <div >
+                <label class="form-label" style="width:19%">Reference From</label>
+                 <label> : </label>
+            <b class="form-label">${dataProsbis.jobRefName}</b>
             </div>
           </div>
         `;
@@ -142,13 +160,15 @@ async function cardSelectedProsbisref() {
                       <td style="text-align:center">
                         <img src="/assets/images/rasci/danger-circle.svg" alt="Filter Icon"
                             class="example-popover" style="margin-top:-2px;height: 20px;" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Add/Edit Comment">
+                            data-bs-placement="top" title="Add/Edit Comment" >
                         <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditComment(${JSON.stringify(
                           item,
                         ).replace(/"/g, "&quot;")})">
                             <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
                         </button>
-                         <button class="btn btn-outline-danger btn-small-icon" type="button">
+                         <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="handleDeleteProsbis(${JSON.stringify(
+                           item,
+                         ).replace(/"/g, "&quot;")})">
                           <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
                         </button>
                      </td>
