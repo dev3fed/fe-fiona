@@ -16,7 +16,6 @@
     /* Hide the node icons */
 </style>
 <link rel="stylesheet" type="text/css" href="~/assets/css/job-description.css">
-<script src="~/assets/js/organization-structure/data_cnt.js"></script>
 @* style link *@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
@@ -69,18 +68,10 @@
                                 aria-labelledby="pills-jobdesc">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
-                                        <div class="col-3">
-                                            <label for="">Organization Data Source</label>
-                                            <select class="form-select digits" name="selectDraftOrganization" id="selectDraftOrganization">
-                                                <option></option>
-                                            </select>
-                                        </div>
-                                        <div class="col-3">
-                                            <label for="">Search</label>
+                                        <div class="col-4">
                                             <input class="form-control" type="text" placeholder="Search" id="searchJobDesc" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                         </div>
-                                        <div class="col-2" style="padding-left: 0;">
-                                            <label for="">Status</label>
+                                        <div class="col-3" style="padding-left: 0;">
                                             <select class="form-select digits" name="selectStatusJobDesc" id="selectStatusJobDesc" >
                                             @* <select class="form-select digits" name="selectStatusJobDesc" id="selectStatusJobDesc" states="[]" multiple="multiple"> *@
                                                 <option value="">All Status</option>
@@ -90,18 +81,14 @@
                                                 <option value="waiting approval">Waiting Approval</option>
                                             </select>
                                         </div>
-                                        <div class="col-1 d-flex" style="padding-left: 0;">
-                                            <div class="mt-auto">
-                                                <button class="btn btn-primary" type="button" id="searchButton">Search</button>
-                                            </div>
+                                        <div class="col-1" style="padding-left: 0;">
+                                            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
                                         </div>
-                                        <div class="col-3 d-flex justify-content-end" style="padding-left: 0;">
-                                            <div class="mt-auto">
-                                                <button class="btn btn-primary me-2 btn-icon" type="button" id="createJobDesc">
-                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2" style="margin-top: -1px;margin-right :5px;">Create Job Desc
-                                                </button>
-                                                @* <button class="btn btn-primary me-2 btn-icon" type="button" id="downloadJobDesc"><img src="~/assets/images/rasci/vector.svg" alt="Filter Icon" style="margin-top: -5px;margin-right: 7px;">Download</button> *@
-                                            </div>
+                                        <div class="col-4 d-flex justify-content-end" style="padding-left: 0;">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createJobDesc">
+                                                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2" style="margin-top: -1px;margin-right :5px;">Create Job Desc
+                                            </button>
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="downloadJobDesc"><img src="~/assets/images/rasci/vector.svg" alt="Filter Icon" style="margin-top: -5px;margin-right: 7px;">Download</button>
                                         </div>
                                         <div class="col-12 mt-4">
                                             <div class="table-responsive">
@@ -194,7 +181,6 @@
     <script src="../assets/js/job-description/constant.js"></script>
     <script src="../assets/js/job-description/table-custom.js"></script>
     <script src="../assets/js/authentication.js"></script>
-    <script src="../assets/js/job-description/multiple-select.js"></script>
     <script src="../assets/js/job-description/helper.js"></script>
     <script src="../assets/js/job-description/endpoint.js"></script>
     <script src="../assets/js/job-description/index.js"></script>
