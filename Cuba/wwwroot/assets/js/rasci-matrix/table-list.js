@@ -11,10 +11,35 @@ document.addEventListener("dataLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  const tableContainer = document.querySelector(".scrollable-table");
+  let page = 1; // Halaman API
+  let columnPage = 1; // Halaman untuk tambahan kolom
+  const limit = 10; // Data per batch
+  let isLoadingY = false; // Scroll ke bawah
+  let isLoadingX = false; // Scroll ke kanan
+  let extraColumns = 0; // Hitung jumlah kolom tambahan
+
   showLoading();
   loadTableHeader(appState.resultJabatan);
   loadTableBody(appState.resultProsbis);
   feather.replace();
+
+  // Event listener untuk infinite scroll
+  tableContainer.addEventListener("scroll", function () {
+    const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
+    const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
+
+    if (bottomReached) {
+      console.log("scroll buttom");
+      // fetchRows(); // Ambil data baru saat scroll ke bawah
+    }
+
+    if (rightReached) {
+      console.log("scroll right");
+
+      // fetchColumns(); // Ambil data baru saat scroll ke kanan
+    }
+  });
 });
 
 const showDataEmpty = () => {
@@ -184,10 +209,6 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
     return mapRasciCellsCache.get(cacheKey);
   }
 
-  if (rasciMapping.length === 0) {
-    return "";
-  }
-
   const rasciCells = jobTitleList
     .map((jobTitle) => {
       const rasciItems = rasciMapping.filter(
@@ -196,7 +217,6 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
 
       let rasciIcons = "";
       let comments = [];
-
       rasciItems.forEach((item) => {
         switch (item.rasciCode) {
           case "R":
@@ -226,6 +246,14 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
 
+      if (rasciMapping.length === 0) {
+        return `<td style="background-color: #F8D7DA;">
+        <div class="rasci-container">
+          <div class="rasci-icons"></div>
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, '${indexGroupId}')">
+        </div>
+      </td>`;
+      }
       return `<td>
         <div class="rasci-container">
           <div class="rasci-icons">${rasciIcons}</div>

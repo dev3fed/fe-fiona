@@ -184,9 +184,13 @@
                                             <partial name="ModalAddNotation" />
                                             <!-- End Modal add notification -->
 
-                                            <!-- Start Modal add notification by row column-->
+                                            <!-- Start Modal add notation by row column-->
                                             <partial name="ModalNotationRow" />
-                                            <!-- End Modal add notification by row column-->
+                                            <!-- End Modal add notation by row column-->
+
+                                            <!-- Start Modal add notation by reference column-->
+                                            <partial name="ModalEditNotationref" />
+                                            <!-- End Modal add notation by reference column-->
 
                                             <!-- Start Modal edit business process-->
                                             <partial name="ModalEditBusinessProcess" />
@@ -210,8 +214,10 @@
 
 
                                         </div>
-                                        <div class="col-12 d-flex align-items-center mb-3">
-                                            <span class="me-3" style="min-width: 130px;">RASCI data source</span>
+                                        <div class="col-12 d-flex align-items-center mb-2">
+                                            <span class="me-3" style="min-width: 130px;">RASCI Data Source</span>
+                                        </div>
+                                        <div class="col-4">
                                             <select class="form-select digits">
                                                 <option value="" selected>Master data RASCI</option>
                                                 <option value="1">Usulan Perubahan Fungsi Marketing</option>
@@ -227,7 +233,7 @@
                                                 </span>
                                             </div>
                                         </div> *@
-                                        <div class="col-5">
+                                        <div class="col-5 d-flex justify-content-end">
                                             <div class="btn-group w-100" role="group"
                                                 aria-label="Button group with nested dropdown">
                                                 <div class="btn-group" role="group">
@@ -253,14 +259,14 @@
                                                     style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                             </div>
                                         </div>
-                                        <div class="col-2" style="padding-left: 0;">
+                                        @* <div class="col-2" style="padding-left: 0;">
                                             <button class="btn btn-primary " type="button" id="searchButton"
                                                 disabled>Search</button>
                                             <button class="btn btn-outline-primary" type="button" id="clearButton"
                                                 onclick="clearInput()">Clear</button>
-                                        </div>
-                                        <div class="col-5 d-flex justify-content-end" style="padding-left: 0;">
-                                            <button class="btn btn-primary me-2 btn-icon" type="button"
+                                        </div> *@
+                                        <div class="col-3 d-flex justify-content-end" style="padding-left: 0;">
+                                            @* <button class="btn btn-primary me-2 btn-icon" type="button"
                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">
                                                 <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
                                                 Filter
@@ -269,14 +275,33 @@
                                                 data-bs-toggle="modal" data-bs-target="#modalJobCompare">
                                                 <img src="~/assets/images/rasci/job-compare.svg" alt="Filter Icon">
                                                 Job Compare
-                                            </button>
+                                            </button> *@
+                                            <button class="btn btn-primary me-2" type="button" id="searchButton"
+                                                style="width: 100px;" disabled>Search</button>
+                                            <button class="btn btn-outline-primary me-2" type="button" id="clearButton"
+                                                onclick="clearInput()" style="width: 100px;">Clear</button>
                                             <div class="btn-group" role="group">
-                                                <button class="btn btn-primary dropdown-toggle me-2 btn-icon"
+                                                <button class="btn btn-primary dropdown-toggle btn-icon"
                                                     id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
                                                     aria-haspopup="true" aria-expanded="false"><img
-                                                        src="~/assets/images/rasci/plus.svg" alt="Filter Icon"
-                                                        style="margin-top: -1px;">Add</button>
+                                                        src="~/assets/images/rasci/icon_menudots.svg" alt="Filter Icon"
+                                                        style="margin-top: -1px;">Option</button>
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
+                                                    <a class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#exampleModal">
+                                                        <img src="~/assets/images/rasci/icon_filter.svg"
+                                                            alt="Filter Icon">Filter
+                                                    </a>
+                                                    <a class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#modalJobCompare">
+                                                        <img src="~/assets/images/rasci/icon_compare.svg"
+                                                            alt="Filter Icon"> Job Compare
+                                                    </a>
+                                                    <a class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#exampleModal">
+                                                        <img src="~/assets/images/rasci/icon_export.svg"
+                                                            alt="Filter Icon" style="margin-top: -5px;"> Export
+                                                    </a>
                                                     <a class="dropdown-item" onclick="onModalChoose('addNewBp')">
                                                         <img src="~/assets/images/rasci/plus-black.svg"
                                                             alt="Filter Icon" style="margin-top: -1px;">Add New Business
@@ -288,9 +313,9 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                            <button class="btn btn-primary btn-icon" type="button"> <img
+                                            @* <button class="btn btn-primary btn-icon" type="button"> <img
                                                     src="~/assets/images/rasci/vector.svg" alt="Filter Icon"
-                                                    style="margin-top: -5px;">Export</button>
+                                                    style="margin-top: -5px;">Export</button> *@
                                         </div>
                                         <div class="col-12 mt-2">
                                             <div class="loading-container">
@@ -390,17 +415,20 @@
     <script src="../assets/js/rasci-matrix/store.js"></script>
     <script src="../assets/js/rasci-matrix/index.js"></script>
     <script src="../assets/js/rasci-matrix/table-list.js"></script>
+    <script src="../assets/js/rasci-matrix/table-matrix.js"></script>
     <script src="../assets/js/rasci-matrix/job-compare.js"></script>
     <script src="../assets/js/rasci-matrix/detail-prosbis.js"></script>
     <script src="../assets/js/rasci-matrix/add-prosbis.js"></script>
     <script src="../assets/js/rasci-matrix/rasci-draft.js"></script>
     <script src="../assets/js/rasci-matrix/rasci-approval.js"></script>
     <script src="../assets/js/rasci-matrix/add-notation.js"></script>
+    <script src="../assets/js/rasci-matrix/add-rascireference.js"></script>
     <script src="../assets/js/rasci-matrix/edit-businesspro.js"></script>
     <script src="../assets/js/rasci-matrix/detail-draft.js"></script>
     <script src="../assets/js/rasci-matrix/joblist-card.js"></script>
     <script src="../assets/js/rasci-matrix/filter-rasci.js"></script>
     <script src="../assets/js/rasci-matrix/activity-detaildraft.js"></script>
     <script src="../assets/js/rasci-matrix/detail-job.js"></script>
+
 
 }

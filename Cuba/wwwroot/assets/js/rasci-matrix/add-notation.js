@@ -8,19 +8,18 @@ async function onModalAddNotation() {
     const resultLevel = await fetchSelectLevel(dataChangeNotasi.draftId);
     const listLevel = resultLevel?.data.res;
     const formContent = `
-        <div class="col-12">
-        <div>
-          <label class="form-label">RASCI Matrix Draft Name</label>
-          <select class="form-select digits" disabled>
-            <option value="${dataChangeNotasi.draftId}">${dataChangeNotasi.draftName}</option>
-          </select>
-        </div>
-        <hr style="margin-top:25px;margin-bottom:20px"/>
+        <div class="col-12 mb-2">
+          <div>
+            <label class="form-label">RASCI Matrix Draft Name</label>
+            <select class="form-select digits" disabled>
+              <option value="${dataChangeNotasi.draftId}">${dataChangeNotasi.draftName}</option>
+            </select>
+          </div>
       </div>
       <div class="col-12">
         <div class="mb-2">
           <label class="form-label">Position</label>
-           <select class="form-select digits" name="jobIdPosition" id="jobIdPosition">
+           <select class="form-select digits" name="jobIdPosition" id="jobIdPosition" onchange="onSelectPosition(event)">
       </select>
         </div>
       </div>
@@ -40,7 +39,7 @@ async function onModalAddNotation() {
       </div>
   `;
     const bodyJobRef = `
-    <label class="form-label">position Reference</label>
+    <label class="form-label">Position Reference</label>
       <select class="form-select digits" name="jobIdRef" id="jobIdRef" onchange="onSelectJobRef(event)">
       </select>
     <hr style="margin-top:25px;margin-bottom:20px" />
@@ -184,15 +183,19 @@ async function onSelectJobRef(event) {
       if (result.success === true) {
         const dataTbl = result.data;
         const elementSelectedBispro = document.getElementById("table-prosbisref");
+        const elementSelectedBisproref = document.getElementById("selectedBisproref");
+        elementSelectedBisproref.style.display = "block";
         elementSelectedBispro.style.display = "block";
         const contentRefProsbis = `
-        <div class="table-responsive scrollable mt-2" style=" max-height: 220px;">
+        <label class="form-label">Business Process from reference</label>
+        <div class="card-tblbusiness" style="height:300px !important">
+          <div class="table-responsive scrollable mt-2" style=" max-height: 260px;">
             <table class="table tbl-border-notation">
                 <thead>
                 <tr>
                 <th scope="col" style="width: 50px"></th>
-              <th scope="col" style="width: 80px">Level</th>
-              <th scope="col" style="width: 100px;text-align:center">Index</th>
+              <th scope="col" style="width: 50px">Level</th>
+              <th scope="col" style="width: 90px;text-align:center">Index</th>
               <th scope="col" >Business Process</th>
               <th scope="col" style="width: 120px;text-align:center">RASCI</th>
               </tr>
@@ -232,60 +235,71 @@ async function onSelectJobRef(event) {
                       rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
                     }
                     return `
-                   <th scope="row">
-                    <label class="radio-label" for="checked-body-bp">
-                      <input class="checkbox_animated" id="checked-prosbisref-${item.indexNo}" 
-                        type="checkbox" value="${item.indexNo}" 
-                        onclick="onSelectProsbisRef(${JSON.stringify(item).replace(/"/g, "&quot;")})">
-
-                    </label>
-                  </th>
-                  <td>
-                    ${item.level}
-                  </td>
-                  <td style="text-align:center">
-                  ${item.indexNo}
-                  </td>
-                  <td>
-                  ${item.process}
-                  </td>
-                  <td>
-                      <div class="rasci-container">
-                        <div class="rasci-icons">${rasciIcons}</div>
-                      </div>
-                  </td>
+                    <th scope="row">
+                      <label class="radio-label" for="checked-body-bp">
+                        <input class="checkbox_animated" id="checked-prosbisref-${item.indexNo}" 
+                          type="checkbox" value="${item.indexNo}" 
+                          onclick="onSelectProsbisRef(${JSON.stringify(item).replace(/"/g, "&quot;")});">
+                      </label>
+                    </th>
+                    <td style="text-align:center">
+                      ${item.level}
+                    </td>
+                    <td style="text-align:center">
+                    ${item.indexNo}
+                    </td>
+                    <td>
+                    ${item.process}
+                    </td>
+                    <td>
+                        <div class="rasci-container">
+                          <div class="rasci-icons">${rasciIcons}</div>
+                        </div>
+                    </td>
                 </tr>
                   `;
                   })
                   .join("")}
                 </tbody>
             </table>
+        </div>
         </div>`;
         elementSelectedBispro.innerHTML = contentRefProsbis;
       }
     } else {
       $("#table-prosbisref").hide();
+      $("#selectedBisproref").hide();
       return;
     }
   } catch (error) {}
 }
 
+function onSelectPosition(item) {
+  const dataChangeNotasi = getState("dataChangeNotasi") || { busProsMapped: [] };
+  const jobName = $("#jobIdPosition").find(":selected").text();
+  const jobId = item.target.value;
+  const updatedPayload = {
+    ...dataChangeNotasi,
+    jobId: jobId,
+    jobName: jobName,
+  };
+  setState("dataChangeNotasi", updatedPayload);
+}
 function onSelectProsbisRef(item) {
   const elementChecked = document.getElementById(`checked-prosbisref-${item.indexNo}`);
   const isChecked = elementChecked.checked;
-  const selectedJobId = document.getElementById("jobIdPosition");
+  const jobRefName = $("#jobIdRef").find(":selected").text();
   const dataChangeNotasi = getState("dataChangeNotasi") || { busProsMapped: [] };
-
+  const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
   if (isChecked) {
     const notation = item.rasciNotation.map((notation) => ({
       rasciCode: notation.notation,
       comment: notation.comment,
       isChecked: isChecked,
     }));
-
+    console.log("item", item);
     const updatedPayload = {
       ...dataChangeNotasi,
-      jobId: selectedJobId.value,
       busProsMapped: [
         ...dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNo),
         {
@@ -294,15 +308,20 @@ function onSelectProsbisRef(item) {
         },
       ],
     };
+    const sendData = { ...item, jobRefName: jobRefName };
+    setState("listSelectedProsbisref", [...listSelectedProsbisref, sendData]);
     setState("dataChangeNotasi", updatedPayload);
   } else {
     const updatedPayload = {
       ...dataChangeNotasi,
       busProsMapped: dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNo),
     };
-
+    // console.log("item", item);
+    const removeList = listSelectedProsbisref.filter((entry) => entry.indexNo !== item.indexNo);
+    setState("listSelectedProsbisref", removeList);
     setState("dataChangeNotasi", updatedPayload);
   }
+  cardSelectedProsbisref();
 }
 
 function onSelectLevel(event) {
@@ -452,12 +471,16 @@ const handleRadioChange = (event) => {
     $("#bispro, #selectedBispro").hide();
     cardSelectedNotasilist(reset);
     setState("dataChangeNotasi", reset);
+    setState("listSelectedProsbisref", []);
+    cardSelectedProsbisref();
   } else if (value === "nonReference") {
     jobSelect.val(null).trigger("change");
     $("#table-prosbisref").hide();
     $("#posref").hide();
     $("#bispro, #selectedBispro").show();
     setState("dataChangeNotasi", reset);
+    setState("listSelectedProsbisref", []);
+    cardSelectedProsbisref();
   }
 };
 const tblRasciNotation = (rasciNotation) => {
@@ -522,7 +545,8 @@ function backChangeNotation() {
 
 function formValidationNotation() {
   const { jobId, busProsMapped } = getState("dataChangeNotasi");
-  const isValid = jobId && busProsMapped.length > 0;
+  const listSelectedProsbisref = getState("listSelectedProsbisref");
+  const isValid = (jobId && busProsMapped.length > 0) || (jobId && listSelectedProsbisref.length > 0);
   document.getElementById("btnDraftnotation").disabled = !isValid;
 }
 
@@ -554,7 +578,7 @@ async function openModalNotRow(jobId, prosbisId) {
           <div >
               <label class="form-label" style="width:19%">Position</label>
                <label> : </label>
-          <b class="form-label">${result.position.code} - ${result.position.name}</b>
+          <b class="form-label">${result.position.name}</b>
           </div>
         </div>
         <div class="col-12">
@@ -571,7 +595,6 @@ async function openModalNotRow(jobId, prosbisId) {
           <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
           <th scope="col">Comment (Optional)</th>
           </tr>`;
-
     const output = mergeRasciData(result.rasci, rasciNotation);
     setState("rasciNotation", output);
     setState("dataDetailProsbis", { ...dataDetailProsbis, jobId: jobId, indexGroup: prosbisId });
@@ -723,6 +746,7 @@ async function saveNotationRow() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
+          backChangeNotationRow();
           loadTableBodyDraft(dataDraft);
         });
       }, 100);
@@ -734,6 +758,7 @@ async function saveDraftnotation() {
     const spinner = document.getElementById("spinBtnNotation");
     spinner.style.display = "inline-block";
     const dataChangeNotasi = getState("dataChangeNotasi");
+    console.log("dataChangeNotasi", dataChangeNotasi);
     const inputValue = {
       draftName: dataChangeNotasi.draftName,
       draftId: dataChangeNotasi.draftId,
