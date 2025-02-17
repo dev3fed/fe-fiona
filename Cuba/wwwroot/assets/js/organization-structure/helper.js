@@ -521,12 +521,17 @@ async function saveInputAttribut(type, data) {
   saveOrgDetails(payload);
   if (payload.type == "edit") {
     data = lsListPosition.find((item) => item.positionId == payload.positionId);
-    swal("Saved", "Save as Draft", "success");
-    window.location.href = "/organization/index?focusNode=" + payload.positionId;
+    swal("Saved", "Position has been updated", "success");
+    // wait 1 second
+    setTimeout(() => {
+      window.location.href = "/organization/index?focusNode=" + payload.positionId;
+    }, 1000);
   } else {
-    swal("Saved", "Save as Draft", "success");
+    swal("Saved", "Position has been saved", "success");
     const getDirectReport = payload.positionId;
-    window.location.href = "/organization/index?focusNode=" + getDirectReport;
+    setTimeout(() => {
+      window.location.href = "/organization/index?focusNode=" + getDirectReport;
+    }, 1000);
   }
 }
 

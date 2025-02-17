@@ -562,7 +562,13 @@ $("input[name='radioDraft']").on("change", function () {
 
 // validasi continue draft
 $("#continueButton").click(async function () {
+  // cannot save draft becouse the name is already exist
   const draftName = $("#inputDraftName").val() ?? $("#selectDraftName").val();
+  if (lsListDraft.find((x) => x.draftName == $("#inputDraftName").val())) {
+    swal("Failed", `${draftName} draft is already exist, please change to another draft name`, "error");
+    return;
+  }
+
   // const checkbox radioDraft
   // const radioDraft = $("input[name='radioDraft']:checked").val();
 
