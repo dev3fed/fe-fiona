@@ -21,6 +21,28 @@
     #header-competency {
         display: block;
     }
+
+    .empty-bodycompetency {
+        background-color: #EAEAEB;
+        height: 400px;
+        background-image: url("/assets/images/competency/empty_competency.svg");
+        background-position: center 150px;
+        background-repeat: no-repeat;
+        background-size: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 235px;
+    }
+
+    #table-competency {
+        display: none;
+    }
+
+    #empty-competency {
+        display: block;
+    }
 </style>
 <div class="page-body">
     <div class="container-fluid">
@@ -104,6 +126,7 @@
                                             <partial name="~/Views/Competency/ModalWarning.cshtml" />
                                             <partial name="~/Views/Competency/ModalSaveDraft.cshtml" />
                                             <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
+                                            <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
 
                                         </div>
                                         <partial name="~/Views/Competency/KkjPage.cshtml" />

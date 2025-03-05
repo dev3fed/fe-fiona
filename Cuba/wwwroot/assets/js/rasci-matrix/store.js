@@ -1,5 +1,7 @@
 const appState = new Proxy(
   {
+    storageJabatan: [],
+    storageProsbis: [],
     allDataJabatan: [],
     resultJabatan: null,
     allDataProsbis: [],
@@ -23,6 +25,10 @@ const appState = new Proxy(
     dataDeleteProsbis: {},
     dataDetailProsbis: {},
     editRasciNotation: {},
+    itemsPerPageY: 20,
+    currentPageY: 1,
+    itemsPerPageX: 20,
+    currentPageX: 1,
     detailJob: {},
     listSelectedProsbisref: [],
     dataChangeNotasi: {
@@ -79,8 +85,8 @@ const appState = new Proxy(
       if (target[property] !== value) {
         // Set the new value
         target[property] = value;
-        loadTableHeader(target.resultJabatan);
-        loadTableBody(target.resultProsbis);
+        // loadTableHeader(target.resultJabatan);
+        // loadTableBody(target.resultProsbis);
         updateSelect2ByProsbis();
         updateSelect2ByJob();
         formValidation();
@@ -122,7 +128,7 @@ window.setState = setState;
 window.getState = getState;
 
 async function SearchMatrix(params) {
-  const url = `${url_api}/api/RasciMatrix/searchBy?type=${params.type}&search=${params.search}`;
+  const url = `${url_api}/api/rasci-matrix/searchBy?type=${params.type}&search=${params.search}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -134,7 +140,7 @@ async function SearchMatrix(params) {
 }
 
 async function fetchDataMatrix(params) {
-  const url = `${url_api}/api/RasciMatrix`;
+  const url = `${url_api}/api/rasci-matrix`;
   try {
     const result = await ajaxRequest(url, "POST", params);
     return result;
@@ -157,7 +163,8 @@ async function fetchSelectLevel(draftId) {
 }
 
 async function fetchDraftProsbis(params) {
-  const url = `${url_api}/api/RasciMatrix/draft/list?${params}`;
+  const url = `${url_api}/api/rasci-matrix/draft/list?${params}`;
+
   try {
     const result = await ajaxRequest(url, "GET");
     return result.data;
@@ -168,7 +175,7 @@ async function fetchDraftProsbis(params) {
 }
 
 async function fetchDraftListProsbis(idDraft, query) {
-  const url = `${url_api}/api/RasciMatrix/draft/list/${idDraft}?${query}`;
+  const url = `${url_api}/api/rasci-matrix/draft/list/${idDraft}?${query}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result.data;
@@ -190,7 +197,7 @@ async function fetchFilterJobList() {
 }
 
 async function fetchDraftProsbisByid(payload) {
-  const url = `${url_api}/api/RasciMatrix/draft/detail/${payload}`;
+  const url = `${url_api}/api/rasci-matrix/draft/detail/${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
@@ -201,7 +208,7 @@ async function fetchDraftProsbisByid(payload) {
 }
 
 async function submitDraftProsbis(payload) {
-  const url = `${url_api}/api/RasciMatrix/draft/save`;
+  const url = `${url_api}/api/rasci-matrix/draft/save`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     return result;
@@ -234,7 +241,7 @@ async function draftSubmittoApproval(payload, id) {
 }
 
 async function deleteProsbisDraft(id) {
-  const url = `${url_api}/api/RasciMatrix/draft/delete?draftId=${id}`;
+  const url = `${url_api}/api/rasci-matrix/draft/delete/${id}`;
   try {
     const result = await ajaxRequest(url, "DELETE");
     return result;
@@ -244,7 +251,7 @@ async function deleteProsbisDraft(id) {
   }
 }
 async function createDraftRasci(payload) {
-  const url = `${url_api}/api/RasciMatrix/draft/create`;
+  const url = `${url_api}/api/rasci-matrix/draft/create`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     return {
@@ -260,7 +267,7 @@ async function createDraftRasci(payload) {
 }
 
 async function endpointRenameDraft(params, payload) {
-  const url = `${url_api}/api/RasciMatrix/draft/rename/${params}`;
+  const url = `${url_api}/api/rasci-matrix/draft/rename/${params}`;
   try {
     const result = await ajaxRequest(url, "PUT", payload);
     return {
@@ -277,7 +284,7 @@ async function endpointRenameDraft(params, payload) {
 }
 
 async function fetchDetailDraftActivity(id) {
-  const url = `${url_api}/api/RasciMatrix/draft/detail-list/${id}`;
+  const url = `${url_api}/api/rasci-matrix/draft/detail-list/${id}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -294,7 +301,7 @@ async function fetchDetailDraftActivity(id) {
 }
 
 async function fetchDetailRasci(param) {
-  const url = `${url_api}/api/RasciMatrix/box-rasci/detail?parentId=${param.indexGroup}&jobId=${param.jobId}`;
+  const url = `${url_api}/api/rasci-matrix/box-rasci/detail?parentId=${param.indexGroup}&jobId=${param.jobId}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -311,7 +318,7 @@ async function fetchDetailRasci(param) {
 }
 
 async function fetchRelatedJob(id) {
-  const url = `${url_api}/api/RasciMatrix/business-process/detail/${id}`;
+  const url = `${url_api}/api/rasci-matrix/business-process/detail/${id}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -328,7 +335,7 @@ async function fetchRelatedJob(id) {
 }
 
 async function fetchProsbisByJob(param) {
-  const url = `${url_api}/api/RasciMatrix/reference-from-position?jobId=${param.jobId}&draftId=${param.draftId}`;
+  const url = `${url_api}/api/rasci-matrix/reference-from-position?jobId=${param.jobId}&draftId=${param.draftId}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -343,27 +350,46 @@ async function fetchProsbisByJob(param) {
     };
   }
 }
+
+async function fetchProsbisSumulation(currentPageY, currentPageX) {
+  const url = `${url_api}/api/rasci-matrix/draft/sumulation/test?draftId=7c7fd4fa-2849-4c12-82a8-26e9ff2d1649&row=${currentPageY}&rowSize=10&col=${currentPageX}&colSize=10`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    console.log("result", result);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 async function fetchData() {
   try {
-    const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
-      fetchDataMatrix(),
-      fetchSelectLevel(),
-      fetchFilterJobList(),
-    ]);
-    // const [dataMatrix, prosbisLvl] = await Promise.all([fetchDataMatrix(), fetchSelectLevel()]);
-    appState.resultJabatan = dataMatrix?.data.jobTitle;
-    appState.resultProsbis = dataMatrix?.data.businessProcess;
-    appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
-    appState.prosbisLevel = prosbisLvl?.data.result;
-    const combinedData = [
-      ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
-      ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
-      ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
-      ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
-      ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
-      ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
-    ];
-    appState.filterJobList = combinedData;
+    // const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
+    //   fetchDataMatrix(),
+    //   fetchSelectLevel(),
+    //   fetchFilterJobList(),
+    // ]);
+    const [resultSimulation] = await Promise.all([fetchProsbisSumulation(1, 1)]);
+    appState.resultJabatan = resultSimulation.data[0].responsibilities;
+    appState.resultProsbis = resultSimulation.data;
+    console.log("cek", resultSimulation);
+    // appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
+    // appState.prosbisLevel = prosbisLvl?.data.result;
+    // const combinedData = [
+    //   ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
+    //   ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
+    //   ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
+    //   ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
+    //   ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
+    //   ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
+    // ];
+    // appState.filterJobList = combinedData;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

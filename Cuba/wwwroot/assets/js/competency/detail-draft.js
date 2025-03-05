@@ -11,7 +11,7 @@ async function detailDraft() {
       const bodyInfo = `
         <div class="col-3 custom-col">
           <label style="color:#9F9FA5">Draft Name</label>
-          <label style="font-weight: 600;font-size: 14px">${dataDraft.draftName}</label>
+          <label style="font-weight: 600;font-size: 14px">${dataDraft.draftCompetencyName}</label>
           <label>${dataDraft.reqId}</label>
         </div>
         <div class="col-3 custom-col">

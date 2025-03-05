@@ -1,0 +1,32 @@
+<div class="row">
+    <div class="col-5">
+        <div class="faq-form">
+            <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                data-feather="search"></i>
+        </div>
+    </div>
+    <div class="col-7 d-flex justify-content-end">
+        <button class="btn btn-primary  btn-icon" type="button" onclick="openFormrole()">
+            <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;">
+            Create Role
+        </button>
+    </div>
+    <div class="col-12 mt-3">
+        <div class="table-responsive" style=" max-height: 450px;">
+            <table class="table tbl-border-management">
+                <thead id="header-role" style="background-color: #006CA9;">
+                    <tr>
+                        <th scope="col" style="width: 50px;text-align:center">
+                            No
+                        </th>
+                        <th scope="col" style="width: 520px">Role</th>
+                        <th scope="col">Total User</th>
+                        <th scope="col" style="text-align: center;width: 160px">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="body-role">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

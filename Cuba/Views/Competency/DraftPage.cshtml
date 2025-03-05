@@ -72,7 +72,7 @@
         padding: 0;
     }
 
-    .empty-body {
+    @* .empty-body {
         background-color: #EAEAEB;
         height: 400px;
         background-image: url("/assets/images/rasci/empty_draft.svg");
@@ -80,6 +80,19 @@
         background-repeat: no-repeat;
         background-size: contain;
         background-size: 150px;
+    } *@
+        .empty-body {
+        background-color: #EAEAEB;
+        height: 400px;
+        background-image: url("/assets/images/rasci/empty_draft.svg");
+        background-position: center 100px;
+        background-repeat: no-repeat;
+        background-size: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 235px;
     }
 
     #table-draft {
@@ -90,13 +103,20 @@
         display: block;
     }
 </style>
-<div class="col-12 " id="empty-draft">
-    <div class="empty-body">
+<div class="col-12" id="empty-draft">
+    <partial name="~/Views/Competency/ModalCreateEmptydraft.cshtml" />
 
+    <div class="empty-body">
+        <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="modal"
+            data-bs-target="#ModalCreateEmptydraft">
+            <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon">
+            Created Competency Draft
+        </button>
     </div>
 </div>
 <div class="col-12" id="table-draft">
     <partial name="~/Views/Competency/ModalDeleteNotif.cshtml" />
+    <partial name="~/Views/Competency/ModalDraftCompetency.cshtml" />
 
     <div class="row">
         <div class="col-3">
@@ -113,6 +133,12 @@
                     data-feather="search"></i>
             </div>
         </div>
+        <div class="col-5 d-flex justify-content-end">
+            <button class="btn btn-primary  btn-icon" type="button" onclick="openDraftCompetency()">
+                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;">
+                Create Competency Draft
+            </button>
+        </div>
         <div class="col-12 mt-3">
             <div class="table-responsive" style=" max-height: 450px;">
                 <table class="table tbl-border-draftcompetency">
@@ -121,11 +147,10 @@
                             <th scope="col" style="width: 50px;text-align:center">
                                 No
                             </th>
-                            <th scope="col" style="width: 200px">Request ID</th>
-                            <th scope="col">Draft Name</th>
-                            <th scope="col" style="width: 150px">Created By</th>
-                            <th scope="col" style="width: 150px">Created Date</th>
-                            <th scope="col">Type</th>
+                            <th scope="col" style="width: 200px">Draft Name</th>
+                            <th scope="col">Organization Structure Data Source</th>
+                            <th scope="col" style="width: 200px">Created By</th>
+                            <th scope="col" style="width: 200px">Updated By</th>
                             <th scope="col" style="text-align: center;">Action</th>
                         </tr>
                     </thead>

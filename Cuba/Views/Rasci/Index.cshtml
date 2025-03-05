@@ -218,9 +218,9 @@
                                             <span class="me-3" style="min-width: 130px;">RASCI Data Source</span>
                                         </div>
                                         <div class="col-4">
-                                            <select class="form-select digits">
-                                                <option value="" selected>Master data RASCI</option>
-                                                <option value="1">Usulan Perubahan Fungsi Marketing</option>
+                                            <select class="form-select digits" id="dataSource-rasci"
+                                                onchange="changeDataSource(this.value)">
+                                                <option value="master">Master data RASCI</option>
                                             </select>
                                         </div>
                                         @* <div class="row">
@@ -332,6 +332,7 @@
                                                 <thead id="table-header">
                                                 </thead>
                                                 <tbody id="table-body" class="rasci-matrix-body">
+
                                                 </tbody>
                                             </table>
                                             <!-- end :: List RASCI Matrix Table -->

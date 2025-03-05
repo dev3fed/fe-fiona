@@ -2,6 +2,78 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .tbl-border-management {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-management th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-management thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-management th,
+    .tbl-border-management td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+    }
+
+    .checkbox_animated {
+        width: 12px;
+        height: 12px;
+        transform: scale(0.8);
+        margin-right: 5px;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+        text-align: center;
+    }
+
+    .radio_animated {
+        margin-right: 5px;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+
+    .switch-sm {
+        display: flex;
+        /* Atur sesuai kebutuhan */
+    }
+</style>
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -29,13 +101,34 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
-                    <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                    <div style="padding:10px">
+                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="pills-user-tab" data-bs-toggle="pill"
+                                    href="#pills-user" role="tab" aria-controls="pills-user"
+                                    aria-selected="true">User</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" id="pills-role-tab" data-bs-toggle="pill"
+                                    href="#pills-role" role="tab" aria-controls="pills-role" aria-selected="false">Role
+                                </a></li>
+                        </ul>
+                        <div class="tab-content" id="pills-competency-tabcontent">
+                            <div class="tab-pane fade show active" id="pills-user" role="tabpanel"
+                                aria-labelledby="pills-user-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <partial name="~/Views/AccessManagement/ModalFormUser.cshtml" />
+                                    <partial name="~/Views/AccessManagement/UserPage.cshtml" />
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-role" role="tabpanel" aria-labelledby="pills-role-tab">
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <partial name="~/Views/AccessManagement/ModalFormRole.cshtml" />
+                                    <partial name="~/Views/AccessManagement/RolePage.cshtml" />
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -43,7 +136,10 @@
     <!-- Container-fluid Ends-->
 </div>
 @section Script {
-    <!-- Plugins JS start-->
+    <script>
+        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        const token = localStorage.getItem("token");
+    </script> <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
@@ -51,4 +147,9 @@
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/access-management/store.js"></script>
+    <script src="../assets/js/access-management/user-service.js"></script>
+    <script src="../assets/js/access-management/role-service.js"></script>
+
+
 }

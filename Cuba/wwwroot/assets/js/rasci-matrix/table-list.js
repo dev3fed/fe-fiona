@@ -1,5 +1,12 @@
-document.addEventListener("dataLoaded", function () {
+document.addEventListener("dataLoaded", async function () {
   if (appState.resultJabatan.length > 0 && appState.resultProsbis.length > 0) {
+    console.log("appState.resultJabatan", appState.resultJabatan);
+    setTimeout(() => {
+      const tableContainer = document.querySelector(".scrollable-table");
+      if (tableContainer) {
+        tableContainer.scrollTop = 100;
+      }
+    }, 0);
     setTimeout(() => {
       hideLoading();
       loadTableHeader(appState.resultJabatan);
@@ -10,37 +17,60 @@ document.addEventListener("dataLoaded", function () {
   }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  const tableContainer = document.querySelector(".scrollable-table");
-  let page = 1; // Halaman API
-  let columnPage = 1; // Halaman untuk tambahan kolom
-  const limit = 10; // Data per batch
-  let isLoadingY = false; // Scroll ke bawah
-  let isLoadingX = false; // Scroll ke kanan
-  let extraColumns = 0; // Hitung jumlah kolom tambahan
+document.addEventListener("DOMContentLoaded", async function () {
+  console.log("appState.resultJabatan", appState.resultJabatan);
+  let selectElement = document.querySelector("#dataSource-rasci");
 
+  if (selectElement.value === "master") {
+    document.getElementById("pills-warningtab").style.display = "none";
+  }
+  setTimeout(() => {
+    const tableContainer = document.querySelector(".scrollable-table");
+    if (tableContainer) {
+      tableContainer.scrollTop = 100;
+    }
+  }, 0);
   showLoading();
   loadTableHeader(appState.resultJabatan);
   loadTableBody(appState.resultProsbis);
+  fetchDatasource();
   feather.replace();
-
-  // Event listener untuk infinite scroll
-  tableContainer.addEventListener("scroll", function () {
-    const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
-    const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
-
-    if (bottomReached) {
-      console.log("scroll buttom");
-      // fetchRows(); // Ambil data baru saat scroll ke bawah
-    }
-
-    if (rightReached) {
-      console.log("scroll right");
-
-      // fetchColumns(); // Ambil data baru saat scroll ke kanan
-    }
-  });
 });
+
+function fetchDatasource() {
+  $.ajax({
+    url: `${url_api}/api/Utilities/selection`,
+    dataType: "json",
+    data: {
+      type: "draft-rasci",
+      page: 1,
+      search: "",
+    },
+    success: function (response) {
+      if (response && response.data && response.data.result) {
+        let $select = $("#dataSource-rasci");
+        $select.find("option:not(:first)").remove();
+        response.data.result.forEach((item) => {
+          $select.append(new Option(item.text, item.id, false, false));
+        });
+        $select.select2({
+          placeholder: "Choose",
+          allowClear: true,
+        });
+      }
+    },
+  });
+}
+
+function changeDataSource(dataSource) {
+  console.log("first", dataSource);
+  if (dataSource !== "master") {
+    document.getElementById("pills-warningtab").style.display = "flex";
+  } else {
+    document.getElementById("pills-warningtab").style.display = "none";
+  }
+}
+// Event listener untuk infinite scroll
 
 const showDataEmpty = () => {
   const textInfo = document.getElementById("text-info");
@@ -123,18 +153,26 @@ function loadTableBody(prosbisList) {
   const rasciMapping = appState.resultRasciMapping || [];
   const isSearch = getState("isSearchMatrix");
   const idProsbisSelected = getState("idSearchProsbis");
-  const bodyContent = visibleProsbis
-    ?.map((val, i) => {
-      const levelClass =
-        val.level && idProsbisSelected == val.indexGroup
-          ? `level-${val.level} highlight`
-          : val.level
-          ? `level-${val.level}`
-          : "";
-      const isExpanded = expandedRows.includes(val.indexGroup) ? "chevron-up" : "chevron-down";
-      const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping, val.indexGroup);
-      return `
-        <tr class="clusterize-cluster ${levelClass}" id="${val.indexGroup}">
+  // console.log("visibleProsbis", visibleProsbis);
+  const tableBody = document.getElementById("table-body");
+  if (!tableBody) return;
+  const fragment = document.createDocumentFragment();
+  visibleProsbis?.forEach((val, i) => {
+    const levelClass =
+      val.level && idProsbisSelected == val.indexGroup
+        ? `level-${val.level} highlight`
+        : val.level
+        ? `level-${val.level}`
+        : "";
+    const isExpanded = expandedRows.includes(val.indexGroup) ? "chevron-up" : "chevron-down";
+    // const rasciCells = mapRasciCells(val.id, jobTitleList, rasciMapping, val.indexGroup);
+    const row = document.createElement("tr");
+    row.id = `row-${val.indexGroup}`;
+    row.classList.add("clusterize-cluster", levelClass);
+
+    const resciCells = mapRasciCells(val.responsibilities);
+    // console.log("first", val);
+    row.innerHTML = `
           <td scope="row" class="level-col" style="font-size:12px;font-weight: 500 !important;">
             L${val.level}
           </td>
@@ -179,46 +217,37 @@ function loadTableBody(prosbisList) {
               </div>
            </div>
           </td>
-          ${rasciCells}
-        </tr>`;
-    })
-    .join("");
-
+          ${resciCells}
+        `;
+    fragment.appendChild(row);
+  });
+  tableBody.appendChild(fragment);
   // var clusterize = new Clusterize({
   //   rows: bodyContent,
   //   scrollId: "table-container",
   //   contentId: "table-body",
   // });
-  const tableBody = document.getElementById("table-body");
-  if (tableBody) {
-    tableBody.innerHTML = bodyContent;
-    feather.replace();
-    initializeTooltips();
-  } else {
-    console.error("Table body element not found");
-  }
+  // const tableBody = document.getElementById("table-body");
+  feather.replace();
+  initializeTooltips();
 }
 
 // Map RASCI Cells (Memoized)
 const mapRasciCellsCache = new Map();
 
-function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroupId) {
-  const cacheKey = `${businessProcessId}-${jobTitleList.length}-${JSON.stringify(rasciMapping)}`;
+function mapRasciCells(natation) {
+  // const cacheKey = `${businessProcessId}-${jobTitleList.length}-${JSON.stringify(rasciMapping)}`;
 
-  if (mapRasciCellsCache.has(cacheKey)) {
-    return mapRasciCellsCache.get(cacheKey);
-  }
+  // if (mapRasciCellsCache.has(cacheKey)) {
+  //   return mapRasciCellsCache.get(cacheKey);
+  // }
 
-  const rasciCells = jobTitleList
-    .map((jobTitle) => {
-      const rasciItems = rasciMapping.filter(
-        (rm) => rm.businessProcessId === businessProcessId && rm.jobTitleId === jobTitle.id,
-      );
-
+  const rasciCells = natation
+    .map((value) => {
       let rasciIcons = "";
       let comments = [];
-      rasciItems.forEach((item) => {
-        switch (item.rasciCode) {
+      value.rasciCode.forEach((item) => {
+        switch (item.code) {
           case "R":
             rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
             break;
@@ -246,26 +275,26 @@ function mapRasciCells(businessProcessId, jobTitleList, rasciMapping, indexGroup
         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
 
-      if (rasciMapping.length === 0) {
-        return `<td style="background-color: #F8D7DA;">
-        <div class="rasci-container">
-          <div class="rasci-icons"></div>
-          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, '${indexGroupId}')">
-        </div>
-      </td>`;
-      }
+      // if (rasciMapping.length === 0) {
+      //   return `<td style="background-color: #F8D7DA;">
+      //   <div class="rasci-container">
+      //     <div class="rasci-icons"></div>
+      //     <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, '${indexGroupId}')">
+      //   </div>
+      // </td>`;
+      // }
       return `<td>
         <div class="rasci-container">
           <div class="rasci-icons">${rasciIcons}</div>
-          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="onModalChoose('editNotation',${jobTitle.id}, '${indexGroupId}')">
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon">
         </div>
       </td>`;
     })
     .join("");
 
-  if (rasciCells) {
-    mapRasciCellsCache.set(cacheKey, rasciCells);
-  }
+  // if (rasciCells) {
+  //   mapRasciCellsCache.set(cacheKey, rasciCells);
+  // }
 
   return rasciCells;
 }
@@ -407,6 +436,14 @@ async function clearInput() {
   resultAllData(resultMatrix?.data);
   setState("isSearchMatrix", false);
   setState("idSearchProsbis", "");
+  setState("currentPageY", 0);
+  setState("currentPageX", 0);
+  setState("strorageProsbis", []);
+  setState("storageJabatan", []);
+  const tableHeader = document.getElementById("table-header");
+  const tableBody = document.getElementById("table-body"); // Merujuk ke <tbody>
+  tableHeader.innerHTML = "";
+  tableBody.innerHTML = "";
   document.getElementById("inputText").value = "";
   document.getElementById("inputSearchCompare").value = "";
   handleCloseModal();

@@ -13,6 +13,94 @@ function handleDataLoad() {
 document.addEventListener("dataLoaded", handleDataLoad);
 document.addEventListener("DOMContentLoaded", handleDataLoad);
 
+function openFormEmptyDraft() {
+  const modal = new bootstrap.Modal(document.getElementById("modalformEmptydraft"));
+  modal.show();
+  fetchSelectEmptyDraftso();
+}
+function fetchSelectEmptyDraftso() {
+  $("#select-emptydraftso")
+    .select2({
+      dropdownParent: $("#modalformEmptydraft"),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "draft-so",
+          };
+        },
+        processResults: function (data) {
+          if (data && data.data) {
+            return {
+              results: data.data.result,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
+}
+
+function openFormDraft() {
+  const modal = new bootstrap.Modal(document.getElementById("modalformDraft"));
+  modal.show();
+  fetchSelect2Draftso();
+}
+function fetchSelect2Draftso() {
+  $("#select-draftso")
+    .select2({
+      dropdownParent: $("#modalformDraft"),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "draft-so",
+          };
+        },
+        processResults: function (data) {
+          if (data && data.data) {
+            return {
+              results: data.data.result,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
+}
+
 async function serviceDraftList(payload) {
   try {
     const queryString = new URLSearchParams(payload).toString();
@@ -231,7 +319,6 @@ function handleChangeItemsPerPage(event) {
     Page: payloadDraftList.Page,
     PageSize: itemsPerPage,
   };
-
   // Call the service function to fetch data
   serviceDraftList(payload);
 }
@@ -274,7 +361,6 @@ async function handleOpenDetail(id) {
     headerMatrix.style.display = "none";
   }
   const dataDraft = await fetchDraftProsbisByid(id);
-  console.log("first", dataDraft);
   if (dataDraft.status === 200) {
     // const dataDetail = dataDraft.data.draftDetail[0];
     // const dataInfo = dataDraft.data.draftInfo;
@@ -339,11 +425,13 @@ async function confirmDeleteProsbisDraft() {
 
 async function handleSaveDraft() {
   const draftNameInput = document.getElementById("input-draftname").value;
+  const selectedValue = $("#select-draftso").val();
+
   const spinner = document.getElementById("loadingSavedraft");
   spinner.style.display = "inline-block";
   const payload = {
     draftName: draftNameInput,
-    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+    draftSOId: selectedValue,
   };
   try {
     const result = await createDraftRasci(payload);
@@ -353,7 +441,6 @@ async function handleSaveDraft() {
       if (modal) {
         modal.hide();
       }
-
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -363,7 +450,7 @@ async function handleSaveDraft() {
           content: {
             element: "div",
             attributes: {
-              innerHTML: `<div style="text-align: center;">${result?.data.draftName} draft has been saved</div>`,
+              innerHTML: `<div style="text-align: center;">${result?.data?.draftRasci.draftName} draft has been saved</div>`,
             },
           },
         }).then(async () => {
@@ -388,11 +475,12 @@ async function handleSaveDraft() {
 
 async function handleSaveEmptyDraft() {
   const emptydraftNameInput = document.getElementById("input-emptydraftname").value;
+  const selectedValue = $("#select-emptydraftso").val();
   const spinner = document.getElementById("loadingEmptysavedraft");
   spinner.style.display = "inline-block";
   const payload = {
     draftName: emptydraftNameInput,
-    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+    draftSOId: selectedValue,
   };
   try {
     const result = await createDraftRasci(payload);

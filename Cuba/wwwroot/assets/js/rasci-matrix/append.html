@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Scroll Table with Slice</title>
+    <style>
+        #data-container {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        #loader {
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="data-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+    <div id="loader">Loading...</div>
+
+    <script>
+        let allData = [];
+        let currentIndex = 0;
+        const pageSize = 20;
+        const tableBody = document.getElementById("table-body");
+        const dataContainer = document.getElementById("data-container");
+        const loader = document.getElementById("loader");
+        let isLoading = false;
+
+        // Fungsi untuk mengambil semua data saat pertama kali load
+        async function fetchAllData() {
+            try {
+                isLoading = true;
+                loader.style.display = "block";
+                const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_limit=200`);
+                allData = await response.json();
+                loader.style.display = "none";
+                isLoading = false;
+                renderNextBatch();
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                loader.style.display = "none";
+                isLoading = false;
+            }
+        }
+
+        // Fungsi untuk menampilkan data menggunakan slice
+        function renderNextBatch() {
+            const nextBatch = allData.slice(currentIndex, currentIndex + pageSize);
+            nextBatch.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${item.id}</td><td>${item.title}</td><td>${item.body}</td>`;
+                tableBody.appendChild(row);
+            });
+            currentIndex += pageSize;
+        }
+
+        // Event listener untuk mendeteksi scroll
+        dataContainer.addEventListener("scroll", () => {
+            if (dataContainer.scrollTop + dataContainer.clientHeight >= dataContainer.scrollHeight - 10) {
+                renderNextBatch();
+            }
+        });
+
+        // Muat semua data di awal
+        fetchAllData();
+    </script>
+</body>
+
+</html>

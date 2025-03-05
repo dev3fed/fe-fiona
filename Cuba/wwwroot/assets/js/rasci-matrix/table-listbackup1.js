@@ -377,6 +377,11 @@ async function clearInput() {
   appState.idProsbis = [];
   appState.resetIdProsbis = [];
   // resultAllData(appState.resultProsbis);
+  // Bersihkan isi tabel sebelum diisi ulang
+  const tableHeader = document.getElementById("table-header");
+  const tableBody = document.getElementById("table-body"); // Merujuk ke <tbody>
+  tableHeader.innerHTML = "";
+  tableBody.innerHTML = "";
   const resultMatrix = await fetchDataMatrix();
   // const result = traverse(appState.allDataProsbis, appState.idProsbis);
   resultAllData(resultMatrix?.data);

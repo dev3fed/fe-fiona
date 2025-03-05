@@ -317,19 +317,33 @@ const applyFilterRasci = async () => {
     busProsLevel: getState("levelFilter"),
     rasciNotation: getState("rasciNotationFilter"),
   };
+  const itemsPerPageY = getState("itemsPerPageY");
+  const currentPageY = getState("currentPageY");
+  const itemsPerPageX = getState("itemsPerPageX");
+  const currentPageX = getState("currentPageX");
   const resultMatrix = await fetchDataMatrix(payload);
-  const firstPart = resultMatrix?.data.rasciMatrix.slice(0, 250);
+  const firstPart = resultMatrix?.data.rasciMatrix;
   const outputTbl = {
-    businessProcess: resultMatrix?.data.businessProcess.slice(0, 300),
-    jobTitle: resultMatrix?.data.jobTitle,
+    businessProcess: resultMatrix?.data.businessProcess.slice(currentPageY, itemsPerPageY),
+    jobTitle: resultMatrix?.data.jobTitle.slice(currentPageX, itemsPerPageX),
     rasciMatrix: firstPart,
   };
   if (resultMatrix.status === 200) {
     // resultAllData(resultMatrix?.data);
-    resultAllData(outputTbl);
+    // console.log("first", outputTbl);
+    // const container = document.getElementById("table-container");
+    // new VirtualTable(container, outputTbl.businessProcess, outputTbl.jobTitle);
+    // resetTable();
+    // resultAllData(outputTbl);
+    // setState("storageJabatan", resultMatrix?.data.jobTitle);
+    // setState("storageProsbis", resultMatrix?.data.businessProcess);
+    // renderRow(currentPageY, itemsPerPageX);
+    // setState("currentPageY", currentPageY + 1);
+
     setTimeout(() => {
       spinner.style.display = "none";
     }, 2000);
+
     const modalElement = document.getElementById("exampleModal");
     const modal = bootstrap.Modal.getInstance(modalElement);
     setState("isSearchMatrix", true);

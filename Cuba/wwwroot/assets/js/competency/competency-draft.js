@@ -36,19 +36,28 @@ function loadTableBodyDraft(dataList) {
       return `
         <tr>
           <th scope="row" style="text-align:center">${i + 1}</th>
-          <td>${val.reqId || "-"}</td>
           <td>${val.draftName || "-"}</td>
-          <td>${val.createdBy ? val.createdBy : "-"}</td>
-          <td>${val.createdDate ? new Date(val.createdDate).toLocaleDateString() : "-"}</td>
-          <td>${val.typeDetail || "-"}</td>
-          <td style="width: 200px;text-align:center">
+          <td>${val.draftSoName || "-"}</td>
+          <td>${val.createdBy ? val.createdBy : "-"}
+            <br>
+            <small style="color:#9F9FA5">
+              ${val.createdDate ? "at " + new Date(val.createdDate).toLocaleString() : "-"}
+            </small>
+          </td>
+          <td>${val.modifiedBy || "-"}
+            <br>
+            <small style="color:#9F9FA5">
+              ${val.modifiedDate ? "at " + new Date(val.modifiedDate).toLocaleString() : "-"}
+            </small>
+          </td>
+          <td style="width: 120px;text-align:center">
             <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail(${val.id})">
-              <i class="icon-eye"></i> Detail
+              <i class="icon-eye"></i> 
             </button>
             <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="handleDeleteCompeDraft(${
               val.id
             })">
-              <i class="icon-trash"></i> Delete
+              <i class="icon-trash"></i> 
             </button>
           </td>
         </tr>`;
@@ -91,6 +100,142 @@ function loadTableBodyDraft(dataList) {
   }
 }
 
+// start section create draft competency
+
+function openFormDraft() {
+  const modal = new bootstrap.Modal(document.getElementById("modalformDraft"));
+  modal.show();
+}
+
+function handleSaveDraft() {
+  const draftNameInput = document.getElementById("input-draftname").value;
+  const spinner = document.getElementById("loadingSavedraft");
+  spinner.style.display = "inline-block";
+  const payload = {
+    draftName: draftNameInput,
+    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+  };
+  console.log("payload", payload);
+  // try {
+  //   const result = createDraftRasci(payload);
+  //   if (result.success === true) {
+  //     const modaldraft = document.getElementById("modalformDraft");
+  //     const modal = bootstrap.Modal.getInstance(modaldraft);
+  //     if (modal) {
+  //       modal.hide();
+  //     }
+  //     setTimeout(() => {
+  //       swal({
+  //         title: "SUCCESS",
+  //         icon: "success",
+  //         buttons: false,
+  //         timer: 2000,
+  //         content: {
+  //           element: "div",
+  //           attributes: {
+  //             innerHTML: `<div style="text-align: center;">Usulan perubahan KKJ divisi HC draft has been saved</div>`,
+  //           },
+  //         },
+  //       });
+  //     }, 1000);
+  //     setTimeout(() => {
+  //       spinner.style.display = "none";
+  //     }, 2000);
+  //   } else {
+  //     spinner.style.display = "none";
+  //   }
+  // } catch (error) {
+  //   spinner.style.display = "none";
+  // }
+}
+function openDraftCompetency() {
+  const modal = new bootstrap.Modal(document.getElementById("ModalDraftCompetency"));
+  modal.show();
+}
+function handleSubmitDraft() {
+  const draftNameInput = document.getElementById("input-draftname").value;
+  const spinner = document.getElementById("loadingSavedraft");
+  spinner.style.display = "inline-block";
+  const payload = {
+    draftName: draftNameInput,
+    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+  };
+  console.log("payload", payload);
+  // try {
+  //   const result = createDraftRasci(payload);
+  //   if (result.success === true) {
+  //     const modaldraft = document.getElementById("modalformDraft");
+  //     const modal = bootstrap.Modal.getInstance(modaldraft);
+  //     if (modal) {
+  //       modal.hide();
+  //     }
+  //     setTimeout(() => {
+  //       swal({
+  //         title: "SUCCESS",
+  //         icon: "success",
+  //         buttons: false,
+  //         timer: 2000,
+  //         content: {
+  //           element: "div",
+  //           attributes: {
+  //             innerHTML: `<div style="text-align: center;">Usulan perubahan KKJ divisi HC draft has been saved</div>`,
+  //           },
+  //         },
+  //       });
+  //     }, 1000);
+  //     setTimeout(() => {
+  //       spinner.style.display = "none";
+  //     }, 2000);
+  //   } else {
+  //     spinner.style.display = "none";
+  //   }
+  // } catch (error) {
+  //   spinner.style.display = "none";
+  // }
+}
+function handleSaveEmptyDraft() {
+  const draftNameInput = document.getElementById("draftname-competency").value;
+  const spinner = document.getElementById("loadingSubmitdraft");
+  spinner.style.display = "inline-block";
+  const payload = {
+    draftName: draftNameInput,
+    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+  };
+  console.log("payload", payload);
+  // try {
+  //   const result = createDraftRasci(payload);
+  //   if (result.success === true) {
+  //     const modaldraft = document.getElementById("modalformDraft");
+  //     const modal = bootstrap.Modal.getInstance(modaldraft);
+  //     if (modal) {
+  //       modal.hide();
+  //     }
+  //     setTimeout(() => {
+  //       swal({
+  //         title: "SUCCESS",
+  //         icon: "success",
+  //         buttons: false,
+  //         timer: 2000,
+  //         content: {
+  //           element: "div",
+  //           attributes: {
+  //             innerHTML: `<div style="text-align: center;">Usulan perubahan KKJ divisi HC draft has been saved</div>`,
+  //           },
+  //         },
+  //       });
+  //     }, 1000);
+  //     setTimeout(() => {
+  //       spinner.style.display = "none";
+  //     }, 2000);
+  //   } else {
+  //     spinner.style.display = "none";
+  //   }
+  // } catch (error) {
+  //   spinner.style.display = "none";
+  // }
+}
+// end section create draft competency
+
 function handleClickCard(length) {
   const tableDraft = document.getElementById("table-draft");
   const emptyCard = document.getElementById("empty-draft");
@@ -115,45 +260,62 @@ function changeemptyPageDraft(length) {
     emptyCard.style.display = "block";
   }
 }
-const confirmDeletecompeDraft = () => {
+const confirmDeletecompeDraft = async () => {
   const id = getState("deleteDraftCompetency");
-  const draftList = getState("draftList");
+  console.log("id", id);
+  try {
+    const deleteResult = await fetchDeleteDraft(id);
+    console.log("deleteResult", deleteResult);
+    if (deleteResult.success === true) {
+      const modalDelDraft = document.getElementById("modalDelete");
+      const modal = bootstrap.Modal.getInstance(modalDelDraft);
+      if (modal) {
+        modal.hide();
+      }
+      const listDraft = await fetchDraftList();
+      const IsNotEmpty = listDraft.data.length;
+      changeemptyPageDraft(IsNotEmpty);
+      loadTableBodyDraft(listDraft.data);
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">${deleteResult.data.draftName} draft has been deleted.</div>`,
+          },
+        },
+      });
+    }
+  } catch (error) {}
   // remove from draft list
-  setState(
-    "draftList",
-    draftList.filter((val) => val.id !== id),
-  );
-  const modalDelDraft = document.getElementById("modalDelete");
-  const modal = bootstrap.Modal.getInstance(modalDelDraft);
-  if (modal) {
-    modal.hide();
-  }
-  const draftListAfter = getState("draftList");
-  const IsNotEmpty = draftListAfter.length;
-  changeemptyPageDraft(IsNotEmpty);
-  loadTableBodyDraft(draftListAfter);
 };
 
 async function handleOpenDetail(id) {
-  const draftDetail = document.getElementById("draft-detail");
-  const mainCompetency = document.getElementById("main-competency");
-  const headerCompetency = document.getElementById("header-competency");
-  const headerDetail = document.getElementById("header-detail-draft");
-  const detailDraft = getState("draftList").find((val) => val.id === id);
-  if (draftDetail) {
-    draftDetail.style.display = "block";
-  }
-  if (mainCompetency) {
-    mainCompetency.style.display = "none";
-  }
-  if (headerDetail) {
-    headerDetail.style.display = "block";
-  }
-  if (headerCompetency) {
-    headerCompetency.style.display = "none";
-  }
-  console.log("first", detailDraft);
-  setState("dataDetailDraft", detailDraft);
+  try {
+    const draftDetail = document.getElementById("draft-detail");
+    const mainCompetency = document.getElementById("main-competency");
+    const headerCompetency = document.getElementById("header-competency");
+    const headerDetail = document.getElementById("header-detail-draft");
+    if (draftDetail) {
+      draftDetail.style.display = "block";
+    }
+    if (mainCompetency) {
+      mainCompetency.style.display = "none";
+    }
+    if (headerDetail) {
+      headerDetail.style.display = "block";
+    }
+    if (headerCompetency) {
+      headerCompetency.style.display = "none";
+    }
+    const detailResult = await fetchDetailDraft(id);
+    if (detailResult.success === true) {
+      setState("dataDetailDraft", detailResult.data);
+    }
+  } catch (error) {}
   // const dataDraft = await fetchDraftProsbisByid(id);
   // if (dataDraft.status === 200) {
   //   const dataDetail = dataDraft.data.draftDetail[0];

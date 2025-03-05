@@ -9,15 +9,130 @@ document.addEventListener("dataLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   const jobList = getState("jobList");
   const competencyList = getState("competencyList");
+  let selectElement = document.querySelector("#dataSource-competency");
+  console.log("Selected value:", selectElement.value);
+
+  selectedType = document.querySelector(".dropdown-menu .dropdown-item").textContent.trim();
+  console.log("Default selected:", selectedType);
+
+  if (selectElement.value === "master") {
+    document.getElementById("pills-warningtab").style.display = "none";
+  }
+  fetctDataSourceComp();
   loadTableHeader(competencyList);
   loadTableBody(jobList);
   feather.replace();
 });
 
+function fetctDataSourceComp() {
+  $.ajax({
+    url: `${API_URL_COMPE}/api/Utilities/selection`,
+    dataType: "json",
+    data: {
+      type: "draft-comp",
+      page: 1,
+      search: "",
+    },
+    success: function (response) {
+      if (response && response.data && response.data.result) {
+        let $select = $("#dataSource-competency");
+        $select.find("option:not(:first)").remove();
+        response.data.result.forEach((item) => {
+          $select.append(new Option(item.text, item.id, false, false));
+        });
+        $select.select2({
+          placeholder: "Choose",
+          allowClear: true,
+        });
+      }
+    },
+  });
+}
+function onSelectType(text) {
+  setState("selectedType", text);
+  document.getElementById("btnSearchType").innerText = text;
+  document.getElementById("inputText").value = "";
+}
+$(document).ready(function () {
+  $("#inputText").keyup(function () {
+    if ($(this).val() == "") {
+      $("#btnSearchCompe").prop("disabled", true);
+    } else {
+      $("#btnSearchCompe").prop("disabled", false);
+    }
+  });
+});
+
+async function handleSearchCompetency() {
+  try {
+    const spinner = document.getElementById("loadingSearch");
+    spinner.style.display = "inline-block";
+    const searchType = getState("selectedType");
+    console.log("searchType", searchType);
+    const searchText = document.getElementById("inputText").value;
+    console.log(searchText);
+    let selectElement = document.querySelector("#dataSource-competency");
+    console.log("Selected value:", selectElement.value);
+    const payload = {
+      dataSource: selectElement.value,
+      filter: searchType,
+      search: searchText,
+      page: 1,
+      pageSize: 1000,
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    console.log("queryString", queryString);
+    const resultJob = await fetchJobList(queryString);
+    console.log("resultJob", resultJob);
+    if (resultJob.data.length > 0) {
+      const body = {
+        dataSource: selectElement.value,
+        page: 1,
+        pageSize: 1000,
+        jobCode: resultJob.data.map((value) => value.jobCode),
+      };
+      const resultCompetency = await fetchCompetencyList(body);
+      console.log("resultCompetency", resultCompetency);
+      const bodyMapping = {
+        dataSource: selectElement.value,
+        jobCode: resultJob.data.map((value) => value.jobCode),
+        compCode: resultCompetency?.data.map((val) => val.compCode),
+        page: 1,
+        pageSize: 999999,
+      };
+      const resultMapping = await fetchCompetencyMapping(bodyMapping);
+      console.log("resultMapping", resultMapping.data);
+
+      appState.competencyMapping = resultMapping.data.compData;
+      appState.jobList = resultJob.data;
+      appState.competencyList = resultCompetency.data;
+
+      // set display id empty-competency none
+      document.getElementById("empty-competency").style.display = "none";
+      document.getElementById("table-competency").style.display = "block";
+
+      loadTableHeader(resultCompetency.data);
+      loadTableBody(resultJob.data);
+    }
+    spinner.style.display = "none";
+  } catch (error) {}
+}
+function changeDataSource(dataSource) {
+  console.log("dataSource", dataSource);
+  if (dataSource !== "master") {
+    document.getElementById("pills-warningtab").style.display = "flex";
+    document.getElementById("btnCreateDraft").style.display = "none";
+  } else {
+    document.getElementById("pills-warningtab").style.display = "none";
+    document.getElementById("btnCreateDraft").style.display = "flex";
+  }
+}
 function loadTableHeader(competencyList) {
-  const totalMandatory = competencyList.filter((item) => item.category === "mandatory").length;
-  const totalGeneral = competencyList.filter((item) => item.category === "general").length;
-  const totalSpecific = competencyList.filter((item) => item.category === "specific").length;
+  const totalMandatory = competencyList.filter((item) => item.compType === "Mandatory").length;
+  console.log("competencyList", competencyList);
+  console.log("totalMandatory", totalMandatory);
+  const totalGeneral = competencyList.filter((item) => item.compType === "General").length;
+  const totalSpecific = competencyList.filter((item) => item.compType === "Spesifik").length;
   const headerContent = `
         <tr style="height: 30px;">
             <th rowspan="2" class="headcol head-cell" style="position:sticky;top:0; z-index:1 vertical-align: middle;text-align: center;">
@@ -32,10 +147,10 @@ function loadTableHeader(competencyList) {
                 ${competencyList
                   ?.map(
                     (val, i) => `
-                     <th class="color-${val.category} competency-cell">
+                     <th class="color-${val.compType} competency-cell">
                             <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                title="${val.competency_name}" onclick="handleDetailCompetency(${val.id})">
-                                ${val.competency_name}
+                                title="${val.name}" onclick="handleDetailCompetency(${val.compCode})">
+                                ${val.name}
                             </div>
                         </th>
             `,
@@ -50,14 +165,15 @@ function loadTableHeader(competencyList) {
 function loadTableBody(jobList) {
   const competencyList = getState("competencyList");
   const competencyMapping = getState("competencyMapping");
+  console.log("jobList", jobList);
   const bodyContent = jobList
     ?.map((val, i) => {
-      const compeCells = mapCompetencyCells(val.id, competencyList, competencyMapping);
+      const compeCells = mapCompetencyCells(val.jobCode, competencyList, competencyMapping);
       return `
           <tr>
              <td class="headcol">
                 <div class="joblist-cell-wrapper">
-                    <div class="flex-fill joblist-name">${val.job_name}</div>
+                    <div class="flex-fill joblist-name">${val.jobName}</div>
                 </div>
               </td>
               ${compeCells}

@@ -7,6 +7,7 @@ async function detailDraft() {
     };
     const queryString = new URLSearchParams(payload).toString();
     const listData = await fetchDraftListProsbis(dataDraft.draftId, queryString);
+    console.log("dataDraft", dataDraft);
     if (dataDraft) {
       const bodyInfo = `
       <div class="col-3 custom-col">
@@ -20,7 +21,7 @@ async function detailDraft() {
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Organization Data Source</label>
-        <label style="font-weight: 600;font-size: 14px">Usulan Perubahan Fungsi Marketing</label>
+        <label style="font-weight: 600;font-size: 14px">${dataDraft.draftSO.draftParentName}</label>
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Created by</label>
