@@ -202,26 +202,29 @@ $(document).ready(function () {
   });
 
   $("#saveAsDraft").click(function () {
+    const positionId = urlParams.get("positionId");
     const getDraftById = lsListDraft.find((item) => item.draftId == organizationAttribute.orgUnitId);
     const positionName = $("#inputPositionName").val();
+    let type = "Save";
+    if (positionId) type = "Edit";
     const action = [
       {
         button: "Cancel",
-        className: "btn-primary",
+        className: "btn-outline-dark",
         callback: function () {
           hideModal(`modalConfirm`);
         },
       },
       {
-        button: "Save",
-        className: "btn-outline-dark",
+        button: type,
+        className: "btn-primary",
         callbackFunction: "saveAsDraft",
       },
     ];
     modalConfrimHelper(
       "confirm",
-      "Save Position",
-      `Are you sure you want to save the position <b>${positionName}</b> to the draft <b>${getDraftById.draftName}</b>?`,
+      `${type} Position`,
+      `Are you sure you want to ${type} the position <b>${positionName}</b> to the draft <b>${getDraftById.draftName}</b>?`,
       "",
       action,
       "",

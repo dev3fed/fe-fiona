@@ -2,6 +2,7 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link rel="stylesheet" type="text/css" href="~/assets/css/parameter-setting.css">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -30,16 +31,91 @@
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
                     <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                        <div class="row">
+                            <div class="col-md-2 p-0">
+                                <div class="nav flex-column nav-pills nav-primary gap-2" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                    <a class="nav-link active" id="v-pills-competency-tab" data-bs-toggle="pill" href="#v-pills-competency" role="tab" aria-controls="v-pills-competency" aria-selected="true" style="font-size: 13px;">Mandatory Competency</a>
+                                    <a class="nav-link" id="v-pills-general-tab" data-bs-toggle="pill" href="#v-pills-general" role="tab" aria-controls="v-pills-general" aria-selected="false"  style="font-size: 13px;"><span>General Competency</span></a>
+                                    <a class="nav-link" id="v-pills-skill-group-tab" data-bs-toggle="pill" href="#v-pills-skill-group" role="tab" aria-controls="v-pills-skill-group" aria-selected="false"  style="font-size: 13px;"><span> Skill Group Weight</span></a>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="tab-content" id="v-pills-tabContent">
+                                    <div class="tab-pane fade show active" id="v-pills-competency" role="tabpanel" aria-labelledby="v-pills-competency-tab">
+                                        <div class="mt-2">
+                                            <span class="f-12">Last update on 18/08/2024, 08:30 by Dasa (Superadmin)</span>
+                                            <div class=" scrollable-table table-wrapper mt-2" style=" max-height: 470px;">
+                                                <table class="tbl custom-border-table " style=" table-layout: fixed;">
+                                                    <thead id="table-header">
+                                                        @* <tr style="height: 30px;">
+                                                        <th rowspan="2" class="headcol head-cell" style="position:sticky;top:0; z-index:1 vertical-align: middle;text-align: center;">
+                                                            <span style="padding-left:10px;">Mandatory Competency</span>
+                                                        </th>
+                                                        <th class="tg-baqh competency-cell color-mandatory " colspan="4">
+                                                            Managerial</th>
+                                                        <th class="tg-baqh competency-cell color-general" colspan="10">Generalist </th>
+                                                        <tr style="height: 30px;">
+                                                            <th class=" competency-cell">
+                                                                <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                                                    asik
+                                                                </div>
+                                                            </th>
+                                                            <th class=" competency-cell">
+                                                                <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                                                    asik
+                                                                </div>
+                                                            </th>
+                                                            <th class=" competency-cell">
+                                                                <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                                                    asik
+                                                                </div>
+                                                            </th>
+                                                            <th class=" competency-cell">
+                                                                <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                                                    asik
+                                                                </div>
+                                                            </th>
+                                                        </tr>
+                                                    </thead> *@
+                                                    <tbody id="table-body">
+
+                                                    </tbody>
+                                                </table>
+                                                <!-- end :: List Requirement KKJ Table -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-general" role="tabpanel" aria-labelledby="v-pills-general-tab">
+                                        <div class="mt-2">
+                                            <span class="f-12">Last update on 18/08/2024, 08:30 by Dasa (Superadmin)</span>
+                                            <div class="media mb-2 switch-sm">
+                                                <label class="switch">
+                                                    <input type="checkbox" checked=""><span class="switch-state"></span>
+                                                </label>
+                                                <span class="f-12 align-self-flex-end ml-2" style="padding: 8px;">Edit proficiency level general competency</span>
+                                            </div>
+                                        </div>
+                                        <div class="">
+                                            <span class="p-2 f-12 bg-warning-outline-custom">
+                                            By activate this feature, proficiency level of general competency can be changed below the previous level.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-skill-group" role="tabpanel" aria-labelledby="v-pills-skill-group-tab">
+                                        3
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
+    <partial name="~/Views/ParameterSetting/ModalEditDepthLevel.cshtml" />
+    <partial name="~/Views/ParameterSetting/ModalConfirm.cshtml" />
+
     <!-- Container-fluid Ends-->
 </div>
 @section Script {
@@ -48,7 +124,11 @@
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
+    <script src="../assets/js/parameter-setting/constant.js"></script>
+    <script src="../assets/js/parameter-setting/index.js"></script>
     <script src="../assets/js/script.js"></script>
 }
