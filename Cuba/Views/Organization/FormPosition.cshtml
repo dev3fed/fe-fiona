@@ -127,12 +127,12 @@
                                 <div class="col-md-12 m-t-15">
                                     <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                         <label class="new-switch mb-0" for="inputClassOrgUnitParentName">Org Unit Parent</label>
-                                        <div class="d-flex align-items-center">
+                                        @* <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'OrgUnitParentName')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="OrgUnitParentNameSwitch" onchange="onChangeSwith(event,'OrgUnitParentName')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
-                                        </div>
+                                        </div> *@
                                     </div>
                                     <select class="form-select digits" class="select-class" id="selectOrgUnitParentName" name="orgUnitParentName"  > 
                                     </select>
@@ -150,7 +150,7 @@
                                         <label class="new-switch mb-0" for="Function">Function (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'Function')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="FunctionSwitch" onchange="onChangeSwith(event,'Function')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -165,7 +165,7 @@
                                         <label class="new-switch mb-0" for="Division">Division (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'Division')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="DivisionSwitch" onchange="onChangeSwith(event,'Division')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -180,7 +180,7 @@
                                         <label class="new-switch mb-0" for="SubDivision">Sub Division (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'SubDivision')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="SubDivisionSwitch" onchange="onChangeSwith(event,'SubDivision')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -195,7 +195,7 @@
                                         <label class="new-switch mb-0" for="Department">Department (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'Department')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="DepartmentSwitch" onchange="onChangeSwith(event,'Department')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -210,7 +210,7 @@
                                         <label class="new-switch mb-0" for="Section">Section (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'Section')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="SectionSwitch" onchange="onChangeSwith(event,'Section')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -242,7 +242,7 @@
                                         <label class="new-switch mb-0" for="inputClassAbbrvPosition">Abbrv Position</label>
                                         <div class="d-flex align-items-center">
                                             <label for="" class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'AbbrvPosition')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="AbbrvPositionSwitch" onchange="onChangeSwith(event,'AbbrvPosition')" ><span class="switch-state"></span>
                                             </label>
                                             <label for="" class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -266,7 +266,7 @@
                                         <label class="new-switch mb-0" for="KBO">KBO (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label for="" class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'KBO')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="KBOSwitch" onchange="onChangeSwith(event,'KBO')" ><span class="switch-state"></span>
                                             </label>
                                             <label for="" class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -282,7 +282,7 @@
                                         <label for="" class="new-switch mb-0" for="CostCenter">Cost Center (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label for="" class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'CostCenter')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="CostCenterSwitch" onchange="onChangeSwith(event,'CostCenter')" ><span class="switch-state"></span>
                                             </label>
                                             <label for="" class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -298,7 +298,7 @@
                                         <label class="new-switch mb-0" for="PersonalAreaName">Personnel Area Name (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'PersonalAreaName')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="PersonalAreaNameSwitch" onchange="onChangeSwith(event,'PersonalAreaName')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>
@@ -313,7 +313,7 @@
                                         <label class="new-switch mb-0" for="PersonalSubareaName">Personal Subarea Name (Optional)</label>
                                         <div class="d-flex align-items-center">
                                             <label class="switch m-0">
-                                                <input type="checkbox" onchange="onChangeSwith(event,'PersonalSubareaName')" ><span class="switch-state"></span>
+                                                <input type="checkbox" id="PersonalSubareaNameSwitch" onchange="onChangeSwith(event,'PersonalSubareaName')" ><span class="switch-state"></span>
                                             </label>
                                             <label class="col-form-label mb-0" style="margin-top: -4px; margin-left: 5px;">New</label>
                                         </div>

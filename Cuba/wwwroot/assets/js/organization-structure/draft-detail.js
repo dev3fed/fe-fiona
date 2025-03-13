@@ -83,14 +83,12 @@ async function checkPage() {
   }
 }
 
-async function initializeDraftDetail(draftId) {
-  if (draftId == null) return;
-  const getDetailDraft = lsListDraft.find((x) => x.draftId == draftId);
-  $("#draftName").text(getDetailDraft?.draftName);
-  $("#createdBy").text(getDetailDraft?.createdBy);
-  $("#createdDate").text(getDetailDraft?.createdDate);
-  $("#updatedBy").text(getDetailDraft?.modifiedBy);
-  $("#updatedDate").text(getDetailDraft?.modifiedDate);
+async function initializeDraftDetail(getDraft) {
+  $("#draftName").text(getDraft?.draftName);
+  $("#createdBy").text(getDraft?.createdBy);
+  $("#createdDate").text(getDraft?.createdDate);
+  $("#updatedBy").text(getDraft?.modifiedBy);
+  $("#updatedDate").text(getDraft?.modifiedDate);
 }
 
 //  =================
@@ -158,36 +156,30 @@ function confirmDelete(id) {
   swal("Deleted", "Activity data has been deleted", "success");
 }
 
-function confirmSubmit(id) {
+async function confirmSubmit(id) {
   const draftId = urlParams.get("draftId");
-  const draft = lsListDraft.find((x) => x.draftId == draftId);
-  // {
-  //   id: 1,
-  //   "request-id": "R0001",
-  //   "draft-name": "Draft Name",
-  //   "submitted-date": "05/05/2021",
-  //   "approval-reject-date": "05/05/2021",
-  //   status: "1",
-  // },
-  lsListApproval.push({
-    id: lsListApproval.length + 1,
-    "request-id": "R0001",
-    "draft-name": draft?.draftName,
-    "submitted-date": new Date().toLocaleDateString(),
-    "approval-reject-date": "-",
-    status: "1",
-  });
-  localStorage.setItem("listApproval", JSON.stringify(lsListApproval));
+  await draftSubmitToApproval(draftId);
+  const getDataDraft = await draftDetailById(draftId);
   $("#modalConfirm").modal("hide");
-  swal("Success", `${draft?.draftName} draft has been submit to approval. You can check in approval tab.`, "success");
-  window.location.href = "/organization/index?ActiveTab=approval";
+  swal("Success", "Draft has been submitted to approval", "success");
+  checkButtonDraftDetail(getDataDraft.data);
 }
 
-function confirmSubmitApproval(id) {
-  swal("Approved", "Evaluasi Struktur Organisasi 2025 draft has been approved.", "success");
+async function confirmSubmitApproval(id) {
+  const draftId = urlParams.get("draftId");
+  await draftApprove(draftId);
+  const getDataDraft = await draftDetailById(draftId);
+  checkButtonDraftDetail(getDataDraft.data);
+  $("#modalConfirm").modal("hide");
+  swal("Approved", "draft has been approved.", "success");
 }
-function confirmRejectApproval(id) {
-  swal("Rejected", "Evaluasi Struktur Organisasi 2025 draft has been rejected.", "success");
+async function confirmRejectApproval(id) {
+  const draftId = urlParams.get("draftId");
+  await draftReject(draftId, rejectReason);
+  const getDataDraft = await draftDetailById(draftId);
+  checkButtonDraftDetail(getDataDraft.data);
+  $("#modalConfirm").modal("hide");
+  swal("Rejected", "draft has been rejected.", "success");
 }
 
 function previewDesignCost() {
@@ -214,7 +206,7 @@ $("#searchOrgNodeButton").on("click", function () {
 
 function submitToApproval() {
   const draftId = urlParams.get("draftId");
-  const draft = lsListDraft.find((x) => x.draftId == draftId);
+  const draftName = $("#draftName").text();
   const action = [
     actionBack,
     {
@@ -226,7 +218,7 @@ function submitToApproval() {
   modalConfrimHelper(
     "confirm",
     "Submit to Approval",
-    `Are you sure want to submit to approval <b>${draft?.draftName}</b> draft?`,
+    `Are you sure want to submit to approval <b>${draftName}</b> draft?`,
     "You cannot change data after submit",
     action,
     "",
@@ -238,7 +230,12 @@ function finalizeApproval() {
   $("#modalUploadFinalized").modal("show");
 }
 
-function clickUploadFunction() {}
+async function clickUploadFunction() {
+  const file = $("#fileImportDraft")[0].files[0];
+  const sendFile = await uploadDataDraftSO(organizationAttribute.orgUnitId, file);
+  swal("Success", "Data has been imported", "success");
+  hideModal(`modalConfirm`);
+}
 
 function editPositionDraft(id) {
   window.location.href = "/organization/form-position?positionId=" + id;
@@ -370,27 +367,114 @@ function rejectApproval() {
   );
 }
 
+function checkButtonDraftDetail(data) {
+  // hideModal(`modalConfirm`);
+  console.log("getDataDraft.data", data);
+  const submitApprovalButton = $("#submitApproval");
+  const acceptApprovalButton = $("#acceptApproval");
+  const rejectApprovalButton = $("#rejectApproval");
+  const finalizeButton = $("#finalize");
+
+  // submitApprovalButton.toggle(!data.isSubmitted && !data.isApproved && !data.isFinalized);
+  // acceptApprovalButton.toggle(data.isSubmitted && !data.isApproved);
+  // rejectApprovalButton.toggle(data.isSubmitted && !data.isApproved);
+  // finalizeButton.toggle(data.isApproved || data.isFinalized);
+
+  submitApprovalButton.show();
+  acceptApprovalButton.hide();
+  rejectApprovalButton.hide();
+  finalizeButton.hide();
+  if (data.isSubmitted) {
+    submitApprovalButton.hide();
+    acceptApprovalButton.show();
+    rejectApprovalButton.show();
+  }
+
+  if (data.isRejected) {
+    submitApprovalButton.show();
+    acceptApprovalButton.hide();
+    rejectApprovalButton.hide();
+  }
+
+  if (data.isApproved) {
+    submitApprovalButton.hide();
+    acceptApprovalButton.hide();
+    rejectApprovalButton.hide();
+    finalizeButton.show();
+  }
+
+  if (data.isFinalized) {
+    submitApprovalButton.hide();
+    finalizeButton.show();
+  }
+}
+
 $(document).ready(async function () {
   let draftId = urlParams.get("draftId");
+  const getDataDraft = await draftDetailById(draftId);
+  checkDataOrganizationLocalStorage();
+  // console.log(storeData.listDraft);
+  // const getDraft = storeData.listDraft.find((x) => x.draftId == draftId);
+  // await checkDataOrganization(storeData.listDraft);
 
   checkDataOrganization();
-  await initializeDraftDetail(draftId);
-  checkPage();
-  getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
-  // uploadFinalizeHandler();
+  await initializeDraftDetail(getDataDraft.data);
 
-  // tab-custom class on change
-  $(".tab-custom").on("click", function () {
-    $(this).attr("id");
-    const value = $(this).attr("id");
-    if (value == "all") {
-      getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
-    } else {
-      getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId && x.type == value));
-    }
+  checkButtonDraftDetail(getDataDraft.data);
+  // checkPage();
+  // getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
+  // // uploadFinalizeHandler();
 
-    // $(".tab-custom").removeClass("active");
-    // $(this).addClass("active");
+  // // tab-custom class on change
+  // $(".tab-custom").on("click", function () {
+  //   $(this).attr("id");
+  //   const value = $(this).attr("id");
+  //   if (value == "all") {
+  //     getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
+  //   } else {
+  //     getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId && x.type == value));
+  //   }
+
+  //   // $(".tab-custom").removeClass("active");
+  //   // $(this).addClass("active");
+  // });
+
+  $("#importDataDraft").on("click", function () {
+    $("#fileImportDraft").click();
+  });
+
+  $("#fileImportDraft").on("change", function () {
+    const action = [
+      {
+        button: "Cancel",
+        className: "btn-primary",
+        callback: function () {
+          hideModal(`modalConfirm`);
+        },
+      },
+      {
+        button: "Yes, Submit",
+        className: "btn-primary",
+        callbackFunction: "clickUploadFunction",
+      },
+    ];
+    modalConfrimHelper(
+      "confirm",
+      "Import Data",
+      "Are you sure want to import data from this file?",
+      "All data in this draft will be replaced with the data in the file",
+      action,
+      "",
+      1
+    );
+
+    // const file = $("#fileImportDraft")[0].files[0];
+    // const reader = new FileReader();
+    // reader.onload = function (e) {
+    //   const data = e.target.result;
+    //   console.log(data);
+    // };
+    // reader.readAsText(file);
   });
 
   $("#editDraftName").on("click", function () {
@@ -399,11 +483,12 @@ $(document).ready(async function () {
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
   });
 
-  $("#continueButton").on("click", function () {
+  $("#continueButton").on("click", async function () {
     const draftName = $("#inputDraftName").val();
     const draftId = urlParams.get("draftId");
     $("#draftName").text(draftName);
     $("#modalCreateDraftSO").modal("hide");
+    const updateDraft = await renameDraftSO({ id: draftId, name: draftName });
     swal("Success", "Draft name has been updated", "success");
     lsListDraft.map((x) => {
       if (x.draftId == draftId) {

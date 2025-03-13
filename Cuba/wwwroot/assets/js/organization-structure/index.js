@@ -1,30 +1,458 @@
-function initializeHelper(data) {
+async function initializeHelper(data) {
   if (!data) {
     //
   }
+
+  const dataChart = await chartShow({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: "10132405",
+    depth: 3,
+  });
+
+  // const dataChartHiearchies = await chartJobHiearchies({
+  //   draftId: organizationAttribute.orgUnitId,
+  //   jobCode: "10132405",
+  //   depth: 1,
+  // });
+
+  //   {
+  //     org_unit_name: "Talent Management",
+  //     basket: false,
+  //     id_org_unit: "10135491",
+  //     layering: "L3",
+  //     pid: "10135490",
+  //     id: "30263313",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30263313",
+  //     jumlah_formasi: 8,
+  //     position_parent: "Human Capital",
+  //     id_position_atasan_langsung: "10135490",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Talent Management",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Organization Capability",
+  //     basket: false,
+  //     id_org_unit: "10135494",
+  //     layering: "L3",
+  //     pid: "10135490",
+  //     id: "30263319",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30263319",
+  //     jumlah_formasi: 8,
+  //     position_parent: "Human Capital",
+  //     id_position_atasan_langsung: "10135490",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Organization Capability",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Quality Management",
+  //     basket: false,
+  //     id_org_unit: "10135496",
+  //     layering: "L3",
+  //     pid: "10135490",
+  //     id: "30263325",
+  //     coordination: null,
+  //     prl: "19",
+  //     id_position: "30263325",
+  //     jumlah_formasi: 5,
+  //     position_parent: "Human Capital",
+  //     id_position_atasan_langsung: "10135490",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Quality Management",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "IR & Compensation Benefit",
+  //     basket: false,
+  //     id_org_unit: "10135498",
+  //     layering: "L3",
+  //     pid: "10135490",
+  //     id: "30263330",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30263330",
+  //     jumlah_formasi: 6,
+  //     position_parent: "Human Capital",
+  //     id_position_atasan_langsung: "10135490",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager IR & Compensation Benefit",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "HC Business Partner",
+  //     basket: false,
+  //     id_org_unit: "10135500",
+  //     layering: "L3",
+  //     pid: "10135490",
+  //     id: "30263336",
+  //     coordination: null,
+  //     prl: "21",
+  //     id_position: "30263336",
+  //     jumlah_formasi: 8,
+  //     position_parent: "Human Capital",
+  //     id_position_atasan_langsung: "10135490",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager HC Business Partner",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "HC Services",
+  //     basket: false,
+  //     id_org_unit: "10135502",
+  //     layering: "L3",
+  //     pid: "10135490",
+  //     id: "30263342",
+  //     coordination: null,
+  //     prl: "19",
+  //     id_position: "30263342",
+  //     jumlah_formasi: 8,
+  //     position_parent: "Human Capital",
+  //     id_position_atasan_langsung: "10135490",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager HC Services",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Human Capital",
+  //     basket: false,
+  //     id_org_unit: "10135490",
+  //     layering: "L2",
+  //     pid: "10135488",
+  //     id: "30263312",
+  //     coordination: null,
+  //     prl: "23",
+  //     id_position: "30263312",
+  //     jumlah_formasi: 44,
+  //     position_parent: "SDM & Penunjang Bisnis",
+  //     id_position_atasan_langsung: "10135488",
+  //     project: false,
+  //     gl: "GL1",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "VP Human Capital",
+  //     isNeck: false,
+  //     hasChildren: true,
+  //   },
+  //   {
+  //     org_unit_name: "Asset Management",
+  //     basket: false,
+  //     id_org_unit: "10135506",
+  //     layering: "L3",
+  //     pid: "10135505",
+  //     id: "30263349",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30263349",
+  //     jumlah_formasi: 13,
+  //     position_parent: "Procurement & Asset Management",
+  //     id_position_atasan_langsung: "10135505",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Asset Management",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Procurement Support",
+  //     basket: false,
+  //     id_org_unit: "10135528",
+  //     layering: "L3",
+  //     pid: "10135505",
+  //     id: "30263378",
+  //     coordination: null,
+  //     prl: "19",
+  //     id_position: "30263378",
+  //     jumlah_formasi: 6,
+  //     position_parent: "Procurement & Asset Management",
+  //     id_position_atasan_langsung: "10135505",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Procurement Governance & Support",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Procurement Management I",
+  //     basket: false,
+  //     id_org_unit: "10164022",
+  //     layering: "L3",
+  //     pid: "10135505",
+  //     id: "30314731",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30314731",
+  //     jumlah_formasi: 11,
+  //     position_parent: "Procurement & Asset Management",
+  //     id_position_atasan_langsung: "10135505",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Procurement Management I",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Procurement Management II",
+  //     basket: false,
+  //     id_org_unit: "10164032",
+  //     layering: "L3",
+  //     pid: "10135505",
+  //     id: "30314742",
+  //     coordination: null,
+  //     prl: "21",
+  //     id_position: "30314742",
+  //     jumlah_formasi: 12,
+  //     position_parent: "Procurement & Asset Management",
+  //     id_position_atasan_langsung: "10135505",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Procurement Management II",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Procurement & Asset Management",
+  //     basket: false,
+  //     id_org_unit: "10135505",
+  //     layering: "L2",
+  //     pid: "10135488",
+  //     id: "30263348",
+  //     coordination: null,
+  //     prl: "23",
+  //     id_position: "30263348",
+  //     jumlah_formasi: 43,
+  //     position_parent: "SDM & Penunjang Bisnis",
+  //     id_position_atasan_langsung: "10135488",
+  //     project: false,
+  //     gl: "GL1",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "VP Procurement & Asset Management",
+  //     isNeck: false,
+  //     hasChildren: true,
+  //   },
+  //   {
+  //     org_unit_name: "IT Plan., Gov. & Security",
+  //     basket: false,
+  //     id_org_unit: "10135535",
+  //     layering: "L3",
+  //     pid: "10135534",
+  //     id: "30263385",
+  //     coordination: null,
+  //     prl: "19",
+  //     id_position: "30263385",
+  //     jumlah_formasi: 9,
+  //     position_parent: "IT",
+  //     id_position_atasan_langsung: "10135534",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager IT Plan., Gov. & Security",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "IT Solution & Infrastructure",
+  //     basket: false,
+  //     id_org_unit: "10135539",
+  //     layering: "L3",
+  //     pid: "10135534",
+  //     id: "30263392",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30263392",
+  //     jumlah_formasi: 18,
+  //     position_parent: "IT",
+  //     id_position_atasan_langsung: "10135534",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager IT Solution & Infrastructure",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Business Relationship",
+  //     basket: false,
+  //     id_org_unit: "10135548",
+  //     layering: "L3",
+  //     pid: "10135534",
+  //     id: "30263403",
+  //     coordination: null,
+  //     prl: "19",
+  //     id_position: "30263403",
+  //     jumlah_formasi: 7,
+  //     position_parent: "IT",
+  //     id_position_atasan_langsung: "10135534",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Business Relationship",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "Business Data Management",
+  //     basket: false,
+  //     id_org_unit: "10135555",
+  //     layering: "L3",
+  //     pid: "10135534",
+  //     id: "30263410",
+  //     coordination: null,
+  //     prl: "19",
+  //     id_position: "30263410",
+  //     jumlah_formasi: 8,
+  //     position_parent: "IT",
+  //     id_position_atasan_langsung: "10135534",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Manager Bus. Data Mgt & Integration",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "IT",
+  //     basket: false,
+  //     id_org_unit: "10164048",
+  //     layering: "L3",
+  //     pid: "10135534",
+  //     id: "30314763",
+  //     coordination: null,
+  //     prl: "20",
+  //     id_position: "30314763",
+  //     jumlah_formasi: 47,
+  //     position_parent: "IT",
+  //     id_position_atasan_langsung: "10135534",
+  //     project: false,
+  //     gl: "GL2",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "IT Project Lead",
+  //     isNeck: false,
+  //     hasChildren: false,
+  //   },
+  //   {
+  //     org_unit_name: "IT",
+  //     basket: false,
+  //     id_org_unit: "10135534",
+  //     layering: "L2",
+  //     pid: "10135488",
+  //     id: "10135534",
+  //     coordination: null,
+  //     prl: "22",
+  //     id_position: "30263384",
+  //     jumlah_formasi: 90,
+  //     position_parent: "SDM & Penunjang Bisnis",
+  //     id_position_atasan_langsung: "10135488",
+  //     project: false,
+  //     gl: "GL1",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "VP IT",
+  //     isNeck: false,
+  //     hasChildren: true,
+  //   },
+  //   {
+  //     org_unit_name: "SDM & Penunjang Bisnis",
+  //     basket: false,
+  //     id_org_unit: "10135488",
+  //     layering: "L1",
+  //     pid: "10132405",
+  //     id: "30263310",
+  //     coordination: null,
+  //     prl: "25",
+  //     id_position: "30263310",
+  //     jumlah_formasi: 179,
+  //     position_parent: "PT Pertamina Patra Niaga",
+  //     id_position_atasan_langsung: "10132405",
+  //     project: false,
+  //     gl: "GL0",
+  //     assistant: false,
+  //     tags: [],
+  //     position: "Direktur SDM & Penunjang Bisnis",
+  //     isNeck: false,
+  //     hasChildren: true,
+  //   },
+  // ];
+
+  // change chartid id from id_org_unit
+
+  if (!dataChart.data) {
+    swal("Warning", "Data not found", "warning");
+    return;
+  }
+  dataChart.data.forEach((item) => {
+    item.id = item.id_org_unit;
+  });
+
   // helper orTree
-  helperOrgTree(lsListOrgNode);
+  const dataAawal = dataChart.data.filter((x) => x.position == "Direktur Utama");
+  helperOrgTree(dataAawal);
   // get helper datePicker
   helperDatePicker();
   // helper bagan
-  helperOrgChart(true, "os-container", lsListOrgNode, true);
+  helperOrgChart(true, "os-container", dataChart.data, true);
+  // helperOrgChartTester(true, "os-container", dataChart.data, true);
+  // focusNode("10135488");
 }
 
 function updateDataList(orgUnitId, orgUnitName) {
   if (organizationAttribute.orgUnitId == "" || organizationAttribute.orgUnitId == null) return;
   // update bagan
-
+  // dotnet ef migrations remove; dotnet ef migrations add rasci; dotnet ef database update
   // initializeHelper(data);
   // update data list draft
 }
 
 $("#searchOrgNodeButton").on("click", function () {
   const searchValue = $("#searchOrgNode").val();
-  console.log("masuk sini");
-  focusNode(searchValue);
+  // focusNode(searchValue);
 });
 
 $("#searchOrgNode").on("change", function () {
+  const searchValue = $("#searchOrgNode").val();
+  // console.log("masuk sini", searchValue);
   focusNode($("#searchOrgNode").val());
 });
 
@@ -37,135 +465,92 @@ function changeOrganization(value, text) {
   if (organizationAttribute.orgUnitId == "1") {
     $("#pills-warningtab").attr("style", "display:none !important");
     $("#labelChart").attr("style", "display:none !important");
-    $("#createDraft").show();
+    // $("#createDraft").show();
   } else {
-    $("#createDraft").attr("style", "display:none !important");
+    // $("#createDraft").attr("style", "display:none !important");
     $("#pills-warningtab").show();
     $("#labelChart").show();
   }
 }
 
+async function confirmDuplicate(id) {
+  await draftJobDuplicate({
+    draftId: organizationAttribute.orgUnitId,
+    userId: "system",
+    unitCodeReference: $("#positionId").val(),
+  });
+  $("#modalConfirm").modal("hide");
+  swal("Success", "Position has been duplicated", "success");
+}
+
 async function duplicateJob(draftId, positionId) {
-  const data = [...lsListDetailDraft];
-  const selftAttribute = lsListPosition.find((item) => item.positionId == positionId);
-  const childrenSubordinate = getallChildrenPosition(positionId);
-  const dataSubordinate = [selftAttribute, ...childrenSubordinate];
-  lsListDetailDraft = JSON.parse(localStorage.getItem("listDraftDetail"));
-  dataSubordinate.forEach((item) => {
-    item.positionIdCopy = Math.floor(1000000000 + Math.random() * 9000000000);
-    item.positionName = item.positionName + " (Copy)";
-    // item.orgUnitIdCopy = Math.floor(1000000000 + Math.random() * 9000000000);
-    // item.orgUnitName = item.orgUnitName + " (Copy)";
-    if (item.listSubPosition.length > 0) {
-      item.listSubPosition.forEach((subItem) => {
-        // subItem.subPositionId = Math.floor(1000000000 + Math.random() * 9000000000);
-        // subItem.subPositionName = subItem.subPositionName + " (Copy)";
-      });
-    }
-  });
-  // console.log("lsListDetailDraft 1", data);
-  // console.log("lsListDetailDraft 2", lsListDetailDraft);
-  // console.log("dataSubordinate", dataSubordinate);
-
-  let dataSubordinateCopy = correctedDirectReport(positionId);
-  dataSubordinateCopy = [selftAttribute, ...dataSubordinateCopy];
-  // console.log("dataSubordinateCopy", dataSubordinateCopy);
-  // console.log(dataSubordinateCopy);
-  // console.log("lsListDetailDraft :>> ", lsListDetailDraft);
-  // return;
-  dataSubordinateCopy.forEach((item, idx) => {
-    item.draftId = draftId;
-    item.type = "create";
-    if (idx == 0) {
-      item.positionId = item.positionIdCopy;
-      delete item.positionIdCopy;
-      return;
-    }
-    item.positionId = item.positionIdCopy;
-    item.directReportId = item.directReportIdCopy;
-    // remove object item.positionIdCopy
-    delete item.positionIdCopy;
-    delete item.directReportIdCopy;
-  });
-
-  dataSubordinateCopy.forEach((itm) => {
-    console.log("itm.draftId", itm.draftId);
-    const checkData = lsListDetailDraft.find(
-      (item) => item.positionId == itm.positionId && item.draftId == itm.draftId
-    );
-    // console.log("checkData", checkData);
-    console.log("checkData", checkData);
-
-    if (checkData) {
-      console.log("masuk checkData");
-      const index = lsListDetailDraft.findIndex(
-        (item) => item.positionId == itm.positionId && item.draftId == itm.draftId
-      );
-      console.log("masuk checkData", lsListDetailDraft[index]);
-      lsListDetailDraft[index] = itm;
-    } else {
-      lsListDetailDraft.push(itm);
-    }
-  });
-
-  localStorage.setItem("listDraftDetail", JSON.stringify(lsListDetailDraft));
-  saveOrgDetailBulk(draftId, dataSubordinateCopy);
-  changeOrganization(draftId, lsListDraft.find((x) => x.draftId == draftId).draftName);
-  getDataOrganization(draftId);
-  focusNode(selftAttribute.positionId);
   $("#modalDetailJob").modal("hide");
-  swal("Success", "Job has been duplicated", "success");
-}
-
-function getDataOrganization(orgUnitId) {
-  const dataListPosition = lsListDetailDraft.filter((x) => x.draftId == orgUnitId);
-  const dataListOrg = lsListDraftOrgNode.filter((x) => x.draft_id == orgUnitId);
-  lsListOrgNode = [...myData];
-  lsListPosition = [...positionDetail];
-  console.log(lsListPosition.length);
-
-  dataListPosition.forEach((item) => {
-    const index = lsListPosition.findIndex((x) => x.positionId == item.positionId);
-    if (item.type == "create") {
-      lsListPosition.push(item);
-    } else if (item.type == "edit") {
-      if (index == -1) {
-        lsListPosition.push(item);
-      } else {
-        lsListPosition[index] = item;
-      }
-    } else if (item.type == "delete") {
-      lsListPosition.splice(index, 1);
-    }
-  });
-
-  dataListOrg.forEach((item) => {
-    const index = lsListOrgNode.findIndex((x) => x.id_position == item.id_position);
-    if (item.type == "create") {
-      lsListOrgNode.push(item);
-    } else if (item.type === "edit") {
-      if (index == -1) {
-        lsListOrgNode.push(item);
-      } else {
-        lsListOrgNode[index] = item;
-      }
-    } else if (item.type === "delete") {
-      lsListOrgNode.splice(index, 1);
-    }
-    // console.log("lsListOrgNode", lsListOrgNode);
-  });
-  initializeHelper();
-
-  getDataList([
+  const action = [
+    actionBack,
     {
-      dataId: "searchOrgNode",
-      data: lsListOrgNode.map((item) => ({ id: item.id_position, text: item.position })),
+      button: "Edit",
+      className: "btn-primary",
+      callbackFunction: "confirmDuplicate",
     },
-  ]);
-
-  localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
+  ];
+  modalConfrimHelper(
+    "confirm",
+    "Duplicate Position",
+    "<span>Are you sure want to duplicate <b>Manager Strategic Planning</b> position?</span>",
+    "",
+    action,
+    "40%",
+    1
+  );
+  $("#modalConfirm").modal("show");
 }
+
+// function getDataOrganization(orgUnitId) {
+//   initializeHelper();
+// const dataListPosition = lsListDetailDraft.filter((x) => x.draftId == orgUnitId);
+// const dataListOrg = lsListDraftOrgNode.filter((x) => x.draft_id == orgUnitId);
+// lsListOrgNode = [...myData];
+// lsListPosition = [...positionDetail];
+// console.log(lsListPosition.length);
+// dataListPosition.forEach((item) => {
+//   const index = lsListPosition.findIndex((x) => x.positionId == item.positionId);
+//   if (item.type == "create") {
+//     lsListPosition.push(item);
+//   } else if (item.type == "edit") {
+//     if (index == -1) {
+//       lsListPosition.push(item);
+//     } else {
+//       lsListPosition[index] = item;
+//     }
+//   } else if (item.type == "delete") {
+//     lsListPosition.splice(index, 1);
+//   }
+// });
+// dataListOrg.forEach((item) => {
+//   const index = lsListOrgNode.findIndex((x) => x.id_position == item.id_position);
+//   if (item.type == "create") {
+//     lsListOrgNode.push(item);
+//   } else if (item.type === "edit") {
+//     if (index == -1) {
+//       lsListOrgNode.push(item);
+//     } else {
+//       lsListOrgNode[index] = item;
+//     }
+//   } else if (item.type === "delete") {
+//     lsListOrgNode.splice(index, 1);
+//   }
+//   // console.log("lsListOrgNode", lsListOrgNode);
+// });
+// initializeHelper();
+// getDataList([
+//   {
+//     dataId: "searchOrgNode",
+//     data: lsListOrgNode.map((item) => ({ id: item.id_position, text: item.position })),
+//   },
+// ]);
+// localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
+// localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
+// }
 
 async function getInitialData() {
   const listDraft = await listDraftSO();
@@ -175,13 +560,6 @@ async function getInitialData() {
 }
 
 const positionId = $("#positionId").val();
-// async function handleEditJob(params) {
-//   alert("masok");
-//   const isMasterData = checkIsMasterData();
-//   if (!isMasterData) {
-//     window.location.href = "/organization/detail?edit=true&positionId=" + positionId;
-//   }
-// }
 
 function confirmDeleteOption(value) {
   hideModal(`modalConfirm`);
@@ -192,168 +570,62 @@ function confirmDeleteOption(value) {
   );
 }
 
-function confirmDeleteJob() {
+async function confirmDeleteJob(unitCode) {
   const positionId = $("#positionId").val();
-  const draftId = organizationAttribute.orgUnitId;
-  const position = lsListPosition.find((x) => x.positionId == positionId);
-  const getParent = lsListPosition.find((x) => x.positionId == position.directReportId);
-  const getchildren = getallChildrenPosition(positionId);
-  const dataSubordinate = [position, ...getchildren];
-  console.log(dataSubordinate);
-  // delete from listPosition, listOrgNode, listDraftDetail, listDraftOrgNode
-  dataSubordinate.forEach((item) => {
-    const indexPosition = lsListPosition.findIndex((x) => x.positionId == item.positionId);
-    const indexOrgNode = lsListOrgNode.findIndex((x) => x.id_position == item.positionId);
-    const indexDraftDetail = lsListDetailDraft.findIndex((x) => x.positionId == item.positionId);
-    const indexDraftOrgNode = lsListDraftOrgNode.findIndex((x) => x.id_position == item.positionId);
-
-    // if indexDraftDetail and indexDraftOrgNode not found
-    if (indexDraftDetail == -1 && indexDraftOrgNode == -1) {
-      // change data type to delete
-      // item.type = "delete";
-      // console.log("item", item);
-      lsListPosition[indexPosition].type = "delete";
-      lsListOrgNode[indexOrgNode].type = "delete";
-      lsListOrgNode[indexOrgNode].tags.push("delete");
-    } else {
-      lsListPosition.splice(indexPosition, 1);
-      lsListOrgNode.splice(indexOrgNode, 1);
-      lsListDetailDraft.splice(indexDraftDetail, 1);
-      lsListDraftOrgNode.splice(indexDraftOrgNode, 1);
-    }
-  });
-
-  localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-  localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  localStorage.setItem("listDraftDetail", JSON.stringify(lsListDetailDraft));
-  localStorage.setItem("listDraftOrgNode", JSON.stringify(lsListDraftOrgNode));
-
-  changeOrganization(draftId, lsListDraft.find((x) => x.draftId == draftId).draftName);
-  getDataOrganization(draftId);
-  $("#modalConfirm").modal("hide");
-  focusNode(getParent.positionId);
-  swal("Success", "Job has been deleted", "success");
-}
-
-async function handleDeleteJob(params) {
-  $("#modalDetailJob").modal("hide");
-  const action = [
-    actionBack,
-    {
-      button: "Delete",
-      className: "btn-danger",
-      callbackFunction: "confirmDeleteJob",
-    },
-  ];
-  modalConfrimHelper("delete", "Delete Position", divDeleteSpesific, "", action, "modal-lg", 1);
-  getDeleteMoveVariousTable();
-}
-
-function confirmEditJob() {
-  const positionId = $("#positionId").val();
-  const editPositionBox = $("input[name='editPositionBox']:checked").val();
-  if (editPositionBox == "editSelf") {
-    window.location.href = "/organization/form-position?positionId=" + positionId;
-  } else {
-    console.log("masuk sini");
-    const table = $("#editMoveVariousTable");
-    const data = table.DataTable().rows().data().toArray();
-    // get data select inside table
-    const dataSelect = data.map((item) => ({
-      positionId: item[0],
-      directReportId: $(`#editSelect${item[0]}`).val(),
-    }));
-    console.log(dataSelect);
-
-    // takeout data if directReportId is empty or ''
-    const dataSelectFiltered = dataSelect.filter((item) => item.directReportId != "" && item.directReportId != null);
-    console.log(dataSelectFiltered);
-    if (!dataSelectFiltered.length) {
-      alert("Please select direct report");
-      return;
-    }
-    dataSelectFiltered.forEach((item) => {
-      console.log("item", item);
-      const position = lsListPosition.find((x) => x.positionId == item.positionId);
-      const directReport = lsListPosition.find((x) => x.positionId == item.directReportId);
-      console.log("position", position);
-      console.log("directReport", directReport);
-
-      // update listPosition
-      // update directReportId
-      const indexPosition = lsListPosition.findIndex((x) => x.positionId == item.positionId);
-      lsListPosition[indexPosition].directReportId = parseInt(item.directReportId);
-      lsListPosition[indexPosition].directReport = directReport.positionName;
-
-      lsListPosition[indexPosition].draftId = organizationAttribute.orgUnitId;
-      lsListPosition[indexPosition].type = "edit";
-
-      const payload = {
-        positionId: item.positionId,
-        draftId: organizationAttribute.orgUnitId,
-        // add other necessary properties here
-      };
-
-      console.log("item.directReportId", item.directReportId);
-      const checkData = lsListDetailDraft.find(
-        (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-      );
-
-      if (checkData) {
-        const index = lsListDetailDraft.findIndex(
-          (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-        );
-        lsListDetailDraft[index] = lsListPosition[indexPosition];
-      } else {
-        lsListDetailDraft.push(lsListPosition[indexPosition]);
-      }
-
-      // update listDraftOrgNode and listOrgNode
-      const indexOrgNode = lsListOrgNode.findIndex((x) => x.id_position == item.positionId);
-      console.log(indexOrgNode);
-      lsListOrgNode[indexOrgNode].id_position_atasan_langsung = parseInt(item.directReportId);
-      lsListOrgNode[indexOrgNode].pid = parseInt(item.directReportId);
-      lsListOrgNode[indexOrgNode].tags.push("edit");
-      lsListOrgNode[indexOrgNode].draft_id = organizationAttribute.orgUnitId;
-      lsListOrgNode[indexOrgNode].type = "edit";
-
-      const checkData2 = lsListDraftOrgNode.find(
-        (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
-      );
-      if (checkData2) {
-        const index = lsListDraftOrgNode.findIndex(
-          (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
-        );
-        lsListDraftOrgNode[index] = lsListOrgNode[indexOrgNode];
-      } else {
-        lsListDraftOrgNode.push(lsListOrgNode[indexOrgNode]);
-      }
-      // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-      localStorage.setItem("listDraftDetail", JSON.stringify(lsListDetailDraft));
-      // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-      localStorage.setItem("listDraftOrgNode", JSON.stringify(lsListDraftOrgNode));
+  // check radio button name deleteOption
+  const deleteOption = $("input[name='deleteOption']:checked").val();
+  // return;
+  // takeout data if directReportId is empty or ''
+  const tableVarious = $("#editMoveVariousTable");
+  const data = tableVarious.DataTable().rows().data().toArray();
+  const dataSelect = data.map((item) => ({
+    unitCode: item[0],
+    unitCodeParent: $(`#editSelect${item[0]}`).val(),
+  }));
+  const dataSelectFiltered = dataSelect.filter((item) => item.unitCodeParent != "" && item.unitCodeParent != null);
+  if (deleteOption == "deleteAll") {
+    const deleteData = await draftJobDelete({
+      draftId: organizationAttribute.orgUnitId,
+      unitCode: positionId,
+      prlOrg: "8-9",
+      userId: "system",
     });
-
-    // return;
-
-    changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
-    getDataOrganization(organizationAttribute.orgUnitId);
-    $("#modalConfirm").modal("hide");
-    swal("Success", "Job has been edited", "success");
-    focusNode(positionId);
-    // const checkData = lsListDetailDraft.find(
-    //   (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-    // );
-    // console.log("checkData 1", checkData, payload.draftId);
-
-    // if (checkData) {
-    //   const index = lsListDetailDraft.findIndex(
-    //     (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-    //   );
-    //   lsListDetailDraft[index] = payload;
-    // } else {
-    //   lsListDetailDraft.push(payload);
-    // }
+    if (deleteData) {
+      swal("Success", "Job has been deleted", "success");
+      // hide modal
+      $("#modalConfirm").modal("hide");
+    }
+  } else if (deleteOption == "deleteMoveSpesific") {
+    const geteditSelectNewValue = $("#editSelectNew").val();
+    const movePosition = dataSelect.map((item) => ({
+      unitCode: item.unitCode,
+      unitCodeParent: geteditSelectNewValue,
+    }));
+    await moveJob(movePosition);
+    const deleteData = await draftJobDelete({
+      draftId: organizationAttribute.orgUnitId,
+      unitCode: unitCode,
+      prlOrg: "8-9",
+      userId: "system",
+    });
+    if (deleteData) {
+      swal("Success", "Position has been deleted", "success");
+      // hide modal
+      $("#modalConfirm").modal("hide");
+    }
+  } else {
+    await moveJob(dataSelectFiltered);
+    const deleteData = await draftJobDelete({
+      draftId: organizationAttribute.orgUnitId,
+      unitCode: unitCode,
+      prlOrg: "8-9",
+      userId: "system",
+    });
+    if (deleteData) {
+      swal("Success", "Position has been deleted", "success");
+      // hide modal
+      $("#modalConfirm").modal("hide");
+    }
   }
 }
 
@@ -361,18 +633,19 @@ async function handleEditJob() {
   statusHelper.formPositionAsCreated = false;
   const getPositionById = $(`#positionId`).val();
   $("#modalDetailJob").modal("hide");
-  // const isMasterData = checkIsMasterData();
-  // if (!isMasterData) {
-  //   window.location.href = "/organization/form-position?positionId=" + getPositionById;
-  // }
-  const findChildren = lsListPosition.filter((x) => x.directReportId == getPositionById);
-  //  have no children then straght redirect
-  if (!findChildren.length) {
+  const getDataSub = await draftJobSubordinate({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: $("#positionId").val(),
+  });
+  const dataSub =
+    getDataSub?.data?.map((item) => ({
+      unitCode: item.unitCode,
+      unitName: item.unitName,
+    })) ?? [];
+  if (!dataSub.length) {
     window.location.href = "/organization/form-position?positionId=" + getPositionById;
     return;
   }
-  const option = lsListPosition.map((item) => ({ id: item.positionId, text: item.positionName }));
-  // create table editMoveVariousTable
   let table = ` <table class="tableMasterData table table-hover w-100" id="editMoveVariousTable">`;
   table += `<thead>
     <tr>
@@ -381,18 +654,12 @@ async function handleEditJob() {
       <th>Direct Report</th>
       </tr> </thead>`;
   table += `<tbody>`;
-  findChildren.forEach((item, idx) => {
+  dataSub.forEach((item, idx) => {
     table += `<tr>
-      <td>${item.positionId}</td>
-      <td>${item.positionName}</td>
-      <td>
-      <select class="form-control classEditSelect" id="editSelect${item.positionId}" name="selectDirectReport">
-        <option value="">Select Direct Report</option>
-        ${
-          option && option.length > 0
-            ? option.map((item) => `<option value="${item.id}">${item.text}</option>`).join("")
-            : ""
-        }
+      <td width="20%">${item.unitCode}</td>
+      <td width="30%">${item.unitName}</td>
+      <td width="50%">
+      <select class="form-control classEditSelect" id="editSelect${item.unitCode}" name="selectDirectReport">
       </select>
       </td>
       </tr>`;
@@ -433,13 +700,322 @@ async function handleEditJob() {
       callbackFunction: "confirmEditJob",
     },
   ];
-  modalConfrimHelper("confirm", "Edit Position", divEditSpesific, "", action, "modal-lg", 1);
+  modalConfrimHelper("confirm", "Edit Position", divEditSpesific, "", action, "60%", 1);
+  callSelect2("editMoveVariousTable");
+}
+
+async function handleDeleteJob() {
+  const getDataSub = await draftJobSubordinate({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: $("#positionId").val(),
+  });
+
+  const dataSub =
+    getDataSub?.data?.map((item) => ({
+      unitCode: item.unitCode,
+      unitName: item.unitName,
+    })) ?? [];
+  // const findChildren = lsListPosition.filter((x) => x.directReportId == getPositionById);
+  //  have no children then straght redirect
+  // create table editMoveVariousTable
+  let table = ` <table class="tableMasterData table table-hover w-100" id="editMoveVariousTable">`;
+  table += `<thead>
+      <tr>
+        <th>Position Id</th>
+        <th>Position Name</th>
+        <th>Direct Report</th>
+        </tr> </thead>`;
+  table += `<tbody>`;
+  dataSub.forEach((item, idx) => {
+    table += `<tr>
+        <td width="20%">${item.unitCode}</td>
+        <td width="30%">${item.unitName}</td>
+        <td width="50%">
+          <select class="form-control classEditSelect" id="editSelect${item.unitCode}" name="selectDirectReport">
+          </select>
+        </td>
+        </tr>`;
+  });
+  table += `</tbody>`;
+
+  table += `</table>`;
+
+  // handleEditJob
+  const divDeleteSpesific = `<span>Are you sure want to delete <b>Manager Strategic Planning</b> position?</span>
+    <br/>
+    <div class="col">
+        <div class="mb-3 m-t-15 custom-radio-ml">
+            <div class="form-check radio radio-primary">
+                <input class="form-check-input" id="radio1" type="radio" name="deleteOption" value="deleteAll" onclick="onChangeDeleteOption(this, 'deleteOption')" checked="true">
+                <label class="form-check-label" for="radio1">Delete position & subordinate</span></label>
+            </div>
+            <div class="form-check radio radio-primary">
+              <input class="form-check-input" id="radio2" type="radio"  name="deleteOption" value="deleteMoveSpesific" onclick="onChangeDeleteOption(this, 'deleteOption')">
+              <label class="form-check-label" for="radio2">Delete position & move subordinate reporting line to specific position</label>
+              <div class="row m-t-10 m-b-10 d-none p-10 m-r-10" id="deleteMoveSpesificDiv" style="background-color: #f5f5f5;">
+                <div class="col-sm-12">
+                    <select class="form-control classEditSelectNew" id="editSelectNew" name="selectDirectReportNew">
+                    </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-check radio radio-primary">
+                <input class="form-check-input" id="radio3" type="radio" name="deleteOption" value="deleteMoveVarious" onclick="onChangeDeleteOption(this, 'deleteOption')">
+                <label class="form-check-label" for="radio3">Delete position & move subordinate reporting line to various positions</label>
+                <div class="row m-t-10 m-b-10 d-none p-10 m-r-10" id="deleteMoveVariousDiv" style="background-color: #f5f5f5;">
+                  <div class="col-sm-12">
+                      <div class="table-responsive">
+                        ${table}
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    `;
+
+  $("#modalDetailJob").modal("hide");
+  const action = [
+    actionBack,
+    {
+      button: "Delete",
+      className: "btn-danger",
+      callbackFunction: "confirmDeleteJob",
+    },
+  ];
+  modalConfrimHelper("delete", "Delete Position", divDeleteSpesific, "", action, "70%", 1);
+  // getDeleteMoveVariousTable();
+  // callSelect2("editMoveSpesificTable");
+  // callSelect2("editMoveVariousTable");
   $("#modalConfirm").on("shown.bs.modal", function () {
-    $(".classEditSelect").select2({
-      dropdownParent: $("#editMoveVariousTable"),
-      placeholder: "Select Direct Report",
-      allowClear: true,
+    $(".classEditSelect")
+      .select2({
+        dropdownParent: $(`#editMoveVariousTable`),
+        allowClear: true,
+        delay: 250,
+        ajax: {
+          url: `${url.baseUrl}/${url["api-organization"]}/chart/job/list?draftId=` + organizationAttribute.orgUnitId,
+          dataType: "json",
+          data: function (params) {
+            return {
+              search: params.term || "",
+              page: params.page || 1,
+              pageSize: 10,
+            };
+          },
+          processResults: function (data, params) {
+            params.page = params.page || 1;
+
+            return {
+              results: data.data.map((item) => ({
+                id: item.unitCode || item.Id || item.id, // The ID for Select2
+                text: item.unitName || item.Name || item.name, // The text that appears in the dropdown
+              })),
+              pagination: {
+                more: data.hasMore, // Boolean to indicate if more data is available
+              },
+            };
+          },
+          cache: true,
+        },
+      })
+      .on("select2:open", function () {
+        page = 1;
+      });
+    $(".classEditSelectNew")
+      .select2({
+        dropdownParent: $(`#modalConfirm`),
+        allowClear: true,
+        delay: 250,
+        ajax: {
+          url: `${url.baseUrl}/${url["api-organization"]}/chart/job/list?draftId=` + organizationAttribute.orgUnitId,
+          dataType: "json",
+          data: function (params) {
+            return {
+              search: params.term || "",
+              page: params.page || 1,
+              pageSize: 10,
+            };
+          },
+          processResults: function (data, params) {
+            params.page = params.page || 1;
+
+            return {
+              results: data.data.map((item) => ({
+                id: item.unitCode || item.Id || item.id, // The ID for Select2
+                text: item.unitName || item.Name || item.name, // The text that appears in the dropdown
+              })),
+              pagination: {
+                more: data.hasMore, // Boolean to indicate if more data is available
+              },
+            };
+          },
+          cache: true,
+        },
+      })
+      .on("select2:open", function () {
+        page = 1;
+      });
+  });
+  // callSelect2("editMoveSpesificTable");
+}
+
+async function moveJob(dataSelectFiltered) {
+  for (const item of dataSelectFiltered) {
+    const saveMoveJob = await draftJobMove({
+      draftId: organizationAttribute.orgUnitId,
+      unitCode: item.unitCode,
+      unitCodeParent: item.unitCodeParent,
+      userId: "system",
     });
+  }
+}
+
+async function confirmEditJob() {
+  const positionId = $("#positionId").val();
+  const editPositionBox = $("input[name='editPositionBox']:checked").val();
+  if (editPositionBox == "editSelf") {
+    window.location.href = "/organization/form-position?positionId=" + positionId;
+  } else {
+    const table = $("#editMoveVariousTable");
+    const data = table.DataTable().rows().data().toArray();
+    // get data select inside table
+    const dataSelect = data.map((item) => ({
+      unitCode: item[0],
+      unitCodeParent: $(`#editSelect${item[0]}`).val(),
+    }));
+
+    // takeout data if directReportId is empty or ''
+    const dataSelectFiltered = dataSelect.filter((item) => item.unitCodeParent != "" && item.unitCodeParent != null);
+    console.log("dataSelectFiltered", dataSelectFiltered);
+
+    const result = await moveJob(dataSelectFiltered);
+    swal("Success", "position has been moved to new  parent position", "success");
+    $("#modalConfirm").modal("hide");
+    return;
+    // if (!dataSelectFiltered.length) {
+    //   alert("Please select direct report");
+    //   return;
+    // }
+    // dataSelectFiltered.forEach((item) => {
+    //   const position = lsListPosition.find((x) => x.positionId == item.positionId);
+    //   const directReport = lsListPosition.find((x) => x.positionId == item.directReportId);
+
+    //   // update listPosition
+    //   // update directReportId
+    //   const indexPosition = lsListPosition.findIndex((x) => x.positionId == item.positionId);
+    //   lsListPosition[indexPosition].directReportId = parseInt(item.directReportId);
+    //   lsListPosition[indexPosition].directReport = directReport.positionName;
+
+    //   lsListPosition[indexPosition].draftId = organizationAttribute.orgUnitId;
+    //   lsListPosition[indexPosition].type = "edit";
+
+    //   const payload = {
+    //     positionId: item.positionId,
+    //     draftId: organizationAttribute.orgUnitId,
+    //     // add other necessary properties here
+    //   };
+
+    //   console.log("item.directReportId", item.directReportId);
+    //   const checkData = lsListDetailDraft.find(
+    //     (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    //   );
+
+    //   if (checkData) {
+    //     const index = lsListDetailDraft.findIndex(
+    //       (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    //     );
+    //     lsListDetailDraft[index] = lsListPosition[indexPosition];
+    //   } else {
+    //     lsListDetailDraft.push(lsListPosition[indexPosition]);
+    //   }
+
+    //   // update listDraftOrgNode and listOrgNode
+    //   const indexOrgNode = lsListOrgNode.findIndex((x) => x.id_position == item.positionId);
+    //   console.log(indexOrgNode);
+    //   lsListOrgNode[indexOrgNode].id_position_atasan_langsung = parseInt(item.directReportId);
+    //   lsListOrgNode[indexOrgNode].pid = parseInt(item.directReportId);
+    //   lsListOrgNode[indexOrgNode].tags.push("edit");
+    //   lsListOrgNode[indexOrgNode].draft_id = organizationAttribute.orgUnitId;
+    //   lsListOrgNode[indexOrgNode].type = "edit";
+
+    //   const checkData2 = lsListDraftOrgNode.find(
+    //     (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
+    //   );
+    //   if (checkData2) {
+    //     const index = lsListDraftOrgNode.findIndex(
+    //       (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
+    //     );
+    //     lsListDraftOrgNode[index] = lsListOrgNode[indexOrgNode];
+    //   } else {
+    //     lsListDraftOrgNode.push(lsListOrgNode[indexOrgNode]);
+    //   }
+    //   // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
+    //   localStorage.setItem("listDraftDetail", JSON.stringify(lsListDetailDraft));
+    //   // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
+    //   localStorage.setItem("listDraftOrgNode", JSON.stringify(lsListDraftOrgNode));
+    // });
+
+    // return;
+
+    changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
+    getDataOrganization(organizationAttribute.orgUnitId);
+    $("#modalConfirm").modal("hide");
+    swal("Success", "Job has been edited", "success");
+    focusNode(positionId);
+    // const checkData = lsListDetailDraft.find(
+    //   (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    // );
+    // console.log("checkData 1", checkData, payload.draftId);
+
+    // if (checkData) {
+    //   const index = lsListDetailDraft.findIndex(
+    //     (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    //   );
+    //   lsListDetailDraft[index] = payload;
+    // } else {
+    //   lsListDetailDraft.push(payload);
+    // }
+  }
+}
+
+function callSelect2(params) {
+  $("#modalConfirm").on("shown.bs.modal", function () {
+    $(".classEditSelect")
+      .select2({
+        dropdownParent: $(`#${params}`),
+        allowClear: true,
+        delay: 250,
+        ajax: {
+          url: `${url.baseUrl}/${url["api-organization"]}/chart/job/list?draftId=` + organizationAttribute.orgUnitId,
+          dataType: "json",
+          data: function (params) {
+            return {
+              search: params.term || "",
+              page: params.page || 1,
+              pageSize: 10,
+            };
+          },
+          processResults: function (data, params) {
+            params.page = params.page || 1;
+
+            return {
+              results: data.data.map((item) => ({
+                id: item.unitCode || item.Id || item.id, // The ID for Select2
+                text: item.unitName || item.Name || item.name, // The text that appears in the dropdown
+              })),
+              pagination: {
+                more: data.hasMore, // Boolean to indicate if more data is available
+              },
+            };
+          },
+          cache: true,
+        },
+      })
+      .on("select2:open", function () {
+        page = 1;
+      });
   });
 }
 
@@ -562,73 +1138,40 @@ $("input[name='radioDraft']").on("change", function () {
 
 // validasi continue draft
 $("#continueButton").click(async function () {
-  // cannot save draft becouse the name is already exist
   const draftName = $("#inputDraftName").val() ?? $("#selectDraftName").val();
-  if (lsListDraft.find((x) => x.draftName == $("#inputDraftName").val())) {
+  if (storeData.listDraft.find((x) => x.draftName == $("#inputDraftName").val())) {
     swal("Failed", `${draftName} draft is already exist, please change to another draft name`, "error");
     return;
   }
-
-  // const checkbox radioDraft
-  // const radioDraft = $("input[name='radioDraft']:checked").val();
 
   if (!draftName) {
     alert("Draft Name is required");
     return;
   }
 
-  // if (radioDraft == "existingDraft" && !$("#selectDraftName").val()) {
-  //   alert("Please select draft name");
-  //   return;
-  // }
+  const saveDraft = await createDraftSO(draftName);
 
-  // if (radioDraft == "newDraft") {
   loader(true);
-  const getListDraftId = lsListDraft.map((item) => item.draftId);
-  const draftId = Math.max(...getListDraftId) + 1;
-  const draft = {
-    draftId: draftId,
-    draftName: draftName,
-    createdBy: "Superadmin",
-    createdDate: new Date().toLocaleDateString("en-GB"),
-    modifiedDate: new Date().toLocaleDateString("en-GB"),
-    modifiedBy: "Superadmin",
-  };
-  lsListDraft.push(draft);
-  localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
+  if (saveDraft.status == 500) {
+    loader(false);
+    swal("Failed", saveDraft.error, "error");
+    return;
+  }
+  const getDataDraft = await chartDraftList();
+  storeData.listDraft = getDataDraft.data;
+
   $("#modalCreateDraftSO").modal("hide");
-  swal("Success", `Draft ${draftName} has been created`, "success");
   getDataList([
     {
       dataId: "selectDraftOrganization",
-      data: lsListDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
-    },
-    {
-      dataId: "selectDraftName",
-      data: lsListDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
-      isHide: true,
+      data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
     },
   ]);
-  getTableListDraft(lsListDraft.filter((x) => x.draftName != "Master Data SO"));
-  changeOrganization(draftId, draftName);
+  getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
+  changeOrganization(saveDraft.data.draftId, saveDraft.data.draftName);
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
   loader(false);
-  // window.location.href = "/organization/form-position";
   swal("Success", `Draft ${draftName} has been created`, "success");
-  // } else {
-  //   loader(true);
-  //   $("#modalCreateDraftSO").modal("hide");
-  //   swal("Success", `Draft ${draftName} has been selected`, "success");
-  //   changeOrganization($("#selectDraftName").val(), $("#selectDraftName option:selected").text());
-  //   getDataOrganization(organizationAttribute.orgUnitId);
-  //   loader(false);
-  //   // window.location.href = "/organization/form-position?positionId=" + $("#positionId").val();
-  // }
-  // if (statusHelper.formPositionAsCreated) {
-  //   window.location.href = "/organization/form-position";
-  // } else {
-  //   window.location.href = "/organization/form-position?positionId=" + $("#positionId").val();
-  // }
 });
 
 // click view org tree
@@ -649,13 +1192,39 @@ $("#designCost").click(function () {
 
 // click export org chart
 $("#exportOrgChart").click(function () {
-  alert("exportOrgChart");
+  // alert("exportOrgChart");
 });
 
 // change select draft organization
-$("#selectDraftOrganization").change(function () {
+$("#selectDraftOrganization").change(async function () {
   changeOrganization($("#selectDraftOrganization").val(), $("#selectDraftOrganization option:selected").text());
-  getDataOrganization(organizationAttribute.orgUnitId);
+  // getDataOrganization(organizationAttribute.orgUnitId);
+  initializeHelper();
+  // const getListOrgNode = await chartOrgNodeList({
+  //   draftId: organizationAttribute.orgUnitId,
+  // });
+  getDataListAsync([
+    {
+      id: "searchOrgNode",
+      endpoint: "chart/job/list",
+      draftId: organizationAttribute.orgUnitId,
+    },
+  ]);
+  // storeData.listOrgNode = getListOrgNode.data.length > 0 ? getListOrgNode.data : [];
+  // if (typeof storeData.listOrgNode == "string") {
+  //   alert("masuk sini 2");
+  //   return;
+  // }
+  // getDataList([
+  //   {
+  //     dataId: "searchOrgNode",
+  //     data:
+  //       storeData.listOrgNode.length > 0
+  //         ? storeData.listOrgNode.map((item) => ({ id: item.unitCode, text: item.unitName }))
+  //         : [],
+  //   },
+  // ]);
+
   loader(true);
   // wait 1s for update data
   setTimeout(() => {
@@ -664,29 +1233,16 @@ $("#selectDraftOrganization").change(function () {
 });
 
 $(document).ready(async function () {
-  // initialize helper
-  loader(true);
-
-  // get initial data
-  // const data = await getInitialData();
-  // const dataListDraft = data.listDraft;
+  const getDataDraft = await chartDraftList();
+  const getDataApproval = await approvedList();
+  storeData.listDraft = getDataDraft.data;
+  await checkDataOrganization(storeData.listDraft);
+  loader(false);
 
   // initialize table
-  getTableListDraft(lsListDraft.filter((x) => x.draftName != "Master Data SO"));
-  getTableListApproval(lsListApproval.filter((x) => x.draftName != "Master Data SO"));
-  getTableListLog();
-
-  getDataList([
-    {
-      dataId: "selectDraftOrganization",
-      data: lsListDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
-    },
-    {
-      dataId: "selectDraftName",
-      data: lsListDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
-      isHide: true,
-    },
-  ]);
+  getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
+  getTableListApproval(getDataApproval.data);
+  // getTableListLog();
 
   $("#createDraft").on("click", function () {
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
@@ -695,13 +1251,20 @@ $(document).ready(async function () {
   });
 
   // check data Initial
-  checkDataOrganization();
   // getDataOrganization(organizationAttribute.orgUnitId);
+
+  getDataList([
+    {
+      dataId: "selectDraftOrganization",
+      data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
+    },
+  ]);
+
+  $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
 
   let activeTab = urlParams.get("activeTab");
   let focusNode = urlParams.get("focusNode");
   if (focusNode) {
-    // focusNode(focus
     setTimeout(() => {
       $("#searchOrgNode").val(focusNode).trigger("change");
     }, 1000);

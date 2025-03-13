@@ -23,7 +23,7 @@
     }
 
     .custom-card {
-        height: 800px;
+        height: 600px !important;
         border: 1px solid #BFBFC2;
         border-radius: 4px;
         padding: 10px;
@@ -81,7 +81,8 @@
     }
 
     .column-item-name {
-        flex: 1;
+        @* flex: 1; *@
+        padding-right: 5px;
         word-wrap: break-word;
     }
 
@@ -102,7 +103,6 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
                 <div id="chooseJob">
                     <div class="row">
                         <div class="col-12">
@@ -111,12 +111,12 @@
                                     <div class="col">
                                         <div class="m-t-15 m-checkbox-inline custom-radio-ml">
                                             <div class="form-check form-check-inline radio radio-primary">
-                                                <input class="form-check-input" id="searchByName" type="radio" name="searchReferenceBy" value="searchByName" checked>
-                                                <label class="form-check-label mb-0" for="searchByName">Search by Job Name</span></label>
+                                                <input class="form-check-input" id="searchByPercentage" type="radio" name="searchReferenceBy" value="searchByPercentage" checked >
+                                                <label class="form-check-label mb-0" for="searchByPercentage">Search by RASCI similarities (%)</span></label>
                                             </div>
                                             <div class="form-check form-check-inline radio radio-primary">
-                                                <input class="form-check-input" id="searchByPercentage" type="radio" name="searchReferenceBy" value="searchByPercentage" >
-                                                <label class="form-check-label mb-0" for="searchByPercentage">Search by RASCI similarities (%)</span></label>
+                                                <input class="form-check-input" id="searchByName" type="radio" name="searchReferenceBy" value="searchByName" >
+                                                <label class="form-check-label mb-0" for="searchByName">Search by Job Name</span></label>
                                             </div>
                                         </div>
                                     </div>
@@ -136,9 +136,39 @@
                         </div>
                         <div class="col-12" id="percentageDiv">
                             <div class="custom-card">
-                                <div class="col-md-12">
+                                @* <div class="col-md-12">
                                     <input id="rangePercentage" type="text"  oninput="searchJobCompare(event,'pecentage')">
+                                </div> *@
+                                <div class="row">
+                                    <div class="col-6">
+                                        <select class="form-select digits" id="selectSK" name="selectSK">
+                                            <option value="2">SK A</option>
+                                            <option value="1">SK B</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <div id="form-wrapper">
+                                            <form id="debt-amount-form">
+                                                <div id="debt-amount-slider">
+                                                    <input type="radio" name="debt-amount" id="50" value="50" required oninput="searchJobCompare(event,'pecentage')">
+                                                    <label for="50" data-debt-amount="50%"></label>
+                                                    <input type="radio" name="debt-amount" id="60" value="60" required>
+                                                    <label for="60" data-debt-amount="60%"></label>
+                                                    <input type="radio" name="debt-amount" id="70" value="70" required>
+                                                    <label for="70" data-debt-amount="70%"></label>
+                                                    <input type="radio" name="debt-amount" id="80" value="80" required>
+                                                    <label for="80" data-debt-amount="80%"></label>
+                                                    <input type="radio" name="debt-amount" id="90" value="90" required>
+                                                    <label for="90" data-debt-amount="90%"></label>
+                                                    <input type="radio" name="debt-amount" id="100" value="100" required>
+                                                    <label for="100" data-debt-amount="100%"></label>
+                                                    <div id="debt-amount-pos"></div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
+                               
                                 @* <input class="form-control" type="text" placeholder="Search" id="inputSearchCompare"
                                     oninput="searchJobCompare(event)"> *@
                                 <div class="animate-chk mt-3 scrollable">

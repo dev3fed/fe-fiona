@@ -23,22 +23,16 @@ const statusHelper = {
   formPositionAsCreated: true,
 };
 const statusApproval = {
-  0: "Draft",
   1: "Submmited",
   2: "Approved",
   3: "Rejected",
-  4: "Re Submit",
-  5: "Approved",
-  6: "Finalized",
+  4: "Finalized",
 };
 const statusApprovalClass = {
-  0: "label-warning-custom",
-  1: "label-warning-custom",
+  1: "label-info-custom",
   2: "label-success-custom",
-  3: "label-danger-custom",
-  4: "label-info-custom",
-  5: "label-primary-custom",
-  6: "label-success-custom",
+  3: "label-info-custom",
+  4: "label-primary-custom",
 };
 
 const prl = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28];
@@ -80,9 +74,10 @@ const formPositionData = {
   "sub-position": [],
 };
 
-// const lsOrgNode = localStorage.getItem("lsOrgNode")
-//   ? JSON.parse(localStorage.getItem("lsOrgNode"))
-//   : JSON.parse(localStorage.setItem("lsOrgNode", JSON.stringify(myData)));
+if (!localStorage.getItem("subJobPos")) {
+  localStorage.setItem("subJobPos", JSON.stringify([]));
+}
+const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
 
 // get list draft
 const listDraft = [
@@ -153,21 +148,26 @@ const payloadPosition = {
 };
 
 // wait 1 second
-let initializeLocalStorage = (key, defaultValue) => {
-  let value = localStorage.getItem(key);
-  if (!value) {
-    localStorage.setItem(key, JSON.stringify(defaultValue));
-    return defaultValue;
-  }
-  return JSON.parse(value);
-};
+// let initializeLocalStorage = (key, defaultValue) => {
+//   let value = localStorage.getItem(key);
+//   if (!value) {
+//     localStorage.setItem(key, JSON.stringify(defaultValue));
+//     return defaultValue;
+//   }
+//   return JSON.parse(value);
+// };
 
-let lsListDraft = initializeLocalStorage("listDraft", listDraft);
-let lsListOrgNode = initializeLocalStorage("listOrgNode", myData);
-let lsListPosition = initializeLocalStorage("listPosition", positionDetail);
-let lsListDetailDraft = initializeLocalStorage("listDraftDetail", []);
-let lsListDraftOrgNode = initializeLocalStorage("listDraftOrgNode", []);
-let lsListApproval = initializeLocalStorage("listApproval", []);
+// let lsListDraft = initializeLocalStorage("listDraft", listDraft);
+// let lsListOrgNode = initializeLocalStorage("listOrgNode", myData);
+// let lsListPosition = initializeLocalStorage("listPosition", positionDetail);
+// let lsListDetailDraft = initializeLocalStorage("listDraftDetail", []);
+// let lsListDraftOrgNode = initializeLocalStorage("listDraftOrgNode", []);
+// let lsListApproval = initializeLocalStorage("listApproval", []);
+
+const storeData = {
+  listDraft: [],
+  listOrgNode: [],
+};
 
 // get draft detail
 const draftDetail = [
@@ -251,10 +251,7 @@ const listLog = [
 
 // delete subordinate list
 const deleteSubordinateList = [
-  {
-    id: 1,
-    "subordinate-name": "Subordinate Name 1",
-  },
+  { id: 1, "subordinate-name": "Subordinate Name 1" },
   {
     id: 2,
     "subordinate-name": "Subordinate Name 2",
@@ -268,49 +265,145 @@ const deleteSubordinateList = [
 // ---------------
 // const div
 // ---------------
-const divDeleteSpesific = `<span>Are you sure want to delete <b>Manager Strategic Planning</b> position?</span>
-    <br/>
-    <div class="col">
-        <div class="mb-3 m-t-15 custom-radio-ml">
-            <div class="form-check radio radio-primary">
-                <input class="form-check-input" id="radio1" type="radio" name="deleteOption" value="deleteAll" onclick="onChangeDeleteOption(this, 'deleteOption')" checked="true">
-                <label class="form-check-label" for="radio1">Delete position & subordinate</span></label>
-            </div>
-            <div class="form-check radio radio-primary">
-              <input class="form-check-input" id="radio2" type="radio"  name="deleteOption" value="deleteMoveSpesific" onclick="onChangeDeleteOption(this, 'deleteOption')">
-              <label class="form-check-label" for="radio2">Delete position & move subordinate reporting line to specific position</label>
-              <div class="row m-t-10 m-b-10 d-none p-10 m-r-10" id="deleteMoveSpesificDiv" style="background-color: #f5f5f5;">
-                <div class="form-group"> 
-                  <div class="col-sm-12">
-                    <span class="text-muted f-12">Org Unit</span> 
-                    <select class="form-control" id="selectOrgUnitDelete" name="selectOrgUnitDelete">
-                      <option value="0">Select Org Unit</option>
-                      <option value="1">Org Unit 1</option>
-                    </select>
-                  </div>
-                  <div class="col-sm-12 m-t-10">
-                    <span class="text-muted f-12">Direct Report</span> 
-                    <select class="form-control" id="selectDirectReportDelete" name="selectDirectReportDelete">
-                      <option value="0">Select Position</option>
-                      <option value="1">Manager Strategic Planning</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-check radio radio-primary">
-                <input class="form-check-input" id="radio3" type="radio" name="deleteOption" value="deleteMoveVarious" onclick="onChangeDeleteOption(this, 'deleteOption')">
-                <label class="form-check-label" for="radio3">Delete position & move subordinate reporting line to various positions</label>
-                <div class="row m-t-10 m-b-10 d-none p-10 m-r-10" id="deleteMoveVariousDiv" style="background-color: #f5f5f5;">
-                  <div class="col-sm-12">
-                      <div class="table-responsive">
-                        <table class="tableMasterData table table-hover w-100" id="deleteMoveVariousTable">
-                        </table>
-                      </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-        </div>
-    </div>
-    `;
+
+const formPositionParam = {
+  userId: "system",
+  draftId: "",
+  unit: {
+    unitCode: null,
+    unitName: "",
+    layer: 1,
+    prlPlan: 8,
+    prlOrgFrom: 8,
+    prlOrgTo: null, // null if not exist
+    formation: 1,
+    isNeckFunction: false,
+    isProject: false,
+    isCoordinate: false,
+    isBasket: false,
+  },
+  careerType: {
+    careerTypeCode: "",
+    careerTypeName: "",
+  },
+  careerLevel: {
+    careerLevelCode: "",
+    careerLevelName: "",
+  },
+  function: {
+    functionCode: "",
+    functionName: "",
+    isNew: false,
+  },
+  division: {
+    divisionCode: "",
+    divisionName: "",
+    isNew: false,
+  },
+  subDivision: {
+    subDivisionCode: "",
+    subDivisionName: "",
+    isNew: false,
+  },
+  department: {
+    departmentCode: "",
+    departmentName: "",
+    isNew: false,
+  },
+  section: {
+    sectionCode: "",
+    sectionName: "",
+    isNew: false,
+  },
+  personnelArea: {
+    personnelAreaCode: "",
+    personnelAreaName: "",
+    isNew: false,
+  },
+  personnelSubArea: {
+    personnelSubAreaCode: "",
+    personnelSubAreaName: "",
+    isNew: false,
+  },
+  directReportTo: {
+    jobPositionCode: "",
+    jobPositionName: "",
+  },
+  unitParent: {
+    unitParentCode: "",
+    unitParentName: "",
+  },
+  abbrivation: {
+    careerJobName: "",
+    jobAbbrivationName: "",
+    isNew: false,
+  },
+  coordinateWith: {
+    unitCode: "",
+    unitName: "",
+  },
+  skillGroups: [
+    {
+      skillGroupCode: "",
+      skillGroupName: "",
+      subSkillGroupCode: "",
+      subSkillGroupName: "",
+      isNew: false,
+      subSkillGroupSequence: 1,
+    },
+  ],
+  subOrdinates: [
+    {
+      unitCode: null,
+      unitName: null,
+      unitParentCode: null,
+      unitParentName: null,
+      jobPositionName: null,
+      layer: 1,
+      prlFrom: 8,
+      prlTo: 9,
+      prlPlan: 1,
+      formation: 1,
+      careerLevel: {
+        careerLevelCode: "",
+        careerLevelName: "",
+      },
+      careerType: {
+        careerTypeCode: "",
+        careerTypeName: "",
+      },
+      abbrivation: {
+        careerJobName: null,
+        jobAbbrivationName: "",
+        jobAbbrivationCode: "",
+        isNew: false,
+      },
+    },
+  ],
+};
+
+const subOrdinates = {
+  unitCode: null,
+  unitName: null,
+  unitParentCode: null,
+  unitParentName: null,
+  jobPositionName: null,
+  layer: 1,
+  prlFrom: 8,
+  prlTo: 9,
+  prlPlan: 1,
+  formation: 1,
+  careerLevel: {
+    careerLevelCode: "",
+    careerLevelName: "",
+  },
+  careerType: {
+    careerTypeCode: "",
+    careerTypeName: "",
+  },
+  abbrivation: {
+    careerJobName: null,
+    jobAbbrivationName: "",
+    isNew: false,
+  },
+};

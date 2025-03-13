@@ -71,9 +71,9 @@ async function checkUniqueCode(typeId, identifier) {
   }
 }
 
-async function checkDataOrganization() {
-  localStorage.getItem("organizationAttribute") ??
-    localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
+async function checkDataOrganization(draftList) {
+  localStorage.getItem("organizationAttribute") ? checkDataOrganizationLocalStorage() : setOrganizationAttribute();
+  localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
   const data = JSON.parse(localStorage.getItem("organizationAttribute"));
   Object.keys(organizationAttribute).forEach((key) => {
     if (data[key]) {
@@ -81,72 +81,135 @@ async function checkDataOrganization() {
     }
   });
   // append value to input
-  $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+  // $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+}
+
+function checkDataOrganizationLocalStorage() {
+  const data = JSON.parse(localStorage.getItem("organizationAttribute"));
+  if (data) {
+    Object.keys(organizationAttribute).forEach((key) => {
+      if (data[key]) {
+        organizationAttribute[key] = data[key];
+      }
+    });
+  }
+}
+
+function setOrganizationAttribute() {
+  organizationAttribute.orgUnitId = null;
+  organizationAttribute.orgUnitName = "";
+}
+
+function clearAllInput() {
+  localStorage.setItem("subJobPos", JSON.stringify([]));
+  $("[id^=select]").val(null).trigger("change");
+  $("[id^=input]").val(null);
+  $("[id^=modalSelect]").val(null).trigger("change");
+  $("[id^=modalInput]").val(null);
+  $("#selectBasket").val("No").trigger("change");
+  $("#selectNeckFunction").val("No").trigger("change");
+  $("#selectIsProject").val("No").trigger("change");
+  $("#selectCoordination").val("No").trigger("change");
 }
 
 async function insertFormPostion(paramId) {
-  const getDetailPosition = lsListPosition.find((item) => item.positionId == paramId);
-  console.log(getDetailPosition);
-  const fields = [
-    { id: "#selectCareerType", value: getDetailPosition?.careerType, type: "select" },
-    { id: "#selectCareerLevel", value: getDetailPosition?.careerLevel, type: "select" },
-    { id: "#selectAbbrvPosition", value: getDetailPosition?.abbrvPosition, type: "select" },
-    { id: "#selectOrgUnitParentName", value: getDetailPosition?.orgUnitParentId, type: "select" },
-    { id: "#selectOrgUnitName", value: getDetailPosition?.orgUnitName, type: "select" },
-    { id: "#inputPositionName", value: getDetailPosition?.positionName, type: "input" },
-    { id: "#selectPrlOrg", value: getDetailPosition?.prlOrg, type: "select" },
-    { id: "#selectPrlOrgTo", value: getDetailPosition?.prlOrgTo, type: "select" },
-    { id: "#inputFormation", value: getDetailPosition?.formation || 1, type: "input" },
-    { id: "#inputOrgUnitName", value: getDetailPosition?.orgUnitName, type: "input" },
-    { id: "#selectKBO", value: getDetailPosition?.kbo, type: "select" },
-    { id: "#selectCostCenter", value: getDetailPosition?.costCenterDesc, type: "select" },
-    { id: "#selectDirectReport", value: getDetailPosition?.directReportId, type: "select" },
-    { id: "#selectFunction", value: getDetailPosition?.function, type: "select" },
-    { id: "#selectDivision", value: getDetailPosition?.division, type: "select" },
-    { id: "#selectSubDivision", value: getDetailPosition?.subDivision, type: "select" },
-    { id: "#selectDepartment", value: getDetailPosition?.department, type: "select" },
-    { id: "#selectSection", value: getDetailPosition?.section, type: "select" },
-    { id: "#selectPersonalAreaName", value: getDetailPosition?.personalAreaName, type: "select" },
-    { id: "#selectSkillGroupMain", value: getDetailPosition?.mainSkillGroup, type: "select" },
-    { id: "#selectSubSkillGroupMain", value: getDetailPosition?.mainSubSkillGroup, type: "select" },
-    { id: "#selectSkillGroupSecond", value: getDetailPosition?.secondSkillGroup, type: "select" },
-    { id: "#selectSubSkillGroupSecond", value: getDetailPosition?.secondSubSkillGroup, type: "select" },
-    { id: "#selectSkillGroupThird", value: getDetailPosition?.thirdSkillGroup, type: "select" },
-    { id: "#selectSubSkillGroupThird", value: getDetailPosition?.thirdSubSkillGroup, type: "select" },
-  ];
-
-  fields.forEach(({ id, value, type }) => {
-    if (type === "select") {
-      $(id).val(value).trigger("change");
-    } else {
-      $(id).val(value);
-    }
+  const getDetailPosition = await chartJobDetail({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: paramId,
   });
+  const data = getDetailPosition.data;
 
-  $("#selectBasket").attr("disabled", true).val("No").trigger("change");
-  if (getDetailPosition?.isBasket == "Yes") {
-    $("#selectBasket").attr("disabled", false).val("Yes").trigger("change");
+  // clear all input
+  clearAllInput();
+
+  $("#inputPositionName").val(data?.positionName);
+  $("#selectPrlOrg").val(data?.prlOrgFrom).trigger("change");
+  $("#selectPrlOrgTo").val(data?.prlOrgTo).trigger("change");
+  $("#selectFunction").val(data?.functionCode).trigger("change");
+  $("#inputOrgUnitName").val(data?.unitName);
+  $("#inputFormation").val(data?.formation);
+  if (data?.directReportCode) {
+    $("#selectDirectReport").append(new Option(data?.directReportName, data?.directReportCode, true, true));
   }
-  if (getDetailPosition?.neckFunction) {
-    $("#selectNeckFunction").prop("checked", true).trigger("change");
+  if (data?.parentCode) {
+    $("#selectOrgUnitParentName").append(new Option(data?.parentName, data?.parentCode, true, true));
   }
-  if (getDetailPosition?.isProject) {
-    $("#selectIsProject").prop("checked", true).trigger("change");
+  if (data?.divisionCode) {
+    $("#selectDivision").append(new Option(data?.divisionName, data?.divisionCode, true, true));
   }
-  if (getDetailPosition?.isCoordination) {
-    $("#selectCoordination").prop("checked", true).trigger("change");
-    $("#selectCoordinationWith")
-      .append(new Option(getDetailPosition?.coordinationWith, getDetailPosition?.coordinationWith, true, true))
-      .attr("disabled", false);
+  if (data?.subDivisionCode) {
+    $("#selectSubDivision").append(new Option(data?.subDivisionName, data?.subDivisionCode, true, true));
+  }
+  if (data?.departmentCode) {
+    $("#selectDepartment").append(new Option(data?.departmentName, data?.departmentCode, true, true));
+  }
+  if (data?.sectionCode) {
+    $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
+  }
+  if (data?.personalAreaCode) {
+    $("#selectPersonalAreaName").append(new Option(data?.personalAreaName, data?.personalAreaCode, true, true));
+  }
+  if (data?.personnelSubAreaCode) {
+    $("#selectPersonalSubareaName").append(
+      new Option(data?.personnelSubAreaName, data?.personnelSubAreaCode, true, true)
+    );
+  }
+  if (data?.careerLevelName) {
+    $("#selectCareerLevel").append(new Option(data?.careerLevelName, 1, true, true));
+  }
+  if (data?.careerTypeName) {
+    $("#selectCareerType").append(new Option(data?.careerTypeName, 1, true, true));
   }
 
-  $("#noDataSubPosition").show();
-  if (getDetailPosition?.listSubPosition.length > 0) {
-    // hide noDataSubPosition
-    updateDivSubPosition(getDetailPosition?.listSubPosition, getDetailPosition);
-    // $("#noDataSubPosition").hide();
-    // getTablePositionList(getDetailPosition?.listSubPosition);
+  const arraySkillGroup = ["selectSkillGroupMain", "selectSkillGroupSecond", "selectSkillGroupThird"];
+  const arraySubSkillGroup = ["selectSubSkillGroupMain", "selectSubSkillGroupSecond", "selectSubSkillGroupThird"];
+
+  const skillGroup = data?.skillGroups ? data?.skillGroups : [];
+  const basket = data?.basket ? data?.basket : [];
+  if (skillGroup.length > 0) {
+    data.skillGroups.forEach((item, index) => {
+      $(`#${arraySkillGroup[index]}`).append(new Option(item.skillGroupName, item.skillGroupCode, true, true));
+      $(`#${arraySubSkillGroup[index]}`).append(new Option(item.subSkillGroupName, item.subSkillGroupCode, true, true));
+    });
   }
+  const arrayBasket = [];
+  if (basket.length > 0) {
+    data.basket.forEach((item, index) => {
+      const params = { ...subOrdinates };
+      params.subPosId = index + 1;
+      params.unitCode = item.unitCode;
+      params.unitName = item.unitName;
+      params.unitParentCode = data?.parentCode;
+      params.unitParentName = data?.parentName;
+      params.jobPositionName = item.jobPositionName || "";
+      params.layer = item.layer;
+      params.prlFrom = item.prlOrgFrom;
+      params.prlTo = item.prlOrgTo;
+      params.formation = item.formation;
+      params.prlPlan = 4;
+      params.careerLevel = {
+        careerLevelCode: "",
+        careerLevelName: "",
+      };
+      params.careerType = {
+        careerTypeCode: "",
+        careerTypeName: data?.careerTypeName,
+      };
+      params.abbrivation = {
+        careerJobName: "",
+        jobAbbrivationName: "",
+        isNew: false,
+      };
+      console.log("params", params);
+      arrayBasket.push(params);
+    });
+    localStorage.setItem("subJobPos", JSON.stringify(arrayBasket));
+    $("#selectBasket").val("Yes").trigger("change");
+  } else {
+    $("#selectBasket").val("No").trigger("change");
+  }
+
+  return;
 }
 
 async function checkUniqueCodeSubordinate() {
@@ -401,13 +464,13 @@ function updatedAllSubordinate(dataObject) {
   );
 }
 
-function updateDivSubPosition(dataSubPosition, dataObject) {
+function updateDivSubPosition(dataSubPosition) {
   $("#noDataSubPosition").show();
   $("#dataSubPosition").hide();
-  if (dataObject?.listSubPosition.length > 0) {
+  if (dataSubPosition.length > 0) {
     $("#noDataSubPosition").hide();
     $("#dataSubPosition").show();
-    getTablePositionList(dataObject?.listSubPosition);
+    getTablePositionList(dataSubPosition);
   }
 }
 
@@ -514,25 +577,174 @@ function previousTab() {
   }
 }
 
-async function saveInputAttribut(type, data) {
-  const payload = payloadPosition;
-  payload.type = type;
-  saveEmployeeDetails(payload, data);
-  saveOrgDetails(payload);
-  if (payload.type == "edit") {
-    data = lsListPosition.find((item) => item.positionId == payload.positionId);
-    swal("Saved", "Position has been updated", "success");
-    // wait 1 second
-    setTimeout(() => {
-      window.location.href = "/organization/index?focusNode=" + payload.positionId;
-    }, 1000);
-  } else {
-    swal("Saved", "Position has been saved", "success");
-    const getDirectReport = payload.positionId;
-    setTimeout(() => {
-      window.location.href = "/organization/index?focusNode=" + getDirectReport;
-    }, 1000);
+// async function saveInputAttributOld(type, data) {
+//   const payload = payloadPosition;
+//   payload.type = type;
+//   saveEmployeeDetails(payload, data);
+//   saveOrgDetails(payload);
+//   if (payload.type == "edit") {
+//     data = lsListPosition.find((item) => item.positionId == payload.positionId);
+//     swal("Saved", "Position has been updated", "success");
+//     // wait 1 second
+//     setTimeout(() => {
+//       window.location.href = "/organization/index?focusNode=" + payload.positionId;
+//     }, 1000);
+//   } else {
+//     swal("Saved", "Position has been saved", "success");
+//     const getDirectReport = payload.positionId;
+//     setTimeout(() => {
+//       window.location.href = "/organization/index?focusNode=" + getDirectReport;
+//     }, 1000);
+//   }
+// }
+
+async function saveInputAttribut(type) {
+  const unitCode = urlParams.get("unitCode");
+  const payload = formPositionParam;
+  payload.draftId = organizationAttribute.orgUnitId;
+  payload.userId = "system";
+  payload.unit.unitCode = type == "edit" ? unitCode : null;
+  payload.unit.unitName = $("#inputPositionName").val();
+  payload.unit.layer = 4;
+  payload.unit.isBasket = $("#selectBasket").val() == "Yes" ? true : false;
+  const isBasket = payload.unit.isBasket;
+  payload.unit.prlPlan = 12;
+  payload.unit.prlOrgFrom = $("#selectPrlOrg").val();
+  payload.unit.prlOrgTo = isBasket ? $("#selectPrlOrgTo").val() : null;
+  payload.unit.formation = $("#inputFormation").val() == "" ? 1 : $("#inputFormation").val();
+  payload.unit.isNeckFunction = $("#selectNeckFunction").prop("checked") ? true : false;
+  payload.unit.isProject = $("#selectIsProject").prop("checked") ? true : false;
+  payload.unit.isCoordinate = $("#selectCoordination").prop("checked") ? true : false;
+  // career type
+  payload.careerType.careerTypeCode = $("#selectCareerType").val();
+  payload.careerType.careerTypeName = $("#selectCareerType option:selected").text();
+  // career level
+  payload.careerLevel.careerLevelCode = $("#selectCareerLevel").val();
+  payload.careerLevel.careerLevelName = $("#selectCareerLevel option:selected").text();
+  // function
+  payload.function.isNew = $("#FunctionSwitch").prop("checked");
+  payload.function.functionCode = payload.function.isNew ? "" : $("#selectFunction").val();
+  payload.function.functionName = payload.function.isNew
+    ? $("#inputFunction").val()
+    : $("#selectFunction option:selected").text();
+
+  // division
+  payload.division.isNew = $("#DivisionSwitch").prop("checked");
+  payload.division.divisionCode = payload.division.isNew ? "" : $("#selectDivision").val();
+  payload.division.divisionName = payload.division.isNew
+    ? $("#inputDivision").val()
+    : $("#selectDivision option:selected").text();
+  // sub division
+  payload.subDivision.isNew = $("#SubDivisionSwitch").prop("checked");
+  payload.subDivision.subDivisionCode = payload.subDivision.isNew ? "" : $("#selectSubDivision").val();
+  if (payload.subDivision.subDivisionCode == "null" || payload.subDivision.subDivisionCode == null) {
+    payload.subDivision.subDivisionCode = "";
   }
+  payload.subDivision.subDivisionName = payload.subDivision.isNew
+    ? $("#inputSubDivision").val()
+    : $("#selectSubDivision option:selected").text();
+  payload.department.isNew = $("#DepartmentSwitch").prop("checked");
+  // department
+  payload.department.departmentCode = payload.department.isNew ? "" : $("#selectDepartment").val();
+  if (payload.department.departmentCode == "null" || payload.department.departmentCode == null) {
+    payload.department.departmentCode = "";
+  }
+  payload.department.departmentName = payload.department.isNew
+    ? $("#inputDepartment").val()
+    : $("#selectDepartment option:selected").text();
+  // section
+  payload.section.isNew = $("#SectionSwitch").prop("checked");
+  payload.section.sectionCode = payload.section.isNew ? "" : $("#selectSection").val();
+  if (payload.section.sectionCode == "null" || payload.section.sectionCode == null) {
+    payload.section.sectionCode = "";
+  }
+  payload.section.sectionName = payload.section.isNew
+    ? $("#inputSection").val()
+    : $("#selectSection option:selected").text();
+  // personnelArea
+  payload.personnelArea.isNew = $("#PersonalAreaNameSwitch").prop("checked");
+  payload.personnelArea.personnelAreaCode = payload.personnelArea.isNew ? "" : $("#selectPersonalAreaName").val();
+  if (payload.personnelArea.personnelAreaCode == "null" || payload.personnelArea.personnelAreaCode == null) {
+    payload.personnelArea.personnelAreaCode = "";
+  }
+  payload.personnelArea.personnelAreaName = payload.personnelArea.isNew
+    ? $("#inputPersonalAreaName").val()
+    : $("#selectPersonalAreaName option:selected").text();
+  // personnelSubArea
+  payload.personnelSubArea.isNew = $("#PersonalSubareaNameSwitch").prop("checked");
+  payload.personnelSubArea.personnelSubAreaCode = payload.personnelSubArea.personnelSubAreaCode
+    ? ""
+    : $("#selectPersonalSubareaName").val();
+  if (
+    payload.personnelSubArea.personnelSubAreaCode == "null" ||
+    payload.personnelSubArea.personnelSubAreaCode == null
+  ) {
+    payload.personnelSubArea.personnelSubAreaCode = "";
+  }
+  payload.personnelSubArea.personnelSubAreaName = payload.personnelSubArea.isNew
+    ? $("#inputPersonalSubareaName").val()
+    : $("#selectPersonalSubareaName option:selected").text();
+  // costCenter
+  payload.unitParent.isNew = false;
+  payload.unitParent.unitParentCode = $("#selectOrgUnitParentName").val() || "";
+  payload.unitParent.unitParentName =
+    $("#selectOrgUnitParentName option:selected").text() || "Operational Risk Papua-Maluku";
+  // directReport
+  payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
+  payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
+  // abbreviation
+  payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked");
+  payload.abbrivation.jobAbbrivationCode = payload.abbrivation.isNew ? "" : $("#selectAbbrvPosition").val();
+  if (payload.abbrivation.jobAbbrivationCode == "null" || payload.abbrivation.jobAbbrivationCode == null) {
+    payload.abbrivation.jobAbbrivationCode = "";
+  }
+  payload.abbrivation.careerJobName = payload.abbrivation.isNew
+    ? $("#inputAbbrvPosition").val()
+    : $("#selectAbbrvPosition option:selected").text();
+
+  payload.abbrivation.jobAbbrivationName = payload.abbrivation.isNew
+    ? $("#inputAbbrvPosition").val()
+    : $("#selectAbbrvPosition option:selected").text();
+  // get first 12 character
+  payload.abbrivation.jobAbbrivationName = payload.abbrivation.jobAbbrivationName.substring(0, 12);
+
+  // coordinateWith
+  payload.coordinateWith.unitCode = payload.unit.isCoordinate ? $("#selectCoordinationWith").val() : "";
+  payload.coordinateWith.unitName = payload.unit.isCoordinate
+    ? $("#selectCoordinationWith option:selected").text()
+    : "";
+
+  payload.skillGroups = [];
+  ["Main", "Second", "Third"].forEach((level, index) => {
+    const skillGroup = $(`#selectSkillGroup${level}`).val();
+    const subSkillGroup = $(`#selectSubSkillGroup${level}`).val();
+    if (skillGroup != "null" && skillGroup != null) {
+      payload.skillGroups.push({
+        skillGroupCode: skillGroup,
+        skillGroupName: $(`#selectSkillGroup${level} option:selected`).text(),
+        subSkillGroupCode: subSkillGroup,
+        subSkillGroupName: $(`#selectSubSkillGroup${level} option:selected`).text(),
+        subSkillGroupSequence: index + 1,
+      });
+    }
+  });
+
+  payload.subOrdinates = [];
+  let subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
+  if (subJobPos.length > 0) {
+    payload.subOrdinates = subJobPos;
+  }
+
+  console.log("payload", payload);
+  // return;
+
+  if (type == "edit") {
+    await draftJobUpdateAsDraft(payload);
+  } else {
+    await draftJobSaveAsDraft(payload);
+  }
+
+  return;
 }
 
 function saveEmployeeDetails(payload, data) {
@@ -813,18 +1025,48 @@ async function saveInputSgSsg() {
   // async await
 }
 
-function modalSubPosition(defaultState) {
+function clearInputModal() {
+  $("#modalInputSubPosId").val("");
+  $("#modalSelectCareerLevel").val("").trigger("change");
+  $("#modalSelectAbbrvPosition").val("").trigger("change");
+  $("#modalInputSubPositionName").val("");
+  $("#modalSelectPrlOrgSubPos").val("").trigger("change");
+  $("#modalSelectPrlOrgToSubPos").val("").trigger("change");
+  $("#modalInputFormation").val("");
+}
+
+async function modalSubPosition() {
+  const draftId = organizationAttribute.orgUnitId;
+  const _abbrv = await abbrvPositionList(organizationAttribute.orgUnitId);
   $("#modalAddSubPosition").modal("show");
-  // $("[id^=modalSelect]").attr("disabled", false);
-  // $("[id^=modalInput]").attr("disabled", false);
-  // const inputOrgUnitName =
-  //   $("#inputOrgUnitName").val() == "" ? $("#selectOrgUnitName").val() : $("#inputOrgUnitName").val() ?? "";
-  // const careerType = $("#selectCareerType").val() ?? "";
-  // $("#modalInputOrgUnitName").val(inputOrgUnitName).attr("disabled", true);
-  // $("#modalInputCareerType").val(careerType).attr("disabled", true);
-  // if (defaultState) {
-  //   defaultStateMOdal();
-  // }
+  clearInputModal();
+  getDataListAsync([
+    {
+      id: "modalSelectCareerLevel",
+      endpoint: "draft/career-level/list",
+      draftId: draftId,
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+  ]);
+
+  getDataList([
+    // modalSelectPrlOrgSubPos
+    {
+      dataId: "modalSelectPrlOrgSubPos",
+      data: prl.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+    {
+      dataId: "modalSelectPrlOrgToSubPos",
+      data: prl.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+    {
+      dataId: "modalSelectAbbrvPosition",
+      data: _abbrv.data.map((item) => ({ id: item.id, text: item.name })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+  ]);
 }
 
 function refreshData() {
@@ -844,7 +1086,30 @@ function refreshDataSubordinate() {
 }
 
 async function editSubPosition(id) {
-  $("#modalAddSubPosition").modal("show");
+  // addSubPos("edit", id);
+  await modalSubPosition(true);
+  // get local storage subJobPos
+  const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
+  const data = subJobPos.find((item) => item.subPosId == id);
+  console.log("id", id);
+  console.log(data);
+  console.log(data.jobPositionName);
+  $("#modalInputSubPosId").val(data.subPosId);
+  if (data.careerLevel.careerLevelCode) {
+    $("#modalSelectCareerLevel").append(
+      new Option(data.careerLevel.careerLevelName, data.careerLevel.careerLevelCode, true, true)
+    );
+  }
+  if (data.abbrivation.jobAbbrivationCode) {
+    $("#modalSelectAbbrvPosition").append(
+      new Option(data.abbrivation.careerJobName, data.abbrivation.jobAbbrivationCode, true, true)
+    );
+  }
+
+  $("#modalInputSubPositionName").val(data.jobPositionName);
+  $("#modalSelectPrlOrgSubPos").val(data.prlFrom).trigger("change");
+  $("#modalSelectPrlOrgToSubPos").val(data.prlTo).trigger("change");
+  $("#modalInputFormation").val(data.formation);
 }
 
 function editDraft(id) {
@@ -868,13 +1133,12 @@ async function deleteSubPosition(id) {
   }).then(async (result) => {
     if (result) {
       try {
-        await deleteDraftJobSubPosition(id);
-        const getUrlPathName = window.location.pathname;
-        if (getUrlPathName === "/organization/new-subordinate") {
-          refreshDataSubordinate();
-        } else {
-          refreshData();
-        }
+        let subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
+        subJobPos = subJobPos.filter((item) => item.subPosId != id);
+        localStorage.setItem("subJobPos", JSON.stringify(subJobPos));
+        checkBasketSelected("Yes");
+
+        // await deleteDraftJobSubPosition(id);
       } catch (error) {
         console.log(error);
       }
@@ -1058,56 +1322,62 @@ async function handleDelete() {
 
 async function modalJobPopup(params) {
   const dataDefault = 30313912;
-  let data = lsListPosition.find((item) => item.positionId == params);
-  console.log("params", params);
-  console.log("data", data);
+
+  // test delate
+  // handleDeleteJob(params);
+
+  // test move
+  // handleEditJob(params);
+  //
+  // return;
+  let data = await chartJobDetail({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: params,
+  });
+  data = data?.data;
   if (data == undefined) {
     data = lsListPosition.find((item) => item.positionId == dataDefault);
   }
-  console.log(data?.incumbent[0]?.employeeId);
+  // console.log(data?.incumbent[0]?.employeeId);
   $("#jobName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
-  $("#positionId").val(data.positionId);
+  $("#positionId").val(data.unitCode);
   $("#modalDirectorate").text("Pertamina Patra Niaga");
-  $("#modalDivision").text(data?.division ?? "");
-  $("#modalSubDivision").text(data?.subDivision ?? "");
-  $("#modalDepartment").text(data?.department ?? "");
-  $("#modalSection").text(data?.section ?? "");
-  $("#modalPersonnelAreaName").text(data?.personalAreaName ?? "");
-  $("#modalPersonnelAreaSubname").text(data?.personalSubareaName ?? "");
+  $("#modalDivision").text(data?.divisionName ?? "");
+  $("#modalSubDivision").text(data?.subDivisionName ?? "");
+  $("#modalDepartment").text(data?.departmentName ?? "");
+  $("#modalSection").text(data?.sectionName ?? "");
+  $("#modalPersonnelAreaName").text(data?.personnelAreaName ?? "");
+  $("#modalPersonnelAreaSubname").text(data?.personnelSubAreaName ?? "");
   $("#modalCareerType").text(data?.careerType ?? "");
   $("#modalCareerLevel").text(data?.careerLevel ?? "");
   $("#modalAbbrvPosition").text(data?.abbrvPosition ?? "");
-  $("#modalOrgUnitName").text(data?.orgUnitName ?? "");
+  $("#modalOrgUnitName").text(data?.unitName ?? "");
   $("#modalPositionName").text(data?.positionName ?? "");
   $("#modalOrgPRL").text(data?.prlOrg ?? "");
   $("#modalFormation").text(data?.formation ?? "");
-  $("#modalDirectReport").text(data?.directReport ?? "");
+  $("#modalDirectReport").text(data?.parentName ?? "");
   $("#modalNeckFunction").text(data?.neckFunction ?? "");
   $("#modalIsProject").text(data?.isProject ?? "");
   $("#modalIsCoordination").text(data?.isCoordination ?? "");
   $("#modalCoordinationWith").text(data?.coordinationWith ?? "");
-  $("#modalFunction").text(data?.function ?? "");
+  $("#modalFunction").text(data?.functionName ?? "");
   $("#modalSKNumber").text(data?.skNumber ?? "");
 
-  $("#modalMainSkillGroup").text(data?.mainSkillGroup ?? "");
-  $("#modalMainSubSkillGroup").text(data?.mainSubSkillGroup ?? "");
-  $("#modalSecondSkillGroup").text(data?.secondSkillGroup ?? "");
-  $("#modalSecondSubSkillGroup").text(data?.secondSubSkillGroup ?? "");
-  $("#modalThirdSkillGroup").text(data?.thirdSkillGroup ?? "");
-  $("#modalThirdSubSkillGroup").text(data?.thirdSubSkillGroup ?? "");
+  $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
+  $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
+  $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
+  $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupCode ?? "");
+  $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
+  $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupCode ?? "");
 
-  $("#incumbentId").text(data?.incumbent[0]?.employeeId ?? "");
-  $("#incumbentName").text(data?.incumbent[0]?.employeeName ?? "");
-  $("#prlPlanComp").text(data?.incumbent[0]?.prlPlanComp ?? "");
+  $("#incumbentId").text(data?.incumbents[0]?.personCode ?? "");
+  $("#incumbentName").text(data?.incumbents[0]?.personName ?? "");
+  $("#prlPlanComp").text(data?.incumbents[0]?.prlPlan ?? "");
 
   $("#modalDetailJob").modal("show");
 }
 
 function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
-  console.log("paramsId", paramsId);
-  if (modalSize) {
-    $("#modalConfirm").find(".modal-dialog").addClass(modalSize);
-  }
   $("#modalConfirmTitle").html("");
   $("#modalConfirmBody").html("");
   $("#modalConfirmFooter").html("");
@@ -1159,6 +1429,12 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           `</button>`
       );
     });
+  }
+
+  if (modalSize) {
+    $("#modalConfirm").find(".modal-confirm").css("width", modalSize).css("max-width", modalSize);
+  } else {
+    $("#modalConfirm").find(".modal-confirm").css("width", "50%").css("max-width", "50%");
   }
 
   $("#modalConfirm").modal("show");
@@ -1319,17 +1595,20 @@ function createHierarchy(data, parentId = null) {
     .map((item) => ({
       id: item.id,
       text: item.position,
-      icon: "icofont icofont-plus font-theme",
+      icon: "",
+      // icon: "icofont icofont-plus font-theme",
       a_attr: item.a_attr ? null : { class: "no-children" }, // add class if no children
       children: createHierarchy(data, item.id) ?? null,
     }));
 }
 
 async function helperOrgTree(params) {
+  console.log(params);
   // refresh jsTree
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
     core: {
+      check_callback: true,
       data: createHierarchy(params),
     },
     plugins: ["ui", "types"],
@@ -1356,20 +1635,67 @@ async function helperOrgTree(params) {
     });
   });
 
-  $("#orgThreeDiv").on("click", ".jstree-anchor", function (e) {
-    if (e.detail === 2) {
-      const node = $("#orgThreeDiv").jstree(true).get_node($(this).closest(".jstree-node").attr("id"));
-      let newIcon;
-      if (node.icon === true) {
-        newIcon = true;
-        $("#orgThreeDiv").jstree(true).set_icon(node, newIcon);
-        return;
+  function reloadTree(newData) {
+    const tree = $("#orgThreeDiv").jstree(true);
+    tree.settings.core.data = createHierarchy(newData); // Set new data
+    tree.refresh(); // Refresh the tree
+  }
+
+  $("#orgThreeDiv").on("click", ".jstree-anchor", async function (e) {
+    const node = $("#orgThreeDiv").jstree(true).get_node($(this).closest(".jstree-node").attr("id"));
+    const dataChart = await chartShow({
+      draftId: organizationAttribute.orgUnitId,
+      jobCode: node.id,
+      depth: 2,
+    });
+    dataChart.data.forEach((item) => {
+      item.id = item.id_org_unit;
+    });
+
+    // check only pid is node.id
+    // const selfNode = dataChart.data.find((item) => item.id == node.id);
+    // const directReportfNode = dataChart.data.filter((item) => item.pid == node.id);
+    // dataChart.data = [selfNode, ...directReportfNode];
+    console.log(node.id);
+    console.log(dataChart.data);
+
+    if (!dataChart.data || !dataChart.data.length) {
+      console.warn("No data received for children");
+      return;
+    }
+
+    const newChildren = createHierarchy(dataChart.data);
+    console.log(newChildren);
+
+    if (!newChildren.length || !newChildren[0].children) {
+      console.warn("No children to add");
+      return;
+    }
+
+    const children = newChildren[0].children;
+
+    for (const child of children) {
+      if (!child.id || !child.text) {
+        continue;
       }
-      newIcon =
-        node.icon === "icofont icofont-plus font-theme"
-          ? "icofont icofont-minus font-theme"
-          : "icofont icofont-plus font-theme";
-      $("#orgThreeDiv").jstree(true).set_icon(node, newIcon);
+      // check if parent node already has this child
+      const existingChild = $("#orgThreeDiv").jstree(true).get_node(child.id);
+      if (existingChild) {
+        console.warn("Child already exists", child.id);
+        continue;
+      }
+      // setTimeout(() => {
+      $("#orgThreeDiv")
+        .jstree(true)
+        .create_node(node.id, child, "last", function (new_node) {});
+    }
+
+    if (e.detail === 2) {
+      // let newIcon =
+      //   node.icon === "icofont icofont-plus font-theme"
+      //     ? "icofont icofont-minus font-theme"
+      //     : "icofont icofont-plus font-theme";
+      // $("#orgThreeDiv").jstree(true).set_icon(node, newIcon);
     }
   });
 
@@ -1386,17 +1712,17 @@ async function helperOrgTree(params) {
 // helper bagan org
 // ======================
 
-function focusNode(nodeId) {
-  let selfNode = lsListOrgNode.find((item) => item.id == nodeId);
-  let parentNode = lsListOrgNode.find((item) => item.id == selfNode?.pid) || {};
-  const childrenData = getallChildrenNode(parentNode);
-  const data = [parentNode, ...childrenData].filter((item) => item.id != nodeId);
+async function focusNode(nodeId) {
+  // let selfNode = lsListOrgNode.find((item) => item.id == nodeId);
+  // let parentNode = lsListOrgNode.find((item) => item.id == selfNode?.pid) || {};
+  // const childrenData = getallChildrenNode(parentNode);
+  // const data = [parentNode, ...childrenData].filter((item) => item.id != nodeId);
 
-  selfNode = {
-    ...selfNode,
-    tags: [...selfNode.tags, "pointed"],
-  };
-  data.push(selfNode);
+  // selfNode = {
+  //   ...selfNode,
+  //   tags: [...selfNode.tags, "pointed"],
+  // };
+  // data.push(selfNode);
 
   // let grandParentNode = lsListOrgNode.find((item) => item.id == parentNode?.pid) || {};
   // let childrenNode = lsListOrgNode.filter((item) => item.pid == nodeId) || [];
@@ -1420,12 +1746,21 @@ function focusNode(nodeId) {
 
   // hide node 39020818
   // chart.hide(39020818);
+  const dataChart = await chartShow({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: nodeId,
+    depth: 3,
+  });
+
+  // change chartid id from id_org_unit
+  if (!dataChart.data) {
+    dataChart.data = [];
+  }
+  dataChart.data.forEach((item) => {
+    item.id = item.id_org_unit;
+  });
   setTimeout(() => {
-    helperOrgChart(true, "os-container", data, true, { expand: true, nodeId: nodeId });
-    // const getChildrenNode = lsListOrgNode.filter((item) => item.pid == nodeId).map((item) => item.id) || [];
-    // const siblingNode = lsListOrgNode.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
-    // const getAll = [...getChildrenNode, ...siblingNode];
-    // chart.expand(nodeId, getAll);
+    helperOrgChart(true, "os-container", dataChart.data, true, { expand: true, nodeId: nodeId });
   }, 500);
 }
 
@@ -1435,6 +1770,31 @@ function getallChildrenNode(parentNode) {
     children = children.concat(getallChildrenNode(child));
   });
   return children;
+}
+
+function helperOrgChartTester(init, id, data, isFocusNode, object) {
+  OrgChart.templates.myTemplate = Object.assign({}, OrgChart.templates.ana);
+  OrgChart.templates.myTemplate.size = [200, 200];
+  OrgChart.templates.myTemplate.node = `
+    <circle cx="100" cy="100" r="100" fill="#4D4D4D" stroke-width="1" stroke="#aeaeae"></circle>
+    <text style="font-size: 24px;" fill="#ffffff" x="100" y="90" text-anchor="middle">{val}</text>
+    <text style="font-size: 16px;" fill="#ffffff" x="100" y="60" text-anchor="middle">{val}</text>
+    <circle cx="150" cy="50" r="20" fill="#ffffff" stroke="#aeaeae" stroke-width="1"></circle>
+    <text style="font-size: 24px;" fill="#4D4D4D" x="150" y="55" text-anchor="middle">+</text>
+`;
+
+  var chart = new OrgChart("#os-container", {
+    template: "myTemplate",
+    nodes: [
+      { id: 1, name: "Parent Node" },
+      // { id: 2, pid: 1, name: "Child Node" },
+    ],
+  });
+
+  // click event on plus
+  chart.on("plus", function (sender, node) {
+    console.log("plus", node);
+  });
 }
 
 function helperOrgChart(init, id, data, isFocusNode, object) {
@@ -1459,12 +1819,14 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   default_t.jumlah_formasi = `<g><rect x="180" y="35" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px; text-anchor: middle;" fill="#353238" x="200" y="57.5">{val}</text></g>`;
 
   default_t.expandCollapseSize = 10;
-  // default_t.link = `<path stroke-linejoin="round" stroke-width="1" fill="none" d="{edge}" />`;
+  default_t.link = `<path stroke-linejoin="round" stroke-width="1" fill="none" d="{edge}" />`;
   default_t.plus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
   <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line>
   <line x1="5" y1="3" x2="5" y2="7" stroke-width="1" stroke="#000"></line></g>`;
   default_t.minus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
   <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line></g>`;
+  // default_t.plus = ``;
+  // default_t.minus = ``;
   // chaert separation
   OrgChart.templates.split = Object.assign({}, OrgChart.templates.base);
   // RESET_MOVABLE_ONEXPANDCOLLAPSE
@@ -1553,10 +1915,32 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     for (let key in baseNodeBinding) {
       nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
     }
-    tags[`bracket_${i}`] = {
+    tags[`basket_${i}`] = {
       template: `bracket_${i}_t`,
     };
   }
+
+  // add tags
+  // "hasChildren": {
+  //   template: "withChildren"
+  // }
+  // tags["hasChildren"] = {
+  //   template: "withChildren",
+  // };
+
+  //  templates: {
+  //     withChildren: Object.assign({}, OrgChart.templates.base, {
+  //       node: '<rect x="0" y="0" width="250" height="100" fill="lightblue"></rect>',
+  //       plus: '<circle cx="225" cy="50" r="15" fill="green" stroke="black" stroke-width="2"></circle>',
+  //   })
+  // }
+
+  // templates["withChildren"] = Object.assign({}, OrgChart.templates.base, {
+
+  // console.log("testOrgBagan", testOrgBagan);
+
+  // remove duplicate id in array data
+  // data = data.filter((item, index, self) => self.findIndex((t) => t.id === item.id) === index);
 
   OrgChart.RESET_MOVABLE_ONEXPANDCOLLAPSE = true;
   OrgChart.SEARCH_CLOSE_RESULT_ON_ESCAPE_OR_CLICKOUTSIDE = true;
@@ -1572,9 +1956,10 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     assistantSeparation: 10,
     levelSeparation: 30,
     scaleInitial: OrgChart.match.boundary,
+    // nodes: testOrgBagan,
     nodes: data,
     align: OrgChart.ORIENTATION,
-    movable: OrgChart.movable.node,
+    // movable: OrgChart.movable.node,
     nodeMouseClick: false,
     menu: {
       pdf: { text: "Export PDF" },
@@ -1612,6 +1997,23 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       helperOrgChart(true, "os-container", lsListOrgNode, true);
     });
     chart.element.appendChild(title);
+
+    // console.log("node", chart.nodes);
+    // const nodes = chart.nodes;
+    // // node object to array
+    // const nodesArray = Object.keys(nodes).map((key) => nodes[key]);
+    // nodesArray.forEach((node) => {
+    //   if (!chart.getNode(node.id).children || chart.getNode(node.id).children.length === 0) {
+    //     // add tags
+    //     chart.addTag(node.id, "hidePlus");
+    //   }
+    //   console.log("node", chart.getNode(node.id).children);
+    // });
+    // chart.node.forEach((node) => {
+    // if (!chart.getNode(node.id).children || chart.getNode(node.id).children.length === 0) {
+    //   chart.addTag(node.id, "hidePlus");
+    // }
+    // });
   });
 
   chart.onExportStart((args) => {
@@ -1624,7 +2026,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   chart.onUpdated(() => {});
 
-  chart.on("expcollclick", function (sender, collapse, id, ids) {});
+  chart.on("expcollclick", function (sender, collapse, id, ids) {
+    // alert("masd");
+  });
 
   chart.on("node-layout", function (sender, args) {
     const childrenCount = args?.childrenIds?.length;
@@ -1636,9 +2040,48 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   });
 
   chart.on("click", async (sender, node) => {
-    const param = {};
+    // const param = {};
     const nodeID = node.node.id;
     await modalJobPopup(nodeID);
+
+    // expandCollapse
+    // chart.expand(node.node.id);
+
+    // const nodeID = node.node.id;
+    // console.log("nodeID", nodeID);
+    // const dataChart = await chartShow({
+    //   draftId: organizationAttribute.orgUnitId,
+    //   jobCode: nodeID,
+    //   depth: 2,
+    // });
+    // dataChart.data.forEach((item) => {
+    //   item.id = item.id_org_unit;
+    // });
+
+    // remove find where pid = nodeID
+    // const dataChartFiltered = dataChart.data
+    //   .filter((item) => !data.find((element) => element.id === item.id_org_unit))
+    //   .filter((item) => item.pid == nodeID);
+    // console.log("dataChartFiltered", dataChartFiltered);
+    // dataChartFiltered.forEach((item) => {
+    //   setTimeout(() => {
+    //     chart.addNode(item);
+    //   }, 300);
+    // });
+
+    // check if node have children
+    //  check if node have children expanded
+  });
+
+  // chart on right click
+  chart.on("contextmenu", function (sender, args) {
+    args.event.preventDefault(); // Prevent default browser menu
+
+    // Remove existing menu
+    let existingMenu = document.getElementById("custom-menu");
+    if (existingMenu) {
+      existingMenu.remove();
+    }
   });
 
   chart.on("searchclick", (sender, node) => {
@@ -1663,9 +2106,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   // }
 
   if (object?.expand) {
-    let selfNode = lsListOrgNode.find((item) => item.id == object.nodeId);
-    const getChildrenNode = lsListOrgNode.filter((item) => item.pid == object.nodeId).map((item) => item.id) || [];
-    const siblingNode = lsListOrgNode.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
+    let selfNode = data.find((item) => item.id == object.nodeId);
+    const getChildrenNode = data.filter((item) => item.pid == object.nodeId).map((item) => item.id) || [];
+    const siblingNode = data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
     const getAll = [...getChildrenNode, ...siblingNode];
     setTimeout(() => {
       chart.expand(object.nodeId, getAll);

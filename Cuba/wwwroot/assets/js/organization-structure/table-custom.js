@@ -2,6 +2,7 @@ function getTablePositionList(dataSet, status) {
   if ($.fn.DataTable.isDataTable("#subPositionList")) {
     $("#subPositionList").DataTable().destroy();
   }
+  console.log("dataSet", dataSet);
   $("#subPositionList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
     buttons: [
@@ -29,7 +30,7 @@ function getTablePositionList(dataSet, status) {
     columns: [
       {
         title: "No",
-        data: "id",
+        data: "subPosId",
         width: "5%",
         render: function (data, type, row, meta) {
           return meta.row + 1;
@@ -38,22 +39,28 @@ function getTablePositionList(dataSet, status) {
       {
         title: "Sub Position Name",
         width: "30%",
-        data: "subPositionName",
+        data: null,
+        render: function (data) {
+          return data.jobPositionName;
+        },
       },
       {
         title: "Career Level",
         width: "30%",
-        data: "careerLevel",
+        data: null,
+        render: function (data) {
+          return data.careerLevel.careerLevelName;
+        },
       },
       {
         title: "PRL Org",
         width: "15%",
         data: null,
         render: function (data) {
-          if (data.prlOrg === data.prlOrgTo) {
-            return data.prlOrg;
+          if (!data.prlTo) {
+            return data.prlFrom;
           }
-          return `${data.prlOrg} - ${data.prlOrgTo}`;
+          return `${data.prlFrom} - ${data.prlTo}`;
         },
       },
       {
@@ -67,8 +74,8 @@ function getTablePositionList(dataSet, status) {
         width: "15%",
         render: function (data) {
           // button action edit and delete
-          const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editSubPosition('${data.id}')"> <i class="icon-pencil f-16"></i></button>`;
-          const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteSubPosition('${data.id}')"><i class="icon-trash f-16"></i></button>`;
+          const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editSubPosition('${data.subPosId}')"> <i class="icon-pencil f-16"></i></button>`;
+          const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteSubPosition('${data.subPosId}')"><i class="icon-trash f-16"></i></button>`;
           return `${editPositionDraft} ${deletePositionDraft}`;
         },
       },
@@ -89,8 +96,8 @@ function getTablePositionDetail(dataSet) {
     columns: [
       {
         title: "No",
-        data: "id",
-        width: "10%",
+        data: "subPosId",
+        width: "5%",
         render: function (data, type, row, meta) {
           return meta.row + 1;
         },
@@ -98,33 +105,33 @@ function getTablePositionDetail(dataSet) {
       {
         title: "Sub Position Name",
         width: "30%",
-        data: "positionName",
+        data: "subPositionName",
       },
-      {
-        title: "Career Level",
-        width: "20%",
-        data: "careerLevel",
-      },
-      {
-        title: "PRL Org",
-        width: "15%",
-        data: "prlOrg",
-      },
-      {
-        title: "Formation",
-        width: "15%",
-        data: "formation",
-      },
-      {
-        title: "Action",
-        data: null,
-        width: "30%",
-        render: function (data) {
-          return `
-          <button class="" style="background:transparent;color:black;padding:4px 12px;font-size:12px;border:1px solid black;"  onclick="detailSubPosition('${data.id}')"> <i class="icon-eye p-r-5"></i>Detail</button>
-          `;
-        },
-      },
+      // {
+      //   title: "Career Level",
+      //   width: "20%",
+      //   data: "careerLevel",
+      // },
+      // {
+      //   title: "PRL Org",
+      //   width: "15%",
+      //   data: "prlOrgToSubPos",
+      // },
+      // {
+      //   title: "Formation",
+      //   width: "15%",
+      //   data: "formation",
+      // },
+      // {
+      //   title: "Action",
+      //   data: null,
+      //   width: "30%",
+      //   render: function (data) {
+      //     return `
+      //     <button class="" style="background:transparent;color:black;padding:4px 12px;font-size:12px;border:1px solid black;"  onclick="detailSubPosition('${data.subPosId}')"> <i class="icon-eye p-r-5"></i>Detail</button>
+      //     `;
+      //   },
+      // },
     ],
   });
 }
@@ -345,22 +352,22 @@ function getTableListApproval(params) {
       },
       {
         title: "Request ID",
-        data: "request-id",
+        data: "draftId",
         width: "15%",
       },
       {
         title: "Draft Name",
-        data: "draft-name",
+        data: "draftName",
         width: "20%",
       },
       {
         title: "Submitted Date",
-        data: "submitted-date",
+        data: "submittedDate",
         width: "15%",
       },
       {
         title: "Approval/Reject Date",
-        data: "approval-reject-date",
+        data: "rejectedDate",
         width: "15%",
       },
       {
@@ -368,6 +375,21 @@ function getTableListApproval(params) {
         data: null,
         width: "15%",
         render: function (data) {
+          if (data.isSubmitted) {
+            data.status = 1;
+          }
+
+          if (data.isRejected) {
+            data.status = 2;
+          }
+
+          if (data.isApproved) {
+            data.status = 3;
+          }
+
+          if (data.isFinalized) {
+            data.status = 4;
+          }
           return `<span class="p-2 b-r-8 ${statusApprovalClass[data.status]}">${statusApproval[data.status]}</span>`;
         },
       },

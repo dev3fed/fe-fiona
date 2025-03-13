@@ -31,7 +31,7 @@ function updateTable(params, data, rowHeader, refer) {
   let row = "";
   if (data.length === 0) {
     row = `<tr>
-      <td colspan="100%" class="text-center p-10">Data not found</td>
+      <td colspan="100%" class="text-center p-30">Data not found</td>
     </tr>`;
     tableBody.append(row);
     return;
@@ -246,12 +246,14 @@ async function searchJobCompare(event, isPercentage) {
             <div class="column-item-name" onClick="applyCompare(${item.id})">
               ${item.name} 
               ${item.badge}
+              <i class="fas fa-info-circle" data-toggle="popover" data-placement="top" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"></i> 
             </div>
           </div>
         `
       )
       .join("");
 
+    $('[data-toggle="popover"]').popover();
     return;
   }
 
@@ -307,393 +309,329 @@ async function searchJobCompare(event, isPercentage) {
 }
 
 async function applyCompare(id) {
-  // open modal
   $("#modalJobCompareDetail").modal("show");
-  // const jobSelectedList = document.getElementById("job-selected-list");
-  // const selectedItems = Array.from(jobSelectedList.children).map((item) => ({
-  //   id: item.id.replace("selected-job-", ""),
-  //   name: item.textContent.trim(),
-  // }));
-  // console.log("selectedItems", selectedItems);
-  // $("#chooseJob").hide();
-  // $("#detailJob").show();
-  // selectedData.selectedJobDesc = selectedItems;
   await applySelectedData(id);
 }
 
 async function addJobReference() {
   $("#modalJobCompare").modal("show");
-  $("#percentageDiv").hide();
+  $("#searchDiv").hide();
   // $("#detailJob").show();
 
   // searchJobCompare();
 }
 
 async function applySelectedData(id) {
-  $("#detailJob").empty();
-  let data = dataJobDescCompare.filter((item) => item.identifikasi.id === id);
-  selectedData.selectedJobDesc = data[0];
+  const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
+  arrayId.forEach((item) => {
+    $(`#${item}`).empty();
+  });
+  let data = dataJobDescCompare.find((item) => item.identifikasi.id === id);
+  selectedData.selectedJobDesc = data;
   let row = "<div class='row'>";
-  for (const item of data) {
-    const listInternal = item?.koordinasi;
-    const listExternal = item?.relation;
-    row += `
-      <div class="col-md-12">
-        <div class="container vertical-scroll scroll-content">
-          <div class="">
-          <label class="container-checkbox" id="detailJobName">${item?.identifikasi?.jobName}
-            <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_jobdesc_all" class="checkbox_animated checbox-compare" checked>
-            <span class="checkmark"></span>
-          </label>
-          </div>
-          <h6 class="card-title mt-4">1. IDENTIFIKASI JABATAN</h6>
-          <div class="table-responsive ">
-            <table class="tableIndentifikasiCompare">
-              <tbody>
-                  <tr>
-                      <td>Unit Kerja / Fungsi</td>
-                      <td><span id="function">${item?.identifikasi?.function}</span></td>
-                  </tr>
-                  <tr>
-                      <td>Lokasi</td>
-                      <td><span id="location">${item?.identifikasi?.location}</span></td>
-                  </tr>
-                  <tr>
-                      <td>Direktorat</td>
-                      <td><span id="directorat">${item?.identifikasi?.directorat}</span></td>
-                  </tr>
-                  <tr>
-                      <td>Atasan Langsung</td>
-                      <td><span id="directReport">${item?.identifikasi?.directReport}</span></td>
-                  </tr>
-                  <tr>
-                      <td>Surat Keputusan</td>
-                      <td><span id="sk">${item?.identifikasi?.location}</span></td>
-                  </tr>
-              </tbody>
-            </table>
-          </div>`;
-    row += `<br>
-          <label class="container-checkbox mt-3"><h6>2. FUNGSI JABATAN</h6>
-            <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_fungsi" class="checkbox_animated checbox-compare" checked>
-            <span class="checkmark" style="width:20px;height:20px" ></span>
-          </label>
-          <span class="" id="fungsiText">${item?.fungsi}.</span> 
-          `;
-    row += `<br>
-          <label class="container-checkbox mt-3"><h6>3. TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</h6>
-            <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha_all" class="checkbox_animated checbox-compare" checked>
-            <span class="checkmark" style="width:20px;height:20px" ></span>
-          </label>
-          <span class="mt-2" style="font-size:11px;color:grey">Merupakan acuan dalam melaksanakan tugasnya. Jika dibutuhkan, dalam situasi tertentu tingkat prioritas dan perubahan tugas dan tanggung jawab dapat disesuaikan dengan kebutuhan perusahaan.</span>
-        `;
-    for (let j = 0; j < item?.tugasHa.length; j++) {
-      const listItemOutput = await addList(item?.tugasHa[j].output);
-      const listItemLeadingIndicator = await addList(item?.tugasHa[j].lead);
-      row += `
-            <div class="mt-2">
-              <div class="card p-1 m-0">
-                <div class="card-header" style="background:#B0D1E4;color:#006CA9;padding:8px;font-weight: 600;">
-                  <label class="container-checkbox m-0"><span style="font-size:16px !important"> No. ${item?.tugasHa[j].id}</span>
-                    <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha_${item?.tugasHa[j].id}" class="checkbox_animated checbox-compare" checked>
-                    <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-                  </label>
-                </div>
-                <div class="card-body p-2" style="border:1px solid #B0D1E4">
-                  <div class="p-2"style="border:1px solid #EAEAEB;border-radius:8px">
-                  <h6 class="mt-2">Tugas & Tanggung Jawab</h6>
-                  <hr>
-                  <span class="mt-1 text-secondary">Mengarahkan, memonitor dan mengevaluasi kegiatan pengembangan dan pengelolaan event produk ritel seperti pameran produk dll</span>
-                  </div>
-                  <div class="p-2 mt-3"style="border:1px solid #EAEAEB;border-radius:8px">
-                    <h6 class="mt-2">Hasil Akhir yang Diharapkan</h6>
-                    <hr>
-                    <ul class="m-3 text-secondary" style="list-style-type:disc">
-                    ${listItemOutput}
-                    </ul>
-                  </div>
-                  <div class="p-2 mt-3"style="border:1px solid #EAEAEB;border-radius:8px">
-                    <h6 class="mt-2">Lead Indicator</h6>
-                    <hr>
-                    <ul class="m-3 text-secondary" style="list-style-type:disc">
-                    ${listItemLeadingIndicator}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-    }
-    // row += `<br>
-    //       <h6 class="mt-4">4. TUGAS DAN TANGGUNG JAWAB UMUM</h6>
-    //     `;
-    // for (let j = 0; j < item?.tugasUmum.length; j++) {
-    //   const listItemOutput = await addList(item?.tugasUmum[j].tugas);
-    //   row += `
-    //         <div class="mt-2">
-    //           <div class="card p-1 m-0">
-    //             <div class="card-header" style="background:#B0D1E4;color:#006CA9;padding:8px;font-weight: 600;font-size: 14px;">
-    //               <span style="font-size:16px !important;color:#006CA9;padding-left:15px">No. ${item?.tugasUmum[j].id}</span>
-    //             </div>
-    //             <div class="card-body p-2" style="border:1px solid #B0D1E4">
-    //               <div class="p-2"style="border:1px solid #EAEAEB;border-radius:8px">
-    //               <h6 class="mt-2">Tugas & Tanggung Jawab</h6>
-    //               <hr>
-    //               <span class="mt-1">${item?.tugasUmum[j].header}</span>
-    //               </div>
-    //               <div class="p-2 mt-3"style="border:1px solid #EAEAEB;border-radius:8px">
-    //                 <h6 class="mt-2">Hasil Akhir yang Diharapkan</h6>
-    //                 <hr>
-    //                 <ul class="m-3 text-secondary" style="list-style-type:disc">
-    //                 ${listItemOutput}
-    //                 </ul>
-    //               </div>
-    //             </div>
-    //           </div>
-    //         </div>
-    //       `;
-    // }
-    // row += `<br>
-    //       <h6 class="mt-4">5. WEWENANG</h6>
-    //       <div class="table-responsive m-t-10">
-    //           <table class="tableMasterData w-100" id="masterDataList">
-    //               <thead>
-    //                   <tr>
-    //                       <th>Id</th>
-    //                       <th>Wewenang</th>
-    //                   </tr>
-    //               </thead>
-    //               <tbody>
-    //               `;
-    // for (let j = 0; j < item?.wewenang.length; j++) {
-    //   row += `
-    //                     <tr class="p-3">
-    //                         <td class="p-3">${item?.wewenang[j].id}</td>
-    //                         <td class="p-3">${item?.wewenang[j].wewenang}</td>
-    //                     </tr>
-    //                   `;
-    // }
-    // row += ` </tbody>
-    //             </table>
-    //         </div>
-    // `;
-    row += `
-          <br>
-          <label class="container-checkbox mt-3"><h6>4. KOORDINASI INTERNAL</h6>
-            <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_internal_all" class="checkbox_animated checbox-compare" checked>
-            <span class="checkmark" style="width:20px;height:20px" ></span>
-          </label>
-          <div class="table-responsive mt-2">
-            <table class="tableMasterData">
-                <thead>
-                    <tr>
-                        <th>Pihak Internal</th>
-                        <th>Aktivitas</th>
-                    </tr>
-                </thead>
-              <tbody>`;
-    for (const element of listInternal) {
-      const listItemOutput = await addList(element.aktivitas);
-      row += `
-                        <tr class="p-3">
-                            <td class="p-3">
-                              <label class="container-checkbox m-0"><span style="font-size:14px !important">${element.internal}</span>
-                                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_internal_${element.id}" class="checkbox_animated checbox-compare" checked>
-                                <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-                              </label>
-                            </td>
-                            <td class="p-3">${listItemOutput}</td>
-                        </tr>
-                      `;
-    }
-    row += ` </tbody>
-            </table>
-            </div>
-            `;
-    row += `
-          <label class="container-checkbox mt-3"><h6>5. KOORDINASI EKSTERNAL</h6>
-            <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_eksternal_all" class="checkbox_animated checbox-compare" checked>
-            <span class="checkmark" style="width:20px;height:20px" ></span>
-          </label>
-          <div class="table-responsive mt-2">
-            <table class="tableMasterData">
-                <thead>
-                    <tr>
-                        <th>Pihak Eksternal</th>
-                        <th>Aktivitas</th>
-                    </tr>
-                </thead>
-              <tbody>`;
-    for (const element of listExternal) {
-      const listItemOutput = await addList(element?.aktivitas);
-      row += `
-                        <tr class="p-3">
-                            <td class="p-3">
-                              <label class="container-checkbox m-0"><span style="font-size:14px !important">${element.eksternal}</span>
-                                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_eksternal_${element.id}" class="checkbox_animated checbox-compare" checked>
-                                <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-                              </label>
-                            </td>
-                            <td class="p-3">${listItemOutput}</td>
-                        </tr>
-                      `;
-    }
-    row += ` </tbody>
-            </table>
-            </div>
-            `;
-    row += `
-          <br>
-          <label class="container-checkbox mt-3"><h6>6. PERSYARATAN JABATAN</h6>
-            <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_persyaratan_all" class="checkbox_animated checbox-compare" checked>
-            <span class="checkmark" style="width:20px;height:20px" ></span>
-          </label>
-          <div class="mt-2">
-            <div class="card p-1 m-0">
-              <div class="card-header" style="background:#B0D1E4;color:#006CA9;padding:8px;font-weight: 600;font-size: 14px;">
-                1. Pendidikan dan Pengalaman
-              </div>
-              <div class="card-body p-2" style="border:1px solid #B0D1E4">
-                  `;
-    for (let j = 0; j < item?.education.length; j++) {
-      row += `${item?.education[j]} <br><br>`;
-    }
-    row += `
-              </div>
-            </div>
-          </div>
-        `;
-    row += `
-          <br>
-          <div class="mt-2">
-            <div class="card p-1 m-0">
-              <div class="card-header" style="background:#B0D1E4;color:#006CA9;padding:8px;font-weight: 600;font-size: 14px;">
-                2. Persyaratan Khusus
-              </div>
-              <div class="card-body p-2" style="border:1px solid #B0D1E4">
-                  `;
-    for (let j = 0; j < item?.persyaratanKhusus.length; j++) {
-      row += `${item?.persyaratanKhusus[j]} <br><br>`;
-    }
-    row += `
-              </div>
-            </div>
-          </div>
-        `;
-    row += `
-          <div class="mt-2">
-            <div class="card p-1 m-0">
-                <div class="card-header" style="background:#B0D1E4;color:#006CA9;padding:8px;font-weight: 600;font-size: 14px;">
-                  3. Kompetensi
-                </div>
-              <div class="card-body p-2" style="border:1px solid #B0D1E4">
-                <div class="p-2 mb-3"style="border:1px solid #EAEAEB;border-radius:8px">
-                <h6 class="mt-2">Kompetensi Teknis Mandatori</h6>
-                <hr>
-                <div class="table-responsive m-t-10">
-                  <table class="tableMasterData w-100" id="masterDataList">
-                      <thead>
-                          <tr>
-                              <th>Nama Kompetensi</th>
-                              <th>Level Kedalaman</th>
-                          </tr>
-                      </thead>
-                      <tbody>`;
-    for (let j = 0; j < item?.komtekMandatori.length; j++) {
-      row += `
-            <tr class="p-3">
-                <td class="p-3">
-                  <label class="container-checkbox m-0"><span style="font-size:14px !important">${item?.komtekMandatori[j].komtekMandatoriName}</span>
-                    <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_persyaratan_mandatori_${item?.komtekMandatori[j].id}" class="checkbox_animated checbox-compare" checked>
-                    <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-                  </label>
-                </td>
-                <td class="p-3">${item?.komtekMandatori[j].level}</td>
-            </tr>
-          `;
-    }
-    row += `</tbody>
-                  </table>
-                  </div>
-                  </div>
-                `;
+  const identifikasi = document.getElementById("identifikasi");
+  const fungsi = document.getElementById("fungsi");
+  const tugasHa = document.getElementById("tugas-ha");
+  const koordinasiInternal = document.getElementById("koordinasi-internal");
+  const relasiEksternal = document.getElementById("relasi-eksternal");
+  const stk = document.getElementById("stk");
 
-    row += ` 
-              <div class="p-2 mb-3"style="border:1px solid #EAEAEB;border-radius:8px">
-                <h6 class="mt-3">Kompetensi Teknis General</h6>
-                <hr>
-                <div class="table-responsive m-t-10">
-                  <table class="tableMasterData w-100" id="masterDataList">
-                      <thead>
-                          <tr>
-                              <th>Nama Kompetensi</th>
-                              <th>Level Kedalaman</th>
-                          </tr>
-                      </thead>
-                      <tbody>`;
-    for (let j = 0; j < item?.komtekGeneral.length; j++) {
-      row += `
-                          <tr class="p-3">
-                            <td class="p-3">
-                              <label class="container-checkbox m-0"><span style="font-size:14px !important">${item?.komtekGeneral[j].komtekGeneralName}</span>
-                                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_persyaratan_general_${item?.komtekGeneral[j].id}" class="checkbox_animated checbox-compare" checked>
-                                <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-                              </label>
-                            </td>
-                            <td class="p-3">${item?.komtekGeneral[j].level}</td>
-                          </tr>
-                        `;
-    }
-    row += `</tbody>
-                  </table>
-                </div>
-                </div>`;
-
-    row += ` 
-                <div class="p-2"style="border:1px solid #EAEAEB;border-radius:8px">
-                <h6 class="mt-3">Kompetensi Teknis Spesifik</h6>
-                <hr>
-                <div class="table-responsive m-t-10">
-                  <table class="tableMasterData w-100" id="masterDataList">
-                      <thead>
-                          <tr>
-                              <th>Nama Kompetensi</th>
-                              <th>Level Kedalaman</th>
-                          </tr>
-                      </thead>
-                      <tbody>`;
-    for (let j = 0; j < item?.komtekSpesifik.length; j++) {
-      row += `
-                          <tr class="p-3">
-                            <td class="p-3">
-                                <label class="container-checkbox m-0"><span style="font-size:14px !important">${item?.komtekSpesifik[j].komtekSpesifikName}</span>
-                                  <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_persyaratan_spesifik_${item?.komtekSpesifik[j].id}" class="checkbox_animated checbox-compare" checked>
-                                  <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-                                </label>
-                              </td>    
-                            <td class="p-3">${item?.komtekSpesifik[j].level}</td>
-                          </tr>
-                        `;
-    }
-    row += `</tbody>
-                  </table>
-                    </div>
-                    </div>
-                </div>
-
-                </div>
-                </div>`;
-
-    // row += ` </div>
-    //         </div>
-    //       </div>
-    //     `;
-    row += `
+  // jaga-jaga kalau data tidak ada
+  /* <div class="">
+  <label class="container-checkbox" id="detailJobName">${data?.identifikasi?.jobName}
+    <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_jobdesc_all" class="checkbox_animated checbox-compare" checked>
+    <span class="checkmark"></span>
+  </label>
+</div> */
+  const identifikasiDiv = `
+    <div class="col-md-12 mb-4">
+        <span class="section-name mb-2 ">IDENTIFIKASI JABATAN</span>
+        <div class="table-responsive ">
+          <table class="tableIndentifikasiCompareModal">
+            <tbody>
+              <tr>
+                <td class="identifikasi-header">Unit Kerja / Fungsi</td>
+                <td><span class="content-class" id="function">${data?.identifikasi?.function}</span></td>
+              </tr>
+              <tr>
+                <td class="identifikasi-header">Lokasi</td>
+                <td><span class="content-class" id="location">${data?.identifikasi?.location}</span></td>
+              </tr>
+              <tr>
+                <td class="identifikasi-header">Direktorat</td>
+                <td><span class="content-class" id="directorat">${data?.identifikasi?.directorat}</span></td>
+              </tr>
+              <tr>
+                <td class="identifikasi-header">Atasan Langsung</td>
+                <td><span class="content-class" id="directReport">${data?.identifikasi?.directReport}</span></td>
+              </tr>
+              <tr>
+                <td class="identifikasi-header">Surat Keputusan</td>
+                <td><span class="content-class" id="sk">${data?.identifikasi?.location}</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>`;
+    </div>
+        `;
+  identifikasi.innerHTML = identifikasiDiv;
+
+  const fungsiDiv = `
+    <div class="col-md-12 mb-4">
+        <label class="container-checkbox mt-3"><span class="section-name mb-2 ">FUNGSI JABATAN</span>
+          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_fungsi" class="checkbox_animated checbox-compare" checked>
+          <span class="checkmark" style="width:20px;height:20px" ></span>
+        </label>
+        <span class="content-class" id="fungsiText">${data?.fungsi}.</span>
+    </div>
+    `;
+  fungsi.innerHTML = fungsiDiv;
+
+  let tugasHaRow = `
+    <div class="table-responsive" style="overflow-x: auto;">
+      <table class="tableMasterData" id="tugasHaTable" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width:10%">
+              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha" class="checkbox_animated checbox-compare" checked>
+                <span class="checkmark" style="width:20px;height:20px" ></span>
+              </label>
+            </th>
+            <th style="width:30%">Tugas & Tanggung Jawab</th>
+            <th style="width:30%">Hasil Akhir Yang Diharapkan</th>
+            <th style="width:30%">Leading Indicator</th>
+          </tr>
+        </thead>
+        <tbody class="tbodyTugasHa">
+        </tbody>
+      </table>
+    </div>
+    `;
+
+  const tugasHaDiv =
+    `
+    <div class="col-md-12 mb-3">
+      <span class="section-name mb-1 ">TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span>
+      <span class="text-muted f-12" style="">Merupakan acuan dalam melaksanakan tugasnya. Jika dibutuhkan, dalam situasi tertentu tingkat prioritas dan perubahan tugas dan tanggung jawab dapat disesuaikan dengan kebutuhan perusahaan.</span>
+    </div>
+    <div class="col-md-12 mb-3">
+    ` +
+    tugasHaRow +
+    `
+    </div>
+    <div class="col-12 mb-3">
+        <span class="notifWarning">There are one or more tasks & responsibilities for which references are not available in this position, so it is necessary to seek references from other positions.</span>
+    </div>
+    `;
+
+  tugasHa.innerHTML = tugasHaDiv;
+
+  // tbodyTugasHa
+  let bodyTugasHa = document.querySelector(".tbodyTugasHa");
+  for (let j = 0; j < data?.tugasHa.length; j++) {
+    const listItemOutput = await addList(data?.tugasHa[j].output);
+    const listItemLeadingIndicator = await addList(data?.tugasHa[j].lead);
+
+    bodyTugasHa.innerHTML += `
+    <tr>
+      <td class="p-3" style="place-content: flex-start">
+        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;">${data?.tugasHa[j].id}</span>
+          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha_${data?.tugasHa[j].id}" class="checkbox_animated checbox-compare" checked>
+          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
+        </label>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <span class="">${data?.tugasHa[j].responsible}</span>
+      </td> 
+      <td class="p-3" style="place-content: flex-start">
+        <ul class="" style="list-style-type:disc">
+          ${listItemOutput}
+        </ul>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <ul class="" style="list-style-type:disc">
+          ${listItemLeadingIndicator}
+        </ul>
+      </td>
+    </tr>
+    `;
   }
-  row += "</div>";
-  $("#detailJob").append(row);
+
+  let koordinasiInternalRow = `
+    <div class="table-responsive" style="overflow-x: auto;">
+      <table class="tableMasterData" id="koordinasiInternalTable" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width:10%">
+              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_ki" class="checkbox_animated checbox-compare" checked>
+                <span class="checkmark" style="width:20px;height:20px" ></span>
+              </label>
+            </th>
+            <th style="width:35%">Pihak Internal</th>
+            <th style="width:55%">Aktivitas</th>
+          </tr>
+        </thead>
+        <tbody class="tbodyKoordinasiInternal">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const koordinasiInternalDiv =
+    `
+    <div class="col-md-12 mb-3">
+      <span class="section-name mb-1 ">KOORDINASI INTERNAL</span>
+    </div>
+    <div class="col-md-12 mb-3">
+    ` +
+    koordinasiInternalRow +
+    `
+    </div>
+  `;
+
+  koordinasiInternal.innerHTML = koordinasiInternalDiv;
+
+  let bodyKoordinasiInternal = document.querySelector(".tbodyKoordinasiInternal");
+  const listInternal = data?.koordinasi;
+  for (let j = 0; j < listInternal.length; j++) {
+    let listItemOutput = await addList(listInternal[j].aktivitas);
+    bodyKoordinasiInternal.innerHTML += `
+    <tr>
+      <td class="p-3" style="place-content: flex-start">
+        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;"></span>
+          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_ki_${listInternal[j].id}" class="checkbox_animated checbox-compare" checked>
+          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
+        </label>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <span class="">${listInternal[j].internal}</span>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <ul class="" style="list-style-type:disc">
+          ${listItemOutput}
+        </ul>
+      </td>
+    </tr>
+    `;
+  }
+
+  let relasiEksternalRow = `
+    <div class="table-responsive" style="overflow-x: auto;">
+      <table class="tableMasterData" id="relasiEksternalTable" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width:10%">
+              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_re" class="checkbox_animated checbox-compare" checked>
+                <span class="checkmark" style="width:20px;height:20px" ></span>
+              </label>
+            </th>
+            <th style="width:35%">Pihak Eksternal</th>
+            <th style="width:55%">Aktivitas</th>
+          </tr>
+        </thead>
+        <tbody class="tbodyRelasiEksternal">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const relasiEksternalDiv =
+    `
+    <div class="col-md-12 mb-3">
+      <span class="section-name mb-1 ">RELASI EKSTERNAL</span>
+    </div>
+    <div class="col-md-12 mb-3">
+    ` +
+    relasiEksternalRow +
+    `
+    </div>
+  `;
+
+  relasiEksternal.innerHTML = relasiEksternalDiv;
+
+  const listExternal = data?.relation;
+  let bodyRelasiEksternal = document.querySelector(".tbodyRelasiEksternal");
+  for (let j = 0; j < listExternal.length; j++) {
+    let listItemOutput = await addList(listExternal[j].aktivitas);
+    bodyRelasiEksternal.innerHTML += `
+    <tr>
+      <td class="p-3" style="place-content: flex-start">
+        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;"></span>
+          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_re_${listExternal[j].id}" class="checkbox_animated checbox-compare" checked>
+          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
+        </label>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <span class="">${listExternal[j].eksternal}</span>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <ul class="" style="list-style-type:disc">
+          ${listItemOutput}
+        </ul>
+      </td>
+    </tr>
+    `;
+  }
+
+  let stkRow = `
+    <div class="table-responsive" style="overflow-x: auto;">
+      <table class="tableMasterData" id="stkTable" style="width:100%">
+        <thead>
+          <tr>
+            <th style="width:10%">
+              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_stk" class="checkbox_animated checbox-compare" checked>
+                <span class="checkmark" style="width:20px;height:20px" ></span>
+              </label>
+            </th>
+            <th style="width:30%">No. STK</th>
+            <th style="width:60%">Judul STK</th>
+          </tr>
+        </thead>
+        <tbody class="tbodyStk">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const stkDiv =
+    `
+    <div class="col-md-12 mb-3">
+      <span class="section-name mb-1 ">KOORDINASI INTERNAL</span>
+    </div>
+    <div class="col-md-12 mb-3">
+    ` +
+    stkRow +
+    `</div>
+  `;
+  stk.innerHTML = stkDiv;
+  const listSk = [
+    { id: 1, noStk: "1", titleStk: "title 1" },
+    { id: 2, noStk: "2", titleStk: "title 2" },
+    { id: 3, noStk: "3", titleStk: "title 3" },
+  ];
+  let bodyStk = document.querySelector(".tbodyStk");
+  for (let j = 0; j < listSk.length; j++) {
+    bodyStk.innerHTML += `
+    <tr>
+      <td class="p-3" style="place-content: flex-start">
+        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;"></span>
+          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_stk_${listSk[j].id}" class="checkbox_animated checbox-compare" checked>
+          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
+        </label>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <span class="">${listSk[j].noStk}</span>
+      </td>
+      <td class="p-3" style="place-content: flex-start">
+        <span class="">${listSk[j].titleStk}</span>
+      </td>
+    </tr>
+    `;
+  }
 }
 
 function filterListJobDesc(value, search) {
@@ -742,9 +680,10 @@ async function saveReference() {
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
     (item) => !item.id.includes("all") && item.checked
   );
+  console.log("checkboxList", checkboxList);
   const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
   const checboxTugasHa = checkboxList.filter((item) => item.id.includes("checkbox_tugas_ha"));
-  const checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_internal"));
+  const checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_ir"));
   const checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_eksternal"));
   const checboxPersyaratanMandatori = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_mandatori"));
   const checboxPersyaratanGeneral = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_general"));
@@ -759,6 +698,7 @@ async function saveReference() {
   console.log("checboxPersyaratanGeneral", checboxPersyaratanGeneral);
   console.log("checboxPersyaratanSpesifik", checboxPersyaratanSpesifik);
   console.log("reference", reference);
+  return;
   if (checboxFungsi) {
     const getLocalFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
     // add to array
@@ -881,4 +821,128 @@ async function saveReference() {
       swal("Success!", "Reference has been saved", "success");
     }
   });
+}
+
+function checkButtonTable(buttonTable, id, lastPath) {
+  const user = localStorage.getItem("user") === "admin" ? "admin" : "admin";
+  const status = "2";
+  // swith case by parameter buttonTable and lastPath
+  switch (buttonTable) {
+    case "deleteMoveVariousTable":
+      return `<span class="f-14">${id}</span>
+          <br/>
+          <div class="col m-t-5 m-b-5">
+            <div class="col-sm-12">
+              <span class="text-muted f-12">Org Unit</span> 
+              <select class="form-control" id="selectOrgUnitDelete" name="selectOrgUnitDelete">
+                <option value="0">Select Org Unit</option>
+                <option value="1">Org Unit 1</option>
+              </select>
+            </div>
+            <div class="col-sm-12 m-t-10">
+              <span class="text-muted f-12">Direct Report</span> 
+              <select class="form-control" id="selectDirectReportDelete" name="selectDirectReportDelete">
+                <option value="0">Select Position</option>
+                <option value="1">Manager Strategic Planning</option>
+              </select>
+            </div>
+          </div>`;
+    case "positionList":
+      if (lastPath === "draft-detail") {
+        const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
+        const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
+        const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
+        return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
+      } else {
+        const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
+        return `${detail}`;
+      }
+    case "draftList":
+      const detailDraft = `<button class="btn-custom-outline-dark" onclick="detailDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
+      const deleteDraft = `<button class="btn-custom-outline-danger" onclick="deleteDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+      return `${detailDraft} ${deleteDraft}`;
+    case "approvalList":
+      const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
+      const approve = `<button class="btn-custom-outline-primary" onclick="acceptApproval('${id}')"> <i class="icon-check f-16"></i></button>`;
+      const reject = `<button class="btn-custom-outline-danger" onclick="rejectApproval('${id}')"> <i class="icon-close f-16"></i></button>`;
+      if (status === "1" || status === "4") {
+        return `${detail} ${user === "admin" ? `${approve} ${reject}` : ""}`;
+      } else if (status === "2" || status === "3" || status === "5") {
+        return detail;
+      } else {
+        return `${detail} ${user === "admin" ? `${approve} ${reject}` : ""}`;
+      }
+    default:
+      return ``;
+  }
+}
+
+function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
+  if (modalSize) {
+    alert(modalSize);
+    // update modal size css width, exm: 90%
+    $("#modalConfirm")
+      .find(".modal-dialog")
+      .css("width", modalSize + "!important");
+  } else {
+    $("#modalConfirm").find(".modal-dialog").css("width", "90%");
+  }
+  $("#modalConfirmTitle").html("");
+  $("#modalConfirmBody").html("");
+  $("#modalConfirmFooter").html("");
+
+  let icon =
+    type == "delete"
+      ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
+      : type == "success"
+      ? '<i class="fas fa-check-circle text-success"></i>'
+      : '<i class="fas fa-exclamation-circle text-warning"></i>';
+  let title = `<span class="p-l-10">` + titleModal + `</span>`;
+  $("#modalConfirmTitle").html(icon + title);
+  $("#modalConfirmBody").html(
+    `<div class="f-14" role="alert">` +
+      message +
+      `
+    </div>`
+  );
+
+  if (note) {
+    $("#modalConfirmBody").append(
+      `<div class="alert alert-danger-custom m-t-10" role="alert">
+        <strong>Note:</strong> ` +
+        note +
+        `
+      </div>`
+    );
+  }
+
+  if (action) {
+    action.forEach((item) => {
+      if (item.callback) {
+        $("#modalConfirmFooter").append(
+          `<button type="button" class="btn ` +
+            item.className +
+            ` m-r-5" onclick="(` +
+            item.callback +
+            `)()">` +
+            item.button +
+            `</button>`
+        );
+        return;
+      }
+      $("#modalConfirmFooter").append(
+        `<button type="button" class="btn ` +
+          item.className +
+          ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
+          item.button +
+          `</button>`
+      );
+    });
+  }
+
+  $("#modalConfirm").modal("show");
+}
+
+function hideModal(id) {
+  $("#" + id).modal("hide");
 }
