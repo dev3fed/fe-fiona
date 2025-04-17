@@ -1,4 +1,8 @@
-$(document).ready(function () {
+function detailDraft(id) {
+  window.location.href = `/job-description/draft-detail`;
+}
+
+$(document).ready(async function () {
   $("#createJobDesc").click(function () {
     window.location.href = "/job-description/detail";
   });
@@ -28,4 +32,21 @@ $(document).ready(function () {
     const search = $(this).val() ?? "";
     filterListJobDesc(value, search);
   });
+
+  $("#createDraft").click(function () {
+    $("#modalCreateDraftJobDesc").modal("show");
+  });
+
+  $("#selectJobDescDraft").change(function () {
+    const value = $(this).val();
+    console.log("value", value);
+    if (value == "1") {
+      $("#pills-warningtab").attr("style", "display:none !important");
+    } else {
+      $("#pills-warningtab").show();
+    }
+  });
+  getTableListDraft();
+  getTableListApproval();
+  getTableListLog();
 });

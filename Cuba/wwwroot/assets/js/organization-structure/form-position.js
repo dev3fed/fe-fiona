@@ -4,90 +4,197 @@ function starter() {
   $("#subPositionDiv").hide();
 }
 
-function initializeList() {
-  const uniqueValues = (key) => [...new Set(lsListPosition.map((item) => item[key]))];
-  const mapToSelectData = (key) => uniqueValues(key).map((item) => ({ id: item, text: item }));
-  // if isbasked = yes, then using orgUnitName as positionName
-  const mapToSelectDataPosition = lsListPosition.map((item) => ({
-    id: item.positionId,
-    text: item.isBasket == "Yes" ? item.orgUnitName : item.positionName,
-  }));
-
-  console.log(lsListPosition);
-  // for selectOrgUnitParentName and selectPrlOr, distinct lsListPosition data by orgUnitId, and text by orgUnitName + " - " + orgUnitId
-  const mapToSelectDataOrgUnitParent = uniqueValues("orgUnitParentId").map((item) => ({
-    id: item,
-    text: lsListPosition.find((x) => x.orgUnitParentId == item).orgUnitParent + " - " + item,
-  }));
+async function initializeList() {
+  const _function = await functionList(organizationAttribute.orgUnitId);
+  const _abbrv = await abbrvPositionList(organizationAttribute.orgUnitId);
+  const draftId = organizationAttribute.orgUnitId;
+  getDataListAsync([
+    {
+      id: "selectJobReference",
+      endpoint: "chart/job/list",
+      draftId: draftId,
+    },
+    {
+      id: "selectDivision",
+      endpoint: "draft/division/list",
+      draftId: draftId,
+    },
+    {
+      id: "selectSubDivision",
+      endpoint: "draft/sub-division/list",
+      draftId: draftId,
+    },
+    {
+      id: "selectDepartment",
+      endpoint: "draft/department/list",
+      draftId: draftId,
+    },
+    {
+      id: "selectSection",
+      endpoint: "draft/section/list",
+      addedParams: "",
+      draftId: draftId,
+    },
+    { id: "selectCareerType", endpoint: "draft/career-type/list", draftId: draftId },
+    { id: "selectCareerLevel", endpoint: "draft/career-level/list", draftId: draftId },
+    // { id: "selectAbbrvPosition", endpoint: "draft/job-abbriviation/list", draftId: draftId },
+    { id: "selectPersonalAreaName", endpoint: "draft/personnel-area/list", draftId: draftId },
+    { id: "selectPersonalSubareaName", endpoint: "draft/personnel-sub-area/list", draftId: draftId },
+    { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId },
+    { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId },
+    { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId },
+    { id: "selectSubSkillGroupMain", endpoint: "draft/sub-skill-group/list", draftId: draftId },
+    { id: "selectSkillGroupSecond", endpoint: "draft/skill-group/list", draftId: draftId },
+    { id: "selectSubSkillGroupSecond", endpoint: "draft/sub-skill-group/list", draftId: draftId },
+    { id: "selectSkillGroupThird", endpoint: "draft/skill-group/list", draftId: draftId },
+    { id: "selectSubSkillGroupThird", endpoint: "draft/sub-skill-group/list", draftId: draftId },
+  ]);
   return [
     {
-      dataId: "selectJobReference",
-      data: mapToSelectDataPosition,
+      dataId: "selectFunction",
+      data: _function.data.map((item) => ({ id: item.functionCode, text: item.functionName })),
     },
-    { dataId: "selectOrgUnitParentName", data: mapToSelectDataOrgUnitParent },
-    { dataId: "selectPrlOrg", data: prl },
-    { dataId: "selectPrlOrgTo", data: prl },
     {
-      dataId: "selectDirectReport",
-      data: mapToSelectDataPosition,
+      dataId: "selectAbbrvPosition",
+      data: _abbrv.data.map((item) => ({ id: item.id, text: item.name })),
     },
-    { dataId: "selectFunction", data: mapToSelectData("function") },
-    { dataId: "selectDivision", data: mapToSelectData("division") },
-    { dataId: "selectSubDivision", data: mapToSelectData("subDivision") },
-    { dataId: "selectDepartment", data: mapToSelectData("department") },
-    { dataId: "selectSection", data: mapToSelectData("section") },
-    { dataId: "selectCareerType", data: mapToSelectData("careerType") },
-    { dataId: "selectCareerLevel", data: mapToSelectData("careerLevel") },
-    { dataId: "selectAbbrvPosition", data: mapToSelectData("abbrvPositon") },
-    { dataId: "selectKBO", data: mapToSelectData("kbo") },
-    { dataId: "selectCostCenter", data: mapToSelectData("costCenterDesc") },
-    { dataId: "selectPersonalAreaName", data: mapToSelectData("personalAreaName") },
-    { dataId: "selectPersonalSubareaName", data: mapToSelectData("personalSubAreaName") },
-    { dataId: "selectCoordinationWith", data: mapToSelectData("coordinationWith") },
-    { dataId: "selectSkillGroupMain", data: mapToSelectData("mainSkillGroup") },
-    { dataId: "selectSubSkillGroupMain", data: mapToSelectData("mainSubSkillGroup") },
-    { dataId: "selectSkillGroupSecond", data: mapToSelectData("secondSkillGroup") },
-    { dataId: "selectSubSkillGroupSecond", data: mapToSelectData("secondSubSkillGroup") },
-    { dataId: "selectSkillGroupThird", data: mapToSelectData("thirdSkillGroup") },
-    { dataId: "selectSubSkillGroupThird", data: mapToSelectData("thirdSubSkillGroup") },
+    {
+      dataId: "selectPrlOrg",
+      data: prl.map((item) => ({ id: item, text: item })),
+    },
+    {
+      dataId: "selectPrlOrgTo",
+      data: prl.map((item) => ({ id: item, text: item })),
+    },
+    // {
+    //   dataId: "selectCareerType",
+    //   data: careerType.value.data.map((item) => ({ id: item.id, text: item.name })),
+    // },
   ];
 }
 
 function saveAsDraft() {
-  const positionId = urlParams.get("positionId");
+  const positionId = urlParams.get("unitCode");
   let type = "create";
-  let data = {};
-  if (positionId) {
-    type = "edit";
-    data = lsListPosition.find((item) => item.positionId == positionId);
-    saveInputAttribut(type, data);
-    // swal("Saved", "Save as Draft", "success");
-    // window.location.href = "/organization/index?focusNode=" + positionId;
-  } else {
-    // swal("Saved", "Save as Draft", "success");
-    saveInputAttribut(type, data);
+  if (positionId) type = "edit";
+  const save = saveInputAttribut(type);
+  if (save) {
+    hideModal(`modalConfirm`);
     // const getDirectReport = $("#selectDirectReport").val();
     // window.location.href = "/organization/index?focusNode=" + getDirectReport;
   }
+  swal("Saved", "Save as Draft", "success");
 }
 
+// function saveAsDraft() {
+//   const positionId = urlParams.get("unitCode");
+//   let type = "create";
+//   let data = {};
+//   if (positionId) {
+//     type = "edit";
+//     data = lsListPosition.find((item) => item.positionId == positionId);
+//     saveInputAttribut(type, data);
+//     // swal("Saved", "Save as Draft", "success");
+//     // window.location.href = "/organization/index?focusNode=" + positionId;
+//   } else {
+//     // swal("Saved", "Save as Draft", "success");
+//     saveInputAttribut(type, data);
+//     // const getDirectReport = $("#selectDirectReport").val();
+//     // window.location.href = "/organization/index?focusNode=" + getDirectReport;
+//   }
+// }
+
 function addSubPos() {
-  const subPosDiv = $("#subPosDiv").children();
-  const countSubPosDiv = subPosDiv.length;
-  const newSubPosDiv = subPosDiv.first().clone();
-  newSubPosDiv.attr("id", "rowPosDiv" + countSubPosDiv);
-  newSubPosDiv.find("#modalSelectCareerLevel").attr("id", "modalSelectCareerLevel" + countSubPosDiv);
-  newSubPosDiv.find("#modalSelectAbbrvPosition").attr("id", "modalSelectAbbrvPosition" + countSubPosDiv);
-  newSubPosDiv.find("#modalInputSubPositionName").attr("id", "modalInputSubPositionName" + countSubPosDiv);
-  newSubPosDiv.find("#modalSelectPrlOrgSubPos").attr("id", "modalSelectPrlOrgSubPos" + countSubPosDiv);
-  newSubPosDiv.find("#modalInputFormation").attr("id", "modalInputFormation" + countSubPosDiv);
-  newSubPosDiv.find(".add-sub-pos").removeClass("add-sub-pos").addClass("delete-sub-pos");
-  newSubPosDiv.find("#addSubPos").attr("id", "deleteSubPos" + countSubPosDiv);
-  newSubPosDiv.find(`#deleteSubPos${countSubPosDiv}`).attr("onclick", "deleteSubPos(" + countSubPosDiv + ")");
-  newSubPosDiv.find("#imageIcon").attr("id", "imageIcon" + countSubPosDiv);
-  newSubPosDiv.find("#imageIcon" + countSubPosDiv).attr("src", "/assets/images/rasci/trash-white.svg");
-  // imageIcon
-  newSubPosDiv.appendTo("#subPosDiv");
+  const positionId = urlParams.get("unitCode");
+  let type = "create";
+  if (positionId) type = "edit";
+  const dataAddSubPos = {};
+  dataAddSubPos.subPosId = $("#modalInputSubPosId").val() == "" ? 0 : parseInt($("#modalInputSubPosId").val(), 10);
+  dataAddSubPos.careerLevelCode = $("#modalSelectCareerLevel").val();
+  dataAddSubPos.careerLevelName = $("#modalSelectCareerLevel option:selected").text();
+  dataAddSubPos.careerTypeCode = $("#selectCareerType").val();
+  dataAddSubPos.careerTypeName = $("#selectCareerType option:selected").text();
+  dataAddSubPos.abbrvPositionCode = $("#modalSelectAbbrvPosition").val();
+  dataAddSubPos.abbrvPositionName = $("#modalSelectAbbrvPosition option:selected").text();
+  dataAddSubPos.modalInputSubPositionName = $("#modalInputSubPositionName").val();
+  dataAddSubPos.modalSelectPrlOrgSubPos = parseInt($("#modalSelectPrlOrgSubPos").val());
+  dataAddSubPos.modalSelectPrlOrgToSubPos = parseInt($("#modalSelectPrlOrgToSubPos").val()) || 0;
+  dataAddSubPos.modalInputFormation = parseInt($("#modalInputFormation").val());
+  dataAddSubPos.unitCode = "";
+  dataAddSubPos.unitName = $("#inputOrgUnitName").val();
+  if (type == "edit") {
+    dataAddSubPos.unitCode = positionId;
+  }
+  dataAddSubPos.unitParentCode = $("#selectOrgUnitParentName").val();
+  dataAddSubPos.unitParentName = $("#selectOrgUnitParentName option:selected").text();
+  let subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
+  console.log("dataAddSubPos", dataAddSubPos);
+  let id;
+  if (dataAddSubPos.subPosId !== 0) {
+    id = dataAddSubPos.subPosId;
+    const index = subJobPos.findIndex((item) => item.subPosId == dataAddSubPos.subPosId);
+    subJobPos[index] = {
+      subPosId: id,
+      unitCode: dataAddSubPos.unitCode,
+      unitName: dataAddSubPos.unitName,
+      unitParentCode: dataAddSubPos.unitParentCode,
+      unitParentName: dataAddSubPos.unitParentName,
+      jobPositionName: dataAddSubPos.modalInputSubPositionName,
+      layer: 5,
+      prlFrom: dataAddSubPos.modalSelectPrlOrgSubPos,
+      prlTo: dataAddSubPos.modalSelectPrlOrgToSubPos,
+      prlPlan: 4,
+      formation: dataAddSubPos.modalInputFormation,
+      careerLevel: {
+        careerLevelCode: dataAddSubPos.careerLevelCode,
+        careerLevelName: dataAddSubPos.careerLevelName,
+      },
+      careerType: {
+        careerTypeCode: dataAddSubPos.careerTypeCode,
+        careerTypeName: dataAddSubPos.careerTypeName,
+      },
+      abbrivation: {
+        careerJobName: dataAddSubPos.abbrvPositionName,
+        jobAbbrivationName: dataAddSubPos.abbrvPositionName.substring(0, 12),
+        jobAbbrivationCode: dataAddSubPos.abbrvPositionCode,
+        isNew: false,
+      },
+    };
+  } else {
+    id = dataAddSubPos.subPosId !== 0 ? dataAddSubPos.subPosId : subJobPos.length + 1;
+    subJobPos.push({
+      subPosId: id,
+      unitCode: dataAddSubPos.unitCode,
+      unitName: dataAddSubPos.unitName,
+      unitParentCode: dataAddSubPos.unitParentCode,
+      unitParentName: dataAddSubPos.unitParentName,
+      jobPositionName: dataAddSubPos.modalInputSubPositionName,
+      layer: 5,
+      prlFrom: dataAddSubPos.modalSelectPrlOrgSubPos,
+      prlTo: dataAddSubPos.modalSelectPrlOrgToSubPos,
+      prlPlan: 4,
+      formation: dataAddSubPos.modalInputFormation,
+      careerLevel: {
+        careerLevelCode: dataAddSubPos.careerLevelCode,
+        careerLevelName: dataAddSubPos.careerLevelName,
+      },
+      careerType: {
+        careerTypeCode: dataAddSubPos.careerTypeCode,
+        careerTypeName: dataAddSubPos.careerTypeName,
+      },
+      abbrivation: {
+        careerJobName: dataAddSubPos.abbrvPositionName,
+        jobAbbrivationName: dataAddSubPos.abbrvPositionName.substring(0, 12),
+        jobAbbrivationCode: dataAddSubPos.abbrvPositionCode,
+        isNew: false,
+      },
+    });
+  }
+  localStorage.setItem("subJobPos", JSON.stringify(subJobPos));
+
+  $("#modalAddSubPosition").modal("hide");
+  swal("Saved", "Save Sub Position", "success");
+  checkBasketSelected("Yes");
 }
 
 function deleteSubPos(countSubPosDiv) {
@@ -99,63 +206,68 @@ function checkBasketSelected(selectBasket) {
   $("#subPositionDiv").hide();
   $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").show();
   $("#selectPrlOrgTo").prop("disabled", true);
+  // alert("masuk");
   if (selectBasket == "Yes") {
+    // alert("masuk 1");
+    const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
     // $("#prlOrgDiv, #prlOrgToDiv").removeClass("col-md-4").addClass("col-md-6");
     $("#subPositionDiv").show();
     $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").hide();
     $("#selectPrlOrgTo").prop("disabled", false);
+    updateDivSubPosition(subJobPos);
   }
 }
 
-$(document).ready(function () {
+$(document).ready(async function () {
   // check query url
-  checkDataOrganization();
-  const positionId = urlParams.get("positionId");
+  // check data organization from local storage
+  checkDataOrganizationLocalStorage();
+  console.log(organizationAttribute);
 
-  const updateDataDraft = initializeList();
+  const positionId = urlParams.get("unitCode");
+
+  const updateDataDraft = await initializeList();
   getDataList(updateDataDraft);
   starter();
   if (positionId) {
     $("#headerForm").text("Edit Position");
     $("#breadcrumbForm").text("Edit Position");
     insertFormPostion(positionId);
-    const data = lsListPosition.find((item) => item.positionId == positionId);
-    checkBasketSelected(data);
   }
   // changes inside detail
-  $("#selectCareerType").on("change", function (event) {
-    const selectCareerType = event.target.value;
-    $("#selectBasket").prop("disabled", false);
-    if (selectCareerType == "Managerial") {
-      $("#selectBasket").prop("disabled", true);
-      $("#selectBasket").val("No");
-    }
-    updateCareerLevel(selectCareerType);
-  });
+  // $("#selectCareerType").on("change", function (event) {
+  //   const selectCareerType = event.target.value;
+  //   $("#selectBasket").prop("disabled", false);
+  //   if (selectCareerType == "Managerial") {
+  //     $("#selectBasket").prop("disabled", true);
+  //     $("#selectBasket").val("No");
+  //   }
+  //   updateCareerLevel(selectCareerType);
+  // });
 
-  $("#selectCareerLevel").on("change", function (event) {
-    const selectCareerType = $("#selectCareerType").val();
-    const selectCareerLevel = event.target.value;
-    openAll();
-    updateAbbrvPosition(selectCareerType, selectCareerLevel);
-    updatePrlOrg(selectCareerType, selectCareerLevel);
-  });
+  // $("#selectCareerLevel").on("change", function (event) {
+  //   const selectCareerType = $("#selectCareerType").val();
+  //   const selectCareerLevel = event.target.value;
+  //   openAll();
+  //   updateAbbrvPosition(selectCareerType, selectCareerLevel);
+  //   updatePrlOrg(selectCareerType, selectCareerLevel);
+  // });
 
-  $("#modalSelectCareerLevel").on("change", function (event) {
-    const selectCareerType = $("#modalInputCareerType").val();
-    const selectCareerLevel = event.target.value;
+  // $("#modalSelectCareerLevel").on("change", function (event) {
+  //   const selectCareerType = $("#modalInputCareerType").val();
+  //   const selectCareerLevel = event.target.value;
 
-    // modalSelectAbbrvPosition disable false
-    $("#modalSelectAbbrvPosition").attr("disabled", false);
-    $("#modalInputSubPositionName").attr("disabled", false);
-    $("#modalSelectPrlOrgSubPos").attr("disabled", false);
-    $("#modalInputFormation").attr("disabled", false);
+  //   // modalSelectAbbrvPosition disable false
+  //   $("#modalSelectAbbrvPosition").attr("disabled", false);
+  //   $("#modalInputSubPositionName").attr("disabled", false);
+  //   $("#modalSelectPrlOrgSubPos").attr("disabled", false);
+  //   $("#modalInputFormation").attr("disabled", false);
 
-    updateAbbrvPositionModal(selectCareerType, selectCareerLevel);
-    // const selectCareerLevel = event.target.value;
-    // openAll();
-    // updatePrlOrg(selectCareerType, selectCareerLevel);
-  });
+  //   updateAbbrvPositionModal(selectCareerType, selectCareerLevel);
+  //   // const selectCareerLevel = event.target.value;
+  //   // openAll();
+  //   // updatePrlOrg(selectCareerType, selectCareerLevel);
+  // });
 
   $("#selectCoordination").on("change", function (event) {
     const value = event.target.value;
@@ -166,6 +278,7 @@ $(document).ready(function () {
   });
 
   $("#selectBasket").on("change", function (event) {
+    // console.log("basket selected");
     const selectBasket = event.target.value;
     checkBasketSelected(selectBasket);
   });
@@ -189,6 +302,7 @@ $(document).ready(function () {
 
   $("#addSubPosition").click(function () {
     $("#modalAddSubPosition").modal("show");
+    modalSubPosition();
   });
 
   $("#modalInputFormation").on("change", function (event) {
@@ -198,15 +312,16 @@ $(document).ready(function () {
   });
 
   $("#saveSubPos").click(function () {
-    swal("Saved", "Save Sub Position", "success");
+    // swal("Saved", "Save Sub Position", "success");
+    addSubPos();
   });
 
   $("#saveAsDraft").click(function () {
-    const positionId = urlParams.get("positionId");
-    const getDraftById = lsListDraft.find((item) => item.draftId == organizationAttribute.orgUnitId);
+    const positionId = urlParams.get("unitCode");
     const positionName = $("#inputPositionName").val();
-    let type = "Save";
-    if (positionId) type = "Edit";
+    const draftName = organizationAttribute.orgUnitName;
+    let type = "create";
+    if (positionId) type = "edit";
     const action = [
       {
         button: "Cancel",
@@ -224,10 +339,10 @@ $(document).ready(function () {
     modalConfrimHelper(
       "confirm",
       `${type} Position`,
-      `Are you sure you want to ${type} the position <b>${positionName}</b> to the draft <b>${getDraftById.draftName}</b>?`,
+      `Are you sure you want to ${type} the position <b>${positionName}</b> to the draft <b>${draftName}</b>?`,
       "",
       action,
-      "",
+      "50%",
       ""
     );
   });

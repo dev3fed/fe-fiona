@@ -8,7 +8,6 @@
         background-color: #F5F5F5;
     }
 </style>
-
 <style id="myStyle">
     [data-l-id] path {
         stroke: #000000;
@@ -33,8 +32,10 @@
 
     @* class edit *@
     [data-n-id].edit rect {
-        fill: #fff3cd;
-        stroke: #ffc107;
+        @* fill: #fff3cd;
+        stroke: #ffc107; *@
+        fill: #e6f6fe;
+        stroke: #03a9f4;
     }
     [data-n-id].create rect {
         fill: #e6f6fe;
@@ -58,8 +59,9 @@
     }
 </style>
 <script src="../assets/js/balkan/orgchart.js"></script>
-<script src="../assets/js/organization-structure/data_cnt.js"></script>
-<link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
+<script src="../assets/js/job-description/data_detail_position.js"></script>
+<script src="../assets/js/job-description/data_cnt.js"></script>
+<link rel="stylesheet" type="text/css" href="~/assets/css/job-description.css">
 @* style link *@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
@@ -79,7 +81,8 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item ">Organization Structure</li>
-                        <li class="breadcrumb-item active"></li>
+                        <li class="breadcrumb-item"></li>
+                        <li class="breadcrumb active">Draft Detail</li>
                     </ol>
                 </div>
             </div>
@@ -95,240 +98,77 @@
                         Info
                     </div>
                     <div class="row" style="margin-top: 20px;">
-                        <div class="col-3 text-center" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                            <label id="" class="" style="font-size: 14px;">Draft Name</label>
-                            <br>
-                            <span id="draftName" class="f-w-600" style="font-size: 16px;"></span>
-                            <br>
-                            <label id="requestId" class="f-w-200" style="font-size: 14px;">Req/200924/001</label>
+                        <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="text-black-50" style="font-size: 14px;">Draft Name</label>
+                            <div>
+                                <span id="draftName" class="f-w-600" style="font-size: 16px;"></span>
+                                <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" class="p-l-5" style="margin-top: -1px;" id="editDraftName">
+                            </div>
+                            <label id="requestId" class="f-w-200" style="font-size: 14px;"></label>
                         </div>
-                        <div class="col-3 text-center" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                            <label id="" class="" style="font-size: 14px;">Created by</label>
-                            <br>
+                        <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <label id="" class="text-black-50" style="font-size: 14px;">Created by</label>
                             <span id="createdBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <label id="createdDate" class="f-w-200" style="font-size: 14px;"></label>
                         </div>
-                        <div class="col-3 text-center" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                            <label id="" class="" style="font-size: 14px;">Created Date</label>
-                            <br>
-                            <span id="createdDate" class="f-w-600" style="font-size: 16px;"></span>
-                        </div>
-                        <div class="col-3 text-center" style="padding: 10px">
-                            <label id="" class="" style="font-size: 14px;">Type</label>
-                            <br>
-                            <span id="draftType" class="f-w-600" style="font-size: 16px;"></span>
+                        <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <label id="" class="text-black-50" style="font-size: 14px;">Updated by</label>
+                            <span id="updatedBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <label id="updatedDate" class="f-w-200" style="font-size: 14px;"></label>
                         </div>
                     </div>
                 </div>
-                <!-- Card detail end-->
-
-                <!-- Card detail start-->
                 <div class="custom-card-draft">
                     <div class="header-card-draft">
                         Detail
                     </div>
-                    
                     <div class="row mt-4">
-                        <div class="col-sm-3 col-xs-12">
-                            <div class="nav flex-column nav-pills nav-primary gap-2" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                                <a class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">1. Attribute</a>
-                                <a class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">2. SG & SSG</a>
-                                <a class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">3. Subordinate</a>
-                                <a class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">4. Preview</a>
-                            </div>
+                        <div class="col-md-6" id="activityType d-flex flex-column" style="padding: 10px;">
+                            <label class="f-12" for="">Activity Type : </label>
+                            <button id="all" class="tab-custom active">All</button>
+                            <button id="create" class="tab-custom">Created Job Desc</button>
+                            <button id="edit" class="tab-custom">Edit Job Desc</button>
                         </div>
-                        <div class="col-sm-9 col-xs-12">
-                            <div class="tab-content" id="v-pills-tabContent">
-                                <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                                    <div class="row" style="margin-top: 20px;border:1px solid #bfbfc2;padding:10px;margin:5px">
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <span id="" class="" style="font-size: 13px;">Position Name</span>
-                                            <br>
-                                            <span id="positionName" class="f-w-600" style="font-size: 16px;"></span>
-                                            <br>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label for="" class="" style="font-size: 13px;">Abbrv Position</label>
-                                            <br>
-                                            <span id="abbrvPosition" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label for="" class="" style="font-size: 13px;">Org Unit Name</label>
-                                            <br>
-                                            <span id="orgUnitName" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px">
-                                            <label for="" class="" style="font-size: 13px;">Org PRIL</label>
-                                            <br>
-                                            <span id="orgPrl" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <hr class="m-t-20 m-r-5">
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <span id="" class="" style="font-size: 13px;">Formation</span>
-                                            <br>
-                                            <span id="formation" class="f-w-600" style="font-size: 16px;"></span>
-                                            <br>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Career Type</label>
-                                            <br>
-                                            <span id="careerType" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Career Level</label>
-                                            <br>
-                                            <span id="careerLevel" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px">
-                                            <label id="" class="" style="font-size: 13px;">Basket</label>
-                                            <br>
-                                            <span id="basket" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <hr class="m-t-20 m-r-5">
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <span id="" class="" style="font-size: 13px;">Direct Report</span>
-                                            <br>
-                                            <span id="directReport" class="f-w-600" style="font-size: 16px;"></span>
-                                            <br>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Fungi Leher</label>
-                                            <br>
-                                            <span id="neckFunction" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Project/Non Project</label>
-                                            <br>
-                                            <span id="isProject" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;">
-                                            <span id="" class="" style="font-size: 13px;">Coordination</span>
-                                            <br>
-                                            <span id="coordination" class="f-w-600" style="font-size: 16px;"></span>
-                                            <br>
-                                        </div>
-                                        <hr class="m-t-20 m-r-5">
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Coordination With</label>
-                                            <br>
-                                            <span id="coordinationWith" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Directorate</label>
-                                            <br>
-                                            <span id="directorate" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Division</label>
-                                            <br>
-                                            <span id="division" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px">
-                                            <span id="" class="" style="font-size: 13px;">Sub Division</span>
-                                            <br>
-                                            <span id="subDivision" class="f-w-600" style="font-size: 16px;"></span>
-                                            <br>
-                                        </div>
-                                        <hr class="m-t-20 m-r-5">
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Department</label>
-                                            <br>
-                                            <span id="department" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Section</label>
-                                            <br>
-                                            <span id="section" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                            <label id="" class="" style="font-size: 13px;">Personnel Area Name</label>
-                                            <br>
-                                            <span id="personnelAreaName" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                        <div class="col-3" style="padding: 10px">
-                                            <label id="" class="" style="font-size: 13px;">Section</label>
-                                            <br>
-                                            <span id="section" class="f-w-600" style="font-size: 16px;"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                                    <div class="table-responsive">
-                                        <table class="tableMasterData table table-hover w-100" id="subPositionList">
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
-                                    
-                                    <div style="padding-top: 10px;display:flex;border:1px solid #EAEAEB;" >
-                                        <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
-                                            <div style="margin: 10px;">
-                                                <span style="font-size: 12px;">Main Skill Group</span>
-                                                <br>
-                                                <span class="f-w-600" style="font-size: 16px;" id="mainSkillGroup">SDM & Penunjang Bisnis</span>
-                                                <br>
-                                            </div>
-                                            <div style="margin: 10px;">
-                                                <span style="font-size: 12px;">Main Sub Skill Group</span>
-                                                <br>
-                                                <span class="f-w-600" style="font-size: 16px;" id="mainSubSkillGroup">Business Planning</span>
-                                                <br>
-                                            </div>
-                                        </div>
-                                        <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
-                                            <div style="margin: 10px;">
-                                                <span style="font-size: 12px;">Second Skill Group</span>
-                                                <br>
-                                                <span class="f-w-600" style="font-size: 16px;" id="secondSkillGroup">SDM & Penunjang Bisnis</span>
-                                                <br>
-                                            </div>
-                                            <div style="margin: 10px;">
-                                                <span style="font-size: 12px;">Second Sub Skill Group</span>
-                                                <br>
-                                                <span class="f-w-600" style="font-size: 16px;" id="secondSubSkillGroup">Business Planning</span>
-                                                <br>
-                                            </div>
-                                        </div>
-                                        <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
-                                            <div style="margin: 10px;">
-                                                <span style="font-size: 12px;">Third Skill Group</span>
-                                                <br>
-                                                <span class="f-w-600" style="font-size: 16px;" id="thirdSkillGroup">SDM & Penunjang Bisnis</span>
-                                                <br>
-                                            </div>
-                                            <div style="margin: 10px;">
-                                                <span style="font-size: 12px;" >Third Sub Skill Group</span>
-                                                <br>
-                                                <span class="f-w-600" style="font-size: 16px;" id="thirdSubSkillGroup">Business Planning</span>
-                                                <br>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
-                                    <div id="os-preview-container" style="width: 100%; height: 100%"></div>
-                                </div>
+                        <div class="col-md-2 offset-4 align-self-center" id="statusApproval">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        @* button left import *@
+                        <div class="col-md-12 text-end" id="importButton">
+                            <input type="file" id="fileImportDraft" style="display: none;" />
+                            <button class="btn btn-primary" type="button" id="importDataDraft">
+                                Import 
+                                <img src="~/assets/images/rasci/download.svg" alt="Download Icon" class="p-l-5" style="margin-top: -1px;" id="">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="tableMasterData table table-hover w-100" id="draftListDetail">
+                                </table>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                
-                <!-- Card detail end-->
 
                 <!-- card footer start-->
                 <div class="text-end mt-4 mb-2">
-                    <button class="btn btn-outline-light" type="button" onclick="handleBack()">
-                        <i class="icon-arrow-left"></i> Back
+                    <button class="btn btn-outline-light" type="button" onclick="backToOrg()">
+                        Back
                     </button>
-                    <button class="btn btn-outline-light" type="button" onclick="handleDelete()">
+                    <button class="btn btn-outline-danger" id="deleteDraft" type="button" onclick="deleteDraft()">
                         <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
                     </button>
-                    <button class=" btn btn-outline-light" type="button" onclick="handleEdit()">
-                        <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit Draft
+                    <button class="btn btn-primary" type="button" id="submitApproval" onclick="submitToApproval()"> Submit To Approval
                     </button>
-                    <button class="btn btn-outline-light" type="button" onclick="downloadDraft()"> Downlaod Draft<i
-                            class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> 
+                    @* <button class="btn btn-primary" type="button" id="exportFile" onclick="exportFileApproval()"> Export Data
+                    </button> *@
+                    @* <button class="btn btn-success" type="button" id="finalize" onclick="finalizeApproval()"> Finalize
+                    </button> *@
+                    <button class="btn btn-success" type="button" id="acceptApproval" onclick="acceptApproval()"> Approve
+                    </button>
+                    <button class="btn btn-danger" type="button" id="rejectApproval" onclick="rejectApproval()"> Reject
                     </button>
                 </div>
                 <!-- card footer end-->
@@ -338,6 +178,12 @@
     </div>
     <!-- Container-fluid Ends-->
     <partial name="~/Views/Organization/ModalAddSubPosition.cshtml" />
+    <partial name="~/Views/Organization/ModalDetailJobDraft.cshtml" />
+    <partial name="~/Views/Organization/ModalPreviewOrgChart.cshtml" />
+    <partial name="~/Views/Organization/ModalPreviewDesignCost.cshtml" />
+    <partial name="~/Views/Organization/ModalCreateDraftSO.cshtml" />
+    <partial name="~/Views/Organization/ModalConfirm.cshtml" />
+    <partial name="~/Views/Organization/ModalUploadFinalized.cshtml" />
 </div>
 @section Script {
     <!-- Plugins JS start-->
@@ -350,6 +196,9 @@
     <script src="../assets/js/select2/select2.full.min.js"></script>
     <script src="../assets/js/select2/select2-custom.js"></script>
     <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <script src="../assets/js/dropzone/dropzone.js"></script>
+    @* <script src="../assets/js/dropzone/dropzone-script.js"></script> *@
+    <script src="../assets/js/tooltip-init.js"></script>
 
 
     @* datatable *@
@@ -357,13 +206,13 @@
     <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
 
     @* custom js *@
-    <script src="../assets/js/organization-structure/multiple-select.js"></script>
-    <script src="../assets/js/organization-structure/helper.js"></script>
-    <script src="../assets/js/organization-structure/constant.js"></script>
-    <script src="../assets/js/organization-structure/endpoint.js"></script>
-    <script src="../assets/js/organization-structure/table-custom.js"></script>
-    <script src="../assets/js/organization-structure/os-preview.js"></script>
-    <script src="../assets/js/organization-structure/draft-detail.js"></script>
+    <script src="../assets/js/job-description/multiple-select.js"></script>
+    <script src="../assets/js/job-description/constant.js"></script>
+    <script src="../assets/js/job-description/endpoint.js"></script>
+    <script src="../assets/js/job-description/table-custom.js"></script>
+    <script src="../assets/js/job-description/helper.js"></script>
+    @* <script src="../assets/js/job-description/balkan.js"></script> *@
+    <script src="../assets/js/job-description/draft-detail.js"></script>
     <script src="../assets/js/script.js"></script>
 }
 

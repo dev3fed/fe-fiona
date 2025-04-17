@@ -5948,45 +5948,84 @@ const dataListJobDescription = [
     id: 1,
     jobName: "Manager Internal Communication",
     jobStatus: "not available",
+    division: "Corporate Secretary",
+    function: "Corporate Secretary",
   },
   {
     id: 2,
     jobName: "SBM Sumsel VI Gas",
     jobStatus: "not available",
+    division: "Regional Sumbagsel",
+    function: "Retail Sales Sumbagsel",
   },
   {
     id: 3,
     jobName: "Manager Stakeholder Relation & Management",
     jobStatus: "available",
+    division: "Corporate Secretary Subholding Commercial & Trading",
+    function: "Corporate Secretary",
   },
   {
     id: 4,
     jobName: "Manager Corporate Communication",
     jobStatus: "available",
+    division: "Corporate Secretary Subholding Commercial & Trading",
+    function: "Corporate Secretary",
   },
   {
     id: 5,
     jobName: "Manager CSR & SMEPP Management",
     jobStatus: "waiting approval",
+    division: "Corporate Secretary Subholding Commercial & Trading",
+    function: "Corporate Secretary",
   },
   {
     id: 6,
     jobName: "SBM Sumsel V Gas",
     jobStatus: "waiting approval",
+    division: "Regional Sumbagsel",
+    function: "Retail Sales Sumbagsel",
   },
   {
     id: 9,
     jobName: "Manager Corporate Governance & Board Support",
     jobStatus: "available",
+    division: "Corporate Secretary Subholding Commercial & Trading",
+    function: "Corporate Secretary",
   },
   {
     id: 13,
     jobName: "SBM Jambi III Gas",
     jobStatus: "available",
+    division: "Regional Sumbagsel",
+    function: "Retail Sales Sumbagsel",
   },
   {
     id: 14,
     jobName: "SBM Jambi IV Gas",
     jobStatus: "available",
+    division: "Regional Sumbagsel",
+    function: "Retail Sales Sumbagsel",
   },
 ];
+
+const actionBack = {
+  button: "Back",
+  className: "btn-outline-primary",
+  callback: function () {
+    hideModal(`modalConfirm`);
+  },
+};
+
+const statusApproval = {
+  1: "Submmited",
+  2: "Approved",
+  3: "Rejected",
+  4: "Finalized",
+};
+const statusApprovalClass = {
+  1: "label-info-custom",
+  2: "label-success-custom",
+  3: "label-info-custom",
+  4: "label-primary-custom",
+};

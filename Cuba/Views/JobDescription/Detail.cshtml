@@ -36,6 +36,12 @@
     </div>
     <!-- Container-fluid starts-->
     <div class="container-fluid">
+        <button class="btn btn-primary btn-md" id="modalCon" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">modal Confirm</button>
+        <button class="btn btn-primary btn-md" id="otherRec" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">other recommend</button>
+        <button class="btn btn-primary btn-md" id="applyRef" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">apply Reference</button>
+        <button class="btn btn-primary btn-md" id="popUpBispro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popup kesesuain bispro</button>h
+        <button class="btn btn-primary btn-md" id="popUpMergeBisPro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popUpMergeBisPro</button>h
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
@@ -298,7 +304,6 @@
                                     </div>
                                 </div>
                             </div>
-                                
                         </div>
                     </div>
                     @* button save as draft *@
@@ -316,6 +321,9 @@
     </div>
     <!-- Container-fluid Ends-->
     @* <partial name="~/Views/Organization/ModalAddSubPosition.cshtml" /> *@
+    <partial name="~/Views/JobDescription/ModalConfirm.cshtml" />
+    <partial name="~/Views/JobDescription/ModalRecomendation.cshtml" />
+    <partial name="~/Views/JobDescription/ModalBusinessProcess.cshtml" />
     <partial name="~/Views/JobDescription/ModalJobCompare.cshtml" />
     <partial name="~/Views/JobDescription/ModalJobCompareDetail.cshtml" />
 </div>

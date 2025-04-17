@@ -18,6 +18,13 @@ namespace Cuba.Controllers
             return View();
         }
 
+        [HttpGet("draft-detail")]
+        [HttpGet("approval-detail")]
+        public IActionResult DraftDetail()
+        {
+            return View();
+        }
+
         // [HttpGet("draft-detail")] 
         // public IActionResult DraftDetail()
         // {
