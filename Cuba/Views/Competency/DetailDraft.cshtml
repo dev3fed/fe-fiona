@@ -60,6 +60,58 @@
     .btn-outline-light:hover img {
         filter: brightness(0) invert(1);
     }
+
+    .btn-small-icon {
+        padding: 2px 5px;
+        font-size: 12px;
+    }
+
+    .btn-small-icon img {
+        font-size: 10px;
+    }
+
+    .btn-rounded {
+        border-radius: 26px;
+        margin: 5px;
+    }
+
+    .icon-svg {
+        stroke: #000;
+        /* Warna default stroke */
+        transition: stroke 0.3s ease;
+        /* Transisi untuk efek halus */
+    }
+
+    .btn:hover .icon-svg {
+        stroke: #fffff;
+        /* Warna stroke tetap saat tombol di-hover */
+    }
+
+    .long-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        white-space: normal;
+        flex: 1;
+    }
+
+    .empty-activity-body {
+        background-color: #EAEAEB;
+        height: 300px;
+        background-image: url("/assets/images/competency/empty_draftkkj.svg");
+        background-position: center 60px;
+        background-repeat: no-repeat;
+        background-size: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 200px;
+        margin-top: 25px;
+        border-radius: 7px;
+    }
 </style>
 
 <div class="card" style="border-radius:8px">
@@ -80,6 +132,9 @@
             <div class="header-card-draft">
                 Detail
             </div>
+            <div id="empty-activity">
+
+            </div>
             <div class="row" style="padding-top: 20px;" id="detail-competency">
             </div>
         </div>
@@ -90,7 +145,7 @@
             <button class="btn btn-outline-light" type="button" onclick="handleBack()">
                 <i class="icon-arrow-left"></i> Back
             </button>
-            <button class="btn btn-outline-light" type="button" onclick="deleteDetailDraft()">
+            <button class="btn btn-outline-danger" type="button" onclick="deleteDetailDraft()">
                 <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
             </button>
             <button class=" btn btn-outline-light" type="button" onclick="triggleEditCompetency()">

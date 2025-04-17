@@ -212,14 +212,16 @@
                                             <partial name="ModalAddMapping" />
                                             <!-- End Modal Add Mapping  -->
 
+                                            <!-- Start Modal Create Draft  -->
+                                            <partial name="ModalCreateDraft" />
+                                            <!-- End Modal Create Draft  -->
 
                                         </div>
                                         <div class="col-12 d-flex align-items-center mb-2">
                                             <span class="me-3" style="min-width: 130px;">RASCI Data Source</span>
                                         </div>
                                         <div class="col-4">
-                                            <select class="form-select digits" id="dataSource-rasci"
-                                                onchange="changeDataSource(this.value)">
+                                            <select class="form-select digits" id="dataSource-rasci">
                                                 <option value="master">Master data RASCI</option>
                                             </select>
                                         </div>
@@ -302,14 +304,20 @@
                                                         <img src="~/assets/images/rasci/icon_export.svg"
                                                             alt="Filter Icon" style="margin-top: -5px;"> Export
                                                     </a>
-                                                    <a class="dropdown-item" onclick="onModalChoose('addNewBp')">
+                                                    <a class="dropdown-item" onclick="onModalAddBp()" id="btnAddBp">
                                                         <img src="~/assets/images/rasci/plus-black.svg"
                                                             alt="Filter Icon" style="margin-top: -1px;">Add New Business
                                                         Process
                                                     </a>
-                                                    <a class="dropdown-item" onclick="onModalChoose('addNotation')">
+                                                    <a class="dropdown-item" onclick="onModalAddNotation()"
+                                                        id="btnAddNotation">
                                                         <img src="~/assets/images/rasci/plus-black.svg"
                                                             alt="Filter Icon" style="margin-top: -1px;">Add RASCI
+                                                    </a>
+                                                    <a class="dropdown-item" onclick="openModalCreatedraft()"
+                                                        id="btnFormdraft">
+                                                        <img src="~/assets/images/rasci/plus-black.svg"
+                                                            alt="Filter Icon" style="margin-top: -1px;">Create Draft
                                                     </a>
                                                 </div>
                                             </div>
@@ -336,6 +344,10 @@
                                                 </tbody>
                                             </table>
                                             <!-- end :: List RASCI Matrix Table -->
+                                        </div>
+                                        <div id="loader">
+                                            <div class="spinner"></div>
+                                            <p class="loading-text">Loading Data...</p>
                                         </div>
                                     </div>
                                 </div>

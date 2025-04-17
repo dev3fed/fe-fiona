@@ -212,14 +212,17 @@ async function onModalAddBp() {
     modal.show();
     const rasciNotation = getState("rasciNotation") || [];
     const dataProsbis = getState("insertProsbis");
-    const resultLevel = await fetchSelectLevel(dataProsbis.draftId);
-    const listLevel = resultLevel?.data.res;
+    const draftidRasci = $("#dataSource-rasci").val();
+    const draftName = $("#dataSource-rasci option:selected").text();
+    const resultLevel = await fetchSelectLevel(draftidRasci);
+    console.log("resultLevel", resultLevel);
+    const listLevel = resultLevel?.data.result;
     const formContent = `
     <div class="col-12">
       <div>
         <label class="form-label">RASCI Matrix Draft Name</label>
         <select class="form-select digits" disabled>
-          <option value="${dataProsbis.draftId}">${dataProsbis.draftName}</option>
+          <option value="${draftidRasci}">${draftName}</option>
         </select>
       </div>
       <hr style="margin-top:25px;margin-bottom:20px"/>
@@ -227,7 +230,7 @@ async function onModalAddBp() {
     <div class="col-2">
       <div class="mb-3">
         <label class="form-label">Level</label>
-        <select class="form-select digits" onchange="onSelect(event)">
+        <select class="form-select digits" onchange="onSelect(event)" id="idprosbisLevel">
           <option>Choose</option>
           ${listLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
@@ -390,7 +393,8 @@ function updateSelect2DraftList() {
 }
 
 function updateSelect2ByProsbis() {
-  const dataProsbis = getState("insertProsbis");
+  const draftidRasci = $("#dataSource-rasci").val();
+  const idprosbisLevel = $("#idprosbisLevel").val();
   $("#parentId")
     .select2({
       dropdownParent: $("#modalAddBp"),
@@ -405,14 +409,14 @@ function updateSelect2ByProsbis() {
             search: params.term || "",
             page: params.page || 1,
             type: "business-process",
-            level: appState.selectedLevel - 1,
-            draftId: dataProsbis.draftId,
+            level: idprosbisLevel - 1,
+            draftId: draftidRasci,
           };
         },
         processResults: function (data) {
-          if (data.data && data.data.res) {
+          if (data.data && data.data.result) {
             return {
-              results: data.data.res,
+              results: data.data.result,
               pagination: {
                 more: data.data.pagination.more,
               },
@@ -432,7 +436,10 @@ function updateSelect2ByProsbis() {
 }
 
 function updateSelect2ByJob() {
-  const dataProsbis = getState("insertProsbis");
+  const draftidRasci = $("#dataSource-rasci").val();
+  let $select = $("#dataSource-rasci");
+  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
+  let selectedDraftSo = selectedOption.attr("data-draftso");
   $("#jobId")
     .select2({
       dropdownParent: $("#modalAddBp"),
@@ -446,14 +453,14 @@ function updateSelect2ByJob() {
           return {
             search: params.term || "",
             page: params.page || 1,
-            type: "job",
-            draftId: dataProsbis.draftId,
+            type: "position",
+            draftId: selectedDraftSo,
           };
         },
         processResults: function (data) {
           if (data && data.data) {
             return {
-              results: data.data.res,
+              results: data.data.result,
               pagination: {
                 more: data.data.pagination.more,
               },
@@ -539,6 +546,10 @@ const triggleSelectJob = () => {
   const jobName = selectedJobId.find(":selected").text();
   const dataProsbis = getState("insertProsbis") || {};
   const rasciNotation = getState("rasciNotation") || [];
+  const [orgUnitCode, orgPrl] = selectedValue.split(";");
+  console.log("orgUnitCode", orgUnitCode);
+  console.log("orgPrl", orgPrl);
+
   const payload = {
     ...dataProsbis,
     parentId: selectedParentValue,
@@ -546,7 +557,8 @@ const triggleSelectJob = () => {
       ...dataProsbis.jobMapped,
       {
         jobName,
-        jobId: selectedValue,
+        orgUnitCode: orgUnitCode,
+        orgPrl: orgPrl,
         rasciNotation: rasciNotation,
       },
     ],
@@ -570,13 +582,15 @@ async function saveAsDraft() {
   try {
     const dataProsbis = getState("insertProsbis");
     const spinner = document.getElementById("saveDraftBtn");
+    const draftId = $("#dataSource-rasci").val();
     spinner.style.display = "inline-block";
     const inputValue = {
       ...dataProsbis,
+      draftId: draftId,
+      draftJobSource: null,
       draftType: "Add New Business Process",
     };
     const result = await submitDraftProsbis(inputValue);
-
     if (result.status === 200) {
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);

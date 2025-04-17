@@ -2,6 +2,8 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link rel="stylesheet" type="text/css" href="~/assets/css/competency.css">
+<link href="~/assets/css/clusterize.css" rel="stylesheet">
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -28,13 +30,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
+
                 <div class="card" style="border-radius:8px">
                     <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                        <partial name="~/Views/Sklist/ModalFormSk.cshtml" />
+                        <partial name="~/Views/Sklist/SklistPage.cshtml" />
+
                     </div>
                 </div>
             </div>
@@ -51,4 +52,6 @@
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/sk-list/index.js"></script>
+
 }

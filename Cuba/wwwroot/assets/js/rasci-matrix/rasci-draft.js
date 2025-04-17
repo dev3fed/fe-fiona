@@ -56,16 +56,21 @@ function fetchSelectEmptyDraftso() {
       page = 1;
     });
 }
+function openModalCreatedraft() {
+  const modal = new bootstrap.Modal(document.getElementById("modalcreateDraft"));
+  modal.show();
+  fetchSelect2Draftso("#modalcreateDraft", "#selectso-mainpage");
+}
 
 function openFormDraft() {
   const modal = new bootstrap.Modal(document.getElementById("modalformDraft"));
   modal.show();
-  fetchSelect2Draftso();
+  fetchSelect2Draftso("#modalformDraft", "#select-draftso");
 }
-function fetchSelect2Draftso() {
-  $("#select-draftso")
+function fetchSelect2Draftso(elementId, selectId) {
+  $(selectId)
     .select2({
-      dropdownParent: $("#modalformDraft"),
+      dropdownParent: $(elementId),
       placeholder: "Choose",
       allowClear: true,
       delay: 250,
@@ -423,6 +428,78 @@ async function confirmDeleteProsbisDraft() {
   } catch (error) {}
 }
 
+async function handleSaveCreateDraft() {
+  const draftNameInput = document.getElementById("draftname-mainpage").value;
+  const selectedValue = $("#selectso-mainpage").val();
+  const spinner = document.getElementById("loadingDraftmain");
+  spinner.style.display = "inline-block";
+  const payload = {
+    draftName: draftNameInput,
+    draftSOId: selectedValue,
+  };
+  try {
+    const modaldraft = document.getElementById("modalcreateDraft");
+    const modal = bootstrap.Modal.getInstance(modaldraft);
+    const result = await createDraftRasci(payload);
+    if (result.success === true) {
+      if (modal) {
+        modal.hide();
+      }
+      let draftId = result?.data?.draftRasci?.draftId;
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result?.data?.draftRasci.draftName} draft has been saved</div>`,
+            },
+          },
+        }).then(async () => {
+          $("#draftname-mainpage").val("");
+          $("#selectso-mainpage").val("");
+          spinner.style.display = "none";
+          const payload = {
+            Page: 1,
+            PageSize: 5,
+          };
+          const queryString = new URLSearchParams(payload).toString();
+          const dataDraft = await fetchDraftProsbis(queryString);
+          fetchDatasource(draftId);
+          if (dataDraft.data && Array.isArray(dataDraft.data)) {
+            const IsNotEmpty = dataDraft.data.length;
+            handleClickCard(IsNotEmpty);
+            loadTableBodyDraft(dataDraft);
+            feather.replace();
+          }
+        });
+      }, 100);
+    } else {
+      modal.hide();
+      $("#draftname-mainpage").val("");
+      $("#selectso-mainpage").val("");
+      spinner.style.display = "none";
+      setTimeout(() => {
+        swal({
+          title: "FAILED",
+          icon: "error",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result.error}, please change to another draft name</div>`,
+            },
+          },
+        });
+      }, 200);
+    }
+  } catch (error) {}
+}
+
 async function handleSaveDraft() {
   const draftNameInput = document.getElementById("input-draftname").value;
   const selectedValue = $("#select-draftso").val();
@@ -434,10 +511,10 @@ async function handleSaveDraft() {
     draftSOId: selectedValue,
   };
   try {
+    const modaldraft = document.getElementById("modalformDraft");
+    const modal = bootstrap.Modal.getInstance(modaldraft);
     const result = await createDraftRasci(payload);
     if (result.success === true) {
-      const modaldraft = document.getElementById("modalformDraft");
-      const modal = bootstrap.Modal.getInstance(modaldraft);
       if (modal) {
         modal.hide();
       }
@@ -454,6 +531,8 @@ async function handleSaveDraft() {
             },
           },
         }).then(async () => {
+          $("#input-draftname").val("");
+          $("#select-draftso").val("");
           spinner.style.display = "none";
           const payload = {
             Page: 1,
@@ -461,6 +540,7 @@ async function handleSaveDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
+          fetchDatasource();
           if (dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
@@ -469,6 +549,25 @@ async function handleSaveDraft() {
           }
         });
       }, 100);
+    } else {
+      modal.hide();
+      $("#input-draftname").val("");
+      $("#select-draftso").val("");
+      spinner.style.display = "none";
+      setTimeout(() => {
+        swal({
+          title: "FAILED",
+          icon: "error",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result.error}, please change to another draft name</div>`,
+            },
+          },
+        });
+      }, 200);
     }
   } catch (error) {}
 }
@@ -483,14 +582,13 @@ async function handleSaveEmptyDraft() {
     draftSOId: selectedValue,
   };
   try {
+    const modaldraft = document.getElementById("modalformEmptydraft");
+    const modal = bootstrap.Modal.getInstance(modaldraft);
     const result = await createDraftRasci(payload);
     if (result.success === true) {
-      const modaldraft = document.getElementById("modalformEmptydraft");
-      const modal = bootstrap.Modal.getInstance(modaldraft);
       if (modal) {
         modal.hide();
       }
-
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -504,6 +602,8 @@ async function handleSaveEmptyDraft() {
             },
           },
         }).then(async () => {
+          $("#input-emptydraftname").val("");
+          $("#select-emptydraftso").val("");
           spinner.style.display = "none";
           const payload = {
             Page: 1,
@@ -511,6 +611,7 @@ async function handleSaveEmptyDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
+          fetchDatasource();
           if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
@@ -519,6 +620,25 @@ async function handleSaveEmptyDraft() {
           }
         });
       }, 100);
+    } else {
+      modal.hide();
+      $("#input-emptydraftname").val("");
+      $("#select-emptydraftso").val("");
+      spinner.style.display = "none";
+      setTimeout(() => {
+        swal({
+          title: "FAILED",
+          icon: "error",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result.error}, please change to another draft name</div>`,
+            },
+          },
+        });
+      }, 200);
     }
   } catch (error) {}
 }

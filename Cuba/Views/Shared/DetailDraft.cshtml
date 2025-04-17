@@ -97,6 +97,23 @@
         white-space: normal;
         flex: 1;
     }
+
+    .empty-activity-body {
+        background-color: #EAEAEB;
+        height: 300px;
+        background-image: url("/assets/images/rasci/empty_draftrasci.svg");
+        background-position: center 60px;
+        background-repeat: no-repeat;
+        background-size: 230px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 200px;
+        margin-top: 25px;
+        border-radius: 7px;
+        margin-right: 10px;
+    }
 </style>
 
 <div class="card" style="border-radius:8px">
@@ -132,10 +149,13 @@
             <div class="header-card-draft">
                 Detail
             </div>
+            <div id="empty-activity">
+
+            </div>
             <div class="row" style="padding-top: 20px;" id="detail-prosbis">
             </div>
-            <div style="padding-top: 20px;" id="detail-job">
-            </div>
+            @* <div style="padding-top: 20px;" id="detail-job">
+            </div> *@
         </div>
         <!-- Card detail end-->
 

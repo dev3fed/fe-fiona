@@ -1,11 +1,19 @@
 const detailsProsbis = async () => {
+  console.log("cek");
   try {
     const modal = new bootstrap.Modal(document.getElementById("modalBusinessPro"));
     modal.show();
     const dataDetailProsbis = getState("dataDetailProsbis");
-    const result = await fetchRelatedJob(dataDetailProsbis.indexGroup);
-    const dataJob = result.data.relatedJob;
-    const dataHierarchy = result.data.hierarcy;
+    console.log("dataDetailProsbis", dataDetailProsbis);
+    const payload = {
+      draftRasciId: dataDetailProsbis.draftRasci,
+      draftSOId: dataDetailProsbis.draftSo,
+    };
+    const queryString = new URLSearchParams(payload).toString();
+    const result = await fetchRelatedJob(dataDetailProsbis.indexGroup, queryString);
+    console.log("result", result);
+    const dataJob = result.data.relatedPosition;
+    const dataHierarchy = result.data.businessProcess;
     const bodyTitle = `
     <div class="mb-2" id="prosbis-title">
                     <h6 class="mb-2" style="font-weight: bold;">${dataDetailProsbis.description}</h6>
@@ -26,9 +34,10 @@ const layoutTabProsbis = (data) => {
   let countC = 0;
   let countI = 0;
   let countComments = 0;
+  console.log("data", data);
   data.forEach((item) => {
     item.notation.forEach((note) => {
-      switch (note.rasciCode) {
+      switch (note.notation) {
         case "R":
           countR++;
           break;
@@ -64,7 +73,7 @@ const layoutTabProsbis = (data) => {
           No 
           </th>
           <th scope="col" style="width: 230px">Job Title</th>
-          <th scope="col" style="width: 80px">Directorate</th>
+          <th scope="col" style="width: 120px">Directorate</th>
           <th scope="col">Division</th>
           <th scope="col">Sub Division</th>
           <th scope="col">Department</th>
@@ -77,7 +86,7 @@ const layoutTabProsbis = (data) => {
         let rasciIcons = "";
         let comments = [];
         item.notation.forEach((value) => {
-          switch (value.rasciCode) {
+          switch (value.notation) {
             case "R":
               rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
               break;
@@ -96,7 +105,7 @@ const layoutTabProsbis = (data) => {
           }
 
           if (value.comment) {
-            comments.push(`<li>${value.rasciCode}: ${value.comment}</li>`);
+            comments.push(`<li>${value.notation}: ${value.comment}</li>`);
           }
         });
 
@@ -109,12 +118,12 @@ const layoutTabProsbis = (data) => {
           <th scope="row" style="text-align:center">
           ${index + 1}
           </th>
-          <td>${item.jobName || "-"}</td>
-          <td>${item.directorate || "-"}</td>
-          <td>${item.division || "-"}</td>
-          <td>${item.subDivision || "-"}</td>
-          <td>${item.departement || "-"}</td>
-          <td>${item.section || "-"}</td>
+          <td>${item.positionName || "-"}</td>
+          <td>${item.directorateName || "-"}</td>
+          <td>${item.divisionName || "-"}</td>
+          <td>${item.subDivisionName || "-"}</td>
+          <td>${item.departmentName || "-"}</td>
+          <td>${item.sectionName || "-"}</td>
           <td>
             <div class="rasci-container">
               <div class="rasci-icons">${rasciIcons}</div>

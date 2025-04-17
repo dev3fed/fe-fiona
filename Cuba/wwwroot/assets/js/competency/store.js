@@ -1,3 +1,5 @@
+const selectedValue = $("#dataSource-competency").val();
+
 const appState = new Proxy(
   {
     draftList: [
@@ -30,6 +32,21 @@ const appState = new Proxy(
     selectedType: "position",
     competencyList: [],
     competencyMapping: [],
+    currentPageY: 1,
+    currentPageX: 1,
+    payloadJob: {
+      dataSource: selectedValue,
+      page: 1,
+      pageSize: 15,
+    },
+    payloadCompetency: {
+      dataSource: selectedValue,
+      page: 1,
+      pageSize: 10,
+    },
+    detailProficiency: {},
+    storageDataCompetency: [],
+    storageDataMapping: [],
   },
   {
     set(target, property, value) {
@@ -78,7 +95,7 @@ async function fetchCompetencyList(payload) {
     const result = await ajaxRequest(url, "POST", payload);
     return {
       success: true,
-      data: result.data.data,
+      data: result.data,
     };
   } catch (error) {
     console.log("error", error);
@@ -140,8 +157,32 @@ async function fetchDeleteDraft(id) {
   }
 }
 
+async function fetchCreateDraft(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchDetailDraft(id) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency/detail-action/${id}`;
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency/${id}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -156,6 +197,123 @@ async function fetchDetailDraft(id) {
     };
   }
 }
+
+async function fetchRenameDraft(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/rename-draft-competency${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchMandatoryList(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/mandatory-competency-dictionary${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchTechnicalList(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/technical-competency-dictionary${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchBehaviorList(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/behavioural-competency-dictionary${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchProficiencyLevel(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/get-proficiency-level${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchSaveProficiencyLevel(payload) {
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/edit-proficiency-level`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 // END NEW API SERVICE COMPETENCY
 
 //OLD API SERVICE COMPETENCY
@@ -172,7 +330,7 @@ async function fetchDataCompetency(params) {
 }
 
 async function fetchCompetencyDetail(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/kkj-detail/${payload}`;
+  const url = `${API_URL_COMPE}/api/TechnicalCompetency/detail-dictionary/${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;

@@ -41,7 +41,19 @@ async function detailDraft() {
       const draftInfo = document.getElementById("draft-info");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
-    renderTableActivity(listData);
+    console.log("listData", listData.data);
+    if (listData.data.length > 0) {
+      renderTableActivity(listData);
+    } else {
+      const bodyEmpty = `
+      <div class="empty-activity-body">
+        <button class="btn btn-primary" type="button">
+          <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;"> Import</button>
+      </div>
+    `;
+      const emptyActivity = document.getElementById("empty-activity");
+      if (emptyActivity) emptyActivity.innerHTML = bodyEmpty;
+    }
   } catch (error) {}
 }
 
@@ -52,6 +64,9 @@ async function renderTableActivity(listData) {
            <span style="font-size:13px">Activity Type :</span>
            <button class="btn btn-outline-light btn-rounded" style="width:60px" type="button">
               All
+            </button>
+            <button class="btn btn-outline-light btn-rounded"  type="button">
+              Upload
             </button>
             <button class="btn btn-outline-light btn-rounded" type="button">
               Add New Business Process
@@ -71,6 +86,12 @@ async function renderTableActivity(listData) {
                 <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
                     data-feather="search"></i>
             </div>
+        </div>
+        <div class="col-8 text-end mt-3" style="padding-right:23px">
+          <button class="btn btn-primary" type="button">
+          <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;"> Import</button>
+            <button class="btn btn-primary" type="button">
+            <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;"> Export</button>
         </div>
         <div class="col-12 mt-3">
           <div class="table-responsive scrollable" style=" max-height: 350px;">
