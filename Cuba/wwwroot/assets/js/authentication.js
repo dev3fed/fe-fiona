@@ -53,25 +53,60 @@ function checkTokenValidity() {
   }
 }
 
-async function ajaxRequest(url, method, data = null) {
+// async function ajaxRequest(url, method, data = null) {
+//   try {
+//     const isFormData = data instanceof FormData;
+
+//     const response = await $.ajax({
+//       url,
+//       type: method,
+//       data: isFormData ? data : data ? JSON.stringify(data) : null,
+//       processData: !isFormData,
+//       contentType: isFormData ? false : "application/json",
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem("token")}`,
+//       },
+//     });
+
+//     return response;
+//   } catch (error) {
+//     if (error.status === 401) {
+//       console.warn("Token has expired. Redirecting to login.");
+//       handleLogout();
+//     } else {
+//       console.error("Error fetching data from API", error);
+//       $("#resultJabatan").html("Error fetching data from API");
+//       throw error;
+//     }
+//   }
+// }
+async function ajaxRequest(url, method, data = null, responseType = "json") {
   try {
+    const isFormData = data instanceof FormData;
+
     const response = await $.ajax({
       url,
       type: method,
-      contentType: "application/json",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      data: data ? JSON.stringify(data) : null,
+      data: isFormData ? data : data ? JSON.stringify(data) : null,
+      processData: !isFormData,
+      contentType: isFormData ? false : "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      xhrFields: {
+        responseType: responseType === "blob" ? "blob" : undefined,
+      },
     });
+
     return response;
   } catch (error) {
     if (error.status === 401) {
-      console.warn("Token has expired. Redirecting to login.");
+      console.warn("Token expired, redirecting...");
       handleLogout();
     } else {
-      console.error("Error fetching data from API", error);
-      $("#resultJabatan").html("Error fetching data from API");
-      throw error;
+      console.error("API error", error);
     }
+    throw error;
   }
 }
 

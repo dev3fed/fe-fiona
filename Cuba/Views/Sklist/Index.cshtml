@@ -2,7 +2,7 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link rel="stylesheet" type="text/css" href="~/assets/css/competency.css">
+<link rel="stylesheet" type="text/css" href="~/assets/css/rasci-matrix.css">
 <link href="~/assets/css/clusterize.css" rel="stylesheet">
 <div class="page-body">
     <div class="container-fluid">
@@ -34,6 +34,7 @@
                 <div class="card" style="border-radius:8px">
                     <div class="card-body">
                         <partial name="~/Views/Sklist/ModalFormSk.cshtml" />
+                        <partial name="~/Views/Sklist/ModalPreviewSk.cshtml" />
                         <partial name="~/Views/Sklist/SklistPage.cshtml" />
 
                     </div>
@@ -44,14 +45,24 @@
     <!-- Container-fluid Ends-->
 </div>
 @section Script {
+    <script>
+        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
+        const token = localStorage.getItem("token");
+    </script>
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/datepicker/date-picker/datepicker.js"></script>
+    <script src="../assets/js/datepicker/date-picker/datepicker.en.js"></script>
+    <script src="../assets/js/datepicker/date-picker/datepicker.custom.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/sk-list/store.js"></script>
     <script src="../assets/js/sk-list/index.js"></script>
 
 }

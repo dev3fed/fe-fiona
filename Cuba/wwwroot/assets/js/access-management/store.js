@@ -55,7 +55,6 @@ async function fetchRoleList() {
   }
 }
 
-("http://localhost:5095/api/");
 // async function fetchCompetencyList(payload) {
 //   const url = `${url_api}/api/TechnicalCompetency/list-competency/position-code`;
 //   try {

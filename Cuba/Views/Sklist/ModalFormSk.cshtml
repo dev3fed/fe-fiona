@@ -18,19 +18,19 @@
                 <div class="row">
                     <div class="col-12">
                         <label class="form-label">SK Number</label>
-                        <input class="form-control" type="text">
+                        <input class="form-control" type="text" id="sk-number">
                     </div>
                     <div class="col-12 mt-3">
                         <label class="form-label">SK Title</label>
-                        <textarea class="form-control" rows="3"></textarea>
+                        <textarea class="form-control" rows="3" id="sk-title"></textarea>
                     </div>
                     <div class="col-12 mt-3">
                         <label class="form-label">Note (Optional)</label>
-                        <textarea class="form-control" rows="3"></textarea>
+                        <textarea class="form-control" rows="3" id="sk-note"></textarea>
                     </div>
                     <div class="col-12 mt-3">
                         <label class="form-label">Upload SK File (only PDF maximum 20 mb)</label>
-                        <input class="form-control" type="file">
+                        <input class="form-control" type="file" id="sk-file" name="skFile">
                     </div>
                 </div>
             </div>
@@ -38,10 +38,10 @@
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
                             class="icon-arrow-left"></i> Back</button>
-                    <button id="applyFilterBtn" class="btn btn-primary" type="button">
+                    <button class="btn btn-primary" type="button" onclick="handleUploadSk()">
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                                id="loadingCreateuser" role="status"></div>
+                                id="loadingUploadsk" role="status"></div>
                             <span class="btn-text">Upload</span>
                         </div>
                     </button>
