@@ -70,6 +70,8 @@ async function checkPage() {
   if (lastPath === "draft-detail") {
     $("#statusApproval, #acceptApproval, #rejectApproval").hide();
     $("#deleteDraft, #submitApproval").show();
+  } else {
+    $("#statusApproval, #acceptApproval, #rejectApproval").show();
   }
 
   const hideButtons = status !== 5 && status !== 6;
@@ -110,21 +112,27 @@ async function backToOrg(params) {
 }
 
 async function confirmDeleteDraft(id) {
-  lsListDraft = lsListDraft.filter((x) => x.draftId != id);
-  lsListDetailDraft = lsListDetailDraft.filter((x) => x.draftId != id);
-  lsListPosition = lsListPosition.filter((x) => x.draftId != id);
-  lsListOrgNode = lsListOrgNode.filter((x) => x.draftId != id);
-  localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
-  localStorage.setItem("listDetailDraft", JSON.stringify(lsListDetailDraft));
-  localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-  localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  changeOrganization(0, "Master Data SO");
-  swal("Success", "Draft has been deleted", "success");
-  window.location.href = "/organization/index";
+  // alert("confirmDeleteDraft" + id);
+  // lsListDraft = lsListDraft.filter((x) => x.draftId != id);
+  // lsListDetailDraft = lsListDetailDraft.filter((x) => x.draftId != id);
+  // lsListPosition = lsListPosition.filter((x) => x.draftId != id);
+  // lsListOrgNode = lsListOrgNode.filter((x) => x.draftId != id);
+  // localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
+  // localStorage.setItem("listDetailDraft", JSON.stringify(lsListDetailDraft));
+  // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
+  // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
+  // changeOrganization(0, "Master Data SO");
+  let rollback = await rollback(id);
+  if (rollback) {
+    swal("Success", "Draft has been deleted", "success");
+    window.location.href = "/organization/index";
+  }
 }
 
 function deleteDraft() {
-  const getDraftById = lsListDraft.find((x) => x.draftId == organizationAttribute.orgUnitId);
+  // const getDraftById = lsListDraft.find((x) => x.draftId == organizationAttribute.orgUnitId);
+  const draftName = $("#draftName").text();
+
   const action = [
     {
       button: "Cancel",
@@ -142,11 +150,11 @@ function deleteDraft() {
   modalConfrimHelper(
     "delete",
     "Delete Draft",
-    `Are you sure want to delete <b>${getDraftById.draftName}</b> draft?`,
+    `Are you sure want to delete <b>${draftName}</b> draft?`,
     "All Position title in this draft will be deleted, including related RASCI notations, Competencies, and Position Descriptions",
     action,
     "",
-    getDraftById.draftId
+    urlParams.get("draftId")
   );
 }
 
@@ -182,19 +190,39 @@ async function confirmRejectApproval(id) {
   swal("Rejected", "draft has been rejected.", "success");
 }
 
-function previewDesignCost() {
+async function previewDesignCost() {
+  await changeDataSourceFilter($("#selectDraftFilterByDataSource").val());
   $("#modalPreviewDesignCost").modal("show");
 }
 
-function previewOrgChart() {
-  getDataList([
+$("#selectDraftFilterByDataSource").on("change", async function () {
+  await changeDataSourceFilter($(this).val());
+});
+
+async function previewOrgChart() {
+  getDataListAsync([
     {
-      dataId: "searchOrgNode",
-      data: lsListOrgNode.map((item) => ({ id: item.id_position, text: item.position })),
+      id: "searchOrgNode",
+      endpoint: "chart/job/list",
+      draftId: organizationAttribute.orgUnitId,
       dropdownParent: $("#modalPreviewOrgChart"),
     },
   ]);
-  helperOrgChart(true, "os-container", lsListOrgNode, true);
+  $("#modalPreviewOrgChart").modal("show");
+  const dataChart = await chartShow({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: "10132405",
+    depth: 3,
+  });
+
+  if (!dataChart.data) {
+    swal("Warning", "Data not found", "warning");
+    return;
+  }
+  dataChart.data.forEach((item) => {
+    item.id = item.id_org_unit;
+  });
+  helperOrgChart(true, "os-container", dataChart.data, true);
 
   $("#modalPreviewOrgChart").modal("show");
 }
@@ -238,64 +266,97 @@ async function clickUploadFunction() {
 }
 
 function editPositionDraft(id) {
-  window.location.href = "/organization/form-position?positionId=" + id;
+  window.location.href = "/organization/form-position?unitCode=" + id;
 }
 
-function detailPositionDraft(id) {
-  const findPosition = lsListDetailDraft.find((x) => x.positionId == id);
+async function detailPositionDraft(id) {
+  let findPosition = await chartJobDetail({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: id,
+  });
+  findPosition = findPosition?.data;
+  if (findPosition == undefined) {
+    alert("Data not found");
+    return;
+    // data = lsListPosition.find((item) => item.positionId == dataDefault);
+  }
+  // const findPosition = lsListDetailDraft.find((x) => x.positionId == id);
   console.log("findPosition", findPosition);
+  $("#jobName").text(
+    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
+  );
   $("#positionName").text(
     findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
   );
   $("#abbrvPosition").text(
-    findPosition.abbrvPosition == "" || findPosition.abbrvPosition == null ? "-" : findPosition.abbrvPosition
+    findPosition.abbreviationName == "" || findPosition.abbreviationName == null ? "-" : findPosition.abbreviationName
   );
-  $("#orgUnitName").text(
-    findPosition.orgUnitName == "" || findPosition.orgUnitName == null ? "-" : findPosition.orgUnitName
-  );
+  $("#orgUnitName").text(findPosition.unitName == "" || findPosition.unitName == null ? "-" : findPosition.unitName);
   $("#orgPrl").text(findPosition.prlOrg == "" || findPosition.prlOrg == null ? "-" : findPosition.prlOrg);
   $("#formation").text(findPosition.formation == "" || findPosition.formation == null ? "-" : findPosition.formation);
   $("#careerType").text(
-    findPosition.careerType == "" || findPosition.careerType == null ? "-" : findPosition.careerType
+    findPosition.careerTypeName == "" || findPosition.careerTypeName == null ? "-" : findPosition.careerTypeName
   );
   $("#careerLevel").text(
-    findPosition.careerLevel == "" || findPosition.careerLevel == null ? "-" : findPosition.careerLevel
+    findPosition.careerLevelName == "" || findPosition.careerLevelName == null ? "-" : findPosition.careerLevelName
   );
-  $("#basket").text(findPosition.isBasket == "Yes" ? "Yes" : "No");
+  $("#basket").text(findPosition.basket.length > 0 ? "Yes" : "No");
   $("#directReport").text(
-    findPosition.directReport == "" || findPosition.directReport == null ? "-" : findPosition.directReport
+    findPosition.directorateName == "" || findPosition.directorateName == null ? "-" : findPosition.directorateName
   );
-  $("#neckFunction").text(findPosition.neckFunction ? "Yes" : "No");
+  $("#neckFunction").text(findPosition.isNeck ? "Yes" : "No");
   $("#isProject").text(findPosition.isProject ? "Yes" : "No");
-  $("#coordination").text(findPosition.isCoordination ? "Yes" : "No");
+  $("#coordination").text(findPosition.coordinationWith !== "" ? "Yes" : "No");
   $("#coordinationWith").text(
     findPosition.coordinationWith == "" || findPosition.coordinationWith == null ? "-" : findPosition.coordinationWith
   );
-  $("#directorate").text(findPosition.function == "" || findPosition.function == null ? "-" : findPosition.function);
-  $("#division").text(findPosition.division == "" || findPosition.division == null ? "-" : findPosition.division);
+  $("#directorate").text(
+    findPosition.directorateName == "" || findPosition.directorateName == null ? "-" : findPosition.directorateName
+  );
+  $("#division").text(
+    findPosition.divisionName == "" || findPosition.divisionName == null ? "-" : findPosition.divisionName
+  );
   $("#subDivision").text(
-    findPosition.subDivision == "" || findPosition.subDivision == null ? "-" : findPosition.subDivision
+    findPosition.subDivisionName == "" || findPosition.subDivisionName == null ? "-" : findPosition.subDivisionName
   );
   $("#department").text(
-    findPosition.department == "" || findPosition.department == null ? "-" : findPosition.department
+    findPosition.departmentName == "" || findPosition.departmentName == null ? "-" : findPosition.departmentName
   );
   $("#section").text(findPosition.section == "" || findPosition.section == null ? "-" : findPosition.section);
   $("#personnelAreaName").text(
-    findPosition.personalAreaName == "" || findPosition.personalAreaName == null ? "-" : findPosition.personalAreaName
+    findPosition.sectionName == "" || findPosition.sectionName == null ? "-" : findPosition.sectionName
   );
 
-  $("#modalMainSkillGroup").text(findPosition.mainSkillGroup);
-  $("#modalMainSubSkillGroup").text(findPosition.mainSubSkillGroup);
-  $("#modalSecondSkillGroup").text(findPosition.secondSkillGroup);
-  $("#modalSecondSubSkillGroup").text(findPosition.secondSubSkillGroup);
-  $("#modalThirdSkillGroup").text(findPosition.thirdSkillGroup);
-  $("#modalThirdSubSkillGroup").text(findPosition.thirdSubSkillGroup);
+  const skillGroup = findPosition?.skillGroups ? findPosition?.skillGroups : [];
+  const arrayType = ["Main", "Second", "Third"];
+  if (skillGroup.length > 0) {
+    findPosition.skillGroups.forEach((item, index) => {
+      $(`#modal${arrayType[index]}SkillGroup`).text(item.skillGroupName);
+      $(`#modal${arrayType[index]}SubSkillGroup`).text(item.subSkillGroupName);
+    });
+  }
 
   $("#modalDetailJobDraft").modal("show");
 }
 
+async function confirmRollback(unitCode) {
+  // alert("confirmRollback" + unitCode);
+  const rollback = await deleteJobAndSubordinates({
+    draftId: organizationAttribute.orgUnitId,
+    unitCode: unitCode,
+    userId: "system",
+  });
+
+  if (rollback) {
+    hideModal(`modalConfirm`);
+    swal("Success", "Data has been rollback", "success");
+    const getDataDraft = await draftDetailById(organizationAttribute.orgUnitId);
+    checkButtonDraftDetail(getDataDraft.data);
+  }
+  // const getDataDraft = await draftDetailById(organizationAttribute.orgUnitId);
+}
+
 function deletePositionDraft(positionId) {
-  const getPosition = lsListDetailDraft.find((x) => x.positionId == positionId);
   const action = [
     {
       button: "Back",
@@ -305,19 +366,19 @@ function deletePositionDraft(positionId) {
       },
     },
     {
-      button: "Delete",
-      className: "btn-outline-dark",
-      callback: function () {
-        confirmDelete(1);
-      },
+      button: "delete",
+      className: "btn-outline-danger",
+      callbackFunction: "confirmRollback",
     },
   ];
   modalConfrimHelper(
     "delete",
     "Delete Data",
-    `Are you sure you want to delete the activity data for ${getPosition.positionName}?`,
-    "All information in the draft related to this position will be deleted, including details about subordinates, RASCI notations, Competencies, and Position Descriptions",
-    action
+    `Are you sure you want to rollback the activity?`,
+    "All information in the draft related to this position will be rollback, including details about subordinates, RASCI notations, Competencies, and Position Descriptions",
+    action,
+    "",
+    positionId
   );
 }
 
@@ -369,21 +430,22 @@ function rejectApproval() {
 
 function checkButtonDraftDetail(data) {
   // hideModal(`modalConfirm`);
-  console.log("getDataDraft.data", data);
+  // console.log("getDataDraft.data", data);
   const submitApprovalButton = $("#submitApproval");
   const acceptApprovalButton = $("#acceptApproval");
   const rejectApprovalButton = $("#rejectApproval");
-  const finalizeButton = $("#finalize");
+  const finalizeConfirm = $("#finalize");
+  const deleteDraft = $("#deleteDraft");
 
   // submitApprovalButton.toggle(!data.isSubmitted && !data.isApproved && !data.isFinalized);
   // acceptApprovalButton.toggle(data.isSubmitted && !data.isApproved);
   // rejectApprovalButton.toggle(data.isSubmitted && !data.isApproved);
-  // finalizeButton.toggle(data.isApproved || data.isFinalized);
+  // finalizeConfirm.toggle(data.isApproved || data.isFinalized);
 
   submitApprovalButton.show();
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
-  finalizeButton.hide();
+  finalizeConfirm.hide();
   if (data.isSubmitted) {
     submitApprovalButton.hide();
     acceptApprovalButton.show();
@@ -400,19 +462,42 @@ function checkButtonDraftDetail(data) {
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
-    finalizeButton.show();
+    finalizeConfirm.show();
+    deleteDraft.hide();
   }
 
   if (data.isFinalized) {
     submitApprovalButton.hide();
-    finalizeButton.show();
+    finalizeConfirm.hide();
+    deleteDraft.hide();
+  }
+  if (lastPath === "draft-detail") {
+    acceptApprovalButton.hide();
+    rejectApprovalButton.hide();
+  } else {
+    finalizeConfirm.hide();
   }
 }
+
+$("#finalizeConfirm").on("click", async function () {
+  // alert('masok')
+  const file = $("#file-input")[0].files[0];
+  const sendFinalize = await draftFinalize(organizationAttribute.orgUnitId, file);
+  if (sendFinalize) {
+    hideModal(`modalUploadFinalized`);
+    swal("Success", "Draft has been finalized", "success");
+  }
+});
 
 $(document).ready(async function () {
   let draftId = urlParams.get("draftId");
   const getDataDraft = await draftDetailById(draftId);
   checkDataOrganizationLocalStorage();
+  const getDataListDraft = await listDetailJobs({
+    draftId: draftId,
+    page: 1,
+    pageSize: 10000,
+  });
   // console.log(storeData.listDraft);
   // const getDraft = storeData.listDraft.find((x) => x.draftId == draftId);
   // await checkDataOrganization(storeData.listDraft);
@@ -422,8 +507,8 @@ $(document).ready(async function () {
 
   checkButtonDraftDetail(getDataDraft.data);
   // checkPage();
-  // getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
-  // // uploadFinalizeHandler();
+  getTableListDraftDetail(getDataListDraft.data);
+  uploadFinalizeHandler();
 
   // // tab-custom class on change
   // $(".tab-custom").on("click", function () {

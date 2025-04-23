@@ -1,5 +1,4 @@
 async function ajaxRequestFile(url, method, data = null, file = null) {
-  console.log("...", file);
   try {
     const formData = new FormData();
     if (data) {
@@ -234,6 +233,32 @@ async function approvedList() {
   } catch (error) {
     console.error("Error fetching data from API");
     $("#chartJobPositionList").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/organization-structure/draft/jobs/delete-job-and-subordinates
+async function deleteJobAndSubordinates(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/delete-job-and-subordinates`;
+  try {
+    const result = await ajaxRequest(api, "DELETE", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/organization-structure/draft/rollback/{draftId}
+async function rollback(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/rollback/${params}`;
+  try {
+    const result = await ajaxRequest(api, "POST", {}); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
     throw error;
   }
 }
@@ -497,11 +522,11 @@ async function draftJobSubordinate(params) {
   }
 }
 
-// http://localhost:5095/api/organization-structure/draft/jobs/move-job
-async function draftJobMove(params) {
-  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/move-job`;
+// http://localhost:5095/api/organization-structure/draft/jobs/duplicate-job
+async function draftJobDuplicate(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/duplicate-job`;
   try {
-    const result = await ajaxRequest(api, "PUT", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(api, "POST", params); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -510,11 +535,50 @@ async function draftJobMove(params) {
   }
 }
 
-// http://localhost:5095/api/organization-structure/draft/jobs/duplicate-job
-async function draftJobDuplicate(params) {
-  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/duplicate-job`;
+// http://localhost:5095/design-cost-by-function?draftId=a7ce5e5c-7dd8-4683-9025-35f301340d19&page=1&pageSize=10
+async function designCostByFunction(params) {
+  const api = `${url.baseUrl}/design-cost-by-function?draftId=${params.draftId}&page=${params.page}&pageSize=${params.pageSize}`;
   try {
-    const result = await ajaxRequest(api, "POST", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// http://localhost:5095/design-cost-by-division?draftId=a7ce5e5c-7dd8-4683-9025-35f301340d19&page=1&pageSize=10
+async function designCostByDivision(params) {
+  const api = `${url.baseUrl}/design-cost-by-division?draftId=${params.draftId}&page=${params.page}&pageSize=${params.pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// http://localhost:5095/design-cost-by-level?draftId=a7ce5e5c-7dd8-4683-9025-35f301340d19&page=1&pageSize=10
+async function designCostByLevel(params) {
+  const api = `${url.baseUrl}/design-cost-by-level?draftId=${params.draftId}&page=${params.page}&pageSize=${params.pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// 'http://localhost:5095/api/organization-structure/draft/jobs/list-detail-jobs?draftId=d2e69277-3791-4f14-9f50-b55e1fca77f1&page=2&pageSize=10' \
+async function listDetailJobs(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/list-detail-jobs?draftId=${params.draftId}&page=${params.page}&pageSize=${params.pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
     console.error("Error fetching data from API");

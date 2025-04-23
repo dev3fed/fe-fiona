@@ -192,7 +192,6 @@ $("#searchOrgNodeButton").on("click", function () {
 });
 
 function focusNode(nodeId) {
-  alert("masok");
   let data = myData.find((item) => item.id == nodeId);
   let parentNode = myData.find((item) => item.id == data?.pid) || {};
   let grandParentNode = myData.find((item) => item.id == parentNode?.pid) || {};

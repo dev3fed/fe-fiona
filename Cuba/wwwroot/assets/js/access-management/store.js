@@ -8,7 +8,7 @@ const appState = new Proxy(
       }
       return true;
     },
-  },
+  }
 );
 function setState(key, value) {
   appState[key] = value;

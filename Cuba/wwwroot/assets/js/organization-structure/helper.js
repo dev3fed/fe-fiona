@@ -686,9 +686,8 @@ async function saveInputAttribut(type) {
     : $("#selectPersonalSubareaName option:selected").text();
   // costCenter
   payload.unitParent.isNew = false;
-  payload.unitParent.unitParentCode = $("#selectOrgUnitParentName").val() || "";
-  payload.unitParent.unitParentName =
-    $("#selectOrgUnitParentName option:selected").text() || "Operational Risk Papua-Maluku";
+  payload.unitParent.unitCode = $("#selectOrgUnitParentName").val() || "";
+  payload.unitParent.unitName = $("#selectOrgUnitParentName option:selected").text() || "Operational Risk Papua-Maluku";
   // directReport
   payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
   payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
@@ -738,13 +737,8 @@ async function saveInputAttribut(type) {
   console.log("payload", payload);
   // return;
 
-  if (type == "edit") {
-    await draftJobUpdateAsDraft(payload);
-  } else {
-    await draftJobSaveAsDraft(payload);
-  }
-
-  return;
+  const result = type === "edit" ? await draftJobUpdateAsDraft(payload) : await draftJobSaveAsDraft(payload);
+  return result;
 }
 
 function saveEmployeeDetails(payload, data) {
@@ -1320,6 +1314,10 @@ async function handleDelete() {
   });
 }
 
+function checkValue(value) {
+  return value == null || value == "" ? "-" : value;
+}
+
 async function modalJobPopup(params) {
   const dataDefault = 30313912;
 
@@ -1336,32 +1334,34 @@ async function modalJobPopup(params) {
   });
   data = data?.data;
   if (data == undefined) {
-    data = lsListPosition.find((item) => item.positionId == dataDefault);
+    alert("Data not found");
+    return;
+    // data = lsListPosition.find((item) => item.positionId == dataDefault);
   }
   // console.log(data?.incumbent[0]?.employeeId);
   $("#jobName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
   $("#positionId").val(data.unitCode);
   $("#modalDirectorate").text("Pertamina Patra Niaga");
-  $("#modalDivision").text(data?.divisionName ?? "");
-  $("#modalSubDivision").text(data?.subDivisionName ?? "");
-  $("#modalDepartment").text(data?.departmentName ?? "");
-  $("#modalSection").text(data?.sectionName ?? "");
-  $("#modalPersonnelAreaName").text(data?.personnelAreaName ?? "");
-  $("#modalPersonnelAreaSubname").text(data?.personnelSubAreaName ?? "");
-  $("#modalCareerType").text(data?.careerType ?? "");
-  $("#modalCareerLevel").text(data?.careerLevel ?? "");
-  $("#modalAbbrvPosition").text(data?.abbrvPosition ?? "");
-  $("#modalOrgUnitName").text(data?.unitName ?? "");
-  $("#modalPositionName").text(data?.positionName ?? "");
-  $("#modalOrgPRL").text(data?.prlOrg ?? "");
-  $("#modalFormation").text(data?.formation ?? "");
-  $("#modalDirectReport").text(data?.parentName ?? "");
-  $("#modalNeckFunction").text(data?.neckFunction ?? "");
-  $("#modalIsProject").text(data?.isProject ?? "");
-  $("#modalIsCoordination").text(data?.isCoordination ?? "");
-  $("#modalCoordinationWith").text(data?.coordinationWith ?? "");
-  $("#modalFunction").text(data?.functionName ?? "");
-  $("#modalSKNumber").text(data?.skNumber ?? "");
+  $("#modalDivision").text(checkValue(data?.divisionName));
+  $("#modalSubDivision").text(checkValue(data?.subDivisionName));
+  $("#modalDepartment").text(checkValue(data?.departmentName));
+  $("#modalSection").text(checkValue(data?.sectionName));
+  $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
+  $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubAreaName));
+  $("#modalCareerType").text(checkValue(data?.careerTypeName));
+  $("#modalCareerLevel").text(checkValue(data?.careerLevelName));
+  $("#modalAbbrvPosition").text(checkValue(data?.abbrvPosition));
+  $("#modalOrgUnitName").text(checkValue(data?.unitName));
+  $("#modalPositionName").text(checkValue(data?.positionName));
+  $("#modalOrgPRL").text(checkValue(data?.prlOrg));
+  $("#modalFormation").text(checkValue(data?.formation));
+  $("#modalDirectReport").text(checkValue(data?.parentName));
+  $("#modalNeckFunction").text(checkValue(data?.neckFunction));
+  $("#modalIsProject").text(checkValue(data?.isProject));
+  $("#modalIsCoordination").text(checkValue(data?.isCoordination));
+  $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
+  $("#modalFunction").text(checkValue(data?.functionName));
+  $("#modalSKNumber").text(checkValue(data?.skNumber));
 
   $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
   $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
@@ -1603,7 +1603,7 @@ function createHierarchy(data, parentId = null) {
 }
 
 async function helperOrgTree(params) {
-  console.log(params);
+  // console.log(params);
   // refresh jsTree
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
@@ -1899,6 +1899,81 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     return template;
   }
 
+  function bracketTemplateGeneratorJoinFormation(bracketSizeFormat) {
+    const bracketSize = bracketSizeFormat.split("_")[0];
+    const bracketSplitted = bracketSizeFormat.split("_").slice(1);
+    // console.log({bracketSize})
+    // console.log({bracketSplitted})
+    const template = Object.assign({}, OrgChart.templates.default_t);
+    template.size = [220, 0];
+    for (let i = 0; i < bracketSize; i++) {
+      template.size = [template.size[0], 120];
+    }
+    template.position = null;
+    template.prl = null;
+    template.jumlah_formasi = null;
+    template.position =
+      `<g>` +
+      '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
+      `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
+      `</g>`;
+
+    let height = 40;
+    for (let i = 1; i <= bracketSize; i++) {
+      // alert('masuk 3')
+      const yPosition = 40 + (i - 1) * 40;
+      const yTextPosition = 60 + (i - 1) * 40;
+      height += 40;
+      template.size = [template.size[0], height];
+      template[`bc_${i}_position`] =
+        `<g>` +
+        `<rect x="0" y="${yPosition}" height="40" width="140" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+        `<text data-width="120" style="font-size:10px;text-anchor: middle;" fill="#353238" x="70" y="${yTextPosition}" data-text-overflow="multiline">{val}</text>` +
+        `</g>`;
+      template[`bc_${i}_prl`] =
+        `<g>` +
+        `<rect x="140" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+        `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="160" y="${
+          yTextPosition + 4
+        }">{val}</text>` +
+        `</g>`;
+      template[`bc_${i}_level`] =
+        `<g>` +
+        `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+        `</g>`;
+      // template[`bc_${i}_jumlah_formasi`] =
+      //   `<g>` +
+      //   `<rect x="180" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+      //   `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="200" y="${
+      //     yTextPosition + 4
+      //   }">{val}</text>` +
+      //   `</g>`;
+    }
+    let yHeight = 0;
+    let yTextPosition = 0;
+    let yPosition = 0;
+    for (let i = 0; i < bracketSplitted.length; i++) {
+      if (i == 0) {
+        yPosition = 40;
+        yHeight = 40 * parseInt(bracketSplitted[i]);
+        yTextPosition = yHeight / 2 + yPosition;
+        // yTextPosition = yHeight + 20;
+        // console.log(bracketSplitted[i])
+      } else {
+        yPosition = yHeight + yPosition;
+        yHeight = 40 * bracketSplitted[i];
+        yTextPosition = yHeight / 2 + yPosition;
+      }
+      template[`bc_${i + 1}_jumlah_formasi`] =
+        `<g>` +
+        `<rect x="180" y="${yPosition}" height="${yHeight}" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+        `<text style="font-size:11px;text-anchor: middle;"  x="200" y="${yTextPosition}">asd</text>` +
+        `</g>`;
+    }
+
+    return template;
+  }
+
   const bracketLimit = 20;
 
   for (let i = 1; i <= bracketLimit; i++) {
@@ -1911,6 +1986,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   const tags = {};
 
+  // console.log({baseNodeBinding})
   for (let i = 1; i <= bracketLimit; i++) {
     for (let key in baseNodeBinding) {
       nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
@@ -1919,6 +1995,32 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       template: `bracket_${i}_t`,
     };
   }
+
+  // tags['basket_3_2_1'] = {
+  //   template: "basket_3_2_1_t",
+  // };
+  // OrgChart.templates[`basket_3_2_1_t`] = bracketTemplateGeneratorJoinFormation('3_2_1');
+
+  // tags['basket_3_1_2'] = {
+  //   template: "basket_3_1_2_t",
+  // };
+  // OrgChart.templates[`basket_3_1_2_t`] = bracketTemplateGeneratorJoinFormation('3_1_2');
+
+  // tags["basket_4_1_1_2"] = {
+  //   template: "basket_4_1_1_2_t",
+  // };
+  // OrgChart.templates[`basket_4_1_1_2_t`] = bracketTemplateGeneratorJoinFormation("4_1_1_2");
+
+  // for (let i = 1; i <= bracketLimit; i++) {
+  //   for (let key in baseNodeBinding) {
+  //     nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
+  //   }
+  //   tags[`basket_${i}`] = {
+  //     template: `bracket_${i}_t`,
+  //   };
+  // }
+  // console.log(OrgChart.templates);
+  // console.log({tags})
 
   // add tags
   // "hasChildren": {
@@ -1957,6 +2059,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     levelSeparation: 30,
     scaleInitial: OrgChart.match.boundary,
     // nodes: testOrgBagan,
+    // nodes: test,
     nodes: data,
     align: OrgChart.ORIENTATION,
     // movable: OrgChart.movable.node,
@@ -2114,4 +2217,58 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       chart.expand(object.nodeId, getAll);
     }, 500);
   }
+}
+
+async function changeDataSourceFilter(value) {
+  const tableBody = $("#tableDesignCostBody").empty();
+  const tableFooter = $("#tableDesignCostFooter").empty();
+  const data = {
+    addHtml: "",
+    totalFormationProposed: 0,
+    totalCostYearProposed: 0,
+    totalFormationExisting: 0,
+    totalCostYearExisting: 0,
+    totalFormationAdjustment: 0,
+    totalCostYearAdjustment: 0,
+  };
+
+  const result = await (value === "function"
+    ? designCostByFunction
+    : value === "division"
+    ? designCostByDivision
+    : designCostByLevel)({
+    draftId: organizationAttribute.orgUnitId,
+    page: 1,
+    pageSize: 10,
+  });
+
+  result.data.forEach((item, idx) => {
+    data.addHtml += `<tr>
+      <td>${idx + 1}</td>
+      <td>${item.functionName || item.divisionName || item.layerName}</td>
+      <td>${item.formationProposed}</td>
+      <td>${item.costYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${item.formationExisting}</td>
+      <td>${item.costYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${item.formationAdjustment}</td>
+      <td>${item.costYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    </tr>`;
+    data.totalFormationProposed += item.formationProposed;
+    data.totalCostYearProposed += item.costYearProposed;
+    data.totalFormationExisting += item.formationExisting;
+    data.totalCostYearExisting += item.costYearExisting;
+    data.totalFormationAdjustment += item.formationAdjustment;
+    data.totalCostYearAdjustment += item.costYearAdjustment;
+  });
+
+  tableBody.append(data.addHtml);
+  tableFooter.append(`<tr>
+    <td colspan="2">Total</td>
+    <td>${data.totalFormationProposed}</td>
+    <td>${data.totalCostYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data.totalFormationExisting}</td>
+    <td>${data.totalCostYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data.totalFormationAdjustment}</td>
+    <td>${data.totalCostYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+  </tr>`);
 }

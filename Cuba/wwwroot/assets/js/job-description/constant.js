@@ -1,8 +1,9 @@
 const url = {
   baseUrl: "http://localhost:5095",
   "api-organization": "api/organization-structure",
+  "rasci-matrix": "api/rasci-matrix",
+  "job-description": "api/job-description",
 };
-const tabArray = ["inputAttribute", "inputSubordinate", "inputSgSsg", "preview"];
 const tabArrayIndex = ["chart", "draft", "2", "3"];
 let statusAction = "add";
 let dataAvailable = true;

@@ -17,19 +17,13 @@
                             <option value="level">Level</option>
                         </select>
                     </div>
-                    <div class="col-md-9">
-                        @* select *@
-                        <label class="form-label digits" for="selectDraftOrganizationDataSource">Organization Data Source</label>
-                        <select class="form-select digits" name="selectDraftOrganizationDataSource" id="selectDraftOrganizationDataSource">
-                        </select>
-                    </div>
                     <div class="col-md-12">
                         <div class="table-responsive m-t-25">
                             <table class="tableMasterData table table-hover w-100" id="tableDesignCost">
                                 <thead>
                                     <tr>
                                         <th rowspan="2" class="text-center">No</th>
-                                        <th rowspan="2" class="text-center">Function</th>
+                                        <th rowspan="2" class="text-center" id="titleFilter">Function</th>
                                         <th colspan="2" class="text-center">Proposed</th>
                                         <th colspan="2" class="text-center">Existing</th>
                                         <th colspan="2" class="text-center">Total Adjustment</th>
@@ -43,18 +37,8 @@
                                         <th class="text-center">Design Cost (IDR)</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center"></td>
-                                        <td class="text-center">-</td>
-                                        <td class="text-center">-</td>
-                                        <td class="text-center">-</td>
-                                        <td class="text-center">-</td>
-                                        <td class="text-center">-</td>
-                                        <td class="text-center">-</td>
-                                        <td class="text-center">-</td>
-                                    </tr>
-                                <tfoot>
+                                <tbody id="tableDesignCostBody">
+                                <tfoot id="tableDesignCostFooter">
                                     <tr>
                                         <td class="text-center"></td>
                                         <td class="text-center">Total</td>

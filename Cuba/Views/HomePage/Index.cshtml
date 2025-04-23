@@ -138,12 +138,72 @@
             stroke: #fff;
             stroke-width: 0.1;
         }
+        .notification-box {
+            position: relative;
+            margin-top: -12px;
+            margin-right: 190px;
+        }
+        .badge {
+            position: absolute;
+            right: -5px;
+            top: -6px;
+            padding: 2px 4px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: work-Sans, sans-serif;
+        }
+        .notification-dropdown {
+            top: 52px;
+            width: 350px;
+            right: 20px !important;
+            left: unset;
+        }
+        .dropdown-title {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(145, 142, 153, 0.3);
+        }
+        .primary {
+            color: #006CA9;
+        }
+        .bg-primary-light {
+            background-color: #E6F0F6;
+        }
+
+        .badge-icon-menu {
+            position: absolute;
+            right: -5%;
+            top: -5%;
+            padding: 5px 13px;
+            font-size: 20px;
+            color: white;
+            font-weight: 700;
+        }
+
     </style>
 
 </head>
 
 <body class="page-body">
     <div class="header-card">
+        <div class="profile-nav pe-0 py-0" style="position: absolute; top: 20px; right: 0px;">
+            <li class="onhover-dropdown">
+                <div class="notification-box">
+                    <i data-feather="bell" style="stroke: white;"></i><span
+                        class="badge rounded-pill badge-secondary">4 </span>
+                </div>
+                <div class="onhover-show-div notification-dropdown">
+                    <h6 class="f-18 mb-0 dropdown-title">Notitications </h6>
+                    <ul class="">
+                        <li class="b-primary bg-primary-light border-1 p-10 m-2 b-r-3">
+                            <span class="f-14 primary f-w-600 mb-1">Organization Structure Approval</span>
+                            <p class="f-12 f-w-400">There is a approval request for organization structure #Req/SO/01122024/001. Click here to see detail.</p>
+                            <span class="f-12 f-w-400 text-muted">20/08/2024, 13:30</span>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </div> 
         <div class="profile-nav onhover-dropdown pe-0 py-0" style="position: absolute; top: 20px; right: 20px;">
             <div class="media profile-media" style="margin-right:10px">
                 <img src="~/assets/images/homepage/user_profile.png" alt="User Profile"
