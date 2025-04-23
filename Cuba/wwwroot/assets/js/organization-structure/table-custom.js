@@ -399,7 +399,8 @@ function getTableListApproval(params) {
         className: "text-center",
         data: null,
         render: function (data) {
-          return checkButtonTable("approvalList", data.id, lastPath);
+          // console.log("data", data)
+          return checkButtonTable("approvalList", data.draftId, lastPath);
         },
       },
     ],
@@ -454,17 +455,17 @@ function getTableListDraftDetail(params, lastPath) {
       },
       {
         title: "Activity Type",
-        data: "type",
+        data: "actionType",
         width: "15%",
       },
       {
         title: "ID Org Unit",
-        data: "orgUnitId",
+        data: "unitCode",
         width: "10%",
       },
       {
         title: "ID Pos",
-        data: "positionId",
+        data: "positionCode",
         width: "10%",
       },
       {
@@ -479,7 +480,7 @@ function getTableListDraftDetail(params, lastPath) {
       },
       {
         title: "Direct Report",
-        data: "directReport",
+        data: "unitParentName",
         width: "20%",
       },
       {
@@ -487,7 +488,7 @@ function getTableListDraftDetail(params, lastPath) {
         width: "25%",
         data: null,
         render: function (data) {
-          return checkButtonTable("positionList", data.positionId, window.location.pathname.split("/").pop());
+          return checkButtonTable("positionList", data.unitCode, window.location.pathname.split("/").pop());
         },
       },
     ],

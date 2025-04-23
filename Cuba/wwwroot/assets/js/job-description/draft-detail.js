@@ -54,17 +54,13 @@ async function backToOrg(params) {
 }
 
 async function confirmDeleteDraft(id) {
-  // lsListDraft = lsListDraft.filter((x) => x.draftId != id);
-  // lsListDetailDraft = lsListDetailDraft.filter((x) => x.draftId != id);
-  // lsListPosition = lsListPosition.filter((x) => x.draftId != id);
-  // lsListOrgNode = lsListOrgNode.filter((x) => x.draftId != id);
-  // localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
-  // localStorage.setItem("listDetailDraft", JSON.stringify(lsListDetailDraft));
-  // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-  // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  // changeOrganization(0, "Master Data SO");
-  swal("Success", "Draft has been deleted", "success");
-  // window.location.href = "/organization/index";
+  // alert("confirmDeleteDraft" + id);
+  const draftId = urlParams.get("draftId");
+  const deleteDraft = await deleteDraftJobDesc(draftId);
+  if (deleteDraft) {
+    swal("Success", "Draft has been deleted", "success");
+    window.location.href = "/job-description/index";
+  }
 }
 
 function deleteDraft() {
@@ -182,7 +178,7 @@ async function clickUploadFunction() {
 }
 
 function editPositionDraft(id) {
-  window.location.href = "/organization/form-position?positionId=" + id;
+  window.location.href = "/organization/form-position?unitCode=" + id;
 }
 
 function detailPositionDraft(id) {
@@ -392,14 +388,11 @@ function editJobDesc() {
 }
 
 $(document).ready(async function () {
-  // let draftId = urlParams.get("draftId");
-  // const getDataDraft = await draftDetailById(draftId);
-  // checkDataOrganizationLocalStorage();
-  // checkDataOrganization();
-  // await initializeDraftDetail(getDataDraft.data);
-  // checkButtonDraftDetail(getDataDraft.data);
+  const draftId = urlParams.get("draftId");
+  const data = await listDraftDetailJobDesc(draftId, 1, 10);
 
-  getTableListDraftDetail();
+  // checkDataOrganization();
+  initializeDraftDetail(data.data);
 
   // checkPage();
   // getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
@@ -468,15 +461,8 @@ $(document).ready(async function () {
     const draftId = urlParams.get("draftId");
     $("#draftName").text(draftName);
     $("#modalCreateDraftSO").modal("hide");
-    const updateDraft = await renameDraftSO({ id: draftId, name: draftName });
+    const updateDraft = await renameDraftJobDesc({ draftId: draftId, draftName: draftName, description: "" });
     swal("Success", "Draft name has been updated", "success");
-    lsListDraft.map((x) => {
-      if (x.draftId == draftId) {
-        x.draftName = draftName;
-      }
-      return x;
-    });
-    localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
     changeOrganization();
   });
 });

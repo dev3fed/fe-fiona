@@ -1,3 +1,7 @@
+const url = {
+  baseUrl: "http://localhost:5095",
+};
+
 const dataDummy = {
   tableHeader: [
     { id: 1, text: "Strategic Leader", type: "Managerial" },

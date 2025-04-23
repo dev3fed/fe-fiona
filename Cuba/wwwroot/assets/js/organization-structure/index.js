@@ -3,438 +3,26 @@ async function initializeHelper(data) {
     //
   }
 
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: "10132405",
-    depth: 3,
-  });
-
-  // const dataChartHiearchies = await chartJobHiearchies({
+  // const dataChart = await chartShow({
   //   draftId: organizationAttribute.orgUnitId,
   //   jobCode: "10132405",
-  //   depth: 1,
+  //   depth: 3,
   // });
 
-  //   {
-  //     org_unit_name: "Talent Management",
-  //     basket: false,
-  //     id_org_unit: "10135491",
-  //     layering: "L3",
-  //     pid: "10135490",
-  //     id: "30263313",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30263313",
-  //     jumlah_formasi: 8,
-  //     position_parent: "Human Capital",
-  //     id_position_atasan_langsung: "10135490",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Talent Management",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Organization Capability",
-  //     basket: false,
-  //     id_org_unit: "10135494",
-  //     layering: "L3",
-  //     pid: "10135490",
-  //     id: "30263319",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30263319",
-  //     jumlah_formasi: 8,
-  //     position_parent: "Human Capital",
-  //     id_position_atasan_langsung: "10135490",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Organization Capability",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Quality Management",
-  //     basket: false,
-  //     id_org_unit: "10135496",
-  //     layering: "L3",
-  //     pid: "10135490",
-  //     id: "30263325",
-  //     coordination: null,
-  //     prl: "19",
-  //     id_position: "30263325",
-  //     jumlah_formasi: 5,
-  //     position_parent: "Human Capital",
-  //     id_position_atasan_langsung: "10135490",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Quality Management",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "IR & Compensation Benefit",
-  //     basket: false,
-  //     id_org_unit: "10135498",
-  //     layering: "L3",
-  //     pid: "10135490",
-  //     id: "30263330",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30263330",
-  //     jumlah_formasi: 6,
-  //     position_parent: "Human Capital",
-  //     id_position_atasan_langsung: "10135490",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager IR & Compensation Benefit",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "HC Business Partner",
-  //     basket: false,
-  //     id_org_unit: "10135500",
-  //     layering: "L3",
-  //     pid: "10135490",
-  //     id: "30263336",
-  //     coordination: null,
-  //     prl: "21",
-  //     id_position: "30263336",
-  //     jumlah_formasi: 8,
-  //     position_parent: "Human Capital",
-  //     id_position_atasan_langsung: "10135490",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager HC Business Partner",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "HC Services",
-  //     basket: false,
-  //     id_org_unit: "10135502",
-  //     layering: "L3",
-  //     pid: "10135490",
-  //     id: "30263342",
-  //     coordination: null,
-  //     prl: "19",
-  //     id_position: "30263342",
-  //     jumlah_formasi: 8,
-  //     position_parent: "Human Capital",
-  //     id_position_atasan_langsung: "10135490",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager HC Services",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Human Capital",
-  //     basket: false,
-  //     id_org_unit: "10135490",
-  //     layering: "L2",
-  //     pid: "10135488",
-  //     id: "30263312",
-  //     coordination: null,
-  //     prl: "23",
-  //     id_position: "30263312",
-  //     jumlah_formasi: 44,
-  //     position_parent: "SDM & Penunjang Bisnis",
-  //     id_position_atasan_langsung: "10135488",
-  //     project: false,
-  //     gl: "GL1",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "VP Human Capital",
-  //     isNeck: false,
-  //     hasChildren: true,
-  //   },
-  //   {
-  //     org_unit_name: "Asset Management",
-  //     basket: false,
-  //     id_org_unit: "10135506",
-  //     layering: "L3",
-  //     pid: "10135505",
-  //     id: "30263349",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30263349",
-  //     jumlah_formasi: 13,
-  //     position_parent: "Procurement & Asset Management",
-  //     id_position_atasan_langsung: "10135505",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Asset Management",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Procurement Support",
-  //     basket: false,
-  //     id_org_unit: "10135528",
-  //     layering: "L3",
-  //     pid: "10135505",
-  //     id: "30263378",
-  //     coordination: null,
-  //     prl: "19",
-  //     id_position: "30263378",
-  //     jumlah_formasi: 6,
-  //     position_parent: "Procurement & Asset Management",
-  //     id_position_atasan_langsung: "10135505",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Procurement Governance & Support",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Procurement Management I",
-  //     basket: false,
-  //     id_org_unit: "10164022",
-  //     layering: "L3",
-  //     pid: "10135505",
-  //     id: "30314731",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30314731",
-  //     jumlah_formasi: 11,
-  //     position_parent: "Procurement & Asset Management",
-  //     id_position_atasan_langsung: "10135505",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Procurement Management I",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Procurement Management II",
-  //     basket: false,
-  //     id_org_unit: "10164032",
-  //     layering: "L3",
-  //     pid: "10135505",
-  //     id: "30314742",
-  //     coordination: null,
-  //     prl: "21",
-  //     id_position: "30314742",
-  //     jumlah_formasi: 12,
-  //     position_parent: "Procurement & Asset Management",
-  //     id_position_atasan_langsung: "10135505",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Procurement Management II",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Procurement & Asset Management",
-  //     basket: false,
-  //     id_org_unit: "10135505",
-  //     layering: "L2",
-  //     pid: "10135488",
-  //     id: "30263348",
-  //     coordination: null,
-  //     prl: "23",
-  //     id_position: "30263348",
-  //     jumlah_formasi: 43,
-  //     position_parent: "SDM & Penunjang Bisnis",
-  //     id_position_atasan_langsung: "10135488",
-  //     project: false,
-  //     gl: "GL1",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "VP Procurement & Asset Management",
-  //     isNeck: false,
-  //     hasChildren: true,
-  //   },
-  //   {
-  //     org_unit_name: "IT Plan., Gov. & Security",
-  //     basket: false,
-  //     id_org_unit: "10135535",
-  //     layering: "L3",
-  //     pid: "10135534",
-  //     id: "30263385",
-  //     coordination: null,
-  //     prl: "19",
-  //     id_position: "30263385",
-  //     jumlah_formasi: 9,
-  //     position_parent: "IT",
-  //     id_position_atasan_langsung: "10135534",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager IT Plan., Gov. & Security",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "IT Solution & Infrastructure",
-  //     basket: false,
-  //     id_org_unit: "10135539",
-  //     layering: "L3",
-  //     pid: "10135534",
-  //     id: "30263392",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30263392",
-  //     jumlah_formasi: 18,
-  //     position_parent: "IT",
-  //     id_position_atasan_langsung: "10135534",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager IT Solution & Infrastructure",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Business Relationship",
-  //     basket: false,
-  //     id_org_unit: "10135548",
-  //     layering: "L3",
-  //     pid: "10135534",
-  //     id: "30263403",
-  //     coordination: null,
-  //     prl: "19",
-  //     id_position: "30263403",
-  //     jumlah_formasi: 7,
-  //     position_parent: "IT",
-  //     id_position_atasan_langsung: "10135534",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Business Relationship",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "Business Data Management",
-  //     basket: false,
-  //     id_org_unit: "10135555",
-  //     layering: "L3",
-  //     pid: "10135534",
-  //     id: "30263410",
-  //     coordination: null,
-  //     prl: "19",
-  //     id_position: "30263410",
-  //     jumlah_formasi: 8,
-  //     position_parent: "IT",
-  //     id_position_atasan_langsung: "10135534",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Manager Bus. Data Mgt & Integration",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "IT",
-  //     basket: false,
-  //     id_org_unit: "10164048",
-  //     layering: "L3",
-  //     pid: "10135534",
-  //     id: "30314763",
-  //     coordination: null,
-  //     prl: "20",
-  //     id_position: "30314763",
-  //     jumlah_formasi: 47,
-  //     position_parent: "IT",
-  //     id_position_atasan_langsung: "10135534",
-  //     project: false,
-  //     gl: "GL2",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "IT Project Lead",
-  //     isNeck: false,
-  //     hasChildren: false,
-  //   },
-  //   {
-  //     org_unit_name: "IT",
-  //     basket: false,
-  //     id_org_unit: "10135534",
-  //     layering: "L2",
-  //     pid: "10135488",
-  //     id: "10135534",
-  //     coordination: null,
-  //     prl: "22",
-  //     id_position: "30263384",
-  //     jumlah_formasi: 90,
-  //     position_parent: "SDM & Penunjang Bisnis",
-  //     id_position_atasan_langsung: "10135488",
-  //     project: false,
-  //     gl: "GL1",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "VP IT",
-  //     isNeck: false,
-  //     hasChildren: true,
-  //   },
-  //   {
-  //     org_unit_name: "SDM & Penunjang Bisnis",
-  //     basket: false,
-  //     id_org_unit: "10135488",
-  //     layering: "L1",
-  //     pid: "10132405",
-  //     id: "30263310",
-  //     coordination: null,
-  //     prl: "25",
-  //     id_position: "30263310",
-  //     jumlah_formasi: 179,
-  //     position_parent: "PT Pertamina Patra Niaga",
-  //     id_position_atasan_langsung: "10132405",
-  //     project: false,
-  //     gl: "GL0",
-  //     assistant: false,
-  //     tags: [],
-  //     position: "Direktur SDM & Penunjang Bisnis",
-  //     isNeck: false,
-  //     hasChildren: true,
-  //   },
-  // ];
+  // if (!dataChart.data) {
+  //   swal("Warning", "Data not found", "warning");
+  //   return;
+  // }
+  // dataChart.data.forEach((item) => {
+  //   item.id = item.id_org_unit;
+  // });
 
-  // change chartid id from id_org_unit
-
-  if (!dataChart.data) {
-    swal("Warning", "Data not found", "warning");
-    return;
-  }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
-
-  // helper orTree
-  const dataAawal = dataChart.data.filter((x) => x.position == "Direktur Utama");
-  helperOrgTree(dataAawal);
-  // get helper datePicker
-  helperDatePicker();
-  // helper bagan
-  helperOrgChart(true, "os-container", dataChart.data, true);
-  // helperOrgChartTester(true, "os-container", dataChart.data, true);
-  // focusNode("10135488");
+  // // helper orTree
+  // const dataAawal = dataChart.data.filter((x) => x.position == "Direktur Utama");
+  // helperOrgTree(dataAawal);
+  // helperDatePicker();
+  // helperOrgChart(true, "os-container", dataChart.data, true);
+  helperOrgChart(true, "os-container", test, true);
 }
 
 function updateDataList(orgUnitId, orgUnitName) {
@@ -643,7 +231,7 @@ async function handleEditJob() {
       unitName: item.unitName,
     })) ?? [];
   if (!dataSub.length) {
-    window.location.href = "/organization/form-position?positionId=" + getPositionById;
+    window.location.href = "/organization/form-position?unitCode=" + getPositionById;
     return;
   }
   let table = ` <table class="tableMasterData table table-hover w-100" id="editMoveVariousTable">`;
@@ -865,7 +453,7 @@ async function moveJob(dataSelectFiltered) {
   for (const item of dataSelectFiltered) {
     const saveMoveJob = await draftJobMove({
       draftId: organizationAttribute.orgUnitId,
-      unitCode: item.unitCode,
+      unitCodes: [item.unitCode],
       unitCodeParent: item.unitCodeParent,
       userId: "system",
     });
@@ -876,7 +464,7 @@ async function confirmEditJob() {
   const positionId = $("#positionId").val();
   const editPositionBox = $("input[name='editPositionBox']:checked").val();
   if (editPositionBox == "editSelf") {
-    window.location.href = "/organization/form-position?positionId=" + positionId;
+    window.location.href = "/organization/form-position?unitCode=" + positionId;
   } else {
     const table = $("#editMoveVariousTable");
     const data = table.DataTable().rows().data().toArray();
@@ -1186,9 +774,18 @@ $("#createJob").click(function () {
 });
 
 // click design cost
-$("#designCost").click(function () {
+$("#designCost").click(async function () {
+  const filter = $("#selectDraftFilterByDataSource").val();
+  await changeDataSourceFilter(filter);
   $("#modalPreviewDesignCost").modal("show");
 });
+
+$("#selectDraftFilterByDataSource").on("change", async function () {
+  const filter = $("#selectDraftFilterByDataSource").val();
+  await changeDataSourceFilter(filter);
+});
+
+
 
 // click export org chart
 $("#exportOrgChart").click(function () {
@@ -1260,13 +857,20 @@ $(document).ready(async function () {
     },
   ]);
 
-  $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
 
-  let activeTab = urlParams.get("activeTab");
-  let focusNode = urlParams.get("focusNode");
+  $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+  const focusNode = urlParams.get("focusNode");
+  const activeTab = urlParams.get("activeTab");
   if (focusNode) {
-    setTimeout(() => {
-      $("#searchOrgNode").val(focusNode).trigger("change");
+    setTimeout(async () => {
+      // alert('masok')
+      let data = await chartJobDetail({
+        draftId: organizationAttribute.orgUnitId,
+        jobCode: focusNode,
+      });
+      data = data.data;
+      // $("#searchOrgNode").val(focusNode).trigger("change");
+      $("#searchOrgNode").append(new Option(data.positionName, focusNode, true, true)).trigger("change");
     }, 1000);
   }
 

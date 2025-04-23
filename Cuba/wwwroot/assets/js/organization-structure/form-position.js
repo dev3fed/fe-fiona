@@ -73,17 +73,22 @@ async function initializeList() {
   ];
 }
 
-function saveAsDraft() {
+async function saveAsDraft() {
   const positionId = urlParams.get("unitCode");
   let type = "create";
   if (positionId) type = "edit";
-  const save = saveInputAttribut(type);
+  loader(true);
+  // return;  
+  const save = await saveInputAttribut(type);
+  console.log("save", save);
   if (save) {
     hideModal(`modalConfirm`);
-    // const getDirectReport = $("#selectDirectReport").val();
-    // window.location.href = "/organization/index?focusNode=" + getDirectReport;
+    loader(false);
+    swal("Saved", "Save as Draft", "success");
+    setTimeout(() => {
+      window.location.href = "/organization/index?focusNode=" + save.data.unitCode;
+    }, 2000);
   }
-  swal("Saved", "Save as Draft", "success");
 }
 
 // function saveAsDraft() {
@@ -219,6 +224,7 @@ function checkBasketSelected(selectBasket) {
 }
 
 $(document).ready(async function () {
+  loader(false);
   // check query url
   // check data organization from local storage
   checkDataOrganizationLocalStorage();
