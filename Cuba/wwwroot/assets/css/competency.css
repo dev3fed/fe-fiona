@@ -117,7 +117,7 @@
 
 .custom-border-table {
   border-right: 1px solid #b0d1e4;
-  border-bottom: 1px solid #b0d1e4;
+  border-bottom: px solid #b0d1e4;
   border-left: 1px solid #b0d1e4;
   border-collapse: collapse;
   font-size: 12px;

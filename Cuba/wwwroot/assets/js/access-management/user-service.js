@@ -31,7 +31,10 @@ function loadTableBodyUser(userList) {
             </div>
             </td>
             <td style="width: 120px;text-align:center">
-              <button class="btn btn-outline-light" type="button" style="width: 100%">
+             <button class="btn btn-outline-danger" type="button">
+            <i class="icon-trash"></i> Delete
+          </button>  
+            <button class="btn btn-outline-light" type="button"  onclick="handleEditUser('${val.id}')">
                 <i class="icon-marker-alt"></i>
                 Edit
               </button>
@@ -42,6 +45,11 @@ function loadTableBodyUser(userList) {
   tableBody.appendChild(fragment);
 }
 
+function handleEditUser(id) {
+  console.log("cek", id);
+  const modal = new bootstrap.Modal(document.getElementById("modalEdituser"));
+  modal.show();
+}
 function openFormuser() {
   // open modal by id
   const modal = new bootstrap.Modal(document.getElementById("modalFormuser"));

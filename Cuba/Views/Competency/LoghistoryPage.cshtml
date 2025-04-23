@@ -1,0 +1,86 @@
+<style>
+    .tbl-border-loghistory {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-loghistory th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-loghistory thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-loghistory th,
+    .tbl-border-loghistory td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+</style>
+<div class="col-12">
+    <div class="row">
+        <div class="col-4">
+            <div class="faq-form">
+                <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                    <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                            data-feather="calendar" style="width: 20px;"></i></div>
+                    <input class="datepicker-here form-control digits" type="text" data-language="en"
+                        data-multiple-dates-separator=", " data-position="bottom left" placeholder="Created Date">
+                </div>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="faq-form">
+                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                    data-feather="search"></i>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="table-responsive" style=" max-height: 450px;">
+                <table class="table tbl-border-loghistory">
+                    <thead id="tbl-loghistory-header" style="background-color: #006CA9;">
+                        <tr>
+                            <th scope="col" style="width: 50px;text-align:center">
+                                No
+                            </th>
+                            <th scope="col" style="width: 280px;">Date Time</th>
+                            <th scope="col" style="width: 280px;">Username</th>
+                            <th scope="col" style="width: 280px;">Draft Name</th>
+                            <th scope="col" style="width: 280px;">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-loghistory">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-10 mt-3">
+            <div id="total-loghistory-page">
+            </div>
+        </div>
+        <div class="col-2 mt-3">
+            <div id="list-loghistory-page">
+            </div>
+        </div>
+    </div>
+</div>

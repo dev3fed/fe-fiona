@@ -5,14 +5,16 @@ async function onModalAddNotation() {
     modal.show();
     const rasciNotation = getState("rasciNotation") || [];
     const dataChangeNotasi = getState("dataChangeNotasi");
-    const resultLevel = await fetchSelectLevel(dataChangeNotasi.draftId);
-    const listLevel = resultLevel?.data.res;
+    const draftidRasci = $("#dataSource-rasci").val();
+    const draftName = $("#dataSource-rasci option:selected").text();
+    const resultLevel = await fetchSelectLevel(draftidRasci);
+    const listLevel = resultLevel?.data.result;
     const formContent = `
         <div class="col-12 mb-2">
           <div>
             <label class="form-label">RASCI Matrix Draft Name</label>
             <select class="form-select digits" disabled>
-              <option value="${dataChangeNotasi.draftId}">${dataChangeNotasi.draftName}</option>
+              <option value="${draftidRasci}">${draftName}</option>
             </select>
           </div>
       </div>
@@ -127,7 +129,10 @@ const deleteBusinesslist = (id) => {
 };
 
 function updateSelectProsbis() {
-  const dataChangeNotasi = getState("dataChangeNotasi");
+  const draftidRasci = $("#dataSource-rasci").val();
+  const levelId = $("#levelId").val();
+  const selectedOption = $("#dataSource-rasci option:selected");
+  const draftSo = selectedOption.data("draftso");
   $("#businessId")
     .select2({
       dropdownParent: $("#modalAddNotation"),
@@ -142,14 +147,15 @@ function updateSelectProsbis() {
             search: params.term || "",
             page: params.page || 1,
             type: "business-process",
-            level: appState.selectedLevel,
-            draftId: dataChangeNotasi.draftId,
+            level: levelId,
+            draftId: draftidRasci,
+            draftSo: draftSo,
           };
         },
         processResults: function (data) {
-          if (data.data && data.data.res) {
+          if (data.data && data.data.result) {
             return {
-              results: data.data.res,
+              results: data.data.result,
               pagination: {
                 more: data.data.pagination.more,
               },
@@ -171,6 +177,10 @@ function updateSelectProsbis() {
 async function onSelectJobRef(event) {
   const jobId = event.target.value;
   const dataChangeNotasi = getState("dataChangeNotasi");
+  const draftidRasci = $("#dataSource-rasci").val();
+  let $select = $("#dataSource-rasci");
+  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
+  let selectedDraftSo = selectedOption.attr("data-draftso");
   try {
     const reset = {
       ...dataChangeNotasi,
@@ -178,8 +188,12 @@ async function onSelectJobRef(event) {
     };
     setState("dataChangeNotasi", reset);
     if (jobId) {
-      const payload = { draftId: dataChangeNotasi.draftId, jobId: jobId };
-      const result = await fetchProsbisByJob(payload);
+      const [orgUnitCode, orgPrl] = jobId.split(";");
+      const payload = { unitCode: orgUnitCode, prlOrg: orgPrl, draftRasciId: draftidRasci };
+      const queryString = "?" + new URLSearchParams(payload).toString();
+      console.log("queryString", queryString);
+      const result = await fetchProsbisByJob(queryString);
+      console.log("result", result);
       if (result.success === true) {
         const dataTbl = result.data;
         const elementSelectedBispro = document.getElementById("table-prosbisref");
@@ -237,8 +251,8 @@ async function onSelectJobRef(event) {
                     return `
                     <th scope="row">
                       <label class="radio-label" for="checked-body-bp">
-                        <input class="checkbox_animated" id="checked-prosbisref-${item.indexNo}" 
-                          type="checkbox" value="${item.indexNo}" 
+                        <input class="checkbox_animated" id="checked-prosbisref-${item.indexNumber}" 
+                          type="checkbox" value="${item.indexNumber}" 
                           onclick="onSelectProsbisRef(${JSON.stringify(item).replace(/"/g, "&quot;")});">
                       </label>
                     </th>
@@ -246,10 +260,10 @@ async function onSelectJobRef(event) {
                       ${item.level}
                     </td>
                     <td style="text-align:center">
-                    ${item.indexNo}
+                    ${item.indexNumber}
                     </td>
                     <td>
-                    ${item.process}
+                    ${item.description}
                     </td>
                     <td>
                         <div class="rasci-container">
@@ -286,7 +300,7 @@ function onSelectPosition(item) {
   setState("dataChangeNotasi", updatedPayload);
 }
 function onSelectProsbisRef(item) {
-  const elementChecked = document.getElementById(`checked-prosbisref-${item.indexNo}`);
+  const elementChecked = document.getElementById(`checked-prosbisref-${item.indexNumber}`);
   const isChecked = elementChecked.checked;
   const jobRefName = $("#jobIdRef").find(":selected").text();
   const dataChangeNotasi = getState("dataChangeNotasi") || { busProsMapped: [] };
@@ -301,9 +315,9 @@ function onSelectProsbisRef(item) {
     const updatedPayload = {
       ...dataChangeNotasi,
       busProsMapped: [
-        ...dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNo),
+        ...dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNumber),
         {
-          parentId: item.indexNo,
+          parentId: item.indexNumber,
           rasciNotation: notation,
         },
       ],
@@ -314,10 +328,10 @@ function onSelectProsbisRef(item) {
   } else {
     const updatedPayload = {
       ...dataChangeNotasi,
-      busProsMapped: dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNo),
+      busProsMapped: dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNumber),
     };
     // console.log("item", item);
-    const removeList = listSelectedProsbisref.filter((entry) => entry.indexNo !== item.indexNo);
+    const removeList = listSelectedProsbisref.filter((entry) => entry.indexNumber !== item.indexNumber);
     setState("listSelectedProsbisref", removeList);
     setState("dataChangeNotasi", updatedPayload);
   }
@@ -352,9 +366,11 @@ async function triggleSelectBusiness() {
   const businessName = selectedBusinessId.find(":selected").text();
   const dataChangeNotasi = getState("dataChangeNotasi") || {};
   const rasciNotation = getState("rasciNotation") || [];
+  const [orgUnitCode, orgPrl] = selectedJobValue.split(";");
   const payload = {
     ...dataChangeNotasi,
-    jobId: selectedJobValue,
+    orgUnitCode: orgUnitCode,
+    orgPrl: orgPrl,
     busProsMapped: [
       ...dataChangeNotasi.busProsMapped,
       {
@@ -377,7 +393,9 @@ async function triggleSelectBusiness() {
   }, 200);
 }
 function selectJobPosition() {
-  const dataProsbis = getState("insertProsbis");
+  let $select = $("#dataSource-rasci");
+  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
+  let selectedDraftSo = selectedOption.attr("data-draftso");
   $("#jobIdPosition")
     .select2({
       dropdownParent: $("#modalAddNotation"),
@@ -391,14 +409,14 @@ function selectJobPosition() {
           return {
             search: params.term || "",
             page: params.page || 1,
-            type: "job",
-            draftId: dataProsbis.draftId,
+            type: "position",
+            draftId: selectedDraftSo,
           };
         },
         processResults: function (data) {
           if (data && data.data) {
             return {
-              results: data.data.res,
+              results: data.data.result,
               pagination: {
                 more: data.data.pagination.more,
               },
@@ -418,7 +436,10 @@ function selectJobPosition() {
 }
 
 function selectJobReference() {
-  const dataProsbis = getState("insertProsbis");
+  const draftidRasci = $("#dataSource-rasci").val();
+  let $select = $("#dataSource-rasci");
+  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
+  let selectedDraftSo = selectedOption.attr("data-draftso");
   $("#jobIdRef")
     .select2({
       dropdownParent: $("#modalAddNotation"),
@@ -432,14 +453,14 @@ function selectJobReference() {
           return {
             search: params.term || "",
             page: params.page || 1,
-            type: "job",
-            draftId: dataProsbis.draftId,
+            type: "position",
+            draftId: selectedDraftSo,
           };
         },
         processResults: function (data) {
           if (data && data.data) {
             return {
-              results: data.data.res,
+              results: data.data.result,
               pagination: {
                 more: data.data.pagination.more,
               },
@@ -756,55 +777,57 @@ async function saveNotationRow() {
 async function saveDraftnotation() {
   try {
     const spinner = document.getElementById("spinBtnNotation");
-    spinner.style.display = "inline-block";
+    // spinner.style.display = "inline-block";
     const dataChangeNotasi = getState("dataChangeNotasi");
-    console.log("dataChangeNotasi", dataChangeNotasi);
+    const draftId = $("#dataSource-rasci").val();
     const inputValue = {
-      draftName: dataChangeNotasi.draftName,
-      draftId: dataChangeNotasi.draftId,
+      draftId: draftId,
+      draftJobSource: null,
       draftType: "Add/Edit RASCI",
-      jobId: dataChangeNotasi.jobId,
+      orgUnitCode: dataChangeNotasi.orgUnitCode,
+      orgPrl: dataChangeNotasi.orgPrl,
       busProsMapped: dataChangeNotasi.busProsMapped,
     };
-    const result = await submitDraftProsbis(inputValue);
-    if (result.status === 200) {
-      const modalAddNotation = document.getElementById("modalAddNotation");
-      const modal = bootstrap.Modal.getInstance(modalAddNotation);
+    console.log("first", inputValue);
+    // const result = await submitDraftProsbis(inputValue);
+    // if (result.status === 200) {
+    //   const modalAddNotation = document.getElementById("modalAddNotation");
+    //   const modal = bootstrap.Modal.getInstance(modalAddNotation);
 
-      const btnDraft = document.getElementById("btnDraftnotation");
-      btnDraft.disabled = true;
-      // btnApproval.disabled = true;
+    //   const btnDraft = document.getElementById("btnDraftnotation");
+    //   btnDraft.disabled = true;
+    //   // btnApproval.disabled = true;
 
-      setTimeout(() => {
-        swal({
-          title: "SUCCESS",
-          icon: "success",
-          buttons: false,
-          timer: 2000,
-          content: {
-            element: "div",
-            attributes: {
-              innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
-              <br>
-              <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
-              `,
-            },
-          },
-        }).then(async () => {
-          spinner.style.display = "none";
-          if (modal) {
-            modal.hide();
-          }
-          backChangeNotation();
-          const payload = {
-            Page: 1,
-            PageSize: 5,
-          };
-          const queryString = new URLSearchParams(payload).toString();
-          const dataDraft = await fetchDraftProsbis(queryString);
-          loadTableBodyDraft(dataDraft);
-        });
-      }, 100);
-    }
+    //   setTimeout(() => {
+    //     swal({
+    //       title: "SUCCESS",
+    //       icon: "success",
+    //       buttons: false,
+    //       timer: 2000,
+    //       content: {
+    //         element: "div",
+    //         attributes: {
+    //           innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+    //           <br>
+    //           <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
+    //           `,
+    //         },
+    //       },
+    //     }).then(async () => {
+    //       spinner.style.display = "none";
+    //       if (modal) {
+    //         modal.hide();
+    //       }
+    //       backChangeNotation();
+    //       const payload = {
+    //         Page: 1,
+    //         PageSize: 5,
+    //       };
+    //       const queryString = new URLSearchParams(payload).toString();
+    //       const dataDraft = await fetchDraftProsbis(queryString);
+    //       loadTableBodyDraft(dataDraft);
+    //     });
+    //   }, 100);
+    // }
   } catch (error) {}
 }

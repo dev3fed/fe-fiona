@@ -1,0 +1,60 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<style>
+    .modal-dialog.modal-editrole {
+        max-width: 60%;
+        margin: 120px auto;
+    }
+</style>
+<div class="modal fade" id="modalEditrole" tabindex="-1" role="dialog" aria-labelledby="modalEditroleLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-editrole bounceInDown  animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditroleTitle">Edit Role</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="body-edituser">
+                <div class="row">
+                    <div class="col-12">
+                        <label class="form-label">Role Name</label>
+                        <input class="form-control" type="text" id="role-name" placeholder="Type role name">
+                    </div>
+                    <div class="col-12 mt-3">
+                        <div class="table-responsive " style=" max-height: 350px;">
+                            <table class="table tbl-border-management">
+                                <thead id="header-editrole" style="background-color: #006CA9;">
+                                    <tr>
+                                        <th scope="col" style="width: 30px;text-align:center">
+
+                                        </th>
+                                        <th scope="col" style="width: 180px">Menu</th>
+                                        <th scope="col" style="width: 350px">Action Access</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-editrole">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i> Back</button>
+                    <button id="applyFilterBtn" class="btn btn-primary" type="button">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingCreateuser" role="status"></div>
+                            <span class="btn-text">Save Change</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

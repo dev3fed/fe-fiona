@@ -11,8 +11,8 @@ async function handleEditComment(data) {
 async function handleDeleteProsbis(param) {
   try {
     const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
-    const deleted = listSelectedProsbisref.filter((item) => item.indexNo !== param.indexNo);
-    const checkbox = document.getElementById(`checked-prosbisref-${param.indexNo}`);
+    const deleted = listSelectedProsbisref.filter((item) => item.indexNumber !== param.indexNumber);
+    const checkbox = document.getElementById(`checked-prosbisref-${param.indexNumber}`);
     if (checkbox) {
       checkbox.checked = false;
     }
@@ -147,10 +147,10 @@ async function cardSelectedProsbisref() {
                        ${item.level}
                      </td>
                      <td style="text-align:center">
-                     ${item.indexNo}
+                     ${item.indexNumber}
                      </td>
                      <td>
-                     ${item.process}
+                     ${item.description}
                      </td>
                      <td>
                          <div class="rasci-container">

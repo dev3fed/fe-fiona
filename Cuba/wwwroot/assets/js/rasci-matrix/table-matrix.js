@@ -1,20 +1,16 @@
+let onLoadData = false;
 function resetTable() {
   const tableHeader = document.getElementById("table-header");
   const tableBody = document.getElementById("table-body");
 
-  // Hapus semua elemen dalam thead dan tbody
   while (tableHeader.firstChild) {
     tableHeader.removeChild(tableHeader.firstChild);
   }
   while (tableBody.firstChild) {
     tableBody.removeChild(tableBody.firstChild);
   }
-
-  // Optional: Reset ukuran kolom agar tabel tidak berubah drastis
   const table = document.querySelector(".custom-border-table");
   table.style.tableLayout = "auto";
-
-  console.log("Table header, body, and columns reset!");
 }
 
 function debounce(func, delay) {
@@ -25,6 +21,12 @@ function debounce(func, delay) {
   };
 }
 
+const hideAllTooltips = () => {
+  document.querySelectorAll(".tooltip").forEach((tooltip) => {
+    bootstrap.Tooltip.getInstance(tooltip)?.hide();
+  });
+};
+
 const tableContainer = document.querySelector(".scrollable-table");
 
 tableContainer.addEventListener(
@@ -32,138 +34,165 @@ tableContainer.addEventListener(
   debounce(async function () {
     const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
     const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
-
+    const leftReached = tableContainer.scrollLeft === 0;
+    const loader = document.getElementById("loader");
+    let currentPageY = getState("currentPageY");
+    let currentPageX = getState("currentPageX");
+    if (onLoadData) return;
     if (bottomReached) {
-      console.log("scroll bottom");
-
-      // const itemsPerPageY = getState("itemsPerPageY");
-      let currentPageY = getState("currentPageY");
-      let currentPageX = getState("currentPageX");
-      // const storageProsbis = getState("storageProsbis");
-      const resultProsbis = await fetchProsbisSumulation(currentPageY + 1, currentPageX);
-      console.log("first", resultProsbis.data);
-      loadTableBody(resultProsbis.data);
-      setState("currentPageY", currentPageY + 1);
-      // const startIndex = currentPageY * itemsPerPageY;
-      // const endIndex = startIndex + itemsPerPageY;
-      // console.log("currentPageY", currentPageY + 1);
-
-      if (startIndex < storageProsbis.length) {
-        // loadTableHeader(appState.resultJabatan);
-        // renderRow(startIndex, endIndex);
-        // setState("currentPageY", currentPageY + 1);
+      const selectedValue = $("#dataSource-rasci").val();
+      const payloadProsbis = getState("payloadProsbis");
+      const payloadPosition = getState("payloadPosition");
+      const payload = {
+        ...payloadProsbis,
+        draftRasciId: selectedValue === "master" ? null : selectedValue,
+        level: [1, 2, 3, 4, 5, 6],
+        row: currentPageY + 1,
+        rowSize: 15,
+      };
+      isLoading = true;
+      onLoadData = true;
+      loader.style.display = "flex";
+      const resultProsbis = await fetchProsbisMatrix(payload);
+      const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
+      const indexNumberPros = getAllIndexNumbers();
+      const combineIndex = [...indexNumberPros, ...prosbisNumber];
+      const storageDataPosition = getState("storageDataPosition");
+      if (combineIndex.length > 0 && resultProsbis.success === true) {
+        if (storageDataPosition.length > 10) {
+          const numberLoop = [currentPageX - 1, currentPageX];
+          const positionList = await fetchMultiplePage(numberLoop, combineIndex);
+          setTimeout(() => {
+            loadTableBody(resultProsbis.data);
+            mapRasciCells(combineIndex, positionList);
+            setState("currentPageY", currentPageY + 1);
+            isLoading = false;
+            loader.style.display = "none";
+            onLoadData = false;
+            setState("payloadPosition", { ...payloadPosition, indexNumber: combineIndex });
+            hideAllTooltips();
+          }, 50);
+        } else {
+          const payloadJob = {
+            ...payloadPosition,
+            col: 1,
+            colSize: 10,
+            draftRasciId: selectedValue === "master" ? null : selectedValue,
+            indexNumber: combineIndex,
+          };
+          const resultPosition = await fetchPositionMatrix(payloadJob);
+          setTimeout(() => {
+            loadTableBody(resultProsbis.data);
+            mapRasciCells(combineIndex, resultPosition.data);
+            setState("currentPageY", currentPageY + 1);
+            isLoading = false;
+            loader.style.display = "none";
+            onLoadData = false;
+            setState("payloadPosition", { ...payloadPosition, indexNumber: combineIndex });
+            hideAllTooltips();
+          }, 50);
+        }
       }
     }
 
     if (rightReached) {
-      console.log("scroll right");
-
-      // const itemsPerPageX = getState("itemsPerPageX");
-      // let currentPageX = getState("currentPageX");
-
-      // const startIndex = currentPageX * itemsPerPageX;
-      // const endIndex = startIndex + itemsPerPageX;
-
-      // setState("currentPageX", currentPageX + 1);
-      // renderColumn(startIndex, endIndex);
+      isLoading = true;
+      onLoadData = true;
+      loader.style.display = "flex";
+      setState("currentPageX", currentPageX + 1);
+      loadMoreData(currentPageX + 1);
     }
-  }, 300), // 300ms debounce delay
+    if (leftReached) {
+      if (currentPageX > 2) {
+        isLoading = true;
+        onLoadData = true;
+        loader.style.display = "flex";
+        restoreData();
+      }
+    }
+  }, 100),
 );
 
-function renderRow(startIndex, endIndex) {
-  console.log("Load data from", startIndex, "to", endIndex);
+const fetchMultiplePage = async (numberLoop, combineIndex) => {
+  const payloadPosition = getState("payloadPosition");
+  const selectedValue = $("#dataSource-rasci").val();
+  const positionList = await Promise.all(
+    numberLoop.map(async (number) => {
+      const payloadJob = {
+        ...payloadPosition,
+        col: number,
+        colSize: 10,
+        draftRasciId: selectedValue === "master" ? null : selectedValue,
+        indexNumber: combineIndex,
+      };
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+      return resultPosition.data;
+    }),
+  );
 
-  const storageProsbis = getState("storageProsbis");
-  const resultProsbis = getState("resultProsbis");
-  const rasciMapping = getState("resultRasciMapping") || [];
-  const jobTitleList = getState("resultJabatan");
-
-  const updateProsbis = storageProsbis.slice(startIndex, endIndex);
-  console.log("updateProsbis", updateProsbis);
-  if (updateProsbis.length === 0) return; // Tidak ada data baru untuk dimuat
-
-  const tableBody = document.getElementById("table-body");
-  if (!tableBody) return;
-
-  const fragment = document.createDocumentFragment();
-
-  updateProsbis.forEach((val) => {
-    const levelClass =
-      val.level && getState("idSearchProsbis") == val.indexGroup
-        ? `level-${val.level} highlight`
-        : val.level
-        ? `level-${val.level}`
-        : "";
-
-    const isExpanded = getState("idProsbis").includes(val.indexGroup) ? "chevron-up" : "chevron-down";
-
-    const row = document.createElement("tr");
-    row.id = `row-${val.indexGroup}`;
-    row.classList.add("clusterize-cluster", levelClass);
-
-    row.innerHTML = `
-      <td scope="row" class="level-col" style="font-size:12px;font-weight: 500;">
-        L${val.level}
-      </td>
-      <td class="index-col" style="text-align:left;font-size:12px;font-weight: 500;">
-        <span style="padding-left:5px;">${val.indexGroup}</span>
-      </td>
-      <td class="headcol" style="font-size:12px;font-weight: 500;">
-        <div class="prosbis-cell-wrapper">
-          <div class="hierarchy-icon-wrapper">
-            ${
-              !getState("isSearchMatrix") && val.hasChild
-                ? `<i data-feather="${isExpanded}" class="hierarchy-icon" id="icon-${val.indexGroup}"
-                style="width:24px;" onclick="handleCollapse('${val.indexGroup}')"></i>`
-                : ``
-            }
-          </div>
-          <div class="flex-fill prosbis-name" onclick="onModalProsbis(${JSON.stringify(val).replace(
-            /"/g,
-            "&quot;",
-          )})">${val.description}</div>
-          <div class="ellipsis-menu prosbis-row-ellipsis">
-            <div class="dropright">
-              <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
-              style="border: none; background: transparent; cursor: pointer;">
-              <i class="fas fa-ellipsis-v"></i>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li onclick="onModalProsbis(${JSON.stringify(val).replace(
-                  /"/g,
-                  "&quot;",
-                )})"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
-                <li onclick="sendDetailbp(${JSON.stringify(val).replace(
-                  /"/g,
-                  "&quot;",
-                )})"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
-                <li onclick="checkChildrenProsbis(${JSON.stringify(val).replace(
-                  /"/g,
-                  "&quot;",
-                )})" ><a class="dropdown-item" style="color: red;">
-                  <img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </td>
-    
-    `;
-    fragment.appendChild(row);
-  });
-  // setState("currentPageY", startIndex + 1);
-
-  tableBody.appendChild(fragment);
-
-  feather.replace();
-  initializeTooltips();
+  return positionList.flat();
+};
+async function loadMoreData(page) {
+  try {
+    const payloadPosition = getState("payloadPosition");
+    const loader = document.getElementById("loader");
+    const payloadJob = {
+      ...payloadPosition,
+      col: page,
+    };
+    setState("payloadPosition", payloadJob);
+    const resultPosition = await fetchPositionMatrix(payloadJob);
+    const storageDataPosition = getState("storageDataPosition");
+    const positionList = [...storageDataPosition, ...resultPosition.data];
+    console.log("positionList", positionList);
+    if (positionList.length > 20) {
+      const cuttingPosition = positionList.slice(10); // Pangkas 10 data di awal
+      setState("storageDataPosition", cuttingPosition);
+      const indexNumberList = getAllIndexNumbers();
+      appendDynamicHeader(cuttingPosition);
+      mapRasciCells(indexNumberList, cuttingPosition);
+      loader.style.display = "none";
+      isLoading = false;
+      onLoadData = false;
+      tableContainer.scrollLeft -= 1700;
+      hideAllTooltips();
+    } else {
+      setState("storageDataPosition", positionList);
+      const indexNumberList = getAllIndexNumbers();
+      appendDynamicHeader(positionList);
+      mapRasciCells(indexNumberList, positionList);
+      loader.style.display = "none";
+      isLoading = false;
+      onLoadData = false;
+      hideAllTooltips();
+    }
+  } catch (error) {}
 }
+async function restoreData() {
+  try {
+    const storageDataPosition = getState("storageDataPosition");
+    let currentPageX = getState("currentPageX");
+    const loader = document.getElementById("loader");
+    if (currentPageX > 2) {
+      const payloadPosition = getState("payloadPosition");
+      const indexNumberList = getAllIndexNumbers();
 
-function renderColumn(page, limit) {
-  console.log("first", page);
-  console.log("first", limit);
-  const storageJabatan = getState("storageJabatan");
-  const resultJabatan = getState("resultJabatan");
-  const updatejob = storageJabatan.slice(page, limit);
-  setState("resultJabatan", [...resultJabatan, ...updatejob]);
+      const payloadJob = {
+        ...payloadPosition,
+        col: currentPageX - 2,
+      };
+      const cuttingPosition = storageDataPosition.slice(0, -10);
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+      const combinedPosition = [...resultPosition.data, ...cuttingPosition];
+      appendDynamicHeader(combinedPosition);
+      mapRasciCells(indexNumberList, combinedPosition);
+      setState("currentPageX", currentPageX - 1);
+      loader.style.display = "none";
+      isLoading = false;
+      onLoadData = false;
+      hideAllTooltips();
+      tableContainer.scrollLeft += 1700;
+    }
+    //
+  } catch (error) {}
 }

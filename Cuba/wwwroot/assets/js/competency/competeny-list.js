@@ -1,30 +1,51 @@
 document.addEventListener("dataLoaded", function () {
-  const jobList = getState("jobList");
-  const competencyList = getState("competencyList");
-  loadTableHeader(competencyList);
-  loadTableBody(jobList);
+  // const jobList = getState("jobList");
+  // const competencyList = getState("competencyList");
+  // loadTableHeader(competencyList);
+  // loadTableBody(jobList);
   feather.replace();
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  const jobList = getState("jobList");
-  const competencyList = getState("competencyList");
+  // const jobList = getState("jobList");
+  // const competencyList = getState("competencyList");
   let selectElement = document.querySelector("#dataSource-competency");
-  console.log("Selected value:", selectElement.value);
 
   selectedType = document.querySelector(".dropdown-menu .dropdown-item").textContent.trim();
-  console.log("Default selected:", selectedType);
 
   if (selectElement.value === "master") {
-    document.getElementById("pills-warningtab").style.display = "none";
+    document.getElementById("pills-competency-tabcontent").style.display = "none";
   }
   fetctDataSourceComp();
-  loadTableHeader(competencyList);
-  loadTableBody(jobList);
+  // loadTableHeader(competencyList);
+  // loadTableBody(jobList);
   feather.replace();
 });
 
-function fetctDataSourceComp() {
+async function openPageDictionary() {
+  try {
+    const dictionaryPage = document.getElementById("dictionary-page");
+    const mainCompetency = document.getElementById("main-competency");
+    const headerCompetency = document.getElementById("header-competency");
+    const headerDictionary = document.getElementById("header-dictionarypage");
+    if (dictionaryPage) {
+      dictionaryPage.style.display = "block";
+    }
+    if (mainCompetency) {
+      mainCompetency.style.display = "none";
+    }
+    if (headerDictionary) {
+      headerDictionary.style.display = "block";
+    }
+    if (headerCompetency) {
+      headerCompetency.style.display = "none";
+    }
+    bodypageMandatory();
+    bodypageTechnical();
+    bodypageBehavior();
+  } catch (error) {}
+}
+function fetctDataSourceComp(draftId = null) {
   $.ajax({
     url: `${API_URL_COMPE}/api/Utilities/selection`,
     dataType: "json",
@@ -38,12 +59,20 @@ function fetctDataSourceComp() {
         let $select = $("#dataSource-competency");
         $select.find("option:not(:first)").remove();
         response.data.result.forEach((item) => {
-          $select.append(new Option(item.text, item.id, false, false));
+          let isSelected = draftId && item.id == draftId;
+          $select.append(new Option(item.text, item.id, isSelected, isSelected));
         });
+        if (draftId) {
+          let newOption = new Option(`Draft ${draftId}`, draftId, true, true);
+          $select.append(newOption);
+        }
         $select.select2({
           placeholder: "Choose",
           allowClear: true,
         });
+        if (draftId) {
+          $select.val(draftId).trigger("change");
+        }
       }
     },
   });
@@ -68,127 +97,255 @@ async function handleSearchCompetency() {
     const spinner = document.getElementById("loadingSearch");
     spinner.style.display = "inline-block";
     const searchType = getState("selectedType");
-    console.log("searchType", searchType);
     const searchText = document.getElementById("inputText").value;
-    console.log(searchText);
     let selectElement = document.querySelector("#dataSource-competency");
-    console.log("Selected value:", selectElement.value);
+    const payloadJob = getState("payloadJob");
+    const payloadCompetency = getState("payloadCompetency");
+    const storageDataCompetency = getState("storageDataCompetency");
+    const storageDataMapping = getState("storageDataMapping");
+    console.log("storageDataCompetency", storageDataCompetency);
+    console.log("storageDataMapping", storageDataMapping);
+    setState("storageDataCompetency", []);
+    setState("storageDataMapping", []);
     const payload = {
+      ...payloadJob,
       dataSource: selectElement.value,
       filter: searchType,
       search: searchText,
       page: 1,
-      pageSize: 1000,
     };
+    setState("payloadJob", payload);
+    setState("currentPageY", 1);
+    setState("currentPageX", 1);
     const queryString = "?" + new URLSearchParams(payload).toString();
-    console.log("queryString", queryString);
     const resultJob = await fetchJobList(queryString);
-    console.log("resultJob", resultJob);
+    const listJobCode = resultJob.data.map((value) => value.positionCode);
     if (resultJob.data.length > 0) {
       const body = {
+        ...payloadCompetency,
         dataSource: selectElement.value,
+        jobCode: listJobCode,
         page: 1,
-        pageSize: 1000,
-        jobCode: resultJob.data.map((value) => value.jobCode),
       };
+      setState("payloadCompetency", body);
       const resultCompetency = await fetchCompetencyList(body);
       console.log("resultCompetency", resultCompetency);
-      const bodyMapping = {
-        dataSource: selectElement.value,
-        jobCode: resultJob.data.map((value) => value.jobCode),
-        compCode: resultCompetency?.data.map((val) => val.compCode),
-        page: 1,
-        pageSize: 999999,
-      };
-      const resultMapping = await fetchCompetencyMapping(bodyMapping);
-      console.log("resultMapping", resultMapping.data);
-
-      appState.competencyMapping = resultMapping.data.compData;
-      appState.jobList = resultJob.data;
-      appState.competencyList = resultCompetency.data;
+      const combineCompetency = [...storageDataCompetency, ...resultCompetency.data.competency];
+      // const bodyMapping = {
+      //   dataSource: selectElement.value,
+      //   jobCode: resultJob.data.map((value) => value.jobCode),
+      //   compCode: resultCompetency?.data.map((val) => val.compCode),
+      //   page: 1,
+      //   pageSize: 10,
+      // };
+      // const resultMapping = await fetchCompetencyMapping(bodyMapping);
+      // appState.competencyMapping = resultMapping.data.level;
+      // appState.jobList = resultJob.data;
+      // appState.competencyList = resultCompetency?.data.competency;
 
       // set display id empty-competency none
       document.getElementById("empty-competency").style.display = "none";
       document.getElementById("table-competency").style.display = "block";
-
-      loadTableHeader(resultCompetency.data);
-      loadTableBody(resultJob.data);
+      $("#table-body").empty();
+      setTimeout(() => {
+        setState("storageDataCompetency", combineCompetency);
+        setState("storageDataMapping", resultCompetency.data.level);
+        loadTableHeader(resultCompetency?.data.competency);
+        loadTableBody(resultJob.data);
+        mapCompetencyCells(listJobCode, combineCompetency, resultCompetency.data.level);
+      }, 500);
     }
     spinner.style.display = "none";
   } catch (error) {}
 }
 function changeDataSource(dataSource) {
-  console.log("dataSource", dataSource);
   if (dataSource !== "master") {
-    document.getElementById("pills-warningtab").style.display = "flex";
+    document.getElementById("pills-competency-tabcontent").style.display = "flex";
     document.getElementById("btnCreateDraft").style.display = "none";
   } else {
-    document.getElementById("pills-warningtab").style.display = "none";
+    document.getElementById("pills-competency-tabcontent").style.display = "none";
     document.getElementById("btnCreateDraft").style.display = "flex";
   }
 }
+
+// function loadTableHeader(competencyList) {
+//   const typeMap = {
+//     mandatory: "Mandatory",
+//     general: "General",
+//     spesifik: "Specific",
+//   };
+
+//   const typeCounts = {
+//     mandatory: competencyList.filter((item) => item.compType === "mandatory").length,
+//     general: competencyList.filter((item) => item.compType === "general").length,
+//     spesifik: competencyList.filter((item) => item.compType === "spesifik").length,
+//   };
+
+//   let headerRow1 = `
+//     <tr style="height: 30px;">
+//       <th rowspan="2" class="headcol head-cell" style="
+//         position: sticky;
+//         left: 0;
+//         top: 0;
+//         z-index: 5;
+//         background-color: #fff;
+//         vertical-align: middle;
+//         text-align: center;
+//       ">
+//         <span style="padding-left:10px;">Job Title</span>
+//       </th>`;
+
+//   // Loop setiap jenis kompetensi
+//   for (const [key, label] of Object.entries(typeMap)) {
+//     if (typeCounts[key] > 0) {
+//       headerRow1 += `<th class="tg-baqh competency-cell color-${key}" colspan="${typeCounts[key]}">${label}</th>`;
+//     }
+//   }
+
+//   headerRow1 += `</tr>`;
+
+//   const headerRow2 = `
+//     <tr style="height: 50px;">
+//       ${competencyList
+//         .map(
+//           (val) => `
+//             <th class="color-${val.compType} competency-cell">
+//               <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom"
+//                 title="${val.compName}" onclick="handleDetailCompetency('${val.compCode}')">
+//                 ${val.compName}
+//               </div>
+//             </th>`,
+//         )
+//         .join("")}
+//     </tr>
+//   `;
+
+//   document.getElementById("table-header").innerHTML = headerRow1 + headerRow2;
+//   initializeTooltips();
+// }
+
 function loadTableHeader(competencyList) {
-  const totalMandatory = competencyList.filter((item) => item.compType === "Mandatory").length;
-  console.log("competencyList", competencyList);
-  console.log("totalMandatory", totalMandatory);
-  const totalGeneral = competencyList.filter((item) => item.compType === "General").length;
-  const totalSpecific = competencyList.filter((item) => item.compType === "Spesifik").length;
-  const headerContent = `
-        <tr style="height: 30px;">
-            <th rowspan="2" class="headcol head-cell" style="position:sticky;top:0; z-index:1 vertical-align: middle;text-align: center;">
-                <span style="padding-left:10px;">Job Title</span>
-            </th>
-            <th class="tg-baqh competency-cell color-mandatory " colspan="${totalMandatory}">
-                Mandatory</th>
-            <th class="tg-baqh competency-cell color-general" colspan="${totalGeneral}">General </th>
-            <th class="tg-baqh competency-cell color-specific" colspan="${totalSpecific}">Specific</th>
-        </tr>
-            <tr style="height: 50px;">
-                ${competencyList
-                  ?.map(
-                    (val, i) => `
-                     <th class="color-${val.compType} competency-cell">
-                            <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                title="${val.name}" onclick="handleDetailCompetency(${val.compCode})">
-                                ${val.name}
-                            </div>
-                        </th>
-            `,
-                  )
-                  .join("")}
-            </tr>
-            `;
-  document.getElementById("table-header").innerHTML = headerContent;
+  const headerTable = document.getElementById("table-header");
+  headerTable.innerHTML = renderStaticHeader(); // buat #header-row-1 dan #header-row-2
+
+  appendDynamicHeader(competencyList); // baru di sini aman diisi
+}
+
+function renderStaticHeader() {
+  return `
+    <tr style="height: 30px;" id="header-row-1">
+      <th rowspan="2" class="headcol head-cell" style="
+        position: sticky;
+        left: 0;
+        top: 0;
+        z-index: 5;
+        background-color: #fff;
+        vertical-align: middle;
+        text-align: center;
+      ">
+        <span style="padding-left:10px;">Job Title</span>
+      </th>
+    </tr>
+    <tr id="header-row-2" style="height: 50px;"></tr>
+  `;
+}
+
+function appendDynamicHeader(competencyList) {
+  const headerRow1 = document.getElementById("header-row-1");
+  const headerRow2 = document.getElementById("header-row-2");
+
+  if (!headerRow1 || !headerRow2) {
+    console.error("Header row 1 atau 2 tidak ditemukan!");
+    return;
+  }
+
+  const typeMap = {
+    mandatory: "Mandatory",
+    general: "General",
+    spesifik: "Specific",
+  };
+
+  // 1. Hapus semua <th> dinamis sebelumnya dari headerRow1 (selain kolom "Job Title")
+  headerRow1.querySelectorAll(".competency-cell").forEach((th) => th.remove());
+
+  // 2. Hapus semua kolom dari headerRow2
+  while (headerRow2.firstChild) {
+    headerRow2.removeChild(headerRow2.firstChild);
+  }
+
+  // 3. Hitung jumlah kompetensi berdasarkan tipe
+  const typeCounts = {
+    mandatory: competencyList.filter((item) => item.compType === "mandatory").length,
+    general: competencyList.filter((item) => item.compType === "general").length,
+    spesifik: competencyList.filter((item) => item.compType === "spesifik").length,
+  };
+
+  // 4. Tambahkan kolom grup: Mandatory / General / Specific
+  for (const [key, label] of Object.entries(typeMap)) {
+    if (typeCounts[key] > 0) {
+      const th = document.createElement("th");
+      th.className = `tg-baqh competency-cell color-${key}`;
+      th.colSpan = typeCounts[key];
+      th.textContent = label;
+      headerRow1.appendChild(th);
+    }
+  }
+
+  // 5. Tambahkan kolom kompetensi satu per satu ke baris kedua
+  competencyList.forEach((val) => {
+    const th = document.createElement("th");
+    th.className = `color-${val.compType} competency-cell`;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "competency-cell-wrapper";
+    wrapper.setAttribute("data-bs-toggle", "tooltip");
+    wrapper.setAttribute("data-bs-placement", "bottom");
+    wrapper.title = val.compName;
+    wrapper.textContent = val.compName;
+    wrapper.onclick = () => handleDetailCompetency(val.compCode);
+
+    th.appendChild(wrapper);
+    headerRow2.appendChild(th);
+  });
+
   initializeTooltips();
 }
 
 function loadTableBody(jobList) {
-  const competencyList = getState("competencyList");
-  const competencyMapping = getState("competencyMapping");
-  console.log("jobList", jobList);
-  const bodyContent = jobList
-    ?.map((val, i) => {
-      const compeCells = mapCompetencyCells(val.jobCode, competencyList, competencyMapping);
-      return `
-          <tr>
-             <td class="headcol">
-                <div class="joblist-cell-wrapper">
-                    <div class="flex-fill joblist-name">${val.jobName}</div>
-                </div>
-              </td>
-              ${compeCells}
-          </tr>`;
-    })
-    .join("");
-
   const tableBody = document.getElementById("table-body");
-  if (tableBody) {
-    tableBody.innerHTML = bodyContent;
-    feather.replace();
-    initializeTooltips();
-  } else {
+
+  if (!tableBody) {
     console.error("Table body element not found");
+    return;
   }
+
+  // Kosongkan tbody sebelum isi baru ditambahkan
+  // while (tableBody.firstChild) {
+  //   tableBody.removeChild(tableBody.firstChild);
+  // }
+
+  // Tambahkan setiap baris
+  jobList?.forEach((val) => {
+    const tr = document.createElement("tr");
+    tr.id = `tr-${val.positionCode}`;
+    const td = document.createElement("td");
+    td.className = "headcol";
+
+    const wrapperDiv = document.createElement("div");
+    wrapperDiv.className = "joblist-cell-wrapper";
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "flex-fill joblist-name";
+    nameDiv.textContent = val.positionName;
+
+    wrapperDiv.appendChild(nameDiv);
+    td.appendChild(wrapperDiv);
+    tr.appendChild(td);
+    tableBody.appendChild(tr);
+  });
+
+  feather.replace();
+  initializeTooltips();
 }
 
 // Initialize tooltips after rendering
@@ -197,70 +354,65 @@ function initializeTooltips() {
   tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
-// Map RASCI Cells (Memoized)
-const compentencyCellsChace = new Map();
+function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
+  // console.log("listJobCode", listJobCode);
+  // console.log("listCompetency", listCompetency);
+  // console.log("competencyMapping", competencyMapping);
 
-function mapCompetencyCells(jobId, competencyList, competencyMapping) {
-  // Tambahkan timestamp atau versi data ke cacheKey
-  const timestamp = new Date().toISOString();
-  const cacheKey = `${jobId}-${competencyList.length}-${timestamp}`;
+  listJobCode.forEach((jobCode) => {
+    const row = getRowById(`tr-${jobCode}`);
+    if (!row) {
+      console.warn(`Baris dengan ID #tr-${jobCode} tidak ditemukan!`);
+      return;
+    }
+    row.querySelectorAll("td[data-index]").forEach((td) => td.remove());
+    listCompetency.forEach((value) => {
+      const competencyItem = competencyMapping.find(
+        (rm) => rm.positionCode === jobCode && rm.compCode === value.compCode,
+      );
+      // console.log("competencyItem", competencyItem);
 
-  if (compentencyCellsChace.has(cacheKey)) {
-    return compentencyCellsChace.get(cacheKey);
-  }
+      const tdElement = document.createElement("td");
+      tdElement.dataset.index = `${jobCode}-${value.compCode}`;
 
-  if (competencyMapping.length === 0) {
-    return "";
-  }
+      const level = competencyItem?.level || "";
 
-  const compeCells = competencyList
-    .map((competency) => {
-      const competencyItem = competencyMapping.filter((rm) => rm.jobId === jobId && rm.compeId === competency.id);
-      let competencyLevel = "";
-      competencyItem.forEach((item) => {
-        if (item) {
-          competencyLevel = item.level;
-        }
-      });
-      return `<td>
-                <div class="competency-container">
-                    <div class="competency-value">
-                        ${competencyLevel} 
-                    </div>
-                    <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="openModalEditDepth(${jobId},${competency.id})">
-                </div>
-            </td>`;
-    })
-    .join("");
+      tdElement.innerHTML = `
+        <div class="competency-container">
+          <div class="competency-value">
+            ${level}
+          </div>
+          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="openModalEditDepth('${jobCode}', '${value.compCode}')">
+        </div>
+      `;
 
-  // Cache the result only if it's valid
-  if (compeCells) {
-    compentencyCellsChace.set(cacheKey, compeCells);
-  }
-
-  return compeCells;
+      row.appendChild(tdElement);
+    });
+  });
 }
 
-const openModalEditDepth = (jobId, competencyId) => {
-  const competencyList = getState("competencyList");
-  const competencyMapping = getState("competencyMapping");
-  const jobList = getState("jobList");
-  // Cari level berdasarkan jobId dan competencyId
-  const competencyLevel = competencyMapping.find((rm) => rm.jobId === jobId && rm.compeId === competencyId);
-  const compeCategory = competencyList.find((compe) => compe.id === competencyId);
-  const dataJob = jobList.find((job) => job.id === jobId);
+const openModalEditDepth = async (jobCode, compCode) => {
+  const selectedValue = $("#dataSource-competency").val();
+  const payload = {
+    dataSource: selectedValue,
+    positionCode: jobCode,
+    competencyCode: compCode,
+  };
+  const queryString = "?" + new URLSearchParams(payload).toString();
+  const result = await fetchProficiencyLevel(queryString);
+  setState("detailProficiency", result.data);
+  const competencyLevel = result.data.proficiencyLevel;
+  const compeCategory = result.data.competencyType;
+  const detailData = result.data;
 
-  setState("dataEditDraft", { compeId: competencyId, jobId: jobId, level: competencyLevel?.level || null });
-
-  const btnDraft = document.getElementById("btnSaveDraft");
   const btnApproval = document.getElementById("btnSubmitApproval");
-  btnDraft.disabled = competencyLevel?.level ? false : true;
-  btnApproval.disabled = competencyLevel?.level ? false : true;
-  if (compeCategory?.category !== "mandatory") {
+  btnApproval.disabled = competencyLevel ? false : true;
+
+  if (compeCategory !== "mandatory") {
     const modal = new bootstrap.Modal(document.getElementById("modalEditDepthLevel"));
     modal.show();
 
-    const selectedLevel = competencyLevel?.level || "";
+    const selectedLevel = competencyLevel || "";
 
     // Array dinamis untuk level
     const levels = [1, 2, 3, 4];
@@ -270,16 +422,16 @@ const openModalEditDepth = (jobId, competencyId) => {
       let radioButtons = levels
         .map((level) => {
           // Kondisi disabled jika compeCategory === "general" dan level < selectedLevel
-          const isDisabled = compeCategory?.category === "general" && level < selectedLevel;
+          const isDisabled = compeCategory === "general" && level < selectedLevel;
 
           return `
             <div class="form-check form-check-inline radio radio-primary">
-              <input 
-                class="form-check-input" 
-                id="radioinline${level}" 
-                type="radio" 
-                name="radio1" 
-                value="${level}" 
+              <input
+                class="form-check-input"
+                id="radioinline${level}"
+                type="radio"
+                name="radio1"
+                value="${level}"
                 onchange="changeLevel()"
                 ${level === selectedLevel ? "checked" : ""}
                 ${isDisabled ? "disabled" : ""}
@@ -290,14 +442,14 @@ const openModalEditDepth = (jobId, competencyId) => {
         .join("");
 
       // Tambahkan opsi "No Level/Remove" jika compeCategory === "specific"
-      if (compeCategory?.category === "specific") {
+      if (compeCategory === "specific") {
         radioButtons += `
             <div class="form-check form-check-inline radio radio-primary">
-              <input 
-                class="form-check-input" 
-                id="radioinlineNone" 
-                type="radio" 
-                name="radio1" 
+              <input
+                class="form-check-input"
+                id="radioinlineNone"
+                type="radio"
+                name="radio1"
                 value="none"
                 onchange="changeLevel()"
                 ${selectedLevel === "none" ? "checked" : ""}
@@ -308,7 +460,6 @@ const openModalEditDepth = (jobId, competencyId) => {
 
       return radioButtons;
     };
-    console.log("compeCategory", compeCategory);
     // Isi konten form secara dinamis
     const category = {
       mandatory: "Mandatory",
@@ -317,28 +468,52 @@ const openModalEditDepth = (jobId, competencyId) => {
     };
     const formContent = `
         <div class="col-12">
-            <div class="mb-2">
-              <label style="color:#9F9FA5">Job Title</label>
-              <h6>${dataJob.job_name}</h6>
+          <div class="row mb-2">
+            <div class="col-4" style="display: flex; justify-content: space-between; align-items: center;">
+              <label style="color:#9F9FA5">Competency Draft</label>
+              <label>:</label>
             </div>
+            <div class="col-8">
+              <h6>${detailData.draftName}</h6>
+            </div>
+          </div>
         </div>
         <div class="col-12">
-            <div class="mt-3">
-              <label style="color:#9F9FA5">${category[compeCategory.category]} Competency</label>
-              <h6 style="color:#03A9F4; cursor: pointer" onclick="handleDetailCompetency(${compeCategory.id})">${
-      compeCategory.competency_name
+          <div class="row mb-2">
+            <div class="col-4" style="display: flex; justify-content: space-between; align-items: center;">
+              <label style="color:#9F9FA5">Position</label>
+              <label>:</label>
+            </div>
+            <div class="col-8">
+              <h6>${detailData.positionName}</h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="row mb-2">
+            <div class="col-4" style="display: flex; justify-content: space-between; align-items: center;">
+              <label style="color:#9F9FA5">${category[compeCategory]} Competency</label>
+              <label>:</label>
+            </div>
+            <div class="col-8">
+              <h6 style="color:#03A9F4; cursor: pointer" onclick="handleDetailCompetency('${detailData.compCode}')">${
+      detailData.compName
     }</h6>
             </div>
+          </div>
         </div>
         <div class="col-12">
-            <div class="mt-4">
-              <label>Depth Level</label>
-              <div class="col">
-                  <div class="m-t-10 m-checkbox-inline">
+          <div class="row">
+            <div class="col-4" style="display: flex; justify-content: space-between; align-items: center;">
+              <label style="color:#9F9FA5">Proficiency Level</label>
+              <label>:</label>
+            </div>
+            <div class="col-8">
+               <div class="m-t-10 m-checkbox-inline">
                     ${renderRadioButtons(levels, selectedLevel, compeCategory)}
                   </div>
-              </div>
             </div>
+          </div>
         </div>
       `;
 
@@ -349,7 +524,6 @@ const openModalEditDepth = (jobId, competencyId) => {
   } else {
     const modal = new bootstrap.Modal(document.getElementById("ModalWarning"));
     modal.show();
-
     const formContent = `
     <div class="col-12">
         <div class="mb-2 m-4" style="text-align: center">
@@ -378,19 +552,69 @@ const openModalEditDepth = (jobId, competencyId) => {
 
 const changeLevel = () => {
   const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
-  const btnDraft = document.getElementById("btnSaveDraft");
   const btnApproval = document.getElementById("btnSubmitApproval");
-  btnDraft.disabled = selectedValue ? false : true;
   btnApproval.disabled = selectedValue ? false : true;
 };
 const openModalSaveDraft = () => {
   const modal = new bootstrap.Modal(document.getElementById("modalSaveDraft"));
   modal.show();
 };
-const openModalApprovalDepthLevel = () => {
+const openModalApprovalDepthLevel = async () => {
   // get value from input radio id radioinlineNone
-  const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
-  console.log("cek", selectedValue);
+  try {
+    //
+    const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
+    const draftId = $("#dataSource-competency").val();
+    const detailProficiency = getState("detailProficiency");
+    console.log("detailProficiency", detailProficiency);
+    console.log("cek", selectedValue);
+    const payload = {
+      draftId: draftId,
+      positionCode: detailProficiency.positionCode,
+      compCode: detailProficiency.compCode,
+      proficiencyLevel: selectedValue,
+    };
+    console.log("payload", payload);
+    const result = await fetchSaveProficiencyLevel(payload);
+    console.log("result", result);
+    if (result.success === true) {
+      const modalEditDepthLevel = document.getElementById("modalEditDepthLevel");
+      const modal = bootstrap.Modal.getInstance(modalEditDepthLevel);
+      if (modal) {
+        modal.hide();
+      }
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+              <br>
+              <span>You can check in <b>${result.data.data.draftName}</b> at draft tab.</span>
+              `,
+            },
+          },
+        }).then(async () => {
+          // spinner.style.display = "none";
+          // const payload = {
+          //   Page: 1,
+          //   PageSize: 5,
+          // };
+          // const queryString = new URLSearchParams(payload).toString();
+          // const dataDraft = await fetchDraftProsbis(queryString);
+          // const IsNotEmpty = dataDraft.data.length;
+          // handleClickCard(IsNotEmpty);
+          // loadTableBodyDraft(dataDraft);
+          handleSearchCompetency();
+        });
+      }, 100);
+    }
+    // fetchSaveProficiencyLevel()
+  } catch (error) {}
 };
 function handleInputDraftName(value) {
   const btnSave = document.getElementById("compeSavedraft");
@@ -479,79 +703,77 @@ async function saveAsDraft() {
 
 const handleDetailCompetency = async (id) => {
   // open modal dengan id modalDetailCompe
-  const competencyList = getState("competencyList");
   const dataDetail = await fetchCompetencyDetail(id);
-  const findcompetencyList = competencyList.find((compe) => compe.id === dataDetail.data.idcompetency);
   const modal = new bootstrap.Modal(document.getElementById("modalDetailCompe"));
   modal.show();
 
   const formContent = `
-  <div class="col-12 scrollable-content" style="min-height: 620px;">
-      <div class="mb-2">
-        <h6>${findcompetencyList.competency_name} </h6>
-      </div>
-             
-      <div class="custom-card-approval">
-          <div class="header-card-approval">
-              Detail
-          </div>
-          <div>
-              <div class=" custom-row-full">
-                  <label>${dataDetail?.data.definition}</label>
-              </div>
-          </div>
-      </div>
-      <div class="custom-card-approval">
-          <div class="header-card-approval">
-              Level 1 (Basic)
-          </div>
-          <div style="padding-top: 10px;">
-              <div class=" custom-row-full">
-                  <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.data.level1.map((item) => `<li> ${item}</li>`).join("")}
-                  </ul>
-              </div>
-          </div>
-      </div>
-      <div class="custom-card-approval">
-          <div class="header-card-approval">
-            Level 2 (Intermediate)
-          </div>
-          <div style="padding-top: 10px;">
-              <div class=" custom-row-full">
-                  <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.data.level2.map((item) => `<li> ${item}</li>`).join("")}
-                  </ul>
-              </div>
-          </div>
-      </div>
-      <div class="custom-card-approval">
-          <div class="header-card-approval">
-              Level 3 (Advance)
-          </div>
-          <div style="padding-top: 10px;">
-              <div class=" custom-row-full">
-                 <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.data.level3.map((item) => `<li> ${item}</li>`).join("")}
-                  </ul>
-              </div>
-          </div>
-      </div>
-      <div class="custom-card-approval">
-          <div class="header-card-approval">
-              Level 4 (Mastery)
-          </div>
-          <div style="padding-top: 10px;">
-              <div class=" custom-row-full">
-                  <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                  ${dataDetail?.data.level4.map((item) => `<li> ${item}</li>`).join("")}
-                  </ul>
-              </div>
-          </div>
-      </div>
-  </div>
-  <div class="col-12">
-`;
+    <div class="col-12 scrollable-content" style="min-height: 620px;">
+        <div class="mb-2">
+          <h6 style="font-weight:bold">${dataDetail.data.compName} </h6>
+        </div>
+
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Definition
+            </div>
+            <div>
+                <div class=" custom-row-full">
+                    <label>${dataDetail?.data.definition}</label>
+                </div>
+            </div>
+        </div>
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Level 1 (Basic)
+            </div>
+            <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
+                    ${dataDetail?.data.levels[1].map((item) => `<li> ${item}</li>`).join("")}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+              Level 2 (Intermediate)
+            </div>
+            <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
+                    ${dataDetail?.data.levels[2].map((item) => `<li> ${item}</li>`).join("")}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Level 3 (Advance)
+            </div>
+            <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                   <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
+                    ${dataDetail?.data.levels[3].map((item) => `<li> ${item}</li>`).join("")}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Level 4 (Mastery)
+            </div>
+            <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
+                    ${dataDetail?.data.levels[4].map((item) => `<li> ${item}</li>`).join("")}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+  `;
 
   const modalBodyContent = document.getElementById("body-detailcompe");
   if (modalBodyContent) {

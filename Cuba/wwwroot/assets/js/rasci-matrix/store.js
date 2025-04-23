@@ -1,3 +1,4 @@
+const selectedValue = $("#dataSource-rasci").val();
 const appState = new Proxy(
   {
     storageJabatan: [],
@@ -25,6 +26,25 @@ const appState = new Proxy(
     dataDeleteProsbis: {},
     dataDetailProsbis: {},
     editRasciNotation: {},
+    payloadProsbis: {
+      draftRasciId: selectedValue === "master" ? null : selectedValue,
+      level: [1, 2, 3, 4, 5, 6],
+      indexNumber: [],
+      row: 1,
+      rowSize: 15,
+    },
+    payloadPosition: {
+      draftRasciId: selectedValue === "master" ? null : selectedValue,
+      draftSoId: null,
+      unitCode: [],
+      prlOrg: [],
+      level: [],
+      indexNumber: [],
+      rasciNotation: [],
+      col: 1,
+      colSize: 10,
+    },
+    storageDataPosition: [],
     itemsPerPageY: 20,
     currentPageY: 1,
     itemsPerPageX: 20,
@@ -254,11 +274,13 @@ async function createDraftRasci(payload) {
   const url = `${url_api}/api/rasci-matrix/draft/create`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
+    console.log("result", result);
     return {
       success: true,
       data: result.data,
     };
   } catch (error) {
+    console.log("first", error);
     return {
       success: false,
       error: error?.responseJSON.message || "Error fetching data from API",
@@ -317,8 +339,8 @@ async function fetchDetailRasci(param) {
   }
 }
 
-async function fetchRelatedJob(id) {
-  const url = `${url_api}/api/rasci-matrix/business-process/detail/${id}`;
+async function fetchRelatedJob(id, param) {
+  const url = `${url_api}/api/rasci-matrix/business-process/detail/${id}?${param}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -335,7 +357,7 @@ async function fetchRelatedJob(id) {
 }
 
 async function fetchProsbisByJob(param) {
-  const url = `${url_api}/api/rasci-matrix/reference-from-position?jobId=${param.jobId}&draftId=${param.draftId}`;
+  const url = `${url_api}/api/rasci-matrix/reference-from-position${param}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -368,6 +390,40 @@ async function fetchProsbisSumulation(currentPageY, currentPageX) {
     };
   }
 }
+async function fetchProsbisMatrix(payload) {
+  const url = `${url_api}/api/rasci-matrix/business-process`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchPositionMatrix(payload) {
+  const url = `${url_api}/api/rasci-matrix/position-rasci`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+// /
 async function fetchData() {
   try {
     // const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
@@ -375,10 +431,23 @@ async function fetchData() {
     //   fetchSelectLevel(),
     //   fetchFilterJobList(),
     // ]);
-    const [resultSimulation] = await Promise.all([fetchProsbisSumulation(1, 1)]);
-    appState.resultJabatan = resultSimulation.data[0].responsibilities;
+    // const [resultSimulation] = await Promise.all([fetchProsbisSumulation(1, 1)]);
+    // appState.resultJabatan = resultSimulation.data[0].responsibilities;
+    // appState.resultProsbis = resultSimulation.data;
+    // console.log("cek", resultSimulation);
+    // const selectedValue = $("#dataSource-rasci").val();
+    // const payload = {
+    //   draftRasciId: selectedValue === "master" ? null : selectedValue,
+    //   level: [1],
+    //   indexNumber: [],
+    //   row: 1,
+    //   rowSize: 15,
+    // };
+
+    const [resultSimulation] = await Promise.all([fetchProsbisMatrix(appState.payloadProsbis)]);
+    console.log("resultSimulation", resultSimulation);
+    appState.indexNumberProsbis = resultSimulation.data.map((val) => val.indexNumber);
     appState.resultProsbis = resultSimulation.data;
-    console.log("cek", resultSimulation);
     // appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
     // appState.prosbisLevel = prosbisLvl?.data.result;
     // const combinedData = [

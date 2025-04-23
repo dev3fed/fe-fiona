@@ -105,134 +105,256 @@ function loadTableBodyDraft(dataList) {
 function openFormDraft() {
   const modal = new bootstrap.Modal(document.getElementById("modalformDraft"));
   modal.show();
+  fetchSelect2Draftso("#modalformDraft", "#selects0-mainpage");
 }
 
-function handleSaveDraft() {
+async function handleSaveDraft() {
   const draftNameInput = document.getElementById("input-draftname").value;
+  const selectedValue = $("#selects0-mainpage").val();
   const spinner = document.getElementById("loadingSavedraft");
   spinner.style.display = "inline-block";
   const payload = {
-    draftName: draftNameInput,
-    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+    dataSource: selectedValue,
+    draftCompName: draftNameInput,
   };
-  console.log("payload", payload);
-  // try {
-  //   const result = createDraftRasci(payload);
-  //   if (result.success === true) {
-  //     const modaldraft = document.getElementById("modalformDraft");
-  //     const modal = bootstrap.Modal.getInstance(modaldraft);
-  //     if (modal) {
-  //       modal.hide();
-  //     }
-  //     setTimeout(() => {
-  //       swal({
-  //         title: "SUCCESS",
-  //         icon: "success",
-  //         buttons: false,
-  //         timer: 2000,
-  //         content: {
-  //           element: "div",
-  //           attributes: {
-  //             innerHTML: `<div style="text-align: center;">Usulan perubahan KKJ divisi HC draft has been saved</div>`,
-  //           },
-  //         },
-  //       });
-  //     }, 1000);
-  //     setTimeout(() => {
-  //       spinner.style.display = "none";
-  //     }, 2000);
-  //   } else {
-  //     spinner.style.display = "none";
-  //   }
-  // } catch (error) {
-  //   spinner.style.display = "none";
-  // }
+  const queryString = "?" + new URLSearchParams(payload).toString();
+  try {
+    const result = await fetchCreateDraft(queryString);
+    const modaldraft = document.getElementById("modalformDraft");
+    const modal = bootstrap.Modal.getInstance(modaldraft);
+    if (result.success === true) {
+      if (modal) {
+        modal.hide();
+      }
+      let draftId = result?.data?.draftId;
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result?.data.draftName} draft has been saved</div>`,
+            },
+          },
+        }).then(async () => {
+          spinner.style.display = "none";
+          $("#input-draftname").val("");
+          $("#selects0-mainpage").val("");
+          const draftList = await fetchDraftList();
+          fetctDataSourceComp(draftId);
+          const IsNotEmpty = draftList.data.length;
+          handleClickCard(IsNotEmpty);
+          loadTableBodyDraft(draftList.data);
+          feather.replace();
+        });
+      }, 100);
+    } else {
+      modal.hide();
+      $("#input-draftname").val("");
+      $("#selects0-mainpage").val("");
+      spinner.style.display = "none";
+      setTimeout(() => {
+        swal({
+          title: "FAILED",
+          icon: "error",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result.error}, please change to another draft name</div>`,
+            },
+          },
+        });
+      }, 200);
+    }
+  } catch (error) {
+    spinner.style.display = "none";
+  }
+}
+function openEmptyDraftCompetency() {
+  const modal = new bootstrap.Modal(document.getElementById("ModalCreateEmptydraft"));
+  modal.show();
+  fetchSelect2Draftso("#ModalCreateEmptydraft", "#selectso-emptydraftpage");
 }
 function openDraftCompetency() {
   const modal = new bootstrap.Modal(document.getElementById("ModalDraftCompetency"));
   modal.show();
+  fetchSelect2Draftso("#ModalDraftCompetency", "#selectso-draftpage");
 }
-function handleSubmitDraft() {
-  const draftNameInput = document.getElementById("input-draftname").value;
-  const spinner = document.getElementById("loadingSavedraft");
-  spinner.style.display = "inline-block";
-  const payload = {
-    draftName: draftNameInput,
-    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
-  };
-  console.log("payload", payload);
-  // try {
-  //   const result = createDraftRasci(payload);
-  //   if (result.success === true) {
-  //     const modaldraft = document.getElementById("modalformDraft");
-  //     const modal = bootstrap.Modal.getInstance(modaldraft);
-  //     if (modal) {
-  //       modal.hide();
-  //     }
-  //     setTimeout(() => {
-  //       swal({
-  //         title: "SUCCESS",
-  //         icon: "success",
-  //         buttons: false,
-  //         timer: 2000,
-  //         content: {
-  //           element: "div",
-  //           attributes: {
-  //             innerHTML: `<div style="text-align: center;">Usulan perubahan KKJ divisi HC draft has been saved</div>`,
-  //           },
-  //         },
-  //       });
-  //     }, 1000);
-  //     setTimeout(() => {
-  //       spinner.style.display = "none";
-  //     }, 2000);
-  //   } else {
-  //     spinner.style.display = "none";
-  //   }
-  // } catch (error) {
-  //   spinner.style.display = "none";
-  // }
+function fetchSelect2Draftso(elementId, selectId) {
+  $(selectId)
+    .select2({
+      dropdownParent: $(elementId),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${API_URL_COMPE}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "draft-so",
+          };
+        },
+        processResults: function (data) {
+          if (data && data.data) {
+            return {
+              results: data.data.result,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
 }
-function handleSaveEmptyDraft() {
+async function handleSubmitDraft() {
   const draftNameInput = document.getElementById("draftname-competency").value;
+  const selectedValue = $("#selectso-draftpage").val();
   const spinner = document.getElementById("loadingSubmitdraft");
   spinner.style.display = "inline-block";
   const payload = {
-    draftName: draftNameInput,
-    draftSOId: "5d64fe52-3b91-4d21-a5b9-e5e809460392",
+    dataSource: selectedValue,
+    draftCompName: draftNameInput,
   };
-  console.log("payload", payload);
-  // try {
-  //   const result = createDraftRasci(payload);
-  //   if (result.success === true) {
-  //     const modaldraft = document.getElementById("modalformDraft");
-  //     const modal = bootstrap.Modal.getInstance(modaldraft);
-  //     if (modal) {
-  //       modal.hide();
-  //     }
-  //     setTimeout(() => {
-  //       swal({
-  //         title: "SUCCESS",
-  //         icon: "success",
-  //         buttons: false,
-  //         timer: 2000,
-  //         content: {
-  //           element: "div",
-  //           attributes: {
-  //             innerHTML: `<div style="text-align: center;">Usulan perubahan KKJ divisi HC draft has been saved</div>`,
-  //           },
-  //         },
-  //       });
-  //     }, 1000);
-  //     setTimeout(() => {
-  //       spinner.style.display = "none";
-  //     }, 2000);
-  //   } else {
-  //     spinner.style.display = "none";
-  //   }
-  // } catch (error) {
-  //   spinner.style.display = "none";
-  // }
+  const queryString = "?" + new URLSearchParams(payload).toString();
+  try {
+    const result = await fetchCreateDraft(queryString);
+    const modaldraft = document.getElementById("ModalDraftCompetency");
+    const modal = bootstrap.Modal.getInstance(modaldraft);
+    if (result.success === true) {
+      if (modal) {
+        modal.hide();
+      }
+      fetctDataSourceComp();
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result?.data.draftName} draft has been saved</div>`,
+            },
+          },
+        }).then(async () => {
+          spinner.style.display = "none";
+          $("#draftname-competency").val("");
+          $("#selectso-draftpage").val("");
+          const draftList = await fetchDraftList();
+          const IsNotEmpty = draftList.data.length;
+          handleClickCard(IsNotEmpty);
+          loadTableBodyDraft(draftList.data);
+          feather.replace();
+        });
+      }, 100);
+    } else {
+      modal.hide();
+      $("#draftname-competency").val("");
+      $("#selectso-draftpage").val("");
+      spinner.style.display = "none";
+      setTimeout(() => {
+        swal({
+          title: "FAILED",
+          icon: "error",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result.error}, please change to another draft name</div>`,
+            },
+          },
+        });
+      }, 200);
+    }
+  } catch (error) {
+    spinner.style.display = "none";
+  }
+}
+async function handleSaveEmptyDraft() {
+  const draftNameInput = document.getElementById("input-emptydraftname").value;
+  const selectedValue = $("#selectso-emptydraftpage").val();
+  const spinner = document.getElementById("loadingEmptysavedraft");
+  spinner.style.display = "inline-block";
+  const payload = {
+    dataSource: selectedValue,
+    draftCompName: draftNameInput,
+  };
+  const queryString = "?" + new URLSearchParams(payload).toString();
+  try {
+    const result = await fetchCreateDraft(queryString);
+    const modaldraft = document.getElementById("ModalCreateEmptydraft");
+    const modal = bootstrap.Modal.getInstance(modaldraft);
+    if (result.success === true) {
+      if (modal) {
+        modal.hide();
+      }
+      fetctDataSourceComp();
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result?.data.draftName} draft has been saved</div>`,
+            },
+          },
+        }).then(async () => {
+          spinner.style.display = "none";
+          $("#input-emptydraftname").val("");
+          $("#selectso-emptydraftpage").val("");
+          const draftList = await fetchDraftList();
+          const IsNotEmpty = draftList.data.length;
+          console.log("draftList", draftList);
+          handleClickCard(IsNotEmpty);
+          loadTableBodyDraft(draftList.data);
+          feather.replace();
+        });
+      }, 100);
+    } else {
+      modal.hide();
+      $("#input-emptydraftname").val("");
+      $("#selectso-emptydraftpage").val("");
+      spinner.style.display = "none";
+      setTimeout(() => {
+        swal({
+          title: "FAILED",
+          icon: "error",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${result.error}, please change to another draft name</div>`,
+            },
+          },
+        });
+      }, 200);
+    }
+  } catch (error) {
+    spinner.style.display = "none";
+  }
 }
 // end section create draft competency
 
@@ -272,6 +394,7 @@ const confirmDeletecompeDraft = async () => {
       if (modal) {
         modal.hide();
       }
+      fetctDataSourceComp();
       const listDraft = await fetchDraftList();
       const IsNotEmpty = listDraft.data.length;
       changeemptyPageDraft(IsNotEmpty);

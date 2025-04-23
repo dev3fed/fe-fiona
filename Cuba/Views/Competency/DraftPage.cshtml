@@ -1,11 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 <style>
-    .modal-dialog.custom-modal-bp {
-        max-width: 60% !important;
-        margin: 30px auto;
-    }
-
     .tbl-border-draftcompetency {
         width: 100%;
         border-top: 1px solid #b0d1e4;
@@ -107,9 +102,8 @@
     <partial name="~/Views/Competency/ModalCreateEmptydraft.cshtml" />
 
     <div class="empty-body">
-        <button class="btn btn-primary btn-icon" type="button" data-bs-toggle="modal"
-            data-bs-target="#ModalCreateEmptydraft">
-            <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon">
+        <button class="btn btn-primary btn-icon" type="button" onclick="openEmptyDraftCompetency()">
+            <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
             Created Competency Draft
         </button>
     </div>
