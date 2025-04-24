@@ -193,7 +193,7 @@ function fetchSelect2Draftso(elementId, selectId) {
       allowClear: true,
       delay: 250,
       ajax: {
-        url: `${API_URL_COMPE}/api/Utilities/selection`,
+        url: `${url_api}/api/Utilities/selection`,
         dataType: "json",
         data: function (params) {
           return {

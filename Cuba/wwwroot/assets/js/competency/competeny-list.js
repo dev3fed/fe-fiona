@@ -47,7 +47,7 @@ async function openPageDictionary() {
 }
 function fetctDataSourceComp(draftId = null) {
   $.ajax({
-    url: `${API_URL_COMPE}/api/Utilities/selection`,
+    url: `${url_api}/api/Utilities/selection`,
     dataType: "json",
     data: {
       type: "draft-comp",

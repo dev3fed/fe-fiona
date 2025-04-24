@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -387,9 +388,8 @@
 
 @section Script {
     <script>
-        const url_api = '@(Environment.GetEnvironmentVariable("API_URL"))'
         const token = localStorage.getItem("token");
-
+        const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
         function handleCloseModal() {
             const applyButton = document.getElementById("apply-search");
             if (applyButton) {
