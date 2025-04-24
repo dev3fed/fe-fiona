@@ -338,6 +338,16 @@ function loadTableBody(jobList) {
     nameDiv.className = "flex-fill joblist-name";
     nameDiv.textContent = val.positionName;
 
+    nameDiv.onclick = () => {
+      console.log("Clicked position:", val.positionName);
+      // atau jalankan fungsi lain, misalnya:
+      // openDetailModal(val.positionCode);
+
+      // open modal by id ModalDetailPos
+      const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
+      modal.show();
+    };
+
     wrapperDiv.appendChild(nameDiv);
     td.appendChild(wrapperDiv);
     tr.appendChild(td);

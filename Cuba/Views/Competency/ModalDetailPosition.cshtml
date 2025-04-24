@@ -1,0 +1,113 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.modal-detailpos {
+        max-width: 75% !important;
+        margin: 50px auto;
+    }
+
+    /* Custom scrollbar styles */
+    .scrollable-posdetail {
+        max-height: 460px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .scrollable-posdetail::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-posdetail::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-posdetail::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-posdetail::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+</style>
+
+
+<div class="modal fade" id="ModalDetailPos" tabindex="-1" role="dialog" aria-labelledby="ModalDetailPosLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-detailpos bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalDetailPosTitle">Position Detail</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h6 style="font-weight: bold;">VP Legal Counsel</h6>
+                    <ul class="nav nav-tabs nav-primary mt-3" id="pills-job-tab" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" id="pills-jobinfo-tab" data-bs-toggle="pill"
+                                href="#pills-jobinfo" role="tab" aria-controls="pills-jobinfo" aria-selected="true">Job
+                                Info</a></li>
+                        <li class="nav-item"><a class="nav-link" id="pills-relatedbp-tab" data-bs-toggle="pill"
+                                href="#pills-relatedbp" role="tab" aria-controls="pills-relatedbp"
+                                aria-selected="false">Related Business Process</a></li>
+                    </ul>
+                    <div class="tab-content" id="pills-businessContent">
+                        <div class="tab-pane fade show active" id="pills-jobinfo" role="tabpanel"
+                            aria-labelledby="pills-jobinfo-tab">
+                            <div class="mt-1 scrollable-jobdetail">
+                                <!-- Card job attribut start-->
+                                <div class="custom-card-draft">
+                                    <div class="header-card-draft">
+                                        Job Attribute
+                                    </div>
+                                    <div class="row" style="padding-top: 20px;" id="job-attribute">
+                                    </div>
+                                </div>
+                                <!-- Card job attribut end-->
+
+                                <!-- Card skill Group & subskill start-->
+                                <div class="custom-card-draft">
+                                    <div class="header-card-draft">
+                                        Skill Group & Sub Skill Group
+                                    </div>
+                                    <div class="row" id="skill-group-content">
+
+                                    </div>
+                                </div>
+                                <!-- Card skill Group & subskill end-->
+
+                                <!-- Card Incumbent start-->
+                                <div class="custom-card-draft">
+                                    <div class="header-card-draft">
+                                        Incumbent
+                                    </div>
+                                    <div class="row mt-4" id="incumbent-content">
+
+                                    </div>
+                                </div>
+                                <!-- Card Incumbent end-->
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-relatedbp" role="tabpanel"
+                            aria-labelledby="pills-relatedbp-tab">
+                            <div class="mt-2">
+                                Related Business Process
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i> Back</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
