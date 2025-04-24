@@ -247,6 +247,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
     <script>
         const baseImageUrl = '@Url.Content("~/assets/images/homepage/")';
+        const baseUrl = '@Url.Content("~/")';
+        console.log(baseImageUrl);
+        console.log(baseUrl);
         feather.replace();
         new WOW().init();
         document.addEventListener('DOMContentLoaded', function () {
@@ -265,8 +268,8 @@
         });
 
     </script>
-    <script src="../assets/js/authentication.js"></script>
-    <script src="../assets/js/homepage.js"></script>
+    <script src="@Url.Content("~/assets/js/authentication.js")"></script>
+    <script src="@Url.Content("~/assets/js/homepage.js")"></script>
 </body>
 
 </html>
