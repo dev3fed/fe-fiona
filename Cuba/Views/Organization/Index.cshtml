@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -314,7 +315,9 @@
 </div>
 @section Script {
     <!-- Plugins JS start-->
-
+    <script>
+        const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
+    </script>
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Cuba.Controllers
 {
-    [Authorize]
+    // [Authorize]
     public class HomePageController : Controller
     {
 
