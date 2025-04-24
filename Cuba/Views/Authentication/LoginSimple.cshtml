@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
     ViewData["Title"] = "Login Simple";
     Layout = "~/Views/Shared/_SimpleLayout.cshtml";
 }
@@ -68,7 +69,8 @@
 <script>
     feather.replace();
     new WOW().init();
-    const url_api = 'http://localhost:5095';
+    const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
+
     const state = {
         exampleValue: "testing",
         username: null,

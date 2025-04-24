@@ -73,7 +73,7 @@ window.getState = getState;
 
 // START NEW API SERVICE COMPETENCY
 async function fetchJobList(params) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/list-job${params}`;
+  const url = `${url_api}/api/TechnicalCompetency/list-job${params}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -90,7 +90,7 @@ async function fetchJobList(params) {
 }
 
 async function fetchCompetencyList(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/list-competency/position-code`;
+  const url = `${url_api}/api/TechnicalCompetency/list-competency/position-code`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     return {
@@ -107,7 +107,7 @@ async function fetchCompetencyList(payload) {
 }
 
 async function fetchCompetencyMapping(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/list-competency/competency-mapping`;
+  const url = `${url_api}/api/TechnicalCompetency/list-competency/competency-mapping`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     return {
@@ -124,7 +124,7 @@ async function fetchCompetencyMapping(payload) {
 }
 
 async function fetchDraftList() {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency?page=1&pageSize=10`;
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency?page=1&pageSize=10`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -141,7 +141,7 @@ async function fetchDraftList() {
 }
 
 async function fetchDeleteDraft(id) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency/${id}`;
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency/${id}`;
   try {
     const result = await ajaxRequest(url, "DELETE");
     return {
@@ -158,7 +158,7 @@ async function fetchDeleteDraft(id) {
 }
 
 async function fetchCreateDraft(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency${payload}`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     if (result.status === 400) {
@@ -182,7 +182,7 @@ async function fetchCreateDraft(payload) {
 }
 
 async function fetchDetailDraft(id) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/draft-competency/${id}`;
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency/${id}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -199,7 +199,7 @@ async function fetchDetailDraft(id) {
 }
 
 async function fetchRenameDraft(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/rename-draft-competency${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/rename-draft-competency${payload}`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     if (result.status === 400) {
@@ -223,7 +223,7 @@ async function fetchRenameDraft(payload) {
 }
 
 async function fetchMandatoryList(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/mandatory-competency-dictionary${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/mandatory-competency-dictionary${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -240,7 +240,7 @@ async function fetchMandatoryList(payload) {
 }
 
 async function fetchTechnicalList(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/technical-competency-dictionary${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/technical-competency-dictionary${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -257,7 +257,7 @@ async function fetchTechnicalList(payload) {
 }
 
 async function fetchBehaviorList(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/behavioural-competency-dictionary${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/behavioural-competency-dictionary${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -274,7 +274,7 @@ async function fetchBehaviorList(payload) {
 }
 
 async function fetchProficiencyLevel(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/get-proficiency-level${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/get-proficiency-level${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -291,7 +291,7 @@ async function fetchProficiencyLevel(payload) {
 }
 
 async function fetchSaveProficiencyLevel(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/edit-proficiency-level`;
+  const url = `${url_api}/api/TechnicalCompetency/edit-proficiency-level`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     if (result.status === 400) {
@@ -318,7 +318,7 @@ async function fetchSaveProficiencyLevel(payload) {
 
 //OLD API SERVICE COMPETENCY
 async function fetchDataCompetency(params) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency`;
+  const url = `${url_api}/api/TechnicalCompetency`;
   try {
     const result = await ajaxRequest(url, "GET", params);
     return result;
@@ -330,7 +330,7 @@ async function fetchDataCompetency(params) {
 }
 
 async function fetchCompetencyDetail(payload) {
-  const url = `${API_URL_COMPE}/api/TechnicalCompetency/detail-dictionary/${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/detail-dictionary/${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return result;
