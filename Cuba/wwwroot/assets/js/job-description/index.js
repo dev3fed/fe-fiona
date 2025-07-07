@@ -1,73 +1,138 @@
-function getDataList(data) {
-  data.forEach((item) => {
-    getSelect2(item);
-  });
-}
-
-async function getAllListData() {
-  const data = {};
-  data.listDraftRasci = (await draftRasciMatrix()).data.data;
-  data.listDraftJobDesc = (await listDraftJobDesc(1, 99)).data;
-  return data;
-}
-
 function detailDraft(id) {
-  window.location.href = `/job-description/draft-detail?draftId=${id}`;
+  window.location.href = `/job-description/draft-detail`;
 }
 
-async function deleteDraft(id) {
-  const deleteDraft = await deleteDraftJobDesc(id);
-  if (deleteDraft) {
-    swal("Success", "Draft has been deleted", "success");
+async function checkDraftSelected(listDraft) {
+  localStorage.getItem("draftExistingJobDesc") ??
+    localStorage.setItem(
+      "draftExistingJobDesc",
+      JSON.stringify(draftExistingJobDesc)
+    );
+  const data = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+  Object.keys(draftExistingJobDesc).forEach((key) => {
+    if (data[key]) {
+      draftExistingJobDesc[key] = data[key];
+    }
+  });
+
+  if (
+    draftExistingJobDesc.draftId == "" ||
+    draftExistingJobDesc.draftId == null
+  ) {
+    // get first draft
+    const firstDraft = listDraft[0];
+    draftExistingJobDesc.draftId = firstDraft.draftId;
+    draftExistingJobDesc.draftRasciId = firstDraft.draftRasciId;
+    draftExistingJobDesc.draftOrganizationId = firstDraft.draftOrganizationId;
+    draftExistingJobDesc.draftName = firstDraft.draftName;
+    localStorage.setItem(
+      "draftExistingJobDesc",
+      JSON.stringify(draftExistingJobDesc)
+    );
   }
+
+  const draftId =
+    draftExistingJobDesc.draftOrganizationId +
+    "|" +
+    draftExistingJobDesc.draftRasciId +
+    "|" +
+    draftExistingJobDesc.draftId;
+  // append value to input
+  $("#selectJobDescDraft").val(draftId).trigger("change");
 }
 
 $(document).ready(async function () {
-  const listData = await getAllListData();
-  getDataList([
-    {
-      dataId: "selectDraftRacsi",
-      data: listData.listDraftRasci.map((item) => ({ id: item.draftId, text: item.draftName })),
-      dropdownParent: $("#modalCreateDraftJobDesc"),
-    },
-    {
-      dataId: "selectJobDescDraft",
-      data: listData.listDraftJobDesc.map((item) => ({ id: item.draftId, text: item.draftName })),
-      // dropdownParent: $("#modalDetailDraft"),
-    },
-  ]);
-
-  // event index.js
   $("#createJobDesc").click(function () {
     window.location.href = "/job-description/detail";
+  });
+
+  localStorage.getItem("statusManager")
+    ? localStorage.getItem("statusManager")
+    : localStorage.setItem("statusManager", "not available");
+  localStorage.getItem("statusSbm")
+    ? localStorage.getItem("statusSbm")
+    : localStorage.setItem("statusSbm", "not available");
+
+  let dataList = dataListJobDescription;
+  dataList[0].jobStatus = localStorage.getItem("statusManager");
+  dataList[1].jobStatus = localStorage.getItem("statusSbm");
+
+  // get draft list
+  const dataListDraft = await draftList();
+  getDataList([
+    {
+      dataId: "selectJobDescDraft",
+      data: dataListDraft.data.map((item) => ({
+        id:
+          item.draftOrganizationId +
+          "|" +
+          item.draftRasciId +
+          "|" +
+          item.draftId,
+        text: item.draftName,
+      })),
+    },
+  ]);
+  checkDraftSelected(dataListDraft.data);
+
+  // get data for table job description list
+  getTableListJobDes();
+
+  $("#selectStatusJobDesc").on("change", function () {
+    // const value = $(this).val() ?? "";
+    // const search = $("#searchJobDesc").val() ?? "";
+    // filterListJobDesc(value, search);
+    getTableListJobDes();
+  });
+
+  // function onSelectType(text) {
+  //   setState("selectedType", text);
+  //   document.getElementById("btnSearchType").innerText = text;
+  //   document.getElementById("inputText").value = "";
+  // }
+
+  $(".di").on("click", function () {
+    const value = $(this).attr("value");
+    console.log("Selected type:", value);
+    document.getElementById("btnSearchType").innerText =
+      value.charAt(0).toUpperCase() + value.slice(1);
+  });
+
+  $("#searchJobDesc").on("input", function () {
+    // const value = $("#selectStatusJobDesc").val() ?? "";
+    // const search = $(this).val() ?? "";
+    // filterListJobDesc(value, search);
+    getTableListJobDes();
   });
 
   $("#createDraft").click(function () {
     $("#modalCreateDraftJobDesc").modal("show");
   });
 
-  $("#saveDraft").click(async function () {
-    const rasciDraftSelected = $("#selectDraftRacsi").val();
-    const draftName = $("#inputDraftName").val();
-
-    if (!rasciDraftSelected || !draftName) {
-      alert(!rasciDraftSelected ? "Please select a draft RASCI matrix." : "Please enter a draft name.");
-      return;
-    }
-
-    const save = await postDraftJobDesc({
-      draftSOId: "f5a33bf6-3e21-4778-ae55-e9ec2b0a0dd5",
-      // draftRasciId: "823e8ea2-904c-4aa9-b3ef-b2db2d674e80",
-      draftRasciId: rasciDraftSelected,
-      draftName: draftName,
-    });
-    if (save) {
-      swal("Success", `Draft ${draftName} has been created`, "success");
-      hideModal("modalCreateDraftJobDesc");
+  $("#selectJobDescDraft").change(function () {
+    const value = $(this).val();
+    if (value == "1") {
+      $("#pills-warningtab").attr("style", "display:none !important");
     } else {
-      alert("Error saving draft RASCI matrix");
+      $("#pills-warningtab").show();
     }
   });
 
-  getTableListDraft(listData.listDraftJobDesc);
+  getTableListApproval();
+  getTableListLog();
+
+  checkDraftSelected(dataListDraft.data);
+
+  $("#selectJobDescDraft").on("change", function () {
+    const value = $(this).val();
+    const data = value.split("|");
+    draftExistingJobDesc.draftId = data[2];
+    draftExistingJobDesc.draftRasciId = data[1];
+    draftExistingJobDesc.draftOrganizationId = data[0];
+    draftExistingJobDesc.draftName = $(this).find("option:selected").text();
+    localStorage.setItem(
+      "draftExistingJobDesc",
+      JSON.stringify(draftExistingJobDesc)
+    );
+  });
 });

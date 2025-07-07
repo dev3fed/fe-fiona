@@ -1,19 +1,44 @@
 const url = {
-  baseUrl: "http://localhost:5095",
-  "api-organization": "api/organization-structure",
-  "rasci-matrix": "api/rasci-matrix",
+  baseUrl: url_api,
+  "organization-structure": "api/organization-structure",
   "job-description": "api/job-description",
 };
+const tabArray = [
+  "inputAttribute",
+  "inputSubordinate",
+  "inputSgSsg",
+  "preview",
+];
 const tabArrayIndex = ["chart", "draft", "2", "3"];
 let statusAction = "add";
 let dataAvailable = true;
 const token = localStorage.getItem("token");
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 const urlParams = new URLSearchParams(window.location.search);
 let helperId = "";
 const uuid = {
   uniqueCode: "",
   uniquePosCode: "",
+};
+
+const draftExistingJobDesc = {
+  draftId: null,
+  draftOrganizationId: null,
+  draftRasciId: null,
+  draftName: null,
 };
 
 const selectedData = {
@@ -96,7 +121,10 @@ const dataJobDesc = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
+        tugas: [
+          "Laporan implementasi tidak lanjut hasil audit;",
+          "Kelengkapan data dan dokumen untuk proses audit.",
+        ],
       },
       {
         id: 7,
@@ -125,13 +153,17 @@ const dataJobDesc = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
+        tugas: [
+          "Terlaksananya pengelolaan data;",
+          "Tersedianya hasil pengolahan dan penyajian data. ",
+        ],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang:
+          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -742,16 +774,23 @@ const dataJobDescCompare = [
       },
       {
         id: 4,
-        responsible: "Mengarahkan, memonitor dan mengevaluasi pengelolaan perizinan terkait Izin Niaga Umum (INU).",
-        output: ["Terlaksananya pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU)."],
-        lead: ["Tingkat kesesuaian dan efektivitas pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU)."],
+        responsible:
+          "Mengarahkan, memonitor dan mengevaluasi pengelolaan perizinan terkait Izin Niaga Umum (INU).",
+        output: [
+          "Terlaksananya pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU).",
+        ],
+        lead: [
+          "Tingkat kesesuaian dan efektivitas pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU).",
+        ],
       },
       {
         id: 5,
         responsible:
           "Mengarahkan, memonitor dan mengevaluasi kegiatan pengelolaan laporan perusahaan terkait pemenuhan data kebutuhan regulatory report.",
         output: ["Terlaksananya pemenuhan data kebutuhan regulatory report."],
-        lead: ["Tingkat akurasi dan kesesuaian pemenuhan data kebutuhan regulatory report."],
+        lead: [
+          "Tingkat akurasi dan kesesuaian pemenuhan data kebutuhan regulatory report.",
+        ],
       },
     ],
     tugasUmum: [
@@ -815,7 +854,10 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
+        tugas: [
+          "Laporan implementasi tidak lanjut hasil audit;",
+          "Kelengkapan data dan dokumen untuk proses audit.",
+        ],
       },
       {
         id: 7,
@@ -844,13 +886,17 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
+        tugas: [
+          "Terlaksananya pengelolaan data;",
+          "Tersedianya hasil pengolahan dan penyajian data. ",
+        ],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang:
+          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -882,12 +928,16 @@ const dataJobDescCompare = [
       {
         id: 3,
         internal: "Direktorat/Fungsi lain",
-        aktivitas: ["Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan."],
+        aktivitas: [
+          "Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan.",
+        ],
       },
       {
         id: 4,
         internal: "Fungsi di Direktorat SDM",
-        aktivitas: ["Koordinasi terkait pelaporan operasional dan program kerja perusahaan."],
+        aktivitas: [
+          "Koordinasi terkait pelaporan operasional dan program kerja perusahaan.",
+        ],
       },
       {
         id: 5,
@@ -901,14 +951,18 @@ const dataJobDescCompare = [
       {
         id: 6,
         internal: "Internal Audit",
-        aktivitas: ["Koordinasi terkait temuan-temuan yang mempunyai implikasi terhadap opini perusahaan."],
+        aktivitas: [
+          "Koordinasi terkait temuan-temuan yang mempunyai implikasi terhadap opini perusahaan.",
+        ],
       },
     ],
     relation: [
       {
         id: 1,
         eksternal: "Anak Perusahaan dan Subholding lainnya",
-        aktivitas: ["Koordinasi terkait penyediaan data dan informasi yang bersifat material."],
+        aktivitas: [
+          "Koordinasi terkait penyediaan data dan informasi yang bersifat material.",
+        ],
       },
       {
         id: 2,
@@ -919,7 +973,8 @@ const dataJobDescCompare = [
       },
       {
         id: 3,
-        eksternal: "Seluruh Stakeholder (Pemerintah, legislatif, judiciary, NGO, TNI, Polri)",
+        eksternal:
+          "Seluruh Stakeholder (Pemerintah, legislatif, judiciary, NGO, TNI, Polri)",
         aktivitas: [
           "Koordinasi terkait sosialisasi kegiatan perusahaan/program perusahaan, pembentukan opini, pendekatan, mediasi dan permintaan kerja sama.",
         ],
@@ -1195,7 +1250,10 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
+        tugas: [
+          "Laporan implementasi tidak lanjut hasil audit;",
+          "Kelengkapan data dan dokumen untuk proses audit.",
+        ],
       },
       {
         id: 7,
@@ -1224,13 +1282,17 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
+        tugas: [
+          "Terlaksananya pengelolaan data;",
+          "Tersedianya hasil pengolahan dan penyajian data. ",
+        ],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang:
+          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -1278,7 +1340,10 @@ const dataJobDescCompare = [
       {
         id: 5,
         internal: "Legal",
-        aktivitas: ["Koordinasi terkait anggaran dasar perusahaan", "Koordinasi terkait produk-produk hukum terkait"],
+        aktivitas: [
+          "Koordinasi terkait anggaran dasar perusahaan",
+          "Koordinasi terkait produk-produk hukum terkait",
+        ],
       },
     ],
     relation: [
@@ -1292,7 +1357,9 @@ const dataJobDescCompare = [
       {
         id: 2,
         eksternal: "Anak Perusahaan dan Subholding lainnya",
-        aktivitas: ["Koordinasi terkait penyediaan data dan informasi yang bersifat material"],
+        aktivitas: [
+          "Koordinasi terkait penyediaan data dan informasi yang bersifat material",
+        ],
       },
       {
         id: 3,
@@ -1466,7 +1533,8 @@ const dataJobDescCompare = [
     tugasHa: [
       {
         id: 1,
-        responsible: "Mengarahkan, memonitor dan mengevaluasi penyusunan rencana dan strategi CSR & SMEPP.",
+        responsible:
+          "Mengarahkan, memonitor dan mengevaluasi penyusunan rencana dan strategi CSR & SMEPP.",
         output: [
           "Tersedianya strategi CSR & SMEPP perusahaan",
           "Terlaksananya social mapping",
@@ -1479,7 +1547,8 @@ const dataJobDescCompare = [
       },
       {
         id: 2,
-        responsible: "Mengarahkan, memonitor dan mengevaluasi proses implementasi program CSR & SMEPP.",
+        responsible:
+          "Mengarahkan, memonitor dan mengevaluasi proses implementasi program CSR & SMEPP.",
         output: [
           "Tersedianya usulan mitra program CSR dan/atau SMEPP",
           "Tersedianya laporan implementasi program CSR & SMEPP",
@@ -1493,7 +1562,10 @@ const dataJobDescCompare = [
         id: 3,
         responsible:
           "Mengarahkan, memonitor dan mengevaluasi proses koordinasi dan pengawasan pelaksanaan CSR & SMEPP.",
-        output: ["Terlaksananya pengawasan aktivitas CSR & SMEPP", "Tersedianya laporan pelaksanaan CSR & SMEPP"],
+        output: [
+          "Terlaksananya pengawasan aktivitas CSR & SMEPP",
+          "Tersedianya laporan pelaksanaan CSR & SMEPP",
+        ],
         lead: [
           "Tingkat akurasi dan kesesuaian pengawasan aktivitas CSR & SMEPP",
           "Tingkat akurasi, kelengkapan dan ketepatan waktu laporan pengawasan CSR & SMEPP",
@@ -1562,7 +1634,10 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
+        tugas: [
+          "Laporan implementasi tidak lanjut hasil audit;",
+          "Kelengkapan data dan dokumen untuk proses audit.",
+        ],
       },
       {
         id: 7,
@@ -1591,13 +1666,17 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
+        tugas: [
+          "Terlaksananya pengelolaan data;",
+          "Tersedianya hasil pengolahan dan penyajian data. ",
+        ],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang:
+          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -1649,11 +1728,14 @@ const dataJobDescCompare = [
       {
         id: 2,
         eksternal: "Pemerintah Daerah Setempat/Instansi Terkait",
-        aktivitas: ["Koordinasi terkait perijinan dan koordinasi pelaksanaan program."],
+        aktivitas: [
+          "Koordinasi terkait perijinan dan koordinasi pelaksanaan program.",
+        ],
       },
       {
         id: 3,
-        eksternal: "LSM, Lembaga Profesional dan Perguruan Tinggi/Riset/Konsultan",
+        eksternal:
+          "LSM, Lembaga Profesional dan Perguruan Tinggi/Riset/Konsultan",
         aktivitas: [
           "Kerjasama terkait evaluasi, monitoring, pelatihan pendampingan, dan bentuk pembinaan usaha kecil lainnya.",
         ],
@@ -1661,7 +1743,9 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Lembaga Hukum",
-        aktivitas: ["Kerjasama terkait pendampingan bantuan hukum dan advokasi."],
+        aktivitas: [
+          "Kerjasama terkait pendampingan bantuan hukum dan advokasi.",
+        ],
       },
       {
         id: 5,
@@ -1733,7 +1817,8 @@ const dataJobDescCompare = [
       },
       {
         id: "2",
-        komtekSpesifikName: "Community Involvement and Development Program Planning & Design",
+        komtekSpesifikName:
+          "Community Involvement and Development Program Planning & Design",
         level: 3,
       },
       {
@@ -1748,7 +1833,8 @@ const dataJobDescCompare = [
       },
       {
         id: "5",
-        komtekSpesifikName: "Community Involvement and Development Project Management",
+        komtekSpesifikName:
+          "Community Involvement and Development Project Management",
         level: 3,
       },
       {
@@ -1836,8 +1922,14 @@ const dataJobDescCompare = [
         id: 1,
         responsible:
           "Melakukan penyusunan sales planning produk gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Lahat.",
-        output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
-        lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
+        output: [
+          "Sales forecast (pragnosa revenue);",
+          "Sales goals (target, strategi dan rencana penjualan).",
+        ],
+        lead: [
+          "Tersedianya sales forecast;",
+          "Tersedianya sales goals untuk masing-masing channel.",
+        ],
       },
       {
         id: 2,
@@ -1859,7 +1951,9 @@ const dataJobDescCompare = [
           "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
           "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
         ],
-        lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
+        lead: [
+          "Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan.",
+        ],
       },
       {
         id: 4,
@@ -1870,7 +1964,9 @@ const dataJobDescCompare = [
           "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
           "Pelaksanaan proses peluang channel baru.",
         ],
-        lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
+        lead: [
+          "Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel.",
+        ],
       },
       {
         id: 5,
@@ -1921,7 +2017,9 @@ const dataJobDescCompare = [
         responsible:
           "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Lahat.",
         output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-        lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
+        lead: [
+          "Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder.",
+        ],
       },
     ],
     tugasUmum: [
@@ -1967,12 +2065,16 @@ const dataJobDescCompare = [
       {
         id: 2,
         internal: "Region Manager Reliability & Project Development ",
-        aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas."],
+        aktivitas: [
+          "Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas.",
+        ],
       },
       {
         id: 3,
         internal: "Region Manager Supply and Distribution",
-        aktivitas: ["Koordinasi terkait keandalan pasokan gas ke lembaga penyalur."],
+        aktivitas: [
+          "Koordinasi terkait keandalan pasokan gas ke lembaga penyalur.",
+        ],
       },
       {
         id: 4,
@@ -2002,12 +2104,16 @@ const dataJobDescCompare = [
       {
         id: 1,
         eksternal: "DPR/DPRD",
-        aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan gas."],
+        aktivitas: [
+          "Koordinasi/hearing terkait situasi terkini pengelolaan gas.",
+        ],
       },
       {
         id: 2,
         eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-        aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran gas."],
+        aktivitas: [
+          "Koordinasi terkait perizinan dan pengawasan penyaluran gas.",
+        ],
       },
       {
         id: 3,
@@ -2017,12 +2123,16 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Hiswana Migas",
-        aktivitas: ["Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur."],
+        aktivitas: [
+          "Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur.",
+        ],
       },
       {
         id: 5,
         eksternal: "BPK/Kementrian Keuangan",
-        aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran gas PSO."],
+        aktivitas: [
+          "Koordinasi terkait pemeriksaan laporan penyaluran gas PSO.",
+        ],
       },
       {
         id: 6,
@@ -2037,7 +2147,9 @@ const dataJobDescCompare = [
       {
         id: 8,
         eksternal: "Wartawan",
-        aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang gas."],
+        aktivitas: [
+          "Koordinasi terkait pengelolaan informasi publik tentang gas.",
+        ],
       },
       {
         id: 9,
@@ -2162,469 +2274,6 @@ const dataJobDescCompare = [
       },
     ],
   },
-  // {
-  //   identifikasi: {
-  //     id: 7,
-  //     jobName: "SAM Retail Sumsel",
-  //     function: "Regional Sumbagsel/Retail Sales Sumbagsel",
-  //     location: "Palembang",
-  //     directorat: "Pemasaran Regional ",
-  //     directReport: "Region Manager Retail Sales Sumbagsel",
-  //     sk: "Kpts-009/PNG000000/2024-S8",
-  //     tanggal: "01 April 2024",
-  //   },
-  //   fungsi:
-  //     "Mengarahkan dan mengevaluasi penyusunan sales planning, pelaksanaan sales  produk dan kegiatan penyaluran, pengelolaan channel terkait penjualan, kegiatan promosi, pengelolaan keluhan pelanggan dan kegiatan relasi dengan pelanggan terkait penjualan, pengelolaan roll out  digitalisasi pada kegiatan channel retail, serta kegiatan relasi dengan stakeholder terkait penjualan produk fuel dan gas yang efektif dan dapat berjalan dengan lancar untuk mencapai target penjualan perusahaan di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //   tugasHa: [
-  //     {
-  //       id: 1,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi penyusunan sales planning produk fuel dan gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Tersedianya sales forecast (pragnosa revenue);",
-  //         "Tersedianya sales goals (target, strategi dan rencana penjualan).",
-  //       ],
-  //       lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
-  //     },
-  //     {
-  //       id: 2,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi pelaksanaan sales  dan penyaluran produk fuel dan gas melalui channel di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Terlaksananya pemantauan stock fuel yang ada pada channel;",
-  //         "Terlaksananya kegiatan penyaluran channel kepada konsumen;",
-  //         "Terlaksananya identifikasi kondisi pasar di sekitar channel.",
-  //       ],
-  //       lead: ["Tercapainya target penjualan yang ditentukan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 3,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi channel terkait penjualan fuel dan gas di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Terlaksananya monitoring dan evaluasi penjualan channel;",
-  //         "Terlaksananya pemberian reward dan konsekuensi terkait kinerja channel;",
-  //         "Terlaksananya evaluasi termasuk tindak lanjut evaluasi serta rekomendasi terhadap kegiatan penyaluran.",
-  //       ],
-  //       lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 4,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan identifikasi kebutuhan pengembangan jaringan dan layanan channel di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Terlaksananya identifikasi kebutuhan pengembangan jaringan dan layanan channel di wilayah;",
-  //         "Terlaksananya analisis kelayakan pengembangan jaringan dan layanan channel;",
-  //         "Terlaksananya proses peluang channel baru.",
-  //       ],
-  //       lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
-  //     },
-  //     {
-  //       id: 5,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan promosi terkait penjualan produk fuel dan gas di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Tersedianya usulan objective promosi produk/layanan dari seluruh wilayah;",
-  //         "Tersedianya usulan tema promosi;",
-  //         "Terlaksananya kerja sama dengan pihak terkait dalam eksekusi program promosi;",
-  //         "Terlaksananya evaluasi program promosi;",
-  //         "Terlaksananya tindak lanjut program promosi.",
-  //       ],
-  //       lead: ["Tingkat efektivitas kegiatan promosi"],
-  //     },
-  //     {
-  //       id: 6,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan pengelolaan keluhan pelanggan dan kegiatan relasi dengan pelanggan terkait penjualan produk gas dan fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Terlaksananya tindak lanjut penanganan saran dan keluhan pelanggan;",
-  //         "Terlaksananya tindak lanjut permintaan pelanggan;",
-  //         "Tersedianya program pembinaan relasi dengan pelanggan;",
-  //         "Terlaksananya kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-  //       ],
-  //       lead: [
-  //         "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-  //         "Customer satisfaction index;",
-  //         "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi pengelolaan roll out  digitalisasi pada kegiatan channel retail di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel.",
-  //       output: [
-  //         "Tersedianya rencana digitalisasi channel;",
-  //         "Terlaksananya implementasi digitalisasi channel;",
-  //         "Tersedianya hasil evaluasi dan rekomendasi kegiatan implementasi digitalisasi channel;",
-  //         "Tersedianya data transaksi pada kegiatan channel.",
-  //       ],
-  //       lead: [
-  //         "Tingkat pencapaian roll out digitalisasi pada kegiatan channel;",
-  //         "Tingkat ketersediaan data transaksi pada kegiatan channel.",
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan relasi dengan stakeholder terkait penjualan produk fuel dan gas di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Sumsel",
-  //       output: ["Terlaksananya relasi dengan pihak stakeholder."],
-  //       lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
-  //     },
-  //   ],
-  //   tugasUmum: [
-  //     {
-  //       id: 1,
-  //       header:
-  //         "<b>Planning, Budgeting dan Pengelolaan Anggaran</b> Mengelola, mengevaluasi, dan memastikan penyusunan dan monitoring Rencana Kerja dan Anggaran (RKA) unit kerja/fungsi dan pengelolaan anggaran.",
-  //       tugas: [
-  //         "Draft Rencana Kerja dan Anggaran (RKA);",
-  //         "Draft Key Performance Indicator (rencana kinerja) unit kerja/fungsi;",
-  //         "Laporan pertanggungjawaban penggunaan anggaran unit kerja/fungsi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       header:
-  //         "<b>Pengelolaan HSSE</b> Melaksanakan dan memonitor program-program budaya HSSE dan pengelolaan risiko HSSE berbasis sistem manajemen HSSE yang diimplementasikan oleh perusahaan.",
-  //       tugas: [
-  //         "Mengupayakan implementasi program budaya HSSE pada segala aspek kegiatan fungsi untuk mencapai level budaya generatif;",
-  //         "Mengupayakan implementasi kebijakan perusahaan terkait aspek HSSE;",
-  //         "Mengupayakan implementasi program pengelolaan risiko aspek HSSE yang terkait dengan kegiatan operasional fungsi;",
-  //         "Mengupayakan parameter leading & lagging indicator aspek HSSE sebagai bagian yang tidak terpisahkan dari kinerja bisnis perusahaan",
-  //       ],
-  //     },
-  //     {
-  //       id: 3,
-  //       header:
-  //         "<b>Pembinaan Pekerja</b> <ul><li>Mengelola, mengevaluasi, dan memastikan kegiatan perencanaan dan penilaian kinerja pekerja, serta pembimbingan pekerja di unit kerja/fungsi, termasuk pada perilaku indisipliner pekerja.</li><li>Mengelola, mengevaluasi, dan memastikan kebutuhan pelatihan dan pengembangan pekerja di unit kerja/fungsi.</li></ul>",
-  //       tugas: [
-  //         "Usulan terkait dengan:",
-  //         "Rencana kebutuhan pekerja di unit/fungsi;",
-  //         "Target dan ukuran kinerja pekerja;",
-  //         "Laporan monitoring coaching-counseling;",
-  //         "Rencana pengembangan individu (pelatihan dan penugasan);",
-  //         "Hasil penilaian kinerja pekerja.",
-  //       ],
-  //     },
-  //     {
-  //       id: 4,
-  //       header:
-  //         "<b>Sistem Tata Kerja</b> Mengelola, mengevaluasi, dan memastikan penyusunan, sosialisasi dan memonitor pelaksanaan kebijakan, Sistem dan Tata Kerja (STK), di unit kerja/fungsi serta melakukan dan memonitor kegiatan transfer knowledge di unit kerja/fungsi.",
-  //       tugas: [
-  //         "Dokumen Sistem dan Tata Kerja (STK);",
-  //         "Implementasi dan evaluasi STK/TKO;",
-  //         "Laporan kegiatan sharing dan transfer knowledge;",
-  //         "Data aset pengetahuan yang termuktahir.",
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       header:
-  //         "<b>Pengelolaan Risiko & Kepatuhan GCG</b> Mengelola, mengevaluasi, dan memastikan pengelolaan risiko yang meliputi identifikasi, mitigasi, monitoring risiko, dan program budaya risiko, serta pengelolaan kepatuhan terhadap standar GCG di unit kerja/fungsi.",
-  //       tugas: [
-  //         "Hasil identifikasi risiko;",
-  //         "Rencana dan realisasi mitigasi risiko;",
-  //         "Dokumen terkait kepatuhan terhadap standar GCG;",
-  //         "Mengupayakan implementasi program budaya risiko pada segala aspek kegiatan fungsi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       header:
-  //         "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-  //       tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
-  //     },
-  //     {
-  //       id: 7,
-  //       header:
-  //         "<b>Procurement </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengadaan sesuai dengan kewenangan tertentu untuk kebutuhan unit kerja/fungsi.",
-  //       tugas: [
-  //         "Usulan rencana pengadaan;",
-  //         "Dokumen terkait pengadaan barang/jasa;",
-  //         "Tersedianya barang/jasa;",
-  //         "Hasil perhitungan TKDN;",
-  //         "Hasil penilaian kinerja penyedia barang/jasa;",
-  //         "Terlaksananya penerimaan barang/jasa.",
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       header:
-  //         "<b>Project </b> Mengelola, mengevaluasi, dan memastikan pelaksanaan project dilakukan sesuai penugasan dan kewenangan yang diberikan untuk kebutuhan perusahaan.",
-  //       tugas: [
-  //         "Tersedianya sumber daya yang diperlukan untuk pelaksanaan project;",
-  //         "Terlaksananya eksekusi project;",
-  //         "Tersedianya hasil monitoring dan evaluasi pelaksanaan project.",
-  //       ],
-  //     },
-  //     {
-  //       id: 9,
-  //       header:
-  //         "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-  //       tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
-  //     },
-  //   ],
-  //   wewenang: [
-  //     {
-  //       id: 1,
-  //       wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
-  //     },
-  //     {
-  //       id: 2,
-  //       wewenang:
-  //         "Melakukan negosiasi dan persetujuan pemenang proses pengadaan barang/jasa sesuai dengan ketentuan yang berlaku.",
-  //     },
-  //     {
-  //       id: 3,
-  //       wewenang: "Menetapkan ketentuan operasional sesuai STK yang berlaku.",
-  //     },
-  //   ],
-  //   koordinasi: [
-  //     {
-  //       id: 1,
-  //       internal: "Area Manager Communication Relation & CSR ",
-  //       aktivitas: [
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak regulator;",
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak media.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       internal: "Region Manager Reliability & Project Development ",
-  //       aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas fuel dan gas."],
-  //     },
-  //     {
-  //       id: 3,
-  //       internal: "Region Manager Supply and Distribution",
-  //       aktivitas: ["Koordinasi terkait keandalan pasokan fuel dan gas ke lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 4,
-  //       internal: "Marketing",
-  //       aktivitas: [
-  //         "Koordinasi terkait riset pasar;",
-  //         "Koordinasi terkait analisa kompetitor serta data dan informasi dalam identifikasi segmen pasar;",
-  //         "Koordinasi terkait kegiatan promosi fuel dan gas;",
-  //         "Koordinasi terkait penetapan harga retail dan commercial fuel  serta gas.",
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       internal: "Retail Fuel Sales",
-  //       aktivitas: [
-  //         "Koordinasi terkait implementasi kebijakan penyaluran dan pengembangan bisnis fuel;",
-  //         "Koordinasi terkait pengembangan jaringan (outlet retail).",
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       internal: "Retail Gas Sales ",
-  //       aktivitas: [
-  //         "Koordinasi terkait penyusunan kebijakan penyaluran dan pengembangan bisnis gas;",
-  //         "Koordinasi terkait pengembangan jaringan (outlet retail).",
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       internal: "Internal audit ",
-  //       aktivitas: ["Koordinasi terkait audit internal dan eksternal."],
-  //     },
-  //   ],
-  //   relation: [
-  //     {
-  //       id: 1,
-  //       eksternal: "DPR/DPRD",
-  //       aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan fuel dan gas."],
-  //     },
-  //     {
-  //       id: 2,
-  //       eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-  //       aktivitas: ["Koordinasi terkait penyaluran fuel dan gas."],
-  //     },
-  //     {
-  //       id: 3,
-  //       eksternal: "Ditjen Migas",
-  //       aktivitas: ["Koordinasi terkait verifikasi LPG PSO."],
-  //     },
-  //     {
-  //       id: 4,
-  //       eksternal: "BPH Migas",
-  //       aktivitas: ["Koordinasi terkait verifikasi BBM PSO dan commercial fuel."],
-  //     },
-  //     {
-  //       id: 5,
-  //       eksternal: "Hiswana Migas",
-  //       aktivitas: ["Koordinasi terkait penyaluran fuel dan gas serta pengelolaan lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 6,
-  //       eksternal: "BPK/Kementrian Keuangan",
-  //       aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran fuel dan gas PSO."],
-  //     },
-  //     {
-  //       id: 7,
-  //       eksternal: "Tokoh Masyarakat",
-  //       aktivitas: ["Koordinasi terkait penggalangan/community development."],
-  //     },
-  //     {
-  //       id: 8,
-  //       eksternal: "Konsultan",
-  //       aktivitas: ["Konsultasi terkait penelitian."],
-  //     },
-  //     {
-  //       id: 9,
-  //       eksternal: "Wartawan",
-  //       aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang fuel dan gas."],
-  //     },
-  //     {
-  //       id: 10,
-  //       eksternal: "Pihak eksternal lainnya",
-  //       aktivitas: ["Koordinasi sesuai kebutuhan perusahaan."],
-  //     },
-  //   ],
-  //   education: [
-  //     "Sarjana dari berbagai jurusan, diutamakan dari Manajemen/Manajemen Pemasaran.",
-  //     "S1 dengan pengalaman kerja 9 - 12 tahun, atau S2 dengan pengalaman kerja 6 - 9 Tahun.",
-  //     "Pengalaman Kerja di bidang Marketing, Sales & Commercial diutamakan di bidang Sales.",
-  //     "6 - 9 tahun menjabat posisi setingkat Analyst atau Sr. Supervisor.",
-  //   ],
-  //   persyaratanKhusus: [" "],
-  //   komtekMandatori: [
-  //     {
-  //       id: "1",
-  //       komtekMandatoriName: "HSSE General ",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekMandatoriName: "Strategic & Business Management  ",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekMandatoriName: "Risk Fundamental",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "4",
-  //       komtekMandatoriName: "Digital & Analytic Insight",
-  //       level: "1",
-  //     },
-  //   ],
-  //   komtekGeneral: [
-  //     {
-  //       id: "1",
-  //       komtekGeneralName: "Marketing Strategy and Planning",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekGeneralName: "Customer Relation Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekGeneralName: "Sales Strategy and Planning",
-  //       level: "2",
-  //     },
-  //   ],
-  //   komtekSpesifik: [
-  //     {
-  //       id: "1",
-  //       komtekSpesifikName: "Stakeholder Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekSpesifikName: "Sales and Account Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekSpesifikName: "Promotion and Campaign Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "4",
-  //       komtekSpesifikName: "Sales Administration",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "5",
-  //       komtekSpesifikName: "Handling Customer Complaint",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "6",
-  //       komtekSpesifikName: "Channel Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "7",
-  //       komtekSpesifikName: "Product/Service Development",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "8",
-  //       komtekSpesifikName: "Domestic Supply Management",
-  //       level: "3",
-  //     },
-  //   ],
-  //   komper: [
-  //     {
-  //       id: "1",
-  //       komperName: "Building Partnerships",
-  //     },
-  //     {
-  //       id: "2",
-  //       komperName: "Decision Making",
-  //     },
-  //     {
-  //       id: "3",
-  //       komperName: "Planning & Organizing",
-  //     },
-  //     {
-  //       id: "4",
-  //       komperName: "Business Awareness",
-  //     },
-  //     {
-  //       id: "5",
-  //       komperName: "Customer Orientation",
-  //     },
-  //     {
-  //       id: "6",
-  //       komperName: "Continuous Improvement",
-  //     },
-  //     {
-  //       id: "7",
-  //       komperName: "Technology Savvy",
-  //     },
-  //     {
-  //       id: "8",
-  //       komperName: "Adaptability",
-  //     },
-  //     {
-  //       id: "9",
-  //       komperName: "Coaching",
-  //     },
-  //     {
-  //       id: "10",
-  //       komperName: "Valuing Differences",
-  //     },
-  //     {
-  //       id: "11",
-  //       komperName: "Gaining Commitment",
-  //     },
-  //     {
-  //       id: "12",
-  //       komperName: "Work Standards",
-  //     },
-  //     {
-  //       id: "13",
-  //       komperName: "Learning Agility",
-  //     },
-  //   ],
-  // },
   {
     identifikasi: {
       id: 9,
@@ -2642,7 +2291,8 @@ const dataJobDescCompare = [
     tugasHa: [
       {
         id: 1,
-        responsible: "Mengarahkan, mengelola dan mengevaluasi kegiatan pengelolaan RUPS (PPN & Anak Perusahaan).",
+        responsible:
+          "Mengarahkan, mengelola dan mengevaluasi kegiatan pengelolaan RUPS (PPN & Anak Perusahaan).",
         output: [
           "Terlaksananya kegiatan RUPS (PPN & Anak Perusahaan);",
           "Tersedianya materi untuk kepentingan RUPS;",
@@ -2697,8 +2347,13 @@ const dataJobDescCompare = [
         id: 5,
         responsible:
           "Mengarahkan, memonitor dan mengevaluasi pengelolaan annual report pada lingkup Pertamina Patra Niaga.",
-        output: ["Tersedianya tema dan desain annual report;", "Tersedianya annual report Pertamina Patra Niaga."],
-        lead: ["Tingkat akurasi, kelengkapan dan ketepatan waktu annual report Pertamina Patra Niaga."],
+        output: [
+          "Tersedianya tema dan desain annual report;",
+          "Tersedianya annual report Pertamina Patra Niaga.",
+        ],
+        lead: [
+          "Tingkat akurasi, kelengkapan dan ketepatan waktu annual report Pertamina Patra Niaga.",
+        ],
       },
     ],
     tugasUmum: [
@@ -2762,7 +2417,10 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
+        tugas: [
+          "Laporan implementasi tidak lanjut hasil audit;",
+          "Kelengkapan data dan dokumen untuk proses audit.",
+        ],
       },
       {
         id: 7,
@@ -2791,13 +2449,17 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
+        tugas: [
+          "Terlaksananya pengelolaan data;",
+          "Tersedianya hasil pengolahan dan penyajian data. ",
+        ],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang:
+          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -2828,7 +2490,9 @@ const dataJobDescCompare = [
       {
         id: 3,
         internal: "Direktorat/Fungsi lain",
-        aktivitas: ["Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan."],
+        aktivitas: [
+          "Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan.",
+        ],
       },
       {
         id: 4,
@@ -2851,7 +2515,9 @@ const dataJobDescCompare = [
       {
         id: 6,
         internal: "Seluruh Fungsi",
-        aktivitas: ["Koordinasi terkait pengumpulan data dan informasi materi Rapat Direksi, Kunjungan Kerja."],
+        aktivitas: [
+          "Koordinasi terkait pengumpulan data dan informasi materi Rapat Direksi, Kunjungan Kerja.",
+        ],
       },
       {
         id: 7,
@@ -2873,7 +2539,9 @@ const dataJobDescCompare = [
       {
         id: 2,
         eksternal: "Anak Perusahaan dan Subholding lainnya",
-        aktivitas: ["Koordinasi terkait penyediaan data dan informasi yang bersifat material."],
+        aktivitas: [
+          "Koordinasi terkait penyediaan data dan informasi yang bersifat material.",
+        ],
       },
       {
         id: 3,
@@ -2892,7 +2560,9 @@ const dataJobDescCompare = [
       {
         id: 5,
         eksternal: "Sekretariat Dewan Komisaris ",
-        aktivitas: ["Koordinasi terkait aktivitas Dewan Komisaris yang melibatkan Direksi."],
+        aktivitas: [
+          "Koordinasi terkait aktivitas Dewan Komisaris yang melibatkan Direksi.",
+        ],
       },
       {
         id: 6,
@@ -3045,1168 +2715,7 @@ const dataJobDescCompare = [
       },
     ],
   },
-  // {
-  //   identifikasi: {
-  //     id: 10,
-  //     jobName: "SAM Retail Jambi",
-  //     function: "Regional Sumbagsel/Retail Sales Sumbagsel",
-  //     location: "Jambi",
-  //     directorat: "Pemasaran Regional ",
-  //     directReport: "Region Manager Retail Sales Sumbagsel",
-  //     sk: "Kpts-009/PNG000000/2024-S8",
-  //     tanggal: "01 April 2024",
-  //   },
-  //   fungsi:
-  //     "Mengarahkan dan mengevaluasi penyusunan sales planning, pelaksanaan sales  produk dan kegiatan penyaluran, pengelolaan channel terkait penjualan, kegiatan promosi, pengelolaan keluhan pelanggan dan kegiatan relasi dengan pelanggan terkait penjualan, pengelolaan roll out  digitalisasi pada kegiatan channel retail, serta kegiatan relasi dengan stakeholder terkait penjualan produk fuel dan gas yang efektif dan dapat berjalan dengan lancar untuk mencapai target penjualan perusahaan di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //   tugasHa: [
-  //     {
-  //       id: 1,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi penyusunan sales planning produk fuel dan gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Tersedianya sales forecast (pragnosa revenue);",
-  //         "Tersedianya sales goals (target, strategi dan rencana penjualan).",
-  //       ],
-  //       lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
-  //     },
-  //     {
-  //       id: 2,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi pelaksanaan sales  dan penyaluran produk fuel dan gas melalui channel di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Terlaksananya pemantauan stock fuel yang ada pada channel;",
-  //         "Terlaksananya kegiatan penyaluran channel kepada konsumen;",
-  //         "Terlaksananya identifikasi kondisi pasar di sekitar channel.",
-  //       ],
-  //       lead: ["Tercapainya target penjualan yang ditentukan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 3,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi channel terkait penjualan fuel dan gas di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Terlaksananya monitoring dan evaluasi penjualan channel;",
-  //         "Terlaksananya pemberian reward dan konsekuensi terkait kinerja channel;",
-  //         "Terlaksananya evaluasi termasuk tindak lanjut evaluasi serta rekomendasi terhadap kegiatan penyaluran.",
-  //       ],
-  //       lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 4,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan identifikasi kebutuhan pengembangan jaringan dan layanan channel di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Terlaksananya identifikasi kebutuhan pengembangan jaringan dan layanan channel di wilayah;",
-  //         "Terlaksananya analisis kelayakan pengembangan jaringan dan layanan channel;",
-  //         "Terlaksananya proses peluang channel baru.",
-  //       ],
-  //       lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
-  //     },
-  //     {
-  //       id: 5,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan promosi terkait penjualan produk fuel dan gas di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Tersedianya usulan objective promosi produk/layanan dari seluruh wilayah;",
-  //         "Tersedianya usulan tema promosi;",
-  //         "Terlaksananya kerja sama dengan pihak terkait dalam eksekusi program promosi;",
-  //         "Terlaksananya evaluasi program promosi;",
-  //         "Terlaksananya tindak lanjut program promosi.",
-  //       ],
-  //       lead: ["Tingkat efektivitas kegiatan promosi"],
-  //     },
-  //     {
-  //       id: 6,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan pengelolaan keluhan pelanggan dan kegiatan relasi dengan pelanggan terkait penjualan produk gas dan fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Terlaksananya tindak lanjut penanganan saran dan keluhan pelanggan;",
-  //         "Terlaksananya tindak lanjut permintaan pelanggan;",
-  //         "Tersedianya program pembinaan relasi dengan pelanggan;",
-  //         "Terlaksananya kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-  //       ],
-  //       lead: [
-  //         "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-  //         "Customer satisfaction index;",
-  //         "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi pengelolaan roll out  digitalisasi pada kegiatan channel retail di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi.",
-  //       output: [
-  //         "Tersedianya rencana digitalisasi channel;",
-  //         "Terlaksananya implementasi digitalisasi channel;",
-  //         "Tersedianya hasil evaluasi dan rekomendasi kegiatan implementasi digitalisasi channel;",
-  //         "Tersedianya data transaksi pada kegiatan channel.",
-  //       ],
-  //       lead: [
-  //         "Tingkat pencapaian roll out digitalisasi pada kegiatan channel;",
-  //         "Tingkat ketersediaan data transaksi pada kegiatan channel.",
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       responsible:
-  //         "Mengarahkan dan mengevaluasi kegiatan relasi dengan stakeholder terkait penjualan produk fuel dan gas di Fungsi Retail Sales Sumbagsel khususnya di Area Retail Jambi",
-  //       output: ["Terlaksananya relasi dengan pihak stakeholder."],
-  //       lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
-  //     },
-  //   ],
-  //   tugasUmum: [
-  //     {
-  //       id: 1,
-  //       header:
-  //         "<b>Planning, Budgeting dan Pengelolaan Anggaran</b> Mengelola, mengevaluasi, dan memastikan penyusunan dan monitoring Rencana Kerja dan Anggaran (RKA) unit kerja/fungsi dan pengelolaan anggaran.",
-  //       tugas: [
-  //         "Draft Rencana Kerja dan Anggaran (RKA);",
-  //         "Draft Key Performance Indicator (rencana kinerja) unit kerja/fungsi;",
-  //         "Laporan pertanggungjawaban penggunaan anggaran unit kerja/fungsi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       header:
-  //         "<b>Pengelolaan HSSE</b> Melaksanakan dan memonitor program-program budaya HSSE dan pengelolaan risiko HSSE berbasis sistem manajemen HSSE yang diimplementasikan oleh perusahaan.",
-  //       tugas: [
-  //         "Mengupayakan implementasi program budaya HSSE pada segala aspek kegiatan fungsi untuk mencapai level budaya generatif;",
-  //         "Mengupayakan implementasi kebijakan perusahaan terkait aspek HSSE;",
-  //         "Mengupayakan implementasi program pengelolaan risiko aspek HSSE yang terkait dengan kegiatan operasional fungsi;",
-  //         "Mengupayakan parameter leading & lagging indicator aspek HSSE sebagai bagian yang tidak terpisahkan dari kinerja bisnis perusahaan",
-  //       ],
-  //     },
-  //     {
-  //       id: 3,
-  //       header:
-  //         "<b>Pembinaan Pekerja</b> <ul><li>Mengelola, mengevaluasi, dan memastikan kegiatan perencanaan dan penilaian kinerja pekerja, serta pembimbingan pekerja di unit kerja/fungsi, termasuk pada perilaku indisipliner pekerja.</li><li>Mengelola, mengevaluasi, dan memastikan kebutuhan pelatihan dan pengembangan pekerja di unit kerja/fungsi.</li></ul>",
-  //       tugas: [
-  //         "Usulan terkait dengan:",
-  //         "Rencana kebutuhan pekerja di unit/fungsi;",
-  //         "Target dan ukuran kinerja pekerja;",
-  //         "Laporan monitoring coaching-counseling;",
-  //         "Rencana pengembangan individu (pelatihan dan penugasan);",
-  //         "Hasil penilaian kinerja pekerja.",
-  //       ],
-  //     },
-  //     {
-  //       id: 4,
-  //       header:
-  //         "<b>Sistem Tata Kerja</b> Mengelola, mengevaluasi, dan memastikan penyusunan, sosialisasi dan memonitor pelaksanaan kebijakan, Sistem dan Tata Kerja (STK), di unit kerja/fungsi serta melakukan dan memonitor kegiatan transfer knowledge di unit kerja/fungsi.",
-  //       tugas: [
-  //         "Dokumen Sistem dan Tata Kerja (STK);",
-  //         "Implementasi dan evaluasi STK/TKO;",
-  //         "Laporan kegiatan sharing dan transfer knowledge;",
-  //         "Data aset pengetahuan yang termuktahir.",
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       header:
-  //         "<b>Pengelolaan Risiko & Kepatuhan GCG</b> Mengelola, mengevaluasi, dan memastikan pengelolaan risiko yang meliputi identifikasi, mitigasi, monitoring risiko, dan program budaya risiko, serta pengelolaan kepatuhan terhadap standar GCG di unit kerja/fungsi.",
-  //       tugas: [
-  //         "Hasil identifikasi risiko;",
-  //         "Rencana dan realisasi mitigasi risiko;",
-  //         "Dokumen terkait kepatuhan terhadap standar GCG;",
-  //         "Mengupayakan implementasi program budaya risiko pada segala aspek kegiatan fungsi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       header:
-  //         "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-  //       tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
-  //     },
-  //     {
-  //       id: 7,
-  //       header:
-  //         "<b>Procurement </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengadaan sesuai dengan kewenangan tertentu untuk kebutuhan unit kerja/fungsi.",
-  //       tugas: [
-  //         "Usulan rencana pengadaan;",
-  //         "Dokumen terkait pengadaan barang/jasa;",
-  //         "Tersedianya barang/jasa;",
-  //         "Hasil perhitungan TKDN;",
-  //         "Hasil penilaian kinerja penyedia barang/jasa;",
-  //         "Terlaksananya penerimaan barang/jasa.",
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       header:
-  //         "<b>Project </b> Mengelola, mengevaluasi, dan memastikan pelaksanaan project dilakukan sesuai penugasan dan kewenangan yang diberikan untuk kebutuhan perusahaan.",
-  //       tugas: [
-  //         "Tersedianya sumber daya yang diperlukan untuk pelaksanaan project;",
-  //         "Terlaksananya eksekusi project;",
-  //         "Tersedianya hasil monitoring dan evaluasi pelaksanaan project.",
-  //       ],
-  //     },
-  //     {
-  //       id: 9,
-  //       header:
-  //         "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-  //       tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
-  //     },
-  //   ],
-  //   wewenang: [
-  //     {
-  //       id: 1,
-  //       wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
-  //     },
-  //     {
-  //       id: 2,
-  //       wewenang:
-  //         "Melakukan negosiasi dan persetujuan pemenang proses pengadaan barang/jasa sesuai dengan ketentuan yang berlaku.",
-  //     },
-  //     {
-  //       id: 3,
-  //       wewenang: "Menetapkan ketentuan operasional sesuai STK yang berlaku.",
-  //     },
-  //   ],
-  //   koordinasi: [
-  //     {
-  //       id: 1,
-  //       internal: "Area Manager Communication Relation & CSR ",
-  //       aktivitas: [
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak regulator;",
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak media.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       internal: "Region Manager Reliability & Project Development ",
-  //       aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas fuel dan gas."],
-  //     },
-  //     {
-  //       id: 3,
-  //       internal: "Region Manager Supply and Distribution",
-  //       aktivitas: ["Koordinasi terkait keandalan pasokan fuel dan gas ke lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 4,
-  //       internal: "Marketing",
-  //       aktivitas: [
-  //         "Koordinasi terkait riset pasar;",
-  //         "Koordinasi terkait analisa kompetitor serta data dan informasi dalam identifikasi segmen pasar;",
-  //         "Koordinasi terkait kegiatan promosi fuel dan gas;",
-  //         "Koordinasi terkait penetapan harga retail dan commercial fuel  serta gas.",
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       internal: "Retail Fuel Sales",
-  //       aktivitas: [
-  //         "Koordinasi terkait implementasi kebijakan penyaluran dan pengembangan bisnis fuel;",
-  //         "Koordinasi terkait pengembangan jaringan (outlet retail).",
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       internal: "Retail Gas Sales ",
-  //       aktivitas: [
-  //         "Koordinasi terkait penyusunan kebijakan penyaluran dan pengembangan bisnis gas;",
-  //         "Koordinasi terkait pengembangan jaringan (outlet retail).",
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       internal: "Internal audit ",
-  //       aktivitas: ["Koordinasi terkait audit internal dan eksternal."],
-  //     },
-  //   ],
-  //   relation: [
-  //     {
-  //       id: 1,
-  //       eksternal: "DPR/DPRD",
-  //       aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan fuel dan gas."],
-  //     },
-  //     {
-  //       id: 2,
-  //       eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-  //       aktivitas: ["Koordinasi terkait penyaluran fuel dan gas."],
-  //     },
-  //     {
-  //       id: 3,
-  //       eksternal: "Ditjen Migas",
-  //       aktivitas: ["Koordinasi terkait verifikasi LPG PSO."],
-  //     },
-  //     {
-  //       id: 4,
-  //       eksternal: "BPH Migas",
-  //       aktivitas: ["Koordinasi terkait verifikasi BBM PSO dan commercial fuel."],
-  //     },
-  //     {
-  //       id: 5,
-  //       eksternal: "Hiswana Migas",
-  //       aktivitas: ["Koordinasi terkait penyaluran fuel dan gas serta pengelolaan lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 6,
-  //       eksternal: "BPK/Kementrian Keuangan",
-  //       aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran fuel dan gas PSO."],
-  //     },
-  //     {
-  //       id: 7,
-  //       eksternal: "Tokoh Masyarakat",
-  //       aktivitas: ["Koordinasi terkait penggalangan/community development."],
-  //     },
-  //     {
-  //       id: 8,
-  //       eksternal: "Konsultan",
-  //       aktivitas: ["Konsultasi terkait penelitian."],
-  //     },
-  //     {
-  //       id: 9,
-  //       eksternal: "Wartawan",
-  //       aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang fuel dan gas."],
-  //     },
-  //     {
-  //       id: 10,
-  //       eksternal: "Pihak eksternal lainnya",
-  //       aktivitas: ["Koordinasi sesuai kebutuhan perusahaan."],
-  //     },
-  //   ],
-  //   //persyaratan jabatan
-  //   education: [
-  //     "Sarjana dari berbagai jurusan, diutamakan dari Manajemen/Manajemen Pemasaran.",
-  //     "S1 dengan pengalaman kerja 9 - 12 tahun, atau S2 dengan pengalaman kerja 6 - 9 Tahun.",
-  //     "Pengalaman Kerja di bidang Marketing, Sales & Commercial diutamakan di bidang Sales.",
-  //     "Min. 3 tahun menjabat posisi setingkat Analyst atau Sr. Supervisor.",
-  //   ],
 
-  //   persyaratanKhusus: [" "],
-
-  //   komtekMandatori: [
-  //     {
-  //       id: "1",
-  //       komtekMandatoriName: "HSSE General ",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekMandatoriName: "Strategic & Business Management  ",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekMandatoriName: "Risk Fundamental",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "4",
-  //       komtekMandatoriName: "Digital & Analytic Insight",
-  //       level: "1",
-  //     },
-  //   ],
-  //   komtekGeneral: [
-  //     {
-  //       id: "1",
-  //       komtekGeneralName: "Marketing Strategy and Planning",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekGeneralName: "Customer Relation Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekGeneralName: "Sales Strategy and Planning",
-  //       level: "2",
-  //     },
-  //   ],
-  //   komtekSpesifik: [
-  //     {
-  //       id: "1",
-  //       komtekSpesifikName: "Stakeholder Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekSpesifikName: "Sales and Account Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekSpesifikName: "Promotion and Campaign Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "4",
-  //       komtekSpesifikName: "Sales Administration",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "5",
-  //       komtekSpesifikName: "Handling Customer Complaint",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "6",
-  //       komtekSpesifikName: "Channel Management",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "7",
-  //       komtekSpesifikName: "Product/Service Development",
-  //       level: "3",
-  //     },
-  //     {
-  //       id: "8",
-  //       komtekSpesifikName: "Domestic Supply Management",
-  //       level: "3",
-  //     },
-  //   ],
-  //   komper: [
-  //     {
-  //       id: "1",
-  //       komperName: "Building Partnerships",
-  //     },
-  //     {
-  //       id: "2",
-  //       komperName: "Decision Making",
-  //     },
-  //     {
-  //       id: "3",
-  //       komperName: "Planning & Organizing",
-  //     },
-  //     {
-  //       id: "4",
-  //       komperName: "Business Awareness",
-  //     },
-  //     {
-  //       id: "5",
-  //       komperName: "Customer Orientation",
-  //     },
-  //     {
-  //       id: "6",
-  //       komperName: "Continuous Improvement",
-  //     },
-  //     {
-  //       id: "7",
-  //       komperName: "Technology Savvy",
-  //     },
-  //     {
-  //       id: "8",
-  //       komperName: "Adaptability",
-  //     },
-  //     {
-  //       id: "9",
-  //       komperName: "Coaching",
-  //     },
-  //     {
-  //       id: "10",
-  //       komperName: "Valuing Differences",
-  //     },
-  //     {
-  //       id: "11",
-  //       komperName: "Gaining Commitment",
-  //     },
-  //     {
-  //       id: "12",
-  //       komperName: "Work Standards",
-  //     },
-  //     {
-  //       id: "13",
-  //       komperName: "Learning Agility",
-  //     },
-  //   ],
-  // },
-  // {
-  //   identifikasi: {
-  //     id: 11,
-  //     jobName: "SBM Jambi I Fuel",
-  //     function: "Regional Sumbagsel/Retail Sales Sumbagsel",
-  //     location: "Jambi",
-  //     directorat: "Pemasaran Regional ",
-  //     directReport: "SAM Retail Jambi",
-  //     sk: "Kpts-009/PNG000000/2024-S8",
-  //     tanggal: "01 April 2024",
-  //   },
-  //   fungsi:
-  //     "Melakukan perencanaan kegiatan penjualan, monitoring pelaksanaan kegiatan penyaluran dan penjualan produk, pelaksanaan kegiatan pemasaran produk, pembuatan laporan aktivitas penjualan, melakukan kegiatan pengelolaan penjualan dan memonitor kinerja channel, penyusunan rencana pengembangan channel (penjualan dan jaringan), dan kunjungan ke channel dan pelanggan serta melakukan pengelolaan relasi dengan pihak stakeholder sebagai upaya tercapainya kegiatan pemasaran produk fuel yang efektif dan dapat berjalan dengan lancar untuk mencapai target penjualan perusahaan di Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //   tugasHa: [
-  //     {
-  //       id: 1,
-  //       responsible:
-  //         "Melakukan penyusunan sales planning produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
-  //       lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
-  //     },
-  //     {
-  //       id: 2,
-  //       responsible:
-  //         "Melakukan pelaksanaan sales dan penyaluran  produk fuel melalui channel di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: [
-  //         "Pelaksanaan pemantauan stock fuel yang ada pada channel;",
-  //         "Pelaksanaan kegiatan penyaluran channel kepada konsumen;",
-  //         "Pelaksanaan identifikasi kondisi pasar di sekitar channel.",
-  //       ],
-  //       lead: ["Tercapainya target penjualan yang ditentukan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 3,
-  //       responsible:
-  //         "Melakukan evaluasi terhadap channel terkait penjualan fuel  di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: [
-  //         "Pelaksanaan monitoring dan evaluasi penjualan channel;",
-  //         "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
-  //         "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
-  //       ],
-  //       lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 4,
-  //       responsible:
-  //         "Melakukan identifikasi kebutuhan pengembangan jaringan dan layanan channel di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: [
-  //         "Pelaksanaan identifikasi kebutuhan pengembangan jaringan dan layanan channel di wilayah;",
-  //         "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
-  //         "Pelaksanaan proses peluang channel baru.",
-  //       ],
-  //       lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
-  //     },
-  //     {
-  //       id: 5,
-  //       responsible:
-  //         "Melakukan kegiatan promosi terkait penjualan produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: [
-  //         "Usulan objective promosi produk/layanan dari seluruh wilayah;",
-  //         "Usulan tema promosi;",
-  //         "Pelaksanaan kerja sama dengan pihak terkait dalam eksekusi program promosi;",
-  //         "Pelaksanaan evaluasi program promosi;",
-  //         "Pelaksanaan tindak lanjut program promosi.",
-  //       ],
-  //       lead: ["Tingkat efektivitas kegiatan promosi."],
-  //     },
-  //     {
-  //       id: 6,
-  //       responsible:
-  //         "Melakukan kegiatan pengelolaan relasi dengan pelanggan terkait penjualan produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: [
-  //         "Pelaksanaan tindak lanjut penanganan saran dan keluhan pelanggan;",
-  //         "Pelaksanaan tindak lanjut permintaan pelanggan;",
-  //         "Program pembinaan relasi dengan pelanggan;",
-  //         "Pelaksanaan kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-  //       ],
-  //       lead: [
-  //         "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-  //         "Customer satisfaction index;",
-  //         "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       responsible:
-  //         "Melakukan pengelolaan roll out  digitalisasi pada kegiatan channel retail di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: [
-  //         "Rencana digitalisasi channel;",
-  //         "Pelaksanaan implementasi digitalisasi channel;",
-  //         "Hasil evaluasi dan rekomendasi kegiatan implementasi digitalisasi channel;",
-  //         "Data transaksi pada kegiatan channel.",
-  //       ],
-  //       lead: [
-  //         "Tingkat pencapaian roll out digitalisasi pada kegiatan channel;",
-  //         "Tingkat ketersediaan data transaksi pada kegiatan channel.",
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       responsible:
-  //         "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-  //       output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-  //       lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
-  //     },
-  //   ],
-  //   tugasUmum: [
-  //     {
-  //       id: 1,
-  //       header:
-  //         "<b>Implementasi HSSE</b> Melakukan implementasi program-program budaya HSSE dan pengelolaan risiko HSSE berbasis sistem manajemen HSSE yang diimplementasikan oleh perusahaan.",
-  //       tugas: [
-  //         "Hasil implementasi program budaya HSSE pada segala aspek kegiatan fungsi untuk mencapai level budaya generatif;",
-  //         "Hasil implementasi kebijakan perusahaan terkait aspek HSSE;",
-  //         "Hasil implementasi program pengelolaan risiko aspek HSSE yang terkait dengan kegiatan operasional fungsi;",
-  //         "Hasil integrasi parameter leading & lagging indicator aspek HSSE sebagai bagian yang tidak terpisahkan dari kinerja bisnis perusahaan.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       header:
-  //         "<b>Pengelolaan Risiko & Kepatuhan GCG</b> Melakukan pengelolaan risiko yang meliputi identifikasi, mitigasi, monitoring risiko, dan program risiko serta pengelolaan kepatuhan terhadap standar GCG di unit kerja/fungsi.",
-  //       tugas: [
-  //         "Hasil identifikasi risiko;",
-  //         "Rencana dan realisasi mitigasi risiko;",
-  //         "Laporan implementasi kepatuhan terhadap standar GCG;",
-  //         "Hasil implementasi program budaya risiko pada segala aspek kegiatan operasional fungsi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 3,
-  //       header:
-  //         "<b>Project</b> Melakukan pelaksanaan project dilakukan sesuai penugasan dan kewenangan yang diberikan untuk kebutuhan perusahaan.",
-  //       tugas: ["Terlaksananya eksekusi project."],
-  //     },
-  //   ],
-  //   wewenang: ["N/A"],
-  //   koordinasi: [
-  //     {
-  //       id: 1,
-  //       internal: "Area Manager Communication Relation & CSR ",
-  //       aktivitas: [
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak regulator;",
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak media.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       internal: "Region Manager Reliability & Project Development ",
-  //       aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas fuel."],
-  //     },
-  //     {
-  //       id: 3,
-  //       internal: "Region Manager Supply and Distribution",
-  //       aktivitas: ["Koordinasi terkait keandalan pasokan fuel dan gas ke lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 4,
-  //       internal: "Marketing",
-  //       aktivitas: [
-  //         "Koordinasi terkait riset pasar;",
-  //         "Koordinasi terkait analisa kompetitor serta data dan informasi dalam identifikasi segmen pasar;",
-  //         "Koordinasi terkait kegiatan promosi fuel;",
-  //         "Koordinasi terkait penetapan harga retail dan commercial fuel.",
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       internal: "Retail Gas Sales ",
-  //       aktivitas: [
-  //         "Koordinasi terkait implementasi kebijakan penyaluran dan pengembangan bisnis fuel;",
-  //         "Koordinasi terkait pengembangan jaringan (outlet retail).",
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       internal: "Internal audit ",
-  //       aktivitas: ["Koordinasi terkait audit internal dan eksternal."],
-  //     },
-  //   ],
-  //   relation: [
-  //     {
-  //       id: 1,
-  //       eksternal: "DPR/DPRD",
-  //       aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan fuel."],
-  //     },
-  //     {
-  //       id: 2,
-  //       eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-  //       aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran fuel."],
-  //     },
-  //     {
-  //       id: 3,
-  //       eksternal: "BPH Migas",
-  //       aktivitas: ["Koordinasi terkait verifikasi fuel PSO."],
-  //     },
-  //     {
-  //       id: 4,
-  //       eksternal: "Hiswana Migas",
-  //       aktivitas: ["Koordinasi terkait penyaluran fuel dan pengelolaan lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 5,
-  //       eksternal: "BPK/Kementrian Keuangan",
-  //       aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran fuel PSO."],
-  //     },
-  //     {
-  //       id: 6,
-  //       eksternal: "Tokoh Masyarakat",
-  //       aktivitas: ["Koordinasi terkait penggalangan/community development."],
-  //     },
-  //     {
-  //       id: 7,
-  //       eksternal: "Konsultan",
-  //       aktivitas: ["Konsultasi terkait penelitian."],
-  //     },
-  //     {
-  //       id: 8,
-  //       eksternal: "Wartawan",
-  //       aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang fuel."],
-  //     },
-  //     {
-  //       id: 9,
-  //       eksternal: "Pihak eksternal lainnya",
-  //       aktivitas: ["Koordinasi sesuai kebutuhan perusahaan."],
-  //     },
-  //   ],
-  //   education: [
-  //     "Sarjana dari berbagai jurusan, diutamakan dari Manajemen/Manajemen Pemasaran.",
-  //     "S1 dengan pengalaman kerja 6 - 9 tahun.",
-  //     "Pengalaman kerja di bidang Marketing, Sales & Commercial diutamakan di bidang Sales.",
-  //     "Min. 3 tahun menjabat posisi setingkat Jr. Analyst atau Supervisor.",
-  //   ],
-
-  //   persyaratanKhusus: [" "],
-
-  //   komtekMandatori: [
-  //     {
-  //       id: "1",
-  //       komtekMandatoriName: "HSSE General ",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekMandatoriName: "Risk Fundamental",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekMandatoriName: "Digital & Analytic Insight",
-  //       level: "1",
-  //     },
-  //   ],
-  //   komtekGeneral: [
-  //     {
-  //       id: "1",
-  //       komtekGeneralName: "Marketing Strategy and Planning",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekGeneralName: "Customer Relation Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekGeneralName: "Sales Strategy and Planning",
-  //       level: "2",
-  //     },
-  //   ],
-  //   komtekSpesifik: [
-  //     {
-  //       id: "1",
-  //       komtekSpesifikName: "Stakeholder Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekSpesifikName: "Sales and Account Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekSpesifikName: "Promotion and Campaign Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "4",
-  //       komtekSpesifikName: "Sales Administration",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "5",
-  //       komtekSpesifikName: "Handling Customer Complaint",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "6",
-  //       komtekSpesifikName: "Channel Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "7",
-  //       komtekSpesifikName: "Product/Service Development",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "8",
-  //       komtekSpesifikName: "Domestic Supply Management",
-  //       level: "2",
-  //     },
-  //   ],
-  //   komper: [
-  //     {
-  //       id: "1",
-  //       komperName: "Fostering Collaboration",
-  //     },
-  //     {
-  //       id: "2",
-  //       komperName: "Analysis",
-  //     },
-  //     {
-  //       id: "3",
-  //       komperName: "Managing Work",
-  //     },
-  //     {
-  //       id: "4",
-  //       komperName: "Continuous Improvement",
-  //     },
-  //     {
-  //       id: "5",
-  //       komperName: "Technology Awareness",
-  //     },
-  //     {
-  //       id: "6",
-  //       komperName: "Adaptability",
-  //     },
-  //     {
-  //       id: "7",
-  //       komperName: "Quality Orientation",
-  //     },
-  //     {
-  //       id: "8",
-  //       komperName: "Learning Agility",
-  //     },
-  //   ],
-  // },
-  // {
-  //   identifikasi: {
-  //     id: 12,
-  //     jobName: "SBM Jambi II Fuel",
-  //     function: "Regional Sumbagsel/Retail Sales Sumbagsel",
-  //     location: "Sungai Penuh",
-  //     directorat: "Pemasaran Regional ",
-  //     directReport: "SAM Retail Jambi",
-  //     sk: "Kpts-009/PNG000000/2024-S8",
-  //     tanggal: "01 April 2024",
-  //   },
-  //   fungsi:
-  //     "Melakukan perencanaan kegiatan penjualan, monitoring pelaksanaan kegiatan penyaluran dan penjualan produk, pelaksanaan kegiatan pemasaran produk, pembuatan laporan aktivitas penjualan, melakukan kegiatan pengelolaan penjualan dan memonitor kinerja channel, penyusunan rencana pengembangan channel (penjualan dan jaringan), dan kunjungan ke channel dan pelanggan serta melakukan pengelolaan relasi dengan pihak stakeholder sebagai upaya tercapainya kegiatan pemasaran produk fuel yang efektif dan dapat berjalan dengan lancar untuk mencapai target penjualan perusahaan di Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //   //responsible : tugas & tanggung jawab, output : hasil akhir yang diharapkan, lead : leading indicator
-  //   tugasHa: [
-  //     {
-  //       id: 1,
-  //       responsible:
-  //         "Melakukan penyusunan sales planning produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
-  //       lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
-  //     },
-  //     {
-  //       id: 2,
-  //       responsible:
-  //         "Melakukan pelaksanaan sales dan penyaluran  produk fuel melalui channel di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: [
-  //         "Pelaksanaan pemantauan stock fuel yang ada pada channel;",
-  //         "Pelaksanaan kegiatan penyaluran channel kepada konsumen;",
-  //         "Pelaksanaan identifikasi kondisi pasar di sekitar channel.",
-  //       ],
-  //       lead: ["Tercapainya target penjualan yang ditentukan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 3,
-  //       responsible:
-  //         "Melakukan evaluasi terhadap channel terkait penjualan fuel  di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: [
-  //         "Pelaksanaan monitoring dan evaluasi penjualan channel;",
-  //         "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
-  //         "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
-  //       ],
-  //       lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
-  //     },
-  //     {
-  //       id: 4,
-  //       responsible:
-  //         "Melakukan identifikasi kebutuhan pengembangan jaringan dan layanan channel di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: [
-  //         "Pelaksanaan identifikasi kebutuhan pengembangan jaringan dan layanan channel di wilayah;",
-  //         "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
-  //         "Pelaksanaan proses peluang channel baru.",
-  //       ],
-  //       lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
-  //     },
-  //     {
-  //       id: 5,
-  //       responsible:
-  //         "Melakukan kegiatan promosi terkait penjualan produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: [
-  //         "Usulan objective promosi produk/layanan dari seluruh wilayah;",
-  //         "Usulan tema promosi;",
-  //         "Pelaksanaan kerja sama dengan pihak terkait dalam eksekusi program promosi;",
-  //         "Pelaksanaan evaluasi program promosi;",
-  //         "Pelaksanaan tindak lanjut program promosi.",
-  //       ],
-  //       lead: ["Tingkat efektivitas kegiatan promosi."],
-  //     },
-  //     {
-  //       id: 6,
-  //       responsible:
-  //         "Melakukan kegiatan pengelolaan relasi dengan pelanggan terkait penjualan produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: [
-  //         "Pelaksanaan tindak lanjut penanganan saran dan keluhan pelanggan;",
-  //         "Pelaksanaan tindak lanjut permintaan pelanggan;",
-  //         "Program pembinaan relasi dengan pelanggan;",
-  //         "Pelaksanaan kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-  //       ],
-  //       lead: [
-  //         "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-  //         "Customer satisfaction index;",
-  //         "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       responsible:
-  //         "Melakukan pengelolaan roll out  digitalisasi pada kegiatan channel retail di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: [
-  //         "Rencana digitalisasi channel;",
-  //         "Pelaksanaan implementasi digitalisasi channel;",
-  //         "Hasil evaluasi dan rekomendasi kegiatan implementasi digitalisasi channel;",
-  //         "Data transaksi pada kegiatan channel.",
-  //       ],
-  //       lead: [
-  //         "Tingkat pencapaian roll out digitalisasi pada kegiatan channel;",
-  //         "Tingkat ketersediaan data transaksi pada kegiatan channel.",
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       responsible:
-  //         "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk fuel di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-  //       output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-  //       lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
-  //     },
-  //   ],
-  //   tugasUmum: [
-  //     {
-  //       id: 1,
-  //       header:
-  //         "<b>Implementasi HSSE</b> Melakukan implementasi program-program budaya HSSE dan pengelolaan risiko HSSE berbasis sistem manajemen HSSE yang diimplementasikan oleh perusahaan.",
-  //       tugas: [
-  //         "Hasil implementasi program budaya HSSE pada segala aspek kegiatan fungsi untuk mencapai level budaya generatif;",
-  //         "Hasil implementasi kebijakan perusahaan terkait aspek HSSE;",
-  //         "Hasil implementasi program pengelolaan risiko aspek HSSE yang terkait dengan kegiatan operasional fungsi;",
-  //         "Hasil integrasi parameter leading & lagging indicator aspek HSSE sebagai bagian yang tidak terpisahkan dari kinerja bisnis perusahaan.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       header:
-  //         "<b>Pengelolaan Risiko & Kepatuhan GCG</b> Melakukan pengelolaan risiko yang meliputi identifikasi, mitigasi, monitoring risiko, dan program risiko serta pengelolaan kepatuhan terhadap standar GCG di unit kerja/fungsi.",
-  //       tugas: [
-  //         "Hasil identifikasi risiko;",
-  //         "Rencana dan realisasi mitigasi risiko;",
-  //         "Laporan implementasi kepatuhan terhadap standar GCG;",
-  //         "Hasil implementasi program budaya risiko pada segala aspek kegiatan operasional fungsi.",
-  //       ],
-  //     },
-  //     {
-  //       id: 3,
-  //       header:
-  //         "<b>Project</b> Melakukan pelaksanaan project dilakukan sesuai penugasan dan kewenangan yang diberikan untuk kebutuhan perusahaan.",
-  //       tugas: ["Terlaksananya eksekusi project."],
-  //     },
-  //   ],
-  //   wewenang: ["N/A"],
-  //   koordinasi: [
-  //     {
-  //       id: 1,
-  //       internal: "Area Manager Communication Relation & CSR ",
-  //       aktivitas: [
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak regulator;",
-  //         "Koordinasi terkait pengelolaan relasi dengan pihak media.",
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       internal: "Region Manager Reliability & Project Development ",
-  //       aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas fuel."],
-  //     },
-  //     {
-  //       id: 3,
-  //       internal: "Region Manager Supply and Distribution",
-  //       aktivitas: ["Koordinasi terkait keandalan pasokan fuel dan gas ke lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 4,
-  //       internal: "Marketing",
-  //       aktivitas: [
-  //         "Koordinasi terkait riset pasar;",
-  //         "Koordinasi terkait analisa kompetitor serta data dan informasi dalam identifikasi segmen pasar;",
-  //         "Koordinasi terkait kegiatan promosi fuel;",
-  //         "Koordinasi terkait penetapan harga retail dan commercial fuel.",
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       internal: "Retail Gas Sales ",
-  //       aktivitas: [
-  //         "Koordinasi terkait implementasi kebijakan penyaluran dan pengembangan bisnis fuel;",
-  //         "Koordinasi terkait pengembangan jaringan (outlet retail).",
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       internal: "Internal audit ",
-  //       aktivitas: ["Koordinasi terkait audit internal dan eksternal."],
-  //     },
-  //   ],
-  //   relation: [
-  //     {
-  //       id: 1,
-  //       eksternal: "DPR/DPRD",
-  //       aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan fuel."],
-  //     },
-  //     {
-  //       id: 2,
-  //       eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-  //       aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran fuel."],
-  //     },
-  //     {
-  //       id: 3,
-  //       eksternal: "BPH Migas",
-  //       aktivitas: ["Koordinasi terkait verifikasi fuel PSO."],
-  //     },
-  //     {
-  //       id: 4,
-  //       eksternal: "Hiswana Migas",
-  //       aktivitas: ["Koordinasi terkait penyaluran fuel dan pengelolaan lembaga penyalur."],
-  //     },
-  //     {
-  //       id: 5,
-  //       eksternal: "BPK/Kementrian Keuangan",
-  //       aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran fuel PSO."],
-  //     },
-  //     {
-  //       id: 6,
-  //       eksternal: "Tokoh Masyarakat",
-  //       aktivitas: ["Koordinasi terkait penggalangan/community development."],
-  //     },
-  //     {
-  //       id: 7,
-  //       eksternal: "Konsultan",
-  //       aktivitas: ["Konsultasi terkait penelitian."],
-  //     },
-  //     {
-  //       id: 8,
-  //       eksternal: "Wartawan",
-  //       aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang fuel."],
-  //     },
-  //     {
-  //       id: 9,
-  //       eksternal: "Pihak eksternal lainnya",
-  //       aktivitas: ["Koordinasi sesuai kebutuhan perusahaan."],
-  //     },
-  //   ],
-  //   //persyaratan jabatan
-  //   education: [
-  //     "Sarjana dari berbagai jurusan, diutamakan dari Manajemen/Manajemen Pemasaran.",
-  //     "S1 dengan pengalaman kerja 3 - 6 tahun.",
-  //     "Pengalaman kerja di bidang Marketing, Sales & Commercial diutamakan di bidang Sales.",
-  //     "3 - 6 tahun menjabat posisi setingkat Jr. Analyst atau Supervisor.",
-  //   ],
-
-  //   persyaratanKhusus: [" "],
-
-  //   komtekMandatori: [
-  //     {
-  //       id: "1",
-  //       komtekMandatoriName: "HSSE General ",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekMandatoriName: "Risk Fundamental",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekMandatoriName: "Digital & Analytic Insight",
-  //       level: "1",
-  //     },
-  //   ],
-  //   komtekGeneral: [
-  //     {
-  //       id: "1",
-  //       komtekGeneralName: "Marketing Strategy and Planning",
-  //       level: "1",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekGeneralName: "Customer Relation Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekGeneralName: "Sales Strategy and Planning",
-  //       level: "2",
-  //     },
-  //   ],
-  //   komtekSpesifik: [
-  //     {
-  //       id: "1",
-  //       komtekSpesifikName: "Stakeholder Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "2",
-  //       komtekSpesifikName: "Sales and Account Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "3",
-  //       komtekSpesifikName: "Promotion and Campaign Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "4",
-  //       komtekSpesifikName: "Sales Administration",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "5",
-  //       komtekSpesifikName: "Handling Customer Complaint",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "6",
-  //       komtekSpesifikName: "Channel Management",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "7",
-  //       komtekSpesifikName: "Product/Service Development",
-  //       level: "2",
-  //     },
-  //     {
-  //       id: "8",
-  //       komtekSpesifikName: "Domestic Supply Management",
-  //       level: "2",
-  //     },
-  //   ],
-  //   komper: [
-  //     {
-  //       id: "1",
-  //       komperName: "Fostering Collaboration",
-  //     },
-  //     {
-  //       id: "2",
-  //       komperName: "Analysis",
-  //     },
-  //     {
-  //       id: "3",
-  //       komperName: "Managing Work",
-  //     },
-  //     {
-  //       id: "4",
-  //       komperName: "Continuous Improvement",
-  //     },
-  //     {
-  //       id: "5",
-  //       komperName: "Technology Awareness",
-  //     },
-  //     {
-  //       id: "6",
-  //       komperName: "Adaptability",
-  //     },
-  //     {
-  //       id: "7",
-  //       komperName: "Quality Orientation",
-  //     },
-  //     {
-  //       id: "8",
-  //       komperName: "Learning Agility",
-  //     },
-  //   ],
-  // },
   {
     identifikasi: {
       id: 13,
@@ -4227,8 +2736,14 @@ const dataJobDescCompare = [
         id: 1,
         responsible:
           "Melakukan penyusunan sales planning produk gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-        output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
-        lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
+        output: [
+          "Sales forecast (pragnosa revenue);",
+          "Sales goals (target, strategi dan rencana penjualan).",
+        ],
+        lead: [
+          "Tersedianya sales forecast;",
+          "Tersedianya sales goals untuk masing-masing channel.",
+        ],
       },
       {
         id: 2,
@@ -4250,7 +2765,9 @@ const dataJobDescCompare = [
           "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
           "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
         ],
-        lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
+        lead: [
+          "Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan.",
+        ],
       },
       {
         id: 4,
@@ -4261,7 +2778,9 @@ const dataJobDescCompare = [
           "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
           "Pelaksanaan proses peluang channel baru.",
         ],
-        lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
+        lead: [
+          "Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel.",
+        ],
       },
       {
         id: 5,
@@ -4312,7 +2831,9 @@ const dataJobDescCompare = [
         responsible:
           "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
         output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-        lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
+        lead: [
+          "Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder.",
+        ],
       },
     ],
     tugasUmum: [
@@ -4358,12 +2879,16 @@ const dataJobDescCompare = [
       {
         id: 2,
         internal: "Region Manager Reliability & Project Development ",
-        aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas."],
+        aktivitas: [
+          "Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas.",
+        ],
       },
       {
         id: 3,
         internal: "Region Manager Supply and Distribution",
-        aktivitas: ["Koordinasi terkait keandalan pasokan gas ke lembaga penyalur."],
+        aktivitas: [
+          "Koordinasi terkait keandalan pasokan gas ke lembaga penyalur.",
+        ],
       },
       {
         id: 4,
@@ -4393,12 +2918,16 @@ const dataJobDescCompare = [
       {
         id: 1,
         eksternal: "DPR/DPRD",
-        aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan gas."],
+        aktivitas: [
+          "Koordinasi/hearing terkait situasi terkini pengelolaan gas.",
+        ],
       },
       {
         id: 2,
         eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-        aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran gas."],
+        aktivitas: [
+          "Koordinasi terkait perizinan dan pengawasan penyaluran gas.",
+        ],
       },
       {
         id: 3,
@@ -4408,12 +2937,16 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Hiswana Migas",
-        aktivitas: ["Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur."],
+        aktivitas: [
+          "Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur.",
+        ],
       },
       {
         id: 5,
         eksternal: "BPK/Kementrian Keuangan",
-        aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran gas PSO."],
+        aktivitas: [
+          "Koordinasi terkait pemeriksaan laporan penyaluran gas PSO.",
+        ],
       },
       {
         id: 6,
@@ -4428,7 +2961,9 @@ const dataJobDescCompare = [
       {
         id: 8,
         eksternal: "Wartawan",
-        aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang gas."],
+        aktivitas: [
+          "Koordinasi terkait pengelolaan informasi publik tentang gas.",
+        ],
       },
       {
         id: 9,
@@ -4577,8 +3112,14 @@ const dataJobDescCompare = [
         id: 1,
         responsible:
           "Melakukan penyusunan sales planning produk gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-        output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
-        lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
+        output: [
+          "Sales forecast (pragnosa revenue);",
+          "Sales goals (target, strategi dan rencana penjualan).",
+        ],
+        lead: [
+          "Tersedianya sales forecast;",
+          "Tersedianya sales goals untuk masing-masing channel.",
+        ],
       },
       {
         id: 2,
@@ -4600,7 +3141,9 @@ const dataJobDescCompare = [
           "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
           "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
         ],
-        lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
+        lead: [
+          "Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan.",
+        ],
       },
       {
         id: 4,
@@ -4611,7 +3154,9 @@ const dataJobDescCompare = [
           "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
           "Pelaksanaan proses peluang channel baru.",
         ],
-        lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
+        lead: [
+          "Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel.",
+        ],
       },
       {
         id: 5,
@@ -4662,7 +3207,9 @@ const dataJobDescCompare = [
         responsible:
           "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
         output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-        lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
+        lead: [
+          "Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder.",
+        ],
       },
     ],
     tugasUmum: [
@@ -4708,12 +3255,16 @@ const dataJobDescCompare = [
       {
         id: 2,
         internal: "Region Manager Reliability & Project Development ",
-        aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas."],
+        aktivitas: [
+          "Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas.",
+        ],
       },
       {
         id: 3,
         internal: "Region Manager Supply and Distribution",
-        aktivitas: ["Koordinasi terkait keandalan pasokan gas ke lembaga penyalur."],
+        aktivitas: [
+          "Koordinasi terkait keandalan pasokan gas ke lembaga penyalur.",
+        ],
       },
       {
         id: 4,
@@ -4743,12 +3294,16 @@ const dataJobDescCompare = [
       {
         id: 1,
         eksternal: "DPR/DPRD",
-        aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan gas."],
+        aktivitas: [
+          "Koordinasi/hearing terkait situasi terkini pengelolaan gas.",
+        ],
       },
       {
         id: 2,
         eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-        aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran gas."],
+        aktivitas: [
+          "Koordinasi terkait perizinan dan pengawasan penyaluran gas.",
+        ],
       },
       {
         id: 3,
@@ -4758,12 +3313,16 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Hiswana Migas",
-        aktivitas: ["Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur."],
+        aktivitas: [
+          "Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur.",
+        ],
       },
       {
         id: 5,
         eksternal: "BPK/Kementrian Keuangan",
-        aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran gas PSO."],
+        aktivitas: [
+          "Koordinasi terkait pemeriksaan laporan penyaluran gas PSO.",
+        ],
       },
       {
         id: 6,
@@ -4778,7 +3337,9 @@ const dataJobDescCompare = [
       {
         id: 8,
         eksternal: "Wartawan",
-        aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang gas."],
+        aktivitas: [
+          "Koordinasi terkait pengelolaan informasi publik tentang gas.",
+        ],
       },
       {
         id: 9,
@@ -6029,4 +4590,26 @@ const statusApprovalClass = {
   2: "label-success-custom",
   3: "label-info-custom",
   4: "label-primary-custom",
+};
+
+const customTableHeaderNoArray = ["responsible"];
+const customTableHeaderCleaned = ["wewenang"];
+const customTableHeaderHeader = ["header"];
+
+// const untuk tableCustomJobDescription
+const tabCusJD = {
+  // tjHa: ["no", "index", "responsible", "output", "lead", "action"],
+  // thUm: ["no", "header", "tugas"],
+  // wewenang: ["no", "wewenang"],
+  // koordinasi: ["no", "internal", "aktivitas", "action"],
+  // relation: ["no", "eksternal", "aktivitas", "action"],
+  // persyaratan: ["pj"],
+  // stk:["stkNumber", "stkTitle", "action"]
+  tugasHa: ["no", "index", "responsible", "output", "lead"],
+  tugasUmum: ["no", "header", "tugas"],
+  wewenang: ["no", "wewenang"],
+  koordinasi: ["no", "internal", "aktivitas"],
+  relation: ["no", "eksternal", "aktivitas"],
+  pj: ["pj"],
+  stk: ["stkNumber", "stkTitle"],
 };

@@ -6,25 +6,40 @@ function checkLocalStorage() {
   localStorage.removeItem("mandatori");
   localStorage.removeItem("general");
   localStorage.removeItem("spesifik");
-  localStorage.getItem("fungsi") ? localStorage.getItem("fungsi") : localStorage.setItem("fungsi", "");
-  localStorage.getItem("tugasHa") ? localStorage.getItem("tugasHa") : localStorage.setItem("tugasHa", "");
-  localStorage.getItem("koordinasi") ? localStorage.getItem("koordinasi") : localStorage.setItem("koordinasi", "");
-  localStorage.getItem("relation") ? localStorage.getItem("relation") : localStorage.setItem("relation", "");
-  localStorage.getItem("mandatori") ? localStorage.getItem("mandatori") : localStorage.setItem("mandatori", "");
-  localStorage.getItem("general") ? localStorage.getItem("general") : localStorage.setItem("general", "");
-  localStorage.getItem("spesifik") ? localStorage.getItem("spesifik") : localStorage.setItem("spesifik", "");
+  localStorage.getItem("fungsi")
+    ? localStorage.getItem("fungsi")
+    : localStorage.setItem("fungsi", "");
+  localStorage.getItem("tugasHa")
+    ? localStorage.getItem("tugasHa")
+    : localStorage.setItem("tugasHa", "");
+  localStorage.getItem("koordinasi")
+    ? localStorage.getItem("koordinasi")
+    : localStorage.setItem("koordinasi", "");
+  localStorage.getItem("relation")
+    ? localStorage.getItem("relation")
+    : localStorage.setItem("relation", "");
+  localStorage.getItem("mandatori")
+    ? localStorage.getItem("mandatori")
+    : localStorage.setItem("mandatori", "");
+  localStorage.getItem("general")
+    ? localStorage.getItem("general")
+    : localStorage.setItem("general", "");
+  localStorage.getItem("spesifik")
+    ? localStorage.getItem("spesifik")
+    : localStorage.setItem("spesifik", "");
 }
 
 function updateIdentifikasiJob(params) {
-  $("#function").text(params.function);
-  $("#location").text(params.location);
-  $("#directorat").text(params.directorat);
-  $("#directReport").text(params.directReport);
-  $("#sk").text(params.sk);
+  $("#jabatan").text(params.jobName);
+  $("#function").text(params.unitKerjaFungsi);
+  $("#location").text(params.lokasiKerja);
+  $("#directorat").text(params.direktorat);
+  $("#directReport").text(params.atasanLangsung);
+  $("#sk").text(params.noSuratKeputusan);
+  $("#skDate").text(params.tanggalSuratKeputusan);
 }
 
 function updateTable(params, data, rowHeader, refer) {
-  // console.log(params, data, rowHeader);
   // get table body
   const tableBody = $(`#${params}Table tbody`);
   tableBody.empty();
@@ -36,10 +51,20 @@ function updateTable(params, data, rowHeader, refer) {
     tableBody.append(row);
     return;
   }
-  data.forEach((item) => {
+
+  // if items in data is not array, convert to array
+  if (!Array.isArray(data)) {
+    // data = [data];
+    console.warn(`Data for ${params} is not an array, converting to array`);
+    return false;
+  }
+
+  data.forEach((item, inc) => {
     const reference = item.reference ? item.reference : "";
     const referenceHtml =
-      reference !== "" ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>` : "";
+      reference !== ""
+        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>`
+        : "";
     row = `<tr>`;
     if (!rowHeader) {
       row += `<td class="tdClass">${item}</td>`;
@@ -48,9 +73,39 @@ function updateTable(params, data, rowHeader, refer) {
       return;
     }
     rowHeader.forEach((header, idx) => {
+      if (header === "no") {
+        row += `<td class="tdClass">${inc + 1}</td>`;
+        return;
+      }
+
+      if (header === "index") {
+        row += `<td class="tdClass text-primary">
+          <span data-bs-toggle="tooltip"  title="${item?.tanggungJawabProses[0]?.description}">
+            ${item?.tanggungJawabProses[0]?.indexNumber}
+          </span>
+        </td>`;
+        return;
+      }
+      // header inside customTableHeader
+      if (customTableHeaderNoArray.includes(header)) {
+        if (Array.isArray(item[header])) {
+          item[header] = item[header].join(", ");
+        }
+      }
+
+      if (customTableHeaderCleaned.includes(header)) {
+        item[header] = item[header].toString().replace(/[\[\]"]/g, "");
+      }
+
       const arrayType = Array.isArray(item[header]);
       if (arrayType) {
-        row += `<td class="tdClass" ><ul style="list-style-type:disc">`;
+        const isHeaderArray = customTableHeaderHeader.includes(header);
+        console.log(`Header: ${header}, isHeaderArray: ${isHeaderArray}`);
+        row += `<td class="tdClass" ><ul style="list-style-type:
+        ${
+          isHeaderArray ? "none" : "disc"
+        }; padding-left: 20px; margin: 0; padding: 0;
+        ">`;
         item[header].forEach((arrayItem) => {
           row += `<li>${arrayItem}</li>`;
         });
@@ -59,7 +114,6 @@ function updateTable(params, data, rowHeader, refer) {
               </td>`;
         return;
       }
-
       if (header === "action") {
         row += `<td class="p-3">
           <button type="button" class="btn btn-primary" id="editData${idx}" onclick="editData(${idx})"> <i class="fas fa-edit"></i></button>
@@ -67,7 +121,9 @@ function updateTable(params, data, rowHeader, refer) {
         </td>`;
         return;
       }
-      row += `<td class="tdClass">${item[header]}${header !== "id" ? referenceHtml : ""}</td>`;
+      row += `<td class="tdClass">${item[header]}${
+        header !== "id" ? referenceHtml : ""
+      }</td>`;
     });
 
     row += `</tr>`;
@@ -94,24 +150,60 @@ async function getJobReferenceDetail() {
   isDisableButton(false);
   $(".summernote").summernote("enable");
 
-  const dataFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
+  const dataFungsi =
+    localStorage.getItem("fungsi") !== ""
+      ? JSON.parse(localStorage.getItem("fungsi"))
+      : [];
   let codeFungsi = "";
   dataFungsi.map((item) => {
     codeFungsi += `${item?.fungsi}<br/><span style="font-size:10px;color:grey">(reference from : ${item?.reference})</span><br/><br/>`;
   });
   $(".summernote").summernote("code", codeFungsi ?? "");
   // input to fungsi jabatan in summernote
-  const dataTugasHa = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
+  const dataTugasHa =
+    localStorage.getItem("tugasHa") !== ""
+      ? JSON.parse(localStorage.getItem("tugasHa"))
+      : [];
   const dataKoordinasi =
-    localStorage.getItem("koordinasi") !== "" ? JSON.parse(localStorage.getItem("koordinasi")) : [];
-  const dataRelation = localStorage.getItem("relation") !== "" ? JSON.parse(localStorage.getItem("relation")) : [];
-  const dataMandatori = localStorage.getItem("mandatori") !== "" ? JSON.parse(localStorage.getItem("mandatori")) : [];
-  const dataGeneral = localStorage.getItem("general") !== "" ? JSON.parse(localStorage.getItem("general")) : [];
-  const dataSpesifik = localStorage.getItem("spesifik") !== "" ? JSON.parse(localStorage.getItem("spesifik")) : [];
+    localStorage.getItem("koordinasi") !== ""
+      ? JSON.parse(localStorage.getItem("koordinasi"))
+      : [];
+  const dataRelation =
+    localStorage.getItem("relation") !== ""
+      ? JSON.parse(localStorage.getItem("relation"))
+      : [];
+  const dataMandatori =
+    localStorage.getItem("mandatori") !== ""
+      ? JSON.parse(localStorage.getItem("mandatori"))
+      : [];
+  const dataGeneral =
+    localStorage.getItem("general") !== ""
+      ? JSON.parse(localStorage.getItem("general"))
+      : [];
+  const dataSpesifik =
+    localStorage.getItem("spesifik") !== ""
+      ? JSON.parse(localStorage.getItem("spesifik"))
+      : [];
 
-  updateTable("tugasHa", dataTugasHa, ["id", "responsible", "output", "lead", "action"]);
-  updateTable("koordinasi", dataKoordinasi, ["id", "internal", "aktivitas", "action"]);
-  updateTable("relation", dataRelation, ["id", "eksternal", "aktivitas", "action"]);
+  updateTable("tugasHa", dataTugasHa, [
+    "id",
+    "responsible",
+    "output",
+    "lead",
+    "action",
+  ]);
+  updateTable("koordinasi", dataKoordinasi, [
+    "id",
+    "internal",
+    "aktivitas",
+    "action",
+  ]);
+  updateTable("relation", dataRelation, [
+    "id",
+    "eksternal",
+    "aktivitas",
+    "action",
+  ]);
   // updateTable("mandatori", dataMandatori, ["id", "mandatori", "action"]);
   // kompetensiTable tbody empty
   const tableBody = $(`#kompetensiTable tbody`);
@@ -178,135 +270,151 @@ function isDisableButton(isDisabled) {
   }
 }
 
-async function searchJobCompare(event, isPercentage) {
-  const chkJobList = document.getElementById("chk-job-list");
-  const jobSelectedList = document.getElementById("job-selected-list");
-  if (isPercentage) {
-    const value = event.target.value;
-    const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
+// async function searchJobCompare(event, isPercentage) {
+//   const chkJobList = document.getElementById("chk-job-list");
+//   const jobSelectedList = document.getElementById("job-selected-list");
+//   if (isPercentage) {
+//     const value = event.target.value;
+//     const chkJobListPercentage = document.getElementById(
+//       "chk-job-list-percentage"
+//     );
 
-    // chkJobListPercentage.innerHTML = dataJobDescCompare
-    //   .map((item) => ({
-    //     id: item?.identifikasi?.id,
-    //     name: item?.identifikasi?.jobName,
-    //     percentage: Math.floor(Math.random() * 50) + 50,
+//     // chkJobListPercentage.innerHTML = dataJobDescCompare
+//     //   .map((item) => ({
+//     //     id: item?.identifikasi?.id,
+//     //     name: item?.identifikasi?.jobName,
+//     //     percentage: Math.floor(Math.random() * 50) + 50,
 
-    //   }))
-    //   .filter((item) => item.percentage >= value)
-    //   .map(
-    //     (item) =>
-    //       `
-    //       <div class="row-item">
-    //         <div class="column-item-name" onClick="applyCompare(${item.id})">
-    //           ${item.name} <span class="badge badge-danger">${item.percentage}% Similarities</span>
-    //         </div>
-    //       </div>
-    //     `
-    //   )
-    //   .join("");
-    const findData = dataJobDescCompare.filter((item) => item.identifikasi.percentage >= value);
-    const urlParams = new URLSearchParams(window.location.search);
-    const idPos = urlParams.get("id");
-    const selectedIdPos = dataJobDesc.find((item) => item.identifikasi.id == idPos);
-    // if selectedIdPos?.identifikasi?.jobName include manager
-    let include = "sbm";
-    if (selectedIdPos?.identifikasi?.jobName.toLowerCase().includes("manager")) {
-      include = "manager";
-    }
+//     //   }))
+//     //   .filter((item) => item.percentage >= value)
+//     //   .map(
+//     //     (item) =>
+//     //       `
+//     //       <div class="row-item">
+//     //         <div class="column-item-name" onClick="applyCompare(${item.id})">
+//     //           ${item.name} <span class="badge badge-danger">${item.percentage}% Similarities</span>
+//     //         </div>
+//     //       </div>
+//     //     `
+//     //   )
+//     //   .join("");
+//     const findData = dataJobDescCompare.filter(
+//       (item) => item.identifikasi.percentage >= value
+//     );
+//     const urlParams = new URLSearchParams(window.location.search);
+//     const idPos = urlParams.get("id");
+//     const selectedIdPos = dataJobDesc.find(
+//       (item) => item.identifikasi.id == idPos
+//     );
+//     // if selectedIdPos?.identifikasi?.jobName include manager
+//     let include = "sbm";
+//     if (
+//       selectedIdPos?.identifikasi?.jobName.toLowerCase().includes("manager")
+//     ) {
+//       include = "manager";
+//     }
 
-    const dataCk = dataJobDescCompare
-      .map((item) => ({
-        id: item?.identifikasi?.id,
-        name: item?.identifikasi?.jobName,
-        percentage: item?.identifikasi?.percentage,
-      }))
-      .filter((item) => item.percentage >= value && item.name.toLowerCase().includes(include));
+//     const dataCk = dataJobDescCompare
+//       .map((item) => ({
+//         id: item?.identifikasi?.id,
+//         name: item?.identifikasi?.jobName,
+//         percentage: item?.identifikasi?.percentage,
+//       }))
+//       .filter(
+//         (item) =>
+//           item.percentage >= value && item.name.toLowerCase().includes(include)
+//       );
 
-    dataCk.forEach((item) => {
-      let color = "";
-      if (item.percentage >= 90) {
-        color = "background-color: #28a745";
-      } else if (item.percentage >= 80) {
-        color = "background-color: #17a2b8";
-      } else if (item.percentage >= 70) {
-        color = "background-color: #ffc107";
-      } else if (item.percentage >= 60) {
-        color = "background-color: #007bff";
-      } else if (item.percentage >= 50) {
-        color = "background-color: #dc3545";
-      }
-      item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
-    });
+//     dataCk.forEach((item) => {
+//       let color = "";
+//       if (item.percentage >= 90) {
+//         color = "background-color: #28a745";
+//       } else if (item.percentage >= 80) {
+//         color = "background-color: #17a2b8";
+//       } else if (item.percentage >= 70) {
+//         color = "background-color: #ffc107";
+//       } else if (item.percentage >= 60) {
+//         color = "background-color: #007bff";
+//       } else if (item.percentage >= 50) {
+//         color = "background-color: #dc3545";
+//       }
+//       item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
+//     });
 
-    chkJobListPercentage.innerHTML = dataCk
-      .map(
-        (item) =>
-          `
-          <div class="row-item">
-            <div class="column-item-name" onClick="applyCompare(${item.id})">
-              ${item.name} 
-              ${item.badge}
-              <i class="fas fa-info-circle" data-toggle="popover" data-placement="top" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"></i> 
-            </div>
-          </div>
-        `
-      )
-      .join("");
+//     chkJobListPercentage.innerHTML = dataCk
+//       .map(
+//         (item) =>
+//           `
+//           <div class="row-item">
+//             <div class="column-item-name" onClick="applyCompare(${item.id})">
+//               ${item.name}
+//               ${item.badge}
+//               <i class="fas fa-info-circle" data-toggle="popover" data-placement="top" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"></i>
+//             </div>
+//           </div>
+//         `
+//       )
+//       .join("");
 
-    $('[data-toggle="popover"]').popover();
-    return;
-  }
+//     $('[data-toggle="popover"]').popover();
+//     return;
+//   }
 
-  const data = dataJobDescCompare
-    .map((item) => ({ id: item?.identifikasi?.id, name: item?.identifikasi?.jobName }))
-    .filter((item) => item.name.toLowerCase().includes(event?.target?.value.toLowerCase()));
+//   const data = dataJobDescCompare
+//     .map((item) => ({
+//       id: item?.identifikasi?.id,
+//       name: item?.identifikasi?.jobName,
+//     }))
+//     .filter((item) =>
+//       item.name.toLowerCase().includes(event?.target?.value.toLowerCase())
+//     );
 
-  chkJobList.innerHTML = data
-    .map(
-      (item) => `
-        <div class="row-item">
-          <div class="column-item-name" onClick="applyCompare(${item.id})"> 
-            ${item.name}
-          </div>
-        </div>
-      `
-    )
-    .join("");
+//   chkJobList.innerHTML = data
+//     .map(
+//       (item) => `
+//         <div class="row-item">
+//           <div class="column-item-name" onClick="applyCompare(${item.id})">
+//             ${item.name}
+//           </div>
+//         </div>
+//       `
+//     )
+//     .join("");
 
-  // chkJobList.addEventListener("change", (e) => {
-  //   if (e.target.classList.contains("checkbox_animated")) {
-  //     const value = e.target.value;
-  //     const name = e.target.getAttribute("data-name");
+//   // chkJobList.addEventListener("change", (e) => {
+//   //   if (e.target.classList.contains("checkbox_animated")) {
+//   //     const value = e.target.value;
+//   //     const name = e.target.getAttribute("data-name");
 
-  //     if (e.target.checked) {
-  //       if (!document.getElementById(`selected-job-${value}`)) {
-  //         const selectedItem = document.createElement("div");
-  //         selectedItem.className = "selected-item";
-  //         selectedItem.id = `selected-job-${value}`;
-  //         selectedItem.innerHTML = `
-  //               ${name}
-  //               <span class="remove-item" data-value="${value}">
-  //                 <i class="fas fa-times"></i>
-  //               </span>
-  //             `;
-  //         jobSelectedList.appendChild(selectedItem);
-  //       }
-  //     } else {
-  //       const itemToRemove = document.getElementById(`selected-job-${value}`);
-  //       if (itemToRemove) itemToRemove.remove();
-  //     }
-  //   }
-  // });
+//   //     if (e.target.checked) {
+//   //       if (!document.getElementById(`selected-job-${value}`)) {
+//   //         const selectedItem = document.createElement("div");
+//   //         selectedItem.className = "selected-item";
+//   //         selectedItem.id = `selected-job-${value}`;
+//   //         selectedItem.innerHTML = `
+//   //               ${name}
+//   //               <span class="remove-item" data-value="${value}">
+//   //                 <i class="fas fa-times"></i>
+//   //               </span>
+//   //             `;
+//   //         jobSelectedList.appendChild(selectedItem);
+//   //       }
+//   //     } else {
+//   //       const itemToRemove = document.getElementById(`selected-job-${value}`);
+//   //       if (itemToRemove) itemToRemove.remove();
+//   //     }
+//   //   }
+//   // });
 
-  // jobSelectedList.addEventListener("click", (e) => {
-  //   if (e.target.closest(".remove-item")) {
-  //     const value = e.target.closest(".remove-item").getAttribute("data-value");
-  //     const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
-  //     if (checkbox) checkbox.checked = false;
-  //     document.getElementById(`selected-job-${value}`).remove();
-  //   }
-  // });
-}
+//   // jobSelectedList.addEventListener("click", (e) => {
+//   //   if (e.target.closest(".remove-item")) {
+//   //     const value = e.target.closest(".remove-item").getAttribute("data-value");
+//   //     const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
+//   //     if (checkbox) checkbox.checked = false;
+//   //     document.getElementById(`selected-job-${value}`).remove();
+//   //   }
+//   // });
+// }
 
 async function applyCompare(id) {
   $("#modalJobCompareDetail").modal("show");
@@ -322,7 +430,14 @@ async function addJobReference() {
 }
 
 async function applySelectedData(id) {
-  const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
+  const arrayId = [
+    "identifikasi",
+    "fungsi",
+    "tugas-ha",
+    "koordinasi-internal",
+    "relasi-eksternal",
+    "stk",
+  ];
   arrayId.forEach((item) => {
     $(`#${item}`).empty();
   });
@@ -493,7 +608,9 @@ async function applySelectedData(id) {
 
   koordinasiInternal.innerHTML = koordinasiInternalDiv;
 
-  let bodyKoordinasiInternal = document.querySelector(".tbodyKoordinasiInternal");
+  let bodyKoordinasiInternal = document.querySelector(
+    ".tbodyKoordinasiInternal"
+  );
   const listInternal = data?.koordinasi;
   for (let j = 0; j < listInternal.length; j++) {
     let listItemOutput = await addList(listInternal[j].aktivitas);
@@ -641,18 +758,20 @@ function filterListJobDesc(value, search) {
     data = data.filter((item) => item.jobStatus === value);
   }
   if (search) {
-    data = data.filter((item) => item.jobName.toLowerCase().includes(search.toLowerCase()));
+    data = data.filter((item) =>
+      item.jobName.toLowerCase().includes(search.toLowerCase())
+    );
   }
   getTableListJobDes(data);
 }
 
-function createJobDesc(id) {
-  const redirectTo = "/job-description/detail?create=true&id=" + id;
+function createJobDesc(jobId, prlOrg, positionCode) {
+  const redirectTo = `/job-description/detail?jobId=${jobId}&prlOrg=${prlOrg}&positionCode=${positionCode}`;
   window.location.href = redirectTo;
 }
 
-function detailJobDesc(id) {
-  const redirectTo = "/job-description/detail?&id=" + id;
+function detailJobDesc(jobId, prlOrg, positionCode) {
+  const redirectTo = `/job-description/detail?jobId=${jobId}&prlOrg=${prlOrg}&positionCode=${positionCode}`;
   window.location.href = redirectTo;
 }
 
@@ -677,18 +796,35 @@ async function checkboxReference(val) {
 
 async function saveReference() {
   const dataSelected = selectedData.selectedJobDesc;
-  const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
-    (item) => !item.id.includes("all") && item.checked
-  );
+  const checkboxList = Array.from(
+    document.querySelectorAll("input[type=checkbox].checbox-compare")
+  ).filter((item) => !item.id.includes("all") && item.checked);
   console.log("checkboxList", checkboxList);
-  const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
-  const checboxTugasHa = checkboxList.filter((item) => item.id.includes("checkbox_tugas_ha"));
-  const checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_ir"));
-  const checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_eksternal"));
-  const checboxPersyaratanMandatori = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_mandatori"));
-  const checboxPersyaratanGeneral = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_general"));
-  const checboxPersyaratanSpesifik = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_spesifik"));
-  const reference = dataSelected?.identifikasi?.jobName + " - " + dataSelected?.identifikasi?.sk;
+  const checboxFungsi = checkboxList.find(
+    (item) => item.id === "checkbox_fungsi"
+  );
+  const checboxTugasHa = checkboxList.filter((item) =>
+    item.id.includes("checkbox_tugas_ha")
+  );
+  const checboxInternal = checkboxList.filter((item) =>
+    item.id.includes("checkbox_ir")
+  );
+  const checboxEksternal = checkboxList.filter((item) =>
+    item.id.includes("checkbox_eksternal")
+  );
+  const checboxPersyaratanMandatori = checkboxList.filter((item) =>
+    item.id.includes("checkbox_persyaratan_mandatori")
+  );
+  const checboxPersyaratanGeneral = checkboxList.filter((item) =>
+    item.id.includes("checkbox_persyaratan_general")
+  );
+  const checboxPersyaratanSpesifik = checkboxList.filter((item) =>
+    item.id.includes("checkbox_persyaratan_spesifik")
+  );
+  const reference =
+    dataSelected?.identifikasi?.jobName +
+    " - " +
+    dataSelected?.identifikasi?.sk;
 
   console.log("checboxFungsi", checboxFungsi);
   console.log("checboxTugasHa", checboxTugasHa);
@@ -700,7 +836,10 @@ async function saveReference() {
   console.log("reference", reference);
   return;
   if (checboxFungsi) {
-    const getLocalFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
+    const getLocalFungsi =
+      localStorage.getItem("fungsi") !== ""
+        ? JSON.parse(localStorage.getItem("fungsi"))
+        : [];
     // add to array
     getLocalFungsi.push({
       reference: reference,
@@ -710,7 +849,10 @@ async function saveReference() {
   }
 
   if (checboxTugasHa.length > 0) {
-    const getLocalTugasHa = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
+    const getLocalTugasHa =
+      localStorage.getItem("tugasHa") !== ""
+        ? JSON.parse(localStorage.getItem("tugasHa"))
+        : [];
     for (const item of checboxTugasHa) {
       const id = item.id.split("checkbox_tugas_ha_")[1];
       console.log("id", id);
@@ -729,7 +871,9 @@ async function saveReference() {
 
   if (checboxInternal.length > 0) {
     const getLocalKoordinasi =
-      localStorage.getItem("koordinasi") !== "" ? JSON.parse(localStorage.getItem("koordinasi")) : [];
+      localStorage.getItem("koordinasi") !== ""
+        ? JSON.parse(localStorage.getItem("koordinasi"))
+        : [];
     for (const item of checboxInternal) {
       const id = item.id.split("checkbox_internal_")[1];
       const findData = dataSelected?.koordinasi.find((item) => item.id == id);
@@ -745,7 +889,9 @@ async function saveReference() {
 
   if (checboxEksternal.length > 0) {
     const getLocalRelation =
-      localStorage.getItem("relation") !== "" ? JSON.parse(localStorage.getItem("relation")) : [];
+      localStorage.getItem("relation") !== ""
+        ? JSON.parse(localStorage.getItem("relation"))
+        : [];
     for (const item of checboxEksternal) {
       const id = item.id.split("checkbox_eksternal_")[1];
       const findData = dataSelected?.relation.find((item) => item.id == id);
@@ -761,11 +907,18 @@ async function saveReference() {
 
   if (checboxPersyaratanMandatori.length > 0) {
     const getLocalMandatori =
-      localStorage.getItem("mandatori") !== "" ? JSON.parse(localStorage.getItem("mandatori")) : [];
+      localStorage.getItem("mandatori") !== ""
+        ? JSON.parse(localStorage.getItem("mandatori"))
+        : [];
     for (const item of checboxPersyaratanMandatori) {
       const id = item.id.split("checkbox_persyaratan_mandatori_")[1];
-      console.log("dataSelected?.komtekMandatori", dataSelected?.komtekMandatori);
-      const findData = dataSelected?.komtekMandatori.find((item) => item.id == id);
+      console.log(
+        "dataSelected?.komtekMandatori",
+        dataSelected?.komtekMandatori
+      );
+      const findData = dataSelected?.komtekMandatori.find(
+        (item) => item.id == id
+      );
       getLocalMandatori.push({
         reference: reference,
         id: findData.id,
@@ -777,10 +930,15 @@ async function saveReference() {
   }
 
   if (checboxPersyaratanGeneral.length > 0) {
-    const getLocalGeneral = localStorage.getItem("general") !== "" ? JSON.parse(localStorage.getItem("general")) : [];
+    const getLocalGeneral =
+      localStorage.getItem("general") !== ""
+        ? JSON.parse(localStorage.getItem("general"))
+        : [];
     for (const item of checboxPersyaratanGeneral) {
       const id = item.id.split("checkbox_persyaratan_general_")[1];
-      const findData = dataSelected?.komtekGeneral.find((item) => item.id == id);
+      const findData = dataSelected?.komtekGeneral.find(
+        (item) => item.id == id
+      );
       getLocalGeneral.push({
         reference: reference,
         id: findData.id,
@@ -793,10 +951,14 @@ async function saveReference() {
 
   if (checboxPersyaratanSpesifik.length > 0) {
     const getLocalSpesifik =
-      localStorage.getItem("spesifik") !== "" ? JSON.parse(localStorage.getItem("spesifik")) : [];
+      localStorage.getItem("spesifik") !== ""
+        ? JSON.parse(localStorage.getItem("spesifik"))
+        : [];
     for (const item of checboxPersyaratanSpesifik) {
       const id = item.id.split("checkbox_persyaratan_spesifik_")[1];
-      const findData = dataSelected?.komtekSpesifik.find((item) => item.id == id);
+      const findData = dataSelected?.komtekSpesifik.find(
+        (item) => item.id == id
+      );
       getLocalSpesifik.push({
         reference: reference,
         id: findData.id,
@@ -877,7 +1039,15 @@ function checkButtonTable(buttonTable, id, lastPath) {
   }
 }
 
-function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
+function modalConfrimHelper(
+  type,
+  titleModal,
+  message,
+  note,
+  action,
+  modalSize,
+  paramsId
+) {
   if (modalSize) {
     alert(modalSize);
     // update modal size css width, exm: 90%
@@ -945,4 +1115,373 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
 
 function hideModal(id) {
   $("#" + id).modal("hide");
+}
+
+function getallChildrenNode(parentNode) {
+  const lsListOrgNode = JSON.parse(localStorage.getItem("listOrgNode") || "[]");
+  let children = lsListOrgNode.filter((item) => item.pid === parentNode.id);
+  children.forEach((child) => {
+    children = children.concat(getallChildrenNode(child));
+  });
+  return children;
+}
+
+function focusNode(nodeId, dataBagan) {
+  let selfNode = dataBagan.find((item) => item.id == nodeId.id) || {};
+  const filteredData = dataBagan.filter((item) => item.id !== nodeId.id);
+  selfNode = {
+    ...selfNode,
+    tags: [...selfNode.tags, "pointed"],
+  };
+
+  filteredData.push(selfNode);
+  filteredData.map((item) => {
+    item.id = parseInt(item.id);
+    item.pid = parseInt(item.pid);
+  });
+  setTimeout(() => {
+    helperOrgChart(true, "os-container", filteredData, true, {
+      expand: true,
+      nodeId: selfNode.id,
+    });
+  }, 1500);
+}
+
+function helperOrgChart(init, id, data, isFocusNode, object) {
+  const lsListOrgNode = JSON.parse(localStorage.getItem("listOrgNode") || "[]");
+  if (!init) {
+    return false;
+  }
+  const param = {};
+  if (isFocusNode) {
+    param.collapsed = {
+      level: 2,
+      allChildren: true,
+    };
+  }
+
+  const default_t = Object.assign({}, OrgChart.templates.base);
+  default_t.size = [220, 70];
+  default_t.ripple = null;
+  default_t.img_0 = null;
+  default_t.node = `<rect x="0" y="0" height="{h}" width="{w}" fill="#ffffff" stroke-width="1" stroke="#000"></rect>`;
+  default_t.position = `<g><text data-width="180" style="font-size:11px;" text-anchor="middle" dominant-baseline="middle" fill="#353238" x="105" y="25" data-text-overflow="multiline">{val}</text></g>`;
+  // default_t.prl = `<g><rect x="180" y="0" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px;text-anchor: middle;" fill="#353238" x="200" y="22.5">{val}</text></g>`;
+  // default_t.jumlah_formasi = `<g><rect x="180" y="35" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px; text-anchor: middle;" fill="#353238" x="200" y="57.5">{val}</text></g>`;
+
+  default_t.expandCollapseSize = 10;
+  // default_t.link = `<path stroke-linejoin="round" stroke-width="1" fill="none" d="{edge}" />`;
+  default_t.plus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
+  <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line>
+  <line x1="5" y1="3" x2="5" y2="7" stroke-width="1" stroke="#000"></line></g>`;
+  default_t.minus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
+  <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line></g>`;
+  // chaert separation
+  OrgChart.templates.split = Object.assign({}, OrgChart.templates.base);
+  // RESET_MOVABLE_ONEXPANDCOLLAPSE
+
+  OrgChart.templates.split.size = [0, 0];
+  OrgChart.templates.split.node = "";
+  OrgChart.templates.default_t = default_t;
+  OrgChart.templates.default_t.menuButton =
+    '<div style="position:absolute;right:0px;top:20px; width:40px;height:50px;cursor:pointer;" data-ctrl-menu="">' +
+    '<hr style="background-color: black; height: 3px;margin:0px; border: none;">' +
+    '<hr style="background-color: black; height: 3px; border: none;">' +
+    '<hr style="background-color: black; height: 3px; border: none;">' +
+    "</div>";
+
+  const baseNodeBinding = {
+    position: "position",
+    prl: "prl",
+    jumlah_formasi: "jumlah_formasi",
+    org_unit: "org_unit_name",
+    level: "level",
+  };
+
+  function bracketTemplateGenerator(bracketSize) {
+    const template = Object.assign({}, OrgChart.templates.default_t);
+    template.size = [220, 0];
+    for (let i = 0; i < bracketSize; i++) {
+      template.size = [template.size[0], 120];
+    }
+    template.position = null;
+    template.prl = null;
+    template.jumlah_formasi = null;
+    template.position =
+      `<g>` +
+      '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
+      `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
+      `</g>`;
+
+    let height = 40;
+    for (let i = 1; i <= bracketSize; i++) {
+      const yPosition = 40 + (i - 1) * 40;
+      const yTextPosition = 60 + (i - 1) * 40;
+      height += 40;
+      template.size = [template.size[0], height];
+      template[`bc_${i}_position`] =
+        `<g>` +
+        `<rect x="0" y="${yPosition}" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+        `<text data-width="120" style="font-size:10px;text-anchor: middle;" fill="#353238" x="110" y="${yTextPosition}" data-text-overflow="multiline">{val}</text>` +
+        `</g>`;
+      // template[`bc_${i}_prl`] =
+      //   `<g>` +
+      //   `<rect x="140" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+      //   `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="160" y="${
+      //     yTextPosition + 4
+      //   }">{val}</text>` +
+      //   `</g>`;
+      // template[`bc_${i}_level`] =
+      //   `<g>` +
+      //   // `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="transparent" stroke-width="1" stroke="#000"></rect>` +
+      //   `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+      //   `</g>`;
+      // template[`bc_${i}_jumlah_formasi`] =
+      //   `<g>` +
+      //   `<rect x="180" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+      //   `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="200" y="${
+      //     yTextPosition + 4
+      //   }">{val}</text>` +
+      //   `</g>`;
+    }
+
+    return template;
+  }
+
+  const bracketLimit = 20;
+
+  for (let i = 1; i <= bracketLimit; i++) {
+    OrgChart.templates[`bracket_${i}_t`] = bracketTemplateGenerator(i);
+  }
+
+  const nodeBinding = {
+    ...baseNodeBinding,
+  };
+
+  const tags = {};
+
+  for (let i = 1; i <= bracketLimit; i++) {
+    for (let key in baseNodeBinding) {
+      nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
+    }
+    tags[`bracket_${i}`] = {
+      template: `bracket_${i}_t`,
+    };
+  }
+
+  OrgChart.RESET_MOVABLE_ONEXPANDCOLLAPSE = true;
+  OrgChart.SEARCH_CLOSE_RESULT_ON_ESCAPE_OR_CLICKOUTSIDE = true;
+  let chart = new OrgChart(document.getElementById(id), {
+    collapse: {
+      ...param.collapsed,
+      // level: 2,
+      // allChildren: true,
+    },
+    template: "default_t",
+    nodeBinding,
+    enableSearch: false,
+    assistantSeparation: 10,
+    levelSeparation: 30,
+    scaleInitial: OrgChart.match.boundary,
+    nodes: data,
+    align: OrgChart.ORIENTATION,
+    movable: OrgChart.movable.node,
+    nodeMouseClick: false,
+    menu: {
+      pdf: { text: "Export PDF" },
+      png: { text: "Export PNG" },
+      svg: { text: "Export SVG" },
+    },
+    toolbar: {
+      fullScreen: true,
+      zoom: true,
+      fit: true,
+    },
+    tags,
+  });
+
+  chart.on("init", function (sender) {
+    // const title = document.createElement("button");
+    // title.style.position = "absolute";
+    // title.style.right = "0px";
+    // title.style.top = "87px";
+    // title.style.width = "50px";
+    // title.style.textAlign = "center";
+    // title.style.color = "#757575";
+    // title.style.backgroundColor = "transparent";
+    // title.style.border = "none";
+    // title.style.fontSize = "42px";
+    // title.style.color = "grey";
+    // title.innerHTML = `<i class="fa fa-refresh"></i>`;
+    // // add id to title
+    // title.addEventListener("click", function () {
+    //   // myData.forEach((item) => {
+    //   //   item.tags = item.tags.filter((tag) => tag !== "edit");
+    //   // });
+    //   // chart.load(myData);
+    //   helperOrgChart(true, "os-container", lsListOrgNode, true);
+    // });
+    // chart.element.appendChild(title);
+  });
+
+  chart.onExportStart((args) => {
+    args.styles += document.getElementById("myStyle").outerHTML;
+  });
+
+  chart.onExportEnd((args) => {
+    console.log(args);
+  });
+
+  chart.onUpdated(() => {});
+
+  chart.on("expcollclick", function (sender, collapse, id, ids) {});
+
+  chart.on("node-layout", function (sender, args) {
+    const childrenCount = args?.childrenIds?.length;
+    if (childrenCount > 10) {
+      args.layout = OrgChart.treeRightOffset;
+    } else {
+      args.layout = OrgChart.normal;
+    }
+  });
+
+  chart.on("click", async (sender, node) => {
+    const param = {};
+    const nodeID = node.node.id;
+    // await modalJobPopup(nodeID);
+  });
+
+  chart.on("searchclick", (sender, node) => {
+    return false;
+  });
+
+  $("#handleExportPdf")
+    .off("click")
+    .on("click", function () {
+      const nodeId = $("#positionId").val();
+      chart.exportPDF({
+        filename: `${nodeId}.pdf`,
+        expandChildren: false,
+      });
+      $("#modalDetailJob").modal("hide");
+    });
+
+  $("#handleExportPng").on("click", function () {
+    const nodeId = $("#positionId").val();
+    exportChartAsBlob();
+    $("#modalDetailJob").modal("hide");
+  });
+
+  function exportChartAsBlob() {
+    //  create canvas from div id os-container, then create png from canvas
+    const osContainer = document.getElementById("os-container");
+
+    if (typeof window.html2canvas === "undefined") {
+      console.error("html2canvas is not loaded.");
+      return;
+    }
+
+    window.html2canvas(osContainer).then((canvas) => {
+      // Get the image data
+      const ctx = canvas.getContext("2d");
+      const { width, height } = canvas;
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      // Find bounds
+      let top = null,
+        bottom = null,
+        left = null,
+        right = null;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+          // If not white and not fully transparent
+          if (
+            !(
+              data[idx] === 255 &&
+              data[idx + 1] === 255 &&
+              data[idx + 2] === 255 &&
+              data[idx + 3] === 255
+            ) &&
+            data[idx + 3] !== 0
+          ) {
+            if (top === null) top = y;
+            if (left === null || x < left) left = x;
+            if (right === null || x > right) right = x;
+            bottom = y;
+          }
+        }
+      }
+
+      if (top !== null && left !== null && right !== null && bottom !== null) {
+        const croppedWidth = right - left + 1;
+        const croppedHeight = bottom - top + 1;
+        const croppedCanvas = document.createElement("canvas");
+        croppedCanvas.width = croppedWidth;
+        croppedCanvas.height = croppedHeight;
+        const croppedCtx = croppedCanvas.getContext("2d");
+        croppedCtx.putImageData(
+          ctx.getImageData(left, top, croppedWidth, croppedHeight),
+          0,
+          0
+        );
+
+        croppedCanvas.toBlob((blob) => {
+          if (blob) {
+            console.log("PNG Blob created (cropped)", blob);
+            // print blob
+            const url = URL.createObjectURL(blob);
+            const img = document.createElement("img");
+            img.src = url;
+            img.onload = () => {
+              // Optionally, you can revoke the object URL after use
+              URL.revokeObjectURL(url);
+              // Append the image to the body or any other element
+              document.body.appendChild(img);
+            };
+            // Download the image as well
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "orgchart-cropped.png";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+        }, "image/png");
+      } else {
+        // fallback: no non-white content found
+        canvas.toBlob((blob) => {
+          if (blob) {
+            console.log("PNG Blob created (original)", blob);
+            // Download the original image as well
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "orgchart.png";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+        }, "image/png");
+      }
+    });
+  }
+
+  if (object?.expand) {
+    let selfNode = data.find((item) => item.id == object.nodeId);
+    const getChildrenNode =
+      data.filter((item) => item.pid == object.nodeId).map((item) => item.id) ||
+      [];
+    const siblingNode =
+      data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) ||
+      [];
+    const getAll = [...getChildrenNode, ...siblingNode];
+    setTimeout(() => {
+      chart.expand(selfNode.id, getAll);
+    }, 1000);
+    setTimeout(() => {
+      chart.fit();
+    }, 2000);
+  }
 }

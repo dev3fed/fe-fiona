@@ -1,10 +1,11 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <style>
     .os-container {
-        height: 700px;
+        height: 500px;
         background-color: #F5F5F5;
     }
 
@@ -46,7 +47,7 @@
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
-                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                        <ul class="nav nav-tabs nav-primary d-none" id="pills-warningtab" role="tablist">
                             <li class="nav-item"><a class="nav-link active" id="pills-jobdesc" data-bs-toggle="pill"
                                     href="#jobdesc" role="tab" aria-controls="pills-matrix"
                                     aria-selected="true">Summary</a></li>
@@ -75,7 +76,21 @@
                                         </div>
                                         <div class="col-3">
                                             <label for="searchJobDesc">Search</label>
-                                            <input class="form-control" type="text" placeholder="Search" id="searchJobDesc" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                            @* <input class="form-control" type="text" placeholder="Search" id="searchJobDesc" style="border-top-left-radius: 0; border-bottom-left-radius: 0;"> *@
+                                            <div class="btn-group w-100" role="group" aria-label="Button group with nested dropdown" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-light dropdown-toggle" id="btnSearchType" type="button" data-bs-toggle="dropdown"
+                                                        aria-haspopup="true" aria-expanded="false">Position</button>
+                                                    <div class="dropdown-menu" aria-labelledby="btnSearchType">
+                                                        <a class="dropdown-item di" value="position">Position</a>
+                                                        <a class="dropdown-item di" value="function">Function</a>
+                                                        <a class="dropdown-item di" value="division">Division</a>
+                                                        <a class="dropdown-item di" value="department">Department</a>
+                                                    </div>
+                                                </div>
+                                                <input class="form-control" type="text" placeholder="Search" id="searchJobDesc"
+                                                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                            </div>
                                         </div>
                                         <div class="col-2" style="padding-left: 0;place-self: end;">
                                             <select class="form-select digits" name="selectStatusJobDesc" id="selectStatusJobDesc" >
@@ -90,7 +105,7 @@
                                             <button class="btn btn-outline-primary me-2 btn-icon" style="height: 42px;place-self: end;width:75px" type="button" id="clearFilter">
                                                 Clear
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon dropdown-toggle" id="downloadJobDesc" style="height: 42px;place-self: end;width:100px" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>
+                                            <button class="btn btn-primary me-2 btn-icon dropdown-toggle d-none" id="downloadJobDesc" style="height: 42px;place-self: end;width:100px" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>
                                             <div class="dropdown-menu" aria-labelledby="downloadJobDesc">
                                                 <a class="dropdown-item" href="#" style="padding: 12px;">
                                                     <img src="~/assets/images/rasci/download-black.svg" alt="Filter Icon" class="" style="margin-top: -1px;padding-right: 5px;">
@@ -105,7 +120,7 @@
                                             @* <button class="btn btn-primary me-2 btn-icon"  style="height: 42px;place-self: end;" type="button" id="downloadJobDesc"><img src="~/assets/images/rasci/vector.svg" alt="Filter Icon" style="margin-top: -5px;margin-right: 7px;">Download</button> *@
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row d-none">
                                         <div class="col-12 mt-1">
                                             <span class="notifDanger">There are 5 positions with job descriptions not available <span><b>[Click here to show]</b></span></span>
                                         </div>
@@ -226,6 +241,9 @@
     <partial name="~/Views/JobDescription/ModalCreateDraftJobDesc.cshtml" />
 </div>
 @section Script {
+    <script>
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
+    </script>
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>

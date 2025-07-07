@@ -3,7 +3,10 @@ async function searchJobCompare(event) {
   if (inputSearch.length <= 3) return;
 
   try {
-    const { status, data } = await SearchMatrix({ type: "job", search: inputSearch });
+    const { status, data } = await SearchMatrix({
+      type: "job",
+      search: inputSearch,
+    });
     if (status === 200 && data.length) {
       const chkJobList = document.getElementById("chk-job-list");
       const jobSelectedList = document.getElementById("job-selected-list");
@@ -46,7 +49,9 @@ async function searchJobCompare(event) {
               jobSelectedList.appendChild(selectedItem);
             }
           } else {
-            const itemToRemove = document.getElementById(`selected-job-${value}`);
+            const itemToRemove = document.getElementById(
+              `selected-job-${value}`,
+            );
             if (itemToRemove) itemToRemove.remove();
           }
         }
@@ -54,8 +59,12 @@ async function searchJobCompare(event) {
 
       jobSelectedList.addEventListener("click", (e) => {
         if (e.target.closest(".remove-item")) {
-          const value = e.target.closest(".remove-item").getAttribute("data-value");
-          const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
+          const value = e.target
+            .closest(".remove-item")
+            .getAttribute("data-value");
+          const checkbox = document.querySelector(
+            `input[type="checkbox"][value="${value}"]`,
+          );
           if (checkbox) checkbox.checked = false;
           document.getElementById(`selected-job-${value}`).remove();
         }

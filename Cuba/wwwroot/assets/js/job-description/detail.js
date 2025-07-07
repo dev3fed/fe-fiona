@@ -3,52 +3,41 @@ function confirmApply() {
 }
 
 $(document).ready(async function () {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // from query string
+  const jobId = urlParams.get("jobId");
+  const prlOrg = urlParams.get("prlOrg");
+  const positionCode = urlParams.get("positionCode");
+  // console.log("positionCode", jobId);
   // initialize popover
   async function searchJobCompare(event, isPercentage) {
     const chkJobList = document.getElementById("chk-job-list");
-    const jobSelectedList = document.getElementById("job-selected-list");
+    // const jobSelectedList = document.getElementById("job-selected-list");
     if (isPercentage) {
       const value = event;
-      const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
+      const chkJobListPercentage = document.getElementById(
+        "chk-job-list-percentage"
+      );
+      const params = {
+        draftId: getDraftExisting.draftId,
+        jobId: jobId,
+        prlOrg: prlOrg,
+        percentage: value,
+      };
 
-      // chkJobListPercentage.innerHTML = dataJobDescCompare
-      //   .map((item) => ({
-      //     id: item?.identifikasi?.id,
-      //     name: item?.identifikasi?.jobName,
-      //     percentage: Math.floor(Math.random() * 50) + 50,
+      const result = await getSimilarities(params);
 
-      //   }))
-      //   .filter((item) => item.percentage >= value)
-      //   .map(
-      //     (item) =>
-      //       `
-      //       <div class="row-item">
-      //         <div class="column-item-name" onClick="applyCompare(${item.id})">
-      //           ${item.name} <span class="badge badge-danger">${item.percentage}% Similarities</span>
-      //         </div>
-      //       </div>
-      //     `
-      //   )
-      //   .join("");
-      const findData = dataJobDescCompare.filter((item) => item.identifikasi.percentage >= value);
-      const urlParams = new URLSearchParams(window.location.search);
-      const idPos = urlParams.get("id");
-      const selectedIdPos = dataJobDesc.find((item) => item.identifikasi.id == idPos);
-      // if selectedIdPos?.identifikasi?.jobName include manager
-      let include = "sbm";
-      if (selectedIdPos?.identifikasi?.jobName.toLowerCase().includes("manager")) {
-        include = "manager";
-      }
-
-      const dataCk = dataJobDescCompare
+      // dan urutan berdasarkan percentage yang paling tinggi
+      const dataCompare = result?.data
         .map((item) => ({
-          id: item?.identifikasi?.id,
-          name: item?.identifikasi?.jobName,
-          percentage: item?.identifikasi?.percentage,
+          id: item?.jobIdTarget,
+          name: item?.positionNameTarget,
+          percentage: item?.matchPercentage,
         }))
-        .filter((item) => item.percentage >= value && item.name.toLowerCase().includes(include));
+        .sort((a, b) => b.percentage - a.percentage);
 
-      dataCk.forEach((item) => {
+      dataCompare.forEach((item) => {
         let color = "";
         if (item.percentage >= 90) {
           color = "background-color: #28a745";
@@ -65,7 +54,7 @@ $(document).ready(async function () {
       });
       const storeId = [];
       let innerHTML = "";
-      for (let item of dataCk) {
+      for (let item of dataCompare) {
         innerHTML += `
           <div class="row-item">
         <div class="column-item-name pointer" onClick="applyCompare(${item.id})">
@@ -76,6 +65,9 @@ $(document).ready(async function () {
           </div>
         `;
         storeId.push(item.id);
+      }
+      if (result?.data?.length === 0) {
+        innerHTML = `<div class="text-center">No data found</div>`;
       }
       chkJobListPercentage.innerHTML = innerHTML;
       storeId.forEach((item) => {
@@ -93,23 +85,43 @@ $(document).ready(async function () {
       $(`[data-toggle="popOver${param}"]`).popover({
         html: true,
         sanitize: false,
-        title: "Rasci Similarities Detail",
         content: `
           <div style="width: 550px;">
-          <table class="display" style="width: 100%">
-            <thead>
+          <h6 style="margin-bottom:10px"> RASCI Similarities Detail ${param}</h6>
+          <table class="display tableRasciSimilarities" style="width: 100%">
+          <thead>
               <tr>
-                <th class="" style="width: 55%;">Business Process</th>
-                <th class="" style="width: 15%;">Notation</th>
-                <th class="" style="width: 30%;">Availability of reference</th>
-            </thead>
-            <tbody>
+              <th style="width: 55%;">Business Process</th>
+              <th style="width: 15%;">Notation</th>
+              <th style="width: 30%;">Availability of reference</th>
               <tr>
-                <th class="" style="">9.1.2 - Pengelolaan kebutuhan ICT/digital</th>
-                <td class="" style="">R</td>
-                <td class="" style="">Available</td>
+          </thead>
+          <tbody>
+              <tr>
+              <td>9.1.2 - Pengelolaan kebutuhan ICT/digital</td>
+              <td style="place-items:center">
+              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-weight:bold;font-size: 12px;">R</span>
+              </div>
+              </td>
+              <td style="color:#06BE00;text-align:center">
+                <span>Available</span>
+                <img src="/assets/images/rasci/available.svg" alt="Available Icon" style="padding-left: 2px;vertical-align:middle;">
+              </td>
               </tr>
-            </tbody>
+              <tr>
+              <td>9.1.2 - Pengelolaan kebutuhan ICT/digital</td>
+              <td style="place-items:center">
+              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-weight:bold;font-size: 12px;">R</span>
+              </div>
+              </td>
+              <td style="color:#D02138;text-align:center">
+                Not Available
+                <img src="/assets/images/rasci/nonavail.svg" alt="Not Available Icon" style="vertical-align:middle;">
+              </td>
+              </tr>
+          </tbody>
           </table>
           </div>
         `,
@@ -117,24 +129,354 @@ $(document).ready(async function () {
       });
     }
 
-    const data = dataJobDescCompare
-      .map((item) => ({ id: item?.identifikasi?.id, name: item?.identifikasi?.jobName }))
-      .filter((item) => item.name.toLowerCase().includes(event?.target?.value.toLowerCase()));
+    // const data = dataJobDescCompare
+    //   .map((item) => ({
+    //     id: item?.identifikasi?.id,
+    //     name: item?.identifikasi?.jobName,
+    //   }))
+    //   .filter((item) =>
+    //     item.name.toLowerCase().includes(event?.target?.value.toLowerCase())
+    //   );
 
-    chkJobList.innerHTML = data
-      .map(
-        (item) => `
-          <div class="row-item">
-            <div class="column-item-name" onClick="applyCompare(${item.id})"> 
-              ${item.name}
-            </div>
-          </div>
-        `
-      )
-      .join("");
+    // chkJobList.innerHTML = data
+    //   .map(
+    //     (item) => `
+    //       <div class="row-item">
+    //         <div class="column-item-name" onClick="applyCompare(${item.id})">
+    //           ${item.name}
+    //         </div>
+    //       </div>
+    //     `
+    //   )
+    //   .join("");
 
-    $('[data-toggle="popover"]').popover();
+    // $('[data-toggle="popover"]').popover();
   }
+
+  const getDraftExisting = JSON.parse(
+    localStorage.getItem("draftExistingJobDesc")
+  );
+
+  function logWewenangFetchSuccess(params, data) {
+    console.log(
+      `get data ${params} berhasil, jika tabel belum muncul cek format data, exp:`,
+      data
+    );
+  }
+  function showEndpointErrorAlert(
+    endpoint,
+    data,
+    errorMessage = "Data tidak valid atau kosong"
+  ) {
+    alert(
+      `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/${endpoint} tidak valid atau kosong, data yang keluar hanya contoh. cek di console log`
+    );
+    console.error(
+      `${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. contoh data expected:`,
+      data
+    );
+  }
+
+  const dataDetailJobDesc = {
+    draftId: getDraftExisting.draftId,
+    jobId: jobId,
+    prlRange: prlOrg,
+  };
+
+  const dataBagan = {
+    draftId: getDraftExisting.draftOrganizationId,
+    jobCode: jobId,
+    depth: 2,
+  };
+
+  let identifikasiJabatan = await getIdentifikasiJabatan(dataDetailJobDesc);
+  const identifikasiJabatanData = {
+    jobId: "10135643 contoh",
+    jobName: "job title contoh",
+    prlOrg: "prlOrg contoh",
+    unitKerjaFungsi: "function name contoh",
+    lokasiKerja: "lokasi kerja contoh",
+    direktorat: "directorat name contoh",
+    atasanLangsung: "direct report contoh",
+    noSuratKeputusan: "no surat keputusan",
+    tanggalSuratKeputusan: "2023-10-01",
+    jobReference: "asd",
+    jobReferences: [],
+  };
+  if (!identifikasiJabatan.jobName) {
+    showEndpointErrorAlert(
+      "job-description/identifikasi-jabatan/show",
+      identifikasiJabatanData
+    );
+    identifikasiJabatan = identifikasiJabatanData;
+  }
+
+  updateIdentifikasiJob(identifikasiJabatan);
+
+  // get fungsi jabatan = getFungsiJabatan
+  let fungsiJabatan = await getFungsiJabatan(dataDetailJobDesc);
+  const fungsiJabatanData = {
+    deskripsi: "deskripsi contoh",
+    "...": "...",
+  };
+  if (!fungsiJabatan.deskripsi) {
+    showEndpointErrorAlert(
+      "job-description/fungsi-jabatan/show",
+      fungsiJabatanData
+    );
+    fungsiJabatan = fungsiJabatanData;
+  }
+
+  $(".summernote").summernote({
+    height: 300,
+    tabsize: 2,
+    // disable font type button
+    toolbar: [
+      // [groupName, [list of button]]
+      ["style", ["bold", "italic", "underline", "clear"]],
+      ["font", ["strikethrough", "superscript", "subscript"]],
+      ["para", ["ul", "ol", "paragraph"]],
+    ],
+  });
+  $(".summernote").summernote("enable");
+  $(".summernote").summernote("code", fungsiJabatan.deskripsi);
+
+  let tugasTanggungJawabUmum;
+  try {
+    tugasTanggungJawabUmum = await getTugasTanggungJawabUmum(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/tugas-tanggung-jawab-umum/show",
+      tugasTanggungJawabUmum.data
+    );
+    updateTable("tugasUmum", tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
+  } catch (error) {
+    showEndpointErrorAlert(
+      "job-description/tugas-tanggung-jawab-umum/show",
+      [],
+      error.message
+    );
+  }
+
+  let tugasTanggungJawabAkhir;
+  const tugasTanggungJawabAkhirData = { data: dataJobDescCompare[0].tugasHa };
+  try {
+    tugasTanggungJawabAkhir = await getTugasTanggungJawabAkhir(
+      dataDetailJobDesc
+    );
+    logWewenangFetchSuccess(
+      "job-description/tugas-tanggung-jawab-akhir/show",
+      tugasTanggungJawabAkhirData
+    );
+    updateTable("tugasHa", tugasTanggungJawabAkhir.data, tabCusJD.tugasHa);
+  } catch (error) {
+    console.error("Error fetching tugasTanggungJawabAkhir:", error);
+    showEndpointErrorAlert(
+      "job-description/tugas-tanggung-jawab-akhir/show",
+      tugasTanggungJawabAkhirData
+    );
+  }
+
+  let wewenang;
+  const wewenangData = { data: dataJobDescCompare[0].wewenang };
+  try {
+    wewenang = await getWewenang(dataDetailJobDesc);
+    logWewenangFetchSuccess("job-description/wewenang/show", wewenangData);
+  } catch (error) {
+    console.error("Error fetching wewenang:", error);
+    showEndpointErrorAlert("job-description/wewenang/show", wewenangData);
+    wewenang = wewenangData;
+  }
+  updateTable("wewenang", wewenang.data, tabCusJD.wewenang);
+
+  let koordinasiInternal;
+  const koordinasiInternalData = {
+    data: dataJobDescCompare[0].koordinasi,
+  };
+  try {
+    koordinasiInternal = await getKoordinasiInternal(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/koordinasi-internal/show",
+      koordinasiInternalData
+    );
+  } catch (error) {
+    console.error("Error fetching koordinasiInternal:", error);
+    showEndpointErrorAlert(
+      "job-description/koordinasi-internal/show",
+      dataJobDescCompare[0].koordinasi
+    );
+    koordinasiInternal = koordinasiInternalData;
+  }
+
+  updateTable("koordinasi", koordinasiInternal.data, tabCusJD.koordinasi);
+
+  let relasiEksternal;
+  const relasiEksternalData = { data: dataJobDescCompare[0].relation };
+
+  try {
+    relasiEksternal = await getRelasiEksternal(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/relasi-eksternal/show",
+      relasiEksternalData
+    );
+    console.log("relasiEksternal", relasiEksternal);
+  } catch (error) {
+    console.error("Error fetching koordinasiInternal:", error);
+    showEndpointErrorAlert(
+      "job-description/relasi-eksternal/show",
+      relasiEksternalData
+    );
+    relasiEksternal = relasiEksternalData;
+  }
+  updateTable("relation", relasiEksternal.data, tabCusJD.relation);
+
+  let persyaratanJabatan;
+  const persyaratanJabatanData = { data: dataJobDescCompare[0].relation };
+
+  try {
+    persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/persyaratan-jabatan/show",
+      persyaratanJabatanData
+    );
+    persyaratanJabatan.data.map((item) => {
+      item.pj = [item.pendidikanMinimal, item.pengalamanKerja];
+    });
+    updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
+  } catch (error) {
+    console.error("Error fetching persyaratanJabatan:", error);
+    showEndpointErrorAlert(
+      "job-description/persyaratan-jabatan/show",
+      persyaratanJabatanData
+    );
+    persyaratanJabatan = persyaratanJabatanData;
+  }
+
+  let persyaratanKhusus;
+  const persyaratanKhususData = { data: dataJobDescCompare[0].relation };
+
+  try {
+    persyaratanKhusus = await getPersyaratanKhusus(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/persyaratan-jabatan/show",
+      persyaratanKhususData
+    );
+
+    persyaratanKhusus.data.map((item) => {
+      item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
+    });
+    // updateTable(
+    //   "persyaratanKhususTable",
+    //   persyaratanKhusus.data,
+    //   tabCusJD.persyaratan
+    // );
+  } catch (error) {
+    console.error("Error fetching persyaratanKhusus:", error);
+    persyaratanKhusus = persyaratanKhususData;
+  }
+
+  const divKompetensiTeknisGeneral = $("#kompetensiGeneral");
+  const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
+  const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
+  // const divKompetensiPerilaku = $("#kompetensiPerilaku");
+
+  let kompetensiTeknis;
+  try {
+    kompetensiTeknis = await getKompetensiTeknis(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/kompetensi-teknis/show",
+      kompetensiTeknis
+    );
+    if (
+      Array.isArray(kompetensiTeknis.data.komtekMandatori) &&
+      kompetensiTeknis.data.komtekMandatori.length > 0
+    ) {
+      const $ul = $(
+        "<ul style='list-style-type: disc; padding-left: 20px;'></ul>"
+      );
+      kompetensiTeknis.data.komtekMandatori.forEach((item) => {
+        $ul.append(
+          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
+        );
+      });
+      divKompetensiTeknisMandatory.empty().append($ul);
+    }
+
+    if (
+      Array.isArray(
+        kompetensiTeknis.data.komtekGeneral &&
+          kompetensiTeknis.data.komtekGeneral.length > 0
+      )
+    ) {
+      const $ul = $('<ul style=""></ul>');
+      kompetensiTeknis.data.komtekGeneral.forEach((item) => {
+        $ul.append(
+          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
+        );
+      });
+      divKompetensiTeknisGeneral.empty().append($ul);
+    }
+
+    if (
+      Array.isArray(kompetensiTeknis.data.komtekSpesifik) &&
+      kompetensiTeknis.data.komtekSpesifik.length > 0
+    ) {
+      const $ul = $('<ul style=""></ul>');
+      kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
+        $ul.append(
+          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
+        );
+      });
+      divKompetensiTeknisSpesifik.empty().append($ul);
+    }
+  } catch (error) {
+    console.error("Error fetching persyaratanKhusus:", error);
+    showEndpointErrorAlert("job-description/persyaratan-jabatan/show", []);
+  }
+
+  let kompetensiPerilaku;
+  try {
+    kompetensiPerilaku = await getKompetensiPerilaku(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/kompetensi-perilaku/show",
+      kompetensiPerilaku
+    );
+    const divKompetensiPerilaku = $("#kompetensiPerilaku");
+    divKompetensiPerilaku.empty();
+    if (Array.isArray(kompetensiPerilaku.data)) {
+      const $ul = $(
+        "<ul style='list-style-type: disc; padding-left: 20px;'></ul>"
+      );
+      kompetensiPerilaku.data.forEach((item) => {
+        $ul.append(`<li ><span>${item.namaKompetensi}</span</li>`);
+      });
+      divKompetensiPerilaku.empty().append($ul);
+    }
+  } catch (error) {
+    console.error("Error fetching kompetensiPerilaku:", error);
+    showEndpointErrorAlert("job-description/kompetensi-perilaku/show", []);
+  }
+
+  let stk;
+  try {
+    stk = await getStk(dataDetailJobDesc);
+    logWewenangFetchSuccess(
+      "job-description/tugas-tanggung-jawab-akhir/show",
+      stk.data
+    );
+    updateTable("stk", stk.data, tabCusJD.stk);
+  } catch (error) {
+    console.error("Error fetching stk:", error);
+    showEndpointErrorAlert(
+      "job-description/tugas-tanggung-jawab-akhir/show",
+      []
+    );
+  }
+
+  const bagan = await chartShow(dataBagan);
+  const dataBaganSelf = bagan?.data.find(
+    (item) => item.id_position == positionCode
+  );
+  focusNode(dataBaganSelf, bagan.data);
 
   checkLocalStorage();
   let activeTab = "identifikasi";
@@ -143,16 +485,19 @@ $(document).ready(async function () {
     $(linkTab).tab("show");
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
   const idPos = urlParams.get("id");
   const isCrete = urlParams.get("create");
   if (idPos) {
     if (isCrete) {
-      const findData = dataJobDesc.find((item) => item.identifikasi.id == idPos);
+      const findData = dataJobDesc.find(
+        (item) => item.identifikasi.id == idPos
+      );
       $("#selectJobReference").val(findData.identifikasi.id);
       getJobReference(findData);
     } else {
-      const findData = await dataJobDescCompare.find((item) => item.identifikasi.id == idPos);
+      const findData = await dataJobDescCompare.find(
+        (item) => item.identifikasi.id == idPos
+      );
       $("#selectJobReference").append(
         `<option value="${findData.identifikasi.id}">${findData.identifikasi.jobName}</option>`
       );
@@ -171,18 +516,7 @@ $(document).ready(async function () {
     }
   }
 
-  $(".summernote").summernote({
-    height: 300,
-    tabsize: 2,
-    // disable font type button
-    toolbar: [
-      // [groupName, [list of button]]
-      ["style", ["bold", "italic", "underline", "clear"]],
-      ["font", ["strikethrough", "superscript", "subscript"]],
-      ["para", ["ul", "ol", "paragraph"]],
-    ],
-  });
-  $(".summernote").summernote("disable");
+  // $(".summernote").summernote("disable");
 
   $("#rangePercentage").ionRangeSlider({
     grid: true,
@@ -201,9 +535,7 @@ $(document).ready(async function () {
   // on change selectJobReference
   $("#selectJobReference").on("change", function (e) {
     const data = e.target.value;
-    console.log("data", data);
     const findData = dataJobDesc.find((item) => item.identifikasi.id == data);
-    console.log("findData", findData);
     getJobReference(findData);
     isDisableButton(false);
     $(".summernote").summernote("enable");
@@ -258,15 +590,23 @@ $(document).ready(async function () {
   // ...existing code...
 
   // Listen for tab navigation events
-  $('#v-pills-tab-modal a[data-bs-toggle="pill"]').on("shown.bs.tab", function (e) {
-    const target = $(e.target).attr("href"); // activated tab
-    activeTab = target.split("#v-pills-")[1];
-    console.log("activeTab", activeTab);
-    const element = document.getElementById(activeTab);
-    if (element) {
-      element.scrollIntoView();
+  $('#v-pills-tab-modal a[data-bs-toggle="pill"]').on(
+    "shown.bs.tab",
+    function (e) {
+      const target = $(e.target).attr("href"); // activated tab
+      console.log("target", target);
+      activeTab = target.split("#v-pills-")[1];
+      console.log("activeTab", activeTab);
+      if (activeTab === "bagan-primary") {
+        focusNode(dataBaganSelf, bagan.data);
+      }
+      const element = document.getElementById(activeTab);
+      if (element) {
+        element.scrollIntoView();
+        window.scrollBy({ top: -80, left: 0, behavior: "instant" }); // 80px jarak dari atas
+      }
     }
-  });
+  );
 
   $("#modalCon").on("click", function () {
     const action = [
@@ -328,7 +668,9 @@ $(document).ready(async function () {
   $("#popUpBispro").on("click", async function () {
     $("#modalBusinessProcess").modal("show");
     // get modalBusinessProcessBody
-    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
+    const modalBusinessProcessBody = document.getElementById(
+      "modalBusinessProcessBody"
+    );
     modalBusinessProcessBody.innerHTML = "";
     let dataBispro = [
       {
@@ -402,9 +744,14 @@ $(document).ready(async function () {
   $("#popUpMergeBisPro").on("click", async function () {
     $("#modalBusinessProcess").modal("show");
     // get modalBusinessProcessBody
-    const modalBusinessProcessHeader = document.getElementById("modalBusinessProcessHeader");
-    modalBusinessProcessHeader.innerHTML = "Merge With Other Business sentences";
-    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
+    const modalBusinessProcessHeader = document.getElementById(
+      "modalBusinessProcessHeader"
+    );
+    modalBusinessProcessHeader.innerHTML =
+      "Merge With Other Business sentences";
+    const modalBusinessProcessBody = document.getElementById(
+      "modalBusinessProcessBody"
+    );
     modalBusinessProcessBody.innerHTML = "";
     let dataBispro = [
       {
@@ -544,13 +891,17 @@ $(document).ready(async function () {
     // }
 
     // update modalRecomendationBody
-    const modalRecomendationBody = document.getElementById("modalRecomendationBody");
+    const modalRecomendationBody = document.getElementById(
+      "modalRecomendationBody"
+    );
     let content = "";
     for (let item of dataAll) {
       let bodyTugasHa = ``;
       for (let j = 0; j < item?.tugas_ha_li.length; j++) {
         const listItemOutput = await addList(item?.tugas_ha_li[j].output);
-        const listItemLeadingIndicator = await addList(item?.tugas_ha_li[j].lead);
+        const listItemLeadingIndicator = await addList(
+          item?.tugas_ha_li[j].lead
+        );
         console.log("listItemOutput", listItemOutput);
 
         bodyTugasHa += `
