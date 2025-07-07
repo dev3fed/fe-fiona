@@ -1,0 +1,113 @@
+{
+  "userId": "system",
+  "draftId": "10ec6833-4de1-48cc-9906-5855d826a737",
+  "unit": {
+    "unitCode": null,
+    "unitName": "example Unit Name",
+    "prlPlan": 8,
+    "prlOrgFrom": 8,
+    "prlOrgTo": 9, // null if not exist
+    "formation": 1,
+    "isNeckFunction": false,
+    "isProject": false,
+    "isCoordinate": false,
+    "isBasket": false
+  },
+  "careerType": {
+    "careerTypeCode": "1",
+    "careerTypeName": "example Career Type Name"
+  },
+  "careerLevel": {
+    "careerLevelCode": "1",
+    "careerLevelName": "example Career Level Name"
+  },
+  "directorate": {
+    "directorateCode": "DI9999",
+    "directorateName": "example Dir Name",
+    "directorateTechnicName": "example Dir Technic Name",
+    "isNew": true
+  },
+  "function": {
+    "functionCode": "FUN99999",
+    "functionName": "example Function Name",
+    "isNew": true
+  },
+  "division": {
+    "divisionCode": "DIV9999",
+    "divisionName": "example Div Name",
+    "isNew": true
+  },
+  "subDivision": {
+    "subDivisionCode": "SDV9999",
+    "subDivisionName": "example Sub Div Name",
+    "isNew": true
+  },
+  "department": {
+    "departmentCode": "DEP9999",
+    "departmentName": "example Department Name",
+    "isNew": true
+  },
+  "section": {
+    "sectionCode": "SEC9999",
+    "sectionName": "example Section Name",
+    "isNew": true
+  },
+  "personnelArea": {
+    "personnelAreaCode": "XXX",
+    "personnelAreaName": "exampleName",
+    "isNew": true
+  },
+  "personnelSubArea": {
+    "personnelSubAreaCode": "YYY",
+    "personnelSubAreaName": "Jayapura XXX",
+    "isNew": true
+  },
+  "directReportTo": {
+    "jobPositionCode": "30318611",
+    "jobPositionName": "Area Manager Operation.Risk Papua-Maluku"
+  },
+  "unitParent": {
+    "unitParentCode": "10166079",
+    "unitParentName": "Operational Risk Papua-Maluku"
+  },
+  "abbrivation": {
+    "careerJobName": "example job",
+    "jobAbbrivationName": "exampleName",
+    "isNew": true
+  },
+  "coordinateWith": {
+    "unitCode": "",
+    "unitName": ""
+  },
+  "skillGroups": [
+    {
+      "skillGroupCode": "SKG999",
+      "skillGroupName": "example Skill Name",
+      "subSkillGroupCode": "SSG999",
+      "subSkillGroupName": "example Sub Skill Name",
+      "isNew": true
+    }
+  ],
+  "subOrdinates": [
+    {
+      "unitCode": null,
+      "unitName": null,
+      "unitParentCode": null,
+      "unitParentName": null,
+      "jobPositionName": null,
+      "prlFrom": 8,
+      "prlTo": 9,
+      "careerLevel": {
+        "careerTypeName": "example Career Type Name",
+        "careerLevelName": "example Career Level Name"
+      },
+      "prlPlan": 1,
+      "formation": 1,
+      "abbrivation": {
+        "careerJobName": null,
+        "jobAbbrivationName": "exampleName",
+        "isNew": true
+      }
+    }
+  ]
+}

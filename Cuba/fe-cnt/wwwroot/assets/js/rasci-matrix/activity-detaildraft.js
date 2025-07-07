@@ -1,0 +1,137 @@
+async function triggleDetailActivity(id, draftType) {
+  console.log("cek", id, draftType);
+  try {
+    if (draftType === "Add New Business Process") {
+      detailAddprosbis(id);
+    } else if (draftType === "Delete Business Process") {
+      detailDeleteBp(id);
+    } else if (draftType === "Edit Business Process") {
+      console.log("cek edit business");
+      detailEditBp(id);
+    }
+  } catch (error) {}
+}
+
+async function detailAddprosbis(id) {
+  try {
+    const modal = new bootstrap.Modal(document.getElementById("modalActivityDetail"));
+    modal.show();
+    const dataActivity = await fetchDetailDraftActivity(id);
+    console.log("dataActivity", dataActivity.data);
+    const dataHeader = dataActivity?.data.businessProcess;
+    const dataFooter = dataActivity?.data.rasciMapping;
+    const elementHeader = `
+        <div class="col-7 custom-col" style="text-align: left">
+          <label style="color:#9F9FA5">Business Process Name</label>
+          <div style="display: flex;  font-weight: 600; font-size: 14px;">
+            <span>${dataHeader.indexGroup} - ${dataHeader.businessProcessName}</span>
+          </div>
+        </div>
+        <div class="col-5 custom-col" style="text-align: left; border-right:none">
+          <label style="color:#9F9FA5">Level</label>
+          <label style="font-weight: 600;font-size: 14px">5</label>
+        </div>
+         <div class="col-12 custom-col" style="text-align: left">
+         <hr style="margin-right: 10px">
+          <label style="color:#9F9FA5">Parent</label>
+          <label style="font-weight: 600;font-size: 14px">${dataHeader.parentId} - ${
+      dataHeader.parentName ? dataHeader.parentName : "-"
+    }</label>
+        </div>
+      `;
+    const elementLabel = `<span>Selected Position (total: ${dataFooter.length})</span>`;
+
+    const elementFooter = dataFooter
+      .map((item, index) => {
+        return `
+         ${index !== 0 ? "<div><hr></div>" : " "}
+        <span class="mb-2" style="display: flex; font-weight: 600; font-size: 14px;">
+        ${item.jobCode} - ${item.jobName}
+        </span>
+        ${item.notations
+          .map(
+            (item) => `
+            <div class="row align-items-center mb-2">
+                <div class="col-auto d-flex align-items-center">
+                <img src="/assets/images/rasci/${item.notation.toLowerCase()}.svg" alt="${
+              item.notation
+            } Icon" style="height: 16px; width: 16px;">
+                </div>
+                <div class="col text-left">
+                <span style="margin-left: auto;">:</span>
+                <span style="font-size: 12px;">${item.comment}</span>
+                </div>
+            </div>
+            `,
+          )
+          .join("")}
+        `;
+      })
+      .join("");
+    const bodyheader = document.getElementById("header-avtivity-detail");
+    if (bodyheader) bodyheader.innerHTML = elementHeader;
+    const bodyLabel = document.getElementById("label-position");
+    if (bodyLabel) bodyLabel.innerHTML = elementLabel;
+
+    const bodyfooter = document.getElementById("footer-activity-detail");
+    if (bodyfooter) bodyfooter.innerHTML = elementFooter;
+  } catch (error) {}
+}
+
+async function detailDeleteBp(id) {
+  try {
+    const modal = new bootstrap.Modal(document.getElementById("modalDetailDeletebp"));
+    modal.show();
+    const dataActivity = await fetchDetailDraftActivity(id);
+    const dataInfo = dataActivity.data.businessProcess;
+    const formContent = `
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Parent</label>
+             <label> : </label>
+            <b class="form-label">${dataInfo.parentId} - ${dataInfo.parentName}</b>
+
+        </div>
+      </div>
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Level</label>
+             <label> : </label>
+            <b class="form-label">${dataInfo.level}</b>
+
+        </div>
+      </div>
+       <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Index</label>
+             <label> : </label>
+            <b class="form-label">${dataInfo.indexGroup}</b>
+
+        </div>
+      </div>
+     <div class="col-12 mt-2">
+      <div>
+        <label class="form-label" style="width:25%">Business Process Name</label>
+             <label> : </label>
+              <b class="form-label">${dataInfo.description}</b>
+      </div>
+    </div>
+    `;
+
+    const bodyContent = document.getElementById("list-detaildeletebp");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+
+    // Initialize Bootstrap Select
+    $(".selectpicker").selectpicker();
+  } catch (error) {}
+}
+
+async function detailEditBp(id) {
+  const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
+  modal.show();
+  const dataActivity = await fetchDetailDraftActivity(id);
+  console.log("dataActivity", dataActivity);
+  // const dataInfo = dataActivity.data.businessProcess;
+}

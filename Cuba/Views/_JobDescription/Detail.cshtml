@@ -1,0 +1,376 @@
+﻿@{
+    ViewData["Title"] = "Chart-Widget";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .os-container {
+        height: 480px;
+        background-color: #F5F5F5;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="~/assets/css/job-description.css">
+@* style link *@
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Create New Position Description</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="HomePage" asp-action="Index">
+                                <svg class="stroke-icon">
+                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item ">Job Description</li>
+                        <li class="breadcrumb-item active">Create New Position Description </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Container-fluid starts-->
+    <div class="container-fluid">
+        <button class="btn btn-primary btn-md" id="modalCon" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">modal Confirm</button>
+        <button class="btn btn-primary btn-md" id="otherRec" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">other recommend</button>
+        <button class="btn btn-primary btn-md" id="applyRef" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">apply Reference</button>
+        <button class="btn btn-primary btn-md" id="popUpBispro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popup kesesuain bispro</button>h
+        <button class="btn btn-primary btn-md" id="popUpMergeBisPro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popUpMergeBisPro</button>h
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card" style="border-radius:8px">
+                    <div style="padding:10px">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="nav flex-column nav-pills nav-primary gap-2" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                    <a class="nav-link active" id="v-pills-identifikasi-tab" data-bs-toggle="pill" href="#v-pills-identifikasi" role="tab" aria-controls="v-pills-identifikasi" aria-selected="true" style="font-size: smaller;"><span class="p-r-10">1.</span><span>IDENTIFIKASI JABATAN</span></a>
+                                    <a class="nav-link" id="v-pills-fungsi-tab" data-bs-toggle="pill" href="#v-pills-fungsi" role="tab" aria-controls="v-pills-fungsi" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">2.</span><span>FUNGSI JABATAN</span></a>
+                                    <a class="nav-link" id="v-pills-tugas-ha-tab" data-bs-toggle="pill" href="#v-pills-tugas-ha" role="tab" aria-controls="v-pills-tugas-ha" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">3.</span><span> TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span></a>
+                                    <a class="nav-link" id="v-pills-tugas-umum-tab" data-bs-toggle="pill" href="#v-pills-tugas-umum" role="tab" aria-controls="v-pills-tugas-umum" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">4.</span><span> TUGAS DAN TANGGUNG JAWAB UMUM</span></a>
+                                    <a class="nav-link" id="v-pills-wewenang-tab" data-bs-toggle="pill" href="#v-pills-wewenang" role="tab" aria-controls="v-pills-wewenang" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">5.</span><span> WEWENANG</span></a>
+                                    <a class="nav-link" id="v-pills-koordinasi-tab" data-bs-toggle="pill" href="#v-pills-koordinasi" role="tab" aria-controls="v-pills-koordinasi" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">6.</span><span> KOORDINASI INTERNAL</span></a>
+                                    <a class="nav-link" id="v-pills-relation-tab" data-bs-toggle="pill" href="#v-pills-relation" role="tab" aria-controls="v-pills-relation" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">7.</span><span> RELASI EKSTERNAL</span></a>
+                                    <a class="nav-link" id="v-pills-persyaratan-tab" data-bs-toggle="pill" href="#v-pills-persyaratan" role="tab" aria-controls="v-pills-persyaratan" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">8.</span><span> PERSYARATAN JABATAN</span></a>
+                                    <a class="nav-link" id="v-pills-posisi-tab" data-bs-toggle="pill" href="#v-pills-posisi" role="tab" aria-controls="v-pills-posisi" aria-selected="false"  style="font-size: 12px;"><span class="p-r-10">9.</span><span> POSISI DALAM STRUKTUR ORGANISASI</span></a>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="tab-content" id="v-pills-tabContent">
+                                    <div class="tab-pane fade show active" id="v-pills-identifikasi" role="tabpanel" aria-labelledby="v-pills-identifikasi-tab">
+                                        <div class="m-20">
+                                            <div class="d-flex justify-content-between"> 
+                                                <h5 class="align-self-center">1. Indentifikasi Jabatan</h5>
+                                                <button class="btn btn-primary btn-md" id="addJobReference" onclick="addJobReference()"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">Add Job desc Reference</button>
+                                            </div>
+                                            <div class="m-t-20">
+                                                <select class="form-select digits " id="selectJobReference" name="selectJobReference"> 
+                                                    <option value="0">Select Job Reference</option>
+                                                    <option value="1">Manager Internal Communication</option>
+                                                    <option value="2">SBM Sumsel VI Gas</option>
+                                                </select>
+                                            </div>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableIndentifikasi">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Unit Kerja / Fungsi</td>
+                                                            <td><span id="function"></span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Lokasi</td>
+                                                            <td><span id="location"></span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Direktorat</td>
+                                                            <td><span id="directorat"></span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Atasan Langsung</td>
+                                                            <td><span id="directReport"></span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Surat Keputusan</td>
+                                                            <td><span id="sk"></span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-fungsi" role="tabpanel" aria-labelledby="v-pills-fungsi-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">2. Fungsi Jabatan</h5>
+                                            <div class="summernote ">
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobJabatan" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataJabatan" disabled> Edit Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-tugas-ha" role="tabpanel" aria-labelledby="v-pills-tugas-ha-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">3. TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableMasterData w-100" id="tugasHaTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:2%">No</th>
+                                                            <th style="width:25%">Tugas & Tanggung Jawab</th>
+                                                            <th style="width:30%">Hasil Akhir Yang Diharapkan</th>
+                                                            <th style="width:30%">Leading Indicator</th>
+                                                            <th style="width:13%">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="5" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobTugasHa" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataTugasHa" disabled> Edit Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-tugas-umum" role="tabpanel" aria-labelledby="v-pills-tugas-umum-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">4. TUGAS DAN TANGGUNG JAWAB UMUM</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableMasterData w-100" id="tugasUmumTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No</th>
+                                                                <th>Tugas & Tanggung Jawab Umum</th>
+                                                                <th>Hasil Akhir Yang Diharapkan</th>
+                                                            </tr>
+                                                        <tbody>
+                                                            @* <tr class="p-20">
+                                                                <td colspan="3" class="p-15 text-center">Data Not Found</td>
+                                                            </tr> *@
+                                                        </tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-wewenang" role="tabpanel" aria-labelledby="v-pills-wewenang-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">5. WEWENANG</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableMasterData w-100" id="wewenangTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Kewenangan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="2" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-koordinasi" role="tabpanel" aria-labelledby="v-pills-koordinasi-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">6. KOORDINASI EKSTERNAL</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableMasterData w-100" id="koordinasiTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:4%">Id</th>
+                                                            <th style="width:32%">Pihak Eksternal</th>
+                                                            <th style="width:50%">Aktivitas</th>
+                                                            <th style="width:14%">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="3" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobKoordinasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataKoordinasi" disabled> Edit Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-relation" role="tabpanel" aria-labelledby="v-pills-relation-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">7.RELASI INTERNAL</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableMasterData w-100" id="relationTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:4%">Id</th>
+                                                            <th style="width:32%">Pihak Internal</th>
+                                                            <th style="width:50%">Aktivitas</th>
+                                                            <th style="width:14%">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="3" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobRelasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataRelasi" disabled> Edit Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-persyaratan" role="tabpanel" aria-labelledby="v-pills-persyaratan-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">8. PERSYARATAN JABATAN</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <table class="tableMasterData w-100" id="persyaratanTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>1. Pendidikan dan Pengalaman</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="1" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobPersyaratan" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataPersyaratan" disabled> Edit Data</button>
+                                            </div>
+                                            <div class="table-responsive m-t-20">
+                                                <table class="tableMasterData w-100" id="masterDataList">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>2. Persyaratan Khusus</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="1" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobKhusus" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataKhusus" disabled> Edit Data</button>
+                                            </div>
+                                            <div class="table-responsive m-t-20">
+                                                <table class="tableMasterData w-100" id="kompetensiTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>3. Kompetensi</th>
+                                                            <th>Level</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="p-20">
+                                                            <td colspan="2" class="p-15 text-center">Data Not Found</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary" id="addJobKompetensi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="editDataKompetensi" disabled> Edit Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-posisi" role="tabpanel" aria-labelledby="v-pills-posisi-tab">
+                                        <div class="m-20">
+                                            <h5 class="m-b-20 ">9. POSISI DALAM STRUKTUR ORGANISASI</h5>
+                                            <div class="table-responsive m-t-10">
+                                                <div class="os-container"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @* button save as draft *@
+                    <div class="card-footer d-flex justify-content-end">
+                        <button class="btn btn-outline-primary m-r-10" type="button" id="downloadJobDesc">
+                            download
+                        </button>
+                        <button class="btn btn-primary" type="button" id="saveDraft">
+                            Save as Draft
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Container-fluid Ends-->
+    @* <partial name="~/Views/Organization/ModalAddSubPosition.cshtml" /> *@
+    <partial name="~/Views/JobDescription/ModalConfirm.cshtml" />
+    <partial name="~/Views/JobDescription/ModalRecomendation.cshtml" />
+    <partial name="~/Views/JobDescription/ModalBusinessProcess.cshtml" />
+    <partial name="~/Views/JobDescription/ModalJobCompare.cshtml" />
+    <partial name="~/Views/JobDescription/ModalJobCompareDetail.cshtml" />
+</div>
+@section Script {
+    <!-- Plugins JS start-->
+    <script src="../assets/js/sidebar-menu.js"></script>
+    <script src="../assets/js/jquery.ui.min.js"></script>
+    <script src="../assets/js/slick/slick.min.js"></script>
+    <script src="../assets/js/slick/slick.js"></script>
+    <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/editor/summernote/summernote.js"></script>
+    <script src="../assets/js/range-slider/ion.rangeSlider.min.js"></script>
+    <script src="../assets/js/range-slider/rangeslider-script.js"></script>
+
+    @* <script src="../assets/js/editor/summernote/summernote.custom.js"></script> *@
+    @* <script src="../assets/js/tooltip-init.js"></script> *@
+
+    <script src="../assets/js/scrollable/perfect-scrollbar.min.js"></script>
+    <script src="../assets/js/scrollable/scrollable-custom.js"></script>
+    <script src="../assets/js/select2/select2.full.min.js"></script>
+    <script src="../assets/js/select2/select2-custom.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+
+    @* <script src="https://cdn.jsdelivr.net/npm/docx@9.1.0/build/index.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> *@
+    @* <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.20.0/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> *@
+
+    <script src="https://cdn.jsdelivr.net/npm/docx@9.1.0/build/index.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+
+    @* datatable *@
+    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
+
+    @* custom js *@
+    <script src="../assets/js/job-description/table-custom.js"></script>
+    <script src="../assets/js/authentication.js"></script>
+    <script src="../assets/js/job-description/multiple-select.js"></script>
+    <script src="../assets/js/job-description/helper.js"></script>
+    <script src="../assets/js/job-description/constant.js"></script>
+    <script src="../assets/js/job-description/endpoint.js"></script>
+    <script src="../assets/js/job-description/detail.js"></script>
+    <script type="module" src="../assets/js/job-description/detail-bundle.js"></script>
+    <script src="../assets/js/script.js"></script>
+
+}
+

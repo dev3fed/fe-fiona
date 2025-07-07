@@ -1,0 +1,239 @@
+.bootstrap-select .dropdown-toggle,
+.bootstrap-select .dropdown-menu {
+  width: 100% !important;
+}
+
+/* Dropdown menu item styles */
+.dropdown-menu {
+  z-index: 999;
+}
+
+.dropdown-menu .dropdown-item {
+  color: #000 !important;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #e6f6fe !important;
+  color: rgb(0, 0, 0) !important;
+}
+
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:focus {
+  background-color: #e6f6fe !important;
+  color: rgb(0, 0, 0) !important;
+}
+
+/* Dropdown item styles */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px !important;
+}
+
+.dropdown-item img {
+  margin-right: 8px;
+}
+
+/* table style start */
+
+.tbl {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+  font-family: "Public Sans", sans-serif;
+}
+
+.tbl td:hover {
+  background-color: #f5f5f5;
+}
+
+.tbl td {
+  border-style: solid;
+  border-width: 1px;
+  font-size: 14px;
+  word-break: normal;
+  white-space: nowrap;
+  background-color: #fff;
+}
+
+.tbl th {
+  background-color: #fff;
+  border-width: 1px;
+  font-size: 14px;
+  font-weight: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 8px;
+  min-width: 160px;
+}
+
+.tbl .tg-baqh {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.competency-cell-wrapper {
+  max-height: 35px;
+  padding-left: 10px;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  flex: 1;
+}
+.competency-cell-wrapper:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tbl .color-mandatory {
+  background-color: #fff383;
+}
+
+.tbl .color-general {
+  background-color: #b1e4fc;
+}
+
+.tbl .color-specific {
+  background-color: #bdffbc;
+}
+
+.joblist-cell-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 3px;
+  min-height: 30px;
+}
+
+.joblist-cell-wrapper > span {
+  flex: 1;
+}
+
+.custom-border-table {
+  border-right: 1px solid #b0d1e4;
+  border-bottom: px solid #b0d1e4;
+  border-left: 1px solid #b0d1e4;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.custom-border-table th,
+.custom-border-table td {
+  border-right: 1px solid #b0d1e4;
+  border-bottom: 1px solid #b0d1e4;
+  border-left: 1px solid #b0d1e4;
+}
+
+td,
+th {
+  padding: 0px !important;
+}
+
+.competency-cell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tbl .headcol {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  min-width: 280px;
+  text-align: left;
+  text-wrap: wrap;
+  vertical-align: middle !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border-right: 1px solid #b0d1e4 !important;
+}
+
+.tbl tbody td.headcol {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+  text-wrap: wrap;
+  padding: 8px;
+  border-right: 1px solid #b0d1e4 !important;
+}
+
+.table-wrapper {
+  overflow: auto;
+  max-height: calc(100vh - 200px);
+  position: relative;
+  white-space: nowrap;
+  border: 1px solid #b0d1e4;
+  background-color: #f0f0f0;
+}
+
+.joblist-name {
+  width: 10px;
+  color: #03a9f4;
+  padding-left: 10px;
+}
+
+.joblist-name:hover {
+  text-decoration: underline;
+}
+
+.competency-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.competency-container:hover .pencil-icon {
+  opacity: 1;
+  cursor: pointer;
+}
+
+/* table style end */
+
+/* Custom scrollbar styles */
+.scrollable-table {
+  overflow-y: auto;
+}
+
+.scrollable-table::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+.scrollable-table::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb {
+  background: #006ca9;
+  border-radius: 10px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb:hover {
+  background: #006ca9;
+}
+
+.pencil-icon {
+  opacity: 0;
+  padding-right: 5px;
+  transition: opacity 0.3s ease;
+}
+
+.competency-value {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+/* end Custom scrollbar styles */

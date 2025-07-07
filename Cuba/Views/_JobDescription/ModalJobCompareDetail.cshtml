@@ -1,0 +1,64 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog-add-refence {
+        max-width: 65% !important;
+        width: 65% !important;
+        margin: 30px auto;
+    }
+</style>
+
+<div class="modal fade" id="modalJobCompareDetail" tabindex="-1" role="dialog" aria-labelledby="modalJobCompareDetailLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-add-refence" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalJobCompareDetailLabel">Add Jobdesc Reference</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="nav flex-column nav-pills nav-primary gap-2" id="v-pills-tab-modal" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-identifikasi-tab" data-bs-toggle="pill" href="#v-pills-identifikasi" role="tab" aria-controls="v-pills-identifikasi" aria-selected="true" style="font-size: smaller;"><span>IDENTIFIKASI JABATAN</span></a>
+                            <a class="nav-link" id="v-pills-fungsi-tab" data-bs-toggle="pill" href="#v-pills-fungsi" role="tab" aria-controls="v-pills-fungsi" aria-selected="false"  style="font-size: 12px;"><span>FUNGSI JABATAN</span></a>
+                            <a class="nav-link" id="v-pills-tugas-ha-tab" data-bs-toggle="pill" href="#v-pills-tugas-ha" role="tab" aria-controls="v-pills-tugas-ha" aria-selected="false"  style="font-size: 12px;"><span> TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span></a>
+                            <a class="nav-link" id="v-pills-koordinasi-internal-tab" data-bs-toggle="pill" href="#v-pills-koordinasi-internal" role="tab" aria-controls="v-pills-koordinasi-internal" aria-selected="false"  style="font-size: 12px;"><span> KOORDINASI INTERNAL</span></a>
+                            <a class="nav-link" id="v-pills-relasi-eksternal-tab" data-bs-toggle="pill" href="#v-pills-relasi-eksternal" role="tab" aria-controls="v-pills-relasi-eksternal" aria-selected="false"  style="font-size: 12px;"><span> RELASI EKSTERNAL</span></a>
+                            <a class="nav-link" id="v-pills-stk-tab" data-bs-toggle="pill" href="#v-pills-stk" role="tab" aria-controls="v-pills-stk" aria-selected="false"  style="font-size: 12px;"><span> SISTEM TATA KERJA</span></a>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="container vertical-scroll scroll-content">
+                            <div id="identifikasi"></div>
+                            <div id="fungsi"></div>
+                            <div id="tugas-ha"></div>
+                            <div id="koordinasi-internal"></div>
+                            <div id="relasi-eksternal"></div>
+                            <div id="stk"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="detailJob"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                        ><i class="icon-arrow-left"></i> Back</button>
+                    <button class="btn btn-primary" type="button" onclick="saveReference()">
+                        <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon" style="margin-right: 8px;">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

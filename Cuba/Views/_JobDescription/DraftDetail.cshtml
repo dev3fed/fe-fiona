@@ -1,0 +1,218 @@
+﻿@{
+    ViewData["Title"] = "Chart-Widget";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .os-container {
+        height: 480px;
+        background-color: #F5F5F5;
+    }
+</style>
+<style id="myStyle">
+    [data-l-id] path {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-n-id] circle {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-n-id] rect {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-ctrl-ec-id] circle,
+    [data-ctrl-ec-id] line {
+        stroke: #000000;
+        stroke-width: 0.6px;
+    }
+    [data-l-id].direktur > path {
+        stroke-dasharray: 3, 3;
+    }
+
+    @* class edit *@
+    [data-n-id].edit rect {
+        @* fill: #fff3cd;
+        stroke: #ffc107; *@
+        fill: #e6f6fe;
+        stroke: #03a9f4;
+    }
+    [data-n-id].create rect {
+        fill: #e6f6fe;
+        stroke: #03a9f4;
+    }
+    [data-n-id].delete rect {
+        fill: #f8d7da;
+        stroke: #dc3545;
+    }
+    .match rect:nth-child(2){
+        fill: #F57C00;
+        stroke: #F57C00;
+    }
+
+    .match path, .match circle{
+        stroke: #F57C00;
+    }
+
+    [data-n-id].bracket_4_edit rect {
+        fill: #FFD700;
+    }
+</style>
+<script src="../assets/js/balkan/orgchart.js"></script>
+@* <script src="../assets/js/job-description/data_detail_position.js"></script>
+<script src="../assets/js/job-description/data_cnt.js"></script> *@
+<link rel="stylesheet" type="text/css" href="~/assets/css/job-description.css">
+@* style link *@
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>Draft Detail</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="HomePage" asp-action="Index">
+                                <svg class="stroke-icon">
+                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item ">Organization Structure</li>
+                        <li class="breadcrumb-item"></li>
+                        <li class="breadcrumb active">Draft Detail</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Container-fluid starts-->
+    <div class="container-fluid">
+        <div class="card" style="border-radius:8px">
+            <div style="padding:15px">
+                <!-- Card detail start-->
+                <div class="custom-card-draft">
+                    <div class="header-card-draft">
+                        Info
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <label id="" class="text-black-50" style="font-size: 14px;">Draft Name</label>
+                            <div>
+                                <span id="draftName" class="f-w-600" style="font-size: 16px;"></span>
+                                <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" class="p-l-5" style="margin-top: -1px;" id="editDraftName">
+                            </div>
+                            <label id="requestId" class="f-w-200" style="font-size: 14px;"></label>
+                        </div>
+                        <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <label id="" class="text-black-50" style="font-size: 14px;">Created by</label>
+                            <span id="createdBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <label id="createdDate" class="f-w-200" style="font-size: 14px;"></label>
+                        </div>
+                        <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <label id="" class="text-black-50" style="font-size: 14px;">Updated by</label>
+                            <span id="updatedBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <label id="updatedDate" class="f-w-200" style="font-size: 14px;"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-card-draft">
+                    <div class="header-card-draft">
+                        Detail
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6" id="activityType d-flex flex-column" style="padding: 10px;">
+                            <label class="f-12" for="">Activity Type : </label>
+                            <button id="all" class="tab-custom active">All</button>
+                            <button id="create" class="tab-custom">Created Job Desc</button>
+                            <button id="edit" class="tab-custom">Edit Job Desc</button>
+                        </div>
+                        <div class="col-md-2 offset-4 align-self-center" id="statusApproval">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        @* button left import *@
+                        <div class="col-md-12 text-end" id="importButton">
+                            <input type="file" id="fileImportDraft" style="display: none;" />
+                            <button class="btn btn-primary" type="button" id="importDataDraft">
+                                Import 
+                                <img src="~/assets/images/rasci/download.svg" alt="Download Icon" class="p-l-5" style="margin-top: -1px;" id="">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="tableMasterData table table-hover w-100" id="draftListDetail">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- card footer start-->
+                <div class="text-end mt-4 mb-2">
+                    <button class="btn btn-outline-light" type="button" onclick="backToOrg()">
+                        Back
+                    </button>
+                    <button class="btn btn-outline-danger" id="deleteDraft" type="button" onclick="deleteDraft()">
+                        <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
+                    </button>
+                    <button class="btn btn-primary" type="button" id="submitApproval" onclick="submitToApproval()"> Submit To Approval
+                    </button>
+                    @* <button class="btn btn-primary" type="button" id="exportFile" onclick="exportFileApproval()"> Export Data
+                    </button> *@
+                    @* <button class="btn btn-success" type="button" id="finalize" onclick="finalizeApproval()"> Finalize
+                    </button> *@
+                    <button class="btn btn-success" type="button" id="acceptApproval" onclick="acceptApproval()"> Approve
+                    </button>
+                    <button class="btn btn-danger" type="button" id="rejectApproval" onclick="rejectApproval()"> Reject
+                    </button>
+                </div>
+                <!-- card footer end-->
+            </div>
+        </div>
+
+    </div>
+    <!-- Container-fluid Ends-->
+    <partial name="~/Views/Organization/ModalAddSubPosition.cshtml" />
+    <partial name="~/Views/Organization/ModalDetailJobDraft.cshtml" />
+    <partial name="~/Views/Organization/ModalPreviewOrgChart.cshtml" />
+    <partial name="~/Views/Organization/ModalPreviewDesignCost.cshtml" />
+    <partial name="~/Views/Organization/ModalCreateDraftSO.cshtml" />
+    <partial name="~/Views/Organization/ModalConfirm.cshtml" />
+    <partial name="~/Views/Organization/ModalUploadFinalized.cshtml" />
+</div>
+@section Script {
+    <!-- Plugins JS start-->
+    <script src="../assets/js/sidebar-menu.js"></script>
+    <script src="../assets/js/slick/slick.min.js"></script>
+    <script src="../assets/js/slick/slick.js"></script>
+    <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/scrollable/perfect-scrollbar.min.js"></script>
+    <script src="../assets/js/scrollable/scrollable-custom.js"></script>
+    <script src="../assets/js/select2/select2.full.min.js"></script>
+    <script src="../assets/js/select2/select2-custom.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <script src="../assets/js/dropzone/dropzone.js"></script>
+    @* <script src="../assets/js/dropzone/dropzone-script.js"></script> *@
+    <script src="../assets/js/tooltip-init.js"></script>
+
+
+    @* datatable *@
+    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
+
+    @* custom js *@
+    <script src="../assets/js/job-description/multiple-select.js"></script>
+    <script src="../assets/js/job-description/constant.js"></script>
+    <script src="../assets/js/job-description/endpoint.js"></script>
+    <script src="../assets/js/job-description/table-custom.js"></script>
+    <script src="../assets/js/job-description/helper.js"></script>
+    @* <script src="../assets/js/job-description/balkan.js"></script> *@
+    <script src="../assets/js/job-description/draft-detail.js"></script>
+    <script src="../assets/js/script.js"></script>
+}
+
