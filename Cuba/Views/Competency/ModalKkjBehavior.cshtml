@@ -1,0 +1,132 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-detailkkjbehavior {
+        max-width: 75% !important;
+        margin: 30px auto;
+    }
+
+    .custom-card-approval {
+        height: auto;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 20px 10px 10px 15px;
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .header-card-approval {
+        background-color: #F5F5F5;
+        height: 35px;
+        padding-left: 15px;
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        position: absolute;
+        top: -5px;
+        left: 0;
+        right: 0;
+        border-radius: 4px 4px 0 0;
+        border: 1px solid #BFBFC2;
+        border-bottom: none;
+        width: calc(100% + 2px);
+        font-size: 14px;
+        margin-left: -1px;
+    }
+
+
+    .custom-col {
+        border-right: 1px solid #BFBFC2;
+        padding-right: 10px;
+        text-align: center;
+    }
+
+    .custom-col:last-child {
+        border-right: none;
+    }
+
+    .custom-col label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .custom-row-full:first-child {
+        border-top: none;
+    }
+
+    .custom-row-full {
+        border-top: 1px solid #BFBFC2;
+        padding-right: 10px;
+        padding-top: 10px;
+        text-align: left;
+
+    }
+
+    .custom-row-full label {
+        display: block;
+        font-size: 13px;
+        margin-top: 10px;
+    }
+
+    .btn-outline-light:hover img {
+        filter: brightness(0) invert(1);
+    }
+
+    /* Custom scrollbar styles */
+    .scrollable-content {
+        overflow-y: auto;
+    }
+
+    .scrollable-content::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+
+    .scrollable-content {
+        max-height: 220px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+</style>
+
+
+<div class="modal fade" id="ModalKkjBehavior" tabindex="-1" role="dialog" aria-labelledby="ModalKkjBehaviorLabel"
+    aria-hidden="true">
+    <div class="modal-dialog custom-detailkkjbehavior bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalKkjBehaviorTitle"></h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body " id="body-detailkkjbehavior">
+
+            </div>
+            <div class="modal-footer   d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i>
+                        Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

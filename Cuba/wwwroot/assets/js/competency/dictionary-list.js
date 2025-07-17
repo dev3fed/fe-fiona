@@ -106,7 +106,7 @@ const bodypageBehavior = async () => {
                   <td>${val.behaviorList || "-"}</td>
                   <td>${val.definition || "-"}</td>
                   <td style="width: 120px;text-align:center">
-                    <button class="btn btn-outline-primary" type="button" onclick="handleDetailDictionary('Behavior','${
+                    <button class="btn btn-outline-primary" type="button" onclick="handleBehavior('Behavior','${
                       val.id
                     }')">
                       <i class="icon-eye"> Detail</i> 
@@ -124,15 +124,60 @@ const bodypageBehavior = async () => {
   } catch (error) {}
 };
 
+async function handleBehavior(type, code) {
+  try {
+    const dataDetail = await fetchCompeBehaviorDetail(code);
+    const modal = new bootstrap.Modal(document.getElementById("ModalDetailBehavior"));
+    modal.show();
+    const modalTitle = document.getElementById("ModalDetailBehaviorTitle");
+    if (modalTitle) {
+      modalTitle.innerHTML = `${type} Competency Detail`;
+    }
+    console.log("dataDetail", dataDetail);
+    const formContent = `
+    <div class="col-12 scrollable-content" style="min-height: 620px;">
+        <div class="mb-2">
+          <h6 style="font-weight:bold">${dataDetail.data.behaviour_list} </h6>
+        </div>
+        ${createCard("Definition", dataDetail?.data.definition, true)}
+    ${createDetailCards(dataDetail.data.detail)}
+    </div>
+  `;
+
+    const modalBodyContent = document.getElementById("body-detailbehavior");
+    if (modalBodyContent) {
+      modalBodyContent.innerHTML = formContent;
+    }
+  } catch (error) {}
+}
+const createCard = (title, content, isDefinition = false) => {
+  const cardContent = isDefinition
+    ? `<div class="custom-row-full">
+         <label>${content}</label>
+       </div>`
+    : `<div class="custom-row-full">
+         <ul style="list-style-type: disc; margin-left: 20px; font-size: 13px;">
+           ${content.map((item) => `<li>${item}</li>`).join("")}
+         </ul>
+       </div>`;
+
+  return `
+    <div class="custom-card-approval">
+      <div class="header-card-approval">
+        ${title}
+      </div>
+      <div${isDefinition ? "" : ' style="padding-top: 10px;"'}>
+        ${cardContent}
+      </div>
+    </div>`;
+};
+const createDetailCards = (details) => {
+  return details.map((item) => createCard(item.key, item.descriptions)).join("");
+};
 async function handleDetailDictionary(type, code) {
   try {
-    const dataDetail =
-      type != "Behavior"
-        ? await fetchCompetencyDetail(code)
-        : await fetchCompeBehaviorDetail(code);
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalDetailDictionary"),
-    );
+    const dataDetail = type != "Behavior" ? await fetchCompetencyDetail(code) : await fetchCompeBehaviorDetail(code);
+    const modal = new bootstrap.Modal(document.getElementById("modalDetailDictionary"));
 
     modal.show();
     // Set the title of the modal id modalDetailDictionaryTitle
@@ -163,9 +208,7 @@ async function handleDetailDictionary(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[1]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[1].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -177,9 +220,7 @@ async function handleDetailDictionary(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[2]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[2].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -191,9 +232,7 @@ async function handleDetailDictionary(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[3]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[3].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -205,15 +244,12 @@ async function handleDetailDictionary(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[4]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[4].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-12">
   `;
 
     const modalBodyContent = document.getElementById("body-detaildictionary");

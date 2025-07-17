@@ -237,7 +237,10 @@ const cardTblMandatory = async (code) => {
     if (result.success === true) {
       const listMandatory = result?.data.compData || [];
       console.log("listMandatory", listMandatory);
-
+      const labelMandatory = document.getElementById("labelMandatory");
+      if (labelMandatory) {
+        labelMandatory.innerHTML = `Mandatory (${listMandatory.length}/5)`;
+      }
       const theadMandatory = `
           <tr>
             <th scope="col" style="width: 40px;text-align:center">No</th>
@@ -274,11 +277,10 @@ const cardTblGeneral = async (code) => {
     const result = await fetchDetailPositionTechnical(payload);
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
-      console.log("listTechnical", listTechnical);
       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
       const labelCore = document.getElementById("labelCore");
       if (labelCore) {
-        labelCore.innerHTML = `Core(${generalCompetencies.length}/3)`;
+        labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
       }
 
       const theadTechnical = `
@@ -294,7 +296,7 @@ const cardTblGeneral = async (code) => {
           return `
               <tr>
                 <td  style="text-align:Center">${i + 1}</td>
-                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Generic','${
+                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Core','${
                   element.compCode
                 }')">
                 ${element.compName}</td>
@@ -325,7 +327,7 @@ const cardTblSpecific = async (code) => {
       const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
       const labelSpecific = document.getElementById("labelSpecific");
       if (labelSpecific) {
-        labelSpecific.innerHTML = `Specific(${specificCompetencies.length}/9)`;
+        labelSpecific.innerHTML = `Specific (${specificCompetencies.length}/9)`;
       }
       const theadTechnical = `
             <tr>
@@ -340,7 +342,7 @@ const cardTblSpecific = async (code) => {
           return `
               <tr>
                 <td  style="text-align:Center">${i + 1}</td>
-                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Generic','${
+                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Specific','${
                   element.compCode
                 }')">${element.compName}</td>
                 <td style="text-align:Center">${element.level}</td>
@@ -366,11 +368,8 @@ const cardTblBehavior = async (code) => {
 
   try {
     const result = await fetchDetailPositionBehavior(queryString);
-    console.log("result", result);
     if (result.success === true) {
       const listBehavior = result?.data.behaviourList[0].behaviouralDictionary || [];
-      console.log("listBehavior", listBehavior);
-
       const theadMandatory = `
           <tr>
             <th scope="col" style="width: 40px;text-align:center">No</th>
@@ -382,7 +381,9 @@ const cardTblBehavior = async (code) => {
           return `
             <tr>
               <td  style="text-align:Center">${i + 1}</td>
-              <td style="color:#03a9f4">${element.behaviourDict}</td>
+              <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="onBehaviorClick('Behavior','${
+                element.id
+              }')">${element.behaviourDict}</td>
             </tr>`;
         })
         .join("");
@@ -395,55 +396,106 @@ const cardTblBehavior = async (code) => {
   }
 };
 
-const modalTabBehavior = async (code) => {
-  const dataSource = $("#dataSource-competency").val();
-  const payload = {
-    dataSource: dataSource,
-    positionCode: code,
-  };
-  const queryString = "?" + new URLSearchParams(payload).toString();
+// const modalTabBehavior = async (code) => {
+//   const dataSource = $("#dataSource-competency").val();
+//   const payload = {
+//     dataSource: dataSource,
+//     positionCode: code,
+//   };
+//   const queryString = "?" + new URLSearchParams(payload).toString();
 
+//   try {
+//     const result = await fetchDetailPositionBehavior(queryString);
+//     if (result.success === true) {
+//       const listBehavior = result?.data.behaviourList[0].behaviouralDictionary || [];
+//       console.log("listBehavior", listBehavior);
+
+//       let html =
+//         '<div style="display: grid; grid-auto-flow: column; grid-template-rows: repeat(5, auto); gap: 15px 40px; padding-left: 10px;">';
+
+//       listBehavior.forEach((item) => {
+//         html += `<div style="white-space: nowrap; color: #03a9f4; font-size: 12px; cursor: pointer;" onclick="onBehaviorClick('Behavior','${item.id}')">${item.behaviourDict}</div>`;
+//       });
+
+//       html += "</div>";
+
+//       document.getElementById("behavior-competency-body").innerHTML = html;
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+const onBehaviorClick = async (type, code) => {
+  console.log("first code", type, code);
   try {
-    const result = await fetchDetailPositionBehavior(queryString);
-    if (result.success === true) {
-      const listBehavior = result?.data.behaviourList[0].behavioural_dictionary || [];
-      console.log("listBehavior", listBehavior);
-
-      let html =
-        '<div style="display: grid; grid-auto-flow: column; grid-template-rows: repeat(5, auto); gap: 15px 40px; padding-left: 10px;">';
-
-      listBehavior.forEach((item) => {
-        html += `<div style="white-space: nowrap; color: #03a9f4; font-size: 12px; cursor: pointer;" onclick="onBehaviorClick('${item.behaviour_dict}')">• ${item.behaviour_dict}</div>`;
-      });
-
-      html += "</div>";
-
-      document.getElementById("behavior-competency-body").innerHTML = html;
+    const dataDetail = await fetchCompeBehaviorDetail(code);
+    const modalElement = document.getElementById("ModalDetailPos");
+    const closeModal = bootstrap.Modal.getInstance(modalElement);
+    if (closeModal) {
+      closeModal.hide();
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
+    const modal = new bootstrap.Modal(document.getElementById("ModalDetailKkj"));
+    modal.show();
+    const modalTitle = document.getElementById("ModalDetailKkjTitle");
+    if (modalTitle) {
+      modalTitle.innerHTML = `${type} Competency Detail`;
+    }
+    console.log("dataDetail", dataDetail);
+    const formContent = `
+    <div class="col-12 scrollable-content" style="min-height: 620px;">
+        <div class="mb-2">
+          <h6 style="font-weight:bold">${dataDetail.data.behaviour_list} </h6>
+        </div>
+      ${cardDefinition("Definition", dataDetail?.data.definition, true)}
+      ${cardDetailBehavior(dataDetail.data.detail)}
+    </div>
+  `;
 
-const onBehaviorClick = (behaviorName) => {
-  console.log("Behavior clicked:", behaviorName);
+    const modalBodyContent = document.getElementById("body-detailKkj");
+    if (modalBodyContent) {
+      modalBodyContent.innerHTML = formContent;
+    }
+  } catch (error) {}
 };
+const cardDefinition = (title, content, isDefinition = false) => {
+  const cardContent = isDefinition
+    ? `<div class="custom-row-full">
+         <label>${content}</label>
+       </div>`
+    : `<div class="custom-row-full">
+         <ul style="list-style-type: disc; margin-left: 20px; font-size: 13px;">
+           ${content.map((item) => `<li>${item}</li>`).join("")}
+         </ul>
+       </div>`;
 
+  return `
+    <div class="custom-card-approval">
+      <div class="header-card-approval">
+        ${title}
+      </div>
+      <div${isDefinition ? "" : ' style="padding-top: 10px;"'}>
+        ${cardContent}
+      </div>
+    </div>`;
+};
+const cardDetailBehavior = (details) => {
+  return details.map((item) => cardDefinition(item.key, item.descriptions)).join("");
+};
 async function handleDetailInfo(type, code) {
   try {
     // close modal ModalDetailPos
     const modalElement = document.getElementById("ModalDetailPos");
     const closeModal = bootstrap.Modal.getInstance(modalElement);
-    console.log("closeModal", closeModal);
     if (closeModal) {
       closeModal.hide();
     }
     const dataDetail = type != "Behavior" ? await fetchCompetencyDetail(code) : await fetchCompeBehaviorDetail(code);
-    const modal = new bootstrap.Modal(document.getElementById("modalDetailDictionary"));
+    const modal = new bootstrap.Modal(document.getElementById("ModalDetailKkj"));
 
     modal.show();
-    // Set the title of the modal id modalDetailDictionaryTitle
-    const modalTitle = document.getElementById("modalDetailDictionaryTitle");
+    // Set the title of the modal id ModalDetailKkjTitle
+    const modalTitle = document.getElementById("ModalDetailKkjTitle");
     if (modalTitle) {
       modalTitle.innerHTML = `${type} Competency Detail`;
     }
@@ -515,9 +567,24 @@ async function handleDetailInfo(type, code) {
     <div class="col-12">
   `;
 
-    const modalBodyContent = document.getElementById("body-detaildictionary");
+    const modalBodyContent = document.getElementById("body-detailKkj");
     if (modalBodyContent) {
       modalBodyContent.innerHTML = formContent;
     }
   } catch (error) {}
 }
+
+const handleCloseBehavior = async () => {
+  console.log("first close");
+  // const modalElement = document.getElementById("ModalDetailPos");
+  //   const closeModal = bootstrap.Modal.getInstance(modalElement);
+  //   if (closeModal) {
+  //     closeModal.hide();
+  //   }
+
+  const modal = document.getElementById("ModalDetailKkj");
+  if (modal) {
+    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+    bootstrapModal.hide();
+  }
+};

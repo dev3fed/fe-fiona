@@ -7,9 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // const competencyList = getState("competencyList");
   let selectElement = document.querySelector("#dataSource-competency");
 
-  selectedType = document
-    .querySelector(".dropdown-menu .dropdown-item")
-    .textContent.trim();
+  selectedType = document.querySelector(".dropdown-menu .dropdown-item").textContent.trim();
 
   if (selectElement.value === "master") {
     document.getElementById("pills-draft-tab").style.display = "none";
@@ -122,11 +120,7 @@ async function handleSearchCompetency() {
       setState("totalCompetency", resultCompetency.totalResult);
       loadTableHeader(resultCompetency?.data.competency);
       loadTableBody(resultJob.data);
-      mapCompetencyCells(
-        listJobCode,
-        resultCompetency.data.competency,
-        resultCompetency.data.level,
-      );
+      mapCompetencyCells(listJobCode, resultCompetency.data.competency, resultCompetency.data.level);
       tableContainer.scrollTop = 0;
       tableContainer.scrollLeft = 0;
     }
@@ -169,15 +163,9 @@ function renderStaticHeader() {
 }
 
 function appendDynamicHeader(competencyList) {
-  const totalMandatory = competencyList.filter(
-    (item) => item.compType === "mandatory",
-  ).length;
-  const totalGeneral = competencyList.filter(
-    (item) => item.compType === "general",
-  ).length;
-  const totalSpecific = competencyList.filter(
-    (item) => item.compType === "specific",
-  ).length;
+  const totalMandatory = competencyList.filter((item) => item.compType === "mandatory").length;
+  const totalGeneral = competencyList.filter((item) => item.compType === "general").length;
+  const totalSpecific = competencyList.filter((item) => item.compType === "specific").length;
 
   let row1HTML = `
   <tr style="height: 30px;">
@@ -264,21 +252,18 @@ function loadTableBody(jobList) {
 function handleClickPosition(positionCode) {
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
   modal.show();
+  console.log("cek");
   modalInfoPosition(positionCode);
   cardTblMandatory(positionCode);
   cardTblGeneral(positionCode);
   cardTblSpecific(positionCode);
   cardTblBehavior(positionCode);
-  modalTabBehavior(positionCode);
+  // modalTabBehavior(positionCode);
 }
 // Initialize tooltips after rendering
 function initializeTooltips() {
-  const tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
-  );
-  tooltipTriggerList.map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
-  );
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
@@ -289,14 +274,11 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
       return;
     }
     row.querySelectorAll("td[data-index]").forEach((td) => td.remove());
-    const staticTds = Array.from(row.querySelectorAll("td")).filter(
-      (td) => !td.dataset.index,
-    );
+    const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");
     listCompetency.forEach((comp) => {
       const compItem = competencyMapping.find(
-        (item) =>
-          item.positionCode === jobCode && item.compCode === comp.compCode,
+        (item) => item.positionCode === jobCode && item.compCode === comp.compCode,
       );
       const level = compItem?.level || "";
       const compTd = `
@@ -319,9 +301,7 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
 }
 
 const changeLevel = () => {
-  const selectedValue = document.querySelector(
-    'input[name="radio1"]:checked',
-  ).value;
+  const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
   const btnApproval = document.getElementById("btnSubmitApproval");
   btnApproval.disabled = selectedValue ? false : true;
 };
