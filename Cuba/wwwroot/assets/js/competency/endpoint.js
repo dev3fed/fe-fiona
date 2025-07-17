@@ -311,6 +311,30 @@ async function fetchDetailPositionBehavior(payload) {
   }
 }
 
+async function fetchSummalyList(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/summary-competency-mapping`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 // END NEW API SERVICE COMPETENCY
 
 //OLD API SERVICE COMPETENCY

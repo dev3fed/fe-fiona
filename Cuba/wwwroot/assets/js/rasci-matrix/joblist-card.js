@@ -1,18 +1,19 @@
 // ================== modified checkbox handling with id+prl key (full sync with user code) ==================
 document.addEventListener("dataLoaded", async function () {
-  // const result = await getState("filterJobList");
-  // const levels = [1, 2, 3, 4, 5, 6, 7, 8];
-  // levels.forEach((lvl) => {
-  //   const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
-  //   if (chkJobLevel) {
-  //     chkJobLevel.innerHTML = createJobLevelBody(
-  //       `level${lvl}`,
-  //       result,
-  //       lvl === 1 ? "hide" : "show",
-  //     );
-  //   }
-  // });
-  // addSearchEventListeners();
+  console.log("cek");
+  const result = await getState("filterJobList");
+  const levels = [1, 2, 3, 4, 5, 6, 7, 8];
+  levels.forEach((lvl) => {
+    const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
+    if (chkJobLevel) {
+      chkJobLevel.innerHTML = createJobLevelBody(
+        `level${lvl}`,
+        result,
+        lvl === 1 ? "hide" : "show",
+      );
+    }
+  });
+  addSearchEventListeners();
 });
 
 const createParentLabel = (parentId) => {
@@ -62,114 +63,76 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
 };
 
 const handleCheckboxChange = async (event) => {
-  try {
-    const checkbox = event.target;
-    const jobId = checkbox.value;
-    const prl = checkbox.getAttribute("prl");
-    const key = `${jobId}|${prl}`;
-    const isChecked = checkbox.checked;
-    const combinedData = await getState("filterJobList");
-    const levelJob = checkbox.getAttribute("levelJob");
-    let selectedId = (await getState("selectedJobId")) || [];
-    // const draftRasciId = getState("draftRasciId");
+  const checkbox = event.target;
+  const jobId = checkbox.value;
+  const prl = checkbox.getAttribute("prl");
+  const key = `${jobId}|${prl}`;
+  const isChecked = checkbox.checked;
+  const combinedData = await getState("filterJobList");
+  const levelJob = checkbox.getAttribute("levelJob");
+  let selectedId = (await getState("selectedJobId")) || [];
 
-    console.log("jobId", jobId);
-    console.log("levelJob", levelJob);
-    // const allLevels = ["1", "2", "3", "4", "5", "6", "7", "8"];
-    // const index = allLevels.indexOf(levelJob);
-    // const targetLevel = allLevels.slice(index + 1).join(",");
-    // const payloadJobList = {
-    //   draftRasciId: draftRasciId === "master" ? null : draftRasciId,
-    //   row: 1,
-    //   rowSize: 10,
-    //   unitCode: [jobId, "10132408"],
-    //   prlOrg: [prl],
-    //   sourceLevel: levelJob,
-    //   targetLevel: "2",
-    // };
-    // console.log("payloadJobList", payloadJobList);
+  const hierarchyIds = [];
+  traverseHierarchy(jobId, prl, combinedData, hierarchyIds);
 
-    // const resultPosition = await fetchJoblistCard(payloadJobList);
-    // const dataPosition = resultPosition?.data;
-    // console.log("dataPosition", dataPosition);
-    // const resultTest = getCombinedLevels(dataPosition, levelJob); // dari level 2 sampai level 8
-    // console.log("resultTest", resultTest);
-    const hierarchyIds = [];
-    traverseHierarchy(jobId, prl, combinedData, hierarchyIds);
-
-    if (isChecked) {
-      hierarchyIds.forEach((id) => {
-        if (!selectedId.includes(id)) {
-          selectedId.push(id);
-        }
-      });
-    } else {
-      selectedId = selectedId.filter((id) => !hierarchyIds.includes(id));
-    }
-
-    await setState("selectedJobId", selectedId);
-
-    const jobList = await getState("filterJobList");
-    const result = jobList.filter((item) =>
-      selectedId.includes(`${item.id}|${item.prl}`),
-    );
-    console.log("result", result);
-    if (result.length > 0) {
-      switch (levelJob) {
-        case "1":
-          updateLevels([2, 3, 4, 5, 6, 7, 8], result);
-          break;
-        case "2":
-          updateLevels([3, 4, 5, 6, 7, 8], result);
-          break;
-        case "3":
-          updateLevels([4, 5, 6, 7, 8], result);
-          break;
-        case "4":
-          updateLevels([5, 6, 7, 8], result);
-          break;
-        case "5":
-          updateLevels([6, 7, 8], result);
-          break;
-        case "6":
-          updateLevels([7, 8], result);
-          break;
-        default:
-          updateLevels([8], result);
-          break;
+  if (isChecked) {
+    hierarchyIds.forEach((id) => {
+      if (!selectedId.includes(id)) {
+        selectedId.push(id);
       }
-    } else {
-      const result = await getState("filterJobList");
-      const levels = [1, 2, 3, 4, 5, 6, 7, 8];
-      levels.forEach((lvl) => {
-        const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
-        if (chkJobLevel) {
-          chkJobLevel.innerHTML = createJobLevelBody(
-            `level${lvl}`,
-            result,
-            lvl === 1 ? "hide" : "show",
-          );
-        }
-      });
-    }
-
-    listChecked(selectedId);
-  } catch (error) {}
-};
-
-function getCombinedLevels(data, sourceLevel) {
-  const result = [];
-  const start = parseInt(sourceLevel, 10);
-
-  for (let i = start; i <= 8; i++) {
-    const levelKey = `level${i}`;
-    if (data[levelKey]?.data) {
-      result.push(...data[levelKey].data);
-    }
+    });
+  } else {
+    selectedId = selectedId.filter((id) => !hierarchyIds.includes(id));
   }
 
-  return result;
-}
+  await setState("selectedJobId", selectedId);
+
+  const jobList = await getState("filterJobList");
+  const result = jobList.filter((item) =>
+    selectedId.includes(`${item.id}|${item.prl}`),
+  );
+
+  if (result.length > 0) {
+    switch (levelJob) {
+      case "1":
+        updateLevels([2, 3, 4, 5, 6, 7, 8], result);
+        break;
+      case "2":
+        updateLevels([3, 4, 5, 6, 7, 8], result);
+        break;
+      case "3":
+        updateLevels([4, 5, 6, 7, 8], result);
+        break;
+      case "4":
+        updateLevels([5, 6, 7, 8], result);
+        break;
+      case "5":
+        updateLevels([6, 7, 8], result);
+        break;
+      case "6":
+        updateLevels([7, 8], result);
+        break;
+      default:
+        updateLevels([8], result);
+        break;
+    }
+  } else {
+    const result = await getState("filterJobList");
+    const levels = [1, 2, 3, 4, 5, 6, 7, 8];
+    levels.forEach((lvl) => {
+      const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
+      if (chkJobLevel) {
+        chkJobLevel.innerHTML = createJobLevelBody(
+          `level${lvl}`,
+          result,
+          lvl === 1 ? "hide" : "show",
+        );
+      }
+    });
+  }
+
+  listChecked(selectedId);
+};
 
 const listChecked = (selectedId) => {
   selectedId.forEach((id) => {

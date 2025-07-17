@@ -2,9 +2,7 @@ document.addEventListener("dataLoaded", async function () {
   try {
     if (appState.resultProsbis.length > 0) {
       const payloadPosition = getState("payloadPosition");
-      const prosbisNumber = appState.resultProsbis.map(
-        (val) => val.indexNumber,
-      );
+      const prosbisNumber = appState.resultProsbis.map((val) => val.indexNumber);
       if (prosbisNumber.length > 0) {
         const resultPosition = await fetchPositionMatrix({
           ...payloadPosition,
@@ -56,40 +54,37 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
     const selectedValue = $("#dataSource-rasci").val();
     setState("draftSoId", selectedDraftSo);
     setState("draftRasciId", selectedValue);
-    // const jobList = await fetchFilterJobList(selectedValue);
-    // const combinedData = [
-    //   ...jobList?.level1.map((item) => ({
-    //     ...item,
-    //     type: "level1",
-    //   })),
-    //   ...jobList?.level2.map((item) => ({
-    //     ...item,
-    //     type: "level2",
-    //   })),
-    //   ...jobList?.level3.map((item) => ({
-    //     ...item,
-    //     type: "level3",
-    //   })),
-    //   ...jobList?.level4.slice(0, 100).map((item) => ({
-    //     ...item,
-    //     type: "level4",
-    //   })),
-    //   ...jobList?.level5.slice(0, 100).map((item) => ({
-    //     ...item,
-    //     type: "level5",
-    //   })),
-    //   ...jobList?.level6.slice(0, 100).map((item) => ({
-    //     ...item,
-    //     type: "level6",
-    //   })),
-    //   ...jobList?.level7
-    //     .slice(0, 100)
-    //     .map((item) => ({ ...item, type: "level7" })),
-    //   ...jobList?.level8
-    //     .slice(0, 100)
-    //     .map((item) => ({ ...item, type: "level8" })),
-    // ];
-    // setState("filterJobList", combinedData);
+    const jobList = await fetchFilterJobList(selectedValue);
+    const combinedData = [
+      ...jobList?.level1.map((item) => ({
+        ...item,
+        type: "level1",
+      })),
+      ...jobList?.level2.map((item) => ({
+        ...item,
+        type: "level2",
+      })),
+      ...jobList?.level3.map((item) => ({
+        ...item,
+        type: "level3",
+      })),
+      ...jobList?.level4.slice(0, 250).map((item) => ({
+        ...item,
+        type: "level4",
+      })),
+      ...jobList?.level5.slice(0, 250).map((item) => ({
+        ...item,
+        type: "level5",
+      })),
+      ...jobList?.level6.slice(0, 250).map((item) => ({
+        ...item,
+        type: "level6",
+      })),
+      ...jobList?.level7.slice(0, 250).map((item) => ({ ...item, type: "level7" })),
+      ...jobList?.level8.slice(0, 250).map((item) => ({ ...item, type: "level8" })),
+    ];
+    console.log("first combinedData", combinedData);
+    setState("filterJobList", combinedData);
     ChangeSourceDraft();
     changeDataSource(selectedValue, selectedDraftSo);
   } catch (error) {}
@@ -265,9 +260,7 @@ function appendDynamicHeader(jobTitleList) {
 
   if (!jobTitleList || jobTitleList.length === 0) {
     console.warn("jobTitleList kosong, tidak ada kolom yang ditambahkan.");
-    document.getElementById(
-      "table-header",
-    ).innerHTML = `<tr>${staticHeaders}</tr>`;
+    document.getElementById("table-header").innerHTML = `<tr>${staticHeaders}</tr>`;
     return;
   }
 
@@ -306,9 +299,7 @@ function appendDynamicHeader(jobTitleList) {
     dynamicHeaders += headerHTML;
   });
 
-  document.getElementById(
-    "table-header",
-  ).innerHTML = `<tr>${staticHeaders}${dynamicHeaders}</tr>`;
+  document.getElementById("table-header").innerHTML = `<tr>${staticHeaders}${dynamicHeaders}</tr>`;
   initializeTooltips();
 }
 function loadTableBody(prosbisList) {
@@ -328,9 +319,7 @@ function loadTableBody(prosbisList) {
         : val.level
         ? `level-${val.level}`
         : "";
-    const isExpanded = expandedRows.includes(val.indexNumber)
-      ? "chevron-up"
-      : "chevron-down";
+    const isExpanded = expandedRows.includes(val.indexNumber) ? "chevron-up" : "chevron-down";
 
     const valString = JSON.stringify(val).replace(/"/g, "&quot;");
     const hierarchyIcon =
@@ -352,9 +341,7 @@ function loadTableBody(prosbisList) {
           <div class="prosbis-cell-wrapper">
             <div class="hierarchy-icon-wrapper">${hierarchyIcon}</div>
             <div class="flex-fill prosbis-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
-              title="${
-                val.description
-              }" onclick="onModalProsbis(${valString})">${val.description}</div>
+              title="${val.description}" onclick="onModalProsbis(${valString})">${val.description}</div>
             <div class="ellipsis-menu prosbis-row-ellipsis">
               <div class="dropright">
                 <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
@@ -365,14 +352,10 @@ function loadTableBody(prosbisList) {
                   <li onclick="onModalProsbis(${valString})">
                     <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
                   </li>
-                  <li onclick="sendDetailbp(${valString})" style="display: ${
-      isMaster ? "none" : "flex"
-    }">
+                  <li onclick="sendDetailbp(${valString})" style="display: ${isMaster ? "none" : "flex"}">
                     <a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a>
                   </li>
-                  <li onclick="checkChildrenProsbis(${valString})" style="display: ${
-      isMaster ? "none" : "flex"
-    } ">
+                  <li onclick="checkChildrenProsbis(${valString})" style="display: ${isMaster ? "none" : "flex"} ">
                     <a class="dropdown-item" style="color: red !important;">
                       <img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete
                     </a>
@@ -404,9 +387,7 @@ function getAllIndexNumbers() {
 }
 
 function getJobTitleData() {
-  const headerCells = document.querySelectorAll(
-    "#table-header tr .jabatan-cell",
-  );
+  const headerCells = document.querySelectorAll("#table-header tr .jabatan-cell");
   const jobData = [];
 
   headerCells.forEach((cell) => {
@@ -444,18 +425,14 @@ function mapRasciCells(indexNumbers, positions) {
       return;
     }
 
-    const staticTds = Array.from(row.querySelectorAll("td")).filter(
-      (td) => !td.dataset.index,
-    );
+    const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");
 
     positions.forEach((value) => {
       let rasciIcons = "";
       let comments = [];
       if (value?.responsibility) {
-        const notations = value.responsibility.filter(
-          (item) => item.indexNumber === indexNumber,
-        );
+        const notations = value.responsibility.filter((item) => item.indexNumber === indexNumber);
         notations.forEach((notationItem) => {
           switch (notationItem.notation) {
             case "R":
@@ -476,9 +453,7 @@ function mapRasciCells(indexNumbers, positions) {
           }
 
           if (notationItem.comment) {
-            comments.push(
-              `<li>${notationItem.notation}: ${notationItem.comment}</li>`,
-            );
+            comments.push(`<li>${notationItem.notation}: ${notationItem.comment}</li>`);
           }
         });
       }
@@ -510,12 +485,8 @@ function mapRasciCells(indexNumbers, positions) {
 }
 
 function initializeTooltips() {
-  const tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
-  );
-  tooltipTriggerList.map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
-  );
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 function onModalProsbis(data) {
   const draftSoId = getState("draftSoId");
@@ -566,10 +537,7 @@ async function handleCollapse(id) {
     if (!resultMatrix.success) {
       const errorIcon = document.getElementById(`icon-${id}`);
       if (errorIcon) {
-        errorIcon.setAttribute(
-          "data-feather",
-          isExpanded ? "chevron-down" : "chevron-up",
-        );
+        errorIcon.setAttribute("data-feather", isExpanded ? "chevron-down" : "chevron-up");
         feather.replace();
       }
       return;
@@ -609,10 +577,7 @@ async function handleCollapse(id) {
       appState.resetIdProsbis.filter((item) => item !== parentId),
     );
 
-    const selectedIds = filterChild(
-      appState.idProsbis,
-      appState.resetIdProsbis,
-    );
+    const selectedIds = filterChild(appState.idProsbis, appState.resetIdProsbis);
     await updateStatesAndRender(selectedIds);
   } else {
     // Collapse logic
@@ -642,10 +607,7 @@ function filterArray(inputs, array) {
     return child.startsWith(parent + ".") || child === parent;
   }
   const result = array.filter((value) => {
-    return (
-      !inputs.some((input) => isDescendant(input, value)) &&
-      !inputs.includes(value)
-    );
+    return !inputs.some((input) => isDescendant(input, value)) && !inputs.includes(value);
   });
 
   return result.sort((a, b) => {
@@ -692,11 +654,7 @@ function traverse(data, filters) {
   }
   filters.forEach((filter) => {
     data.forEach((item) => {
-      if (
-        item.indexGroup === filter &&
-        item.parentId === null &&
-        !addedItems.has(item.indexGroup)
-      ) {
+      if (item.indexGroup === filter && item.parentId === null && !addedItems.has(item.indexGroup)) {
         result.push(item);
         addedItems.add(item.indexGroup);
         helper(item.indexGroup);

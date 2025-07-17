@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("pills-draft-tab").style.display = "none";
     document.getElementById("pills-approval-tab").style.display = "none";
     document.getElementById("pills-history-tab").style.display = "none";
+    document.getElementById("pills-compreq-tab").style.display = "none";
   }
   fetctDataSourceComp();
   bodypageMandatory();
@@ -128,15 +129,21 @@ async function handleSearchCompetency() {
   } catch (error) {}
 }
 function changeDataSource(dataSource) {
+  $("#dataSource-summary").val(dataSource).trigger("change");
+  document.getElementById("dataSource-summary").disabled = true;
+
   if (dataSource !== "master") {
     document.getElementById("pills-draft-tab").style.display = "flex";
     document.getElementById("pills-approval-tab").style.display = "flex";
     document.getElementById("pills-history-tab").style.display = "flex";
+    document.getElementById("pills-compreq-tab").style.display = "flex";
+    getSummaryList(dataSource);
     // document.getElementById("btnCreateDraft").style.display = "none";
   } else {
     document.getElementById("pills-draft-tab").style.display = "none";
     document.getElementById("pills-approval-tab").style.display = "none";
     document.getElementById("pills-history-tab").style.display = "none";
+    document.getElementById("pills-compreq-tab").style.display = "none";
     // document.getElementById("btnCreateDraft").style.display = "flex";
   }
 }

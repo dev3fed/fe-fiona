@@ -76,17 +76,13 @@ document.addEventListener("dataLoaded", async function () {
           }
         });
         setState("levelFilter", levelFilter);
-        const areAllChecked = levelProsbis.every(
-          (level) => document.getElementById(`level-${level}`)?.checked,
-        );
+        const areAllChecked = levelProsbis.every((level) => document.getElementById(`level-${level}`)?.checked);
         checkboxAll.checked = areAllChecked;
       }
 
       checkboxAll.addEventListener("change", function () {
         const isChecked = this.checked;
-        const levelFilter = isChecked
-          ? levelProsbis.map((level) => levelMapping[level])
-          : [];
+        const levelFilter = isChecked ? levelProsbis.map((level) => levelMapping[level]) : [];
         setState("levelFilter", levelFilter);
 
         levelProsbis.forEach((level) => {
@@ -121,9 +117,7 @@ document.addEventListener("dataLoaded", async function () {
 
         setState("rasciNotationFilter", notationFilter);
 
-        const allChecked = checkboxes.every(
-          (notation) => document.getElementById(`notation-${notation}`).checked,
-        );
+        const allChecked = checkboxes.every((notation) => document.getElementById(`notation-${notation}`).checked);
         const notationAll = document.getElementById("notation-all");
         const raChecked = document.getElementById("notation-ra").checked;
 
@@ -147,60 +141,53 @@ document.addEventListener("dataLoaded", async function () {
         }
       }
 
-      document
-        .getElementById("notation-all")
-        .addEventListener("change", function () {
-          const isChecked = this.checked;
-          const checkboxes = ["r", "a", "s", "c", "i", "na"];
-          const checkboxRa = document.getElementById(`notation-ra`);
+      document.getElementById("notation-all").addEventListener("change", function () {
+        const isChecked = this.checked;
+        const checkboxes = ["r", "a", "s", "c", "i", "na"];
+        const checkboxRa = document.getElementById(`notation-ra`);
 
-          if (isChecked) {
-            checkboxRa.checked = false;
-          }
+        if (isChecked) {
+          checkboxRa.checked = false;
+        }
 
-          checkboxes.forEach((notation) => {
-            const checkbox = document.getElementById(`notation-${notation}`);
-            if (notation !== "ra") {
-              checkbox.checked = isChecked;
-            }
-          });
-
-          if (!isChecked) {
-            setState("rasciNotationFilter", []);
-          }
-
-          syncRasciCheckboxes();
-        });
-
-      document
-        .getElementById("notation-ra")
-        .addEventListener("change", function () {
-          const isChecked = this.checked;
-          const checkbox = document.getElementById(`notation-all`);
-
-          if (isChecked) {
-            checkbox.checked = false;
+        checkboxes.forEach((notation) => {
+          const checkbox = document.getElementById(`notation-${notation}`);
+          if (notation !== "ra") {
+            checkbox.checked = isChecked;
           }
         });
+
+        if (!isChecked) {
+          setState("rasciNotationFilter", []);
+        }
+
+        syncRasciCheckboxes();
+      });
+
+      document.getElementById("notation-ra").addEventListener("change", function () {
+        const isChecked = this.checked;
+        const checkbox = document.getElementById(`notation-all`);
+
+        if (isChecked) {
+          checkbox.checked = false;
+        }
+      });
 
       ["r", "a", "s", "c", "i", "na"].forEach((notation) => {
-        document
-          .getElementById(`notation-${notation}`)
-          .addEventListener("change", function () {
-            const isChecked = this.checked;
-            if (!isChecked) {
-              document.getElementById("notation-all").checked = false;
-            }
+        document.getElementById(`notation-${notation}`).addEventListener("change", function () {
+          const isChecked = this.checked;
+          if (!isChecked) {
+            document.getElementById("notation-all").checked = false;
+          }
 
-            const allChecked = ["r", "a", "s", "c", "i", "na"].every(
-              (notation) =>
-                document.getElementById(`notation-${notation}`).checked,
-            );
+          const allChecked = ["r", "a", "s", "c", "i", "na"].every(
+            (notation) => document.getElementById(`notation-${notation}`).checked,
+          );
 
-            if (allChecked) {
-              document.getElementById("notation-all").checked = true;
-            }
-          });
+          if (allChecked) {
+            document.getElementById("notation-all").checked = true;
+          }
+        });
       });
 
       ["r", "a", "s", "c", "i", "na", "ra"].forEach((notation) => {
@@ -214,6 +201,69 @@ document.addEventListener("dataLoaded", async function () {
   }
 });
 
+const onModalFilter = async () => {
+  try {
+    const draftRasciId = getState("draftRasciId");
+    const modalFilter = new bootstrap.Modal(document.getElementById("exampleModal"));
+    modalFilter.show();
+    const payloadJobList = {
+      draftRasciId: draftRasciId === "master" ? null : draftRasciId,
+      isFromUncheck: false,
+      row: 1,
+      rowSize: 10,
+      sourceLevel: "1,2,3,4,5,6,7,8",
+    };
+    console.log("payloadJobList", payloadJobList);
+    const result = await fetchJoblistCard(payloadJobList);
+    const jobList = result?.data;
+    console.log("jobList", jobList);
+    const lvlData = [1, 2, 3, 4, 5, 6, 7, 8];
+    lvlData.forEach((lvl) => {
+      setState(`totalJobLevel${lvl}`, jobList[`level${lvl}`].pagination.total);
+    });
+    const combinedData = [
+      ...jobList?.level1.data.map((item) => ({
+        ...item,
+        type: "level1",
+      })),
+      ...jobList?.level2.data.map((item) => ({
+        ...item,
+        type: "level2",
+      })),
+      ...jobList?.level3.data.map((item) => ({
+        ...item,
+        type: "level3",
+      })),
+      ...jobList?.level4.data.map((item) => ({
+        ...item,
+        type: "level4",
+      })),
+      ...jobList?.level5.data.map((item) => ({
+        ...item,
+        type: "level5",
+      })),
+      ...jobList?.level6.data.map((item) => ({
+        ...item,
+        type: "level6",
+      })),
+      ...jobList?.level7.data.map((item) => ({ ...item, type: "level7" })),
+      ...jobList?.level8.data.map((item) => ({ ...item, type: "level8" })),
+    ];
+    console.log("combinedData", combinedData);
+    setState("filterJobList", combinedData);
+    const levels = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    levels.forEach((lvl) => {
+      const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
+      if (chkJobLevel) {
+        chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, combinedData, lvl === 1 ? "hide" : "show");
+      }
+    });
+    addSearchEventListeners();
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+};
 //================================== start reset all proses bisnis level ===========================//
 const resetProssesBusiness = async () => {
   const levelProsbis = ["l1", "l2", "l3", "l4", "l5", "l6"];
@@ -276,9 +326,7 @@ const resetAllFilterRasci = async () => {
 //==================== end reset all filter rasci matrix ===========================//
 function toggleLevelElements(level, isDisabled) {
   const searchInput = document.getElementById(`search-joblevel${level}`);
-  const checkboxes = document.querySelectorAll(
-    `#chk-job-level${level} input[type="checkbox"]`,
-  );
+  const checkboxes = document.querySelectorAll(`#chk-job-level${level} input[type="checkbox"]`);
   const cardContainer = document.getElementById(`chk-job-level${level}`);
   const card = document.getElementById(`card-level${level}`);
   if (searchInput) {
