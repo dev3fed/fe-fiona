@@ -22,57 +22,41 @@ const modalInfoPosition = async (code) => {
         const bodyInfo = `
         <div class="col-2" style="text-align: left; border-right: 1px solid #BFBFC2;">
             <label style="color: #9F9FA5; display: block;">ID Org Unit</label>
-            <label style="font-weight: 600; font-size: 14px">${
-              detailInformation.unitCode
-            }</label>
+            <label style="font-weight: 600; font-size: 14px">${detailInformation.unitCode}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Org Unit</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.unitName
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.unitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5; display: block;">ID Position</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.positionCode
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.positionCode}</label>
         </div>
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">Position Name</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.positionName
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.positionName}</label>
         </div>
         <div class="col-12">
             <hr style="margin-right: 10px">
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">ID Org Unit Parent</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.parentUnitCode
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitCode}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Org Unit Parent</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.parentUnitName
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">ID POS Direct Report</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.parentPositionCode
-              ? detailInformation.parentPositionCode
-              : "-"
+            detailInformation.parentPositionCode ? detailInformation.parentPositionCode : "-"
           }</label>
         </div>
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">Direct Report</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.parentPositionName
-              ? detailInformation.parentPositionName
-              : "-"
+            detailInformation.parentPositionName ? detailInformation.parentPositionName : "-"
           }</label>
         </div>
           <div class="col-12">
@@ -80,16 +64,12 @@ const modalInfoPosition = async (code) => {
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Directorate</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.directorate
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.directorate}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Function</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.functionName
-              ? detailInformation.functionName
-              : "-"
+            detailInformation.functionName ? detailInformation.functionName : "-"
           }</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -137,16 +117,12 @@ const modalInfoPosition = async (code) => {
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Abbrv Position</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.abbrvPosition
-              ? detailInformation.abbrvPosition
-              : "-"
+            detailInformation.abbrvPosition ? detailInformation.abbrvPosition : "-"
           }</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">KBO</label>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.kbo ? detailInformation.kbo : "-"
-          }</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInformation.kbo ? detailInformation.kbo : "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Cost Center</label>
@@ -157,9 +133,7 @@ const modalInfoPosition = async (code) => {
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">Personnel Area</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.personnelArea
-              ? detailInformation.personnelArea
-              : "-"
+            detailInformation.personnelArea ? detailInformation.personnelArea : "-"
           }</label>
         </div>
         <div class="col-12">
@@ -168,25 +142,19 @@ const modalInfoPosition = async (code) => {
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Personnel Area Name</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.personnelAreaName
-              ? detailInformation.personnelAreaName
-              : "-"
+            detailInformation.personnelAreaName ? detailInformation.personnelAreaName : "-"
           }</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Personnel Sub Area</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.personnelSubARea
-              ? detailInformation.personnelSubARea
-              : "-"
+            detailInformation.personnelSubARea ? detailInformation.personnelSubARea : "-"
           }</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Personnel Sub Area Name</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.personnelSubAreaName
-              ? detailInformation.personnelSubAreaName
-              : "-"
+            detailInformation.personnelSubAreaName ? detailInformation.personnelSubAreaName : "-"
           }</label>
         </div>
           <div class="col-4 " style="text-align: left">
@@ -290,10 +258,8 @@ const cardTblMandatory = async (code) => {
         })
         .join("");
 
-      document.getElementById("mandatory-competency-header").innerHTML =
-        theadMandatory;
-      document.getElementById("mandatory-competency-body").innerHTML =
-        bodyMandatory;
+      document.getElementById("mandatory-competency-header").innerHTML = theadMandatory;
+      document.getElementById("mandatory-competency-body").innerHTML = bodyMandatory;
     }
   } catch (error) {
     console.error(error);
@@ -309,9 +275,10 @@ const cardTblGeneral = async (code) => {
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
       console.log("listTechnical", listTechnical);
+      const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
       const labelCore = document.getElementById("labelCore");
       if (labelCore) {
-        labelCore.innerHTML = `Core(${listTechnical.length}/3)`;
+        labelCore.innerHTML = `Core(${generalCompetencies.length}/3)`;
       }
 
       const theadTechnical = `
@@ -322,6 +289,7 @@ const cardTblGeneral = async (code) => {
             </tr>`;
 
       const bodyTechnical = listTechnical
+        .filter((element) => element.compType.toLowerCase() === "general")
         .map((element, i) => {
           return `
               <tr>
@@ -337,10 +305,8 @@ const cardTblGeneral = async (code) => {
         })
         .join("");
 
-      document.getElementById("technical-competency-header").innerHTML =
-        theadTechnical;
-      document.getElementById("technical-competency-body").innerHTML =
-        bodyTechnical;
+      document.getElementById("technical-competency-header").innerHTML = theadTechnical;
+      document.getElementById("technical-competency-body").innerHTML = bodyTechnical;
     }
   } catch (error) {
     console.error(error);
@@ -356,9 +322,10 @@ const cardTblSpecific = async (code) => {
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
       console.log("listTechnical", listTechnical);
+      const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
       const labelSpecific = document.getElementById("labelSpecific");
       if (labelSpecific) {
-        labelSpecific.innerHTML = `Specific(${listTechnical.length}/9)`;
+        labelSpecific.innerHTML = `Specific(${specificCompetencies.length}/9)`;
       }
       const theadTechnical = `
             <tr>
@@ -368,6 +335,7 @@ const cardTblSpecific = async (code) => {
             </tr>`;
 
       const bodyTechnical = listTechnical
+        .filter((element) => element.compType.toLowerCase() === "specific")
         .map((element, i) => {
           return `
               <tr>
@@ -381,10 +349,8 @@ const cardTblSpecific = async (code) => {
         })
         .join("");
 
-      document.getElementById("technical-specifit-header").innerHTML =
-        theadTechnical;
-      document.getElementById("technical-specifit-body").innerHTML =
-        bodyTechnical;
+      document.getElementById("technical-specifit-header").innerHTML = theadTechnical;
+      document.getElementById("technical-specifit-body").innerHTML = bodyTechnical;
     }
   } catch (error) {
     console.error(error);
@@ -402,8 +368,7 @@ const cardTblBehavior = async (code) => {
     const result = await fetchDetailPositionBehavior(queryString);
     console.log("result", result);
     if (result.success === true) {
-      const listBehavior =
-        result?.data.behaviourList[0].behaviouralDictionary || [];
+      const listBehavior = result?.data.behaviourList[0].behaviouralDictionary || [];
       console.log("listBehavior", listBehavior);
 
       const theadMandatory = `
@@ -422,10 +387,8 @@ const cardTblBehavior = async (code) => {
         })
         .join("");
 
-      document.getElementById("mandatory-behavior-header").innerHTML =
-        theadMandatory;
-      document.getElementById("mandatory-behavior-body").innerHTML =
-        bodyMandatory;
+      document.getElementById("mandatory-behavior-header").innerHTML = theadMandatory;
+      document.getElementById("mandatory-behavior-body").innerHTML = bodyMandatory;
     }
   } catch (error) {
     console.error(error);
@@ -443,8 +406,7 @@ const modalTabBehavior = async (code) => {
   try {
     const result = await fetchDetailPositionBehavior(queryString);
     if (result.success === true) {
-      const listBehavior =
-        result?.data.behaviourList[0].behavioural_dictionary || [];
+      const listBehavior = result?.data.behaviourList[0].behavioural_dictionary || [];
       console.log("listBehavior", listBehavior);
 
       let html =
@@ -476,13 +438,8 @@ async function handleDetailInfo(type, code) {
     if (closeModal) {
       closeModal.hide();
     }
-    const dataDetail =
-      type != "Behavior"
-        ? await fetchCompetencyDetail(code)
-        : await fetchCompeBehaviorDetail(code);
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalDetailDictionary"),
-    );
+    const dataDetail = type != "Behavior" ? await fetchCompetencyDetail(code) : await fetchCompeBehaviorDetail(code);
+    const modal = new bootstrap.Modal(document.getElementById("modalDetailDictionary"));
 
     modal.show();
     // Set the title of the modal id modalDetailDictionaryTitle
@@ -513,9 +470,7 @@ async function handleDetailInfo(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[1]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[1].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -527,9 +482,7 @@ async function handleDetailInfo(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[2]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[2].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -541,9 +494,7 @@ async function handleDetailInfo(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[3]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[3].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
@@ -555,9 +506,7 @@ async function handleDetailInfo(type, code) {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.levels[4]
-                      .map((item) => `<li> ${item}</li>`)
-                      .join("")}
+                    ${dataDetail?.data.levels[4].map((item) => `<li> ${item}</li>`).join("")}
                     </ul>
                 </div>
             </div>
