@@ -274,6 +274,8 @@ function initializeTooltips() {
 }
 
 function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
+  const draftCompe = document.querySelector("#dataSource-competency");
+  const isMaster = draftCompe.value === "master" || draftCompe.value === null;
   listJobCode.forEach((jobCode) => {
     const row = getRowById(`tr-${jobCode}`);
     if (!row) {
@@ -294,7 +296,9 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
             <div class="competency-value">
               ${level}
             </div>
-            <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon"
+            <img style="display: ${
+              isMaster ? "none" : "flex"
+            }" src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" 
               onclick="openModalEditDepth('${jobCode}', '${comp.compCode}')">
           </div>
         </td>
