@@ -1,7 +1,9 @@
 // start section add notation by column row
 async function onModalAddNotation() {
   try {
-    const modal = new bootstrap.Modal(document.getElementById("modalAddNotation"));
+    const modal = new bootstrap.Modal(
+      document.getElementById("modalAddNotation"),
+    );
     modal.show();
     const rasciNotation = getState("rasciNotation") || [];
     const dataChangeNotasi = getState("dataChangeNotasi");
@@ -51,11 +53,13 @@ async function onModalAddNotation() {
         <div class="col-3">
           <select class="form-select digits" onchange="onSelectLevel(event)" name="levelId" id="levelId">
            <option value="" disabled selected>Level</option>
-              ${listLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
+              ${listLevel.map(
+                (opt) => `<option value="${opt.id}">${opt.text}</option>`,
+              )}
           </select>
         </div>
         <div class="col-9">
-          <select class="form-select digits" name="businessId" id="businessId" disabled>
+          <select class="form-select digits" name="businessId" id="businessId" disabled onchange="onSelectProsbisNonRef(event)">
           </select>
         </div>
       </div>
@@ -88,16 +92,20 @@ async function onModalAddNotation() {
 const cardSelectedNotasilist = (param) => {
   const bodyBisuness = param.busProsMapped
     .map((value) => {
-      const rasciNotation = value.rasciNotation.filter((item) => item.isChecked);
+      const rasciNotation = value.rasciNotation.filter(
+        (item) => item.isChecked,
+      );
       return `<div class="card-listjob mb-2">
           <div class="row">
             <div class="col-10">
-              <span style="font-size:13px;font-weight:bold">${value.businessName}</span>
+              <span style="font-size:13px;font-weight:bold">${
+                value.businessName
+              }</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
-              <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteBusinesslist(${
+              <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteBusinesslist('${
                 value.parentId
-              })" style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
+              }')" style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
                 <i class="icon-trash" style="font-size: 14px;padding-right:2px"></i>
               </button>
             </div> 
@@ -122,7 +130,9 @@ const cardSelectedNotasilist = (param) => {
 };
 const deleteBusinesslist = (id) => {
   const dataChangeNotasi = getState("dataChangeNotasi");
-  const removeData = dataChangeNotasi.busProsMapped.filter((item) => Number(item.parentId) !== Number(id));
+  const removeData = dataChangeNotasi.busProsMapped.filter(
+    (item) => item.parentId !== id,
+  );
   const result = { ...dataChangeNotasi, busProsMapped: removeData };
   setState("dataChangeNotasi", result);
   cardSelectedNotasilist(result);
@@ -174,13 +184,18 @@ function updateSelectProsbis() {
     });
 }
 
+async function onSelectProsbisNonRef(event) {
+  const prosbisId = event.target.value;
+  if (!prosbisId) return;
+  $("#btn-selectedbusiness").prop("disabled", false);
+
+  try {
+  } catch (error) {}
+}
 async function onSelectJobRef(event) {
   const jobId = event.target.value;
   const dataChangeNotasi = getState("dataChangeNotasi");
   const draftidRasci = $("#dataSource-rasci").val();
-  let $select = $("#dataSource-rasci");
-  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
-  let selectedDraftSo = selectedOption.attr("data-draftso");
   try {
     const reset = {
       ...dataChangeNotasi,
@@ -189,15 +204,19 @@ async function onSelectJobRef(event) {
     setState("dataChangeNotasi", reset);
     if (jobId) {
       const [orgUnitCode, orgPrl] = jobId.split(";");
-      const payload = { unitCode: orgUnitCode, prlOrg: orgPrl, draftRasciId: draftidRasci };
+      const payload = {
+        unitCode: orgUnitCode,
+        prlOrg: orgPrl,
+        draftRasciId: draftidRasci,
+      };
       const queryString = "?" + new URLSearchParams(payload).toString();
-      console.log("queryString", queryString);
       const result = await fetchProsbisByJob(queryString);
-      console.log("result", result);
       if (result.success === true) {
         const dataTbl = result.data;
-        const elementSelectedBispro = document.getElementById("table-prosbisref");
-        const elementSelectedBisproref = document.getElementById("selectedBisproref");
+        const elementSelectedBispro =
+          document.getElementById("table-prosbisref");
+        const elementSelectedBisproref =
+          document.getElementById("selectedBisproref");
         elementSelectedBisproref.style.display = "block";
         elementSelectedBispro.style.display = "block";
         const contentRefProsbis = `
@@ -240,7 +259,9 @@ async function onSelectJobRef(event) {
                       }
 
                       if (value.comment) {
-                        comments.push(`<li>${value.notation}: ${value.comment}</li>`);
+                        comments.push(
+                          `<li>${value.notation}: ${value.comment}</li>`,
+                        );
                       }
                     });
 
@@ -251,9 +272,13 @@ async function onSelectJobRef(event) {
                     return `
                     <th scope="row">
                       <label class="radio-label" for="checked-body-bp">
-                        <input class="checkbox_animated" id="checked-prosbisref-${item.indexNumber}" 
+                        <input class="checkbox_animated" id="checked-prosbisref-${
+                          item.indexNumber
+                        }" 
                           type="checkbox" value="${item.indexNumber}" 
-                          onclick="onSelectProsbisRef(${JSON.stringify(item).replace(/"/g, "&quot;")});">
+                          onclick="onSelectProsbisRef(${JSON.stringify(
+                            item,
+                          ).replace(/"/g, "&quot;")});">
                       </label>
                     </th>
                     <td style="text-align:center">
@@ -289,7 +314,9 @@ async function onSelectJobRef(event) {
 }
 
 function onSelectPosition(item) {
-  const dataChangeNotasi = getState("dataChangeNotasi") || { busProsMapped: [] };
+  const dataChangeNotasi = getState("dataChangeNotasi") || {
+    busProsMapped: [],
+  };
   const jobName = $("#jobIdPosition").find(":selected").text();
   const jobId = item.target.value;
   const updatedPayload = {
@@ -300,10 +327,15 @@ function onSelectPosition(item) {
   setState("dataChangeNotasi", updatedPayload);
 }
 function onSelectProsbisRef(item) {
-  const elementChecked = document.getElementById(`checked-prosbisref-${item.indexNumber}`);
+  const elementChecked = document.getElementById(
+    `checked-prosbisref-${item.indexNumber}`,
+  );
   const isChecked = elementChecked.checked;
   const jobRefName = $("#jobIdRef").find(":selected").text();
-  const dataChangeNotasi = getState("dataChangeNotasi") || { busProsMapped: [] };
+  const draftName = $("#dataSource-rasci option:selected").text();
+  const dataChangeNotasi = getState("dataChangeNotasi") || {
+    busProsMapped: [],
+  };
   const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
   if (isChecked) {
     const notation = item.rasciNotation.map((notation) => ({
@@ -311,11 +343,13 @@ function onSelectProsbisRef(item) {
       comment: notation.comment,
       isChecked: isChecked,
     }));
-    console.log("item", item);
     const updatedPayload = {
       ...dataChangeNotasi,
+      draftName: draftName,
       busProsMapped: [
-        ...dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNumber),
+        ...dataChangeNotasi.busProsMapped.filter(
+          (entry) => entry.parentId !== item.indexNumber,
+        ),
         {
           parentId: item.indexNumber,
           rasciNotation: notation,
@@ -328,10 +362,13 @@ function onSelectProsbisRef(item) {
   } else {
     const updatedPayload = {
       ...dataChangeNotasi,
-      busProsMapped: dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNumber),
+      busProsMapped: dataChangeNotasi.busProsMapped.filter(
+        (entry) => entry.parentId !== item.indexNumber,
+      ),
     };
-    // console.log("item", item);
-    const removeList = listSelectedProsbisref.filter((entry) => entry.indexNumber !== item.indexNumber);
+    const removeList = listSelectedProsbisref.filter(
+      (entry) => entry.indexNumber !== item.indexNumber,
+    );
     setState("listSelectedProsbisref", removeList);
     setState("dataChangeNotasi", updatedPayload);
   }
@@ -390,6 +427,7 @@ async function triggleSelectBusiness() {
     setState("rasciNotation", updatedRasciNotation);
     tblChangeNotation(updatedRasciNotation);
     cardSelectedNotasilist(payload);
+    $("#btn-selectedbusiness").prop("disabled", true);
   }, 200);
 }
 function selectJobPosition() {
@@ -494,6 +532,11 @@ const handleRadioChange = (event) => {
     setState("dataChangeNotasi", reset);
     setState("listSelectedProsbisref", []);
     cardSelectedProsbisref();
+    $("#btn-selectedbusiness").prop("disabled", true);
+    // Reset dropdown levelId ke default
+    $("#levelId").val("");
+    // Kosongkan dan disable businessId
+    $("#businessId").empty().prop("disabled", true);
   } else if (value === "nonReference") {
     jobSelect.val(null).trigger("change");
     $("#table-prosbisref").hide();
@@ -525,7 +568,9 @@ const tblRasciNotation = (rasciNotation) => {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
+          letter.rasciCode
+        }" 
                value="${letter.comment || ""}" 
                ${!letter.isChecked ? "disabled" : ""} 
                oninput="updateRasciComment('${letter.rasciCode}', this.value)">
@@ -567,70 +612,15 @@ function backChangeNotation() {
 function formValidationNotation() {
   const { jobId, busProsMapped } = getState("dataChangeNotasi");
   const listSelectedProsbisref = getState("listSelectedProsbisref");
-  const isValid = (jobId && busProsMapped.length > 0) || (jobId && listSelectedProsbisref.length > 0);
+  const isValid =
+    (jobId && busProsMapped.length > 0) ||
+    (jobId && listSelectedProsbisref.length > 0);
   document.getElementById("btnDraftnotation").disabled = !isValid;
 }
 
 document.querySelectorAll("select").forEach((input) => {
   input.addEventListener("select", formValidationNotation);
 });
-
-async function openModalNotRow(jobId, prosbisId) {
-  try {
-    const modal = new bootstrap.Modal(document.getElementById("modalNotationRow"));
-    modal.show();
-    const rasciNotation = getState("rasciNotation") || [];
-    const payload = {
-      indexGroup: prosbisId,
-      jobId: jobId,
-    };
-    const dataRow = await fetchDetailRasci(payload);
-    const result = dataRow.data;
-    const dataDetailProsbis = getState("dataDetailProsbis");
-    const formContent = `
-        <div class="col-12">
-          <div >
-            <label class="form-label" style="width:19%">RASCI Matrix Draft</label>
-            <label> : </label>
-          <b class="form-label">${dataDetailProsbis.draftName}</b>
-          </div>
-        </div>
-        <div class="col-12">
-          <div >
-              <label class="form-label" style="width:19%">Position</label>
-               <label> : </label>
-          <b class="form-label">${result.position.name}</b>
-          </div>
-        </div>
-        <div class="col-12">
-          <div >
-              <label class="form-label" style="width:19%">Business Process</label>
-               <label> : </label>
-          <b class="form-label">${result.businessProcess.parentId} - ${result.businessProcess.description}</b>
-          </div>
-        </div>
-      `;
-
-    theadContent = `<tr>
-          <th scope="col" style="width: 50px">Check</th>
-          <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
-          <th scope="col">Comment (Optional)</th>
-          </tr>`;
-    const output = mergeRasciData(result.rasci, rasciNotation);
-    setState("rasciNotation", output);
-    setState("dataDetailProsbis", { ...dataDetailProsbis, jobId: jobId, indexGroup: prosbisId });
-    tblChangeNotationRow(output);
-    document.getElementById("tbl-notatrow-header").innerHTML = theadContent;
-
-    const bodyContent = document.getElementById("form-notatrow");
-    if (bodyContent) {
-      bodyContent.innerHTML = formContent;
-    }
-
-    // Initialize Bootstrap Select
-    $(".selectpicker").selectpicker();
-  } catch (error) {}
-}
 
 function mergeRasciData(result, data) {
   // Buat salinan array data agar tidak merusak data asli
@@ -670,7 +660,9 @@ function tblChangeNotation(rasciNotation) {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
+          letter.rasciCode
+        }"
           value="${letter.comment || ""}"
           ${!letter.isChecked ? "disabled" : ""}
           oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -703,7 +695,9 @@ function tblChangeNotationRow(rasciNotation) {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
+          letter.rasciCode
+        }"
           value="${letter.comment || ""}"
           ${!letter.isChecked ? "disabled" : ""}
           oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -724,24 +718,34 @@ function backChangeNotationRow() {
   setState("dataDetailProsbis", {});
   setState("rasciNotation", updatedRasciNotation);
 }
-async function saveNotationRow() {
+
+async function saveDraftnotation() {
   try {
-    const rasciNotation = getState("rasciNotation") || [];
-    const dataDetailProsbis = getState("dataDetailProsbis");
-    const spinner = document.getElementById("loadingEditnotation");
+    const spinner = document.getElementById("spinBtnNotation");
     spinner.style.display = "inline-block";
+    const dataChangeNotasi = getState("dataChangeNotasi");
+    const draftRasciId = $("#dataSource-rasci").val();
+    const selectedOption = $("#dataSource-rasci option:selected");
+    const draftSoId = selectedOption.data("draftso");
+    const jobId = dataChangeNotasi?.jobId;
+    const [unitCode, prl] = jobId.split(";");
     const inputValue = {
-      draftName: dataDetailProsbis.draftName,
-      draftId: dataDetailProsbis.draftId,
+      draftId: draftRasciId,
+      draftJobSource: draftSoId,
       draftType: "Add/Edit RASCI",
-      jobId: dataDetailProsbis.jobId,
-      busProsMapped: [{ parentId: dataDetailProsbis.indexGroup, rasciNotation }],
+      orgUnitCode: unitCode,
+      orgPrl: prl,
+      busProsMapped: dataChangeNotasi.busProsMapped,
     };
     const result = await submitDraftProsbis(inputValue);
     if (result.status === 200) {
-      const modalNotationRow = document.getElementById("modalNotationRow");
-      const modal = bootstrap.Modal.getInstance(modalNotationRow);
-      setTimeout(() => {
+      const modalAddNotation = document.getElementById("modalAddNotation");
+      const modal = bootstrap.Modal.getInstance(modalAddNotation);
+      const btnDraft = document.getElementById("btnDraftnotation");
+      btnDraft.disabled = true;
+      // btnApproval.disabled = true;
+      const resultMatrix = await lastStateTableMatrix();
+      if (resultMatrix) {
         swal({
           title: "SUCCESS",
           icon: "success",
@@ -752,82 +756,25 @@ async function saveNotationRow() {
             attributes: {
               innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
               <br>
-              <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
+              <span>You can check in <b>${result?.data.draftName}</b> at draft tab.</span>
               `,
             },
           },
         }).then(async () => {
+          spinner.style.display = "none";
           if (modal) {
             modal.hide();
           }
-          spinner.style.display = "none";
+          backChangeNotation();
           const payload = {
             Page: 1,
             PageSize: 5,
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          backChangeNotationRow();
           loadTableBodyDraft(dataDraft);
         });
-      }, 100);
+      }
     }
-  } catch (error) {}
-}
-async function saveDraftnotation() {
-  try {
-    const spinner = document.getElementById("spinBtnNotation");
-    // spinner.style.display = "inline-block";
-    const dataChangeNotasi = getState("dataChangeNotasi");
-    const draftId = $("#dataSource-rasci").val();
-    const inputValue = {
-      draftId: draftId,
-      draftJobSource: null,
-      draftType: "Add/Edit RASCI",
-      orgUnitCode: dataChangeNotasi.orgUnitCode,
-      orgPrl: dataChangeNotasi.orgPrl,
-      busProsMapped: dataChangeNotasi.busProsMapped,
-    };
-    console.log("first", inputValue);
-    // const result = await submitDraftProsbis(inputValue);
-    // if (result.status === 200) {
-    //   const modalAddNotation = document.getElementById("modalAddNotation");
-    //   const modal = bootstrap.Modal.getInstance(modalAddNotation);
-
-    //   const btnDraft = document.getElementById("btnDraftnotation");
-    //   btnDraft.disabled = true;
-    //   // btnApproval.disabled = true;
-
-    //   setTimeout(() => {
-    //     swal({
-    //       title: "SUCCESS",
-    //       icon: "success",
-    //       buttons: false,
-    //       timer: 2000,
-    //       content: {
-    //         element: "div",
-    //         attributes: {
-    //           innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
-    //           <br>
-    //           <span>You can check in <b>${result.data.draftName}</b> at draft tab.</span>
-    //           `,
-    //         },
-    //       },
-    //     }).then(async () => {
-    //       spinner.style.display = "none";
-    //       if (modal) {
-    //         modal.hide();
-    //       }
-    //       backChangeNotation();
-    //       const payload = {
-    //         Page: 1,
-    //         PageSize: 5,
-    //       };
-    //       const queryString = new URLSearchParams(payload).toString();
-    //       const dataDraft = await fetchDraftProsbis(queryString);
-    //       loadTableBodyDraft(dataDraft);
-    //     });
-    //   }, 100);
-    // }
   } catch (error) {}
 }

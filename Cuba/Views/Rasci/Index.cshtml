@@ -262,27 +262,23 @@
                                                     style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                             </div>
                                         </div>
-                                        @* <div class="col-2" style="padding-left: 0;">
-                                            <button class="btn btn-primary " type="button" id="searchButton"
-                                                disabled>Search</button>
-                                            <button class="btn btn-outline-primary" type="button" id="clearButton"
-                                                onclick="clearInput()">Clear</button>
-                                        </div> *@
                                         <div class="col-3 d-flex justify-content-end" style="padding-left: 0;">
-                                            @* <button class="btn btn-primary me-2 btn-icon" type="button"
-                                                data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                                <img src="~/assets/images/rasci/filter.svg" alt="Filter Icon">
-                                                Filter
+                                            <button id="searchButton" class="btn btn-primary me-2" type="button"
+                                                style="width: 100px;" disabled>
+                                                <div class="d-flex align-items-center justify-content-center w-100">
+                                                    <div class="spinner-border spinner-border-sm text-light me-2"
+                                                        style="display: none;" id="loadingSearch" role="status"></div>
+                                                    <span class="btn-text">Search</span>
+                                                </div>
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon" type="button"
-                                                data-bs-toggle="modal" data-bs-target="#modalJobCompare">
-                                                <img src="~/assets/images/rasci/job-compare.svg" alt="Filter Icon">
-                                                Job Compare
-                                            </button> *@
-                                            <button class="btn btn-primary me-2" type="button" id="searchButton"
-                                                style="width: 100px;" disabled>Search</button>
-                                            <button class="btn btn-outline-primary me-2" type="button" id="clearButton"
-                                                onclick="clearInput()" style="width: 100px;">Clear</button>
+                                            <button id="clearButton" class="btn btn-outline-primary me-2" type="button"
+                                                onclick="clearInput()" style="width: 100px;">
+                                                <div class="d-flex align-items-center justify-content-center w-100">
+                                                    <div class="spinner-border spinner-border-sm text-light me-2"
+                                                        style="display: none;" id="loadingClear" role="status"></div>
+                                                    <span class="btn-text">Clear</span>
+                                                </div>
+                                            </button>
                                             <div class="btn-group" role="group">
                                                 <button class="btn btn-primary dropdown-toggle btn-icon"
                                                     id="btnGroupVerticalDrop1" type="button" data-bs-toggle="dropdown"
@@ -290,8 +286,7 @@
                                                         src="~/assets/images/rasci/icon_menudots.svg" alt="Filter Icon"
                                                         style="margin-top: -1px;">Option</button>
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                                                    <a class="dropdown-item" data-bs-toggle="modal"
-                                                        data-bs-target="#exampleModal">
+                                                    <a class="dropdown-item" onclick="onModalFilter()">
                                                         <img src="~/assets/images/rasci/icon_filter.svg"
                                                             alt="Filter Icon">Filter
                                                     </a>
@@ -300,8 +295,7 @@
                                                         <img src="~/assets/images/rasci/icon_compare.svg"
                                                             alt="Filter Icon"> Job Compare
                                                     </a>
-                                                    <a class="dropdown-item" data-bs-toggle="modal"
-                                                        data-bs-target="#exampleModal">
+                                                    <a class="dropdown-item">
                                                         <img src="~/assets/images/rasci/icon_export.svg"
                                                             alt="Filter Icon" style="margin-top: -5px;"> Export
                                                     </a>
@@ -334,13 +328,13 @@
                                         </div>
                                     </div>
                                     <div class=" mt-2">
-                                        <div id="table-container" class=" scrollable-table table-wrapper">
+                                        <div id="table-container" class="scrollable-table table-wrapper">
                                             <!-- begin :: List RASCI Matrix Table -->
                                             <table class="table  custom-border-table rasci-matrix"
                                                 style="table-layout: fixed;">
                                                 <thead id="table-header">
                                                 </thead>
-                                                <tbody id="table-body" class="rasci-matrix-body">
+                                                <tbody id="table-body">
 
                                                 </tbody>
                                             </table>
@@ -389,7 +383,8 @@
 @section Script {
     <script>
         const token = localStorage.getItem("token");
-        const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
+        console.log("url_api:", url_api);
         function handleCloseModal() {
             const applyButton = document.getElementById("apply-search");
             if (applyButton) {
@@ -426,8 +421,10 @@
     <!--Theme js-->
     <script src="../assets/js/script.js"></script>
     <script src="../assets/js/rasci-matrix/store.js"></script>
+    <script src="../assets/js/rasci-matrix/endpoint.js"></script>
     <script src="../assets/js/rasci-matrix/index.js"></script>
     <script src="../assets/js/rasci-matrix/table-list.js"></script>
+    <script src="../assets/js/rasci-matrix/event-scroll.js"></script>
     <script src="../assets/js/rasci-matrix/table-matrix.js"></script>
     <script src="../assets/js/rasci-matrix/job-compare.js"></script>
     <script src="../assets/js/rasci-matrix/detail-prosbis.js"></script>
@@ -442,6 +439,10 @@
     <script src="../assets/js/rasci-matrix/filter-rasci.js"></script>
     <script src="../assets/js/rasci-matrix/activity-detaildraft.js"></script>
     <script src="../assets/js/rasci-matrix/detail-job.js"></script>
+    <script src="../assets/js/rasci-matrix/edit-notation.js"></script>
+    <script src="../assets/js/rasci-matrix/table-loghistory.js"></script>
+    <script src="../assets/js/rasci-matrix/table-approval.js"></script>
+    <script src="../assets/js/rasci-matrix/scroll-jobcard.js"></script>
 
 
 }

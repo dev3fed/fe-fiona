@@ -2,17 +2,25 @@ document.addEventListener("dataLoaded", async function () {
   try {
     if (appState.resultProsbis.length > 0) {
       const payloadPosition = getState("payloadPosition");
-      const prosbisNumber = appState.resultProsbis.map((val) => val.indexNumber);
+      const prosbisNumber = appState.resultProsbis.map(
+        (val) => val.indexNumber,
+      );
       if (prosbisNumber.length > 0) {
-        const resultPosition = await fetchPositionMatrix({ ...payloadPosition, indexNumber: prosbisNumber });
-        console.log("resultPosition", resultPosition);
-        setState("payloadPosition", { ...payloadPosition, indexNumber: prosbisNumber });
+        const resultPosition = await fetchPositionMatrix({
+          ...payloadPosition,
+          indexNumber: prosbisNumber,
+        });
+        setState("payloadPosition", {
+          ...payloadPosition,
+          indexNumber: prosbisNumber,
+        });
+        setTimeout(() => {
+          loadTableBody(appState.resultProsbis);
+          loadTableHeader(resultPosition.data);
+          mapRasciCells(prosbisNumber, resultPosition.data);
+          hideLoading();
+        }, 100);
       }
-      setTimeout(() => {
-        hideLoading();
-        // loadTableHeader(appState.resultJabatan);
-        // loadTableBody(appState.resultProsbis);
-      }, 100);
     }
     //  else {
     //   showDataEmpty();
@@ -28,22 +36,63 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("pills-warningtab").style.display = "none";
     document.getElementById("btnAddBp").style.display = "none";
     document.getElementById("btnAddNotation").style.display = "none";
+    document.getElementById("btnDeleteDetail").style.display = "none";
+    document.getElementById("btnEditDetail").style.display = "none";
     document.getElementById("btnFormdraft").style.display = "flex";
   }
   showLoading();
   // loadTableHeader(appState.resultJabatan);
   const loader = document.getElementById("loader");
   loader.style.display = "none";
-  loadTableBody(appState.resultProsbis);
+  // loadTableBody(appState.resultProsbis);
   fetchDatasource();
   feather.replace();
 });
 
-$("#dataSource-rasci").on("select2:select", function (e) {
-  let selectedOption = $(this).find(":selected");
-  let selectedDraftSo = selectedOption.attr("data-draftso");
-  let selectedValue = $(this).val();
-  changeDataSource(selectedValue, selectedDraftSo);
+$("#dataSource-rasci").on("select2:select", async function (e) {
+  try {
+    let selectedOption = $(this).find(":selected");
+    let selectedDraftSo = selectedOption.attr("data-draftso");
+    const selectedValue = $("#dataSource-rasci").val();
+    setState("draftSoId", selectedDraftSo);
+    setState("draftRasciId", selectedValue);
+    // const jobList = await fetchFilterJobList(selectedValue);
+    // const combinedData = [
+    //   ...jobList?.level1.map((item) => ({
+    //     ...item,
+    //     type: "level1",
+    //   })),
+    //   ...jobList?.level2.map((item) => ({
+    //     ...item,
+    //     type: "level2",
+    //   })),
+    //   ...jobList?.level3.map((item) => ({
+    //     ...item,
+    //     type: "level3",
+    //   })),
+    //   ...jobList?.level4.slice(0, 100).map((item) => ({
+    //     ...item,
+    //     type: "level4",
+    //   })),
+    //   ...jobList?.level5.slice(0, 100).map((item) => ({
+    //     ...item,
+    //     type: "level5",
+    //   })),
+    //   ...jobList?.level6.slice(0, 100).map((item) => ({
+    //     ...item,
+    //     type: "level6",
+    //   })),
+    //   ...jobList?.level7
+    //     .slice(0, 100)
+    //     .map((item) => ({ ...item, type: "level7" })),
+    //   ...jobList?.level8
+    //     .slice(0, 100)
+    //     .map((item) => ({ ...item, type: "level8" })),
+    // ];
+    // setState("filterJobList", combinedData);
+    ChangeSourceDraft();
+    changeDataSource(selectedValue, selectedDraftSo);
+  } catch (error) {}
 });
 
 function fetchDatasource(draftId = null) {
@@ -87,50 +136,63 @@ function fetchDatasource(draftId = null) {
 }
 
 async function changeDataSource(dataSource, draftSo) {
-  console.log("DataSource:", dataSource);
-  console.log("DraftSo:", draftSo);
   try {
-    const payloadProsbis = getState("payloadProsbis");
-    const payloadPosition = getState("payloadPosition");
+    const defaultIndexNumber = getState("defaultIndexNumber");
     if (dataSource !== "master" || dataSource === "") {
       document.getElementById("pills-warningtab").style.display = "flex";
       document.getElementById("btnAddBp").style.display = "flex";
       document.getElementById("btnAddNotation").style.display = "flex";
+      document.getElementById("btnDeleteDetail").style.display = "inline-block";
+      document.getElementById("btnEditDetail").style.display = "inline-block";
       document.getElementById("btnFormdraft").style.display = "none";
     } else {
       document.getElementById("pills-warningtab").style.display = "none";
       document.getElementById("btnAddBp").style.display = "none";
       document.getElementById("btnAddNotation").style.display = "none";
+      document.getElementById("btnDeleteDetail").style.display = "none";
+      document.getElementById("btnEditDetail").style.display = "none";
       document.getElementById("btnFormdraft").style.display = "flex";
     }
     const payload = {
-      ...payloadProsbis,
+      indexNumber: defaultIndexNumber,
+      expandNumber: [],
       draftRasciId: dataSource === "master" ? null : dataSource,
       row: 1,
       rowSize: 15,
     };
     const resultProsbis = await fetchProsbisMatrix(payload);
-    const storageDataPosition = getState("storageDataPosition");
     const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
     if (prosbisNumber.length > 0 && resultProsbis.success === true) {
       const payloadJob = {
-        ...payloadPosition,
         draftRasciId: dataSource === "master" ? null : dataSource,
         draftSoId: draftSo,
         indexNumber: prosbisNumber,
+        col: 1,
+        colSize: 10,
       };
+      const tableContainer = document.querySelector(".scrollable-table");
       setState("payloadPosition", payloadJob);
+      setState("payloadProsbis", payload);
       const resultPosition = await fetchPositionMatrix(payloadJob);
-      const combinePosition = [...storageDataPosition, ...resultPosition.data];
-      setState("storageDataPosition", combinePosition);
-      setTimeout(() => {
-        $("#table-body").empty();
+      setState("isSearchMatrix", false);
+      setState("idSearchProsbis", "");
+      setState("actionType", "BP_THEN_JOB");
+      setState("resultProsbis", resultProsbis.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultProsbis.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      if (resultPosition.data.length > 0) {
         loadTableHeader(resultPosition.data);
         loadTableBody(resultProsbis.data);
-        mapRasciCells(prosbisNumber, combinePosition);
-      }, 100);
+        mapRasciCells(prosbisNumber, resultPosition.data);
+        tableContainer.scrollTop = 0;
+        tableContainer.scrollLeft = 0;
+      }
     }
-  } catch (error) {}
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 // Event listener untuk infinite scroll
 
@@ -183,7 +245,7 @@ function renderStaticHeader() {
     <tr style="height:30px">
       <th scope="col" class="level-col head-cell">Level</th>
       <th scope="col" class="index-col head-cell">Index</th>
-      <th scope="col" class="headcol head-cell"><span style="padding-left:10px;">Proses Bisnis</span></th>
+      <th scope="col" class="headcol head-cell"><span style="padding:10px">Proses Bisnis</span></th>
     </tr>
   `;
 }
@@ -195,132 +257,135 @@ function appendDynamicHeader(jobTitleList) {
     return;
   }
 
-  // Hapus semua <th> dinamis sebelum menambahkan yang baru
-  headerRow.querySelectorAll(".jabatan-cell").forEach((th) => th.remove());
+  // Mulai dengan header statis yang mungkin masih ada
+  let staticHeaders = "";
+  headerRow.querySelectorAll("th:not(.jabatan-cell)").forEach((th) => {
+    staticHeaders += th.outerHTML;
+  });
 
   if (!jobTitleList || jobTitleList.length === 0) {
     console.warn("jobTitleList kosong, tidak ada kolom yang ditambahkan.");
+    document.getElementById(
+      "table-header",
+    ).innerHTML = `<tr>${staticHeaders}</tr>`;
     return;
   }
 
+  // Bangun header content dinamis
+  let dynamicHeaders = "";
   jobTitleList.forEach((val) => {
     const uniqueClass = `jabatan-level-${val.level}`;
-
-    const jobTh = document.createElement("th");
-    jobTh.scope = "col";
-    jobTh.className = `jabatan-cell ${uniqueClass}`;
-    jobTh.style.width = "170px";
-    jobTh.dataset.level = val.level;
-    jobTh.dataset.positionName = val.positionName;
-    jobTh.dataset.positionNameNk = val.positionNameNk;
-    jobTh.dataset.prlOrg = val.prlOrg;
-    jobTh.dataset.responsibility = val.responsibility;
-    jobTh.dataset.sequence = val.sequence;
-    jobTh.dataset.unitCode = val.unitCode;
-
-    jobTh.innerHTML = `
-      <div class='jabatan-cell-outer-wrapper'>
-        <div class='jabatan-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom" title="${val.positionName}">
-          ${val.positionName} 
+    const valString = JSON.stringify(val).replace(/"/g, "&quot;");
+    const headerHTML = `
+      <th scope="col" class="jabatan-cell ${uniqueClass}" style="width:170px"
+        data-level="${val.level}"
+        data-position-name="${val.positionName}"
+        data-position-name-nk="${val.positionNameNk}"
+        data-prl-org="${val.prlOrg}"
+        data-responsibility="${val.responsibility}"
+        data-sequence="${val.sequence}"
+        data-unit-code="${val.unitCode}">
+        <div class='jabatan-cell-outer-wrapper'>
+          <div class='jabatan-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom" title="${val.positionName}">
+            ${val.positionName}
+          </div>
         </div>
-      </div>
-      <div>
-        <button class="dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-          <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li onclick="triggleDetailJob(${val.prlOrg})">
-            <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
-          </li>
-          <li><a class="dropdown-item"><img src="/assets/images/rasci/document.svg" alt="Filter Icon">Competency</a></li>
-          <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
-        </ul>
-      </div>
+        <div>
+          <button class="dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+            <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li onclick="triggleDetailJob(${valString})">
+              <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
+            </li>
+            <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
+          </ul>
+        </div>
+      </th>
     `;
-
-    headerRow.appendChild(jobTh);
+    dynamicHeaders += headerHTML;
   });
+
+  document.getElementById(
+    "table-header",
+  ).innerHTML = `<tr>${staticHeaders}${dynamicHeaders}</tr>`;
   initializeTooltips();
 }
-
 function loadTableBody(prosbisList) {
   const expandedRows = appState.idProsbis;
-  const jobTitleList = appState.resultJabatan;
   const visibleProsbis = prosbisList;
-  const rasciMapping = appState.resultRasciMapping || [];
   const isSearch = getState("isSearchMatrix");
   const idProsbisSelected = getState("idSearchProsbis");
   const tableBody = document.getElementById("table-body");
+  const draftRasciId = getState("draftRasciId");
+  const isMaster = draftRasciId === "master" || draftRasciId === null;
   if (!tableBody) return;
-  const fragment = document.createDocumentFragment();
-  visibleProsbis?.forEach((val, i) => {
+  let bodyContent = "";
+  visibleProsbis?.forEach((val) => {
     const levelClass =
       val.level && idProsbisSelected == val.indexNumber
         ? `level-${val.level} highlight`
         : val.level
         ? `level-${val.level}`
         : "";
-    const isExpanded = expandedRows.includes(val.indexNumber) ? "chevron-up" : "chevron-down";
-    const row = document.createElement("tr");
-    row.id = `row-${val.indexNumber}`;
-    row.classList.add("clusterize-cluster", levelClass);
-    row.innerHTML = `
-          <td scope="row" class="level-col" style="font-size:12px;font-weight: 500 !important;">
-            L${val.level}
-          </td>
-          <td class="index-col" style="text-align:left;font-size:12px;font-weight: 500 !important;"><span style="padding-left:5px;">${
-            val.indexNumber
-          }</span></td>
-          <td class="headcol" style="font-size:12px;font-weight: 500 !important;">
-           <div class="prosbis-cell-wrapper">
-              <div class="hierarchy-icon-wrapper">
-                ${
-                  isSearch == false && val.hasChild
-                    ? `<i data-feather="${isExpanded}" class="hierarchy-icon" id="icon-${val.indexNumber}"
-                    style="width:24px;" onclick="handleCollapse('${val.indexNumber}')"></i>`
-                    : ``
-                }
-              </div>
-              <div class="flex-fill prosbis-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip" title="${
+    const isExpanded = expandedRows.includes(val.indexNumber)
+      ? "chevron-up"
+      : "chevron-down";
+
+    const valString = JSON.stringify(val).replace(/"/g, "&quot;");
+    const hierarchyIcon =
+      isSearch == false && val.hasChild
+        ? `<div class="icon-wrapper" style="width:15px;height:15px;display:flex;align-items:center;justify-content:center;">
+         <i data-feather="${isExpanded}" id="icon-${val.indexNumber}" onclick="handleCollapse('${val.indexNumber}')" style="width:15px;height:15px;"></i>
+       </div>`
+        : ``;
+
+    bodyContent += `
+      <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass}">
+        <td scope="row" class="level-col" style="font-size:12px;font-weight: 500 !important;">
+          L${val.level}
+        </td>
+        <td class="index-col" style="text-align:left;font-size:12px;font-weight: 500 !important;">
+          <span style="padding-left:5px;">${val.indexNumber}</span>
+        </td>
+        <td class="headcol" style="font-size:12px;font-weight: 500 !important;">
+          <div class="prosbis-cell-wrapper">
+            <div class="hierarchy-icon-wrapper">${hierarchyIcon}</div>
+            <div class="flex-fill prosbis-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
+              title="${
                 val.description
-              }" onclick="onModalProsbis(${JSON.stringify(val).replace(/"/g, "&quot;")})">${val.description}</div>
-              <div class="ellipsis-menu prosbis-row-ellipsis">
-                <div class="dropright">
-                  <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
+              }" onclick="onModalProsbis(${valString})">${val.description}</div>
+            <div class="ellipsis-menu prosbis-row-ellipsis">
+              <div class="dropright">
+                <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
                   style="border: none; background: transparent; cursor: pointer;">
                   <i class="fas fa-ellipsis-v"></i>
-                  </button>
-                  <ul class="dropdown-menu " aria-labelledby="dropdownMenuButton">
-                    <li onclick="onModalProsbis(${JSON.stringify(val).replace(
-                      /"/g,
-                      "&quot;",
-                    )})"><a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a></li>
-                    <li onclick="sendDetailbp(${JSON.stringify(val).replace(
-                      /"/g,
-                      "&quot;",
-                    )})"><a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a></li>
-                    <li onclick="checkChildrenProsbis(${JSON.stringify(val).replace(
-                      /"/g,
-                      "&quot;",
-                    )})" ><a class="dropdown-item" style="color: red !important;"><img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete</a></li>
-                  </ul>
-                </div>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li onclick="onModalProsbis(${valString})">
+                    <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
+                  </li>
+                  <li onclick="sendDetailbp(${valString})" style="display: ${
+      isMaster ? "none" : "flex"
+    }">
+                    <a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a>
+                  </li>
+                  <li onclick="checkChildrenProsbis(${valString})" style="display: ${
+      isMaster ? "none" : "flex"
+    } ">
+                    <a class="dropdown-item" style="color: red !important;">
+                      <img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete
+                    </a>
+                  </li>
+                </ul>
               </div>
-           </div>
-          </td>
-        
-          `;
-    fragment.appendChild(row);
+            </div>
+          </div>
+        </td>
+      </tr>`;
   });
 
-  tableBody.appendChild(fragment);
-
-  // var clusterize = new Clusterize({
-  //   rows: bodyContent,
-  //   scrollId: "table-container",
-  //   contentId: "table-body",
-  // });
-  // const tableBody = document.getElementById("table-body");
+  tableBody.innerHTML = bodyContent;
   feather.replace();
   initializeTooltips();
 }
@@ -339,7 +404,9 @@ function getAllIndexNumbers() {
 }
 
 function getJobTitleData() {
-  const headerCells = document.querySelectorAll("#table-header tr .jabatan-cell");
+  const headerCells = document.querySelectorAll(
+    "#table-header tr .jabatan-cell",
+  );
   const jobData = [];
 
   headerCells.forEach((cell) => {
@@ -368,21 +435,29 @@ function getJobTitleData() {
 }
 
 function mapRasciCells(indexNumbers, positions) {
+  const draftRasciId = getState("draftRasciId");
+  const isMaster = draftRasciId === "master" || draftRasciId === null;
   indexNumbers.forEach((indexNumber) => {
     const row = getRowById(`row-${indexNumber}`);
     if (!row) {
       console.warn(`Baris dengan ID #row-${indexNumber} tidak ditemukan!`);
       return;
     }
-    row.querySelectorAll("td[data-index]").forEach((td) => td.remove());
+
+    const staticTds = Array.from(row.querySelectorAll("td")).filter(
+      (td) => !td.dataset.index,
+    );
+    let rowContent = staticTds.map((td) => td.outerHTML).join("");
+
     positions.forEach((value) => {
       let rasciIcons = "";
       let comments = [];
       if (value?.responsibility) {
-        const findNotation = value.responsibility.find((item) => item.indexNumber === indexNumber);
-
-        if (findNotation) {
-          switch (findNotation.notation) {
+        const notations = value.responsibility.filter(
+          (item) => item.indexNumber === indexNumber,
+        );
+        notations.forEach((notationItem) => {
+          switch (notationItem.notation) {
             case "R":
               rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
               break;
@@ -400,71 +475,162 @@ function mapRasciCells(indexNumbers, positions) {
               break;
           }
 
-          if (findNotation.comment) {
-            comments.push(`<li>${findNotation.notation}: ${findNotation.comment}</li>`);
+          if (notationItem.comment) {
+            comments.push(
+              `<li>${notationItem.notation}: ${notationItem.comment}</li>`,
+            );
           }
-        }
+        });
       }
 
       if (comments.length > 0) {
         const commentTooltip = `<ul>${comments.join("")}</ul>`;
         rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
       }
-      const tdElement = document.createElement("td");
-      tdElement.dataset.index = `${indexNumber}-${value.prlOrg}-${value.unitCode}`;
-      tdElement.innerHTML = `
-        <div class="rasci-container">
-          <div class="rasci-icons">${rasciIcons}</div>
-          <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon">
-        </div>
-      `;
-      row.appendChild(tdElement);
+
+      const rasciTd = `
+    <td data-index="${indexNumber}-${value.prlOrg}-${value.unitCode}">
+      <div class="rasci-container">
+        <div class="rasci-icons">${rasciIcons}</div>
+        <img  style="display: ${
+          isMaster ? "none" : "flex"
+        }" src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="handleEditNotationRow('${
+        value.prlOrg
+      }','${value.unitCode}', '${indexNumber}')">
+      </div>
+    </td>
+  `;
+      rowContent += rasciTd;
     });
+
+    row.innerHTML = rowContent;
   });
 
   initializeTooltips();
 }
 
 function initializeTooltips() {
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+  const tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+  );
+  tooltipTriggerList.map(
+    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+  );
 }
 function onModalProsbis(data) {
-  const draftidRasci = $("#dataSource-rasci").val();
-  let $select = $("#dataSource-rasci");
-  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
-  let selectedDraftSo = selectedOption.attr("data-draftso");
-  setState("dataDetailProsbis", { ...data, draftRasci: draftidRasci, draftSo: selectedDraftSo });
+  const draftSoId = getState("draftSoId");
+  const draftRasciId = getState("draftRasciId");
+  setState("dataDetailProsbis", {
+    ...data,
+    draftRasci: draftRasciId === "master" ? null : draftRasciId,
+    draftSo: draftSoId || null,
+  });
   detailsProsbis();
 }
 
 async function handleCollapse(id) {
-  const parentId = id;
-  const parentRow = document.getElementById(parentId);
-  const icon = document.getElementById(`icon-${id}`);
+  const parentId = id.toString();
+  const parentRow = document.getElementById(`row-${parentId}`);
+  const draftSoId = getState("draftSoId");
+  const selectedValue = getState("draftRasciId");
+  const isMaster = selectedValue === "master";
+  const draftRasciId = isMaster ? null : selectedValue;
 
-  if (parentRow) {
-    if (!appState.idProsbis.includes(parentId)) {
-      appState.idProsbis = [...appState.idProsbis, parentId.toString()];
-      appState.resetIdProsbis = appState.resetIdProsbis.filter((item) => !parentId.toString().includes(item));
-      const selectId = filterChild(appState.idProsbis, appState.resetIdProsbis);
-      const payload = { parentId: selectId.join(",") };
-      const resultMatrix = await fetchDataMatrix(payload);
-      resultAllData(resultMatrix?.data);
-    } else {
-      const listSelectedId = appState.idProsbis;
-      const index = appState.idProsbis.indexOf(parentId.toString());
-      appState.resetIdProsbis = [...appState.resetIdProsbis, parentId.toString()];
-      const idFiltered = filterArray(appState.resetIdProsbis, listSelectedId);
-      if (idFiltered && index > -1) appState.idProsbis.splice(index, 1);
-      const payload = { parentId: idFiltered.join(",") };
-      const resultMatrix = await fetchDataMatrix(payload);
-      resultAllData(resultMatrix?.data);
-    }
-
+  const icon = document.getElementById(`icon-${parentId}`);
+  if (icon) {
+    icon.setAttribute("data-feather", "loader");
     feather.replace();
+    setTimeout(() => {
+      const svgIcon = document.getElementById(`icon-${parentId}`);
+      if (svgIcon && svgIcon.tagName === "svg") {
+        svgIcon.classList.add("feather-loader");
+      }
+    }, 0);
   }
+
+  if (!parentRow) return;
+
+  const payloadProsbis = getState("payloadProsbis");
+  const payloadPosition = getState("payloadPosition");
+  const isExpanded = appState.idProsbis.includes(parentId);
+
+  const updateStatesAndRender = async (expandNumbers) => {
+    const payload = {
+      ...payloadProsbis,
+      draftRasciId,
+      expandNumber: expandNumbers,
+      row: 1,
+      rowSize: 15,
+    };
+    const resultMatrix = await fetchProsbisMatrix(payload);
+    if (!resultMatrix.success) {
+      const errorIcon = document.getElementById(`icon-${id}`);
+      if (errorIcon) {
+        errorIcon.setAttribute(
+          "data-feather",
+          isExpanded ? "chevron-down" : "chevron-up",
+        );
+        feather.replace();
+      }
+      return;
+    }
+    const indexNumbers = resultMatrix.data.map((val) => val.indexNumber);
+    const jobPayload = {
+      ...payloadPosition,
+      col: 1,
+      colSize: 10,
+      draftRasciId,
+      draftSoId: draftSoId,
+      indexNumber: indexNumbers,
+    };
+    const resultPosition = await fetchPositionMatrix(jobPayload);
+    setTimeout(() => {
+      loadTableBody(resultMatrix.data);
+      appendDynamicHeader(resultPosition.data);
+      mapRasciCells(indexNumbers, resultPosition.data);
+      setState("payloadProsbis", payload);
+      setState("payloadPosition", jobPayload);
+      setState("resultProsbis", resultMatrix.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultMatrix.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      setState("actionType", "BP_THEN_JOB");
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+      hideAllTooltips();
+    }, 100);
+  };
+
+  if (!isExpanded) {
+    // Expand logic
+    setState("idProsbis", [...appState.idProsbis, parentId]);
+    setState(
+      "resetIdProsbis",
+      appState.resetIdProsbis.filter((item) => item !== parentId),
+    );
+
+    const selectedIds = filterChild(
+      appState.idProsbis,
+      appState.resetIdProsbis,
+    );
+    await updateStatesAndRender(selectedIds);
+  } else {
+    // Collapse logic
+    const currentSelected = [...appState.idProsbis];
+    const indexToRemove = currentSelected.indexOf(parentId);
+
+    if (indexToRemove > -1) currentSelected.splice(indexToRemove, 1);
+
+    setState("resetIdProsbis", [...appState.resetIdProsbis, parentId]);
+    setState("idProsbis", currentSelected);
+
+    const filteredIds = filterArray(appState.resetIdProsbis, currentSelected);
+    await updateStatesAndRender(filteredIds);
+  }
+
+  feather.replace();
 }
+
 function filterChild(array, input) {
   const inputSet = new Set(input);
   return array.filter((item) => {
@@ -476,7 +642,10 @@ function filterArray(inputs, array) {
     return child.startsWith(parent + ".") || child === parent;
   }
   const result = array.filter((value) => {
-    return !inputs.some((input) => isDescendant(input, value)) && !inputs.includes(value);
+    return (
+      !inputs.some((input) => isDescendant(input, value)) &&
+      !inputs.includes(value)
+    );
   });
 
   return result.sort((a, b) => {
@@ -523,7 +692,11 @@ function traverse(data, filters) {
   }
   filters.forEach((filter) => {
     data.forEach((item) => {
-      if (item.indexGroup === filter && item.parentId === null && !addedItems.has(item.indexGroup)) {
+      if (
+        item.indexGroup === filter &&
+        item.parentId === null &&
+        !addedItems.has(item.indexGroup)
+      ) {
         result.push(item);
         addedItems.add(item.indexGroup);
         helper(item.indexGroup);
@@ -553,34 +726,145 @@ function traverse(data, filters) {
 }
 
 async function clearInput() {
-  appState.idProsbis = [];
-  appState.resetIdProsbis = [];
-  const resultMatrix = await fetchDataMatrix();
-  resultAllData(resultMatrix?.data);
-  setState("isSearchMatrix", false);
-  setState("idSearchProsbis", "");
-  setState("currentPageY", 0);
-  setState("currentPageX", 0);
-  setState("strorageProsbis", []);
-  setState("storageJabatan", []);
-  const tableHeader = document.getElementById("table-header");
-  const tableBody = document.getElementById("table-body");
-  tableHeader.innerHTML = "";
-  tableBody.innerHTML = "";
+  const draftRasciId = getState("draftRasciId");
+  const draftSoId = getState("draftSoId");
+  const spinner = document.getElementById("loadingClear");
+  const clearButton = document.getElementById("clearButton");
+  spinner.style.display = "inline-block";
+  setState("resultProsbis", []);
+  setState("resultJabatan", []);
+  setState("idProsbis", []);
+  setState("resetIdProsbis", []);
+  setState("currentPageY", 1);
+  setState("currentPageX", 1);
+  const result = await changeDataSource(draftRasciId, draftSoId);
+  if (result) {
+    spinner.style.display = "none";
+    clearButton.blur();
+    document.getElementById("inputText").value = "";
+    document.getElementById("inputSearchCompare").value = "";
+    handleCloseModal();
+    resetAllFilterRasci();
+    hideAllTooltips();
+  }
+}
+
+async function ChangeSourceDraft() {
+  const tableContainer = document.querySelector(".scrollable-table");
+  tableContainer.scrollTop = 0;
+  tableContainer.scrollLeft = 0;
+  setState("resultProsbis", []);
+  setState("resultJabatan", []);
+  setState("idProsbis", []);
+  setState("resetIdProsbis", []);
+  setState("currentPageY", 1);
+  setState("currentPageX", 1);
   document.getElementById("inputText").value = "";
   document.getElementById("inputSearchCompare").value = "";
   handleCloseModal();
   resetAllFilterRasci();
+  hideAllTooltips();
+}
+
+async function lastStateTableMatrix() {
+  const tableContainer = document.querySelector(".scrollable-table");
+  const payloadProsbis = getState("payloadProsbis");
+  const payloadPosition = getState("payloadPosition");
+  const actionType = getState("actionType");
+
+  const payload = {
+    ...payloadProsbis,
+    row: 1,
+    rowSize: 15,
+  };
+  const payloadJob = {
+    ...payloadPosition,
+    col: 1,
+    colSize: 10,
+  };
+
+  try {
+    if (actionType === "BP_THEN_JOB") {
+      const resultProsbis = await fetchProsbisMatrix(payload);
+      const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+      setState("resultProsbis", resultProsbis.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultProsbis.totalResult);
+      console.log("resultProsbis.totalResult", resultProsbis.totalResult);
+
+      setState("totalJob", resultPosition.totalResult);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+      if (resultPosition.data.length > 0) {
+        loadTableHeader(resultPosition.data);
+        loadTableBody(resultProsbis.data);
+        mapRasciCells(prosbisNumber, resultPosition.data);
+      }
+    } else if (actionType === "BP_ONLY") {
+      const resultProsbis = await fetchProsbisMatrix(payload);
+      setState("resultProsbis", resultProsbis.data);
+      setState("resultJabatan", []);
+      setState("totalProsbis", resultProsbis.totalResult);
+      setState("totalJob", 0);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+      if (resultProsbis.data.length > 0) {
+        loadTableBody(resultProsbis.data);
+      }
+    } else if (actionType === "POS_THEN_BP") {
+      const resultProsbis = await fetchProsbisMatrix(payload);
+      const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+      setState("resultProsbis", resultProsbis.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultProsbis.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+      if (resultPosition.data.length > 0) {
+        loadTableHeader(resultPosition.data);
+        loadTableBody(resultProsbis.data);
+        mapRasciCells(prosbisNumber, resultPosition.data);
+      }
+    }
+
+    tableContainer.scrollTop = 0;
+    tableContainer.scrollLeft = 0;
+
+    return true;
+  } catch (error) {
+    console.error("Error in lastStateTableMatrix:", error);
+    return false;
+  }
 }
 
 function sendDetailbp(data) {
-  setState("dataDetailProsbis", data);
-  onModalChoose("editProsbis");
+  const draftidRasci = $("#dataSource-rasci").val();
+  const draftName = $("#dataSource-rasci option:selected").text();
+  const dataSend = {
+    draftId: draftidRasci,
+    draftName: draftName,
+    draftSOId: "",
+    level: data.level,
+    indexNumber: data.indexNumber,
+    description: data.description,
+  };
+  setState("dataDetailProsbis", dataSend);
+  openModalEditBusinesspro();
 }
 function checkChildrenProsbis(data) {
   if (data.hasChild !== true) {
-    setState("dataDeleteProsbis", data);
-    onModalChoose("deleteProsbis");
+    const draftidRasci = $("#dataSource-rasci").val();
+    const draftName = $("#dataSource-rasci option:selected").text();
+    const dataSend = {
+      ...data,
+      draftId: draftidRasci,
+      draftName: draftName,
+      draftSOId: "",
+    };
+    setState("dataDeleteProsbis", dataSend);
+    openModalDeleteBusinesspro();
   } else {
     setTimeout(() => {
       swal({
@@ -618,17 +902,15 @@ async function handleSaveDeletebp() {
     draftId: dataDeleteProsbis.draftId,
     draftType: "Delete Business Process",
     draftName: dataDeleteProsbis.draftName,
-    parentId: dataDeleteProsbis.indexGroup,
+    parentId: dataDeleteProsbis.indexNumber,
   };
   const result = await submitDraftProsbis(payload);
   if (result.status === 200) {
     const modalDeleteBp = document.getElementById("modalDeleteBp");
     const modalDelete = bootstrap.Modal.getInstance(modalDeleteBp);
     document.getElementById("draftName").value = "";
-    if (modalDelete) {
-      modalDelete.hide();
-    }
-    setTimeout(() => {
+    const resultMatrix = await lastStateTableMatrix();
+    if (resultMatrix) {
       swal({
         title: "SUCCESS",
         icon: "success",
@@ -645,6 +927,9 @@ async function handleSaveDeletebp() {
         },
       }).then(async () => {
         spinner.style.display = "none";
+        if (modalDelete) {
+          modalDelete.hide();
+        }
         const payload = {
           Page: 1,
           PageSize: 5,
@@ -654,8 +939,7 @@ async function handleSaveDeletebp() {
         const IsNotEmpty = dataDraft.data.length;
         handleClickCard(IsNotEmpty);
         loadTableBodyDraft(dataDraft);
-        $("#pills-draft-tab").tab("show");
       });
-    }, 100);
+    }
   }
 }

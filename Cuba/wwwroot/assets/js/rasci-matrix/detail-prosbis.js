@@ -1,28 +1,30 @@
 const detailsProsbis = async () => {
-  console.log("cek");
   try {
-    const modal = new bootstrap.Modal(document.getElementById("modalBusinessPro"));
+    const modal = new bootstrap.Modal(
+      document.getElementById("modalBusinessPro"),
+    );
     modal.show();
     const dataDetailProsbis = getState("dataDetailProsbis");
-    console.log("dataDetailProsbis", dataDetailProsbis);
     const payload = {
       draftRasciId: dataDetailProsbis.draftRasci,
       draftSOId: dataDetailProsbis.draftSo,
     };
     const queryString = new URLSearchParams(payload).toString();
-    const result = await fetchRelatedJob(dataDetailProsbis.indexGroup, queryString);
-    console.log("result", result);
+    const result = await fetchRelatedJob(
+      dataDetailProsbis.indexNumber,
+      queryString,
+    );
     const dataJob = result.data.relatedPosition;
     const dataHierarchy = result.data.businessProcess;
     const bodyTitle = `
     <div class="mb-2" id="prosbis-title">
                     <h6 class="mb-2" style="font-weight: bold;">${dataDetailProsbis.description}</h6>
-                    <label>Level ${dataDetailProsbis.level} | Index ${dataDetailProsbis.indexGroup}</label>
+                    <label>Level ${dataDetailProsbis.level} | Index ${dataDetailProsbis.indexNumber}</label>
                 </div>
     `;
     document.getElementById("prosbis-title").innerHTML = bodyTitle;
     layoutTabProsbis(dataJob);
-    layoutTabHierarchy(dataHierarchy, dataDetailProsbis.indexGroup);
+    layoutTabHierarchy(dataHierarchy, dataDetailProsbis.indexNumber);
     layoutTabCompetency();
   } catch (error) {}
 };
@@ -34,7 +36,6 @@ const layoutTabProsbis = (data) => {
   let countC = 0;
   let countI = 0;
   let countComments = 0;
-  console.log("data", data);
   data.forEach((item) => {
     item.notation.forEach((note) => {
       switch (note.notation) {
@@ -133,12 +134,12 @@ const layoutTabProsbis = (data) => {
       })
       .join("")}`;
 
-  document.getElementById("prosbis-details-header").innerHTML = theadContent;
-  document.getElementById("prosbis-details-body").innerHTML = bodyContent;
+  document.getElementById("job-details-header").innerHTML = theadContent;
+  document.getElementById("job-details-body").innerHTML = bodyContent;
   document.getElementById("total-job").innerHTML = totalJob;
   initializeTooltips();
 };
-const layoutTabHierarchy = (data, indexGroup) => {
+const layoutTabHierarchy = (data, indexNumber) => {
   const theadContentHierarchy = `<tr>
   <th scope="col" style="width: 80px;text-align:center">Level</th>
   <th scope="col" style="width: 120px;text-align:left">Index</th>
@@ -147,11 +148,15 @@ const layoutTabHierarchy = (data, indexGroup) => {
   const bodyContentHierarchy = data
     .map((item) => {
       const levelClass =
-        indexGroup == item.indexGroup ? `level-${item.level} highlight` : item.level ? `level-${item.level}` : "";
+        indexNumber == item.indexNumber
+          ? `level-${item.level} highlight`
+          : item.level
+          ? `level-${item.level}`
+          : "";
       return `
       <tr class="clusterize-cluster ${levelClass}">
         <td class="level-col" style="text-align:center">L${item.level}</td>
-        <td class="level-col" style="text-align:left">${item.indexGroup}</td>
+        <td class="level-col" style="text-align:left">${item.indexNumber}</td>
         <td class="level-col" style="text-align:left">
         <div class="prosbis-cell-wrapper">
         ${item.description}
@@ -160,26 +165,30 @@ const layoutTabHierarchy = (data, indexGroup) => {
       </tr>`;
     })
     .join("");
-  document.getElementById("prosbis-hierarchy-header").innerHTML = theadContentHierarchy;
-  document.getElementById("prosbis-hierarchy-body").innerHTML = bodyContentHierarchy;
+  document.getElementById("prosbis-hierarchy-header").innerHTML =
+    theadContentHierarchy;
+  document.getElementById("prosbis-hierarchy-body").innerHTML =
+    bodyContentHierarchy;
 };
 
-const layoutTabCompetency = () => {
-  theadContentCompetency = `<tr>
-  <th scope="col" style="width: 50px">No</th>
-  <th scope="col" style="width: 240px">Skill Group</th>
-  <th scope="col" style="width: 240px">Sub Skill Group</th>
-  <th scope="col">Competency</th>
-</tr>`;
-  bodyContentCompetency = `<tr>
-<td></td>
-<td>Otto</td>
-<td>Otto</td>
-<td>Otto</td>
-</tr>`;
-  document.getElementById("prosbis-competencies-header").innerHTML = theadContentCompetency;
-  document.getElementById("prosbis-competencies-body").innerHTML = bodyContentCompetency;
-};
+// const layoutTabCompetency = () => {
+//   theadContentCompetency = `<tr>
+//   <th scope="col" style="width: 50px">No</th>
+//   <th scope="col" style="width: 240px">Skill Group</th>
+//   <th scope="col" style="width: 240px">Sub Skill Group</th>
+//   <th scope="col">Competency</th>
+// </tr>`;
+//   bodyContentCompetency = `<tr>
+// <td></td>
+// <td>Otto</td>
+// <td>Otto</td>
+// <td>Otto</td>
+// </tr>`;
+//   document.getElementById("prosbis-competencies-header").innerHTML =
+//     theadContentCompetency;
+//   document.getElementById("prosbis-competencies-body").innerHTML =
+//     bodyContentCompetency;
+// };
 
 const handleDetailDeletebp = () => {
   const dataDetailProsbis = getState("dataDetailProsbis");
@@ -220,13 +229,19 @@ const handleCheckSeriesLevel = (event) => {
 };
 
 const openSeiesOfProcess = () => {
-  const modal = new bootstrap.Modal(document.getElementById("ModalSeriesProses"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("ModalSeriesProses"),
+  );
   modal.show();
   const dataDetailProsbis = getState("dataDetailProsbis");
   const bodyTitle = `
     <div class="col-12">
-      <h6 class="mb-2" style="font-weight: bold;">${dataDetailProsbis.description}</h6>
-      <label>Level ${dataDetailProsbis.level} | Index ${dataDetailProsbis.indexGroup}</label>
+      <h6 class="mb-2" style="font-weight: bold;">${
+        dataDetailProsbis.description
+      }</h6>
+      <label>Level ${dataDetailProsbis.level} | Index ${
+    dataDetailProsbis.indexNumber
+  }</label>
       <hr/>
     </div>
     <div class="col-12 mb-3">
@@ -263,29 +278,52 @@ const applySeriesProses = async () => {
     const levelSeries = getState("levelSeries");
     const spinner = document.getElementById("applySeries");
     const dataDetailProsbis = getState("dataDetailProsbis");
+    const draftSoId = getState("draftSoId");
+    const draftRasciId = getState("draftRasciId");
     spinner.style.display = "inline-block";
-    console.log("levelSeries", levelSeries);
-    const payload = {
-      type: "seriesOfProcess",
-      busProsLevel: levelSeries,
-      parentId: dataDetailProsbis.indexGroup,
+    const payloadByBusiness = {
+      draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+      level: levelSeries,
+      indexNumber: [dataDetailProsbis.indexNumber],
+      expandNumber: [],
+      row: 1,
+      rowSize: 15,
     };
-    setState("idSearchProsbis", dataDetailProsbis.indexGroup);
-    const resultMatrix = await fetchDataMatrix(payload);
-    if (resultMatrix.status === 200) {
-      resultAllData(resultMatrix?.data);
-      setTimeout(() => {
-        spinner.style.display = "none";
-      }, 2000);
+    setState("idSearchProsbis", dataDetailProsbis.indexNumber);
+    const resultMatrix = await fetchProsbisMatrix(payloadByBusiness);
+    const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+    if (resultMatrix.success === true) {
+      const payloadJob = {
+        col: 1,
+        colSize: 10,
+        draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+        indexNumber: combineIndex,
+        prlOrg: [],
+        unitCode: [],
+        draftSoId: draftSoId || null,
+      };
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+
       const ModalSeriesProses = document.getElementById("ModalSeriesProses");
       const modal = bootstrap.Modal.getInstance(ModalSeriesProses);
       const modalBusinessPro = document.getElementById("modalBusinessPro");
       const modalProsbis = bootstrap.Modal.getInstance(modalBusinessPro);
       setState("isSearchMatrix", true);
       setState("levelSeries", []);
+      setState("payloadProsbis", payloadByBusiness);
+      setState("payloadPosition", payloadJob);
+      setState("actionType", "BP_THEN_JOB");
+      setState("resultProsbis", resultMatrix.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultMatrix.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      loadTableBody(resultMatrix.data);
+      appendDynamicHeader(resultPosition.data);
+      mapRasciCells(combineIndex, resultPosition.data);
       if (modal && modalProsbis) {
         modal.hide();
         modalProsbis.hide();
+        spinner.style.display = "none";
       }
     } else {
       setState("levelSeries", []);
@@ -298,21 +336,49 @@ const applySeriesProses = async () => {
 
 const showRasciMatrixBybp = async () => {
   const dataDetailProsbis = getState("dataDetailProsbis");
+  const draftSoId = getState("draftSoId");
+  const draftRasciId = getState("draftRasciId");
+  const spinner = document.getElementById("showRasci");
+  spinner.style.display = "inline-block";
   try {
-    const payloadProsbis = {
-      type: "bybusinessprocess",
-      parentId: dataDetailProsbis.indexGroup,
+    const payloadByBusiness = {
+      draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+      level: [],
+      indexNumber: [dataDetailProsbis.indexNumber],
+      expandNumber: [],
+      row: 1,
+      rowSize: 15,
     };
     try {
-      const resultMatrix = await fetchDataMatrix(payloadProsbis);
-      if (resultMatrix.status === 200) {
-        resultAllData(resultMatrix?.data);
+      const resultMatrix = await fetchProsbisMatrix(payloadByBusiness);
+      const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+      if (resultMatrix.success === true) {
+        const payloadJob = {
+          col: 1,
+          colSize: 10,
+          draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+          indexNumber: combineIndex,
+          prlOrg: [],
+          unitCode: [],
+          draftSoId: draftSoId,
+        };
+        const resultPosition = await fetchPositionMatrix(payloadJob);
         SelectedProsbisId = [];
+        setState("idSearchProsbis", "");
         const modalElement = document.getElementById("modalBusinessPro");
         const modal = bootstrap.Modal.getInstance(modalElement);
         setState("isSearchMatrix", true);
-        appState.isSearchMatrix = true;
-        if (modal) {
+        setState("payloadProsbis", payloadByBusiness);
+        setState("payloadPosition", payloadJob);
+        setState("resultProsbis", resultMatrix.data);
+        setState("resultJabatan", resultPosition.data);
+        setState("totalProsbis", resultMatrix.totalResult);
+        setState("totalJob", resultPosition.totalResult);
+        loadTableBody(resultMatrix.data);
+        appendDynamicHeader(resultPosition.data);
+        mapRasciCells(combineIndex, resultPosition.data);
+        if (modal && resultPosition.success === true) {
+          spinner.style.display = "none";
           modal.hide();
         }
       }

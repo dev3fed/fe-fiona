@@ -1,0 +1,71 @@
+<div style="padding:10px">
+    <style>
+        .custom-tab {
+            background-color: white;
+
+        }
+
+        .nav-link {
+            color: #595962;
+        }
+
+        .custom-tab.nav-pills .nav-link {
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 50px;
+            margin-right: 8px;
+            padding: 6px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .custom-tab.nav-pills .nav-link.active {
+            color: #006CA9;
+            background-color: #E6F0F6;
+            border-color: #006CA9;
+            font-weight: 600;
+        }
+
+        .custom-tab.nav-pills .nav-link:hover {
+            background-color: #f1f1f1;
+            color: #006CA9;
+            background-color: #E6F0F6;
+            border-color: #006CA9;
+        }
+    </style>
+
+    <ul class="nav nav-pills custom-tab" id="pills-warningtab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="pills-mandatory-tab" data-bs-toggle="pill" href="#pills-mandatory" role="tab"
+                aria-controls="pills-mandatory" aria-selected="true">
+                Generic Competency
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-technical-tab" data-bs-toggle="pill" href="#pills-technical" role="tab"
+                aria-controls="pills-technical" aria-selected="false">
+                Technical Competency
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pills-behavior-tab" data-bs-toggle="pill" href="#pills-behavior" role="tab"
+                aria-controls="pills-behavior" aria-selected="false">
+                Behavior Competency
+            </a>
+        </li>
+    </ul>
+
+    <partial name="~/Views/Competency/ModalDetailDictionary.cshtml" />
+    <div class="tab-content" id="pills-warningtabContent" style="margin-top: 15px;">
+        <div class="tab-pane fade show active" id="pills-mandatory" role="tabpanel"
+            aria-labelledby="pills-mandatory-tab">
+            <partial name="~/Views/Competency/mandatoryPage.cshtml" />
+        </div>
+        <div class="tab-pane fade" id="pills-technical" role="tabpanel" aria-labelledby="pills-technical-tab">
+            <partial name="~/Views/Competency/TechnicalPage.cshtml" />
+        </div>
+        <div class="tab-pane fade" id="pills-behavior" role="tabpanel" aria-labelledby="pills-behavior-tab">
+            <partial name="~/Views/Competency/behaviorPage.cshtml" />
+        </div>
+    </div>
+</div>

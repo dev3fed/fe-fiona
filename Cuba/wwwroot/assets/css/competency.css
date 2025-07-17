@@ -5,7 +5,9 @@
 
 /* Dropdown menu item styles */
 .dropdown-menu {
-  z-index: 999;
+  z-index: 9999999999 !important;
+  margin-left: 16px !important;
+  margin-top: -22px !important;
 }
 
 .dropdown-menu .dropdown-item {
@@ -24,6 +26,13 @@
 }
 
 /* Dropdown item styles */
+
+/* Dropdown button styles */
+.dropright {
+  cursor: pointer;
+  margin-right: 100px;
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -103,6 +112,22 @@
   background-color: #bdffbc;
 }
 
+.ellipsis-menu {
+  width: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ellipsis-menu.joblist-row-ellipsis .dropdown-menu {
+  left: 12px !important;
+  top: -8px !important;
+}
+
+.ellipsis-menu.joblist-row-ellipsis .dropdown-menu {
+  left: 12px !important;
+  top: -8px !important;
+}
+
 .joblist-cell-wrapper {
   display: flex;
   align-items: center;
@@ -117,8 +142,7 @@
 
 .custom-border-table {
   border-right: 1px solid #b0d1e4;
-  border-bottom: px solid #b0d1e4;
-  border-left: 1px solid #b0d1e4;
+  border-bottom: 1px solid #b0d1e4;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -127,7 +151,6 @@
 .custom-border-table td {
   border-right: 1px solid #b0d1e4;
   border-bottom: 1px solid #b0d1e4;
-  border-left: 1px solid #b0d1e4;
 }
 
 td,
@@ -200,6 +223,7 @@ th {
 /* Custom scrollbar styles */
 .scrollable-table {
   overflow-y: auto;
+  max-height: 430px;
 }
 
 .scrollable-table::-webkit-scrollbar {
@@ -236,4 +260,82 @@ th {
   width: 100%;
 }
 
+/* Sticky columns with borders */
+.competency-matrix .level-col {
+  width: 50px;
+  position: sticky;
+  text-align: center;
+  left: 0;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 500 !important;
+  border-right: 2px solid #b0d1e4;
+  background: #fff;
+}
+
+.competency-matrix .index-col {
+  width: 80px;
+  position: sticky;
+  text-align: center;
+  left: 50px;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 500 !important;
+  border-right: 1px solid #b0d1e4;
+  background: #fff;
+}
+
+.competency-matrix .headcol {
+  width: 350px;
+  position: sticky;
+  text-align: left;
+  text-wrap: wrap;
+  left: 130px;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 500 !important;
+  background: #fff;
+}
+
+.competency-matrix .head-cell {
+  z-index: 3;
+  position: sticky;
+  vertical-align: middle !important;
+  font-size: 12px !important;
+  top: 0;
+}
+.competency-matrix tr.highlight td {
+  /* background color green light */
+  background-color: #daf4fe !important;
+}
+
+#loader {
+  position: absolute;
+  top: 56%; /* Sesuaikan agar lebih ke bawah */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column; /* Ubah ke column agar teks di bawah spinner */
+  align-items: center; /* Pusatkan elemen secara horizontal */
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  z-index: 10;
+  pointer-events: none;
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.loading-text {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
 /* end Custom scrollbar styles */

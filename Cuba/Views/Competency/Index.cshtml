@@ -52,6 +52,33 @@
     #empty-competency {
         display: block;
     }
+
+    /* Custom scrollbar styles */
+    .scrollable-card {
+        max-height: 560px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 10px;
+    }
+
+    .scrollable-card::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-card::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-card::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-card::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
 </style>
 <div class="page-body">
     <div class="container-fluid">
@@ -85,7 +112,7 @@
                         <li class="breadcrumb-item active">Detail Draft</li>
                     </ol>
                 </div>
-                <div class="col-6" id="header-dictionarypage">
+                @* <div class="col-6" id="header-dictionarypage">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a asp-controller="HomePage" asp-action="Index">
@@ -97,7 +124,7 @@
                         <li class="breadcrumb-item">Competency</li>
                         <li class="breadcrumb-item active">Summary</li>
                     </ol>
-                </div>
+                </div> *@
             </div>
         </div>
     </div>
@@ -114,7 +141,7 @@
                 <partial name="~/Views/Competency/ModalRenameDraft.cshtml" />
                 <partial name="~/Views/Competency/DetailDraft.cshtml" />
             </div>
-            <div class="col-12" id="dictionary-page">
+            @* <div class="col-12" id="dictionary-page">
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
@@ -152,17 +179,25 @@
                         <!-- card footer end-->
                     </div>
                 </div>
-            </div>
+            </div> *@
             <div class="col-sm-12" id="main-competency">
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary" id="pills-competency-tabcontent" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" id="pills-kkj-tab" data-bs-toggle="pill"
-                                    href="#pills-kkj" role="tab" aria-controls="pills-kkj"
-                                    aria-selected="true">Requirement (KKJ)</a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-summary-tab" data-bs-toggle="pill"
+                            <li class="nav-item"><a class="nav-link active" id="pills-summary-tab" data-bs-toggle="pill"
                                     href="#pills-summary" role="tab" aria-controls="pills-summary"
                                     aria-selected="false">Summary
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-compreq-tab" data-bs-toggle="pill"
+                                    href="#pills-compreq" role="tab" aria-controls="pills-compreq"
+                                    aria-selected="false">Competency Requirement
+                                </a></li>
+                            <li class="nav-item"><a class="nav-link " id="pills-kkj-tab" data-bs-toggle="pill"
+                                    href="#pills-kkj" role="tab" aria-controls="pills-kkj"
+                                    aria-selected="true">Competency Model</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-dictionary-tab" data-bs-toggle="pill"
+                                    href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
+                                    aria-selected="false">Dictionary
                                 </a></li>
                             <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
                                     href="#pills-draft" role="tab" aria-controls="pills-draft"
@@ -178,8 +213,23 @@
                                 </a></li>
                         </ul>
                         <div class="tab-content" id="pills-competency-tabcontent">
-                            <div class="tab-pane fade show active" id="pills-kkj" role="tabpanel"
-                                aria-labelledby="pills-kkj-tab">
+                            <div class="tab-pane fade show active" id="pills-summary" role="tabpanel"
+                                aria-labelledby="pills-summary-tab">
+                                <div class="card-body scrollable-card" style="padding:12px 5px 15px 5px !important;">
+                                    <div class="row">
+                                        <partial name="~/Views/Competency/SummaryPage.cshtml" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-compreq" role="tabpanel"
+                                aria-labelledby="pills-compreq-tab">
+                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <partial name="~/Views/Competency/RequirementPage.cshtml" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="pills-kkj" role="tabpanel" aria-labelledby="pills-kkj-tab">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -194,11 +244,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-summary" role="tabpanel"
-                                aria-labelledby="pills-summary-tab">
+                            <div class="tab-pane fade" id="pills-dictionary" role="tabpanel"
+                                aria-labelledby="pills-dictionary-tab">
                                 <div class="card-body" style="padding:12px 5px 15px 5px !important">
                                     <div class="row">
-                                        <partial name="~/Views/Competency/SummaryPage.cshtml" />
+                                        <partial name="~/Views/Competency/DictionaryPage.cshtml" />
                                     </div>
                                 </div>
                             </div>
@@ -239,7 +289,7 @@
     <script>
         const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-            const token = localStorage.getItem("token");
+                                                                                                                                                                                                        const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->
@@ -252,11 +302,16 @@
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
     <script src="../assets/js/competency/store.js"></script>
+    <script src="../assets/js/competency/endpoint.js"></script>
     <script src="../assets/js/competency/competeny-list.js"></script>
+    <script src="../assets/js/competency/proficiency-level.js"></script>
+    <script src="../assets/js/competency/detail-competency.js"></script>
     <script src="../assets/js/competency/scroll-table.js"></script>
     <script src="../assets/js/competency/competency-draft.js"></script>
     <script src="../assets/js/competency/detail-draft.js"></script>
     <script src="../assets/js/competency/dictionary-list.js"></script>
+    <script src="../assets/js/competency/detail-position.js"></script>
+    <script src="../assets/js/competency/add-competency.js"></script>
 
 
 

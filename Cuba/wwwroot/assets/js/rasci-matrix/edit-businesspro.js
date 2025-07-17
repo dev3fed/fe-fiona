@@ -1,6 +1,8 @@
 // start section add notation by column row
 function openModalEditBusinesspro() {
-  const modal = new bootstrap.Modal(document.getElementById("modalEditBusinesspro"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("modalEditBusinesspro"),
+  );
   modal.show();
   const dataDetailProsbis = getState("dataDetailProsbis");
   const formContent = `
@@ -22,7 +24,7 @@ function openModalEditBusinesspro() {
         <div >
             <label class="form-label" style="width:25%">Business Process Index</label>
              <label> : </label>
-        <b class="form-label">${dataDetailProsbis.indexGroup}</b>
+        <b class="form-label">${dataDetailProsbis.indexNumber}</b>
         </div>
       </div>
      <div class="col-12 mt-2">
@@ -52,19 +54,18 @@ async function handleEditbp() {
     draftId: dataDetailProsbis.draftId,
     draftType: "Edit Business Process",
     draftName: dataDetailProsbis.draftName,
-    parentId: dataDetailProsbis.indexGroup,
+    parentId: dataDetailProsbis.indexNumber,
     businessProcessName: prosbisName,
   };
-  console.log("payload", payload);
   const result = await submitDraftProsbis(payload);
   if (result.status === 200) {
-    const modalEditBusinesspro = document.getElementById("modalEditBusinesspro");
+    const modalEditBusinesspro = document.getElementById(
+      "modalEditBusinesspro",
+    );
     const modalEditbp = bootstrap.Modal.getInstance(modalEditBusinesspro);
     document.getElementById("draftName").value = "";
-    if (modalEditbp) {
-      modalEditbp.hide();
-    }
-    setTimeout(() => {
+    const resultMatrix = await lastStateTableMatrix();
+    if (resultMatrix) {
       swal({
         title: "SUCCESS",
         icon: "success",
@@ -81,18 +82,18 @@ async function handleEditbp() {
         },
       }).then(async () => {
         spinner.style.display = "none";
+        if (modalEditbp) {
+          modalEditbp.hide();
+        }
         const payload = {
           Page: 1,
           PageSize: 5,
         };
         const queryString = new URLSearchParams(payload).toString();
         const dataDraft = await fetchDraftProsbis(queryString);
-        const IsNotEmpty = dataDraft.data.length;
-        handleClickCard(IsNotEmpty);
         loadTableBodyDraft(dataDraft);
-        $("#pills-draft-tab").tab("show");
       });
-    }, 100);
+    }
   }
 }
 

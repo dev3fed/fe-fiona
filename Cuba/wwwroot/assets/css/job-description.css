@@ -457,3 +457,37 @@ form:invalid + button {
   line-height: 16.8px;
   letter-spacing: 0%;
 }
+
+/* .tableRasciSimilarities {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  margin-top: 20px;
+}
+
+.tableRasciSimilarities td {
+  padding: 12px;
+  border: 1px solid #b0d1e4;
+} */
+
+.tableRasciSimilarities thead {
+  border: 1px solid #e6f0f6 !important;
+}
+.tableRasciSimilarities thead th {
+  background-color: #e6f0f6;
+  border-bottom: 1px solid #e6f0f6 !important;
+  padding: 10px 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: #006ca9;
+}
+.tableRasciSimilarities tbody {
+  border: 1px solid #e6f0f6 !important;
+}
+.tableRasciSimilarities tbody tr td {
+  font-weight: 400;
+  font-size: 12px;
+  background-color: #fff;
+  padding: 8px;
+}

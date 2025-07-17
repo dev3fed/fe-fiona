@@ -13,7 +13,9 @@
 
 /* Dropdown menu item styles */
 .dropdown-menu {
-  z-index: 999;
+  z-index: 9999999999 !important;
+  margin-left: 14px !important;
+  margin-top: -18px !important;
 }
 
 .dropdown-menu .dropdown-item {
@@ -382,7 +384,7 @@ th {
 /* Custom scrollbar styles */
 .scrollable-table {
   overflow: auto;
-  max-height: 470px;
+  max-height: 430px;
 }
 .clusterize-content tr {
   border-bottom: 1px solid #ddd;
@@ -537,6 +539,26 @@ th {
     transform: rotate(0deg);
   }
   to {
+    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+  }
+}
+
+/* Feather loader for expand table business process */
+.feather-loader {
+  animation: rotate-center 1s linear infinite;
+  transform-origin: center center;
+  display: block;
+  margin: auto;
+}
+@keyframes rotate-center {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
     transform: rotate(360deg);
   }
 }

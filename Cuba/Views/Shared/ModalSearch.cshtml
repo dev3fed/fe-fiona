@@ -71,9 +71,6 @@
     }
 
     /* Custom scrollbar styles */
-    .scrollable-tbl-search {
-        overflow-y: auto;
-    }
 
     .scrollable-tbl-search::-webkit-scrollbar {
         width: 10px;
@@ -127,9 +124,13 @@
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
                         onclick="handleCloseModal()"><i class="icon-arrow-left"></i>
                         Back</button>
-                    <button class="btn btn-primary" type="button" id="apply-search" disabled onclick="applySearch()">
-                        <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon" style="margin-right: 8px;">
-                        Apply
+                    <button id="apply-search" class="btn btn-primary" type="button" disabled onclick="applySearch()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="applySearch" role="status"></div>
+                            <span class="btn-text"> <img src="~/assets/images/rasci/incon_success.svg" alt="Filter Icon"
+                                    style="margin-right: 8px;"> Apply</span>
+                        </div>
                     </button>
                 </div>
             </div>

@@ -53,7 +53,7 @@ $(document).ready(function () {
         localStorage.setItem("token", token);
 
         // Redirect after login
-        window.location.href = "/HomePage/Index";
+        window.location.href = `${baseUrl}HomePage/Index`;
       } else {
         showAlert(result.message);
       }
