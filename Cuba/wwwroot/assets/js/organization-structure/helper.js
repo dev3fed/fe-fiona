@@ -1377,10 +1377,10 @@ async function modalJobPopup(params) {
   $("#modalPositionName").text(checkValue(data?.positionName));
   $("#modalOrgPositionName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
 
-  $("#modalDirectReportOrgUnitId").text(checkValue(data.directReportCode));
-  $("#modalDirectReportOrgUnitName").text(checkValue(data.directReportName));
-  $("#modalDirectReportId").text(checkValue(data.parentCode));
-  $("#modalDirectReportName").text(checkValue(data.parentName));
+  $("#modalDirectReportOrgUnitId").text(checkValue(data.parentCode));
+  $("#modalDirectReportOrgUnitName").text(checkValue(data.parentName));
+  $("#modalDirectReportId").text(checkValue(data.directReportCode));
+  $("#modalDirectReportName").text(checkValue(data.directReportName));
 
   $("#modalDirectorate").text(checkValue(data?.directorateName));
   $("#modalFunction").text(checkValue(data?.functionName));
@@ -1423,6 +1423,8 @@ async function modalJobPopup(params) {
   if (data?.isBasket) {
     $("#positionListCard, #basketIncumbent").show();
     $("#nonBasketIncumbent").hide();
+    $(".no-basket").hide();
+    // $("#positionListCard, #basketIncumbent").hide();
 
     // Render incumbents table
     // data?.incumbents make unique by item.personCode
@@ -1432,6 +1434,15 @@ async function modalJobPopup(params) {
     console.log("incumbents unique", data.incumbents);
     data.incumbents = data.incumbents.sort((a, b) => a.personCode.localeCompare(b.personCode));
     console.log("incumbents", data.incumbents);
+
+    // data?.positionList make unique by item.positionCode item.positionName and item.prlOrg
+    data.positionList = data.positionList.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg)
+    );
+    console.log("positionList unique", data.positionList);
+    data.positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
+    console.log("positionList", data.positionList);
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
@@ -1466,7 +1477,9 @@ async function modalJobPopup(params) {
   } else {
     // alert("masuk non basket");
     $("#nonBasketIncumbent").show();
-    $(".no-basket, #positionListCard, #basketIncumbent").hide();
+    $(".no-basket").show();
+    $("#positionListCard, #basketIncumbent").hide();
+
     $("#incumbentId").text(data?.incumbents?.[0]?.personCode ?? "-");
     $("#incumbentName").text(data?.incumbents?.[0]?.personName ?? "Vacant");
     $("#prlPlanComp").text(data?.incumbents?.[0]?.prlPlan ?? "Vacant");

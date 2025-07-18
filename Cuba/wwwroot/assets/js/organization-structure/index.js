@@ -18,7 +18,7 @@ async function initializeHelper(data) {
   });
 
   helperOrgTree(dataChart.data);
-  // helperOrgChart(true, "os-container", dataChart.data, true);
+  helperOrgChart(true, "os-container", dataChart.data, true);
 
   // helperOrgChart(true, "os-container", asik2, true);
   // helperOrgChartTester(true, "os-container", test, true);
