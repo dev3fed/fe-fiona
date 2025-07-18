@@ -13,11 +13,16 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
 <<<<<<< HEAD
+      "applicationUrl": "http://localhost:5095",
+      // "applicationUrl": "http://localhost:5095",
+=======
+<<<<<<< HEAD
       "applicationUrl": "https://lszzm0wz-5095.asse.devtunnels.ms",
       // "applicationUrl": "https://lszzm0wz-5095.asse.devtunnels.ms",
 =======
       "applicationUrl": "http://localhost:5086",
 >>>>>>> 5c3a483887f397fbe34b62006df5093e1cdbe6f0
+>>>>>>> f82b658dc1ba2eeee6bb1d249cfbedac2d654bf0
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -27,10 +32,14 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
 <<<<<<< HEAD
+      "applicationUrl": "http://localhost:5095",
+=======
+<<<<<<< HEAD
       "applicationUrl": "https://lszzm0wz-5095.asse.devtunnels.ms",
 =======
       "applicationUrl": "http://localhost:5086",
 >>>>>>> 5c3a483887f397fbe34b62006df5093e1cdbe6f0
+>>>>>>> f82b658dc1ba2eeee6bb1d249cfbedac2d654bf0
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
