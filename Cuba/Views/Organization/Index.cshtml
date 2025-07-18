@@ -44,16 +44,14 @@
     }
 
     @* class edit *@
-    [data-n-id].edit rect {
-        @* fill: #fff3cd;
-        stroke: #ffc107; *@
+    @* [data-n-id].edit rect {
         fill: #e6f6fe;
         stroke: #03a9f4;
     }
     [data-n-id].create rect {
         fill: #e6f6fe;
         stroke: #03a9f4;
-    }
+    } *@
     [data-n-id].update rect {
         fill: #e6f6fe;
         stroke: #03a9f4;
@@ -121,7 +119,7 @@
             
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
-                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
+                        <ul class="nav nav-tabs nav-primary d-none" id="pills-warningtab" role="tablist">
                             <li class="nav-item"><a class="nav-link active" id="pills-chart" data-bs-toggle="pill"
                                     href="#chart" role="tab" aria-controls="pills-matrix"
                                     aria-selected="true">Chart</a></li>
@@ -161,7 +159,7 @@
                                             @* <button class="btn btn-primary w-100" type="button" id="searchOrgNodeButton">Search</button> *@
                                         @* </div> *@
                                         <div class="col-6" style="margin-bottom: 4px;align-self: end; justify-content: end;text-align:end">
-                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createDraft">
+                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button" id="createDraft">
                                                 <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Draft
                                             </button>
                                             <button class="btn btn-primary me-2 btn-icon" type="button" id="viewOrgTree">
@@ -170,13 +168,13 @@
                                                         style="margin-top: -1px;">
                                                 View Org Tree
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="designCost">
+                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button" id="designCost">
                                                 <img
                                                         src="~/assets/images/rasci/design-cost.svg" alt="Filter Icon" class="pr-2"
                                                         style="margin-top: -1px;">
                                                 Design Cost
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createJob">
+                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button" id="createJob">
                                                 <img
                                                         src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2"
                                                         style="margin-top: -1px;">
@@ -185,20 +183,14 @@
                                         </div>
                                         <div class="col-5 m-t-10 p-l-15">
                                             <div class="d-flex gap-3" id="labelChart" style="display: none !important;">
-                                            @* span *@
-                                            <div class="d-flex gap-2 align-items-center align-self-center"> 
-                                                <div class="square bg-primary-outline-custom"></div>
-                                                <span>New / Edited Position</span>
-                                            </div>
-                                            @* <div class="d-flex gap-2 align-items-center align-self-center"> 
-                                                <div class="square bg-warning-outline-custom"></div>
-                                                <span>Edited Position</span>
-                                            </div> *@
-                                            <div class="d-flex gap-2 align-items-center align-self-center"> 
-                                                <div class="square bg-danger-outline-custom"></div>
-                                                <span>Deleted Position</span>
-                                            </div>
-                                                
+                                                @* <div class="d-flex gap-2 align-items-center align-self-center d-none"> 
+                                                    <div class="square bg-primary-outline-custom"></div>
+                                                    <span>New / Edited Position</span>
+                                                </div>
+                                                <div class="d-flex gap-2 align-items-center align-self-center d-none""> 
+                                                    <div class="square bg-danger-outline-custom"></div>
+                                                    <span>Deleted Position</span>
+                                                </div> *@
                                             </div>
                                         </div>
                                         <div class="col-12 mt-2">

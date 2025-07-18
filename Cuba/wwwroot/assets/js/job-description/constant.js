@@ -3,30 +3,12 @@ const url = {
   "organization-structure": "api/organization-structure",
   "job-description": "api/job-description",
 };
-const tabArray = [
-  "inputAttribute",
-  "inputSubordinate",
-  "inputSgSsg",
-  "preview",
-];
+const tabArray = ["inputAttribute", "inputSubordinate", "inputSgSsg", "preview"];
 const tabArrayIndex = ["chart", "draft", "2", "3"];
 let statusAction = "add";
 let dataAvailable = true;
 const token = localStorage.getItem("token");
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const urlParams = new URLSearchParams(window.location.search);
 let helperId = "";
 const uuid = {
@@ -121,10 +103,7 @@ const dataJobDesc = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: [
-          "Laporan implementasi tidak lanjut hasil audit;",
-          "Kelengkapan data dan dokumen untuk proses audit.",
-        ],
+        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
       },
       {
         id: 7,
@@ -153,17 +132,13 @@ const dataJobDesc = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: [
-          "Terlaksananya pengelolaan data;",
-          "Tersedianya hasil pengolahan dan penyajian data. ",
-        ],
+        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang:
-          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -774,23 +749,16 @@ const dataJobDescCompare = [
       },
       {
         id: 4,
-        responsible:
-          "Mengarahkan, memonitor dan mengevaluasi pengelolaan perizinan terkait Izin Niaga Umum (INU).",
-        output: [
-          "Terlaksananya pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU).",
-        ],
-        lead: [
-          "Tingkat kesesuaian dan efektivitas pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU).",
-        ],
+        responsible: "Mengarahkan, memonitor dan mengevaluasi pengelolaan perizinan terkait Izin Niaga Umum (INU).",
+        output: ["Terlaksananya pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU)."],
+        lead: ["Tingkat kesesuaian dan efektivitas pengelolaan kegiatan perizinan terkait Izin Niaga Umum (INU)."],
       },
       {
         id: 5,
         responsible:
           "Mengarahkan, memonitor dan mengevaluasi kegiatan pengelolaan laporan perusahaan terkait pemenuhan data kebutuhan regulatory report.",
         output: ["Terlaksananya pemenuhan data kebutuhan regulatory report."],
-        lead: [
-          "Tingkat akurasi dan kesesuaian pemenuhan data kebutuhan regulatory report.",
-        ],
+        lead: ["Tingkat akurasi dan kesesuaian pemenuhan data kebutuhan regulatory report."],
       },
     ],
     tugasUmum: [
@@ -854,10 +822,7 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: [
-          "Laporan implementasi tidak lanjut hasil audit;",
-          "Kelengkapan data dan dokumen untuk proses audit.",
-        ],
+        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
       },
       {
         id: 7,
@@ -886,17 +851,13 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: [
-          "Terlaksananya pengelolaan data;",
-          "Tersedianya hasil pengolahan dan penyajian data. ",
-        ],
+        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang:
-          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -928,16 +889,12 @@ const dataJobDescCompare = [
       {
         id: 3,
         internal: "Direktorat/Fungsi lain",
-        aktivitas: [
-          "Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan.",
-        ],
+        aktivitas: ["Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan."],
       },
       {
         id: 4,
         internal: "Fungsi di Direktorat SDM",
-        aktivitas: [
-          "Koordinasi terkait pelaporan operasional dan program kerja perusahaan.",
-        ],
+        aktivitas: ["Koordinasi terkait pelaporan operasional dan program kerja perusahaan."],
       },
       {
         id: 5,
@@ -951,18 +908,14 @@ const dataJobDescCompare = [
       {
         id: 6,
         internal: "Internal Audit",
-        aktivitas: [
-          "Koordinasi terkait temuan-temuan yang mempunyai implikasi terhadap opini perusahaan.",
-        ],
+        aktivitas: ["Koordinasi terkait temuan-temuan yang mempunyai implikasi terhadap opini perusahaan."],
       },
     ],
     relation: [
       {
         id: 1,
         eksternal: "Anak Perusahaan dan Subholding lainnya",
-        aktivitas: [
-          "Koordinasi terkait penyediaan data dan informasi yang bersifat material.",
-        ],
+        aktivitas: ["Koordinasi terkait penyediaan data dan informasi yang bersifat material."],
       },
       {
         id: 2,
@@ -973,8 +926,7 @@ const dataJobDescCompare = [
       },
       {
         id: 3,
-        eksternal:
-          "Seluruh Stakeholder (Pemerintah, legislatif, judiciary, NGO, TNI, Polri)",
+        eksternal: "Seluruh Stakeholder (Pemerintah, legislatif, judiciary, NGO, TNI, Polri)",
         aktivitas: [
           "Koordinasi terkait sosialisasi kegiatan perusahaan/program perusahaan, pembentukan opini, pendekatan, mediasi dan permintaan kerja sama.",
         ],
@@ -1250,10 +1202,7 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: [
-          "Laporan implementasi tidak lanjut hasil audit;",
-          "Kelengkapan data dan dokumen untuk proses audit.",
-        ],
+        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
       },
       {
         id: 7,
@@ -1282,17 +1231,13 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: [
-          "Terlaksananya pengelolaan data;",
-          "Tersedianya hasil pengolahan dan penyajian data. ",
-        ],
+        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang:
-          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -1340,10 +1285,7 @@ const dataJobDescCompare = [
       {
         id: 5,
         internal: "Legal",
-        aktivitas: [
-          "Koordinasi terkait anggaran dasar perusahaan",
-          "Koordinasi terkait produk-produk hukum terkait",
-        ],
+        aktivitas: ["Koordinasi terkait anggaran dasar perusahaan", "Koordinasi terkait produk-produk hukum terkait"],
       },
     ],
     relation: [
@@ -1357,9 +1299,7 @@ const dataJobDescCompare = [
       {
         id: 2,
         eksternal: "Anak Perusahaan dan Subholding lainnya",
-        aktivitas: [
-          "Koordinasi terkait penyediaan data dan informasi yang bersifat material",
-        ],
+        aktivitas: ["Koordinasi terkait penyediaan data dan informasi yang bersifat material"],
       },
       {
         id: 3,
@@ -1533,8 +1473,7 @@ const dataJobDescCompare = [
     tugasHa: [
       {
         id: 1,
-        responsible:
-          "Mengarahkan, memonitor dan mengevaluasi penyusunan rencana dan strategi CSR & SMEPP.",
+        responsible: "Mengarahkan, memonitor dan mengevaluasi penyusunan rencana dan strategi CSR & SMEPP.",
         output: [
           "Tersedianya strategi CSR & SMEPP perusahaan",
           "Terlaksananya social mapping",
@@ -1547,8 +1486,7 @@ const dataJobDescCompare = [
       },
       {
         id: 2,
-        responsible:
-          "Mengarahkan, memonitor dan mengevaluasi proses implementasi program CSR & SMEPP.",
+        responsible: "Mengarahkan, memonitor dan mengevaluasi proses implementasi program CSR & SMEPP.",
         output: [
           "Tersedianya usulan mitra program CSR dan/atau SMEPP",
           "Tersedianya laporan implementasi program CSR & SMEPP",
@@ -1562,10 +1500,7 @@ const dataJobDescCompare = [
         id: 3,
         responsible:
           "Mengarahkan, memonitor dan mengevaluasi proses koordinasi dan pengawasan pelaksanaan CSR & SMEPP.",
-        output: [
-          "Terlaksananya pengawasan aktivitas CSR & SMEPP",
-          "Tersedianya laporan pelaksanaan CSR & SMEPP",
-        ],
+        output: ["Terlaksananya pengawasan aktivitas CSR & SMEPP", "Tersedianya laporan pelaksanaan CSR & SMEPP"],
         lead: [
           "Tingkat akurasi dan kesesuaian pengawasan aktivitas CSR & SMEPP",
           "Tingkat akurasi, kelengkapan dan ketepatan waktu laporan pengawasan CSR & SMEPP",
@@ -1634,10 +1569,7 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: [
-          "Laporan implementasi tidak lanjut hasil audit;",
-          "Kelengkapan data dan dokumen untuk proses audit.",
-        ],
+        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
       },
       {
         id: 7,
@@ -1666,17 +1598,13 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: [
-          "Terlaksananya pengelolaan data;",
-          "Tersedianya hasil pengolahan dan penyajian data. ",
-        ],
+        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang:
-          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -1728,14 +1656,11 @@ const dataJobDescCompare = [
       {
         id: 2,
         eksternal: "Pemerintah Daerah Setempat/Instansi Terkait",
-        aktivitas: [
-          "Koordinasi terkait perijinan dan koordinasi pelaksanaan program.",
-        ],
+        aktivitas: ["Koordinasi terkait perijinan dan koordinasi pelaksanaan program."],
       },
       {
         id: 3,
-        eksternal:
-          "LSM, Lembaga Profesional dan Perguruan Tinggi/Riset/Konsultan",
+        eksternal: "LSM, Lembaga Profesional dan Perguruan Tinggi/Riset/Konsultan",
         aktivitas: [
           "Kerjasama terkait evaluasi, monitoring, pelatihan pendampingan, dan bentuk pembinaan usaha kecil lainnya.",
         ],
@@ -1743,9 +1668,7 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Lembaga Hukum",
-        aktivitas: [
-          "Kerjasama terkait pendampingan bantuan hukum dan advokasi.",
-        ],
+        aktivitas: ["Kerjasama terkait pendampingan bantuan hukum dan advokasi."],
       },
       {
         id: 5,
@@ -1817,8 +1740,7 @@ const dataJobDescCompare = [
       },
       {
         id: "2",
-        komtekSpesifikName:
-          "Community Involvement and Development Program Planning & Design",
+        komtekSpesifikName: "Community Involvement and Development Program Planning & Design",
         level: 3,
       },
       {
@@ -1833,8 +1755,7 @@ const dataJobDescCompare = [
       },
       {
         id: "5",
-        komtekSpesifikName:
-          "Community Involvement and Development Project Management",
+        komtekSpesifikName: "Community Involvement and Development Project Management",
         level: 3,
       },
       {
@@ -1922,14 +1843,8 @@ const dataJobDescCompare = [
         id: 1,
         responsible:
           "Melakukan penyusunan sales planning produk gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Lahat.",
-        output: [
-          "Sales forecast (pragnosa revenue);",
-          "Sales goals (target, strategi dan rencana penjualan).",
-        ],
-        lead: [
-          "Tersedianya sales forecast;",
-          "Tersedianya sales goals untuk masing-masing channel.",
-        ],
+        output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
+        lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
       },
       {
         id: 2,
@@ -1951,9 +1866,7 @@ const dataJobDescCompare = [
           "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
           "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
         ],
-        lead: [
-          "Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan.",
-        ],
+        lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
       },
       {
         id: 4,
@@ -1964,9 +1877,7 @@ const dataJobDescCompare = [
           "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
           "Pelaksanaan proses peluang channel baru.",
         ],
-        lead: [
-          "Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel.",
-        ],
+        lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
       },
       {
         id: 5,
@@ -2017,9 +1928,7 @@ const dataJobDescCompare = [
         responsible:
           "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Lahat.",
         output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-        lead: [
-          "Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder.",
-        ],
+        lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
       },
     ],
     tugasUmum: [
@@ -2065,16 +1974,12 @@ const dataJobDescCompare = [
       {
         id: 2,
         internal: "Region Manager Reliability & Project Development ",
-        aktivitas: [
-          "Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas.",
-        ],
+        aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas."],
       },
       {
         id: 3,
         internal: "Region Manager Supply and Distribution",
-        aktivitas: [
-          "Koordinasi terkait keandalan pasokan gas ke lembaga penyalur.",
-        ],
+        aktivitas: ["Koordinasi terkait keandalan pasokan gas ke lembaga penyalur."],
       },
       {
         id: 4,
@@ -2104,16 +2009,12 @@ const dataJobDescCompare = [
       {
         id: 1,
         eksternal: "DPR/DPRD",
-        aktivitas: [
-          "Koordinasi/hearing terkait situasi terkini pengelolaan gas.",
-        ],
+        aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan gas."],
       },
       {
         id: 2,
         eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-        aktivitas: [
-          "Koordinasi terkait perizinan dan pengawasan penyaluran gas.",
-        ],
+        aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran gas."],
       },
       {
         id: 3,
@@ -2123,16 +2024,12 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Hiswana Migas",
-        aktivitas: [
-          "Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur.",
-        ],
+        aktivitas: ["Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur."],
       },
       {
         id: 5,
         eksternal: "BPK/Kementrian Keuangan",
-        aktivitas: [
-          "Koordinasi terkait pemeriksaan laporan penyaluran gas PSO.",
-        ],
+        aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran gas PSO."],
       },
       {
         id: 6,
@@ -2147,9 +2044,7 @@ const dataJobDescCompare = [
       {
         id: 8,
         eksternal: "Wartawan",
-        aktivitas: [
-          "Koordinasi terkait pengelolaan informasi publik tentang gas.",
-        ],
+        aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang gas."],
       },
       {
         id: 9,
@@ -2291,8 +2186,7 @@ const dataJobDescCompare = [
     tugasHa: [
       {
         id: 1,
-        responsible:
-          "Mengarahkan, mengelola dan mengevaluasi kegiatan pengelolaan RUPS (PPN & Anak Perusahaan).",
+        responsible: "Mengarahkan, mengelola dan mengevaluasi kegiatan pengelolaan RUPS (PPN & Anak Perusahaan).",
         output: [
           "Terlaksananya kegiatan RUPS (PPN & Anak Perusahaan);",
           "Tersedianya materi untuk kepentingan RUPS;",
@@ -2347,13 +2241,8 @@ const dataJobDescCompare = [
         id: 5,
         responsible:
           "Mengarahkan, memonitor dan mengevaluasi pengelolaan annual report pada lingkup Pertamina Patra Niaga.",
-        output: [
-          "Tersedianya tema dan desain annual report;",
-          "Tersedianya annual report Pertamina Patra Niaga.",
-        ],
-        lead: [
-          "Tingkat akurasi, kelengkapan dan ketepatan waktu annual report Pertamina Patra Niaga.",
-        ],
+        output: ["Tersedianya tema dan desain annual report;", "Tersedianya annual report Pertamina Patra Niaga."],
+        lead: ["Tingkat akurasi, kelengkapan dan ketepatan waktu annual report Pertamina Patra Niaga."],
       },
     ],
     tugasUmum: [
@@ -2417,10 +2306,7 @@ const dataJobDescCompare = [
         id: 6,
         header:
           "<b>Tindak Lanjut Hasil Audit</b> Mengelola, mengevaluasi, dan memastikan pelaksanaan audit serta monitoring dan tindak lanjut hasil audit di unit kerja/fungsi.",
-        tugas: [
-          "Laporan implementasi tidak lanjut hasil audit;",
-          "Kelengkapan data dan dokumen untuk proses audit.",
-        ],
+        tugas: ["Laporan implementasi tidak lanjut hasil audit;", "Kelengkapan data dan dokumen untuk proses audit."],
       },
       {
         id: 7,
@@ -2449,17 +2335,13 @@ const dataJobDescCompare = [
         id: 9,
         header:
           "<b>Pengelolaan Data Insight </b> Mengelola, mengevaluasi, dan memastikan kegiatan pengelolaan, pengolahan, dan penyajian data.",
-        tugas: [
-          "Terlaksananya pengelolaan data;",
-          "Tersedianya hasil pengolahan dan penyajian data. ",
-        ],
+        tugas: ["Terlaksananya pengelolaan data;", "Tersedianya hasil pengolahan dan penyajian data. "],
       },
     ],
     wewenang: [
       {
         id: 1,
-        wewenang:
-          "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
+        wewenang: "Menyetujui dan mengelola anggaran sesuai otorisasi yang dimiliki.",
       },
       {
         id: 2,
@@ -2490,9 +2372,7 @@ const dataJobDescCompare = [
       {
         id: 3,
         internal: "Direktorat/Fungsi lain",
-        aktivitas: [
-          "Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan.",
-        ],
+        aktivitas: ["Koordinasi terkait pelaporan kinerja operasional dan program kerja perusahaan."],
       },
       {
         id: 4,
@@ -2515,9 +2395,7 @@ const dataJobDescCompare = [
       {
         id: 6,
         internal: "Seluruh Fungsi",
-        aktivitas: [
-          "Koordinasi terkait pengumpulan data dan informasi materi Rapat Direksi, Kunjungan Kerja.",
-        ],
+        aktivitas: ["Koordinasi terkait pengumpulan data dan informasi materi Rapat Direksi, Kunjungan Kerja."],
       },
       {
         id: 7,
@@ -2539,9 +2417,7 @@ const dataJobDescCompare = [
       {
         id: 2,
         eksternal: "Anak Perusahaan dan Subholding lainnya",
-        aktivitas: [
-          "Koordinasi terkait penyediaan data dan informasi yang bersifat material.",
-        ],
+        aktivitas: ["Koordinasi terkait penyediaan data dan informasi yang bersifat material."],
       },
       {
         id: 3,
@@ -2560,9 +2436,7 @@ const dataJobDescCompare = [
       {
         id: 5,
         eksternal: "Sekretariat Dewan Komisaris ",
-        aktivitas: [
-          "Koordinasi terkait aktivitas Dewan Komisaris yang melibatkan Direksi.",
-        ],
+        aktivitas: ["Koordinasi terkait aktivitas Dewan Komisaris yang melibatkan Direksi."],
       },
       {
         id: 6,
@@ -2736,14 +2610,8 @@ const dataJobDescCompare = [
         id: 1,
         responsible:
           "Melakukan penyusunan sales planning produk gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
-        output: [
-          "Sales forecast (pragnosa revenue);",
-          "Sales goals (target, strategi dan rencana penjualan).",
-        ],
-        lead: [
-          "Tersedianya sales forecast;",
-          "Tersedianya sales goals untuk masing-masing channel.",
-        ],
+        output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
+        lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
       },
       {
         id: 2,
@@ -2765,9 +2633,7 @@ const dataJobDescCompare = [
           "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
           "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
         ],
-        lead: [
-          "Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan.",
-        ],
+        lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
       },
       {
         id: 4,
@@ -2778,9 +2644,7 @@ const dataJobDescCompare = [
           "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
           "Pelaksanaan proses peluang channel baru.",
         ],
-        lead: [
-          "Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel.",
-        ],
+        lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
       },
       {
         id: 5,
@@ -2831,9 +2695,7 @@ const dataJobDescCompare = [
         responsible:
           "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Jambi.",
         output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-        lead: [
-          "Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder.",
-        ],
+        lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
       },
     ],
     tugasUmum: [
@@ -2879,16 +2741,12 @@ const dataJobDescCompare = [
       {
         id: 2,
         internal: "Region Manager Reliability & Project Development ",
-        aktivitas: [
-          "Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas.",
-        ],
+        aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas."],
       },
       {
         id: 3,
         internal: "Region Manager Supply and Distribution",
-        aktivitas: [
-          "Koordinasi terkait keandalan pasokan gas ke lembaga penyalur.",
-        ],
+        aktivitas: ["Koordinasi terkait keandalan pasokan gas ke lembaga penyalur."],
       },
       {
         id: 4,
@@ -2918,16 +2776,12 @@ const dataJobDescCompare = [
       {
         id: 1,
         eksternal: "DPR/DPRD",
-        aktivitas: [
-          "Koordinasi/hearing terkait situasi terkini pengelolaan gas.",
-        ],
+        aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan gas."],
       },
       {
         id: 2,
         eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-        aktivitas: [
-          "Koordinasi terkait perizinan dan pengawasan penyaluran gas.",
-        ],
+        aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran gas."],
       },
       {
         id: 3,
@@ -2937,16 +2791,12 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Hiswana Migas",
-        aktivitas: [
-          "Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur.",
-        ],
+        aktivitas: ["Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur."],
       },
       {
         id: 5,
         eksternal: "BPK/Kementrian Keuangan",
-        aktivitas: [
-          "Koordinasi terkait pemeriksaan laporan penyaluran gas PSO.",
-        ],
+        aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran gas PSO."],
       },
       {
         id: 6,
@@ -2961,9 +2811,7 @@ const dataJobDescCompare = [
       {
         id: 8,
         eksternal: "Wartawan",
-        aktivitas: [
-          "Koordinasi terkait pengelolaan informasi publik tentang gas.",
-        ],
+        aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang gas."],
       },
       {
         id: 9,
@@ -3112,14 +2960,8 @@ const dataJobDescCompare = [
         id: 1,
         responsible:
           "Melakukan penyusunan sales planning produk gas  di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-        output: [
-          "Sales forecast (pragnosa revenue);",
-          "Sales goals (target, strategi dan rencana penjualan).",
-        ],
-        lead: [
-          "Tersedianya sales forecast;",
-          "Tersedianya sales goals untuk masing-masing channel.",
-        ],
+        output: ["Sales forecast (pragnosa revenue);", "Sales goals (target, strategi dan rencana penjualan)."],
+        lead: ["Tersedianya sales forecast;", "Tersedianya sales goals untuk masing-masing channel."],
       },
       {
         id: 2,
@@ -3141,9 +2983,7 @@ const dataJobDescCompare = [
           "Pelaksanaan pemberian reward dan konsekuensi terkait kinerja channel;",
           "Pelaksanaan dan tindak lanjut evaluasi dan rekomendasi terhadap kegiatan penyaluran.",
         ],
-        lead: [
-          "Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan.",
-        ],
+        lead: ["Tingkat standar pelayanan oleh channel sesuai yang ditetapkan oleh perusahaan."],
       },
       {
         id: 4,
@@ -3154,9 +2994,7 @@ const dataJobDescCompare = [
           "Pelaksanaan analisis kelayakan pengembangan jaringan dan layanan channel;",
           "Pelaksanaan proses peluang channel baru.",
         ],
-        lead: [
-          "Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel.",
-        ],
+        lead: ["Tingkat akurasi dan kesesuaian identifikasi kebutuhan pengembangan jaringan dan layanan channel."],
       },
       {
         id: 5,
@@ -3207,9 +3045,7 @@ const dataJobDescCompare = [
         responsible:
           "Melakukan kegiatan relasi dengan stakeholder terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
         output: ["Pelaksanaan relasi dengan pihak stakeholder."],
-        lead: [
-          "Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder.",
-        ],
+        lead: ["Tingkat efektivitas kegiatan pembinaan relasi dengan stakeholder."],
       },
     ],
     tugasUmum: [
@@ -3255,16 +3091,12 @@ const dataJobDescCompare = [
       {
         id: 2,
         internal: "Region Manager Reliability & Project Development ",
-        aktivitas: [
-          "Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas.",
-        ],
+        aktivitas: ["Koordinasi terkait peningkatan keandalan sarana dan fasilitas gas."],
       },
       {
         id: 3,
         internal: "Region Manager Supply and Distribution",
-        aktivitas: [
-          "Koordinasi terkait keandalan pasokan gas ke lembaga penyalur.",
-        ],
+        aktivitas: ["Koordinasi terkait keandalan pasokan gas ke lembaga penyalur."],
       },
       {
         id: 4,
@@ -3294,16 +3126,12 @@ const dataJobDescCompare = [
       {
         id: 1,
         eksternal: "DPR/DPRD",
-        aktivitas: [
-          "Koordinasi/hearing terkait situasi terkini pengelolaan gas.",
-        ],
+        aktivitas: ["Koordinasi/hearing terkait situasi terkini pengelolaan gas."],
       },
       {
         id: 2,
         eksternal: "Pemprov/Pemda/TNI/Polri/ Kejaksaan/Administrasi Pelabuhan",
-        aktivitas: [
-          "Koordinasi terkait perizinan dan pengawasan penyaluran gas.",
-        ],
+        aktivitas: ["Koordinasi terkait perizinan dan pengawasan penyaluran gas."],
       },
       {
         id: 3,
@@ -3313,16 +3141,12 @@ const dataJobDescCompare = [
       {
         id: 4,
         eksternal: "Hiswana Migas",
-        aktivitas: [
-          "Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur.",
-        ],
+        aktivitas: ["Koordinasi terkait penyaluran gas dan pengelolaan lembaga penyalur."],
       },
       {
         id: 5,
         eksternal: "BPK/Kementrian Keuangan",
-        aktivitas: [
-          "Koordinasi terkait pemeriksaan laporan penyaluran gas PSO.",
-        ],
+        aktivitas: ["Koordinasi terkait pemeriksaan laporan penyaluran gas PSO."],
       },
       {
         id: 6,
@@ -3337,9 +3161,7 @@ const dataJobDescCompare = [
       {
         id: 8,
         eksternal: "Wartawan",
-        aktivitas: [
-          "Koordinasi terkait pengelolaan informasi publik tentang gas.",
-        ],
+        aktivitas: ["Koordinasi terkait pengelolaan informasi publik tentang gas."],
       },
       {
         id: 9,

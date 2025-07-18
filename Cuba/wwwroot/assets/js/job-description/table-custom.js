@@ -3,7 +3,7 @@ function getTableListJobDes(dataList) {
     $("#jobdescList").DataTable().destroy();
   }
   const searchValue = $("#searchJobDesc").val();
-  const status = "available"; // $("#selectStatusJobDesc").val().trim();
+  const status = $("#selectStatusJobDesc").val().trim();
   const searchBy = $("#btnSearchType").text().toLowerCase();
   $("#jobdescList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"d-flex justify-content-between bottom"lip><"clear">', // Make bottom flex as well
@@ -19,15 +19,13 @@ function getTableListJobDes(dataList) {
     scrollCollapse: true,
     ajax: function (data, callback, settings) {
       $.ajax({
-        url: `${url.baseUrl}/${url["job-description"]}/get-list-positions/${
-          data.start
-        }/${data.length}?position=${
+        url: `${url.baseUrl}/${url["job-description"]}/get-list-positions/${data.start}/${data.length}?position=${
           searchBy === "position" ? searchValue : ""
         }&division=${searchBy === "division" ? searchValue : ""}&function=${
           searchBy === "function" ? searchValue : ""
-        }&department=${
-          searchBy === "department" ? searchValue : ""
-        }&status=${status}&draftId=${draftExistingJobDesc.draftId}`,
+        }&department=${searchBy === "department" ? searchValue : ""}&status=${status}&draftId=${
+          draftExistingJobDesc.draftId
+        }`,
         type: "GET",
         data: {
           draw: data.draw,
@@ -365,11 +363,7 @@ async function getTableListDraftDetail(params, lastPath) {
         width: "20%",
         data: null,
         render: function (data) {
-          return checkButtonTable(
-            "positionList",
-            data.positionId,
-            window.location.pathname.split("/").pop()
-          );
+          return checkButtonTable("positionList", data.positionId, window.location.pathname.split("/").pop());
         },
       },
     ],
@@ -462,9 +456,7 @@ function getTableListApproval(params) {
           if (data.isFinalized) {
             data.status = 4;
           }
-          return `<span class="p-2 b-r-8 ${statusApprovalClass[data.status]}">${
-            statusApproval[data.status]
-          }</span>`;
+          return `<span class="p-2 b-r-8 ${statusApprovalClass[data.status]}">${statusApproval[data.status]}</span>`;
         },
       },
       {
@@ -490,8 +482,7 @@ function getTableListLog(params) {
       "date-time": "05/05/2021 10:00",
       "user-name": "Yani",
       "draft-name": "Draft Name",
-      detail:
-        "Edit Org Unit Name from Enhancement to Enhancement for Manager Enhancement",
+      detail: "Edit Org Unit Name from Enhancement to Enhancement for Manager Enhancement",
     },
   ];
   $("#logList").DataTable({

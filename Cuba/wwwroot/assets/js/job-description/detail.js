@@ -16,9 +16,7 @@ $(document).ready(async function () {
     // const jobSelectedList = document.getElementById("job-selected-list");
     if (isPercentage) {
       const value = event;
-      const chkJobListPercentage = document.getElementById(
-        "chk-job-list-percentage"
-      );
+      const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
       const params = {
         draftId: getDraftExisting.draftId,
         jobId: jobId,
@@ -27,6 +25,7 @@ $(document).ready(async function () {
       };
 
       const result = await getSimilarities(params);
+      console.log("result", result.data);
 
       // dan urutan berdasarkan percentage yang paling tinggi
       const dataCompare = result?.data
@@ -34,10 +33,32 @@ $(document).ready(async function () {
           id: item?.jobIdTarget,
           name: item?.positionNameTarget,
           percentage: item?.matchPercentage,
+          jobIdFrom: item?.jobIdSource,
+          prlOrgFrom: item?.prlOrgSource,
+          jobIdTarget: item?.jobIdTarget,
+          prlOrgTo: item?.prlOrgTarget,
         }))
         .sort((a, b) => b.percentage - a.percentage);
 
-      dataCompare.forEach((item) => {
+      // Fetch all details in parallel instead of sequentially
+      const detailPromises = dataCompare.map((item) =>
+        getAllTanggungJawabJobToJob({
+          draftId: getDraftExisting.draftId,
+          jobIdFrom: jobId,
+          prlOrgFrom: prlOrg,
+          jobIdTo: item.jobIdTarget,
+          prlOrgTo: item.prlOrgTo,
+          page: 1,
+          pageSize: 99,
+        }).then((res) => ({
+          jobIdTo: item.jobIdTarget,
+          data: res.data,
+        }))
+      );
+
+      const details = await Promise.all(detailPromises);
+
+      for (const item of dataCompare) {
         let color = "";
         if (item.percentage >= 90) {
           color = "background-color: #28a745";
@@ -51,7 +72,7 @@ $(document).ready(async function () {
           color = "background-color: #dc3545";
         }
         item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
-      });
+      }
       const storeId = [];
       let innerHTML = "";
       for (let item of dataCompare) {
@@ -71,7 +92,8 @@ $(document).ready(async function () {
       }
       chkJobListPercentage.innerHTML = innerHTML;
       storeId.forEach((item) => {
-        callPopover(item);
+        const dataDetail = details.find((detail) => detail.jobIdTo === item);
+        callPopover(item, dataDetail);
       });
 
       // Reinitialize popovers after updating the inner HTML
@@ -81,13 +103,49 @@ $(document).ready(async function () {
       return;
     }
 
-    function callPopover(param) {
+    function callPopover(param, dataDetail) {
+      console.log("callPopover", param, dataDetail);
+      // Generate popoverContent dynamically with if-else for status
+      const popoverContent = (dataDetail?.data || [])
+        .map((item) => {
+          let statusText = "";
+          let statusColor = "";
+          let statusIcon = "";
+          if (item?.status === "AVAILABLE") {
+            statusText = "Available";
+            statusColor = "#06BE00";
+            statusIcon = "available";
+          } else if (item?.status === "NOT AVAILABLE") {
+            statusText = "Not Available";
+            statusColor = "#D02138";
+            statusIcon = "nonavail";
+          } else {
+            statusText = "Unknown";
+            statusColor = "#999";
+            statusIcon = "unknown";
+          }
+          return `
+            <tr>
+            <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
+            <td style="place-items:center">
+              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+              <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
+              </div>
+            </td>
+            <td style="color:${statusColor};text-align:center">
+              <span>${statusText}</span>
+              <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
+            </td>
+            </tr>
+            `;
+        })
+        .join("");
       $(`[data-toggle="popOver${param}"]`).popover({
         html: true,
         sanitize: false,
         content: `
           <div style="width: 550px;">
-          <h6 style="margin-bottom:10px"> RASCI Similarities Detail ${param}</h6>
+          <h6 style="margin-bottom:10px">RASCI Similarities Detail</h6>
           <table class="display tableRasciSimilarities" style="width: 100%">
           <thead>
               <tr>
@@ -97,30 +155,7 @@ $(document).ready(async function () {
               <tr>
           </thead>
           <tbody>
-              <tr>
-              <td>9.1.2 - Pengelolaan kebutuhan ICT/digital</td>
-              <td style="place-items:center">
-              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
-                  <span style="font-weight:bold;font-size: 12px;">R</span>
-              </div>
-              </td>
-              <td style="color:#06BE00;text-align:center">
-                <span>Available</span>
-                <img src="/assets/images/rasci/available.svg" alt="Available Icon" style="padding-left: 2px;vertical-align:middle;">
-              </td>
-              </tr>
-              <tr>
-              <td>9.1.2 - Pengelolaan kebutuhan ICT/digital</td>
-              <td style="place-items:center">
-              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
-                  <span style="font-weight:bold;font-size: 12px;">R</span>
-              </div>
-              </td>
-              <td style="color:#D02138;text-align:center">
-                Not Available
-                <img src="/assets/images/rasci/nonavail.svg" alt="Not Available Icon" style="vertical-align:middle;">
-              </td>
-              </tr>
+          ${popoverContent}
           </tbody>
           </table>
           </div>
@@ -153,21 +188,12 @@ $(document).ready(async function () {
     // $('[data-toggle="popover"]').popover();
   }
 
-  const getDraftExisting = JSON.parse(
-    localStorage.getItem("draftExistingJobDesc")
-  );
+  const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
 
   function logWewenangFetchSuccess(params, data) {
-    console.log(
-      `get data ${params} berhasil, jika tabel belum muncul cek format data, exp:`,
-      data
-    );
+    console.log(`get data ${params} berhasil, jika tabel belum muncul cek format data, exp:`, data);
   }
-  function showEndpointErrorAlert(
-    endpoint,
-    data,
-    errorMessage = "Data tidak valid atau kosong"
-  ) {
+  function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
     alert(
       `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/${endpoint} tidak valid atau kosong, data yang keluar hanya contoh. cek di console log`
     );
@@ -181,6 +207,7 @@ $(document).ready(async function () {
     draftId: getDraftExisting.draftId,
     jobId: jobId,
     prlRange: prlOrg,
+    prlOrg: prlOrg,
   };
 
   const dataBagan = {
@@ -204,10 +231,7 @@ $(document).ready(async function () {
     jobReferences: [],
   };
   if (!identifikasiJabatan.jobName) {
-    showEndpointErrorAlert(
-      "job-description/identifikasi-jabatan/show",
-      identifikasiJabatanData
-    );
+    showEndpointErrorAlert("job-description/identifikasi-jabatan/show", identifikasiJabatanData);
     identifikasiJabatan = identifikasiJabatanData;
   }
 
@@ -220,10 +244,7 @@ $(document).ready(async function () {
     "...": "...",
   };
   if (!fungsiJabatan.deskripsi) {
-    showEndpointErrorAlert(
-      "job-description/fungsi-jabatan/show",
-      fungsiJabatanData
-    );
+    showEndpointErrorAlert("job-description/fungsi-jabatan/show", fungsiJabatanData);
     fungsiJabatan = fungsiJabatanData;
   }
 
@@ -244,36 +265,35 @@ $(document).ready(async function () {
   let tugasTanggungJawabUmum;
   try {
     tugasTanggungJawabUmum = await getTugasTanggungJawabUmum(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/tugas-tanggung-jawab-umum/show",
-      tugasTanggungJawabUmum.data
-    );
+    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-umum/show", tugasTanggungJawabUmum.data);
     updateTable("tugasUmum", tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
   } catch (error) {
-    showEndpointErrorAlert(
-      "job-description/tugas-tanggung-jawab-umum/show",
-      [],
-      error.message
-    );
+    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-umum/show", [], error.message);
+  }
+
+  try {
+    const countTugasHa = await getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 });
+    const countAll = countTugasHa.data.length;
+    const countAvailable = countTugasHa.data.filter((item) => item.status === "AVAILABLE").length;
+    const $label = $("#labelFulfillTugasHa");
+    $label
+      .toggleClass("label-success-custom", countAvailable === countAll)
+      .toggleClass("label-danger-custom", countAvailable !== countAll)
+      .text(`${countAvailable}/${countAll} business processes have been fulfilled.`);
+  } catch (error) {
+    console.error("Error fetching countTugasHa:", error);
+    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/count", [], error.message);
   }
 
   let tugasTanggungJawabAkhir;
   const tugasTanggungJawabAkhirData = { data: dataJobDescCompare[0].tugasHa };
   try {
-    tugasTanggungJawabAkhir = await getTugasTanggungJawabAkhir(
-      dataDetailJobDesc
-    );
-    logWewenangFetchSuccess(
-      "job-description/tugas-tanggung-jawab-akhir/show",
-      tugasTanggungJawabAkhirData
-    );
+    tugasTanggungJawabAkhir = await getTugasTanggungJawabAkhir(dataDetailJobDesc);
+    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
     updateTable("tugasHa", tugasTanggungJawabAkhir.data, tabCusJD.tugasHa);
   } catch (error) {
     console.error("Error fetching tugasTanggungJawabAkhir:", error);
-    showEndpointErrorAlert(
-      "job-description/tugas-tanggung-jawab-akhir/show",
-      tugasTanggungJawabAkhirData
-    );
+    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
   }
 
   let wewenang;
@@ -294,16 +314,10 @@ $(document).ready(async function () {
   };
   try {
     koordinasiInternal = await getKoordinasiInternal(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/koordinasi-internal/show",
-      koordinasiInternalData
-    );
+    logWewenangFetchSuccess("job-description/koordinasi-internal/show", koordinasiInternalData);
   } catch (error) {
     console.error("Error fetching koordinasiInternal:", error);
-    showEndpointErrorAlert(
-      "job-description/koordinasi-internal/show",
-      dataJobDescCompare[0].koordinasi
-    );
+    showEndpointErrorAlert("job-description/koordinasi-internal/show", dataJobDescCompare[0].koordinasi);
     koordinasiInternal = koordinasiInternalData;
   }
 
@@ -314,17 +328,11 @@ $(document).ready(async function () {
 
   try {
     relasiEksternal = await getRelasiEksternal(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/relasi-eksternal/show",
-      relasiEksternalData
-    );
+    logWewenangFetchSuccess("job-description/relasi-eksternal/show", relasiEksternalData);
     console.log("relasiEksternal", relasiEksternal);
   } catch (error) {
     console.error("Error fetching koordinasiInternal:", error);
-    showEndpointErrorAlert(
-      "job-description/relasi-eksternal/show",
-      relasiEksternalData
-    );
+    showEndpointErrorAlert("job-description/relasi-eksternal/show", relasiEksternalData);
     relasiEksternal = relasiEksternalData;
   }
   updateTable("relation", relasiEksternal.data, tabCusJD.relation);
@@ -334,20 +342,14 @@ $(document).ready(async function () {
 
   try {
     persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/persyaratan-jabatan/show",
-      persyaratanJabatanData
-    );
+    logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
     persyaratanJabatan.data.map((item) => {
       item.pj = [item.pendidikanMinimal, item.pengalamanKerja];
     });
     updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
   } catch (error) {
     console.error("Error fetching persyaratanJabatan:", error);
-    showEndpointErrorAlert(
-      "job-description/persyaratan-jabatan/show",
-      persyaratanJabatanData
-    );
+    showEndpointErrorAlert("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
     persyaratanJabatan = persyaratanJabatanData;
   }
 
@@ -356,10 +358,7 @@ $(document).ready(async function () {
 
   try {
     persyaratanKhusus = await getPersyaratanKhusus(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/persyaratan-jabatan/show",
-      persyaratanKhususData
-    );
+    logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanKhususData);
 
     persyaratanKhusus.data.map((item) => {
       item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
@@ -382,17 +381,9 @@ $(document).ready(async function () {
   let kompetensiTeknis;
   try {
     kompetensiTeknis = await getKompetensiTeknis(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/kompetensi-teknis/show",
-      kompetensiTeknis
-    );
-    if (
-      Array.isArray(kompetensiTeknis.data.komtekMandatori) &&
-      kompetensiTeknis.data.komtekMandatori.length > 0
-    ) {
-      const $ul = $(
-        "<ul style='list-style-type: disc; padding-left: 20px;'></ul>"
-      );
+    logWewenangFetchSuccess("job-description/kompetensi-teknis/show", kompetensiTeknis);
+    if (Array.isArray(kompetensiTeknis.data.komtekMandatori) && kompetensiTeknis.data.komtekMandatori.length > 0) {
+      const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
       kompetensiTeknis.data.komtekMandatori.forEach((item) => {
         $ul.append(
           `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
@@ -401,12 +392,7 @@ $(document).ready(async function () {
       divKompetensiTeknisMandatory.empty().append($ul);
     }
 
-    if (
-      Array.isArray(
-        kompetensiTeknis.data.komtekGeneral &&
-          kompetensiTeknis.data.komtekGeneral.length > 0
-      )
-    ) {
+    if (Array.isArray(kompetensiTeknis.data.komtekGeneral && kompetensiTeknis.data.komtekGeneral.length > 0)) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekGeneral.forEach((item) => {
         $ul.append(
@@ -416,10 +402,7 @@ $(document).ready(async function () {
       divKompetensiTeknisGeneral.empty().append($ul);
     }
 
-    if (
-      Array.isArray(kompetensiTeknis.data.komtekSpesifik) &&
-      kompetensiTeknis.data.komtekSpesifik.length > 0
-    ) {
+    if (Array.isArray(kompetensiTeknis.data.komtekSpesifik) && kompetensiTeknis.data.komtekSpesifik.length > 0) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
         $ul.append(
@@ -436,16 +419,11 @@ $(document).ready(async function () {
   let kompetensiPerilaku;
   try {
     kompetensiPerilaku = await getKompetensiPerilaku(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/kompetensi-perilaku/show",
-      kompetensiPerilaku
-    );
+    logWewenangFetchSuccess("job-description/kompetensi-perilaku/show", kompetensiPerilaku);
     const divKompetensiPerilaku = $("#kompetensiPerilaku");
     divKompetensiPerilaku.empty();
     if (Array.isArray(kompetensiPerilaku.data)) {
-      const $ul = $(
-        "<ul style='list-style-type: disc; padding-left: 20px;'></ul>"
-      );
+      const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
       kompetensiPerilaku.data.forEach((item) => {
         $ul.append(`<li ><span>${item.namaKompetensi}</span</li>`);
       });
@@ -459,23 +437,17 @@ $(document).ready(async function () {
   let stk;
   try {
     stk = await getStk(dataDetailJobDesc);
-    logWewenangFetchSuccess(
-      "job-description/tugas-tanggung-jawab-akhir/show",
-      stk.data
-    );
+    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", stk.data);
     updateTable("stk", stk.data, tabCusJD.stk);
   } catch (error) {
     console.error("Error fetching stk:", error);
-    showEndpointErrorAlert(
-      "job-description/tugas-tanggung-jawab-akhir/show",
-      []
-    );
+    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", []);
   }
 
   const bagan = await chartShow(dataBagan);
-  const dataBaganSelf = bagan?.data.find(
-    (item) => item.id_position == positionCode
-  );
+  const dataBaganSelf = bagan?.data.find((item) => item.id == jobId);
+  console.log("dataBaganSelf", dataBaganSelf);
+  console.log("bagan?.data", bagan?.data);
   focusNode(dataBaganSelf, bagan.data);
 
   checkLocalStorage();
@@ -489,15 +461,11 @@ $(document).ready(async function () {
   const isCrete = urlParams.get("create");
   if (idPos) {
     if (isCrete) {
-      const findData = dataJobDesc.find(
-        (item) => item.identifikasi.id == idPos
-      );
+      const findData = dataJobDesc.find((item) => item.identifikasi.id == idPos);
       $("#selectJobReference").val(findData.identifikasi.id);
       getJobReference(findData);
     } else {
-      const findData = await dataJobDescCompare.find(
-        (item) => item.identifikasi.id == idPos
-      );
+      const findData = await dataJobDescCompare.find((item) => item.identifikasi.id == idPos);
       $("#selectJobReference").append(
         `<option value="${findData.identifikasi.id}">${findData.identifikasi.jobName}</option>`
       );
@@ -590,23 +558,20 @@ $(document).ready(async function () {
   // ...existing code...
 
   // Listen for tab navigation events
-  $('#v-pills-tab-modal a[data-bs-toggle="pill"]').on(
-    "shown.bs.tab",
-    function (e) {
-      const target = $(e.target).attr("href"); // activated tab
-      console.log("target", target);
-      activeTab = target.split("#v-pills-")[1];
-      console.log("activeTab", activeTab);
-      if (activeTab === "bagan-primary") {
-        focusNode(dataBaganSelf, bagan.data);
-      }
-      const element = document.getElementById(activeTab);
-      if (element) {
-        element.scrollIntoView();
-        window.scrollBy({ top: -80, left: 0, behavior: "instant" }); // 80px jarak dari atas
-      }
+  $('#v-pills-tab-modal a[data-bs-toggle="pill"]').on("shown.bs.tab", function (e) {
+    const target = $(e.target).attr("href"); // activated tab
+    console.log("target", target);
+    activeTab = target.split("#v-pills-")[1];
+    console.log("activeTab", activeTab);
+    if (activeTab === "bagan-primary") {
+      focusNode(dataBaganSelf, bagan.data);
     }
-  );
+    const element = document.getElementById(activeTab);
+    if (element) {
+      element.scrollIntoView();
+      window.scrollBy({ top: -80, left: 0, behavior: "instant" }); // 80px jarak dari atas
+    }
+  });
 
   $("#modalCon").on("click", function () {
     const action = [
@@ -668,9 +633,7 @@ $(document).ready(async function () {
   $("#popUpBispro").on("click", async function () {
     $("#modalBusinessProcess").modal("show");
     // get modalBusinessProcessBody
-    const modalBusinessProcessBody = document.getElementById(
-      "modalBusinessProcessBody"
-    );
+    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
     modalBusinessProcessBody.innerHTML = "";
     let dataBispro = [
       {
@@ -744,14 +707,9 @@ $(document).ready(async function () {
   $("#popUpMergeBisPro").on("click", async function () {
     $("#modalBusinessProcess").modal("show");
     // get modalBusinessProcessBody
-    const modalBusinessProcessHeader = document.getElementById(
-      "modalBusinessProcessHeader"
-    );
-    modalBusinessProcessHeader.innerHTML =
-      "Merge With Other Business sentences";
-    const modalBusinessProcessBody = document.getElementById(
-      "modalBusinessProcessBody"
-    );
+    const modalBusinessProcessHeader = document.getElementById("modalBusinessProcessHeader");
+    modalBusinessProcessHeader.innerHTML = "Merge With Other Business sentences";
+    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
     modalBusinessProcessBody.innerHTML = "";
     let dataBispro = [
       {
@@ -891,17 +849,13 @@ $(document).ready(async function () {
     // }
 
     // update modalRecomendationBody
-    const modalRecomendationBody = document.getElementById(
-      "modalRecomendationBody"
-    );
+    const modalRecomendationBody = document.getElementById("modalRecomendationBody");
     let content = "";
     for (let item of dataAll) {
       let bodyTugasHa = ``;
       for (let j = 0; j < item?.tugas_ha_li.length; j++) {
         const listItemOutput = await addList(item?.tugas_ha_li[j].output);
-        const listItemLeadingIndicator = await addList(
-          item?.tugas_ha_li[j].lead
-        );
+        const listItemLeadingIndicator = await addList(item?.tugas_ha_li[j].lead);
         console.log("listItemOutput", listItemOutput);
 
         bodyTugasHa += `

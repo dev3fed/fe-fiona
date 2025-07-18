@@ -6,27 +6,13 @@ function checkLocalStorage() {
   localStorage.removeItem("mandatori");
   localStorage.removeItem("general");
   localStorage.removeItem("spesifik");
-  localStorage.getItem("fungsi")
-    ? localStorage.getItem("fungsi")
-    : localStorage.setItem("fungsi", "");
-  localStorage.getItem("tugasHa")
-    ? localStorage.getItem("tugasHa")
-    : localStorage.setItem("tugasHa", "");
-  localStorage.getItem("koordinasi")
-    ? localStorage.getItem("koordinasi")
-    : localStorage.setItem("koordinasi", "");
-  localStorage.getItem("relation")
-    ? localStorage.getItem("relation")
-    : localStorage.setItem("relation", "");
-  localStorage.getItem("mandatori")
-    ? localStorage.getItem("mandatori")
-    : localStorage.setItem("mandatori", "");
-  localStorage.getItem("general")
-    ? localStorage.getItem("general")
-    : localStorage.setItem("general", "");
-  localStorage.getItem("spesifik")
-    ? localStorage.getItem("spesifik")
-    : localStorage.setItem("spesifik", "");
+  localStorage.getItem("fungsi") ? localStorage.getItem("fungsi") : localStorage.setItem("fungsi", "");
+  localStorage.getItem("tugasHa") ? localStorage.getItem("tugasHa") : localStorage.setItem("tugasHa", "");
+  localStorage.getItem("koordinasi") ? localStorage.getItem("koordinasi") : localStorage.setItem("koordinasi", "");
+  localStorage.getItem("relation") ? localStorage.getItem("relation") : localStorage.setItem("relation", "");
+  localStorage.getItem("mandatori") ? localStorage.getItem("mandatori") : localStorage.setItem("mandatori", "");
+  localStorage.getItem("general") ? localStorage.getItem("general") : localStorage.setItem("general", "");
+  localStorage.getItem("spesifik") ? localStorage.getItem("spesifik") : localStorage.setItem("spesifik", "");
 }
 
 function updateIdentifikasiJob(params) {
@@ -62,9 +48,7 @@ function updateTable(params, data, rowHeader, refer) {
   data.forEach((item, inc) => {
     const reference = item.reference ? item.reference : "";
     const referenceHtml =
-      reference !== ""
-        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>`
-        : "";
+      reference !== "" ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>` : "";
     row = `<tr>`;
     if (!rowHeader) {
       row += `<td class="tdClass">${item}</td>`;
@@ -102,9 +86,7 @@ function updateTable(params, data, rowHeader, refer) {
         const isHeaderArray = customTableHeaderHeader.includes(header);
         console.log(`Header: ${header}, isHeaderArray: ${isHeaderArray}`);
         row += `<td class="tdClass" ><ul style="list-style-type:
-        ${
-          isHeaderArray ? "none" : "disc"
-        }; padding-left: 20px; margin: 0; padding: 0;
+        ${isHeaderArray ? "none" : "disc"}; padding-left: 20px; margin: 0; padding: 0;
         ">`;
         item[header].forEach((arrayItem) => {
           row += `<li>${arrayItem}</li>`;
@@ -121,9 +103,7 @@ function updateTable(params, data, rowHeader, refer) {
         </td>`;
         return;
       }
-      row += `<td class="tdClass">${item[header]}${
-        header !== "id" ? referenceHtml : ""
-      }</td>`;
+      row += `<td class="tdClass">${item[header]}${header !== "id" ? referenceHtml : ""}</td>`;
     });
 
     row += `</tr>`;
@@ -150,60 +130,24 @@ async function getJobReferenceDetail() {
   isDisableButton(false);
   $(".summernote").summernote("enable");
 
-  const dataFungsi =
-    localStorage.getItem("fungsi") !== ""
-      ? JSON.parse(localStorage.getItem("fungsi"))
-      : [];
+  const dataFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
   let codeFungsi = "";
   dataFungsi.map((item) => {
     codeFungsi += `${item?.fungsi}<br/><span style="font-size:10px;color:grey">(reference from : ${item?.reference})</span><br/><br/>`;
   });
   $(".summernote").summernote("code", codeFungsi ?? "");
   // input to fungsi jabatan in summernote
-  const dataTugasHa =
-    localStorage.getItem("tugasHa") !== ""
-      ? JSON.parse(localStorage.getItem("tugasHa"))
-      : [];
+  const dataTugasHa = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
   const dataKoordinasi =
-    localStorage.getItem("koordinasi") !== ""
-      ? JSON.parse(localStorage.getItem("koordinasi"))
-      : [];
-  const dataRelation =
-    localStorage.getItem("relation") !== ""
-      ? JSON.parse(localStorage.getItem("relation"))
-      : [];
-  const dataMandatori =
-    localStorage.getItem("mandatori") !== ""
-      ? JSON.parse(localStorage.getItem("mandatori"))
-      : [];
-  const dataGeneral =
-    localStorage.getItem("general") !== ""
-      ? JSON.parse(localStorage.getItem("general"))
-      : [];
-  const dataSpesifik =
-    localStorage.getItem("spesifik") !== ""
-      ? JSON.parse(localStorage.getItem("spesifik"))
-      : [];
+    localStorage.getItem("koordinasi") !== "" ? JSON.parse(localStorage.getItem("koordinasi")) : [];
+  const dataRelation = localStorage.getItem("relation") !== "" ? JSON.parse(localStorage.getItem("relation")) : [];
+  const dataMandatori = localStorage.getItem("mandatori") !== "" ? JSON.parse(localStorage.getItem("mandatori")) : [];
+  const dataGeneral = localStorage.getItem("general") !== "" ? JSON.parse(localStorage.getItem("general")) : [];
+  const dataSpesifik = localStorage.getItem("spesifik") !== "" ? JSON.parse(localStorage.getItem("spesifik")) : [];
 
-  updateTable("tugasHa", dataTugasHa, [
-    "id",
-    "responsible",
-    "output",
-    "lead",
-    "action",
-  ]);
-  updateTable("koordinasi", dataKoordinasi, [
-    "id",
-    "internal",
-    "aktivitas",
-    "action",
-  ]);
-  updateTable("relation", dataRelation, [
-    "id",
-    "eksternal",
-    "aktivitas",
-    "action",
-  ]);
+  updateTable("tugasHa", dataTugasHa, ["id", "responsible", "output", "lead", "action"]);
+  updateTable("koordinasi", dataKoordinasi, ["id", "internal", "aktivitas", "action"]);
+  updateTable("relation", dataRelation, ["id", "eksternal", "aktivitas", "action"]);
   // updateTable("mandatori", dataMandatori, ["id", "mandatori", "action"]);
   // kompetensiTable tbody empty
   const tableBody = $(`#kompetensiTable tbody`);
@@ -430,14 +374,7 @@ async function addJobReference() {
 }
 
 async function applySelectedData(id) {
-  const arrayId = [
-    "identifikasi",
-    "fungsi",
-    "tugas-ha",
-    "koordinasi-internal",
-    "relasi-eksternal",
-    "stk",
-  ];
+  const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
   arrayId.forEach((item) => {
     $(`#${item}`).empty();
   });
@@ -608,9 +545,7 @@ async function applySelectedData(id) {
 
   koordinasiInternal.innerHTML = koordinasiInternalDiv;
 
-  let bodyKoordinasiInternal = document.querySelector(
-    ".tbodyKoordinasiInternal"
-  );
+  let bodyKoordinasiInternal = document.querySelector(".tbodyKoordinasiInternal");
   const listInternal = data?.koordinasi;
   for (let j = 0; j < listInternal.length; j++) {
     let listItemOutput = await addList(listInternal[j].aktivitas);
@@ -758,9 +693,7 @@ function filterListJobDesc(value, search) {
     data = data.filter((item) => item.jobStatus === value);
   }
   if (search) {
-    data = data.filter((item) =>
-      item.jobName.toLowerCase().includes(search.toLowerCase())
-    );
+    data = data.filter((item) => item.jobName.toLowerCase().includes(search.toLowerCase()));
   }
   getTableListJobDes(data);
 }
@@ -796,35 +729,18 @@ async function checkboxReference(val) {
 
 async function saveReference() {
   const dataSelected = selectedData.selectedJobDesc;
-  const checkboxList = Array.from(
-    document.querySelectorAll("input[type=checkbox].checbox-compare")
-  ).filter((item) => !item.id.includes("all") && item.checked);
+  const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
+    (item) => !item.id.includes("all") && item.checked
+  );
   console.log("checkboxList", checkboxList);
-  const checboxFungsi = checkboxList.find(
-    (item) => item.id === "checkbox_fungsi"
-  );
-  const checboxTugasHa = checkboxList.filter((item) =>
-    item.id.includes("checkbox_tugas_ha")
-  );
-  const checboxInternal = checkboxList.filter((item) =>
-    item.id.includes("checkbox_ir")
-  );
-  const checboxEksternal = checkboxList.filter((item) =>
-    item.id.includes("checkbox_eksternal")
-  );
-  const checboxPersyaratanMandatori = checkboxList.filter((item) =>
-    item.id.includes("checkbox_persyaratan_mandatori")
-  );
-  const checboxPersyaratanGeneral = checkboxList.filter((item) =>
-    item.id.includes("checkbox_persyaratan_general")
-  );
-  const checboxPersyaratanSpesifik = checkboxList.filter((item) =>
-    item.id.includes("checkbox_persyaratan_spesifik")
-  );
-  const reference =
-    dataSelected?.identifikasi?.jobName +
-    " - " +
-    dataSelected?.identifikasi?.sk;
+  const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
+  const checboxTugasHa = checkboxList.filter((item) => item.id.includes("checkbox_tugas_ha"));
+  const checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_ir"));
+  const checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_eksternal"));
+  const checboxPersyaratanMandatori = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_mandatori"));
+  const checboxPersyaratanGeneral = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_general"));
+  const checboxPersyaratanSpesifik = checkboxList.filter((item) => item.id.includes("checkbox_persyaratan_spesifik"));
+  const reference = dataSelected?.identifikasi?.jobName + " - " + dataSelected?.identifikasi?.sk;
 
   console.log("checboxFungsi", checboxFungsi);
   console.log("checboxTugasHa", checboxTugasHa);
@@ -836,10 +752,7 @@ async function saveReference() {
   console.log("reference", reference);
   return;
   if (checboxFungsi) {
-    const getLocalFungsi =
-      localStorage.getItem("fungsi") !== ""
-        ? JSON.parse(localStorage.getItem("fungsi"))
-        : [];
+    const getLocalFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
     // add to array
     getLocalFungsi.push({
       reference: reference,
@@ -849,10 +762,7 @@ async function saveReference() {
   }
 
   if (checboxTugasHa.length > 0) {
-    const getLocalTugasHa =
-      localStorage.getItem("tugasHa") !== ""
-        ? JSON.parse(localStorage.getItem("tugasHa"))
-        : [];
+    const getLocalTugasHa = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
     for (const item of checboxTugasHa) {
       const id = item.id.split("checkbox_tugas_ha_")[1];
       console.log("id", id);
@@ -871,9 +781,7 @@ async function saveReference() {
 
   if (checboxInternal.length > 0) {
     const getLocalKoordinasi =
-      localStorage.getItem("koordinasi") !== ""
-        ? JSON.parse(localStorage.getItem("koordinasi"))
-        : [];
+      localStorage.getItem("koordinasi") !== "" ? JSON.parse(localStorage.getItem("koordinasi")) : [];
     for (const item of checboxInternal) {
       const id = item.id.split("checkbox_internal_")[1];
       const findData = dataSelected?.koordinasi.find((item) => item.id == id);
@@ -889,9 +797,7 @@ async function saveReference() {
 
   if (checboxEksternal.length > 0) {
     const getLocalRelation =
-      localStorage.getItem("relation") !== ""
-        ? JSON.parse(localStorage.getItem("relation"))
-        : [];
+      localStorage.getItem("relation") !== "" ? JSON.parse(localStorage.getItem("relation")) : [];
     for (const item of checboxEksternal) {
       const id = item.id.split("checkbox_eksternal_")[1];
       const findData = dataSelected?.relation.find((item) => item.id == id);
@@ -907,18 +813,11 @@ async function saveReference() {
 
   if (checboxPersyaratanMandatori.length > 0) {
     const getLocalMandatori =
-      localStorage.getItem("mandatori") !== ""
-        ? JSON.parse(localStorage.getItem("mandatori"))
-        : [];
+      localStorage.getItem("mandatori") !== "" ? JSON.parse(localStorage.getItem("mandatori")) : [];
     for (const item of checboxPersyaratanMandatori) {
       const id = item.id.split("checkbox_persyaratan_mandatori_")[1];
-      console.log(
-        "dataSelected?.komtekMandatori",
-        dataSelected?.komtekMandatori
-      );
-      const findData = dataSelected?.komtekMandatori.find(
-        (item) => item.id == id
-      );
+      console.log("dataSelected?.komtekMandatori", dataSelected?.komtekMandatori);
+      const findData = dataSelected?.komtekMandatori.find((item) => item.id == id);
       getLocalMandatori.push({
         reference: reference,
         id: findData.id,
@@ -930,15 +829,10 @@ async function saveReference() {
   }
 
   if (checboxPersyaratanGeneral.length > 0) {
-    const getLocalGeneral =
-      localStorage.getItem("general") !== ""
-        ? JSON.parse(localStorage.getItem("general"))
-        : [];
+    const getLocalGeneral = localStorage.getItem("general") !== "" ? JSON.parse(localStorage.getItem("general")) : [];
     for (const item of checboxPersyaratanGeneral) {
       const id = item.id.split("checkbox_persyaratan_general_")[1];
-      const findData = dataSelected?.komtekGeneral.find(
-        (item) => item.id == id
-      );
+      const findData = dataSelected?.komtekGeneral.find((item) => item.id == id);
       getLocalGeneral.push({
         reference: reference,
         id: findData.id,
@@ -951,14 +845,10 @@ async function saveReference() {
 
   if (checboxPersyaratanSpesifik.length > 0) {
     const getLocalSpesifik =
-      localStorage.getItem("spesifik") !== ""
-        ? JSON.parse(localStorage.getItem("spesifik"))
-        : [];
+      localStorage.getItem("spesifik") !== "" ? JSON.parse(localStorage.getItem("spesifik")) : [];
     for (const item of checboxPersyaratanSpesifik) {
       const id = item.id.split("checkbox_persyaratan_spesifik_")[1];
-      const findData = dataSelected?.komtekSpesifik.find(
-        (item) => item.id == id
-      );
+      const findData = dataSelected?.komtekSpesifik.find((item) => item.id == id);
       getLocalSpesifik.push({
         reference: reference,
         id: findData.id,
@@ -1039,15 +929,7 @@ function checkButtonTable(buttonTable, id, lastPath) {
   }
 }
 
-function modalConfrimHelper(
-  type,
-  titleModal,
-  message,
-  note,
-  action,
-  modalSize,
-  paramsId
-) {
+function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
   if (modalSize) {
     alert(modalSize);
     // update modal size css width, exm: 90%
@@ -1127,6 +1009,7 @@ function getallChildrenNode(parentNode) {
 }
 
 function focusNode(nodeId, dataBagan) {
+  console.log("nodeId", nodeId);
   let selfNode = dataBagan.find((item) => item.id == nodeId.id) || {};
   const filteredData = dataBagan.filter((item) => item.id !== nodeId.id);
   selfNode = {
@@ -1287,11 +1170,12 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     align: OrgChart.ORIENTATION,
     movable: OrgChart.movable.node,
     nodeMouseClick: false,
-    menu: {
-      pdf: { text: "Export PDF" },
-      png: { text: "Export PNG" },
-      svg: { text: "Export SVG" },
-    },
+    // menu
+    // menu: {
+    //   pdf: { text: "Export PDF" },
+    //   png: { text: "Export PNG" },
+    //   svg: { text: "Export SVG" },
+    // },
     toolbar: {
       fullScreen: true,
       zoom: true,
@@ -1398,12 +1282,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
           const idx = (y * width + x) * 4;
           // If not white and not fully transparent
           if (
-            !(
-              data[idx] === 255 &&
-              data[idx + 1] === 255 &&
-              data[idx + 2] === 255 &&
-              data[idx + 3] === 255
-            ) &&
+            !(data[idx] === 255 && data[idx + 1] === 255 && data[idx + 2] === 255 && data[idx + 3] === 255) &&
             data[idx + 3] !== 0
           ) {
             if (top === null) top = y;
@@ -1421,11 +1300,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
         croppedCanvas.width = croppedWidth;
         croppedCanvas.height = croppedHeight;
         const croppedCtx = croppedCanvas.getContext("2d");
-        croppedCtx.putImageData(
-          ctx.getImageData(left, top, croppedWidth, croppedHeight),
-          0,
-          0
-        );
+        croppedCtx.putImageData(ctx.getImageData(left, top, croppedWidth, croppedHeight), 0, 0);
 
         croppedCanvas.toBlob((blob) => {
           if (blob) {
@@ -1470,12 +1345,8 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   if (object?.expand) {
     let selfNode = data.find((item) => item.id == object.nodeId);
-    const getChildrenNode =
-      data.filter((item) => item.pid == object.nodeId).map((item) => item.id) ||
-      [];
-    const siblingNode =
-      data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) ||
-      [];
+    const getChildrenNode = data.filter((item) => item.pid == object.nodeId).map((item) => item.id) || [];
+    const siblingNode = data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
     const getAll = [...getChildrenNode, ...siblingNode];
     setTimeout(() => {
       chart.expand(selfNode.id, getAll);

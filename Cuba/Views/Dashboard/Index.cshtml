@@ -2,9 +2,156 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .page-wrapper {
+        overflow:visible !important;
+    }
+    #sticky-os-header {
+        position: -webkit-sticky; /* For Safari */
+        position: sticky !important;
+        top: 75px !important; /* Adjusted to ensure it sticks at the top */
+        z-index: 2;
+        background-color: #fff;
+    }
+
+    .container-fluid, .page-body {
+        overflow: visible !important; /* Ensure parent elements do not restrict sticky behavior */
+        height: 100%; /* Ensure parent elements have a defined height */
+    }
+
+    html, body {
+        height: 100%; /* Ensure the root elements have a defined height */
+    }
+
+
+    .checkbox-solid-primary label:before {
+        background-color: var(--theme-deafult);
+        border-color: var(--theme-deafult);
+        color: #fff;
+    }
+    .checkbox input[type="checkbox"]:checked + label::before {
+        font-family: themify;
+        content: "\e64c";
+        text-align: center;
+        line-height: 1.2;
+        background: #006CA9;
+        color: #fff;
+    }
+    .border-custom {
+        border: 1px solid #EAEAEB;
+        @* border-radius: 10px; *@
+    }
+    .widget-1:hover {
+    /* transform: translateY(-5px); */
+    /* transition: 0.5s; */
+    transform: none;
+    transition: none;
+    }
+    .ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 150px;
+        }
+    .no-box-shadow {
+        box-shadow: none !important;
+    }
+    .widget-1 {
+        background-image: none;
+    }
+    .chart-container {
+        display: flex;
+        align-items: center;
+        width: 100%;            /* Pastikan tidak melebihi kolom card */
+    }
+
+    #rasci-notations{
+        display: flex;
+        gap:10px;
+        width: 100%;            /* Pastikan tidak melebihi kolom card */
+    }
+
+    .card-buspro {
+        box-shadow: 0px 0px 0px 0px !important;
+        margin: 0px !important;
+    }
+    .card-rasci-notations {
+        box-shadow: 0px 0px 0px 0px !important;
+        margin: 0px !important;
+        width: 23%;
+    }
+
+    .chart-label {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+        width: 60px;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        color: #9F9FA5;
+        margin: 0px !important;
+        padding-bottom: 0px;
+    }
+
+    .widget-round-buspro{
+        border-width: 0px !important;
+    }
+
+    .bg-round-buspro{
+        box-shadow: 0px 0px 0px 0px !important;
+    }
+
+    .card-body-buspro {
+        border: solid 1px #EAEAEB;
+        border-radius: 10px;
+    }
+    #chart-competency-spesific{
+        width: 95% !important;
+        max-width: 100% !important;
+        height: 600px !important;
+    }
+
+    #chart-rasci-buspro-level, #chart-rasci-position-level, #chart-rasci-notaions-formation,#chart-os-position-level {
+        max-width: 100% !important;
+        height: 500px !important;
+    }
+    .m-checkbox-inline label {
+        margin-right: 2px !important;
+    }
+    @* .select2-selection__rendered li.select2-selection__choice {
+        display: none !important;
+        } *@
+        /* Change the background color of the Select2 dropdown */
+        .select2-container .select2-selection--single {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        /* Change the color of the selected text */
+        .select2-container .select2-selection__rendered {
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Style the dropdown arrow */
+        .select2-container .select2-selection__arrow {
+            height: 100%;
+        }
+
+        /* Style the dropdown list */
+        .select2-container .select2-dropdown {
+            background: #fff;
+            border: 1px solid #aaa;
+        }
+
+</style>
+
+<div id="xTickTooltip" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px 10px; font-size:12px; z-index:9999; pointer-events:none; border-radius:4px;"></div>
+<div id="legendTooltip" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px 10px; font-size:12px; z-index:9999; pointer-events:none; border-radius:4px;"></div>
 <div class="page-body">
-    <div class="container-fluid">
-        <div class="page-title">
+    <div class="container-fluid" id="title">
+        <div class="page-title mb-0">
             <div class="row">
                 <div class="col-6">
                     <h3>Dashboard</h3>
@@ -23,32 +170,802 @@
                 </div>
             </div>
         </div>
+        <div id="sticky-os-header">
+            <div class="page-title mb-0">
+                <div class="row">
+                    <div class="col-12">
+                        <ul class="nav nav-pills nav-primary" id="pills-icontab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active"  id="pills-so-tab" data-bs-toggle="pill" href="#pills-so" role="tab" aria-controls="pills-so" aria-selected="true">Organization Structure</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" id="pills-rasci-tab" data-bs-toggle="pill" href="#pills-rasci" role="tab" aria-controls="pills-rasci" aria-selected="false">RASCI</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-competency-tab" data-bs-toggle="pill" href="#pills-competency" role="tab" aria-controls="pills-competency" aria-selected="false">Competency</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="page-title pt-0" id="os-header-section">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="row" >
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #E87777;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #E87777;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">8</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Director" data-bs-original-title="Director">Director</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #9999FC;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #9999FC;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">8</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="VP/EGM/SMOM">VP/EGM/SMOM</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #7EC67E;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #7EC67E;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">8</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara">Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #7BE5D1;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #7BE5D1;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">8</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Asst. Manager/Sr. Analyst/Setara">Asst. Manager/ Sr. Analyst/ Setara</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #FDC47E;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #FDC47E;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">8</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                Sr. Supervisor/Analyst/Setara">Sr. Supervisor/Analyst/Setara</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #76BFFF;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #76BFFF;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">1679</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                Supervisor/Analyst/Setara">Supervisor/Analyst/Setara</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #FFA5C3;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #FFA5C3;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">990</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                Jr. Supervisor/Jr. Assistant/Setara
+                                                ">Jr. Supervisor/Jr. Assistant/Setara</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 border-custom">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding: 10px;">
+                                        <div class="widget-content">
+                                            <div class="widget-round" style="color: #D3D3D3;">
+                                                <div class="bg-round">
+                                                    <i class="fa fa-user f-22"></i> 
+                                                    <svg class="half-circle" style="fill: #D3D3D3;">
+                                                        <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="f-w-700">648</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                Jr. Operator/Jr. Technician/Administrator/Setara
+                                                ">Jr. Operator/Jr. Technician/Administrator/Setara</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="row" >
+                            <div class="col-sm-12">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding:20px;border: 1px solid #EAEAEB;justify-content:center;">
+                                        <div class="d-flex-row" style="text-align:center;">
+                                            <h4>5020</h4>
+                                            <span>Total Formation</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="card widget-1 no-box-shadow mb-0">
+                                    <div class="card-body" style="padding:20px;border: 1px solid #EAEAEB;justify-content:center;">
+                                        <div class="d-flex-row" style="text-align:center;">
+                                            <h4>242</h4>
+                                            <span>Total Position Project</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
     </div>
-    <!-- Container-fluid starts-->
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card" style="border-radius:8px">
-                    <div class="card-body">
-                        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                            voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+    <div class="tab-content" id="pills-icontabContent" style="margin-top: 40px;">
+        <div class="tab-pane fade show active" id="pills-so" role="tabpanel" aria-labelledby="pills-so-tab">
+            <div id="so-content" style="">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3">
+                                    <h5 class="f-w-700">Position Level by Directorate</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 d-flex justify-content-between mb-4">
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#9999FC;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="VP/EGM/SMOM" data-bs-original-title="VP/EGM/SMOM">VP/EGM/SMOM</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#7EC67E;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara" data-bs-original-title="Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara">Manager/ Region Manager/ Are..</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#7BE5D1;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Asst. Manager/Sr. Analyst/Setara" data-bs-original-title="Asst. Manager/Sr. Analyst/Setara">Asst. Manager/Sr. Analyst/S...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#FDC47E;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Sr. Supervisor/Analyst/Setara" data-bs-original-title="Sr. Supervisor/Analyst/Setara">Sr. Supervisor/Analys...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#76BFFF;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Supervisor/Jr. Analyst/Setara" data-bs-original-title="Supervisor/Jr. Analyst/Setara">Supervisor/Jr. Analy...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#FFA5C3;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Jr. Supervisor/Jr. Assistant/Setara" data-bs-original-title="Jr. Supervisor/Jr. Assistant/Setara">Jr. Supervisor/Jr. Ass...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#B7B7B7;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Jr. Operator/Jr. Technician/Administrator/Setara" data-bs-original-title="Jr. Operator/Jr. Technician/Administrator/Setara">Jr. Operator/Jr. Techn...</span>
+                                            </div>
+                                        </div>
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;margin: 0px !important;padding-bottom: 0px;">RASCI Notation Total</p>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <div class="chart-container">
+                                                <canvas id="chart-os-position-level"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3">
+                                    <h5 class="f-w-700">Organization Shape</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-4">
+                                            <div class="row">
+                                                <div class="col-3" style="align-self: self-end;text-align: center;">
+                                                    <label for="">Area Type</label>
+                                                </div>
+                                                <div class="col-8">
+                                                    <select class="form-select digits" name="selectAreaType" id="selectAreaType" >
+                                                        <option></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="selectDirectorateContainer">
+                                            <div class="row">
+                                                <div class="col-3" style="align-self: self-end;text-align: center;">
+                                                    <label for="">Directorate</label>
+                                                </div>
+                                                <div class="col-8">
+                                                    <select class="form-select digits" name="selectDirectorate" id="selectDirectorate">
+                                                        <option></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="selectRegionalContainer">
+                                            <div class="row">
+                                                <div class="col-3" style="align-self: self-end;text-align: center;">
+                                                    <label for="">Regional</label>
+                                                </div>
+                                                <div class="col-8">
+                                                    <select class="form-select digits" name="selectRegional" id="selectRegional">
+                                                        <option></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="card" style="border-radius:8px">
+                                                <div class="card-header p-3" style="display: flex;justify-content: space-between;">
+                                                    <h6 class="f-w-700" style="align-content:center;">JOB GRADE</h6>
+                                                    <div class="" style="padding: 7px;background: #EAEAEB;border-radius: 5px;">
+                                                        Ketersediaan kotak jabatan :<span class="f-w-700"> 5020</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <canvas id="chart-os-job-grade" height="300"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="card" style="border-radius:8px">
+                                                <div class="card-header p-3" style="display: flex;justify-content: space-between;">
+                                                    <h6 class="f-w-700" style="align-content:center;">PERSON GRADE</h6>
+                                                    <div class="" style="padding: 7px;background: #EAEAEB;border-radius: 5px;">
+                                                        Proyeksi orang pada jabatan :<span class="f-w-700"> 5020</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <canvas id="chart-os-person-grade" height="300"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-rasci" role="tabpanel" aria-labelledby="pills-rasci-tab">
+            <div id="rasci-content" style="">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3" style="display: flex;justify-content: space-between;">
+                                    <h5 class="f-w-700">Business Process</h5>
+                                    <h6 class="f-w-700" style="color:#006CA9">Business Process Value Chain  <img src="/assets/svg/arrow.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"></h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <div class="card widget-1 card-buspro">
+                                                <div class="card-body card-body-buspro">
+                                                    <div class="widget-content">
+                                                        <div class="widget-round widget-round-buspro" style="background-color: #E6F0F6;">
+                                                            <div class="bg-round bg-round-buspro">
+                                                                <h3>L1</h3>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="f-w-700">13</h2><span class="f-light f-14">Category</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="card widget-1 card-buspro">
+                                                <div class="card-body card-body-buspro">
+                                                    <div class="widget-content">
+                                                        <div class="widget-round widget-round-buspro" style="background-color: #E6F0F6;">
+                                                            <div class="bg-round bg-round-buspro">
+                                                                <h3>L2</h3>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="f-w-700">48</h2><span class="f-light f-12">Process group</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="card widget-1 card-buspro">
+                                                <div class="card-body card-body-buspro">
+                                                    <div class="widget-content">
+                                                        <div class="widget-round widget-round-buspro" style="background-color: #E6F0F6;">
+                                                            <div class="bg-round bg-round-buspro">
+                                                                <h3>L3</h3>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="f-w-700">206</h2><span class="f-light f-14">Process</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="card widget-1 card-buspro">
+                                                <div class="card-body card-body-buspro">
+                                                    <div class="widget-content">
+                                                        <div class="widget-round widget-round-buspro" style="background-color: #E6F0F6;">
+                                                            <div class="bg-round bg-round-buspro">
+                                                                <h3>L4</h3>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="f-w-700">700</h2><span class="f-light f-14">Activity</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="card widget-1 card-buspro">
+                                                <div class="card-body card-body-buspro">
+                                                    <div class="widget-content">
+                                                        <div class="widget-round widget-round-buspro" style="background-color: #E6F0F6;">
+                                                            <div class="bg-round bg-round-buspro">
+                                                                <h3>L5</h3>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="f-w-700">3000</h2><span class="f-light f-14">Task</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="card widget-1 card-buspro">
+                                                <div class="card-body card-body-buspro">
+                                                    <div class="widget-content">
+                                                        <div class="widget-round widget-round-buspro" style="background-color: #E6F0F6;">
+                                                            <div class="bg-round bg-round-buspro">
+                                                                <h3>L6</h3>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h2 class="f-w-700">513</h2><span class="f-light f-14">Sub Task</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3">
+                                    <h5 class="f-w-700">rasci-content Notations</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex" style="" id="rasci-notations">
+                                        <div class="card widget-1 card-rasci-notations">
+                                            <div class="card-body card-body-buspro">
+                                                <div class="widget-content">
+                                                    <div class="widget-round widget-round-buspro" style="background-color: #4E9ECA;">
+                                                        <div class="bg-round bg-round-buspro">
+                                                            <h3 class="text-white">A</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="f-w-700">41,769</h2><span class="f-light f-14">Accountable</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card widget-1 card-rasci-notations">
+                                            <div class="card-body card-body-buspro">
+                                                <div class="widget-content">
+                                                    <div class="widget-round widget-round-buspro" style="background-color: #45C6C1;">
+                                                        <div class="bg-round bg-round-buspro">
+                                                            <h3 class="text-white">R</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="f-w-700">247,406</h2><span class="f-light f-14">Responsible</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card widget-1 card-rasci-notations">
+                                            <div class="card-body card-body-buspro">
+                                                <div class="widget-content">
+                                                    <div class="widget-round widget-round-buspro" style="background-color: #8DC2B5;">
+                                                        <div class="bg-round bg-round-buspro">
+                                                            <h3 class="text-white">S</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="f-w-700">668</h2><span class="f-light f-14">Support</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card widget-1 card-rasci-notations">
+                                            <div class="card-body card-body-buspro">
+                                                <div class="widget-content">
+                                                    <div class="widget-round widget-round-buspro" style="background-color: #EF9D91;">
+                                                        <div class="bg-round bg-round-buspro">
+                                                            <h3 class="text-white">C</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="f-w-700">175</h2><span class="f-light f-14">Consulted</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card widget-1 card-rasci-notations">
+                                            <div class="card-body card-body-buspro">
+                                                <div class="widget-content">
+                                                    <div class="widget-round widget-round-buspro" style="background-color: #FFDF6F;">
+                                                        <div class="bg-round bg-round-buspro">
+                                                            <h3 class="text-white">I</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="f-w-700">257</h2><span class="f-light f-14">Informed</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3">
+                                    <h5 class="f-w-700">RASCI Notations by Business Process Level</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;margin: 0px !important;padding-bottom: 0px;">RASCI Notation Total</p>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <div class="chart-container">
+                                                <canvas id="chart-rasci-buspro-level"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* <div class="chart-container">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;">RASCI Notation Total</p>
+                                        </div>
+                                        <canvas id="chart-rasci-buspro-level"></canvas>
+                                    </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3">
+                                    <h5 class="f-w-700">RASCI Notations by Business Process Level</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;margin: 0px !important;padding-bottom: 0px;">RASCI Notation Total</p>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <div class="chart-container">
+                                                <canvas id="chart-rasci-position-level"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* <div class="chart-container">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;">RASCI Notation Total</p>
+                                        </div>
+                                        <canvas id="chart-rasci-position-level"></canvas>
+                                    </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3 d-flex justify-content-between">
+                                    <h5 class="f-w-700">RASCI Notations vs Formation</h5>
+                                    <div>
+                                        <div class="col">
+                                            <div class="m-checkbox-inline">
+                                                <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                    <input class="form-check-input" id="inline-1" type="checkbox">
+                                                    <label class="form-check-label" for="inline-1">All RASCI</label>
+                                                </div>
+                                                <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                    <input class="form-check-input" id="inline-2" type="checkbox">
+                                                    <label class="form-check-label" for="inline-2">Accountable</label>
+                                                </div>
+                                                <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                    <input class="form-check-input" id="inline-3" type="checkbox">
+                                                    <label class="form-check-label" for="inline-3">Responsible</label>
+                                                </div>
+                                                <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                    <input class="form-check-input" id="inline-4" type="checkbox">
+                                                    <label class="form-check-label" for="inline-4">Support</label>
+                                                </div>
+                                                <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                    <input class="form-check-input" id="inline-5" type="checkbox">
+                                                    <label class="form-check-label" for="inline-5">Consulted</label>
+                                                </div>
+                                                <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                    <input class="form-check-input" id="inline-6" type="checkbox">
+                                                    <label class="form-check-label" for="inline-6">Informed</label>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;margin: 0px !important;padding-bottom: 0px;">RASCI Notation Total</p>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <div class="chart-container">
+                                                <canvas id="chart-rasci-notaions-formation"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* <div class="chart-container">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;">RASCI Notation Total</p>
+                                        </div>
+                                        <canvas id="chart-rasci-notaions-formation"></canvas>
+                                    </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-competency" role="tabpanel" aria-labelledby="pills-competency-tab">
+            <div id="competency-content" style="">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="card widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round primary">
+                                            <div class="bg-round">
+                                                <img src="/assets/svg/doc.svg"> 
+                                                <svg class="half-circle svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h2 class="f-w-700">10,000</h2><span class="f-light f-14">Skill Group</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="card widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round primary">
+                                            <div class="bg-round">
+                                                <img src="/assets/svg/docs.svg"> 
+                                                <svg class="half-circle svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h2 class="f-w-700">10,000</h2><span class="f-light f-14">Sub Skill Group</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="card widget-1">
+                                <div class="card-body">
+                                    <div class="widget-content">
+                                        <div class="widget-round primary">
+                                            <div class="bg-round">
+                                                <img src="/assets/svg/books.svg"> 
+                                                <svg class="half-circle svg-fill">
+                                                    <use href="../assets/svg/icon-sprite.svg#halfcircle"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h2 class="f-w-700">10,000</h2><span class="f-light f-14">Technical Competencies</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3">
+                                    <h5 class="f-w-700">Top 10 Technical Competency Spesific</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#9999FC;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="VP/EGM/SMOM" data-bs-original-title="VP/EGM/SMOM">VP/EGM/SMOM</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#7EC67E;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara" data-bs-original-title="Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara">Manager/ Region Manager/ Are..</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#7BE5D1;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Asst. Manager/Sr. Analyst/Setara" data-bs-original-title="Asst. Manager/Sr. Analyst/Setara">Asst. Manager/Sr. Analyst/S...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#FDC47E;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Sr. Supervisor/Analyst/Setara" data-bs-original-title="Sr. Supervisor/Analyst/Setara">Sr. Supervisor/Analys...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#76BFFF;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Supervisor/Jr. Analyst/Setara" data-bs-original-title="Supervisor/Jr. Analyst/Setara">Supervisor/Jr. Analy...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#FFA5C3;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Jr. Supervisor/Jr. Assistant/Setara" data-bs-original-title="Jr. Supervisor/Jr. Assistant/Setara">Jr. Supervisor/Jr. Ass...</span>
+                                            </div>
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#B7B7B7;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Jr. Operator/Jr. Technician/Administrator/Setara" data-bs-original-title="Jr. Operator/Jr. Technician/Administrator/Setara">Jr. Operator/Jr. Techn...</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="chart-container">
+                                                <div class="chart-label">
+                                                    <p class="f-w-400 f-22" style="color: #9F9FA5;">Technical Competency Name</p>
+                                                </div>
+                                                <canvas id="chart-competency-spesific"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Container-fluid Ends-->
 </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<script src="https://unpkg.com/chartjs-chart-funnel@4.2.4/build/index.umd.min.js"></script>
+
 @section Script {
     <!-- Plugins JS start-->
     <script src="../assets/js/sidebar-menu.js"></script>
     <script src="../assets/js/slick/slick.min.js"></script>
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
+    <script src="../assets/js/organization-structure/multiple-select.js"></script>
+
+    <script>
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (tooltipTriggerEl) {
+            if (bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
+                bootstrap.Tooltip.getInstance(tooltipTriggerEl).dispose();
+            }
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+    <script src="../assets/js/dashboard/constant.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
+    <script src="../assets/js/dashboard/helper.js"></script>
+    <script src="../assets/js/dashboard/index.js"></script>
+
     <script src="../assets/js/script.js"></script>
 }

@@ -3,26 +3,27 @@ async function initializeHelper(data) {
     //
   }
 
-  // const dataChart = await chartShow({
-  //   draftId: organizationAttribute.orgUnitId,
-  //   jobCode: "10132405",
-  //   depth: 3,
-  // });
+  const dataChart = await chartShow({
+    draftId: organizationAttribute.orgUnitId,
+    jobCode: "10132406",
+    depth: 3,
+  });
 
-  // if (!dataChart.data) {
-  //   swal("Warning", "Data not found", "warning");
-  //   return;
-  // }
-  // dataChart.data.forEach((item) => {
-  //   item.id = item.id_org_unit;
-  // });
+  if (!dataChart.data) {
+    swal("Warning", "Data not found", "warning");
+    return;
+  }
+  dataChart.data.forEach((item) => {
+    item.id = item.id_org_unit;
+  });
 
-  // // helper orTree
-  // const dataAawal = dataChart.data.filter((x) => x.position == "Direktur Utama");
-  // helperOrgTree(dataAawal);
-  // helperDatePicker();
+  helperOrgTree(dataChart.data);
   // helperOrgChart(true, "os-container", dataChart.data, true);
-  helperOrgChart(true, "os-container", test, true);
+
+  // helperOrgChart(true, "os-container", asik2, true);
+  // helperOrgChartTester(true, "os-container", test, true);
+  // helperDatePicker();
+  // helperOrgChart(true, "os-container", test, true);
 }
 
 function updateDataList(orgUnitId, orgUnitName) {
@@ -785,8 +786,6 @@ $("#selectDraftFilterByDataSource").on("change", async function () {
   await changeDataSourceFilter(filter);
 });
 
-
-
 // click export org chart
 $("#exportOrgChart").click(function () {
   // alert("exportOrgChart");
@@ -856,7 +855,6 @@ $(document).ready(async function () {
       data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
     },
   ]);
-
 
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
   const focusNode = urlParams.get("focusNode");

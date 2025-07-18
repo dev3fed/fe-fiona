@@ -1319,15 +1319,6 @@ function checkValue(value) {
 }
 
 async function modalJobPopup(params) {
-  const dataDefault = 30313912;
-
-  // test delate
-  // handleDeleteJob(params);
-
-  // test move
-  // handleEditJob(params);
-  //
-  // return;
   let data = await chartJobDetail({
     draftId: organizationAttribute.orgUnitId,
     jobCode: params,
@@ -1336,32 +1327,88 @@ async function modalJobPopup(params) {
   if (data == undefined) {
     alert("Data not found");
     return;
-    // data = lsListPosition.find((item) => item.positionId == dataDefault);
   }
-  // console.log(data?.incumbent[0]?.employeeId);
-  $("#jobName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
-  $("#positionId").val(data.unitCode);
-  $("#modalDirectorate").text("Pertamina Patra Niaga");
+  // $("#jobName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
+  // $("#positionId").val(data.unitCode);
+  // $("#modalDirectorate").text("Pertamina Patra Niaga");
+  // $("#modalDivision").text(checkValue(data?.divisionName));
+  // $("#modalSubDivision").text(checkValue(data?.subDivisionName));
+  // $("#modalDepartment").text(checkValue(data?.departmentName));
+  // $("#modalSection").text(checkValue(data?.sectionName));
+  // $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
+  // $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubAreaName));
+  // $("#modalCareerType").text(checkValue(data?.careerTypeName));
+  // $("#modalCareerLevel").text(checkValue(data?.careerLevelName));
+  // $("#modalAbbrvPosition").text(checkValue(data?.abbrvPosition));
+  // $("#modalOrgUnitName").text(checkValue(data?.unitName));
+  // $("#modalPositionName").text(checkValue(data?.positionName));
+  // $("#modalOrgPRL").text(checkValue(data?.prlOrg));
+  // $("#modalFormation").text(checkValue(data?.formation));
+  // $("#modalDirectReport").text(checkValue(data?.parentName));
+  // $("#modalNeckFunction").text(checkValue(data?.neckFunction));
+  // $("#modalIsProject").text(checkValue(data?.isProject));
+  // $("#modalIsCoordination").text(checkValue(data?.isCoordination));
+  // $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
+  // $("#modalFunction").text(checkValue(data?.functionName));
+  // $("#modalSKNumber").text(checkValue(data?.skNumber));
+
+  // $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
+  // $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
+  // $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
+  // $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupCode ?? "");
+  // $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
+  // $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupCode ?? "");
+
+  // $("#incumbentId").text(data?.incumbents[0]?.personCode ?? "");
+  // $("#incumbentName").text(data?.incumbents[0]?.personName ?? "");
+  // $("#prlPlanComp").text(data?.incumbents[0]?.prlPlan ?? "");
+
+  // $("#modalDetailJob").modal("show");
+
+  console.log("data", data);
+  $("#jobName").text(checkValue(data.positionName));
+  $("#positionId").val(data.positionId);
+  $("#modalPrlOrg").text(checkValue(data.prlOrg));
+  $("#modalFormation").text(checkValue(data?.formation));
+
+  $("#modalOrgUnitId").text(checkValue(data.unitCode));
+  $("#modalOrgUnitName").text(checkValue(data.unitName));
+  $("#modalPositionId").text(checkValue(data.positionCode));
+  $("#modalPositionName").text(checkValue(data?.positionName));
+  $("#modalOrgPositionName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
+
+  $("#modalDirectReportOrgUnitId").text(checkValue(data.directReportCode));
+  $("#modalDirectReportOrgUnitName").text(checkValue(data.directReportName));
+  $("#modalDirectReportId").text(checkValue(data.parentCode));
+  $("#modalDirectReportName").text(checkValue(data.parentName));
+
+  $("#modalDirectorate").text(checkValue(data?.directorateName));
+  $("#modalFunction").text(checkValue(data?.functionName));
   $("#modalDivision").text(checkValue(data?.divisionName));
   $("#modalSubDivision").text(checkValue(data?.subDivisionName));
   $("#modalDepartment").text(checkValue(data?.departmentName));
+
   $("#modalSection").text(checkValue(data?.sectionName));
-  $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
-  $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubAreaName));
   $("#modalCareerType").text(checkValue(data?.careerTypeName));
   $("#modalCareerLevel").text(checkValue(data?.careerLevelName));
-  $("#modalAbbrvPosition").text(checkValue(data?.abbrvPosition));
-  $("#modalOrgUnitName").text(checkValue(data?.unitName));
-  $("#modalPositionName").text(checkValue(data?.positionName));
+  $("#modalAbbrvPosition").text(checkValue(data?.abbreviationName));
+
+  $("#modalKBO").text(checkValue(data?.kbo));
+  $("#modalCostCenter").text(checkValue(data?.costCenter));
+  $("#modalPersonnelArea").text(checkValue(data?.personnelAreaCode));
+  $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
+
+  $("#modalPersonnelAreaSub").text(checkValue(data?.personnelSubareaCode));
+  $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubareaName));
+  $("#modalSKNumber").text(checkValue(data?.sourceOfSK));
+
   $("#modalOrgPRL").text(checkValue(data?.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));
-  $("#modalDirectReport").text(checkValue(data?.parentName));
-  $("#modalNeckFunction").text(checkValue(data?.neckFunction));
-  $("#modalIsProject").text(checkValue(data?.isProject));
-  $("#modalIsCoordination").text(checkValue(data?.isCoordination));
-  $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
-  $("#modalFunction").text(checkValue(data?.functionName));
-  $("#modalSKNumber").text(checkValue(data?.skNumber));
+
+  $("#modalNeckFunction").text(data?.neckFunction ?? "");
+  $("#modalIsProject").text(data?.isProject ?? "");
+  $("#modalIsCoordination").text(data?.isCoordination ?? "");
+  $("#modalCoordinationWith").text(data?.coordinationWith ?? "");
 
   $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
   $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
@@ -1370,11 +1417,138 @@ async function modalJobPopup(params) {
   $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
   $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupCode ?? "");
 
-  $("#incumbentId").text(data?.incumbents[0]?.personCode ?? "");
-  $("#incumbentName").text(data?.incumbents[0]?.personName ?? "");
-  $("#prlPlanComp").text(data?.incumbents[0]?.prlPlan ?? "");
-
   $("#modalDetailJob").modal("show");
+  $("#nonBasketIncumbent").show();
+  $("#incumbentCard").show();
+  if (data?.isBasket) {
+    $("#positionListCard, #basketIncumbent").show();
+    $("#nonBasketIncumbent").hide();
+
+    // Render incumbents table
+    const $basketBody = $("#tableBasketIncumbent tbody").empty();
+    (data?.incumbents || []).forEach((item, i) => {
+      $basketBody.append(`<tr>
+      <td>${i + 1}</td>
+      <td>${item.personCode}</td>
+      <td>${item.personName}</td>
+      <td>${item.prlPlan}</td>
+      <td>${item.positionCode}</td>
+      <td>${item.positionName}</td>
+      </tr>`);
+    });
+
+    // Render position list table
+    const $positionBody = $("#tablePositionListBody").empty();
+    (data?.positionList || []).forEach((item, i) => {
+      $positionBody.append(`<tr>
+      <td>${i + 1}</td>
+      <td>${item.unitName}</td>
+      <td>${item.careerLevel}</td>
+      <td>${item.prlOrg}</td>
+      <td>${item.formation}</td>
+      </tr>`);
+    });
+  } else {
+    // alert("masuk non basket");
+    $("#nonBasketIncumbent").show();
+    $(".no-basket, #positionListCard, #basketIncumbent").hide();
+    $("#incumbentId").text(data?.incumbents?.[0]?.personCode ?? "-");
+    $("#incumbentName").text(data?.incumbents?.[0]?.personName ?? "Vacant");
+    $("#prlPlanComp").text(data?.incumbents?.[0]?.prlPlan ?? "Vacant");
+  }
+
+  if (!data?.incumbents?.length) {
+    $("#incumbentId").text("-");
+    $("#incumbentName").text("Vacant");
+    $("#prlPlanComp").text("-");
+    $("#incumbentCard").show();
+  }
+
+  // $("#incumbentCard").hide();
+  // $("#incumbentCard").addClass("d-none");
+  // if (organizationAttribute?.orgUnitId == "1") {
+  //   $("#incumbentCard").show();
+  //   $("#incumbentCard").removeClass("d-none");
+  // }
+
+  // let totalFormationSelf = 0;
+  // if (data.isBasket == "Yes") {
+  //   const tableBasketBody = $("#tableBasketIncumbent tbody");
+  //   const tablePositionListBody = $("#tablePositionList tbody");
+  //   tableBasketBody.html("");
+  //   tablePositionListBody.html("");
+  //   data.listSubPosition.forEach((item, index) => {
+  //     const incumbent = item.incumbent && item.incumbent[0] ? item.incumbent[0] : null;
+
+  //     const no = index + 1;
+  //     const prlOrgSum = item.prlOrg == item.prlOrgTo ? item.prlOrg : `${item.prlOrg} - ${item.prlOrgTo}`;
+  //     if (incumbent) {
+  //       $("#tableBasketIncumbent tbody").append(
+  //         `<tr>
+  //               <td>` +
+  //           no +
+  //           `</td>
+  //               <td>` +
+  //           item.incumbent[0].employeeId +
+  //           `</td>
+  //               <td>` +
+  //           item.incumbent[0].employeeName +
+  //           `</td>
+  //               <td>` +
+  //           item.incumbent[0].prlPlanComp +
+  //           `</td>
+  //               <td>` +
+  //           item.subPositionId +
+  //           `</td>
+  //               <td>` +
+  //           item.subPositionName +
+  //           `</td>
+  //             </tr>`
+  //       );
+  //     }
+  //     $("#tablePositionListBody").append(
+  //       `<tr>
+  //         <td>` +
+  //         no +
+  //         `</td>
+  //         <td>` +
+  //         item.subPositionName +
+  //         `</td>
+  //         <td>` +
+  //         item.careerLevel +
+  //         `</td>
+  //         <td>` +
+  //         prlOrgSum +
+  //         `</td>
+  //         <td>` +
+  //         item.formation +
+  //         `</td>
+
+  //       </tr>`
+  //     );
+  //   });
+  // }
+
+  // if (data.isBasket == "Yes") {
+  //   $("#positionListCard").show();
+  //   $("#nonBasketIncumbent").hide();
+  //   $("#basketIncumbent").show();
+
+  //   if (dataOrg.tags.some((tag) => tag.startsWith("bracket_"))) {
+  //     // console.log("bracket_");
+  //     const bracket = dataOrg.tags.find((tag) => tag.startsWith("bracket_"));
+  //     const bracketValue = bracket.split("_")[1];
+  //     totalFormationSelf += parseInt(bracketValue);
+  //   } else {
+  //     // console.log("no bracket_");
+  //     totalFormationSelf += findChildrenOrg.jumlah_formasi;
+  //   }
+  //   $("#modalFormation").text(totalFormationSelf ?? "");
+  // } else {
+  //   $("#positionListCard").hide();
+  //   $("#nonBasketIncumbent").show();
+  //   $("#basketIncumbent").hide();
+  // }
 }
 
 function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
@@ -1595,21 +1769,22 @@ function createHierarchy(data, parentId = null) {
     .map((item) => ({
       id: item.id,
       text: item.position,
-      icon: "",
-      // icon: "icofont icofont-plus font-theme",
+      icon: "icofont icofont-plus font-theme",
       a_attr: item.a_attr ? null : { class: "no-children" }, // add class if no children
       children: createHierarchy(data, item.id) ?? null,
     }));
 }
 
 async function helperOrgTree(params) {
-  // console.log(params);
+  // const olah = createHierarchy(test2, "10132405");
+  // console.log("olah", olah);
+  // return;
+  // console.log("olah", olah);
   // refresh jsTree
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
     core: {
-      check_callback: true,
-      data: createHierarchy(params),
+      data: createHierarchy(params, "10132405"),
     },
     plugins: ["ui", "types"],
     ui: {
@@ -1635,77 +1810,38 @@ async function helperOrgTree(params) {
     });
   });
 
-  function reloadTree(newData) {
-    const tree = $("#orgThreeDiv").jstree(true);
-    tree.settings.core.data = createHierarchy(newData); // Set new data
-    tree.refresh(); // Refresh the tree
-  }
-
-  $("#orgThreeDiv").on("click", ".jstree-anchor", async function (e) {
-    const node = $("#orgThreeDiv").jstree(true).get_node($(this).closest(".jstree-node").attr("id"));
-    const dataChart = await chartShow({
-      draftId: organizationAttribute.orgUnitId,
-      jobCode: node.id,
-      depth: 2,
-    });
-    dataChart.data.forEach((item) => {
-      item.id = item.id_org_unit;
-    });
-
-    // check only pid is node.id
-    // const selfNode = dataChart.data.find((item) => item.id == node.id);
-    // const directReportfNode = dataChart.data.filter((item) => item.pid == node.id);
-    // dataChart.data = [selfNode, ...directReportfNode];
-    console.log(node.id);
-    console.log(dataChart.data);
-
-    if (!dataChart.data || !dataChart.data.length) {
-      console.warn("No data received for children");
-      return;
-    }
-
-    const newChildren = createHierarchy(dataChart.data);
-    console.log(newChildren);
-
-    if (!newChildren.length || !newChildren[0].children) {
-      console.warn("No children to add");
-      return;
-    }
-
-    const children = newChildren[0].children;
-
-    for (const child of children) {
-      if (!child.id || !child.text) {
-        continue;
-      }
-      // check if parent node already has this child
-      const existingChild = $("#orgThreeDiv").jstree(true).get_node(child.id);
-      if (existingChild) {
-        console.warn("Child already exists", child.id);
-        continue;
-      }
-      // setTimeout(() => {
-      $("#orgThreeDiv")
-        .jstree(true)
-        .create_node(node.id, child, "last", function (new_node) {});
-    }
-
+  $("#orgThreeDiv").on("click", ".jstree-anchor", function (e) {
     if (e.detail === 2) {
-      // let newIcon =
-      //   node.icon === "icofont icofont-plus font-theme"
-      //     ? "icofont icofont-minus font-theme"
-      //     : "icofont icofont-plus font-theme";
-      // $("#orgThreeDiv").jstree(true).set_icon(node, newIcon);
+      const node = $("#orgThreeDiv").jstree(true).get_node($(this).closest(".jstree-node").attr("id"));
+      let newIcon;
+      if (node.icon === true) {
+        newIcon = true;
+        $("#orgThreeDiv").jstree(true).set_icon(node, newIcon);
+        return;
+      }
+      newIcon =
+        node.icon === "icofont icofont-plus font-theme"
+          ? "icofont icofont-minus font-theme"
+          : "icofont icofont-plus font-theme";
+      $("#orgThreeDiv").jstree(true).set_icon(node, newIcon);
     }
   });
 
   // right click
-  $("#orgThreeDiv").on("contextmenu", ".jstree-node", function (e) {
-    e.preventDefault();
-    const node = $("#orgThreeDiv").jstree(true).get_node($(this).attr("id"));
-    focusNode(node.id);
-    $("#modalOrgTree").modal("hide");
-  });
+  $("#orgThreeDiv")
+    .off("contextmenu", ".jstree-node")
+    .on("contextmenu", ".jstree-node", function (e) {
+      e.preventDefault();
+      e.stopPropagation(); // Prevent bubbling to parent nodes
+      const nodeId = $(this).attr("id");
+      // Only trigger for the exact node right-clicked, not its parents
+      if (e.target.closest(".jstree-node") && e.target.closest(".jstree-node").id === nodeId) {
+        const node = $("#orgThreeDiv").jstree(true).get_node(nodeId);
+        console.log("node", node);
+        focusNode(node.id);
+        $("#modalOrgTree").modal("hide");
+      }
+    });
 }
 
 // ======================
@@ -1858,7 +1994,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     template.position = null;
     template.prl = null;
     template.jumlah_formasi = null;
-    template.position =
+    template.org_unit =
       `<g>` +
       '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
       `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
@@ -1903,7 +2039,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     const bracketSize = bracketSizeFormat.split("_")[0];
     const bracketSplitted = bracketSizeFormat.split("_").slice(1);
     // console.log({bracketSize})
-    // console.log({bracketSplitted})
+    console.log({ bracketSplitted });
     const template = Object.assign({}, OrgChart.templates.default_t);
     template.size = [220, 0];
     for (let i = 0; i < bracketSize; i++) {
@@ -1912,7 +2048,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     template.position = null;
     template.prl = null;
     template.jumlah_formasi = null;
-    template.position =
+    template.org_unit =
       `<g>` +
       '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
       `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
@@ -1928,7 +2064,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       template[`bc_${i}_position`] =
         `<g>` +
         `<rect x="0" y="${yPosition}" height="40" width="140" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text data-width="120" style="font-size:10px;text-anchor: middle;" fill="#353238" x="70" y="${yTextPosition}" data-text-overflow="multiline">{val}</text>` +
+        `<text data-width="120" style="font-size:8px;text-anchor: middle;" fill="#353238" x="70" y="${
+          yTextPosition - 5
+        }" data-text-overflow="multiline">{val}</text>` +
         `</g>`;
       template[`bc_${i}_prl`] =
         `<g>` +
@@ -1967,7 +2105,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       template[`bc_${i + 1}_jumlah_formasi`] =
         `<g>` +
         `<rect x="180" y="${yPosition}" height="${yHeight}" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text style="font-size:11px;text-anchor: middle;"  x="200" y="${yTextPosition}">asd</text>` +
+        `<text style="font-size:11px;text-anchor: middle;"  x="200" y="${yTextPosition}">{val}</text>` +
         `</g>`;
     }
 
@@ -1996,20 +2134,153 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     };
   }
 
-  // tags['basket_3_2_1'] = {
-  //   template: "basket_3_2_1_t",
-  // };
-  // OrgChart.templates[`basket_3_2_1_t`] = bracketTemplateGeneratorJoinFormation('3_2_1');
+  // console.log("data", data);
+  const dataMerged = data.filter((item) => item.isMergeFormation === true);
+  console.log("dataMerged", dataMerged);
+  // const isMerge = dataMerged.some((item) =>
+  //   Object.keys(item).some((key) => key.match(/^bc_\d+_isMerge$/) && item[key])
+  // );
+  // console.log("isMerge", isMerge);
+  // console.log("dataMerged", dataMerged);
 
-  // tags['basket_3_1_2'] = {
-  //   template: "basket_3_1_2_t",
-  // };
-  // OrgChart.templates[`basket_3_1_2_t`] = bracketTemplateGeneratorJoinFormation('3_1_2');
+  let tagsCustomMergeArray = [];
 
-  // tags["basket_4_1_1_2"] = {
-  //   template: "basket_4_1_1_2_t",
-  // };
-  // OrgChart.templates[`basket_4_1_1_2_t`] = bracketTemplateGeneratorJoinFormation("4_1_1_2");
+  dataMerged.forEach((item) => {
+    // if (!item.isMerge) return;
+    // const isMerge = Object.keys(item).some((key) => key.match(/^bc_\d+_isMerge$/) && item[key]);
+    // console.log("isMerge", isMerge);
+    // if (!isMerge) return;
+    const dataSelected = item;
+    // console.log("dataSelected", dataSelected);
+    // remove insie item.tags where tag starts with basket_
+    item.tags = item.tags.filter((tag) => !tag.startsWith("basket_"));
+    // cari yang key nya ada text "type"
+    const getType = Object.entries(dataSelected)
+      .filter(([key]) => key.includes("flagMergeFormation"))
+      .map(([key, value]) => ({ key, value }));
+    const totalBAsket = getType.length;
+    let tagCustomMerge = "";
+    if (totalBAsket > 0) {
+      tagCustomMerge = `basket_${totalBAsket}`;
+    }
+    const customMergeLabel = "Z";
+    getType.forEach((ita, ida) => {
+      if (item[ita.key] == null) {
+        item[ita.key] = customMergeLabel + String(ida + 1);
+        ita.value = customMergeLabel + String(ida + 1);
+      }
+    });
+
+    // check ada yang value nilai value getType yang sama atu tidak. contoh = [{a:1},{b:2},{c:1}]
+    const storeValues = [];
+    const uniqueValues = new Set(getType.map((item) => item.value));
+    uniqueValues.forEach((value) => {
+      const count = getType.filter((item) => item.value === value).length;
+      storeValues.push({ value, count });
+    });
+    console.log("uniqueValues", uniqueValues);
+    // console.log("storeValues", storeValues);
+
+    // storeValues.sort((a, b) => {
+    //   if (a.value === null && b.value === null) return 0;
+    //   if (a.value === null) return 1;
+    //   if (b.value === null) return -1;
+    //   return a.value.localeCompare(b.value);
+    // });
+    console.log("storeValues sorted", storeValues);
+
+    storeValues.forEach((itx, index) => {
+      console.log("stroreValues idx", index);
+      console.log("itx", itx);
+      const tagFormation = `bc_${index + 1}_jumlah_formasi`;
+      console.log("tagFormation", tagFormation);
+      // console.log("itx", itx);
+      // console.log("item", item);
+      // console.log("item[tagFormation]", item[tagFormation]);
+
+      // find in item ke includes _flagMergeFormation and value matches itx.value
+      const flagMergeFormationKey = Object.keys(item)
+        .filter((key) => key.includes("_flagMergeFormation") && item[key] === itx.value)
+        .sort((a, b) => {
+          return a.localeCompare(b);
+        });
+      console.log("flagMergeFormationKey", flagMergeFormationKey);
+
+      flagMergeFormationKey.forEach((key) => {
+        console.log("key", key);
+        const separation = key.split("_");
+        const bracketIndex = separation[1]; // get the index of the bracket
+        item[tagFormation] = item[`bc_${bracketIndex}_jumlah_formasi`] || 0; // set jumlah_formasi to count
+      });
+
+      // item["bc_1_jumlah_formasi"] = 1; // example to set jumlah_formasi
+      // item["bc_2_jumlah_formasi"] = 2; // example to set jumlah_formasi
+      // item["bc_3_jumlah_formasi"] = 3; // set jumlah_formasi to count
+
+      // find in item if key includes _jumlah_formasi and value matches itx.value (type-safe)
+      // const keyFound = Object.keys(item)
+      //   .filter((key) => key.includes("_jumlah_formasi"))
+      //   .sort((a, b) => {
+      //     return a.localeCompare(b);
+      //   });
+      // const mergeKeyFound = Object.keys(item)
+      //   .filter((key) => key.includes("_flagMergeFormation"))
+      //   .sort((a, b) => {
+      //     return a.localeCompare(b);
+      //   });
+      // console.log("keyFound", keyFound);
+      // console.log("mergeKeyFound", mergeKeyFound);
+      // // console.log("keyFound", keyFound);
+      // // console.log("item", item);
+      // keyFound.forEach((key, idz) => {
+      //   // console.log("key", key);
+      //   // console.log(mergeKeyFound[idz]);
+      //   // console.log("item[key]", item[key]);
+      //   // console.log("itx.value", itx.value);
+      //   // if (item[key] == itx.value) {
+      //   // console.log("key", key);
+      //   // console.log("item[key]", item[key]);
+      //   // item[tagFormation] = itx.count;
+      //   // console.log("masuk", key);
+      //   // item[key] = itx.count;
+      //   // }
+      //   // console.log("key", key);
+      //   // console.log("item[key]", item[key]);
+      //   // console.log("item[key]", item[key]);
+      //   // if (item[key] == 0) return;
+      //   // console.log("key 2", key);
+      //   // item[tagFormation] = itx.count;
+      //   // if (item[key] == itx.value) {
+      //   //   item[tagFormation] = item[key];
+      //   //   console.log("masuk", key);
+      //   //   // item[key] = itx.count;
+      //   // }
+      // });
+
+      // const keyFound = Object.keys(dataSelected).find((key) => key.includes(itx.value));
+      // console.log("keyFound", keyFound);
+      // tagCustomMerge
+      // console.log("itx.counte", itx.counte);
+      tagCustomMerge += `_${itx.count}`;
+      // console.log("tagFormation", tagFormation);
+    });
+    item.tags.push(tagCustomMerge);
+    tagsCustomMergeArray.push(tagCustomMerge);
+    console.log("tagsCustomMergeArray before unique", tagCustomMerge);
+  });
+
+  // console.log("tagsCustomMergeArray", tagsCustomMergeArray);
+  tagsCustomMergeArray = [...new Set(tagsCustomMergeArray)];
+  // console.log("tagsCustomMergeArray", tagsCustomMergeArray);
+
+  tagsCustomMergeArray.forEach((ity) => {
+    // remove basket_ from ity
+    const itemReplaced = ity.replace("basket_", "");
+    tags[ity] = {
+      template: `${ity}_t`,
+    };
+    OrgChart.templates[`${ity}_t`] = bracketTemplateGeneratorJoinFormation(itemReplaced);
+  });
 
   // for (let i = 1; i <= bracketLimit; i++) {
   //   for (let key in baseNodeBinding) {
@@ -2046,6 +2317,19 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   OrgChart.RESET_MOVABLE_ONEXPANDCOLLAPSE = true;
   OrgChart.SEARCH_CLOSE_RESULT_ON_ESCAPE_OR_CLICKOUTSIDE = true;
+  // remove chart first, then create new chart
+  const chartContainer = document.getElementById(id);
+  if (chartContainer) {
+    chartContainer.innerHTML = "";
+  }
+  if (document.getElementById(id)) {
+    document.getElementById(id).innerHTML = "";
+  } else {
+    const container = document.createElement("div");
+    container.id = id;
+    document.body.appendChild(container);
+  }
+
   let chart = new OrgChart(document.getElementById(id), {
     collapse: {
       ...param.collapsed,
@@ -2064,11 +2348,11 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     align: OrgChart.ORIENTATION,
     // movable: OrgChart.movable.node,
     nodeMouseClick: false,
-    menu: {
-      pdf: { text: "Export PDF" },
-      png: { text: "Export PNG" },
-      svg: { text: "Export SVG" },
-    },
+    // menu: {
+    //   pdf: { text: "Export PDF" },
+    //   png: { text: "Export PNG" },
+    //   svg: { text: "Export SVG" },
+    // },
     toolbar: {
       fullScreen: true,
       zoom: true,
@@ -2191,17 +2475,59 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     return false;
   });
 
-  $("#handleExport").on("click", function () {
-    const nodeId = $("#positionId").val();
-    const position = lsListPosition.find((item) => item.positionId == nodeId);
-    console.log("masuk 3");
-    // exportPDF(nodeId);
-    chart.exportPDF({ filename: `${position.positionName}.pdf`, expandChildren: false, nodeId: nodeId });
-    // chart remove certain tags
-    chart.removeTags(["pointed"]);
+  $("#handleExportPdf")
+    .off("click")
+    .on("click", function () {
+      const nodeId = $("#positionId").val();
+      chart.exportPDF({
+        filename: `${nodeId}.pdf`,
+        expandChildren: false,
+      });
+      $("#modalDetailJob").modal("hide");
+    });
 
-    $("#modalDetailJob").modal("hide");
-  });
+  $("#handleExportPng")
+    .off("click")
+    .on("click", function () {
+      const nodeId = $("#positionId").val();
+      chart.exportPNG({
+        // expandChildren: true,
+        // min: false,
+        openInNewTab: true,
+        filename: `${nodeId}.png`,
+        // parentLevels: 1,
+        // childLevels: 1,
+        expandChildren: false,
+      });
+      $("#modalDetailJob").modal("hide");
+    });
+
+  $("#handleExportSvg")
+    .off("click")
+    .on("click", function () {
+      const nodeId = $("#positionId").val();
+      chart.exportSVG({
+        // expandChildren: true,
+        // min: false,
+        filename: `${nodeId}.svg`,
+        // parentLevels: 1,
+        // childLevels: 1,
+        expandChildren: false,
+      });
+      $("#modalDetailJob").modal("hide");
+    });
+
+  // $("#handleExport").on("click", function () {
+  //   const nodeId = $("#positionId").val();
+  //   const position = lsListPosition.find((item) => item.positionId == nodeId);
+  //   console.log("masuk 3");
+  //   // exportPDF(nodeId);
+  //   chart.exportPDF({ filename: `${position.positionName}.pdf`, expandChildren: false, nodeId: nodeId });
+  //   // chart remove certain tags
+  //   chart.removeTags(["pointed"]);
+
+  //   $("#modalDetailJob").modal("hide");
+  // });
 
   // function handleExport() {
   //   const nodeId = $("#positionId").val();
@@ -2216,6 +2542,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     setTimeout(() => {
       chart.expand(object.nodeId, getAll);
     }, 500);
+    setTimeout(() => {
+      chart.fit();
+    }, 800);
   }
 }
 

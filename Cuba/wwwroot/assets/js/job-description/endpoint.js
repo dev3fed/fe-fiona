@@ -19,9 +19,7 @@ async function draftListJobDesc(id) {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    alert(
-      `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/get-list-positions/ error: ${error.statusText}`
-    );
+    alert(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/get-list-positions/ error: ${error.statusText}`);
   }
 }
 
@@ -44,9 +42,7 @@ async function getDetailByPosition(id) {
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     if (result?.data?.length == 0 || result?.data == null) {
-      alert(
-        `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/show-detail-by-position/ tidak ada`
-      );
+      alert(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/show-detail-by-position/ tidak ada`);
       return [];
     }
     return result;
@@ -62,9 +58,7 @@ async function getFungsiJabatan(params) {
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     if (result?.data?.length == 0) {
-      alert(
-        `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/fungsi-jabatan/show/ tidak ada`
-      );
+      alert(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/fungsi-jabatan/show/ tidak ada`);
       return [];
     }
     return result;
@@ -214,6 +208,30 @@ async function getSimilarities(params) {
   } catch (error) {
     console.error("Error fetching data from API");
     $("#similarityList").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// http://localhost:5095/api/job-description/get-all-tanggung-jawab-to-rasci?draftId=078f449f-a016-44ee-a09c-71326225aed1&jobId=10135617&prlOrg=18&page=1&pageSize=10
+async function getAllTanggungJawabToRasci(params) {
+  const api = `${url.baseUrl}/${url["job-description"]}/get-all-tanggung-jawab-to-rasci?draftId=${params.draftId}&jobId=${params.jobId}&prlOrg=${params.prlOrg}&page=${params.page}&pageSize=${params.pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+// http://localhost:5095/api/job-description/get-all-tanggung-jawab-job-to-job?draftId=078f449f-a016-44ee-a09c-71326225aed1&jobIdFrom=10135617&prlOrgFrom=18&jobIdTo=10132470&prlOrgTo=26&page=1&pageSize=10
+async function getAllTanggungJawabJobToJob(params) {
+  const api = `${url.baseUrl}/${url["job-description"]}/get-all-tanggung-jawab-job-to-job?draftId=${params.draftId}&jobIdFrom=${params.jobIdFrom}&prlOrgFrom=${params.prlOrgFrom}&jobIdTo=${params.jobIdTo}&prlOrgTo=${params.prlOrgTo}&page=${params.page}&pageSize=${params.pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
     throw error;
   }
 }
