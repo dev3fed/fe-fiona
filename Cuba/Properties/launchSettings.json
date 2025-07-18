@@ -12,8 +12,8 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://lszzm0wz-5095.asse.devtunnels.ms",
-      // "applicationUrl": "https://lszzm0wz-5095.asse.devtunnels.ms",
+      "applicationUrl": "http://localhost:5095",
+      // "applicationUrl": "http://localhost:5095",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -22,7 +22,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://lszzm0wz-5095.asse.devtunnels.ms",
+      "applicationUrl": "http://localhost:5095",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

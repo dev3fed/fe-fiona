@@ -1425,8 +1425,23 @@ async function modalJobPopup(params) {
     $("#nonBasketIncumbent").hide();
 
     // Render incumbents table
+    // data?.incumbents make unique by item.personCode
+    data.incumbents = data.incumbents.filter(
+      (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode)
+    );
+    console.log("incumbents unique", data.incumbents);
+    data.incumbents = data.incumbents.sort((a, b) => a.personCode.localeCompare(b.personCode));
+    console.log("incumbents", data.incumbents);
+
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
+      if (item?.personCode == 0) {
+        item.personCode = "-";
+        item.personName = "Vacant";
+        item.prlPlan = "-";
+        item.positionCode = "-";
+        item.positionName = "-";
+      }
       $basketBody.append(`<tr>
       <td>${i + 1}</td>
       <td>${item.personCode}</td>
@@ -1442,7 +1457,7 @@ async function modalJobPopup(params) {
     (data?.positionList || []).forEach((item, i) => {
       $positionBody.append(`<tr>
       <td>${i + 1}</td>
-      <td>${item.unitName}</td>
+      <td>${item.positionName}</td>
       <td>${item.careerLevel}</td>
       <td>${item.prlOrg}</td>
       <td>${item.formation}</td>
