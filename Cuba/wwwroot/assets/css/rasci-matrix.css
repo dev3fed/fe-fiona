@@ -340,6 +340,10 @@ th {
   /* background color green light */
   background-color: #daf4fe !important;
 }
+.rasci-matrix tr.prosbisparent td {
+  /* background color green light */
+  background-color: #f6f6f6 !important;
+}
 .jabatan-cell-outer-wrapper {
   border-top: 5px solid #d9e1f2;
   align-items: center;

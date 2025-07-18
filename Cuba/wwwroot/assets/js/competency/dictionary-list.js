@@ -61,7 +61,6 @@ const bodypageTechnical = async () => {
     const queryString = "?" + new URLSearchParams(payload).toString();
     const result = await fetchTechnicalList(queryString);
     renderTableTchnical(result.data);
-    console.log("result", result);
     setState("payloadTblTechnical", payload);
   } catch (error) {}
 };

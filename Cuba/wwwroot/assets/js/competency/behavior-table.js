@@ -1,7 +1,6 @@
 const renderTableBehavior = async (behaviorList) => {
   try {
     const listData = behaviorList;
-    console.log("first", listData);
     const bodyContent = listData.data
       .map((val, i) => {
         const startIndex = (listData.page - 1) * listData.limit;
@@ -28,16 +27,13 @@ const renderTableBehavior = async (behaviorList) => {
     const totalPages = Math.ceil(listData.count / itemsPerPage);
     const currentPage = listData.page;
     const start = (listData.page - 1) * itemsPerPage + 1;
-    console.log("first", start);
-    console.log("first", totalPages);
-    console.log("first", currentPage);
     renderPaginationBehavior(currentPage, totalPages);
     const totalPage = document.getElementById("total-behavior-page");
     if (totalPage) {
       totalPage.innerHTML = `
           <div class="row">
             <div class="col-2">
-              <select class="form-select digits"  style="width:62%;" id="limitDetailPage" onchange="handleChangeItemsPerPage(event)">
+              <select class="form-select digits"  style="width:62%;" id="limitPageBehavior" onchange="handleChangeItemsPerPage(event)">
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="15">15</option>
@@ -54,7 +50,7 @@ const renderTableBehavior = async (behaviorList) => {
           </div>
         `;
     }
-    let selectElement = document.getElementById("limitDetailPage");
+    let selectElement = document.getElementById("limitPageBehavior");
     selectElement.value = listData.limit;
   } catch (error) {
     console.error("Error rendering table behavior:", error);
@@ -158,7 +154,6 @@ async function handleBehavior(type, code) {
     if (modalTitle) {
       modalTitle.innerHTML = `${type} Competency Detail`;
     }
-    console.log("dataDetail", dataDetail);
     const formContent = `
     <div class="col-12 scrollable-content" style="min-height: 620px;">
         <div class="mb-2">
