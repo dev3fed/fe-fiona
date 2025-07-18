@@ -54,9 +54,9 @@ function loadTableBodyDraft(dataList) {
             <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail(${val.id})">
               <i class="icon-eye"></i> 
             </button>
-            <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="handleDeleteCompeDraft(${
-              val.id
-            })">
+            <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="handleDeleteCompeDraft('${
+              val.draftId
+            }')">
               <i class="icon-trash"></i> 
             </button>
           </td>
@@ -384,7 +384,6 @@ function changeemptyPageDraft(length) {
 }
 const confirmDeletecompeDraft = async () => {
   const id = getState("deleteDraftCompetency");
-  console.log("id", id);
   try {
     const deleteResult = await fetchDeleteDraft(id);
     console.log("deleteResult", deleteResult);

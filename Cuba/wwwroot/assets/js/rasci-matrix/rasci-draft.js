@@ -14,7 +14,9 @@ document.addEventListener("dataLoaded", handleDataLoad);
 document.addEventListener("DOMContentLoaded", handleDataLoad);
 
 function openFormEmptyDraft() {
-  const modal = new bootstrap.Modal(document.getElementById("modalformEmptydraft"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("modalformEmptydraft"),
+  );
   modal.show();
   fetchSelectEmptyDraftso();
 }
@@ -57,7 +59,9 @@ function fetchSelectEmptyDraftso() {
     });
 }
 function openModalCreatedraft() {
-  const modal = new bootstrap.Modal(document.getElementById("modalcreateDraft"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("modalcreateDraft"),
+  );
   modal.show();
   fetchSelect2Draftso("#modalcreateDraft", "#selectso-mainpage");
 }
@@ -156,21 +160,27 @@ function loadTableBodyDraft(response) {
       <tr>
         <th scope="row" style="text-align:center">${startIndex + i + 1}</th>
         <td>${val.draftName || "-"}</td>
-        <td>${val.orgName || "-"}</td>
+        <td>${val.orgNameSource || "-"}</td>
         <td>${val.createdBy || "-"}
           <br>
           <small style="color:#9F9FA5">${
-            val.createdDate ? "at " + new Date(val.createdDate).toLocaleDateString() : "-"
+            val.createdDate
+              ? "at " + new Date(val.createdDate).toLocaleDateString()
+              : "-"
           }</small>
         </td>
         <td>${val.modifiedBy || "-"}
           <br>
           <small style="color:#9F9FA5">${
-            val.modifiedDate ? "at " + new Date(val.modifiedDate).toLocaleDateString() : "-"
+            val.modifiedDate
+              ? "at " + new Date(val.modifiedDate).toLocaleDateString()
+              : "-"
           }</small>
         </td>
         <td style="width: 100px;text-align:center">
-          <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail('${val.draftId}')">
+          <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail('${
+            val.draftId
+          }')">
             <i class="icon-eye"></i> 
           </button>
           <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="handleDeleteProsbisDraft('${
@@ -244,7 +254,11 @@ function renderPagination(currentPage, totalPages) {
       <a 
         class="page-link" 
         href="javascript:void(0)"  
-        ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handlePageChange(${1})"`}
+        ${
+          currentPage === 1
+            ? 'tabindex="-1"'
+            : `onclick="handlePageChange(${1})"`
+        }
       >
       ←
       </a>
@@ -256,7 +270,11 @@ function renderPagination(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)"  
-          ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handlePageChange(${currentPage - 1})"`}
+          ${
+            currentPage === 1
+              ? 'tabindex="-1"'
+              : `onclick="handlePageChange(${currentPage - 1})"`
+          }
         >
           «
         </a>
@@ -275,7 +293,11 @@ function renderPagination(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)" 
-          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handlePageChange(${currentPage + 1})"`}
+          ${
+            currentPage === totalPages
+              ? 'tabindex="-1"'
+              : `onclick="handlePageChange(${currentPage + 1})"`
+          }
         >
           » 
         </a>
@@ -286,7 +308,11 @@ function renderPagination(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)" 
-          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handlePageChange(${totalPages})"`}
+          ${
+            currentPage === totalPages
+              ? 'tabindex="-1"'
+              : `onclick="handlePageChange(${totalPages})"`
+          }
         >
           →
         </a>
@@ -573,7 +599,9 @@ async function handleSaveDraft() {
 }
 
 async function handleSaveEmptyDraft() {
-  const emptydraftNameInput = document.getElementById("input-emptydraftname").value;
+  const emptydraftNameInput = document.getElementById(
+    "input-emptydraftname",
+  ).value;
   const selectedValue = $("#select-emptydraftso").val();
   const spinner = document.getElementById("loadingEmptysavedraft");
   spinner.style.display = "inline-block";

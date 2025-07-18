@@ -1,7 +1,8 @@
 let selectedText = "RASCI by Job";
 let selectedJobIds = [];
+let selectedPrlIds = [];
 let SelectedProsbisId = [];
-let selectedSingleId = "";
+let selectedSingleId = [];
 document.addEventListener("dataLoaded", function () {});
 document.addEventListener("DOMContentLoaded", function () {});
 function setSelectedText(text) {
@@ -10,35 +11,54 @@ function setSelectedText(text) {
   document.getElementById("inputText").value = "";
 }
 
-document.getElementById("searchButton").addEventListener("click", async function () {
-  const inputText = document.getElementById("inputText").value;
-  const searchType =
-    selectedText == "RASCI by Job" ? "job" : selectedText == "RASCI by Bus..." ? "businessprocess" : "businessprocess";
-  let resultTblRbp = [];
-  let resultTblJob = [];
+document
+  .getElementById("searchButton")
+  .addEventListener("click", async function () {
+    const inputText = document.getElementById("inputText").value;
+    const spinner = document.getElementById("loadingSearch");
+    spinner.style.display = "inline-block";
+    //
+    const searchType =
+      selectedText == "RASCI by Job"
+        ? "job"
+        : selectedText == "RASCI by Bus..."
+        ? "businessprocess"
+        : "businessprocess";
+    const draftSoId = getState("draftSoId");
+    const selectedValue = $("#dataSource-rasci").val();
+    let resultTblRbp = [];
+    let resultTblJob = [];
 
-  let resultTblBp = [];
-  const dataTbl = await SearchMatrix({ type: searchType, search: inputText });
-  if (dataTbl.status == 200) {
+    let resultTblBp = [];
+    const payload = {
+      Type: searchType,
+      Search: inputText,
+      DraftSoId: draftSoId || null,
+      DraftRasciId: selectedValue === "master" ? null : selectedValue,
+    };
+    const queryString = new URLSearchParams(payload).toString();
+    const dataTbl = await SearchMatrix(queryString);
+    if (dataTbl.status == 200) {
+      spinner.style.display = "none";
+      switch (selectedText) {
+        case "RASCI by Job":
+          resultTblJob = dataTbl.data;
+          break;
+        case "RASCI by Bus...":
+          resultTblRbp = dataTbl.data;
+          break;
+        default:
+          resultTblBp = dataTbl.data;
+          break;
+      }
+    }
+    let modalSearchTitle = "";
+    let searchLabel = "";
     switch (selectedText) {
       case "RASCI by Job":
-        resultTblJob = dataTbl.data;
-        break;
-      case "RASCI by Bus...":
-        resultTblRbp = dataTbl.data;
-        break;
-      default:
-        resultTblBp = dataTbl.data;
-        break;
-    }
-  }
-  let modalSearchTitle = "";
-  let searchLabel = "";
-  switch (selectedText) {
-    case "RASCI by Job":
-      modalSearchTitle = `Search RASCI by job `;
-      searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblJob?.length} result)`;
-      theadContent = `<tr>
+        modalSearchTitle = `Search RASCI by job `;
+        searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblJob?.length} result)`;
+        theadContent = `<tr>
           <th scope="col" style="width: 50px">
             <label class="checkbox-label" for="checked-head-job">
               <input class="checkbox_animated" id="checked-head-job" type="checkbox" onchange="selectAllJob(event)">
@@ -47,24 +67,26 @@ document.getElementById("searchButton").addEventListener("click", async function
           <th scope="col">Job Level</th>
           <th scope="col">Job Title</th>
         </tr>`;
-      bodyContent = resultTblJob
-        ?.map((item, i) => {
-          return `<tr>
+        bodyContent = resultTblJob
+          ?.map((item, i) => {
+            return `<tr>
             <th scope="row">
-             <label class="checkbox-label" for="checked-body-job">
-              <input class="checkbox_animated" id="checked-body-job" type="checkbox" value="${item.id}">
+             <label class="checkbox-label" for="checked-body-job-${i}">
+              <input class="checkbox_animated checkbox-body-job" id="checked-body-job" type="checkbox" 
+              value="${item.unitCode || ""}" 
+              prlOrg="${item.prlOrg || ""}">
             </label>
             </th>
-            <td>${item.level}</td>
-            <td>${item.name}</td>
+            <td>${item.jobPositionAbbreviation || ""}</td>
+            <td>${item.positionName || ""}</td>
         </tr>`;
-        })
-        .join("");
-      break;
-    case "RASCI by Bus...":
-      modalSearchTitle = "Search RASCI by Business Process";
-      searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblRbp?.length} result)`;
-      theadContent = `<tr>
+          })
+          .join("");
+        break;
+      case "RASCI by Bus...":
+        modalSearchTitle = "Search RASCI by Business Process";
+        searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblRbp?.length} result)`;
+        theadContent = `<tr>
           <th scope="col" style="width: 50px"> 
             <label class="checkbox-label" for="checked-head-rbp">
               <input class="checkbox_animated" id="checked-head-rbp" type="checkbox" onchange="selectAllProsbis(event)">
@@ -74,25 +96,25 @@ document.getElementById("searchButton").addEventListener("click", async function
           <th scope="col" style="width: 80px">Index</th>
           <th scope="col">Business Process</th>
         </tr>`;
-      bodyContent = resultTblRbp
-        ?.map((item, i) => {
-          return `<tr>
+        bodyContent = resultTblRbp
+          ?.map((item, i) => {
+            return `<tr>
             <th scope="row">
               <label class="checkbox-label" for="checked-body-rbp">
-              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.indexGroup}">
+              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.indexNumber}">
             </label>
             </th>
             <td>${item.level}</td>
-            <td>${item.indexGroup}</td>
+            <td>${item.indexNumber}</td>
             <td>${item.description}</td>
         </tr>`;
-        })
-        .join("");
-      break;
-    case "Business Pro...":
-      modalSearchTitle = "Search Business Process";
-      searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblBp?.length} result)`;
-      theadContent = `<tr>
+          })
+          .join("");
+        break;
+      case "Business Pro...":
+        modalSearchTitle = "Search Business Process";
+        searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblBp?.length} result)`;
+        theadContent = `<tr>
           <th scope="col" style="width: 50px">
           Choose
           </th>
@@ -100,63 +122,48 @@ document.getElementById("searchButton").addEventListener("click", async function
           <th scope="col" style="width: 80px">Index</th>
           <th scope="col">Business Process</th>
         </tr>`;
-      bodyContent = resultTblBp
-        ?.map((item, i) => {
-          return `<tr>
+        bodyContent = resultTblBp
+          ?.map((item, i) => {
+            return `<tr>
             <th scope="row">
               <label class="radio-label" for="checked-body-bp">
-                <input class="radio_animated" id="checked-body-bp" type="radio" name="rdo-ani" onchange="selectProsbisId(event)" value="${item.indexGroup}">
+                <input class="radio_animated" id="checked-body-bp" type="radio" name="rdo-ani" onchange="selectProsbisId(event)" value="${item.indexNumber}">
               </label>
             </th>
                <td>${item.level}</td>
-            <td>${item.indexGroup}</td>
+            <td>${item.indexNumber}</td>
             <td>${item.description}</td>
         </tr>`;
-        })
-        .join("");
-      break;
-    default:
-      modalSearchTitle = "No content available";
-  }
-  document.getElementById("modalSearchTitle").innerHTML = modalSearchTitle;
-  document.getElementById("searchLabel").innerHTML = searchLabel;
-  document.getElementById("tbl-search-header").innerHTML = theadContent;
-  document.getElementById("tbl-search-body").innerHTML = bodyContent;
+          })
+          .join("");
+        break;
+      default:
+        modalSearchTitle = "No content available";
+    }
+    document.getElementById("modalSearchTitle").innerHTML = modalSearchTitle;
+    document.getElementById("searchLabel").innerHTML = searchLabel;
+    document.getElementById("tbl-search-header").innerHTML = theadContent;
+    document.getElementById("tbl-search-body").innerHTML = bodyContent;
 
-  document.querySelectorAll("#checked-body-job").forEach((checkbox) => {
-    checkbox.addEventListener("change", selectSingleJob);
+    document.querySelectorAll("#checked-body-job").forEach((checkbox) => {
+      checkbox.addEventListener("change", selectSingleJob);
+    });
+    const headCheckboxJob = document.getElementById("checked-head-job");
+    if (headCheckboxJob) {
+      headCheckboxJob.addEventListener("change", selectAllJob);
+    }
+    document.querySelectorAll("#checked-body-rbp").forEach((checkbox) => {
+      checkbox.addEventListener("change", selectSingleProsbis);
+    });
+    const headCheckboxProsbis = document.getElementById("checked-head-rbp");
+    if (headCheckboxProsbis) {
+      headCheckboxProsbis.addEventListener("change", selectAllProsbis);
+    }
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById("modalSearch"));
+    modal.show();
   });
-  const headCheckboxJob = document.getElementById("checked-head-job");
-  if (headCheckboxJob) {
-    headCheckboxJob.addEventListener("change", selectAllJob);
-  }
-  document.querySelectorAll("#checked-body-rbp").forEach((checkbox) => {
-    checkbox.addEventListener("change", selectSingleProsbis);
-  });
-  const headCheckboxProsbis = document.getElementById("checked-head-rbp");
-  if (headCheckboxProsbis) {
-    headCheckboxProsbis.addEventListener("change", selectAllProsbis);
-  }
-  // Show the modal
-  const modal = new bootstrap.Modal(document.getElementById("modalSearch"));
-  modal.show();
-});
 // Add event listener to the select-all checkbox
-
-// function selectAllJob(event) {
-//   // Access the checkbox element using event.target
-//   const checkbox = event.target;
-
-//   // Get the checked state of the checkbox
-//   const isChecked = checkbox.checked;
-//   console.log(resultTblJob);
-//   // You can now use this value to perform any desired actions
-//   console.log(`Checkbox is ${isChecked ? "checked" : "unchecked"}`);
-
-//   // If you need to check all other checkboxes, you could do something like this:
-//   const allCheckboxes = document.querySelectorAll("#checked-body-job");
-//   allCheckboxes.forEach((cb) => (cb.checked = isChecked));
-// }
 
 function selectProsbisId(event) {
   const jobId = event.target.value;
@@ -169,36 +176,39 @@ function selectProsbisId(event) {
 function selectSingleJob(event) {
   const checkbox = event.target;
   const jobId = checkbox.value;
-
+  const prlOrg = checkbox.getAttribute("prlOrg");
   if (checkbox.checked) {
     if (jobId !== "on" && !selectedJobIds.includes(jobId)) {
       selectedJobIds.push(jobId);
+      selectedPrlIds.push(prlOrg);
     }
   } else {
     selectedJobIds = selectedJobIds.filter((id) => id !== jobId);
+    selectedPrlIds = selectedPrlIds.filter((id) => id !== prlOrg);
   }
-
   updateHeaderCheckboxJob();
 }
 
 function selectAllJob(event) {
   const isChecked = event.target.checked;
-  const allCheckboxes = document.querySelectorAll(".checkbox_animated");
+  const bodyCheckboxes = document.querySelectorAll(".checkbox-body-job");
   const applyButton = document.getElementById("apply-search");
 
-  if (isChecked) {
-    selectedJobIds = [];
-    allCheckboxes.forEach((cb) => {
-      cb.checked = true;
-      const jobId = cb.value;
-      if (jobId !== "on" && !selectedJobIds.includes(jobId)) {
-        selectedJobIds.push(jobId);
+  selectedJobIds = [];
+  selectedPrlIds = [];
+
+  bodyCheckboxes.forEach((cb) => {
+    cb.checked = isChecked;
+    const jobId = cb.value;
+    const prlOrg = cb.getAttribute("prlOrg");
+
+    if (isChecked && jobId && jobId !== "on") {
+      selectedJobIds.push(jobId);
+      if (prlOrg) {
+        selectedPrlIds.push(prlOrg);
       }
-    });
-  } else {
-    selectedJobIds = [];
-    allCheckboxes.forEach((cb) => (cb.checked = false));
-  }
+    }
+  });
   if (applyButton) {
     applyButton.disabled = selectedJobIds.length === 0;
   }
@@ -207,7 +217,6 @@ function selectAllJob(event) {
 function selectSingleProsbis(event) {
   const checkbox = event.target;
   const prosbisId = checkbox.value;
-
   if (checkbox.checked) {
     if (prosbisId !== "on" && !SelectedProsbisId.includes(prosbisId)) {
       SelectedProsbisId.push(prosbisId);
@@ -271,23 +280,58 @@ function updateHeaderCheckboxProsbis() {
 }
 
 async function applySearch() {
+  const draftSoId = getState("draftSoId");
+  const draftRasciId = getState("draftRasciId");
+  const spinner = document.getElementById("applySearch");
+  spinner.style.display = "inline-block";
+
   switch (selectedText) {
     case "RASCI by Job":
       const payload = {
-        type: "job",
-        jobId: selectedJobIds, // Menggabungkan ID job
+        draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+        unitCode: selectedJobIds, // Menggabungkan ID job
+        prlOrg: selectedPrlIds,
+        row: 1,
+        rowSize: 15,
       };
+
+      const payloadJob = {
+        col: 1,
+        colSize: 10,
+        indexNumber: [],
+        draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+        draftSoId: draftSoId,
+        unitCode: selectedJobIds,
+        prlOrg: selectedPrlIds,
+      };
+
       try {
-        const resultMatrix = await fetchDataMatrix(payload); // Memanggil data
-        if (resultMatrix.status === 200) {
-          // Mendapatkan instance modal dan menutup modal
-          resultAllData(resultMatrix?.data);
-          selectedJobIds = [];
+        const resultPosition = await fetchPositionMatrix(payloadJob);
+        const resultMatrix = await fetchProsbisMatrix(payload);
+        const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+        if (resultMatrix.success === true) {
+          SelectedProsbisId = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
           setState("isSearchMatrix", true);
+          setState("idSearchProsbis", "");
+          setState("payloadPosition", payloadJob);
+          setState("payloadProsbis", payload);
+          setState("actionType", "POS_THEN_BP");
+          setState("resultProsbis", resultMatrix.data);
+          setState("resultJabatan", resultPosition.data);
+          setState("totalProsbis", resultMatrix.totalResult);
+          setState("totalJob", resultPosition.totalResult);
+          loadTableBody(resultMatrix.data);
+          appendDynamicHeader(resultPosition.data);
+          mapRasciCells(combineIndex, resultPosition.data);
+          setState("currentPageY", 1);
+          setState("currentPageX", 1);
+          selectedJobIds = [];
+          selectedPrlIds = [];
           if (modal) {
-            modal.hide(); // Menutup modal jika ada instance yang valid
+            spinner.style.display = "none";
+            modal.hide();
           }
         }
       } catch (error) {
@@ -296,22 +340,48 @@ async function applySearch() {
       break;
 
     case "RASCI by Bus...":
-      const payloadProsbis = {
-        type: "bybusinessprocess",
-        parentId: SelectedProsbisId.join(","), // Menggabungkan ID job
+      const payloadByBusiness = {
+        draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+        level: [],
+        indexNumber: SelectedProsbisId,
+        expandNumber: [],
+        prlOrg: [],
+        unitCode: [],
+        row: 1,
+        rowSize: 15,
       };
       try {
-        const resultMatrix = await fetchDataMatrix(payloadProsbis); // Memanggil data
-        if (resultMatrix.status === 200) {
-          // Mendapatkan instance modal dan menutup modal
-          resultAllData(resultMatrix?.data);
+        const resultMatrix = await fetchProsbisMatrix(payloadByBusiness);
+        const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+        if (resultMatrix.success === true) {
+          const payloadJob = {
+            col: 1,
+            colSize: 10,
+            draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+            indexNumber: combineIndex,
+            draftSoId: draftSoId,
+          };
+          const resultPosition = await fetchPositionMatrix(payloadJob);
           SelectedProsbisId = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
+          setState("idSearchProsbis", "");
           setState("isSearchMatrix", true);
-          appState.isSearchMatrix = true;
+          setState("payloadProsbis", payloadByBusiness);
+          setState("payloadPosition", payloadJob);
+          setState("actionType", "BP_THEN_JOB");
+          setState("resultProsbis", resultMatrix.data);
+          setState("resultJabatan", resultPosition.data);
+          setState("totalProsbis", resultMatrix.totalResult);
+          setState("totalJob", resultPosition.totalResult);
+          loadTableBody(resultMatrix.data);
+          appendDynamicHeader(resultPosition.data);
+          mapRasciCells(combineIndex, resultPosition.data);
+          setState("currentPageY", 1);
+          setState("currentPageX", 1);
           if (modal) {
-            modal.hide(); // Menutup modal jika ada instance yang valid
+            spinner.style.display = "none";
+            modal.hide();
           }
         }
       } catch (error) {
@@ -320,22 +390,36 @@ async function applySearch() {
       break;
 
     default:
-      const payloadSingleProsbis = {
-        type: "businessprocess",
-        parentId: selectedSingleId, // Menggabungkan ID job
+      const payloadBusiness = {
+        draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+        level: [],
+        indexNumber: [selectedSingleId],
+        expandNumber: [],
+        type: "BusinessProcess",
+        row: 1,
+        rowSize: 15,
       };
-      setState("idSearchProsbis", selectedSingleId);
       try {
-        const resultMatrix = await fetchDataMatrix(payloadSingleProsbis); // Memanggil data
-        if (resultMatrix.status === 200) {
-          // Mendapatkan instance modal dan menutup modal
-          resultAllData(resultMatrix?.data);
-          selectedSingleId = "";
+        const resultMatrix = await fetchProsbisMatrix(payloadBusiness);
+        if (resultMatrix.success === true) {
+          // selectedSingleId = [];
           const modalElement = document.getElementById("modalSearch");
           const modal = bootstrap.Modal.getInstance(modalElement);
+          setState("idSearchProsbis", selectedSingleId);
           setState("isSearchMatrix", true);
+          setState("payloadProsbis", payloadBusiness);
+          setState("resultProsbis", resultMatrix.data);
+          setState("actionType", "BP_ONLY");
+          setState("resultJabatan", []);
+          setState("totalProsbis", resultMatrix.totalResult);
+          setState("totalJob", 0);
+          loadTableBody(resultMatrix.data);
+          appendDynamicHeader([]);
+          setState("currentPageY", 1);
+          setState("currentPageX", 1);
           if (modal) {
-            modal.hide(); // Menutup modal jika ada instance yang valid
+            spinner.style.display = "none";
+            modal.hide();
           }
         }
       } catch (error) {

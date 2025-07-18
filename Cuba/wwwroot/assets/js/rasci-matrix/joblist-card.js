@@ -1,15 +1,21 @@
+// ================== modified checkbox handling with id+prl key (full sync with user code) ==================
 document.addEventListener("dataLoaded", async function () {
+  console.log("cek");
   const result = await getState("filterJobList");
-  console.log("result", result);
-  const levels = [1, 2, 3, 4, 5, 6];
+  const levels = [1, 2, 3, 4, 5, 6, 7, 8];
   levels.forEach((lvl) => {
     const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
     if (chkJobLevel) {
-      chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, result, lvl === 1 ? "hide" : "show");
+      chkJobLevel.innerHTML = createJobLevelBody(
+        `level${lvl}`,
+        result,
+        lvl === 1 ? "hide" : "show",
+      );
     }
   });
   addSearchEventListeners();
 });
+
 const createParentLabel = (parentId) => {
   const result = getState("filterJobList");
   const getParent = result.find((item) => item.id === parentId);
@@ -32,22 +38,25 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
       label = displayLabel === "show" ? createParentLabel(item.reportToId) : "";
     }
 
-    if (index === filteredData.length - 1 || filteredData[index + 1]?.reportToId !== item.reportToId) {
+    if (
+      index === filteredData.length - 1 ||
+      filteredData[index + 1]?.reportToId !== item.reportToId
+    ) {
       borderBottom = "<hr/>";
     }
 
     bodyJobLevel += `
-        <div id="group${item.reportToId}">
-          ${label}
-          <div class="row-item" data-name="${item.name}" data-type="${level}" data-parent-id="${item.reportToId}">
-            <div class="column-checkbox">
-              <input name="check_job" class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" levelJob="${item.level}" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}">
-            </div>
-            <div class="column-item-name" style="font-size:12px">${item.name}</div>
+      <div id="group${item.reportToId}">
+        ${label}
+        <div class="row-item" data-name="${item.name}" data-type="${level}" data-parent-id="${item.reportToId}">
+          <div class="column-checkbox">
+            <input name="check_job" class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" levelJob="${item.level}" prl="${item.prl}" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}">
           </div>
-          ${borderBottom}
+          <div class="column-item-name" style="font-size:12px">${item.name}</div>
         </div>
-      `;
+        ${borderBottom}
+      </div>
+    `;
   });
 
   return bodyJobLevel;
@@ -55,16 +64,16 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
 
 const handleCheckboxChange = async (event) => {
   const checkbox = event.target;
-  const jobId = Number(checkbox.value);
+  const jobId = checkbox.value;
+  const prl = checkbox.getAttribute("prl");
+  const key = `${jobId}|${prl}`;
   const isChecked = checkbox.checked;
   const combinedData = await getState("filterJobList");
   const levelJob = checkbox.getAttribute("levelJob");
   let selectedId = (await getState("selectedJobId")) || [];
 
-  console.log("jobId", jobId);
-  console.log("combinedData", combinedData);
   const hierarchyIds = [];
-  traverseHierarchy(jobId, combinedData, hierarchyIds);
+  traverseHierarchy(jobId, prl, combinedData, hierarchyIds);
 
   if (isChecked) {
     hierarchyIds.forEach((id) => {
@@ -75,62 +84,96 @@ const handleCheckboxChange = async (event) => {
   } else {
     selectedId = selectedId.filter((id) => !hierarchyIds.includes(id));
   }
-  console.log("selectedId", selectedId);
 
   await setState("selectedJobId", selectedId);
 
   const jobList = await getState("filterJobList");
-  const result = jobList.filter((item) => selectedId.includes(item.id));
+  const result = jobList.filter((item) =>
+    selectedId.includes(`${item.id}|${item.prl}`),
+  );
+
   if (result.length > 0) {
     switch (levelJob) {
       case "1":
-        updateLevels([2, 3, 4, 5, 6], result);
+        updateLevels([2, 3, 4, 5, 6, 7, 8], result);
         break;
       case "2":
-        updateLevels([3, 4, 5, 6], result);
+        updateLevels([3, 4, 5, 6, 7, 8], result);
         break;
       case "3":
-        updateLevels([4, 5, 6], result);
+        updateLevels([4, 5, 6, 7, 8], result);
         break;
       case "4":
-        updateLevels([5, 6], result);
+        updateLevels([5, 6, 7, 8], result);
+        break;
+      case "5":
+        updateLevels([6, 7, 8], result);
+        break;
+      case "6":
+        updateLevels([7, 8], result);
         break;
       default:
-        updateLevels([6], result);
+        updateLevels([8], result);
         break;
     }
   } else {
     const result = await getState("filterJobList");
-    const levels = [1, 2, 3, 4, 5, 6];
+    const levels = [1, 2, 3, 4, 5, 6, 7, 8];
     levels.forEach((lvl) => {
       const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
       if (chkJobLevel) {
-        chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, result, lvl === 1 ? "hide" : "show");
+        chkJobLevel.innerHTML = createJobLevelBody(
+          `level${lvl}`,
+          result,
+          lvl === 1 ? "hide" : "show",
+        );
       }
     });
   }
+
   listChecked(selectedId);
 };
 
 const listChecked = (selectedId) => {
   selectedId.forEach((id) => {
-    const childCheckbox = document.querySelector(`input[type="checkbox"][value="${id}"]`);
-    if (childCheckbox) {
-      childCheckbox.checked = true;
+    const [jobId, prl] = id.split("|");
+    const checkbox = document.querySelector(
+      `input[type="checkbox"][value="${jobId}"][prl="${prl}"]`,
+    );
+    if (checkbox) {
+      checkbox.checked = true;
     }
   });
 };
-const traverseHierarchy = (parentId, data, selectedId, visited = new Set()) => {
-  if (visited.has(parentId)) return;
-  visited.add(parentId);
 
-  if (!selectedId.includes(parentId)) {
-    selectedId.push(parentId);
+const traverseHierarchy = (
+  parentId,
+  prl,
+  data,
+  selectedId,
+  visited = new Set(),
+) => {
+  const key = `${parentId}|${prl}`;
+  if (visited.has(key)) return;
+  visited.add(key);
+
+  if (!selectedId.includes(key)) {
+    selectedId.push(key);
   }
 
   const children = data.filter((item) => item.reportToId === parentId);
   children.forEach((child) => {
-    traverseHierarchy(child.id, data, selectedId, visited);
+    traverseHierarchy(child.id, child.prl, data, selectedId, visited);
+  });
+
+  const sameIdDiffPrl = data.filter(
+    (item) => item.id === parentId && item.prl !== prl,
+  );
+  sameIdDiffPrl.forEach((item) => {
+    const altKey = `${item.id}|${item.prl}`;
+    if (!visited.has(altKey)) {
+      traverseHierarchy(item.id, item.prl, data, selectedId, visited);
+    }
   });
 };
 
@@ -144,7 +187,7 @@ const updateLevels = (levels, result) => {
 };
 
 const addSearchEventListeners = () => {
-  const levels = [1, 2, 3, 4, 5, 6];
+  const levels = [1, 2, 3, 4, 5, 6, 7, 8];
   levels.forEach((lvl) => {
     const searchInput = document.getElementById(`search-joblevel${lvl}`);
     if (searchInput) {
@@ -159,9 +202,13 @@ const searchJob = async (event, level) => {
   const lowerCaseQuery = query.toLowerCase();
   const result = await getState("filterJobList");
   if (query.length > 4) {
-    const filteredResult = result.filter((item) => item.name.toLowerCase().includes(lowerCaseQuery));
+    const filteredResult = result.filter((item) =>
+      item.name.toLowerCase().includes(lowerCaseQuery),
+    );
     if (selectedId.length > 0) {
-      const findDataSelected = filteredResult.filter((value) => selectedId.includes(value.id));
+      const findDataSelected = filteredResult.filter((value) =>
+        selectedId.includes(value.id),
+      );
       if (findDataSelected.length > 0) {
         updateLevels([level], filteredResult);
         listChecked(selectedId);
@@ -174,8 +221,12 @@ const searchJob = async (event, level) => {
     }
   } else {
     if (selectedId.length > 0) {
-      const findJobList = result.filter((value) => selectedId.includes(value.id));
-      const cekLevelParent = findJobList.filter((value) => value.level === level - 1);
+      const findJobList = result.filter((value) =>
+        selectedId.includes(value.id),
+      );
+      const cekLevelParent = findJobList.filter(
+        (value) => value.level === level - 1,
+      );
       if (cekLevelParent.length === 0) {
         updateLevels([level], result);
         listChecked(selectedId);
@@ -265,6 +316,33 @@ const resetAnalyst = async () => {
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
   resetChildrens([6], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel6`);
+  if (searchInput) {
+    searchInput.value = "";
+  }
+};
+
+const resetJrSupervisor = async () => {
+  const result = await getState("filterJobList");
+  const selectedId = await getState("selectedJobId");
+  const findJobList = result.filter((value) => selectedId.includes(value.id));
+  const cekLevel = findJobList.filter((value) => value.level === 7);
+  const descendants = findAllDescendants(cekLevel, result);
+  const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
+  resetChildrens([7], result, selectedId, resetAllId);
+  const searchInput = document.getElementById(`search-joblevel7`);
+  if (searchInput) {
+    searchInput.value = "";
+  }
+};
+const resetJrOperator = async () => {
+  const result = await getState("filterJobList");
+  const selectedId = await getState("selectedJobId");
+  const findJobList = result.filter((value) => selectedId.includes(value.id));
+  const cekLevel = findJobList.filter((value) => value.level === 8);
+  const descendants = findAllDescendants(cekLevel, result);
+  const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
+  resetChildrens([8], result, selectedId, resetAllId);
+  const searchInput = document.getElementById(`search-joblevel8`);
   if (searchInput) {
     searchInput.value = "";
   }

@@ -1,3 +1,4 @@
+let onLoadData = false;
 const tableContainer = document.querySelector(".scrollable-table");
 function debounce(func, delay) {
   let timer;
@@ -6,75 +7,293 @@ function debounce(func, delay) {
     timer = setTimeout(() => func.apply(this, args), delay);
   };
 }
+const hideAllTooltips = () => {
+  document.querySelectorAll(".tooltip").forEach((tooltip) => {
+    bootstrap.Tooltip.getInstance(tooltip)?.hide();
+  });
+};
 tableContainer.addEventListener(
   "scroll",
   debounce(async function () {
-    const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
-    const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
+    const topReached = tableContainer.scrollTop <= 10;
+    const bottomReached =
+      tableContainer.scrollTop + tableContainer.clientHeight >=
+      tableContainer.scrollHeight - 10;
+    const rightReached =
+      tableContainer.scrollLeft + tableContainer.clientWidth >=
+      tableContainer.scrollWidth - 10;
     const leftReached = tableContainer.scrollLeft === 0;
+    const loader = document.getElementById("loader");
     let currentPageY = getState("currentPageY");
     let currentPageX = getState("currentPageX");
+    const totalCompetency = getState("totalCompetency");
     const selectedValue = $("#dataSource-competency").val();
-    const payloadJob = getState("payloadJob");
-    const payloadCompetency = getState("payloadCompetency");
     const searchType = getState("selectedType");
     const searchText = document.getElementById("inputText").value;
-    const jobCode = getAllJobCode();
-    if (bottomReached) {
-      const payload = {
-        ...payloadJob,
-        dataSource: selectedValue,
-        filter: searchType,
-        search: searchText,
-        page: currentPageY + 1,
-      };
-      console.log("payload", payload);
-      const queryString = "?" + new URLSearchParams(payload).toString();
-      const resultJob = await fetchJobList(queryString);
-      console.log("first", resultJob);
-      const jobCodeList = resultJob.data.map((val) => val.positionCode);
-
-      const combineIndex = [...jobCode, ...jobCodeList];
-      console.log("combineIndex", combineIndex);
-      const storageDataCompetency = getState("storageDataCompetency");
-      console.log("storageDataCompetency", storageDataCompetency);
-      if (combineIndex.length > 0 && resultJob.success === true) {
-        if (storageDataCompetency.length > 10) {
-          console.log("cek 10 length");
-        }
-        const body = {
-          ...payloadCompetency,
-          dataSource: selectedValue,
-          jobCode: combineIndex,
-        };
-        setState("payloadCompetency", body);
-        const resultCompetency = await fetchCompetencyList(body);
-        console.log("resultCompetency", resultCompetency);
-        setTimeout(() => {
-          // loadTableHeader(competencyList);
-          loadTableBody(resultJob.data);
-          mapCompetencyCells(combineIndex, resultCompetency.data.competency, resultCompetency.data.level);
-
-          // mapRasciCells(combineIndex, resultPosition.data);
-          setState("currentPageY", currentPageY + 1);
-          // isLoading = false;
-          // loader.style.display = "none";
-          // onLoadData = false;
-          setState("payloadCompetency", { ...payloadCompetency, jobCode: combineIndex });
-          hideAllTooltips();
-        }, 50);
+    if (onLoadData) return;
+    if (topReached) {
+      if (currentPageY > 3) {
+        loader.style.display = "flex";
+        restoreJob();
       }
     }
-
+    if (bottomReached) {
+      loadMoreJob(currentPageY, currentPageX);
+    }
     if (rightReached) {
-      console.log("cek kanan");
-      loadMoreData(currentPageX + 1);
+      const totalPages = Math.ceil(totalCompetency / 10);
+      if (currentPageX < totalPages) {
+        loader.style.display = "flex";
+        setState("currentPageX", currentPageX + 1);
+        loadMoreCompetency(currentPageX + 1);
+      }
+      // loadMoreData(currentPageX + 1);
     }
     if (leftReached) {
+      if (currentPageX > 2) {
+        loader.style.display = "flex";
+        restoreCompetency();
+      }
     }
   }, 100),
 );
 
+async function loadMoreCompetency(page) {
+  try {
+    const payloadCompetency = getState("payloadCompetency");
+    const loader = document.getElementById("loader");
+    const payload = {
+      ...payloadCompetency,
+      page: page,
+    };
+    setState("payloadCompetency", payload);
+    const resultCompetency = await fetchCompetencyList(payload);
+    console.log("payload", payload);
+    console.log("page", page);
+    console.log("first", resultCompetency);
+    const compeList = getState("resultCompetency");
+    const resultJob = getState("resultJob");
+    const mappingList = getState("resultMapping");
+    console.log("first", compeList);
+    console.log("resultJob", resultJob);
+    console.log("mappingList", mappingList);
+    const posCode = resultJob.map((val) => val.positionCode);
+    console.log("posCode", posCode);
+    const allCompeList = [...compeList, ...resultCompetency.data.competency];
+    const allMappingList = [...mappingList, ...resultCompetency.data.level];
+    console.log("first", allCompeList);
+    console.log("allMappingList", allMappingList);
+    if (allCompeList.length > 20) {
+      const cuttingCompe = allCompeList.slice(10); // Pangkas 10 data di awal
+      setState("resultCompetency", cuttingCompe);
+      setState("resultMapping", allMappingList);
+      setState("totalCompetency", resultCompetency.totalResult);
+      loadTableHeader(cuttingCompe);
+      mapCompetencyCells(posCode, cuttingCompe, allMappingList);
+      loader.style.display = "none";
+      isLoading = false;
+      onLoadData = false;
+      tableContainer.scrollLeft -= 1300;
+      hideAllTooltips();
+    } else {
+      setState("resultCompetency", allCompeList);
+      setState("resultMapping", allMappingList);
+      setState("totalCompetency", resultCompetency.totalResult);
+      loadTableHeader(allCompeList);
+      mapCompetencyCells(posCode, allCompeList, allMappingList);
+      loader.style.display = "none";
+      isLoading = false;
+      onLoadData = false;
+      hideAllTooltips();
+    }
+  } catch (error) {}
+}
+
+const fetchMultiplePage = async (numberLoop, combineIndex) => {
+  const payloadCompetency = getState("payloadCompetency");
+  const competencyList = await Promise.all(
+    numberLoop.map(async (number) => {
+      const payload = {
+        ...payloadCompetency,
+        page: number,
+        jobCode: combineIndex,
+      };
+      const resultCompetency = await fetchCompetencyList(payload);
+      return resultCompetency;
+    }),
+  );
+
+  return competencyList;
+};
+
+const restoreJob = async () => {
+  try {
+    let currentPageY = getState("currentPageY");
+    let currentPageX = getState("currentPageX");
+    const payloadJob = getState("payloadJob");
+    const payloadCompetency = getState("payloadCompetency");
+    const loader = document.getElementById("loader");
+    const resultJob = getState("resultJob");
+    const resultCompetency = getState("resultCompetency");
+
+    const payload = {
+      ...payloadJob,
+      page: currentPageY - 3,
+      pageSize: 15,
+    };
+    const rowToRemove =
+      resultJob.length != 45 ? Math.max(0, resultJob.length + 15 - 45) : 15;
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const jobList = await fetchJobList(queryString);
+    const cuttingJob = resultJob.slice(0, -rowToRemove);
+    const combinedJob = [...jobList.data, ...cuttingJob];
+    const posCode = combinedJob.map((val) => val.positionCode);
+    setState("resultJob", combinedJob);
+    if (resultCompetency.length > 10) {
+      const numberLoop = [currentPageX - 1, currentPageX];
+      const competencyList = await fetchMultiplePage(numberLoop, posCode);
+      console.log("competencyList", competencyList);
+      const combinedCompetency = competencyList.flatMap(
+        (item) => item.data.competency,
+      );
+      const combinedlevel = competencyList.flatMap((item) => item.data.level);
+      console.log("combinedlevel", combinedlevel);
+      console.log("combinedCompetency", combinedCompetency);
+      setTimeout(() => {
+        loadTableHeader(combinedCompetency);
+        loadTableBody(combinedJob);
+        mapCompetencyCells(posCode, combinedCompetency, combinedlevel);
+        setState("currentPageY", currentPageY - 1);
+        loader.style.display = "none";
+        onLoadData = false;
+        setState("payloadCompetency", {
+          ...payloadCompetency,
+          jobCode: posCode,
+        });
+        hideAllTooltips();
+      }, 50);
+    } else {
+      const body = {
+        ...payloadCompetency,
+        jobCode: posCode,
+      };
+      const competencyList = await fetchCompetencyList(body);
+      console.log("competencyList", competencyList);
+      setTimeout(() => {
+        loadTableHeader(competencyList?.data.competency);
+        loadTableBody(combinedJob);
+        mapCompetencyCells(
+          posCode,
+          competencyList.data.competency,
+          competencyList.data.level,
+        );
+        setState("currentPageY", currentPageY - 1);
+        loader.style.display = "none";
+        onLoadData = false;
+        setState("payloadCompetency", {
+          ...payloadCompetency,
+          jobCode: posCode,
+        });
+        hideAllTooltips();
+      }, 50);
+    }
+    tableContainer.scrollTop += 550;
+  } catch (error) {}
+};
+const loadMoreJob = async (currentPageY, currentPageX) => {
+  try {
+    const resultJob = getState("resultJob");
+    const payloadJob = getState("payloadJob");
+    const resultCompetency = getState("resultCompetency");
+    const payloadCompetency = getState("payloadCompetency");
+    const totalJob = getState("totalJob");
+    const loader = document.getElementById("loader");
+
+    const totalPages = Math.ceil(totalJob / 15);
+
+    if (currentPageY < totalPages) {
+      const payload = {
+        ...payloadJob,
+        page: currentPageY + 1,
+        pageSize: 15,
+      };
+      loader.style.display = "flex";
+      console.log("payload", payload);
+      const queryString = "?" + new URLSearchParams(payload).toString();
+      const jobList = await fetchJobList(queryString);
+      console.log("first", jobList);
+      const combineJob = [...resultJob, ...jobList.data];
+      const allJob = combineJob.length > 45 ? combineJob.slice(15) : combineJob;
+      console.log("allJob", allJob);
+      const combineIndex = allJob.map((val) => val.positionCode);
+
+      // const resultCompetency = getState("resultCompetency");
+      // console.log("storageDataCompetency", storageDataCompetency);
+      const posCode = resultJob.map((val) => val.positionCode);
+      setState("resultJob", allJob);
+      if (combineIndex.length > 0 && jobList.success === true) {
+        if (resultCompetency.length > 10) {
+          const numberLoop = [currentPageX - 1, currentPageX];
+          console.log("numberLoop", numberLoop);
+          const competencyList = await fetchMultiplePage(numberLoop, posCode);
+          console.log("competencyList", competencyList);
+          const combinedCompetency = competencyList.flatMap(
+            (item) => item.data.competency,
+          );
+          const combinedlevel = competencyList.flatMap(
+            (item) => item.data.level,
+          );
+          console.log("combinedlevel", combinedlevel);
+          console.log("combinedCompetency", combinedCompetency);
+          setTimeout(() => {
+            loadTableHeader(combinedCompetency);
+            loadTableBody(allJob);
+            mapCompetencyCells(combineIndex, combinedCompetency, combinedlevel);
+            setState("currentPageY", currentPageY + 1);
+            loader.style.display = "none";
+            onLoadData = false;
+            setState("payloadCompetency", {
+              ...payloadCompetency,
+              jobCode: combineIndex,
+            });
+            hideAllTooltips();
+          }, 50);
+        } else {
+          const body = {
+            ...payloadCompetency,
+            jobCode: combineIndex,
+          };
+          setState("payloadCompetency", body);
+          const competencyList = await fetchCompetencyList(body);
+          console.log("competencyList", competencyList);
+          setTimeout(() => {
+            loadTableHeader(competencyList?.data.competency);
+            loadTableBody(allJob);
+            mapCompetencyCells(
+              combineIndex,
+              competencyList.data.competency,
+              competencyList.data.level,
+            );
+            setState("currentPageY", currentPageY + 1);
+            loader.style.display = "none";
+            onLoadData = false;
+            setState("payloadCompetency", {
+              ...payloadCompetency,
+              jobCode: combineIndex,
+            });
+            hideAllTooltips();
+          }, 50);
+        }
+      }
+      console.log("loadMoreProsbisAndPosition", combineJob);
+      if (combineJob.length > 45) {
+        tableContainer.scrollTop -= 550;
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 function getAllJobCode() {
   const indexNumbers = [];
   document.querySelectorAll("#table-body tr").forEach((row) => {
@@ -83,63 +302,46 @@ function getAllJobCode() {
   });
   return indexNumbers;
 }
-const hideAllTooltips = () => {
-  document.querySelectorAll(".tooltip").forEach((tooltip) => {
-    bootstrap.Tooltip.getInstance(tooltip)?.hide();
-  });
-};
 
-async function loadMoreData(page) {
+async function restoreCompetency() {
   try {
-    console.log("first", page);
-    const payloadCompetency = getState("payloadCompetency");
-    const selectedValue = $("#dataSource-competency").val();
-    // const loader = document.getElementById("loader");
-    const body = {
-      ...payloadCompetency,
-      dataSource: selectedValue,
-      page: page,
-    };
+    const compeList = getState("resultCompetency");
+    const resultJob = getState("resultJob");
+    const mappingList = getState("resultMapping");
 
-    console.log("first", body);
-    const resultCompetency = await fetchCompetencyList(body);
-    const totalListcompetency = resultCompetency.data.competency.length;
-    console.log("first", totalListcompetency);
-    if (totalListcompetency > 0) {
-      const storageDataCompetency = getState("storageDataCompetency");
-      const competencyList = [...storageDataCompetency, ...resultCompetency?.data.competency];
-      console.log("resultCompetency?.data.competency", resultCompetency?.data.competency);
-      console.log("storageDataCompetency", storageDataCompetency);
-      console.log("competencyList", competencyList);
-      loadTableHeader(competencyList);
-      setState("currentPageX", page + 1);
-      setState("payloadCompetency", body);
+    let currentPageX = getState("currentPageX");
+    const loader = document.getElementById("loader");
+    if (currentPageX > 2) {
+      const payloadCompetency = getState("payloadCompetency");
+      const posCode = resultJob.map((val) => val.positionCode);
+      const payload = {
+        ...payloadCompetency,
+        page: currentPageX - 2,
+      };
+      console.log("payload", payload);
+      console.log("posCode", posCode);
+      console.log("first", compeList);
+      console.log("resultJob", resultJob);
+      const rowToRemove =
+        compeList.length != 20 ? Math.max(0, compeList.length + 10 - 20) : 10;
+      console.log("rowToRemove", rowToRemove);
+      const cuttingCompe = compeList.slice(0, -rowToRemove);
+      console.log("cuttingCompe", cuttingCompe);
+      const resultCompetency = await fetchCompetencyList(payload);
+      console.log("resultCompetency", resultCompetency);
+      const combinedCompe = [
+        ...resultCompetency.data.competency,
+        ...cuttingCompe,
+      ];
+      loadTableHeader(combinedCompe);
+      mapCompetencyCells(posCode, combinedCompe, mappingList);
+      setState("currentPageX", currentPageX - 1);
+      loader.style.display = "none";
+      isLoading = false;
+      onLoadData = false;
+      hideAllTooltips();
+      tableContainer.scrollLeft += 700;
     }
-
-    //   const resultPosition = await fetchPositionMatrix(body);
-    //   const storageDataPosition = getState("storageDataPosition");
-    //   const positionList = [...storageDataPosition, ...resultPosition.data];
-    //   if (positionList.length > 20) {
-    //     const cuttingPosition = positionList.slice(10); // Pangkas 10 data di awal
-    //     setState("storageDataPosition", cuttingPosition);
-    //     const indexNumberList = getAllIndexNumbers();
-    //     appendDynamicHeader(cuttingPosition);
-    //     mapRasciCells(indexNumberList, cuttingPosition);
-    //     loader.style.display = "none";
-    //     isLoading = false;
-    //     onLoadData = false;
-    //     tableContainer.scrollLeft -= 1700;
-    //     hideAllTooltips();
-    //   } else {
-    //     setState("storageDataPosition", positionList);
-    //     const indexNumberList = getAllIndexNumbers();
-    //     appendDynamicHeader(positionList);
-    //     mapRasciCells(indexNumberList, positionList);
-    //     loader.style.display = "none";
-    //     isLoading = false;
-    //     onLoadData = false;
-    //     hideAllTooltips();
-    //   }
   } catch (error) {}
 }
 

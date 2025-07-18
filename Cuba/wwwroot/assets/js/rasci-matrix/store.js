@@ -1,12 +1,14 @@
-const selectedValue = $("#dataSource-rasci").val();
+let selectedValue = $("#dataSource-rasci").val();
+let selectedOption = $(this).find(":selected");
+let selectedDraftSo = selectedOption.attr("data-draftso");
 const appState = new Proxy(
   {
     storageJabatan: [],
     storageProsbis: [],
     allDataJabatan: [],
-    resultJabatan: null,
+    resultJabatan: [],
+    resultProsbis: [],
     allDataProsbis: [],
-    resultProsbis: null,
     idProsbis: [],
     resetIdProsbis: [],
     resultRasciMapping: [],
@@ -26,12 +28,58 @@ const appState = new Proxy(
     dataDeleteProsbis: {},
     dataDetailProsbis: {},
     editRasciNotation: {},
+    isShowRasciJob: false,
+    draftRasciId: null,
+    draftSoId: null,
+    defaultIndexNumber: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+    ],
+    actionType: "BP_THEN_JOB",
+    totalProsbis: 0,
+    totalJob: 0,
+    expandNumber: [],
+    indexNumberForPosition: [],
+    pageLevel1: 1,
+    pageLevel2: 1,
+    pageLevel3: 1,
+    pageLevel4: 1,
+    pageLevel5: 1,
+    pageLevel6: 1,
+    pageLevel7: 1,
+    pageLevel8: 1,
+    totalJobLevel1: 0,
+    totalJobLevel2: 0,
+    totalJobLevel3: 0,
+    totalJobLevel4: 0,
+    totalJobLevel5: 0,
+    totalJobLevel6: 0,
+    totalJobLevel7: 0,
+    totalJobLevel8: 0,
     payloadProsbis: {
       draftRasciId: selectedValue === "master" ? null : selectedValue,
-      level: [1, 2, 3, 4, 5, 6],
-      indexNumber: [],
+      level: [],
       row: 1,
       rowSize: 15,
+      indexNumber: [],
     },
     payloadPosition: {
       draftRasciId: selectedValue === "master" ? null : selectedValue,
@@ -39,15 +87,14 @@ const appState = new Proxy(
       unitCode: [],
       prlOrg: [],
       level: [],
-      indexNumber: [],
       rasciNotation: [],
       col: 1,
       colSize: 10,
     },
     storageDataPosition: [],
-    itemsPerPageY: 20,
+    // itemsPerPageY: 20,
     currentPageY: 1,
-    itemsPerPageX: 20,
+    // itemsPerPageX: 20,
     currentPageX: 1,
     detailJob: {},
     listSelectedProsbisref: [],
@@ -99,14 +146,84 @@ const appState = new Proxy(
       parentId: null,
       jobMapped: [],
     },
+    approvalData: [
+      {
+        requestId: "Req/RM/01122024/001",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        organizationSource: "Usulan Perubahan Fungsi Marketing",
+        status: "On Review",
+      },
+    ],
+    logHistoryData: [
+      {
+        no: 8,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail: "Create draft Pembuatan Bisnis Proses Baru",
+      },
+      {
+        no: 7,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail:
+          "Add/Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5 Pengelolaan brand, RASCI notation before: -, RASCI notation after: R) reference from Manager B2C Loyalty & Marketing Program.",
+      },
+      {
+        no: 6,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail:
+          "Add/Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5.2 Melakukan brand positioning, RASCI notation before: -, RASCI notation after: A) reference from Manager B2C Loyalty & Marketing Program.",
+      },
+      {
+        no: 5,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail:
+          "Add/Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5.3 Mengelola brand identity, RASCI notation before: -, RASCI notation after: A) reference from Manager B2C Loyalty & Marketing Program.",
+      },
+      {
+        no: 4,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail:
+          "Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5 Pengelolaan brand, RASCI notation before: R, RASCI notation after: A)",
+      },
+      {
+        no: 3,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail:
+          "Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5.2 Melakukan brand positioning, RASCI notation before: A, RASCI notation after: A)",
+      },
+      {
+        no: 2,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail:
+          "Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5 Pengelolaan brand, RASCI notation before: R, RASCI notation after: A)",
+      },
+      {
+        no: 1,
+        dateTime: "",
+        user: "Superadmin",
+        draftName: "Usulan Perubahan Fungsi Marketing",
+        detail: "Submit to Approval draft Pembuatan Bisnis Proses Baru",
+      },
+    ],
   },
   {
     set(target, property, value) {
       if (target[property] !== value) {
         // Set the new value
         target[property] = value;
-        // loadTableHeader(target.resultJabatan);
-        // loadTableBody(target.resultProsbis);
         updateSelect2ByProsbis();
         updateSelect2ByJob();
         formValidation();
@@ -118,26 +235,13 @@ const appState = new Proxy(
         } else if (property === "checkedParentId") {
           dataListJobChecked();
         }
-        // if (
-        //   property === "resultJabatan" ||
-        //   property === "resultProsbis" ||
-        //   property === "resultRasciMapping"
-        // ) {
-        //   target[property] = value;
-        //   loadTableHeader(target.resultJabatan);
-        //   loadTableBody(target.resultProsbis);
-        // } else if (property === "idProsbis") {
-        //   target[property] = value;
-        // } else {
-        //   target[property] = value;
-        // }
       }
       return true;
     },
   },
 );
 function setState(key, value) {
-  appState[key] = value; // This will trigger the Proxy set handler
+  appState[key] = value;
 }
 
 // Fungsi untuk mendapatkan nilai state saat ini
@@ -146,333 +250,3 @@ function getState(key) {
 }
 window.setState = setState;
 window.getState = getState;
-
-async function SearchMatrix(params) {
-  const url = `${url_api}/api/rasci-matrix/searchBy?type=${params.type}&search=${params.search}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    $("#resultJabatan").html("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function fetchDataMatrix(params) {
-  const url = `${url_api}/api/rasci-matrix`;
-  try {
-    const result = await ajaxRequest(url, "POST", params);
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    $("#resultJabatan").html("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function fetchSelectLevel(draftId) {
-  const url = `${url_api}/api/Utilities/selection?Page=1&Type=level&DraftId=${draftId}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function fetchDraftProsbis(params) {
-  const url = `${url_api}/api/rasci-matrix/draft/list?${params}`;
-
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return result.data;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function fetchDraftListProsbis(idDraft, query) {
-  const url = `${url_api}/api/rasci-matrix/draft/list/${idDraft}?${query}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return result.data;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function fetchFilterJobList() {
-  const url = `${url_api}/api/JobTitle`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function fetchDraftProsbisByid(payload) {
-  const url = `${url_api}/api/rasci-matrix/draft/detail/${payload}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function submitDraftProsbis(payload) {
-  const url = `${url_api}/api/rasci-matrix/draft/save`;
-  try {
-    const result = await ajaxRequest(url, "POST", payload);
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function updateDraftProsbis(payload, id) {
-  const url = `${url_api}/api/BusinessProcess/draft/${id}`;
-  try {
-    const result = await ajaxRequest(url, "PUT", payload);
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function draftSubmittoApproval(payload, id) {
-  const url = `${url_api}/api/BusinessProcess/draft-submission/${id}`;
-  try {
-    const result = await ajaxRequest(url, "PUT", payload);
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-
-async function deleteProsbisDraft(id) {
-  const url = `${url_api}/api/rasci-matrix/draft/delete/${id}`;
-  try {
-    const result = await ajaxRequest(url, "DELETE");
-    return result;
-  } catch (error) {
-    console.error("Error fetching data from API");
-    throw error;
-  }
-}
-async function createDraftRasci(payload) {
-  const url = `${url_api}/api/rasci-matrix/draft/create`;
-  try {
-    const result = await ajaxRequest(url, "POST", payload);
-    console.log("result", result);
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("first", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function endpointRenameDraft(params, payload) {
-  const url = `${url_api}/api/rasci-matrix/draft/rename/${params}`;
-  try {
-    const result = await ajaxRequest(url, "PUT", payload);
-    return {
-      success: true,
-      data: result,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function fetchDetailDraftActivity(id) {
-  const url = `${url_api}/api/rasci-matrix/draft/detail-list/${id}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function fetchDetailRasci(param) {
-  const url = `${url_api}/api/rasci-matrix/box-rasci/detail?parentId=${param.indexGroup}&jobId=${param.jobId}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function fetchRelatedJob(id, param) {
-  const url = `${url_api}/api/rasci-matrix/business-process/detail/${id}?${param}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function fetchProsbisByJob(param) {
-  const url = `${url_api}/api/rasci-matrix/reference-from-position${param}`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function fetchProsbisSumulation(currentPageY, currentPageX) {
-  const url = `${url_api}/api/rasci-matrix/draft/sumulation/test?draftId=7c7fd4fa-2849-4c12-82a8-26e9ff2d1649&row=${currentPageY}&rowSize=10&col=${currentPageX}&colSize=10`;
-  try {
-    const result = await ajaxRequest(url, "GET");
-    console.log("result", result);
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-async function fetchProsbisMatrix(payload) {
-  const url = `${url_api}/api/rasci-matrix/business-process`;
-  try {
-    const result = await ajaxRequest(url, "POST", payload);
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-
-async function fetchPositionMatrix(payload) {
-  const url = `${url_api}/api/rasci-matrix/position-rasci`;
-  try {
-    const result = await ajaxRequest(url, "POST", payload);
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.log("error", error);
-    return {
-      success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
-    };
-  }
-}
-// /
-async function fetchData() {
-  try {
-    // const [dataMatrix, prosbisLvl, filterJobList] = await Promise.all([
-    //   fetchDataMatrix(),
-    //   fetchSelectLevel(),
-    //   fetchFilterJobList(),
-    // ]);
-    // const [resultSimulation] = await Promise.all([fetchProsbisSumulation(1, 1)]);
-    // appState.resultJabatan = resultSimulation.data[0].responsibilities;
-    // appState.resultProsbis = resultSimulation.data;
-    // console.log("cek", resultSimulation);
-    // const selectedValue = $("#dataSource-rasci").val();
-    // const payload = {
-    //   draftRasciId: selectedValue === "master" ? null : selectedValue,
-    //   level: [1],
-    //   indexNumber: [],
-    //   row: 1,
-    //   rowSize: 15,
-    // };
-
-    const [resultSimulation] = await Promise.all([fetchProsbisMatrix(appState.payloadProsbis)]);
-    console.log("resultSimulation", resultSimulation);
-    appState.indexNumberProsbis = resultSimulation.data.map((val) => val.indexNumber);
-    appState.resultProsbis = resultSimulation.data;
-    // appState.resultRasciMapping = dataMatrix?.data.rasciMatrix;
-    // appState.prosbisLevel = prosbisLvl?.data.result;
-    // const combinedData = [
-    //   ...filterJobList?.data.level1.map((item) => ({ ...item, type: "level1" })),
-    //   ...filterJobList?.data.level2.map((item) => ({ ...item, type: "level2" })),
-    //   ...filterJobList?.data.level3.map((item) => ({ ...item, type: "level3" })),
-    //   ...filterJobList?.data.level4.map((item) => ({ ...item, type: "level4" })),
-    //   ...filterJobList?.data.level5.map((item) => ({ ...item, type: "level5" })),
-    //   ...filterJobList?.data.level6.map((item) => ({ ...item, type: "level6" })),
-    // ];
-    // appState.filterJobList = combinedData;
-    document.dispatchEvent(new Event("dataLoaded"));
-  } catch (error) {
-    console.error("Error fetching data", error);
-  }
-}
-
-// Initial data fetch
-fetchData();
-
-function resultAllData(val) {
-  // console.log(val);
-  appState.resultJabatan = val.jobTitle;
-  appState.resultProsbis = val.businessProcess;
-  appState.resultRasciMapping = val.rasciMatrix;
-
-  //
-}
