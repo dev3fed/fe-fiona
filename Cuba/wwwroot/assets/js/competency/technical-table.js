@@ -3,9 +3,10 @@ const renderTableTchnical = async (technicalList) => {
     const listData = technicalList;
     const bodyContent = listData.data
       .map((val, i) => {
+        const startIndex = (listData.page - 1) * listData.limit;
         return `
               <tr>
-                <th scope="row" style="text-align:center">${i + 1}</th>
+                <th scope="row" style="text-align:center">${startIndex + i + 1}</th>
                 <td>${val.sgName || "-"}</td>
                 <td>${val.ssgName || "-"}</td>
                 <td>${val.compName || "-"}</td>

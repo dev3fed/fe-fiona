@@ -4,9 +4,10 @@ const renderTableBehavior = async (behaviorList) => {
     console.log("first", listData);
     const bodyContent = listData.data
       .map((val, i) => {
+        const startIndex = (listData.page - 1) * listData.limit;
         return `
                 <tr>
-                  <th scope="row" style="text-align:center">${i + 1}</th>
+                  <th scope="row" style="text-align:center">${startIndex + i + 1}</th>
                   <td>${val.behaviorList || "-"}</td>
                   <td>${val.definition || "-"}</td>
                   <td style="width: 120px;text-align:center">

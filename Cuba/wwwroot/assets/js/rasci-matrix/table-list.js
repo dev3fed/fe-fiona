@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("btnAddNotation").style.display = "none";
     document.getElementById("btnDeleteDetail").style.display = "none";
     document.getElementById("btnEditDetail").style.display = "none";
-    document.getElementById("btnFormdraft").style.display = "flex";
+    // document.getElementById("btnFormdraft").style.display = "flex";
   }
   showLoading();
   // loadTableHeader(appState.resultJabatan);
@@ -139,14 +139,14 @@ async function changeDataSource(dataSource, draftSo) {
       document.getElementById("btnAddNotation").style.display = "flex";
       document.getElementById("btnDeleteDetail").style.display = "inline-block";
       document.getElementById("btnEditDetail").style.display = "inline-block";
-      document.getElementById("btnFormdraft").style.display = "none";
+      // document.getElementById("btnFormdraft").style.display = "none";
     } else {
       document.getElementById("pills-warningtab").style.display = "none";
       document.getElementById("btnAddBp").style.display = "none";
       document.getElementById("btnAddNotation").style.display = "none";
       document.getElementById("btnDeleteDetail").style.display = "none";
       document.getElementById("btnEditDetail").style.display = "none";
-      document.getElementById("btnFormdraft").style.display = "flex";
+      // document.getElementById("btnFormdraft").style.display = "flex";
     }
     const payload = {
       indexNumber: defaultIndexNumber,
