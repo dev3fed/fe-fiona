@@ -286,19 +286,19 @@ function appendDynamicHeader(jobTitleList) {
             ${val.positionName}
           </div>
         </div>
-        <div>
-          <button class="dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-            <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li onclick="triggleDetailJob(${valString})">
-              <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
-            </li>
-            <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
-          </ul>
-        </div>
       </th>
     `;
+    //    <div>
+    //   <button class="dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+    //     <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
+    //   </button>
+    //   <ul class="dropdown-menu dropdown-menu-end">
+    //     <li onclick="triggleDetailJob(${valString})">
+    //       <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
+    //     </li>
+    //     <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
+    //   </ul>
+    // </div>
     dynamicHeaders += headerHTML;
   });
 

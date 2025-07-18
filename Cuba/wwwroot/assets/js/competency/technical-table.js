@@ -29,9 +29,6 @@ const renderTableTchnical = async (technicalList) => {
     const totalPages = Math.ceil(listData.count / itemsPerPage);
     const currentPage = listData.page;
     const start = (listData.page - 1) * itemsPerPage + 1;
-    console.log("first", start);
-    console.log("first", totalPages);
-    console.log("first", currentPage);
     renderPaginationTechnical(currentPage, totalPages);
     const totalPage = document.getElementById("total-technical-page");
     if (totalPage) {
