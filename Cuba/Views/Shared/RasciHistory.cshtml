@@ -6,7 +6,7 @@
         margin: 30px auto;
     }
 
-    .tbl-border-add-prosbis {
+    .tbl-border-history {
         width: 100%;
         border-top: 1px solid #b0d1e4;
         border-right: 1px solid #b0d1e4;
@@ -16,13 +16,13 @@
         font-size: 12px !important;
     }
 
-    .tbl-border-add-prosbis th {
+    .tbl-border-history th {
         color: #006CA9;
         font-weight: bold;
         height: 40px;
     }
 
-    .tbl-border-add-prosbis thead th {
+    .tbl-border-history thead th {
         position: sticky;
         top: 0;
         background-color: #E6F0F6;
@@ -30,8 +30,8 @@
         /* To ensure it stays above the content */
     }
 
-    .tbl-border-add-prosbis th,
-    .tbl-border-add-prosbis td {
+    .tbl-border-history th,
+    .tbl-border-history td {
         padding: 8px !important;
         border-right: 1px solid #b0d1e4;
         border-bottom: 1px solid #b0d1e4;
@@ -115,44 +115,20 @@
         </div>
         <div class="col-12 mt-3">
             <div class="table-responsive" style=" max-height: 450px;">
-                <table class="table tbl-border-add-prosbis">
-                    <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
+                <table class="table tbl-border-history">
+                    <thead id="tbl-history-header" style="background-color: #006CA9;">
                         <tr>
-                            <th scope="col" style="width: 50px;text-align:center">
+                            <th scope="col" style="width: 40px;text-align:center">
                                 No
                             </th>
-                            <th scope="col" style="width: 200px">Request ID</th>
-                            <th scope="col">Draft Name</th>
-                            <th scope="col" style="width: 150px">Created By</th>
-                            <th scope="col" style="width: 150px">Created Date</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Action</th>
+                            <th scope="col" style="width: 100px">Date Time</th>
+                            <th scope="col" style="width: 120px">Username</th>
+                            <th scope="col" style="width: 250px">Draft Name</th>
+                            <th scope="col" style="width: 300px">Detail</th>
                         </tr>
                     </thead>
-                    <tbody id="tbl-add-prosbis-body">
-                        <tr>
-                            <th scope="row">
+                    <tbody id="history-body">
 
-                            </th>
-                            <td style="text-align:center">
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td style="width: 200px;text-align:center">
-                                <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail()"><i
-                                        class="icon-eye"></i>
-                                    Detail</button>
-                                <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#modalDelete"><i class="icon-trash"></i>
-                                    Delete</button>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -69,9 +69,6 @@
                         <li class="nav-item"><a class="nav-link" id="pills-hierarchy-tab" data-bs-toggle="pill"
                                 href="#pills-hierarchy" role="tab" aria-controls="pills-hierarchy"
                                 aria-selected="false">Business Process Hierarchy</a></li>
-                        <li class="nav-item"><a class="nav-link" id="pills-competencies-tab" data-bs-toggle="pill"
-                                href="#pills-competencies" role="tab" aria-controls="pills-competencies"
-                                aria-selected="false">Competencies</a></li>
                     </ul>
                     <div class="tab-content" id="pills-businessContent">
                         <div class="tab-pane fade show active" id="pills-related" role="tabpanel"
@@ -80,9 +77,9 @@
                             </div>
                             <div class="table-responsive scrollable" style=" max-height: 300px;">
                                 <table class="table tbl-border ">
-                                    <thead id="prosbis-details-header">
+                                    <thead id="job-details-header">
                                     </thead>
-                                    <tbody id="prosbis-details-body">
+                                    <tbody id="job-details-body">
                                     </tbody>
                                 </table>
                             </div>
@@ -98,17 +95,6 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="pills-competencies" role="tabpanel"
-                            aria-labelledby="pills-competencies-tab">
-                            <div class="table-responsive m-t-15">
-                                <table class="table tbl-border">
-                                    <thead id="prosbis-competencies-header">
-                                    </thead>
-                                    <tbody id="prosbis-competencies-body">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -118,10 +104,11 @@
                     <i class="icon-arrow-left"></i> Back
                 </button>
                 <div>
-                    <button class="btn btn-outline-danger" type="button" onclick="handleDetailDeletebp()"><i
-                            class="icon-trash"></i>
+                    <button id="btnDeleteDetail" class="btn btn-outline-danger" type="button"
+                        onclick="handleDetailDeletebp()"><i class="icon-trash"></i>
                         Delete</button>
-                    <button class="btn btn-outline-light" type="button" onclick="handleDetailEditbp()">
+                    <button id="btnEditDetail" class="btn btn-outline-light" type="button"
+                        onclick="handleDetailEditbp()">
                         <i class="icon-marker-alt"></i>
                         Edit
                     </button>
@@ -129,10 +116,12 @@
                         Series of Process
                         <i class="icon-arrow-right icon-small"></i>
                     </button>
-                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal"
-                        onclick="showRasciMatrixBybp()">
-                        Show RASCI
-                        <i class="icon-arrow-right icon-small"></i>
+                    <button id="btnShowRasci" class="btn btn-primary" type="button" onclick="showRasciMatrixBybp()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="showRasci" role="status"></div>
+                            <span class="btn-text">Show RASCI<i class="icon-arrow-right icon-small"></i></span>
+                        </div>
                     </button>
                 </div>
             </div>

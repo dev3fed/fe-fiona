@@ -6,14 +6,18 @@ async function detailDraft() {
       PageSize: 5,
     };
     const queryString = new URLSearchParams(payload).toString();
-    const listData = await fetchDraftListProsbis(dataDraft.draftId, queryString);
-    console.log("dataDraft", dataDraft);
+    const listData = await fetchDraftListProsbis(
+      dataDraft.draftId,
+      queryString,
+    );
     if (dataDraft) {
       const bodyInfo = `
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Draft Name</label>
         <div style="display: flex; align-items: center; font-weight: 600; font-size: 14px;">
-          <span style="flex-grow: 1; text-align: center; padding-left: 10px">${dataDraft.draftName}</span>
+          <span style="flex-grow: 1; text-align: center; padding-left: 10px">${
+            dataDraft.draftName
+          }</span>
              <button class=" btn btn-outline-light btn-small-icon" type="button" onclick="handleRename()">
               <img src="/assets/images/rasci/icon_pencil.svg" alt="Filter Icon">
           </button>
@@ -21,27 +25,36 @@ async function detailDraft() {
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Organization Data Source</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.draftSO.draftParentName}</label>
+        <label style="font-weight: 600;font-size: 14px">${
+          dataDraft.draftSO.draftParentName
+        }</label>
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Created by</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
+        <label style="font-weight: 600;font-size: 14px">${
+          dataDraft.createdBy ? dataDraft.createdBy : "-"
+        }</label>
         <label style="color:#9F9FA5">${
-          dataDraft.createdDate ? new Date(dataDraft.createdDate).toLocaleDateString() : "-"
+          dataDraft.createdDate
+            ? new Date(dataDraft.createdDate).toLocaleDateString()
+            : "-"
         }</label>
       </div>
       <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Updated by</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
+        <label style="font-weight: 600;font-size: 14px">${
+          dataDraft.createdBy ? dataDraft.createdBy : "-"
+        }</label>
         <label style="color:#9F9FA5">${
-          dataDraft.createdDate ? new Date(dataDraft.createdDate).toLocaleDateString() : "-"
+          dataDraft.createdDate
+            ? new Date(dataDraft.createdDate).toLocaleDateString()
+            : "-"
         }</label>
       </div>
     `;
       const draftInfo = document.getElementById("draft-info");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
-    console.log("listData", listData.data);
     if (listData.data.length > 0) {
       renderTableActivity(listData);
     } else {
@@ -120,7 +133,8 @@ async function renderTableActivity(listData) {
                           </tr>`
                           : listData.data
                               .map((data, index) => {
-                                const startIndex = (listData.page - 1) * listData.pageSize;
+                                const startIndex =
+                                  (listData.page - 1) * listData.pageSize;
                                 return `
                               <tr>
                                 <td style="width: 50px;text-align:center">
@@ -153,7 +167,8 @@ async function renderTableActivity(listData) {
                                          </div>` +
                                         (data.businessProcessName.length > 1
                                           ? `<small style="color:#9F9FA5;cursor: pointer">+${
-                                              data.businessProcessName.length - 1
+                                              data.businessProcessName.length -
+                                              1
                                             } more</small>`
                                           : "")
                                       : "-"
@@ -162,18 +177,34 @@ async function renderTableActivity(listData) {
                                 <td>
                                   ${data.createdBy || "-"}<br>
                                   <small style="color:#9F9FA5">
-                                    ${data.createdDate ? "at " + new Date(data.createdDate).toLocaleString() : "-"}
+                                    ${
+                                      data.createdDate
+                                        ? "at " +
+                                          new Date(
+                                            data.createdDate,
+                                          ).toLocaleString()
+                                        : "-"
+                                    }
                                   </small>
                                 </td>
                                 <td>
                                   ${data.modifiedBy || "-"}<br>
                                   <small style="color:#9F9FA5">
-                                    ${data.modifiedDate ? "at " + new Date(data.modifiedDate).toLocaleString() : "-"}
+                                    ${
+                                      data.modifiedDate
+                                        ? "at " +
+                                          new Date(
+                                            data.modifiedDate,
+                                          ).toLocaleString()
+                                        : "-"
+                                    }
                                   </small>
                                 </td>
                                 <td style="text-align: center;">
                                   <button class="btn btn-outline-light btn-small-icon" type="button" 
-                                    onclick="triggleDetailActivity('${data.draftListId}', '${data.draftType}')">
+                                    onclick="triggleDetailActivity('${
+                                      data.draftListId
+                                    }', '${data.draftType}')">
                                     <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon">
                                   </button>  
                                   <button class="btn btn-outline-light btn-small-icon" type="button">
@@ -228,7 +259,9 @@ async function renderTableActivity(listData) {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
+        listData.total < itemsPerPage * listData.page
+          ? listData.total
+          : itemsPerPage * listData.page
       } of ${listData.total} records</label>
             </div>
           </div>
@@ -260,7 +293,11 @@ function renderPaginationDetailDraft(currentPage, totalPages) {
       <a 
         class="page-link" 
         href="javascript:void(0)"  
-        ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${1})"`}
+        ${
+          currentPage === 1
+            ? 'tabindex="-1"'
+            : `onclick="handleDetailPageChange(${1})"`
+        }
       >
       ←
       </a>
@@ -272,7 +309,11 @@ function renderPaginationDetailDraft(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)"  
-          ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${currentPage - 1})"`}
+          ${
+            currentPage === 1
+              ? 'tabindex="-1"'
+              : `onclick="handleDetailPageChange(${currentPage - 1})"`
+          }
         >
           «
         </a>
@@ -291,7 +332,11 @@ function renderPaginationDetailDraft(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)" 
-          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${currentPage + 1})"`}
+          ${
+            currentPage === totalPages
+              ? 'tabindex="-1"'
+              : `onclick="handleDetailPageChange(${currentPage + 1})"`
+          }
         >
           » 
         </a>
@@ -302,7 +347,11 @@ function renderPaginationDetailDraft(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)" 
-          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handleDetailPageChange(${totalPages})"`}
+          ${
+            currentPage === totalPages
+              ? 'tabindex="-1"'
+              : `onclick="handleDetailPageChange(${totalPages})"`
+          }
         >
           →
         </a>
@@ -320,7 +369,10 @@ function renderPaginationDetailDraft(currentPage, totalPages) {
 
 async function handleDetailPageChange(pageNumber) {
   const payloadDetailDraftPage = getState("payloadDetailDraftPage");
-  setState("payloadDetailDraftPage", { ...payloadDetailDraftPage, Page: pageNumber });
+  setState("payloadDetailDraftPage", {
+    ...payloadDetailDraftPage,
+    Page: pageNumber,
+  });
   const payload = {
     Page: pageNumber,
     PageSize: payloadDetailDraftPage.PageSize,
@@ -333,7 +385,10 @@ async function handleDetailPageChange(pageNumber) {
 async function handleChangeIDetailItemsPerPage(event) {
   const itemsPerPage = parseInt(event.target.value, 10);
   const payloadDetailDraftPage = getState("payloadDetailDraftPage");
-  setState("payloadDetailDraftPage", { ...payloadDetailDraftPage, PageSize: itemsPerPage });
+  setState("payloadDetailDraftPage", {
+    ...payloadDetailDraftPage,
+    PageSize: itemsPerPage,
+  });
   const payload = {
     Page: payloadDetailDraftPage.Page,
     PageSize: itemsPerPage,
@@ -344,7 +399,9 @@ async function handleChangeIDetailItemsPerPage(event) {
   renderTableActivity(listData);
 }
 async function handleRename() {
-  const modal = new bootstrap.Modal(document.getElementById("modalRenameDraft"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("modalRenameDraft"),
+  );
   modal.show();
   const dataDraft = getState("dataDetailDraft");
   const draftRename = document.getElementById("draftRename");
@@ -427,7 +484,9 @@ async function handleOpenDetailBp() {
         </div>
         <div class="col-6">
         <label class="form-label">Draft Type</label>
-            <input class="form-control" type="text" placeholder="Draft Type" value="${dataInfo.typeDetail}" disabled>
+            <input class="form-control" type="text" placeholder="Draft Type" value="${
+              dataInfo.typeDetail
+            }" disabled>
         </div>
         <div class="col-12 mt-3 mb-2">
         <h6 class="f-w-600">Business Process Info</h6>
@@ -438,7 +497,9 @@ async function handleOpenDetailBp() {
                 <select class="form-select digits" id="editLevel" onchange="onEditSelect(event)">
                   ${prosbisLevel.map(
                     (opt) =>
-                      `<option value="${opt.id}" ${dataDetail.level === opt.id ? "selected" : ""}>${opt.text}</option>`,
+                      `<option value="${opt.id}" ${
+                        dataDetail.level === opt.id ? "selected" : ""
+                      }>${opt.text}</option>`,
                   )}
                 </select>
             </div>
@@ -462,12 +523,16 @@ async function handleOpenDetailBp() {
         <div class="col-12">
             <div>
                 <label class="form-label">Business Process Name</label>
-                  <textarea class="form-control" id="edit-prosbisname">${dataDetail.busProsNameAfter}</textarea>
+                  <textarea class="form-control" id="edit-prosbisname">${
+                    dataDetail.busProsNameAfter
+                  }</textarea>
             </div>
             <div class="mt-3">
                 <label class="form-label">Job</label>
                 <select class="form-select digits" name="editJobId" id="editJobId"  onchange="onSelectEditJobId(event)">
-                <option value=${dataDetail?.jobTitle.id}>${dataDetail?.jobTitle.name}</option>
+                <option value=${dataDetail?.jobTitle.id}>${
+      dataDetail?.jobTitle.name
+    }</option>
           </select>
             </div>
         </div>`;
@@ -497,9 +562,9 @@ async function handleOpenDetailBp() {
                   <td>
                     <input class="form-control" type="text" placeholder="Type Comment" id="commentEdit${
                       item.RasciCode
-                    }" value="${item.Comment}" ${item.IsChecked ? "" : "disabled"} oninput="updateDraftComment('${
-          item.RasciCode
-        }', this.value)">
+                    }" value="${item.Comment}" ${
+          item.IsChecked ? "" : "disabled"
+        } oninput="updateDraftComment('${item.RasciCode}', this.value)">
                   </td>
               </tr>
           `;
@@ -678,7 +743,10 @@ async function saveEditDraft() {
       jobTitleId: jobId.value,
       rasciNotation: dataProsbis.rasciNotation,
     };
-    const result = await updateDraftProsbis(payloadSave, dataDraft.draftInfo.id);
+    const result = await updateDraftProsbis(
+      payloadSave,
+      dataDraft.draftInfo.id,
+    );
     if (result.status === 200) {
       const afterSave = await fetchDraftProsbisByid(dataDraft.draftInfo.id);
       setState("dataDetailDraft", afterSave.data);
@@ -696,7 +764,9 @@ async function saveEditDraft() {
 }
 
 async function openDetailApproval() {
-  const openModal = new bootstrap.Modal(document.getElementById("modalDraftAprroval"));
+  const openModal = new bootstrap.Modal(
+    document.getElementById("modalDraftAprroval"),
+  );
   openModal.show();
 }
 async function handleSubmitApproval() {
@@ -746,7 +816,9 @@ async function handleSubmitApproval() {
 
 function deleteDraftFromdetail() {
   const dataDraft = getState("dataDetailDraft");
-  const openModal = new bootstrap.Modal(document.getElementById("modalDeleteDraft"));
+  const openModal = new bootstrap.Modal(
+    document.getElementById("modalDeleteDraft"),
+  );
   openModal.show();
   setState("deleteDraftProsbis", dataDraft?.draftInfo.id);
 }

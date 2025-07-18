@@ -1,12 +1,10 @@
 async function triggleDetailActivity(id, draftType) {
-  console.log("cek", id, draftType);
   try {
     if (draftType === "Add New Business Process") {
       detailAddprosbis(id);
     } else if (draftType === "Delete Business Process") {
       detailDeleteBp(id);
     } else if (draftType === "Edit Business Process") {
-      console.log("cek edit business");
       detailEditBp(id);
     }
   } catch (error) {}
@@ -14,17 +12,20 @@ async function triggleDetailActivity(id, draftType) {
 
 async function detailAddprosbis(id) {
   try {
-    const modal = new bootstrap.Modal(document.getElementById("modalActivityDetail"));
+    const modal = new bootstrap.Modal(
+      document.getElementById("modalActivityDetail"),
+    );
     modal.show();
     const dataActivity = await fetchDetailDraftActivity(id);
-    console.log("dataActivity", dataActivity.data);
     const dataHeader = dataActivity?.data.businessProcess;
     const dataFooter = dataActivity?.data.rasciMapping;
     const elementHeader = `
         <div class="col-7 custom-col" style="text-align: left">
           <label style="color:#9F9FA5">Business Process Name</label>
           <div style="display: flex;  font-weight: 600; font-size: 14px;">
-            <span>${dataHeader.indexGroup} - ${dataHeader.businessProcessName}</span>
+            <span>${dataHeader.indexGroup} - ${
+      dataHeader.businessProcessName
+    }</span>
           </div>
         </div>
         <div class="col-5 custom-col" style="text-align: left; border-right:none">
@@ -34,9 +35,9 @@ async function detailAddprosbis(id) {
          <div class="col-12 custom-col" style="text-align: left">
          <hr style="margin-right: 10px">
           <label style="color:#9F9FA5">Parent</label>
-          <label style="font-weight: 600;font-size: 14px">${dataHeader.parentId} - ${
-      dataHeader.parentName ? dataHeader.parentName : "-"
-    }</label>
+          <label style="font-weight: 600;font-size: 14px">${
+            dataHeader.parentId
+          } - ${dataHeader.parentName ? dataHeader.parentName : "-"}</label>
         </div>
       `;
     const elementLabel = `<span>Selected Position (total: ${dataFooter.length})</span>`;
@@ -80,7 +81,9 @@ async function detailAddprosbis(id) {
 
 async function detailDeleteBp(id) {
   try {
-    const modal = new bootstrap.Modal(document.getElementById("modalDetailDeletebp"));
+    const modal = new bootstrap.Modal(
+      document.getElementById("modalDetailDeletebp"),
+    );
     modal.show();
     const dataActivity = await fetchDetailDraftActivity(id);
     const dataInfo = dataActivity.data.businessProcess;
@@ -129,9 +132,10 @@ async function detailDeleteBp(id) {
 }
 
 async function detailEditBp(id) {
-  const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("ModalDetaileditbp"),
+  );
   modal.show();
   const dataActivity = await fetchDetailDraftActivity(id);
-  console.log("dataActivity", dataActivity);
   // const dataInfo = dataActivity.data.businessProcess;
 }

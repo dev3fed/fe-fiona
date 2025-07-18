@@ -1,14 +1,10 @@
 // Event listener ketika DOM siap
 document.addEventListener("dataLoaded", async function () {
   try {
-    const result = await getState("filterJobList");
-
-    await dataListJob(result);
-    await addSearchEventListeners();
-
     //============================ section start switch btn for card job list ============================//
-    const levels = [1, 2, 3, 4, 5, 6];
+    const levels = [1, 2, 3, 4, 5, 6, 7, 8];
     const switchAll = document.getElementById("switch-all");
+    let disabledJobIds = []; // Array untuk melacak level yang dinonaktifkan
     switchAll.addEventListener("change", function () {
       const isDisabled = !this.checked;
 
@@ -18,13 +14,34 @@ document.addEventListener("dataLoaded", async function () {
           switchLevel.checked = this.checked;
         }
         toggleLevelElements(lvl, isDisabled);
+        // Perbarui daftar ID level yang dinonaktifkan
+        if (isDisabled) {
+          if (!disabledJobIds.includes(lvl)) {
+            disabledJobIds.push(lvl);
+          }
+        } else {
+          disabledJobIds = disabledJobIds.filter((id) => id !== lvl);
+        }
       });
+      // Perbarui state dengan ID level yang dinonaktifkan
+      setState("disabledJobId", disabledJobIds);
     });
     levels.forEach((lvl) => {
       const switchLevel = document.getElementById(`switch-level${lvl}`);
       switchLevel.addEventListener("change", function () {
         const isDisabled = !this.checked;
         toggleLevelElements(lvl, isDisabled);
+        // Perbarui daftar ID level yang dinonaktifkan
+        if (isDisabled) {
+          if (!disabledJobIds.includes(lvl)) {
+            disabledJobIds.push(lvl);
+          }
+        } else {
+          disabledJobIds = disabledJobIds.filter((id) => id !== lvl);
+        }
+        // Perbarui state dengan ID level yang dinonaktifkan
+        setState("disabledJobId", disabledJobIds);
+
         const allLevelsChecked = levels.every((level) => {
           const levelSwitch = document.getElementById(`switch-level${level}`);
           return levelSwitch.checked;
@@ -184,6 +201,69 @@ document.addEventListener("dataLoaded", async function () {
   }
 });
 
+const onModalFilter = async () => {
+  try {
+    const draftRasciId = getState("draftRasciId");
+    const modalFilter = new bootstrap.Modal(document.getElementById("exampleModal"));
+    modalFilter.show();
+    const payloadJobList = {
+      draftRasciId: draftRasciId === "master" ? null : draftRasciId,
+      isFromUncheck: false,
+      row: 1,
+      rowSize: 10,
+      sourceLevel: "1,2,3,4,5,6,7,8",
+    };
+    console.log("payloadJobList", payloadJobList);
+    const result = await fetchJoblistCard(payloadJobList);
+    const jobList = result?.data;
+    console.log("jobList", jobList);
+    const lvlData = [1, 2, 3, 4, 5, 6, 7, 8];
+    lvlData.forEach((lvl) => {
+      setState(`totalJobLevel${lvl}`, jobList[`level${lvl}`].pagination.total);
+    });
+    const combinedData = [
+      ...jobList?.level1.data.map((item) => ({
+        ...item,
+        type: "level1",
+      })),
+      ...jobList?.level2.data.map((item) => ({
+        ...item,
+        type: "level2",
+      })),
+      ...jobList?.level3.data.map((item) => ({
+        ...item,
+        type: "level3",
+      })),
+      ...jobList?.level4.data.map((item) => ({
+        ...item,
+        type: "level4",
+      })),
+      ...jobList?.level5.data.map((item) => ({
+        ...item,
+        type: "level5",
+      })),
+      ...jobList?.level6.data.map((item) => ({
+        ...item,
+        type: "level6",
+      })),
+      ...jobList?.level7.data.map((item) => ({ ...item, type: "level7" })),
+      ...jobList?.level8.data.map((item) => ({ ...item, type: "level8" })),
+    ];
+    console.log("combinedData", combinedData);
+    setState("filterJobList", combinedData);
+    const levels = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    levels.forEach((lvl) => {
+      const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
+      if (chkJobLevel) {
+        chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, combinedData, lvl === 1 ? "hide" : "show");
+      }
+    });
+    addSearchEventListeners();
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+};
 //================================== start reset all proses bisnis level ===========================//
 const resetProssesBusiness = async () => {
   const levelProsbis = ["l1", "l2", "l3", "l4", "l5", "l6"];
@@ -217,6 +297,33 @@ function resetRasciNotation() {
   setState("rasciNotationFilter", []);
 }
 //==================== end reset all rasci matrix notation ===========================//
+
+//==================== start reset all filter rasci matrix ===========================//
+const resetAllFilterRasci = async () => {
+  const result = await getState("filterJobList");
+  updateLevels([1, 2, 3, 4, 5, 6, 7, 8], result);
+  const switchAll = document.getElementById("switch-all");
+  switchAll.checked = true;
+  ["1", "2", "3", "4", "5", "6"].forEach((lvl) => {
+    const switchElement = document.getElementById(`switch-level${lvl}`);
+    if (switchElement) {
+      switchElement.checked = true;
+      toggleLevelElements(lvl, false);
+    }
+  });
+
+  resetRasciNotation();
+  resetProssesBusiness();
+  setState("disabledJobId", []);
+  setState("selectedJobId", []);
+  ["1", "2", "3", "4", "5", "6", "7", "8"].forEach((level) => {
+    const searchInput = document.getElementById(`search-joblevel${level}`);
+    if (searchInput) {
+      searchInput.value = "";
+    }
+  });
+};
+//==================== end reset all filter rasci matrix ===========================//
 function toggleLevelElements(level, isDisabled) {
   const searchInput = document.getElementById(`search-joblevel${level}`);
   const checkboxes = document.querySelectorAll(`#chk-job-level${level} input[type="checkbox"]`);
@@ -239,220 +346,73 @@ function toggleLevelElements(level, isDisabled) {
   }
 }
 
-// Fungsi utama untuk memuat data
-const dataListJob = async (combinedData) => {
-  // Menyusun konten ke dalam level-level yang sesuai
-  const levels = [1, 2, 3, 4, 5, 6];
-  levels.forEach((lvl) => {
-    const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
-    if (chkJobLevel) {
-      chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, combinedData, lvl === 1 ? "hide" : "show");
+// ============== get all checked value and prl ==============
+const getCheckedJobAndPrl = () => {
+  const jobIdFinal = [];
+  const prlFinal = [];
+  const isDisabledJobLevel = getState("disabledJobId");
+  $("input[name='check_job']:checked").each(function () {
+    const levelJob = parseInt($(this).attr("leveljob"), 10);
+    if (!isDisabledJobLevel.includes(levelJob)) {
+      jobIdFinal.push(this.value);
+      prlFinal.push($(this).attr("prl"));
     }
   });
-};
-
-// Fungsi untuk membuat label parent
-const createParentLabel = (parentId, combinedData) => {
-  const parent = combinedData.find((item) => item.id === parentId);
-  if (parent) {
-    return `<label data-parent="${parentId}" style="font-size: 12px; color:#85858C">${parent.name}</label><br/>`;
-  }
-  return "";
-};
-
-// Fungsi untuk membuat body untuk setiap level
-const createJobLevelBody = (level, combinedData, displayLabel) => {
-  let currentReportToId = null;
-  let bodyJobLevel = "";
-
-  // Filter combinedData berdasarkan level
-  const filteredData = combinedData.filter((item) => item.type === level);
-
-  filteredData.forEach((item, index) => {
-    let label = "";
-    let borderBottom = "";
-
-    // Tambahkan label jika reportToId berubah
-    if (item.reportToId !== currentReportToId) {
-      currentReportToId = item.reportToId;
-      label = displayLabel === "show" ? createParentLabel(item.reportToId, combinedData) : "";
-    }
-
-    // Tambahkan borderBottom jika ini adalah item terakhir dalam group reportToId
-    if (index === filteredData.length - 1 || filteredData[index + 1]?.reportToId !== item.reportToId) {
-      borderBottom = "<hr/>";
-    }
-
-    bodyJobLevel += `
-      <div id="group${item.reportToId}">
-        ${label}
-        <div class="row-item" data-name="${item.name}" data-type="${level}" data-parent-id="${item.reportToId}">
-          <div class="column-checkbox">
-            <input class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}">
-          </div>
-          <div class="column-item-name" style="font-size:12px">${item.name}</div>
-        </div>
-        ${borderBottom}
-      </div>
-    `;
-  });
-
-  return bodyJobLevel;
-};
-const handleCheckboxChange = async (event) => {
-  const checkbox = event.target;
-  const isChecked = checkbox.checked;
-  const jobFilter = getState("jobFilter");
-  const levelJobFilter = getState("levelJobFilter");
-  const result = await getState("filterJobList");
-
-  const selectedData = result.find((item) => item.id === Number(checkbox.value));
-  if (!selectedData) return;
-
-  // Traverse dan update check/uncheck checkbox
-  const visited = [...jobFilter];
-  traverseAndUpdateCheckboxes(selectedData.id, result, isChecked, visited);
-  // Update state dengan visited
-  setState("jobFilter", visited);
-  setState("levelJobFilter", [...levelJobFilter, selectedData.level]);
-  const uniqueLevelJobFilter =
-    levelJobFilter.length > 1 && levelJobFilter.length !== new Set(levelJobFilter).size
-      ? [...new Set(levelJobFilter)] // Menghapus duplikat jika ada
-      : levelJobFilter;
-  console.log("first", uniqueLevelJobFilter);
-};
-
-// Fungsi traversal dan memperbarui status checkbox
-const traverseAndUpdateCheckboxes = (parentId, combinedData, isChecked, visited) => {
-  // Jika parentId sudah diproses (untuk checked), hentikan
-  if (isChecked && visited.includes(parentId)) {
-    return;
-  }
-
-  // Tambahkan atau hapus parentId dari visited
-  if (isChecked && !visited.includes(parentId)) {
-    visited.push(parentId);
-  } else if (!isChecked) {
-    removeFromVisited(parentId, combinedData, visited);
-    return; // Tidak perlu lanjutkan jika uncheck
-  }
-
-  // Cari semua turunan
-  const relatedData = combinedData.filter((item) => item.reportToId === parentId);
-
-  // Proses setiap turunan
-  relatedData.forEach((item) => {
-    const checkbox = document.querySelector(`input[type="checkbox"][value="${item.id}"]`);
-    if (checkbox) {
-      checkbox.checked = isChecked; // Update checkbox
-    }
-    traverseAndUpdateCheckboxes(item.id, combinedData, isChecked, visited); // Rekursi untuk anak-anak
-  });
-};
-
-// Fungsi untuk menghapus `id` dan turunannya dari visited
-const removeFromVisited = (parentId, combinedData, visited) => {
-  const processed = new Set(); // Melacak elemen yang sudah diproses
-  const stack = [parentId]; // Gunakan stack untuk iterasi
-
-  while (stack.length > 0) {
-    const currentId = stack.pop();
-
-    // Lewati jika sudah diproses
-    if (processed.has(currentId)) continue;
-    processed.add(currentId);
-
-    // Hapus currentId dari visited
-    const index = visited.indexOf(currentId);
-    if (index > -1) {
-      visited.splice(index, 1);
-    }
-
-    // Cari semua turunan
-    const children = combinedData.filter((item) => item.reportToId === currentId);
-
-    // Update checkbox dan tambahkan turunan ke stack
-    children.forEach((child) => {
-      const checkbox = document.querySelector(`input[type="checkbox"][value="${child.id}"]`);
-      if (checkbox) {
-        checkbox.checked = false; // Set checkbox ke uncheck
-      }
-      stack.push(child.id); // Tambahkan turunan ke stack
-    });
-  }
-};
-
-const addSearchEventListeners = () => {
-  const levels = [1, 2, 3, 4, 5, 6];
-  levels.forEach((lvl) => {
-    const searchInput = document.getElementById(`search-joblevel${lvl}`);
-    if (searchInput) {
-      searchInput.addEventListener("input", (event) => searchJob(event, `level${lvl}`));
-    }
-  });
-};
-// Simpan status pencarian untuk setiap level
-const searchStatus = {
-  level1: "",
-  level2: "",
-  level3: "",
-  level4: "",
-  level5: "",
-  level6: "",
-};
-const searchJob = async (event, level) => {
-  const query = event.target.value.toLowerCase();
-  const levelContainer = document.getElementById(`chk-job-${level}`);
-  searchStatus[level] = query; // Simpan status pencarian untuk level yang sedang dicari
-  const result = await getState("filterJobList");
-
-  if (!levelContainer) return;
-
-  const groups = levelContainer.querySelectorAll(`[id^="group"]`);
-  const rowItems = levelContainer.querySelectorAll(".row-item");
-  rowItems.forEach((rowItem) => {
-    const itemName = rowItem.querySelector(".column-item-name")?.textContent.toLowerCase();
-    rowItem.style.display = itemName.includes(query) ? "" : "none";
-  });
-  if (query.length > 3) {
-    const findParent = result.find(
-      (item) => item.name.toLowerCase().includes(query.toLowerCase()) && item.type === level,
-    );
-    groups.forEach((group) => {
-      group.style.display = group.id === `group${findParent?.reportToId}` ? "" : "none";
-    });
-  } else if (query.length <= 3) {
-    groups.forEach((group) => {
-      group.style.display = "";
-    });
-  }
+  return { jobIdFinal, prlFinal };
 };
 
 const applyFilterRasci = async () => {
-  console.log("first levelFilter", getState("levelFilter"));
-  console.log("rasciNotationFilter", getState("rasciNotationFilter"));
-  console.log("jobFilter", getState("jobFilter"));
-
+  const spinner = document.getElementById("loadingSpinner");
+  const draftSoId = getState("draftSoId");
+  const draftRasciId = getState("draftRasciId");
+  spinner.style.display = "inline-block";
+  const { jobIdFinal, prlFinal } = getCheckedJobAndPrl();
   const payload = {
-    parentId: null,
-    type: "filter",
-    jobId: getState("jobFilter"),
-    busProsLevel: getState("levelFilter"),
+    draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+    unitCode: jobIdFinal,
+    prlOrg: prlFinal,
+    level: getState("levelFilter"),
     rasciNotation: getState("rasciNotationFilter"),
+    row: 1,
+    rowSize: 15,
   };
 
-  const resultMatrix = await fetchDataMatrix(payload);
-
-  if (resultMatrix.status === 200) {
-    // Mendapatkan instance modal dan menutup modal
-    resultAllData(resultMatrix?.data);
+  const payloadJob = {
+    col: 1,
+    colSize: 10,
+    level: getState("levelFilter"),
+    rasciNotation: getState("rasciNotationFilter"),
+    draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+    draftSoId: draftSoId,
+    unitCode: jobIdFinal,
+    prlOrg: prlFinal,
+    type: "filter",
+  };
+  const resultPosition = await fetchPositionMatrix(payloadJob);
+  setState("idSearchProsbis", "");
+  const resultMatrix = await fetchProsbisMatrix(payload);
+  const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+  if (resultMatrix.success === true) {
     const modalElement = document.getElementById("exampleModal");
     const modal = bootstrap.Modal.getInstance(modalElement);
-    setState("isSearchMatrix", true);
-    if (modal) {
-      modal.hide(); // Menutup modal jika ada instance yang valid
-    }
+    setTimeout(() => {
+      spinner.style.display = "none";
+      setState("isSearchMatrix", true);
+      setState("payloadPosition", payloadJob);
+      setState("payloadProsbis", payload);
+      setState("actionType", "POS_THEN_BP");
+      setState("resultProsbis", resultMatrix.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultMatrix.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      loadTableBody(resultMatrix.data);
+      appendDynamicHeader(resultPosition.data);
+      mapRasciCells(combineIndex, resultPosition.data);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+      if (modal) {
+        modal.hide();
+      }
+    }, 600);
   }
-
-  console.log("first", resultMatrix);
 };
