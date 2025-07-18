@@ -68,20 +68,20 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
         ...item,
         type: "level3",
       })),
-      ...jobList?.level4.slice(0, 250).map((item) => ({
+      ...jobList?.level4.slice(0, 500).map((item) => ({
         ...item,
         type: "level4",
       })),
-      ...jobList?.level5.slice(0, 250).map((item) => ({
+      ...jobList?.level5.slice(0, 500).map((item) => ({
         ...item,
         type: "level5",
       })),
-      ...jobList?.level6.slice(0, 250).map((item) => ({
+      ...jobList?.level6.slice(0, 500).map((item) => ({
         ...item,
         type: "level6",
       })),
-      ...jobList?.level7.slice(0, 250).map((item) => ({ ...item, type: "level7" })),
-      ...jobList?.level8.slice(0, 250).map((item) => ({ ...item, type: "level8" })),
+      ...jobList?.level7.slice(0, 500).map((item) => ({ ...item, type: "level7" })),
+      ...jobList?.level8.slice(0, 500).map((item) => ({ ...item, type: "level8" })),
     ];
     console.log("first combinedData", combinedData);
     setState("filterJobList", combinedData);
@@ -322,6 +322,7 @@ function loadTableBody(prosbisList) {
         : val.level
         ? `level-${val.level}`
         : "";
+    const bgParent = val.isContextualParent === 1 ? `level-${val.level} prosbisparent` : "";
     const isExpanded = expandedRows.includes(val.indexNumber) ? "chevron-up" : "chevron-down";
 
     const valString = JSON.stringify(val).replace(/"/g, "&quot;");
@@ -333,7 +334,7 @@ function loadTableBody(prosbisList) {
         : ``;
 
     bodyContent += `
-      <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass}">
+      <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass} ${bgParent}">
         <td scope="row" class="level-col" style="font-size:12px;font-weight: 500 !important;">
           L${val.level}
         </td>
