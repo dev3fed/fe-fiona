@@ -68,20 +68,20 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
         ...item,
         type: "level3",
       })),
-      ...jobList?.level4.slice(0, 500).map((item) => ({
+      ...jobList?.level4.slice(0, 400).map((item) => ({
         ...item,
         type: "level4",
       })),
-      ...jobList?.level5.slice(0, 500).map((item) => ({
+      ...jobList?.level5.slice(0, 400).map((item) => ({
         ...item,
         type: "level5",
       })),
-      ...jobList?.level6.slice(0, 500).map((item) => ({
+      ...jobList?.level6.slice(0, 400).map((item) => ({
         ...item,
         type: "level6",
       })),
-      ...jobList?.level7.slice(0, 500).map((item) => ({ ...item, type: "level7" })),
-      ...jobList?.level8.slice(0, 500).map((item) => ({ ...item, type: "level8" })),
+      ...jobList?.level7.slice(0, 400).map((item) => ({ ...item, type: "level7" })),
+      ...jobList?.level8.slice(0, 400).map((item) => ({ ...item, type: "level8" })),
     ];
     console.log("first combinedData", combinedData);
     setState("filterJobList", combinedData);
