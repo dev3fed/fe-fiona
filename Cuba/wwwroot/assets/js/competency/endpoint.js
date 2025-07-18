@@ -174,7 +174,7 @@ async function fetchTechnicalList(payload) {
     const result = await ajaxRequest(url, "GET");
     return {
       success: true,
-      data: result.data,
+      data: result,
     };
   } catch (error) {
     console.log("error", error);
@@ -189,9 +189,10 @@ async function fetchBehaviorList(payload) {
   const url = `${url_api}/api/TechnicalCompetency/behavioural-competency-dictionary${payload}`;
   try {
     const result = await ajaxRequest(url, "GET");
+    console.log("result", result);
     return {
       success: true,
-      data: result.data,
+      data: result,
     };
   } catch (error) {
     console.log("error", error);
