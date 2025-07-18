@@ -30,7 +30,7 @@ document.addEventListener("dataLoaded", async function () {
 document.addEventListener("DOMContentLoaded", async function () {
   let selectElement = document.querySelector("#dataSource-rasci");
 
-  if (selectElement.value === "master" || selectElement.value === "") {
+  if (selectElement.value === "master" || selectElement.value === "" || selectElement.value === null) {
     document.getElementById("pills-warningtab").style.display = "none";
     document.getElementById("btnAddBp").style.display = "none";
     document.getElementById("btnAddNotation").style.display = "none";
@@ -131,9 +131,12 @@ function fetchDatasource(draftId = null) {
 }
 
 async function changeDataSource(dataSource, draftSo) {
+  console.log("dataSource", dataSource);
   try {
     const defaultIndexNumber = getState("defaultIndexNumber");
-    if (dataSource !== "master" || dataSource === "") {
+    if (dataSource !== "master" && dataSource !== "" && dataSource !== null) {
+      console.log("dataSource", dataSource);
+
       document.getElementById("pills-warningtab").style.display = "flex";
       document.getElementById("btnAddBp").style.display = "flex";
       document.getElementById("btnAddNotation").style.display = "flex";
@@ -695,6 +698,8 @@ async function clearInput() {
   setState("resetIdProsbis", []);
   setState("currentPageY", 1);
   setState("currentPageX", 1);
+  console.log("first draftRasciId", draftRasciId);
+  console.log("first draftSoId", draftSoId);
   const result = await changeDataSource(draftRasciId, draftSoId);
   if (result) {
     spinner.style.display = "none";
