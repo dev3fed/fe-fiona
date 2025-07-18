@@ -9,16 +9,16 @@
         height: 400px;
     }
 
-    .empty-data-container{
+    .empty-data-container {
         background-color: #F5F5F5;
         height: 400px;
 
     }
 
     #orgThree .no-children .jstree-icon {
-        display: none !important; /* Use !important to ensure it overrides other styles */
+        display: none !important;
+        /* Use !important to ensure it overrides other styles */
     }
-
 </style>
 
 <style id="myStyle">
@@ -26,20 +26,24 @@
         stroke: #000000;
         stroke-width: 0.6px;
     }
+
     [data-n-id] circle {
         stroke: #000000;
         stroke-width: 0.6px;
     }
+
     [data-n-id] rect {
         stroke: #000000;
         stroke-width: 0.6px;
     }
+
     [data-ctrl-ec-id] circle,
     [data-ctrl-ec-id] line {
         stroke: #000000;
         stroke-width: 0.6px;
     }
-    [data-l-id].direktur > path {
+
+    [data-l-id].direktur>path {
         stroke-dasharray: 3, 3;
     }
 
@@ -56,28 +60,30 @@
         fill: #e6f6fe;
         stroke: #03a9f4;
     }
+
     [data-n-id].delete rect {
         fill: #f8d7da;
         stroke: #dc3545;
     }
+
     [data-n-id].pointed rect {
         stroke: #03A9F4;
         stroke-width: 3;
     }
-    .match rect:nth-child(2){
+
+    .match rect:nth-child(2) {
         fill: #F57C00;
         stroke: #F57C00;
     }
 
-    .match path, .match circle{
+    .match path,
+    .match circle {
         stroke: #F57C00;
     }
 
     [data-n-id].bracket_4_edit rect {
         fill: #FFD700;
     }
-
-    
 </style>
 <script src="~/assets/js/balkan/orgchart.js"></script>
 <script src="~/assets/js/organization-structure/data_detail_position.js"></script>
@@ -116,24 +122,22 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-            
+
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary d-none" id="pills-warningtab" role="tablist">
                             <li class="nav-item"><a class="nav-link active" id="pills-chart" data-bs-toggle="pill"
-                                    href="#chart" role="tab" aria-controls="pills-matrix"
-                                    aria-selected="true">Chart</a></li>
+                                    href="#chart" role="tab" aria-controls="pills-matrix" aria-selected="true">Chart</a>
+                            </li>
                             <li class="nav-item"><a class="nav-link" id="pills-draft" data-bs-toggle="pill"
-                                    href="#draft" role="tab" aria-controls="pills-draft"
-                                    aria-selected="false">Draft
+                                    href="#draft" role="tab" aria-controls="pills-draft" aria-selected="false">Draft
                                 </a></li>
                             <li class="nav-item"><a class="nav-link" id="pills-request" data-bs-toggle="pill"
                                     href="#request" role="tab" aria-controls="pills-request"
                                     aria-selected="false">Approval List
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-log" data-bs-toggle="pill"
-                                    href="#log" role="tab" aria-controls="pills-log"
-                                    aria-selected="false">Log History
+                            <li class="nav-item"><a class="nav-link" id="pills-log" data-bs-toggle="pill" href="#log"
+                                    role="tab" aria-controls="pills-log" aria-selected="false">Log History
                                 </a></li>
                         </ul>
                         <div class="tab-content" id="pills-rasci-tabcontent">
@@ -145,7 +149,8 @@
                                     <div class="row">
                                         <div class="col-3">
                                             <label for="">Organization Data Source</label>
-                                            <select class="form-select digits" name="selectDraftOrganization" id="selectDraftOrganization">
+                                            <select class="form-select digits" name="selectDraftOrganization"
+                                                id="selectDraftOrganization">
                                                 <option></option>
                                             </select>
                                         </div>
@@ -156,28 +161,31 @@
                                             </select>
                                         </div>
                                         @* <div class="col-1" style="margin-bottom: 4px;align-self: end;"> *@
-                                            @* <button class="btn btn-primary w-100" type="button" id="searchOrgNodeButton">Search</button> *@
+                                        @* <button class="btn btn-primary w-100" type="button" id="searchOrgNodeButton">Search</button> *@
                                         @* </div> *@
-                                        <div class="col-6" style="margin-bottom: 4px;align-self: end; justify-content: end;text-align:end">
-                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button" id="createDraft">
-                                                <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Draft
+                                        <div class="col-6"
+                                            style="margin-bottom: 4px;align-self: end; justify-content: end;text-align:end">
+                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button"
+                                                id="createDraft">
+                                                <img src="/assets/images/rasci/plus.svg" alt="Filter Icon"
+                                                    style="margin-top: -1px;margin-right: 2px;"> Create Draft
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="viewOrgTree">
-                                                <img
-                                                        src="~/assets/images/rasci/org-tree.svg" alt="Filter Icon" class="pr-2"
-                                                        style="margin-top: -1px;">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button"
+                                                id="viewOrgTree">
+                                                <img src="~/assets/images/rasci/org-tree.svg" alt="Filter Icon"
+                                                    class="pr-2" style="margin-top: -1px;">
                                                 View Org Tree
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button" id="designCost">
-                                                <img
-                                                        src="~/assets/images/rasci/design-cost.svg" alt="Filter Icon" class="pr-2"
-                                                        style="margin-top: -1px;">
+                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button"
+                                                id="designCost">
+                                                <img src="~/assets/images/rasci/design-cost.svg" alt="Filter Icon"
+                                                    class="pr-2" style="margin-top: -1px;">
                                                 Design Cost
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button" id="createJob">
-                                                <img
-                                                        src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2"
-                                                        style="margin-top: -1px;">
+                                            <button class="btn btn-primary me-2 btn-icon d-none" type="button"
+                                                id="createJob">
+                                                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" class="pr-2"
+                                                    style="margin-top: -1px;">
                                                 Add Position
                                             </button>
                                         </div>
@@ -199,8 +207,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="draft" role="tabpanel"
-                                aria-labelledby="pills-draft">
+                            <div class="tab-pane fade" id="draft" role="tabpanel" aria-labelledby="pills-draft">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12">
@@ -212,27 +219,31 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="request" role="tabpanel"
-                                aria-labelledby="pills-request">
+                            <div class="tab-pane fade" id="request" role="tabpanel" aria-labelledby="pills-request">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-2">
                                             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
-                                                        data-feather="calendar" style="width: 20px;"></i></div>
-                                                    <input class="form-control" type="text" name="datePicker" id="createDate"  placeholder="Submitted Date">
+                                                <div class="input-group-text" data-target="#dt-minimum"
+                                                    data-toggle="datetimepicker"><i data-feather="calendar"
+                                                        style="width: 20px;"></i></div>
+                                                <input class="form-control" type="text" name="datePicker"
+                                                    id="createDate" placeholder="Submitted Date">
                                             </div>
                                         </div>
                                         <div class="col-2">
                                             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
-                                                        data-feather="calendar" style="width: 20px;"></i></div>
-                                                    <input class="form-control" type="text" name="datePicker"  placeholder="Approved/Reject Date">
+                                                <div class="input-group-text" data-target="#dt-minimum"
+                                                    data-toggle="datetimepicker"><i data-feather="calendar"
+                                                        style="width: 20px;"></i></div>
+                                                <input class="form-control" type="text" name="datePicker"
+                                                    placeholder="Approved/Reject Date">
                                             </div>
                                         </div>
                                         <div class="col-2">
                                             @* select *@
-                                            <select class="form-select digits" name="selectDraftOrganizationNew" id="selectDraftOrganizationNew" placeholder="Organization">
+                                            <select class="form-select digits" name="selectDraftOrganizationNew"
+                                                id="selectDraftOrganizationNew" placeholder="Organization">
                                                 <option value="0">Choose</option>
                                                 <option value="1">Status 1</option>
                                                 <option value="2">Status 2</option>
@@ -242,36 +253,38 @@
                                         </div>
                                         <div class="col-4">
                                             <div class="faq-form">
-                                                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
-                                                    data-feather="search"></i>
+                                                <input class="form-control" type="text" placeholder="Search.."><i
+                                                    class="search-icon" data-feather="search"></i>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row m-t-10">
                                         <div class="col-12">
                                             <div class="table-responsive">
-                                                <table class="tableMasterData table table-hover w-100" id="approvalList">
+                                                <table class="tableMasterData table table-hover w-100"
+                                                    id="approvalList">
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="log" role="tabpanel"
-                                aria-labelledby="pills-log">
+                            <div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="pills-log">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-3">
                                             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
-                                                        data-feather="calendar" style="width: 20px;"></i></div>
-                                                    <input class="form-control" type="text" name="datePicker"  placeholder="Date">
+                                                <div class="input-group-text" data-target="#dt-minimum"
+                                                    data-toggle="datetimepicker"><i data-feather="calendar"
+                                                        style="width: 20px;"></i></div>
+                                                <input class="form-control" type="text" name="datePicker"
+                                                    placeholder="Date">
                                             </div>
                                         </div>
                                         <div class="col-4">
                                             <div class="faq-form">
-                                                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
-                                                    data-feather="search"></i>
+                                                <input class="form-control" type="text" placeholder="Search.."><i
+                                                    class="search-icon" data-feather="search"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -308,7 +321,7 @@
 @section Script {
     <!-- Plugins JS start-->
     <script>
-        const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
     </script>
     <script src="@Url.Content("~/assets/js/sidebar-menu.js")"></script>
     <script src="@Url.Content("~/assets/js/slick/slick.min.js")"></script>
@@ -324,7 +337,7 @@
 
     @* <script src="@Url.Content("~/assets/js/tree/tree.js")"></script> *@
     <!-- Plugins JS Ends-->
-        @* datatable *@
+    @* datatable *@
     <script src="@Url.Content("~/assets/js/datatable/datatables/jquery.dataTables.min.js")"></script>
     <script src="@Url.Content("~/assets/js/datatable/datatable-extension/dataTables.buttons.min.js")"></script>
 

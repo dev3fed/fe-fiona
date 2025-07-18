@@ -276,9 +276,9 @@
 </div>
 @section Script {
     <script>
-        const url_api = "@Configuration["MyAppSettings:ApiUrl"]";
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                    const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->
