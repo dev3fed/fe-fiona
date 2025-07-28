@@ -382,6 +382,7 @@ $(document).ready(async function () {
   try {
     kompetensiTeknis = await getKompetensiTeknis(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/kompetensi-teknis/show", kompetensiTeknis);
+
     if (Array.isArray(kompetensiTeknis.data.komtekMandatori) && kompetensiTeknis.data.komtekMandatori.length > 0) {
       const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
       kompetensiTeknis.data.komtekMandatori.forEach((item) => {
@@ -392,9 +393,12 @@ $(document).ready(async function () {
       divKompetensiTeknisMandatory.empty().append($ul);
     }
 
-    if (Array.isArray(kompetensiTeknis.data.komtekGeneral && kompetensiTeknis.data.komtekGeneral.length > 0)) {
+    console.log("kompetensiTeknis.data.komtekGeneral", kompetensiTeknis.data.komtekGeneral);
+
+    if (Array.isArray(kompetensiTeknis.data.komtekGeneral) && kompetensiTeknis.data.komtekGeneral.length > 0) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekGeneral.forEach((item) => {
+        console.log("ada data komtekGeneral", item);
         $ul.append(
           `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
         );
@@ -402,9 +406,12 @@ $(document).ready(async function () {
       divKompetensiTeknisGeneral.empty().append($ul);
     }
 
+    console.log("kompetensiTeknis.data.komtekSpesifik", kompetensiTeknis.data.komtekSpesifik);
+
     if (Array.isArray(kompetensiTeknis.data.komtekSpesifik) && kompetensiTeknis.data.komtekSpesifik.length > 0) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
+        console.log("ada data komtekSpesifik", item);
         $ul.append(
           `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
         );
@@ -437,6 +444,8 @@ $(document).ready(async function () {
   let stk;
   try {
     stk = await getStk(dataDetailJobDesc);
+    // filter stk.data to remove items with empty stkNumber is null or undefined
+    stk.data = stk.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
     logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", stk.data);
     updateTable("stk", stk.data, tabCusJD.stk);
   } catch (error) {
@@ -444,11 +453,19 @@ $(document).ready(async function () {
     showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", []);
   }
 
-  const bagan = await chartShow(dataBagan);
-  const dataBaganSelf = bagan?.data.find((item) => item.id == jobId);
-  console.log("dataBaganSelf", dataBaganSelf);
-  console.log("bagan?.data", bagan?.data);
-  focusNode(dataBaganSelf, bagan.data);
+  // Store bagan data globally for tab navigation
+  let globalBaganData = null;
+  let globalDataBaganSelf = null;
+
+  chartShow(dataBagan).then((bagan) => {
+    if (bagan && bagan.data) {
+      globalBaganData = bagan.data;
+      globalDataBaganSelf = bagan.data.find((item) => item.id == jobId);
+      console.log("dataBaganSelf", globalDataBaganSelf);
+      console.log("bagan?.data", bagan.data);
+      focusNode(globalDataBaganSelf, bagan.data);
+    }
+  });
 
   checkLocalStorage();
   let activeTab = "identifikasi";
@@ -563,8 +580,8 @@ $(document).ready(async function () {
     console.log("target", target);
     activeTab = target.split("#v-pills-")[1];
     console.log("activeTab", activeTab);
-    if (activeTab === "bagan-primary") {
-      focusNode(dataBaganSelf, bagan.data);
+    if (activeTab === "bagan-primary" && globalDataBaganSelf && globalBaganData) {
+      focusNode(globalDataBaganSelf, globalBaganData);
     }
     const element = document.getElementById(activeTab);
     if (element) {

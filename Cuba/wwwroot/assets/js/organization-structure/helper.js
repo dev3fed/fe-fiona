@@ -1379,8 +1379,8 @@ async function modalJobPopup(params) {
 
   $("#modalDirectReportOrgUnitId").text(checkValue(data.parentCode));
   $("#modalDirectReportOrgUnitName").text(checkValue(data.parentName));
-  $("#modalDirectReportId").text(checkValue(data.directReportCode));
-  $("#modalDirectReportName").text(checkValue(data.directReportName));
+  $("#modalDirectReportId").text(checkValue(data.parentPositionCode));
+  $("#modalDirectReportName").text(checkValue(data.parentPositionName));
 
   $("#modalDirectorate").text(checkValue(data?.directorateName));
   $("#modalFunction").text(checkValue(data?.functionName));
@@ -1394,7 +1394,7 @@ async function modalJobPopup(params) {
   $("#modalAbbrvPosition").text(checkValue(data?.abbreviationName));
 
   $("#modalKBO").text(checkValue(data?.kbo));
-  $("#modalCostCenter").text(checkValue(data?.costCenter));
+  $("#modalCostCenter").text(checkValue(data?.costCenterDescription));
   $("#modalPersonnelArea").text(checkValue(data?.personnelAreaCode));
   $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
 
@@ -1411,11 +1411,11 @@ async function modalJobPopup(params) {
   $("#modalCoordinationWith").text(data?.coordinationWith ?? "");
 
   $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
-  $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
+  $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupName ?? "");
   $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
-  $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupCode ?? "");
+  $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupName ?? "");
   $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
-  $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupCode ?? "");
+  $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupName ?? "");
 
   $("#modalDetailJob").modal("show");
   $("#nonBasketIncumbent").show();
@@ -1431,18 +1431,14 @@ async function modalJobPopup(params) {
     data.incumbents = data.incumbents.filter(
       (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode)
     );
-    console.log("incumbents unique", data.incumbents);
     data.incumbents = data.incumbents.sort((a, b) => a.personCode.localeCompare(b.personCode));
-    console.log("incumbents", data.incumbents);
 
     // data?.positionList make unique by item.positionCode item.positionName and item.prlOrg
     data.positionList = data.positionList.filter(
       (item, index, self) =>
         index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg)
     );
-    console.log("positionList unique", data.positionList);
     data.positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
-    console.log("positionList", data.positionList);
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
@@ -1480,9 +1476,38 @@ async function modalJobPopup(params) {
     $(".no-basket").show();
     $("#positionListCard, #basketIncumbent").hide();
 
-    $("#incumbentId").text(data?.incumbents?.[0]?.personCode ?? "-");
-    $("#incumbentName").text(data?.incumbents?.[0]?.personName ?? "Vacant");
-    $("#prlPlanComp").text(data?.incumbents?.[0]?.prlPlan ?? "Vacant");
+    if (data?.incumbents?.length > 1) {
+      $("#nonBasketIncumbent").hide();
+
+      $("#basketIncumbent").show();
+      data.incumbents = data.incumbents.filter(
+        (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode)
+      );
+      data.incumbents = data.incumbents.sort((a, b) => a.personCode.localeCompare(b.personCode));
+      const $basketBody = $("#tableBasketIncumbent tbody").empty();
+      (data?.incumbents || []).forEach((item, i) => {
+        if (item?.personCode == 0) {
+          item.personCode = "-";
+          item.personName = "Vacant";
+          item.prlPlan = "-";
+          item.positionCode = "-";
+          item.positionName = "-";
+        }
+        $basketBody.append(`<tr>
+      <td>${i + 1}</td>
+      <td>${item.personCode}</td>
+      <td>${item.personName}</td>
+      <td>${item.prlPlan}</td>
+      <td>${item.positionCode}</td>
+      <td>${item.positionName}</td>
+      </tr>`);
+      });
+    } else {
+      $("#incumbentId").text(data?.incumbents?.[0]?.personCode ?? "-");
+      $("#incumbentName").text(data?.incumbents?.[0]?.personName ?? "Vacant");
+      $("#prlPlanComp").text(data?.incumbents?.[0]?.prlPlan ?? "Vacant");
+      $("#modalCareerLevel").text(data?.positionList?.[0]?.careerLevel ?? "-");
+    }
   }
 
   if (!data?.incumbents?.length) {
@@ -1913,7 +1938,7 @@ async function focusNode(nodeId) {
   const dataChart = await chartShow({
     draftId: organizationAttribute.orgUnitId,
     jobCode: nodeId,
-    depth: 3,
+    depth: 5,
   });
 
   // change chartid id from id_org_unit
@@ -2163,7 +2188,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   }
 
   // console.log("data", data);
-  const dataMerged = data.filter((item) => item.isMergeFormation === true);
+  const dataMerged = data.filter((item) => item.isMergeFormation === true && item.basket == true);
   console.log("dataMerged", dataMerged);
   // const isMerge = dataMerged.some((item) =>
   //   Object.keys(item).some((key) => key.match(/^bc_\d+_isMerge$/) && item[key])

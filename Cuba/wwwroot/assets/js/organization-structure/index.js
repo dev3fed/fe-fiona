@@ -6,7 +6,7 @@ async function initializeHelper(data) {
   const dataChart = await chartShow({
     draftId: organizationAttribute.orgUnitId,
     jobCode: "10132406",
-    depth: 3,
+    depth: 5,
   });
 
   if (!dataChart.data) {
@@ -40,9 +40,12 @@ $("#searchOrgNodeButton").on("click", function () {
 });
 
 $("#searchOrgNode").on("change", function () {
-  const searchValue = $("#searchOrgNode").val();
+  let searchValue = $("#searchOrgNode").val();
   // console.log("masuk sini", searchValue);
-  focusNode($("#searchOrgNode").val());
+  if (searchValue == "10132405") {
+    searchValue = "10132406"; // hardcode for testing
+  }
+  focusNode(searchValue);
 });
 
 function changeOrganization(value, text) {
