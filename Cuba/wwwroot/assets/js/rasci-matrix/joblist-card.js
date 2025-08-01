@@ -6,11 +6,7 @@ document.addEventListener("dataLoaded", async function () {
   levels.forEach((lvl) => {
     const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
     if (chkJobLevel) {
-      chkJobLevel.innerHTML = createJobLevelBody(
-        `level${lvl}`,
-        result,
-        lvl === 1 ? "hide" : "show",
-      );
+      chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, result, lvl === 1 ? "hide" : "show");
     }
   });
   addSearchEventListeners();
@@ -25,12 +21,62 @@ const createParentLabel = (parentId) => {
   return "";
 };
 
+// Virtual scroll for job level body
+const VISIBLE_COUNT = 20; // Number of items to render at once
+
 const createJobLevelBody = (level, combinedData, displayLabel) => {
+  // Prepare filtered data
+  const filteredData = combinedData.filter((item) => item.type === level);
+
+  // If data is small, render all
+  if (filteredData.length <= VISIBLE_COUNT) {
+    return renderJobLevelItems(filteredData, displayLabel, level, 0);
+  }
+
+  // Otherwise, render virtual scroll container
+  const containerId = `virtual-scroll-${level}`;
+  const totalHeight = filteredData.length * 38; // Approximate row height (adjust if needed)
+  // Initial render: first VISIBLE_COUNT items
+  const initialItems = renderJobLevelItems(filteredData.slice(0, VISIBLE_COUNT), displayLabel, level, 0);
+
+  // Add scroll event handler (only once per container)
+  setTimeout(() => {
+    // Use .card-scrollable as scroll container if exists
+    const container =
+      document.querySelector(`#${containerId} .card-scrollable`) || document.getElementById(containerId);
+    if (container && !container._virtualScrollAttached) {
+      container._virtualScrollAttached = true;
+      container.addEventListener("scroll", function () {
+        const scrollTop = container.scrollTop;
+        const startIdx = Math.floor(scrollTop / 38);
+        const endIdx = Math.min(startIdx + VISIBLE_COUNT, filteredData.length);
+        const visibleItems = renderJobLevelItems(filteredData.slice(startIdx, endIdx), displayLabel, level, startIdx);
+        container.querySelector(".virtual-scroll-inner").innerHTML = visibleItems;
+        // Maintain padding for scroll illusion
+        container.querySelector(".virtual-scroll-inner").style.paddingTop = startIdx * 38 + "px";
+      });
+    }
+  }, 0);
+
+  return `
+    <div id="${containerId}">
+      <div class="card-scrollable" style="height: ${VISIBLE_COUNT * 38}px; overflow-y: auto; position: relative;">
+        <div class="virtual-scroll-inner" style="height: ${totalHeight}px;">
+          ${initialItems}
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+// Helper to render job level items (with offset for index)
+function renderJobLevelItems(data, displayLabel, level, offset) {
   let currentReportToId = null;
   let bodyJobLevel = "";
+  let selectedId = getState("selectedJobId") || [];
+  // Determine if this checkbox should be checked
 
-  const filteredData = combinedData.filter((item) => item.type === level);
-  filteredData.forEach((item, index) => {
+  data.forEach((item, index) => {
     let label = "";
     let borderBottom = "";
     if (item.reportToId !== currentReportToId) {
@@ -38,19 +84,16 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
       label = displayLabel === "show" ? createParentLabel(item.reportToId) : "";
     }
 
-    if (
-      index === filteredData.length - 1 ||
-      filteredData[index + 1]?.reportToId !== item.reportToId
-    ) {
+    if (index === data.length - 1 || data[index + 1]?.reportToId !== item.reportToId) {
       borderBottom = "<hr/>";
     }
-
+    const isChecked = selectedId.includes(`${item.id}|${item.prl}`) ? "checked" : "";
     bodyJobLevel += `
       <div id="group${item.reportToId}">
         ${label}
         <div class="row-item" data-name="${item.name}" data-type="${level}" data-parent-id="${item.reportToId}">
           <div class="column-checkbox">
-            <input name="check_job" class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" levelJob="${item.level}" prl="${item.prl}" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}">
+            <input name="check_job" class="checkbox_animated" type="checkbox" onchange="handleCheckboxChange(event)" levelJob="${item.level}" prl="${item.prl}" value="${item.id}" parentId="${item.reportToId}" data-name="${item.name}" ${isChecked}>
           </div>
           <div class="column-item-name" style="font-size:12px">${item.name}</div>
         </div>
@@ -60,7 +103,7 @@ const createJobLevelBody = (level, combinedData, displayLabel) => {
   });
 
   return bodyJobLevel;
-};
+}
 
 const handleCheckboxChange = async (event) => {
   const checkbox = event.target;
@@ -86,11 +129,8 @@ const handleCheckboxChange = async (event) => {
   }
 
   await setState("selectedJobId", selectedId);
-
   const jobList = await getState("filterJobList");
-  const result = jobList.filter((item) =>
-    selectedId.includes(`${item.id}|${item.prl}`),
-  );
+  const result = jobList.filter((item) => selectedId.includes(`${item.id}|${item.prl}`));
 
   if (result.length > 0) {
     switch (levelJob) {
@@ -122,11 +162,7 @@ const handleCheckboxChange = async (event) => {
     levels.forEach((lvl) => {
       const chkJobLevel = document.getElementById(`chk-job-level${lvl}`);
       if (chkJobLevel) {
-        chkJobLevel.innerHTML = createJobLevelBody(
-          `level${lvl}`,
-          result,
-          lvl === 1 ? "hide" : "show",
-        );
+        chkJobLevel.innerHTML = createJobLevelBody(`level${lvl}`, result, lvl === 1 ? "hide" : "show");
       }
     });
   }
@@ -137,22 +173,14 @@ const handleCheckboxChange = async (event) => {
 const listChecked = (selectedId) => {
   selectedId.forEach((id) => {
     const [jobId, prl] = id.split("|");
-    const checkbox = document.querySelector(
-      `input[type="checkbox"][value="${jobId}"][prl="${prl}"]`,
-    );
+    const checkbox = document.querySelector(`input[type="checkbox"][value="${jobId}"][prl="${prl}"]`);
     if (checkbox) {
       checkbox.checked = true;
     }
   });
 };
 
-const traverseHierarchy = (
-  parentId,
-  prl,
-  data,
-  selectedId,
-  visited = new Set(),
-) => {
+const traverseHierarchy = (parentId, prl, data, selectedId, visited = new Set()) => {
   const key = `${parentId}|${prl}`;
   if (visited.has(key)) return;
   visited.add(key);
@@ -166,9 +194,7 @@ const traverseHierarchy = (
     traverseHierarchy(child.id, child.prl, data, selectedId, visited);
   });
 
-  const sameIdDiffPrl = data.filter(
-    (item) => item.id === parentId && item.prl !== prl,
-  );
+  const sameIdDiffPrl = data.filter((item) => item.id === parentId && item.prl !== prl);
   sameIdDiffPrl.forEach((item) => {
     const altKey = `${item.id}|${item.prl}`;
     if (!visited.has(altKey)) {
@@ -202,13 +228,9 @@ const searchJob = async (event, level) => {
   const lowerCaseQuery = query.toLowerCase();
   const result = await getState("filterJobList");
   if (query.length > 4) {
-    const filteredResult = result.filter((item) =>
-      item.name.toLowerCase().includes(lowerCaseQuery),
-    );
+    const filteredResult = result.filter((item) => item.name.toLowerCase().includes(lowerCaseQuery));
     if (selectedId.length > 0) {
-      const findDataSelected = filteredResult.filter((value) =>
-        selectedId.includes(value.id),
-      );
+      const findDataSelected = filteredResult.filter((value) => selectedId.includes(value.id));
       if (findDataSelected.length > 0) {
         updateLevels([level], filteredResult);
         listChecked(selectedId);
@@ -221,12 +243,8 @@ const searchJob = async (event, level) => {
     }
   } else {
     if (selectedId.length > 0) {
-      const findJobList = result.filter((value) =>
-        selectedId.includes(value.id),
-      );
-      const cekLevelParent = findJobList.filter(
-        (value) => value.level === level - 1,
-      );
+      const findJobList = result.filter((value) => selectedId.includes(value.id));
+      const cekLevelParent = findJobList.filter((value) => value.level === level - 1);
       if (cekLevelParent.length === 0) {
         updateLevels([level], result);
         listChecked(selectedId);

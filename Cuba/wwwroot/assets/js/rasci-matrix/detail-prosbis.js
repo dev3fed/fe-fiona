@@ -1,8 +1,6 @@
 const detailsProsbis = async () => {
   try {
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalBusinessPro"),
-    );
+    const modal = new bootstrap.Modal(document.getElementById("modalBusinessPro"));
     modal.show();
     const dataDetailProsbis = getState("dataDetailProsbis");
     const payload = {
@@ -10,10 +8,7 @@ const detailsProsbis = async () => {
       draftSOId: dataDetailProsbis.draftSo,
     };
     const queryString = new URLSearchParams(payload).toString();
-    const result = await fetchRelatedJob(
-      dataDetailProsbis.indexNumber,
-      queryString,
-    );
+    const result = await fetchRelatedJob(dataDetailProsbis.indexNumber, queryString);
     const dataJob = result.data.relatedPosition;
     const dataHierarchy = result.data.businessProcess;
     const bodyTitle = `
@@ -120,7 +115,7 @@ const layoutTabProsbis = (data) => {
           ${index + 1}
           </th>
           <td>${item.positionName || "-"}</td>
-          <td>${item.directorateName || "-"}</td>
+          <td>${item.functionName || "-"}</td>
           <td>${item.divisionName || "-"}</td>
           <td>${item.subDivisionName || "-"}</td>
           <td>${item.departmentName || "-"}</td>
@@ -148,11 +143,7 @@ const layoutTabHierarchy = (data, indexNumber) => {
   const bodyContentHierarchy = data
     .map((item) => {
       const levelClass =
-        indexNumber == item.indexNumber
-          ? `level-${item.level} highlight`
-          : item.level
-          ? `level-${item.level}`
-          : "";
+        indexNumber == item.indexNumber ? `level-${item.level} highlight` : item.level ? `level-${item.level}` : "";
       return `
       <tr class="clusterize-cluster ${levelClass}">
         <td class="level-col" style="text-align:center">L${item.level}</td>
@@ -165,10 +156,8 @@ const layoutTabHierarchy = (data, indexNumber) => {
       </tr>`;
     })
     .join("");
-  document.getElementById("prosbis-hierarchy-header").innerHTML =
-    theadContentHierarchy;
-  document.getElementById("prosbis-hierarchy-body").innerHTML =
-    bodyContentHierarchy;
+  document.getElementById("prosbis-hierarchy-header").innerHTML = theadContentHierarchy;
+  document.getElementById("prosbis-hierarchy-body").innerHTML = bodyContentHierarchy;
 };
 
 // const layoutTabCompetency = () => {
@@ -229,19 +218,13 @@ const handleCheckSeriesLevel = (event) => {
 };
 
 const openSeiesOfProcess = () => {
-  const modal = new bootstrap.Modal(
-    document.getElementById("ModalSeriesProses"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("ModalSeriesProses"));
   modal.show();
   const dataDetailProsbis = getState("dataDetailProsbis");
   const bodyTitle = `
     <div class="col-12">
-      <h6 class="mb-2" style="font-weight: bold;">${
-        dataDetailProsbis.description
-      }</h6>
-      <label>Level ${dataDetailProsbis.level} | Index ${
-    dataDetailProsbis.indexNumber
-  }</label>
+      <h6 class="mb-2" style="font-weight: bold;">${dataDetailProsbis.description}</h6>
+      <label>Level ${dataDetailProsbis.level} | Index ${dataDetailProsbis.indexNumber}</label>
       <hr/>
     </div>
     <div class="col-12 mb-3">

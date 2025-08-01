@@ -167,8 +167,8 @@ async function endpointRenameDraft(params, payload) {
   }
 }
 
-async function fetchDetailDraftActivity(id) {
-  const url = `${url_api}/api/rasci-matrix/draft/detail-list/${id}`;
+async function fetchDetailDraftActivity(param) {
+  const url = `${url_api}/api/rasci-matrix/draft/detail-list/${param}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
@@ -316,11 +316,11 @@ async function fetchData() {
       ...filterJobList?.level1.map((item) => ({ ...item, type: "level1" })),
       ...filterJobList?.level2.map((item) => ({ ...item, type: "level2" })),
       ...filterJobList?.level3.map((item) => ({ ...item, type: "level3" })),
-      ...filterJobList?.level4.slice(0, 400).map((item) => ({ ...item, type: "level4" })),
-      ...filterJobList?.level5.slice(0, 400).map((item) => ({ ...item, type: "level5" })),
-      ...filterJobList?.level6.slice(0, 400).map((item) => ({ ...item, type: "level6" })),
-      ...filterJobList?.level7.slice(0, 400).map((item) => ({ ...item, type: "level7" })),
-      ...filterJobList?.level8.slice(0, 400).map((item) => ({ ...item, type: "level8" })),
+      ...filterJobList?.level4.map((item) => ({ ...item, type: "level4" })),
+      ...filterJobList?.level5.map((item) => ({ ...item, type: "level5" })),
+      ...filterJobList?.level6.map((item) => ({ ...item, type: "level6" })),
+      ...filterJobList?.level7.map((item) => ({ ...item, type: "level7" })),
+      ...filterJobList?.level8.map((item) => ({ ...item, type: "level8" })),
     ];
     appState.filterJobList = combinedData;
     document.dispatchEvent(new Event("dataLoaded"));

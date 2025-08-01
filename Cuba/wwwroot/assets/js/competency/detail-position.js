@@ -48,7 +48,7 @@ const modalInfoPosition = async (code) => {
           <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block;">ID POS Direct Report</label>
+          <label style="color:#9F9FA5;display: block;">ID Position Direct Report</label>
           <label style="font-weight: 600;font-size: 14px">${
             detailInformation.parentPositionCode ? detailInformation.parentPositionCode : "-"
           }</label>
@@ -148,7 +148,7 @@ const modalInfoPosition = async (code) => {
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Personnel Sub Area</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.personnelSubARea ? detailInformation.personnelSubARea : "-"
+            detailInformation.personnelSubArea ? detailInformation.personnelSubArea : "-"
           }</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -160,7 +160,7 @@ const modalInfoPosition = async (code) => {
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">SK Number</label>
           <label style="font-weight: 600;font-size: 14px">${
-            detailInformation.SkNumber ? detailInformation.SkNumber : "-"
+            detailInformation.skNumber ? detailInformation.skNumber : "-"
           }</label>
         </div>
       `;
@@ -169,10 +169,14 @@ const modalInfoPosition = async (code) => {
     <div style="padding-top: 20px;display:flex">
         <div style="padding:10px;margin-top:10px;border:1px solid #BFBFC2;width: 100%;border-radius: 5px;">
             <label style="color:#9F9FA5;fonti-size:12px">Main Skill Group</label><br/>
-            <label style="font-weight: 600;font-size: 14px">Business Management</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${
+              detailInformation.mainSkillGroup ? detailInformation.mainSkillGroup : "-"
+            }</label><br/>
 
             <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Main Sub Skill Group</label><br/>
-            <label style="font-weight: 600;font-size: 14px">Business Planning</label>
+            <label style="font-weight: 600;font-size: 14px">${
+              detailInformation.mainSubSkillGroup ? detailInformation.mainSubSkillGroup : "-"
+            }</label>
         </div>
     </div>
     </div>
@@ -180,10 +184,14 @@ const modalInfoPosition = async (code) => {
         <div style="padding-top: 20px;display:flex">
             <div style="padding:10px;margin-top:10px;border:1px solid #BFBFC2;width: 100%;border-radius: 5px;">
                 <label style="color:#9F9FA5;fonti-size:12px">Second Skill Group</label><br/>
-                <label style="font-weight: 600;font-size: 14px">Legal</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${
+                  detailInformation.secondSkillGroup ? detailInformation.secondSkillGroup : "-"
+                }</label><br/>
 
                 <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Second Sub Skill Group</label><br/>
-                <label style="font-weight: 600;font-size: 14px">Legal Reasoning & Analysis</label>
+                <label style="font-weight: 600;font-size: 14px">${
+                  detailInformation.secondSubSkillGroup ? detailInformation.secondSubSkillGroup : "-"
+                }</label>
             </div>
         </div>
     </div>
@@ -191,10 +199,14 @@ const modalInfoPosition = async (code) => {
         <div style="padding-top: 20px;display:flex">
             <div style="padding:10px;margin-top:10px;margin-right:10px;border:1px solid #BFBFC2;width: 100%;border-radius: 5px;">
                 <label style="color:#9F9FA5;fonti-size:12px">Third Skill Group</label><br/>
-                <label style="font-weight: 600;font-size: 14px">Legal</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${
+                  detailInformation.thirdSkillGroup ? detailInformation.thirdSkillGroup : "-"
+                }</label><br/>
 
                 <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Third Sub Skill Group</label><br/>
-                <label style="font-weight: 600;font-size: 14px">Legal Presentation</label>
+                <label style="font-weight: 600;font-size: 14px">${
+                  detailInformation.thirdSubSkillGroup ? detailInformation.thirdSubSkillGroup : "-"
+                }</label>
             </div>
         </div>
     </div>
@@ -202,15 +214,15 @@ const modalInfoPosition = async (code) => {
         const cardIncumbent = `
         <div class="col-3">
             <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-            <label style="font-weight: 600;font-size: 14px">19251894</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeId}</label><br/>
         </div>
         <div class="col-3">
             <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-            <label style="font-weight: 600;font-size: 14px">Lily Desy Saptania Rahayu</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeName}</label><br/>
         </div>
         <div class="col-6">
             <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
-            <label style="font-weight: 600;font-size: 14px">23</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.prlPlanComp}</label><br/>
         </div>
 `;
         const jobInfo = document.getElementById("job-info");
@@ -253,7 +265,7 @@ const cardTblMandatory = async (code) => {
           return `
             <tr>
               <td  style="text-align:Center">${i + 1}</td>
-              <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Generic','${
+              <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Mandatory','${
                 element.compCode
               }')">${element.name}</td>
               <td style="text-align:Center">${element.proficiencyLevel}</td>
@@ -296,7 +308,7 @@ const cardTblGeneral = async (code) => {
           return `
               <tr>
                 <td  style="text-align:Center">${i + 1}</td>
-                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Core','${
+                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('General','${
                   element.compCode
                 }')">
                 ${element.compName}</td>
@@ -323,7 +335,6 @@ const cardTblSpecific = async (code) => {
     const result = await fetchDetailPositionTechnical(payload);
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
-      console.log("listTechnical", listTechnical);
       const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
       const labelSpecific = document.getElementById("labelSpecific");
       if (labelSpecific) {

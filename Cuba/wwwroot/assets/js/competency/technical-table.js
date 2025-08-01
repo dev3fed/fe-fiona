@@ -1,10 +1,99 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("searchTechnical");
+  if (searchInput) {
+    searchInput.addEventListener("input", async (event) => {
+      const keyword = event.target.value.trim();
+      if (keyword.length >= 4 || keyword.length === 0) {
+        const payloadTblTechnical = getState("payloadTblTechnical");
+        const payload = {
+          ...payloadTblTechnical,
+          page: 1,
+          pageSize: 10,
+          search: keyword,
+        };
+        const queryString = "?" + new URLSearchParams(payload).toString();
+        const listData = await fetchTechnicalList(queryString);
+        renderTableTchnical(listData.data);
+        setState("payloadTblTechnical", payload);
+      }
+    });
+  }
+  const url = `${url_api}/api/Utilities/selection`;
+  selectSkillGroupTechnical(url);
+  selectSubSkillGroupTechnical(url);
+
+  $("#skillGroupTechnical").on("select2:clear", async function (e) {
+    const payloadTblTechnical = getState("payloadTblTechnical");
+    const payload = {
+      ...payloadTblTechnical,
+      page: 1,
+      sgName: "",
+      ssgName: "",
+    };
+    $("#subSkillGroupTechnical").val(null).trigger("change");
+    const url = `${url_api}/api/Utilities/selection`;
+    selectSubSkillGroupTechnical(url);
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const listData = await fetchTechnicalList(queryString);
+    renderTableTchnical(listData.data);
+    setState("payloadTblTechnical", payload);
+  });
+  $("#skillGroupTechnical").on("select2:select", async function (e) {
+    const selectedId = e.params.data.id;
+    const selectedText = e.params.data.text;
+    const payloadTblTechnical = getState("payloadTblTechnical");
+    const payload = {
+      ...payloadTblTechnical,
+      page: 1,
+      sgName: selectedText,
+      ssgName: "",
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const listData = await fetchTechnicalList(queryString);
+    $("#subSkillGroupTechnical").val(null).trigger("change");
+    const url = `${url_api}/api/TechnicalCompetency/sub-skill-group/${selectedId}`;
+    subSkillGroupBySg(url);
+    renderTableTchnical(listData.data);
+    setState("payloadTblTechnical", payload);
+  });
+
+  $("#subSkillGroupTechnical").on("select2:clear", async function (e) {
+    const payloadTblTechnical = getState("payloadTblTechnical");
+    const payload = {
+      ...payloadTblTechnical,
+      page: 1,
+      ssgName: "",
+    };
+    $("#subSkillGroupTechnical").val(null).trigger("change");
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const listData = await fetchTechnicalList(queryString);
+    renderTableTchnical(listData.data);
+    setState("payloadTblTechnical", payload);
+  });
+
+  $("#subSkillGroupTechnical").on("select2:select", async function (e) {
+    const selectedText = e.params.data.text;
+    const payloadTblTechnical = getState("payloadTblTechnical");
+    const payload = {
+      ...payloadTblTechnical,
+      page: 1,
+      ssgName: selectedText,
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const listData = await fetchTechnicalList(queryString);
+    renderTableTchnical(listData.data);
+    setState("payloadTblTechnical", payload);
+  });
+});
+
 const renderTableTchnical = async (technicalList) => {
   try {
     const listData = technicalList;
-    const bodyContent = listData.data
-      .map((val, i) => {
-        const startIndex = (listData.page - 1) * listData.limit;
-        return `
+    if (listData.data.length > 0) {
+      const bodyContent = listData.data
+        .map((val, i) => {
+          const startIndex = (listData.page - 1) * listData.limit;
+          return `
               <tr>
                 <th scope="row" style="text-align:center">${startIndex + i + 1}</th>
                 <td>${val.sgName || "-"}</td>
@@ -18,21 +107,20 @@ const renderTableTchnical = async (technicalList) => {
                   </button>
                 </td>
               </tr>`;
-      })
-      .join("");
-
-    const tableBody = document.getElementById("body-technical");
-    if (tableBody) {
-      tableBody.innerHTML = bodyContent;
-    }
-    const itemsPerPage = listData.limit;
-    const totalPages = Math.ceil(listData.count / itemsPerPage);
-    const currentPage = listData.page;
-    const start = (listData.page - 1) * itemsPerPage + 1;
-    renderPaginationTechnical(currentPage, totalPages);
-    const totalPage = document.getElementById("total-technical-page");
-    if (totalPage) {
-      totalPage.innerHTML = `
+        })
+        .join("");
+      const tableBody = document.getElementById("body-technical");
+      if (tableBody) {
+        tableBody.innerHTML = bodyContent;
+      }
+      const itemsPerPage = listData.limit;
+      const totalPages = Math.ceil(listData.count / itemsPerPage);
+      const currentPage = listData.page;
+      const start = (listData.page - 1) * itemsPerPage + 1;
+      renderPaginationTechnical(currentPage, totalPages);
+      const totalPage = document.getElementById("total-technical-page");
+      if (totalPage) {
+        totalPage.innerHTML = `
           <div class="row">
             <div class="col-2">
               <select class="form-select digits"  style="width:62%;" id="limitDetailPage" onchange="changePageSizeTechnical(event)">
@@ -46,14 +134,25 @@ const renderTableTchnical = async (technicalList) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.count < itemsPerPage * listData.page ? listData.count : itemsPerPage * listData.page
-      } of ${listData.count} records</label>
+          listData.count < itemsPerPage * listData.page ? listData.count : itemsPerPage * listData.page
+        } of ${listData.count} records</label>
             </div>
           </div>
         `;
+      }
+      let selectElement = document.getElementById("limitDetailPage");
+      selectElement.value = listData.limit;
+    } else {
+      bodyContent = `
+          <tr>
+            <td colspan="5" style="text-align:center">Data not found</td>
+          </tr>
+        `;
+      const tableBody = document.getElementById("body-technical");
+      if (tableBody) {
+        tableBody.innerHTML = bodyContent;
+      }
     }
-    let selectElement = document.getElementById("limitDetailPage");
-    selectElement.value = listData.limit;
   } catch (error) {
     console.error("Error rendering table behavior:", error);
   }
@@ -138,6 +237,7 @@ async function changePageSizeTechnical(event) {
   const itemsPerPage = parseInt(event.target.value, 10);
   const payloadTblTechnical = getState("payloadTblTechnical");
   const payload = {
+    ...payloadTblTechnical,
     page: payloadTblTechnical.page,
     pageSize: itemsPerPage,
   };
@@ -150,6 +250,7 @@ async function changePageSizeTechnical(event) {
 async function handleChangePageTechnical(pageNumber) {
   const payloadTblTechnical = getState("payloadTblTechnical");
   const payload = {
+    ...payloadTblTechnical,
     page: pageNumber,
     pageSize: payloadTblTechnical.pageSize,
   };

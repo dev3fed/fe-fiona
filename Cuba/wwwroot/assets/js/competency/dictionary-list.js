@@ -34,7 +34,7 @@ const bodypageMandatory = async () => {
               <td>${val.name || "-"}</td>
               <td>${val.definition || "-"}</td>
               <td style="width: 120px;text-align:center">
-                <button class="btn btn-outline-primary" type="button" onclick="handleDetailDictionary('Generic','${
+                <button class="btn btn-outline-primary" type="button" onclick="handleDetailDictionary('Mandatory','${
                   val.compCode
                 }')">
                   <i class="icon-eye"> Detail</i> 

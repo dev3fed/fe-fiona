@@ -131,7 +131,8 @@ async function handleSearchCompetency() {
 function changeDataSource(dataSource) {
   $("#dataSource-summary").val(dataSource).trigger("change");
   document.getElementById("dataSource-summary").disabled = true;
-
+  selectSkillGroupTechnical();
+  selectSubSkillGroupTechnical();
   if (dataSource !== "master") {
     document.getElementById("pills-draft-tab").style.display = "flex";
     document.getElementById("pills-approval-tab").style.display = "flex";
@@ -199,7 +200,7 @@ function appendDynamicHeader(competencyList) {
     row2HTML += `
       <th class="color-${val.compType} competency-cell">
         <div class='competency-cell-wrapper' data-bs-toggle="tooltip" data-bs-placement="bottom"
-             title="${val.compName}" onclick="handleDetailCompetency('${val.compCode}')">
+             title="${val.compName}" onclick="handleDetailCompetency('${val.compType}','${val.compCode}')">
           ${val.compName}
         </div>
       </th>`;

@@ -24,6 +24,7 @@ const appState = new Proxy(
     levelSeries: [],
     visibleJobs: [],
     selectedJobId: [],
+    selectedPosition: [],
     disabledJobId: [],
     dataDeleteProsbis: {},
     dataDetailProsbis: {},

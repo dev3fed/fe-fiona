@@ -1,3 +1,24 @@
+document.getElementById("searchBehavior").addEventListener("input", function (event) {
+  const value = event.target.value.trim();
+  if (value.length >= 4 || value.length === 0) {
+    handleSearchChange(event);
+  }
+});
+
+const handleSearchChange = async (event) => {
+  const searchValue = event.target.value.trim();
+  const payloadTblBehavior = getState("payloadTblBehavior");
+  const payload = {
+    page: payloadTblBehavior.page,
+    pageSize: payloadTblBehavior.pageSize,
+    search: searchValue,
+  };
+  const queryString = "?" + new URLSearchParams(payload).toString();
+  const listData = await fetchBehaviorList(queryString);
+  renderTableBehavior(listData.data);
+  setState("payloadTblBehavior", payload);
+};
+
 const renderTableBehavior = async (behaviorList) => {
   try {
     const listData = behaviorList;
@@ -136,6 +157,7 @@ async function handleChangeItemsPerPage(event) {
   const itemsPerPage = parseInt(event.target.value, 10);
   const payloadTblBehavior = getState("payloadTblBehavior");
   const payload = {
+    ...payloadTblBehavior,
     page: payloadTblBehavior.page,
     pageSize: itemsPerPage,
   };
@@ -282,6 +304,7 @@ async function handleDetailDictionary(type, code) {
 async function handleChangePage(pageNumber) {
   const payloadTblBehavior = getState("payloadTblBehavior");
   const payload = {
+    ...payloadTblBehavior,
     page: pageNumber,
     pageSize: payloadTblBehavior.pageSize,
   };

@@ -308,7 +308,7 @@ const applyFilterRasci = async () => {
     draftRasciId: draftRasciId == "master" ? null : draftRasciId,
     unitCode: jobIdFinal,
     prlOrg: prlFinal,
-    level: getState("levelFilter"),
+    level: [...getState("levelFilter"), 0],
     rasciNotation: getState("rasciNotationFilter"),
     row: 1,
     rowSize: 15,
@@ -317,7 +317,7 @@ const applyFilterRasci = async () => {
   const payloadJob = {
     col: 1,
     colSize: 10,
-    level: getState("levelFilter"),
+    level: [...getState("levelFilter"), 0],
     rasciNotation: getState("rasciNotationFilter"),
     draftRasciId: draftRasciId == "master" ? null : draftRasciId,
     draftSoId: draftSoId,

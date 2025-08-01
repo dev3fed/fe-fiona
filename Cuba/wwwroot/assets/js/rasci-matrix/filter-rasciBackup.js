@@ -215,7 +215,8 @@ const onModalFilter = async () => {
     };
     console.log("payloadJobList", payloadJobList);
     const result = await fetchJoblistCard(payloadJobList);
-    const jobList = result?.data;
+    let jobList = result?.data;
+    jobList = changeLvlDirut(jobList);
     console.log("jobList", jobList);
     const lvlData = [1, 2, 3, 4, 5, 6, 7, 8];
     lvlData.forEach((lvl) => {
@@ -224,27 +225,21 @@ const onModalFilter = async () => {
     const combinedData = [
       ...jobList?.level1.data.map((item) => ({
         ...item,
-        type: "level1",
       })),
       ...jobList?.level2.data.map((item) => ({
         ...item,
-        type: "level2",
       })),
       ...jobList?.level3.data.map((item) => ({
         ...item,
-        type: "level3",
       })),
       ...jobList?.level4.data.map((item) => ({
         ...item,
-        type: "level4",
       })),
       ...jobList?.level5.data.map((item) => ({
         ...item,
-        type: "level5",
       })),
       ...jobList?.level6.data.map((item) => ({
         ...item,
-        type: "level6",
       })),
       ...jobList?.level7.data.map((item) => ({ ...item, type: "level7" })),
       ...jobList?.level8.data.map((item) => ({ ...item, type: "level8" })),
