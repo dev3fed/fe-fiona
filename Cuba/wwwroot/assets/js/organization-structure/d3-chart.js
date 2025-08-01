@@ -4,10 +4,6 @@ let actNdCent = 0;
 let chart; // Global chart variable for access across functions
 
 // Global font sizing function - used by both SVG export and chart rendering
-function asikinAja(text, isHeader = false) {
-  alert("masok");
-}
-
 function initializeChartSystem(dataObject = data, idContainer = "osContainer") {
   return new Promise((resolve, reject) => {
     try {
@@ -842,46 +838,120 @@ function convertForeignObjectToSVGText(svgElement) {
 
 function prepareAndExportSVG() {
   try {
-    const svg = document.querySelector(".chart-container svg");
+    const svg = document.querySelector(".osContainerNew svg");
     if (!svg) {
       console.error("SVG element not found");
       return;
     }
 
-    // just clone the SVG element, so we don't modify the original
-    const clonedSvg = svg.cloneNode(true);
+    // Ensure chart is properly centered before export
+    if (chart && chart.fit) {
+      chart.fit();
+    }
 
-    // Remove node button elements before converting to SVG
-    const nodeButtonForeignObjects = clonedSvg.querySelectorAll(".node-button-foreign-object");
-    nodeButtonForeignObjects.forEach((button) => button.remove());
+    // Wait a bit for chart to settle after fit
+    setTimeout(() => {
+      // Get the SVG element again after fit
+      const svgAfterFit = document.querySelector(".osContainerNew svg");
+      if (!svgAfterFit) {
+        console.error("SVG element not found after fit");
+        return;
+      }
 
-    // Remove paging button elements as well
-    const pagingButtonWrappers = clonedSvg.querySelectorAll(".paging-button-wrapper");
-    pagingButtonWrappers.forEach((button) => button.remove());
+      // Clone the SVG element
+      const clonedSvg = svgAfterFit.cloneNode(true);
 
-    convertForeignObjectToSVGText(clonedSvg);
+      // Remove node button elements before converting to SVG
+      const nodeButtonForeignObjects = clonedSvg.querySelectorAll(".node-button-foreign-object");
+      nodeButtonForeignObjects.forEach((button) => button.remove());
 
-    // Add metadata to help PowerPoint recognize individual nodes
-    clonedSvg.setAttribute("data-org-chart", "true");
-    clonedSvg.setAttribute("data-node-count", clonedSvg.querySelectorAll(".org-chart-node").length);
-    clonedSvg.setAttribute("style", "pointer-events: none; user-select: none;");
-    clonedSvg.setAttribute("data-text-editable", "false");
+      // Remove paging button elements as well
+      const pagingButtonWrappers = clonedSvg.querySelectorAll(".paging-button-wrapper");
+      pagingButtonWrappers.forEach((button) => button.remove());
 
-    // Add specific PowerPoint compatibility attributes
-    clonedSvg.setAttribute("xmlns:ppt", "http://schemas.microsoft.com/office/powerpoint");
-    clonedSvg.setAttribute("ppt:editable", "false");
+      convertForeignObjectToSVGText(clonedSvg);
 
-    const serializer = new XMLSerializer();
-    const svgString = serializer.serializeToString(clonedSvg);
-    console.log("SVG String length:", svgString.length);
+      // Get current viewBox and dimensions
+      const currentViewBox = clonedSvg.getAttribute("viewBox");
+      const currentWidth = clonedSvg.getAttribute("width");
+      const currentHeight = clonedSvg.getAttribute("height");
 
-    const blob = new Blob([svgString], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "org-chart.svg";
-    a.click();
-    URL.revokeObjectURL(url);
+      console.log(`Current SVG - ViewBox: ${currentViewBox}, Width: ${currentWidth}, Height: ${currentHeight}`);
+
+      // Try to get the bounding box of the main chart group
+      const chartGroup = clonedSvg.querySelector("g");
+      if (chartGroup) {
+        try {
+          // Calculate tight bounding box for the content
+          const padding = 50;
+          let minX = 0,
+            minY = 0,
+            maxX = 800,
+            maxY = 600;
+
+          // Look for all node groups to calculate bounds
+          const nodeGroups = clonedSvg.querySelectorAll("g[data-n-id]");
+          if (nodeGroups.length > 0) {
+            minX = Infinity;
+            minY = Infinity;
+            maxX = -Infinity;
+            maxY = -Infinity;
+
+            nodeGroups.forEach((node) => {
+              const transform = node.getAttribute("transform");
+              if (transform) {
+                const match = transform.match(/translate\(([^,]+),([^)]+)\)/);
+                if (match) {
+                  const x = parseFloat(match[1]);
+                  const y = parseFloat(match[2]);
+                  minX = Math.min(minX, x - 125); // node width/2
+                  minY = Math.min(minY, y - 50); // node height/2
+                  maxX = Math.max(maxX, x + 125);
+                  maxY = Math.max(maxY, y + 50);
+                }
+              }
+            });
+          }
+
+          // Apply padding and center the content
+          const contentWidth = maxX - minX + 2 * padding;
+          const contentHeight = maxY - minY + 2 * padding;
+          const viewBoxX = minX - padding;
+          const viewBoxY = minY - padding;
+
+          // Update SVG attributes for centered export
+          clonedSvg.setAttribute("viewBox", `${viewBoxX} ${viewBoxY} ${contentWidth} ${contentHeight}`);
+          clonedSvg.setAttribute("width", contentWidth);
+          clonedSvg.setAttribute("height", contentHeight);
+
+          console.log(`Adjusted SVG - ViewBox: ${viewBoxX} ${viewBoxY} ${contentWidth} ${contentHeight}`);
+        } catch (bboxError) {
+          console.warn("Could not calculate tight bounding box, using default centering");
+        }
+      }
+
+      // Add metadata to help PowerPoint recognize individual nodes
+      clonedSvg.setAttribute("data-org-chart", "true");
+      clonedSvg.setAttribute("data-node-count", clonedSvg.querySelectorAll(".org-chart-node").length);
+      clonedSvg.setAttribute("style", "pointer-events: none; user-select: none;");
+      clonedSvg.setAttribute("data-text-editable", "false");
+
+      // Add specific PowerPoint compatibility attributes
+      clonedSvg.setAttribute("xmlns:ppt", "http://schemas.microsoft.com/office/powerpoint");
+      clonedSvg.setAttribute("ppt:editable", "false");
+
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSvg);
+      console.log("SVG String length:", svgString.length);
+
+      const blob = new Blob([svgString], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "org-chart.svg";
+      a.click();
+      URL.revokeObjectURL(url);
+    }, 500); // Wait for chart to settle
   } catch (error) {
     console.error("Error in prepareAndExportSVG:", error);
   }
@@ -1437,28 +1507,24 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
               `;
       }
     })
-    .container(idContainer || ".chart-container")
+    .container(".osContainerNew")
     .data(processedDataResult.processedData)
     .compact(false)
-    .initialZoom(1.5)
-    .svgWidth(800)
-    .svgHeight(600)
+    .initialZoom(0.8)
+    .svgWidth(1200)
+    .svgHeight(800)
     .render()
     .fit();
 
   console.log("Chart initialized successfully");
 
   // Ensure chart is properly scaled and centered after render
-  // setTimeout(() => {
-  //   if (chart && chart.fit) {
-  //     chart.fit();
-  //     // Apply consistent scale to ensure chart fits container
-  //     if (chart.initialZoom) {
-  //       chart.initialZoom(1.5);
-  //     }
-  //     console.log("Chart re-fitted and scaled to fit container");
-  //   }
-  // }, 200);
+  setTimeout(() => {
+    if (chart && chart.fit) {
+      chart.fit();
+      console.log("Chart re-fitted and centered after initialization");
+    }
+  }, 300);
 
   // Auto-expand node if focusNodeId is provided
   if (focusNodeId) {
