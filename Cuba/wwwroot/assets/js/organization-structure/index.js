@@ -6,7 +6,7 @@ async function initializeHelper(data) {
   const dataChart = await chartShow({
     draftId: organizationAttribute.orgUnitId,
     jobCode: "10132406",
-    depth: 3,
+    depth: 5,
   });
 
   if (!dataChart.data) {
@@ -18,7 +18,7 @@ async function initializeHelper(data) {
   });
 
   helperOrgTree(dataChart.data);
-  // helperOrgChart(true, "os-container", dataChart.data, true);
+  helperOrgChart(true, "os-container", dataChart.data, true);
 
   // helperOrgChart(true, "os-container", asik2, true);
   // helperOrgChartTester(true, "os-container", test, true);
@@ -40,9 +40,12 @@ $("#searchOrgNodeButton").on("click", function () {
 });
 
 $("#searchOrgNode").on("change", function () {
-  const searchValue = $("#searchOrgNode").val();
+  let searchValue = $("#searchOrgNode").val();
   // console.log("masuk sini", searchValue);
-  focusNode($("#searchOrgNode").val());
+  if (searchValue == "10132405") {
+    searchValue = "10132406"; // hardcode for testing
+  }
+  focusNode(searchValue);
 });
 
 function changeOrganization(value, text) {
@@ -839,6 +842,14 @@ $(document).ready(async function () {
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
   getTableListApproval(getDataApproval.data);
   // getTableListLog();
+  getDataList([
+    {
+      dataId: "selectDraftOrganization",
+      data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
+    },
+  ]);
+
+  await checkDataOrganization(storeData.listDraft);
 
   $("#createDraft").on("click", function () {
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
@@ -848,13 +859,6 @@ $(document).ready(async function () {
 
   // check data Initial
   // getDataOrganization(organizationAttribute.orgUnitId);
-
-  getDataList([
-    {
-      dataId: "selectDraftOrganization",
-      data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
-    },
-  ]);
 
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
   const focusNode = urlParams.get("focusNode");

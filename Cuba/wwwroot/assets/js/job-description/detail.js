@@ -194,9 +194,9 @@ $(document).ready(async function () {
     console.log(`get data ${params} berhasil, jika tabel belum muncul cek format data, exp:`, data);
   }
   function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
-    alert(
-      `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/${endpoint} tidak valid atau kosong, data yang keluar hanya contoh. cek di console log`
-    );
+    // alert(
+    //   `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/${endpoint} tidak valid atau kosong, data yang keluar hanya contoh. cek di console log`
+    // );
     console.error(
       `${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. contoh data expected:`,
       data
@@ -218,16 +218,16 @@ $(document).ready(async function () {
 
   let identifikasiJabatan = await getIdentifikasiJabatan(dataDetailJobDesc);
   const identifikasiJabatanData = {
-    jobId: "10135643 contoh",
-    jobName: "job title contoh",
-    prlOrg: "prlOrg contoh",
-    unitKerjaFungsi: "function name contoh",
-    lokasiKerja: "lokasi kerja contoh",
-    direktorat: "directorat name contoh",
-    atasanLangsung: "direct report contoh",
-    noSuratKeputusan: "no surat keputusan",
-    tanggalSuratKeputusan: "2023-10-01",
-    jobReference: "asd",
+    jobId: "Data Not Found",
+    jobName: "Data Not Found",
+    prlOrg: "Data Not Found",
+    unitKerjaFungsi: "Data Not Found",
+    lokasiKerja: "Data Not Found",
+    direktorat: "Data Not Found",
+    atasanLangsung: "Data Not Found",
+    noSuratKeputusan: "Data Not Found",
+    tanggalSuratKeputusan: "Data Not Found",
+    jobReference: "Data Not Found",
     jobReferences: [],
   };
   if (!identifikasiJabatan.jobName) {
@@ -240,7 +240,7 @@ $(document).ready(async function () {
   // get fungsi jabatan = getFungsiJabatan
   let fungsiJabatan = await getFungsiJabatan(dataDetailJobDesc);
   const fungsiJabatanData = {
-    deskripsi: "deskripsi contoh",
+    deskripsi: "Data Not Found",
     "...": "...",
   };
   if (!fungsiJabatan.deskripsi) {
@@ -286,11 +286,17 @@ $(document).ready(async function () {
   }
 
   let tugasTanggungJawabAkhir;
-  const tugasTanggungJawabAkhirData = { data: dataJobDescCompare[0].tugasHa };
+  const tugasTanggungJawabAkhirData = {
+    data: dataJobDescCompare[0].tugasHa.filter((item) => item.responsible.length > 0),
+  };
   try {
     tugasTanggungJawabAkhir = await getTugasTanggungJawabAkhir(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
-    updateTable("tugasHa", tugasTanggungJawabAkhir.data, tabCusJD.tugasHa);
+    updateTable(
+      "tugasHa",
+      tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0),
+      tabCusJD.tugasHa
+    );
   } catch (error) {
     console.error("Error fetching tugasTanggungJawabAkhir:", error);
     showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
@@ -343,9 +349,21 @@ $(document).ready(async function () {
   try {
     persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
+    console.log("persyaratanJabatan.data =========>>>>", persyaratanJabatan.data);
+    persyaratanJabatan.data = persyaratanJabatan.data.filter(
+      (item) =>
+        item.pendidikanMinimal &&
+        typeof item.pendidikanMinimal === "string" &&
+        item.pendidikanMinimal.trim() !== "" &&
+        item.pengalamanKerja &&
+        typeof item.pengalamanKerja === "string" &&
+        item.pengalamanKerja.trim() !== ""
+    );
+    console.log("persyaratanJabatan.data =========>>>>", persyaratanJabatan.data);
     persyaratanJabatan.data.map((item) => {
       item.pj = [item.pendidikanMinimal, item.pengalamanKerja];
     });
+    console.log("persyaratanJabatan", persyaratanJabatan);
     updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
   } catch (error) {
     console.error("Error fetching persyaratanJabatan:", error);
@@ -382,6 +400,7 @@ $(document).ready(async function () {
   try {
     kompetensiTeknis = await getKompetensiTeknis(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/kompetensi-teknis/show", kompetensiTeknis);
+
     if (Array.isArray(kompetensiTeknis.data.komtekMandatori) && kompetensiTeknis.data.komtekMandatori.length > 0) {
       const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
       kompetensiTeknis.data.komtekMandatori.forEach((item) => {
@@ -392,9 +411,12 @@ $(document).ready(async function () {
       divKompetensiTeknisMandatory.empty().append($ul);
     }
 
-    if (Array.isArray(kompetensiTeknis.data.komtekGeneral && kompetensiTeknis.data.komtekGeneral.length > 0)) {
+    console.log("kompetensiTeknis.data.komtekGeneral", kompetensiTeknis.data.komtekGeneral);
+
+    if (Array.isArray(kompetensiTeknis.data.komtekGeneral) && kompetensiTeknis.data.komtekGeneral.length > 0) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekGeneral.forEach((item) => {
+        console.log("ada data komtekGeneral", item);
         $ul.append(
           `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
         );
@@ -402,9 +424,12 @@ $(document).ready(async function () {
       divKompetensiTeknisGeneral.empty().append($ul);
     }
 
+    console.log("kompetensiTeknis.data.komtekSpesifik", kompetensiTeknis.data.komtekSpesifik);
+
     if (Array.isArray(kompetensiTeknis.data.komtekSpesifik) && kompetensiTeknis.data.komtekSpesifik.length > 0) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
+        console.log("ada data komtekSpesifik", item);
         $ul.append(
           `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
         );
@@ -421,13 +446,16 @@ $(document).ready(async function () {
     kompetensiPerilaku = await getKompetensiPerilaku(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/kompetensi-perilaku/show", kompetensiPerilaku);
     const divKompetensiPerilaku = $("#kompetensiPerilaku");
+    console.log("kompetensiPerilaku ==========", kompetensiPerilaku.data);
     divKompetensiPerilaku.empty();
-    if (Array.isArray(kompetensiPerilaku.data)) {
+    if (Array.isArray(kompetensiPerilaku.data) && kompetensiPerilaku.data.length > 0) {
       const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
       kompetensiPerilaku.data.forEach((item) => {
-        $ul.append(`<li ><span>${item.namaKompetensi}</span</li>`);
+        $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
       });
-      divKompetensiPerilaku.empty().append($ul);
+      divKompetensiPerilaku.append($ul);
+    } else {
+      divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
     }
   } catch (error) {
     console.error("Error fetching kompetensiPerilaku:", error);
@@ -437,6 +465,8 @@ $(document).ready(async function () {
   let stk;
   try {
     stk = await getStk(dataDetailJobDesc);
+    // filter stk.data to remove items with empty stkNumber is null or undefined
+    stk.data = stk.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
     logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", stk.data);
     updateTable("stk", stk.data, tabCusJD.stk);
   } catch (error) {
@@ -444,11 +474,19 @@ $(document).ready(async function () {
     showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", []);
   }
 
-  const bagan = await chartShow(dataBagan);
-  const dataBaganSelf = bagan?.data.find((item) => item.id == jobId);
-  console.log("dataBaganSelf", dataBaganSelf);
-  console.log("bagan?.data", bagan?.data);
-  focusNode(dataBaganSelf, bagan.data);
+  // Store bagan data globally for tab navigation
+  let globalBaganData = null;
+  let globalDataBaganSelf = null;
+
+  chartShow(dataBagan).then((bagan) => {
+    if (bagan && bagan.data) {
+      globalBaganData = bagan.data;
+      globalDataBaganSelf = bagan.data.find((item) => item.id == jobId);
+      console.log("dataBaganSelf", globalDataBaganSelf);
+      console.log("bagan?.data", bagan.data);
+      focusNode(globalDataBaganSelf, bagan.data);
+    }
+  });
 
   checkLocalStorage();
   let activeTab = "identifikasi";
@@ -563,8 +601,8 @@ $(document).ready(async function () {
     console.log("target", target);
     activeTab = target.split("#v-pills-")[1];
     console.log("activeTab", activeTab);
-    if (activeTab === "bagan-primary") {
-      focusNode(dataBaganSelf, bagan.data);
+    if (activeTab === "bagan-primary" && globalDataBaganSelf && globalBaganData) {
+      focusNode(globalDataBaganSelf, globalBaganData);
     }
     const element = document.getElementById(activeTab);
     if (element) {
