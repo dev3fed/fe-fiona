@@ -30,6 +30,9 @@ async function checkDraftSelected(listDraft) {
     draftExistingJobDesc.draftId;
   // append value to input
   $("#selectJobDescDraft").val(draftId).trigger("change");
+
+  // disable selectJobDescDraft if draftId is not empty
+  $("#selectJobDescDraft").prop("disabled", true);
 }
 
 $(document).ready(async function () {

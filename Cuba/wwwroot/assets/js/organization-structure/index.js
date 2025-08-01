@@ -842,6 +842,14 @@ $(document).ready(async function () {
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
   getTableListApproval(getDataApproval.data);
   // getTableListLog();
+  getDataList([
+    {
+      dataId: "selectDraftOrganization",
+      data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
+    },
+  ]);
+
+  await checkDataOrganization(storeData.listDraft);
 
   $("#createDraft").on("click", function () {
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
@@ -851,13 +859,6 @@ $(document).ready(async function () {
 
   // check data Initial
   // getDataOrganization(organizationAttribute.orgUnitId);
-
-  getDataList([
-    {
-      dataId: "selectDraftOrganization",
-      data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
-    },
-  ]);
 
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
   const focusNode = urlParams.get("focusNode");

@@ -80,8 +80,21 @@ async function checkDataOrganization(draftList) {
       organizationAttribute[key] = data[key];
     }
   });
+
+  // If organizationAttribute is empty or null, select the first available draft
+  if (!organizationAttribute.orgUnitId || !organizationAttribute.orgUnitName) {
+    if (draftList && draftList.length > 0) {
+      const firstDraft = draftList[0];
+      organizationAttribute.orgUnitId = firstDraft.draftId;
+      organizationAttribute.orgUnitName = firstDraft.draftName;
+      localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
+    }
+  }
   // append value to input
   // $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+
+  // disabled selectDraftOrganization
+  $("#selectDraftOrganization").prop("disabled", true);
 }
 
 function checkDataOrganizationLocalStorage() {
