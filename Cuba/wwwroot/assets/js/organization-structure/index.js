@@ -3,27 +3,73 @@ async function initializeHelper(data) {
     //
   }
 
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: "10132406",
-    depth: 5,
-  });
-
-  if (!dataChart.data) {
-    swal("Warning", "Data not found", "warning");
+  // Show loading on osContainer
+  const osContainer = document.getElementById("osContainer");
+  if (!osContainer) {
+    console.error("osContainer element not found");
     return;
   }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
 
-  helperOrgTree(dataChart.data);
-  helperOrgChart(true, "os-container", dataChart.data, true);
+  // Use the new loading function if available
+  if (typeof showChartLoading === "function") {
+    showChartLoading("osContainer");
+  } else {
+    // Fallback loading
+    osContainer.innerHTML = `
+      <div style="display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column;">
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
+        <p style="margin-top: 10px; color: #666;">Loading chart...</p>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+  }
 
-  // helperOrgChart(true, "os-container", asik2, true);
-  // helperOrgChartTester(true, "os-container", test, true);
+  // Wait for DOM to be ready and initialize chart
+  setTimeout(async () => {
+    console.log("Initializing chart system...");
+    try {
+      if (typeof initializeChartSystem === "function" && typeof dataObjectChartBaru !== "undefined") {
+        await initializeChartSystem(dataObjectChartBaru, "osContainer");
+        console.log("Chart initialization completed successfully");
+
+        // Hide loading after successful initialization
+        if (typeof hideChartLoading === "function") {
+          hideChartLoading("osContainer");
+        }
+      } else {
+        console.error("Dependencies not available, using fallback data");
+        // Fallback to default data if available
+        if (typeof data !== "undefined") {
+          await initializeChartSystem(data, "osContainer");
+          console.log("Chart initialization completed with fallback data");
+
+          // Hide loading after successful fallback initialization
+          if (typeof hideChartLoading === "function") {
+            hideChartLoading("osContainer");
+          }
+        } else {
+          throw new Error("No data available for chart initialization");
+        }
+      }
+    } catch (error) {
+      console.error("Chart initialization failed:", error);
+      osContainer.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart initialization failed</div>';
+    }
+  }, 500);
+
+  // helperOrgTree(dataChart.data);
+  // helperOrgChart(true, "osContainer", dataChart.data, true);
+
+  // helperOrgChart(true, "osContainer", asik2, true);
+  // helperOrgChartTester(true, "osContainer", test, true);
   // helperDatePicker();
-  // helperOrgChart(true, "os-container", test, true);
+  // helperOrgChart(true, "osContainer", test, true);
 }
 
 function updateDataList(orgUnitId, orgUnitName) {
@@ -42,9 +88,9 @@ $("#searchOrgNodeButton").on("click", function () {
 $("#searchOrgNode").on("change", function () {
   let searchValue = $("#searchOrgNode").val();
   // console.log("masuk sini", searchValue);
-  if (searchValue == "10132405") {
-    searchValue = "10132406"; // hardcode for testing
-  }
+  // if (searchValue == "10132405") {
+  //   searchValue = "10132406"; // hardcode for testing
+  // }
   focusNode(searchValue);
 });
 
@@ -55,12 +101,12 @@ function changeOrganization(value, text) {
   const buttons = ["#createJob", "#designCost", "#editJob", "#deleteJob", "#duplicateJob"];
   buttons.forEach((button) => $(button).toggle(organizationAttribute.orgUnitId !== "1"));
   if (organizationAttribute.orgUnitId == "1") {
-    $("#pills-warningtab").attr("style", "display:none !important");
+    $("#pillsSoSection").attr("style", "display:none !important");
     $("#labelChart").attr("style", "display:none !important");
     // $("#createDraft").show();
   } else {
     // $("#createDraft").attr("style", "display:none !important");
-    $("#pills-warningtab").show();
+    $("#pillsSoSection").show();
     $("#labelChart").show();
   }
 }
@@ -743,9 +789,7 @@ $("#continueButton").click(async function () {
 
   const saveDraft = await createDraftSO(draftName);
 
-  loader(true);
   if (saveDraft.status == 500) {
-    loader(false);
     swal("Failed", saveDraft.error, "error");
     return;
   }
@@ -877,7 +921,7 @@ $(document).ready(async function () {
   }
 
   if (activeTab) {
-    const linkTab = "#pills-" + activeTab + "";
+    const linkTab = "#pills" + activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
     setTimeout(() => {
       $(linkTab).tab("show");
     }, 2000);

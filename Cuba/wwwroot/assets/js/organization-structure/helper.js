@@ -1915,55 +1915,47 @@ async function helperOrgTree(params) {
 // ======================
 
 async function focusNode(nodeId) {
-  // let selfNode = lsListOrgNode.find((item) => item.id == nodeId);
-  // let parentNode = lsListOrgNode.find((item) => item.id == selfNode?.pid) || {};
-  // const childrenData = getallChildrenNode(parentNode);
-  // const data = [parentNode, ...childrenData].filter((item) => item.id != nodeId);
+  // Show loading
+  showChartLoading("osContainer");
 
-  // selfNode = {
-  //   ...selfNode,
-  //   tags: [...selfNode.tags, "pointed"],
-  // };
-  // data.push(selfNode);
+  try {
+    const dataChart = await chartShow({
+      draftId: organizationAttribute.orgUnitId,
+      jobCode: nodeId,
+      depth: 5,
+    });
 
-  // let grandParentNode = lsListOrgNode.find((item) => item.id == parentNode?.pid) || {};
-  // let childrenNode = lsListOrgNode.filter((item) => item.pid == nodeId) || [];
-  // let brotherNode = lsListOrgNode.filter((item) => item.pid == selfNode?.pid) || [];
+    // change chartid id from id_org_unit
+    if (!dataChart.data) {
+      dataChart.data = [];
+    }
+    dataChart.data.forEach((item) => {
+      item.id = item.id_org_unit;
+    });
 
-  // brotherNode = brotherNode.filter((item) => item.id != nodeId);
-
-  // if (brotherNode.length % 2 == 0 && brotherNode.length > 0) {
-  //   const middle = brotherNode.length / 2;
-  //   brotherNode.splice(middle, 0, selfNode);
-  // } else if (brotherNode.length % 2 != 0 && brotherNode.length > 0) {
-  //   const middle = (brotherNode.length - 1) / 2;
-  //   brotherNode.splice(middle, 0, selfNode);
-  // } else {
-  //   brotherNode = [selfNode];
-  // }
-
-  // const dataDated = [grandParentNode, parentNode, ...brotherNode, ...childrenNode];
-
-  // chart.load(dataDated);
-
-  // hide node 39020818
-  // chart.hide(39020818);
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: nodeId,
-    depth: 5,
-  });
-
-  // change chartid id from id_org_unit
-  if (!dataChart.data) {
-    dataChart.data = [];
+    setTimeout(async () => {
+      try {
+        await helperOrgChart(true, "osContainer", dataChart.data, true, { expand: true, nodeId: nodeId });
+        console.log("Chart focus completed successfully");
+      } catch (error) {
+        console.error("Error rendering chart:", error);
+        const container = document.getElementById("osContainer");
+        if (container) {
+          container.innerHTML =
+            '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed</div>';
+        }
+      } finally {
+        hideChartLoading("osContainer");
+      }
+    }, 500);
+  } catch (error) {
+    console.error("Error in focusNode:", error);
+    const container = document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed</div>';
+    }
+    hideChartLoading("osContainer");
   }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
-  setTimeout(() => {
-    helperOrgChart(true, "os-container", dataChart.data, true, { expand: true, nodeId: nodeId });
-  }, 500);
 }
 
 function getallChildrenNode(parentNode) {
@@ -1985,7 +1977,7 @@ function helperOrgChartTester(init, id, data, isFocusNode, object) {
     <text style="font-size: 24px;" fill="#4D4D4D" x="150" y="55" text-anchor="middle">+</text>
 `;
 
-  var chart = new OrgChart("#os-container", {
+  var chart = new OrgChart("#osContainer", {
     template: "myTemplate",
     nodes: [
       { id: 1, name: "Parent Node" },
@@ -2443,13 +2435,19 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     title.innerHTML = `<i class="fa fa-refresh"></i>`;
     // add id to title
     title.addEventListener("click", function () {
-      // myData.forEach((item) => {
-      //   item.tags = item.tags.filter((tag) => tag !== "edit");
-      // });
-      // chart.load(myData);
-      helperOrgChart(true, "os-container", lsListOrgNode, true);
+      // Show loading for refresh
+      showChartLoading("osContainer");
+
+      setTimeout(() => {
+        helperOrgChart(true, "osContainer", lsListOrgNode, true);
+      }, 100);
     });
     chart.element.appendChild(title);
+
+    // Hide loading when chart is ready
+    setTimeout(() => {
+      hideChartLoading("osContainer");
+    }, 100);
 
     // console.log("node", chart.nodes);
     // const nodes = chart.nodes;
@@ -2666,4 +2664,72 @@ async function changeDataSourceFilter(value) {
     <td>${data.totalFormationAdjustment}</td>
     <td>${data.totalCostYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
   </tr>`);
+}
+
+// Organization Chart Loading Functions
+function showChartLoading(containerId) {
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.innerHTML = `
+      <div id="chart-loading-overlay" style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: rgba(255, 255, 255, 0.9);
+        z-index: 1000;
+      ">
+        <div style="
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #3498db;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          animation: chart-spin 1s linear infinite;
+        "></div>
+        <p style="
+          margin-top: 15px;
+          color: #666;
+          font-size: 16px;
+          font-weight: 500;
+          text-align: center;
+        ">Loading organization chart...</p>
+      </div>
+      <style>
+        @keyframes chart-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+
+    // Ensure container has relative positioning for absolute positioning to work
+    const containerStyle = window.getComputedStyle(container);
+    if (containerStyle.position === "static") {
+      container.style.position = "relative";
+    }
+  }
+}
+
+function hideChartLoading(containerId) {
+  const container = document.getElementById(containerId);
+  if (container) {
+    // Remove loading overlay
+    const loadingOverlay = container.querySelector("#chart-loading-overlay");
+    const loadingStyle = container.querySelector("style");
+
+    if (loadingOverlay) {
+      loadingOverlay.remove();
+    }
+    if (loadingStyle) {
+      loadingStyle.remove();
+    }
+
+    console.log(`Chart loading hidden for container: ${containerId}`);
+  }
 }
