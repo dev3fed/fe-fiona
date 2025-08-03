@@ -1451,7 +1451,33 @@ async function modalJobPopup(params) {
       (item, index, self) =>
         index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg)
     );
-    data.positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
+
+    // cari data di data.positionList yang memiliki mergeFormation yang sama
+    // exp output nya ke grouping berdasakarkan persamaan mergeFormation
+    const filteredPositions = data.positionList.filter((item) => item.mergeFormation != null);
+
+    // Group by mergeFormation
+    const groupedByMergeFormation = filteredPositions.reduce((groups, item) => {
+      const key = item.mergeFormation;
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(item);
+      return groups;
+    }, {});
+
+    // Transform to expected output format
+    data.positionList = Object.keys(groupedByMergeFormation).map((mergeFormationKey) => {
+      const dataPosition = groupedByMergeFormation[mergeFormationKey];
+      return {
+        mergerFormation: mergeFormationKey,
+        totalRow: dataPosition.length,
+        dataPosition: dataPosition,
+      };
+    });
+    console.log("data.positionList grouped by mergeFormation:", data.positionList);
+
+    // data.positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
@@ -1474,14 +1500,25 @@ async function modalJobPopup(params) {
 
     // Render position list table
     const $positionBody = $("#tablePositionListBody").empty();
-    (data?.positionList || []).forEach((item, i) => {
-      $positionBody.append(`<tr>
-      <td>${i + 1}</td>
-      <td>${item.positionName}</td>
-      <td>${item.careerLevel}</td>
-      <td>${item.prlOrg}</td>
-      <td>${item.formation}</td>
-      </tr>`);
+    (data?.positionList || []).forEach((group, i) => {
+      group.dataPosition.forEach((item, j) => {
+        if (j == 0) {
+          $positionBody.append(`<tr>
+            <td>${i + 1}</td>
+            <td>${item.positionName}</td>
+            <td>${item.careerLevel}</td>
+            <td>${item.prlOrg}</td>
+            <td rowspan="${group.totalRow}">${item.formation}</td>
+            </tr>`);
+        } else {
+          $positionBody.append(`<tr>
+        <td>${i + 1}</td>
+        <td>${item.positionName}</td>
+        <td>${item.careerLevel}</td>
+        <td>${item.prlOrg}</td>
+        </tr>`);
+        }
+      });
     });
   } else {
     // alert("masuk non basket");
