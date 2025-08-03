@@ -2382,13 +2382,28 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   }
   if (document.getElementById(id)) {
     document.getElementById(id).innerHTML = "";
-  } else {
-    const container = document.createElement("div");
-    container.id = id;
-    document.body.appendChild(container);
   }
 
-  let chart = new OrgChart(document.getElementById(id), {
+  // Check if container exists, if not create it
+  let containerElement;
+  if (id === "osContainer") {
+    // For legacy osContainer, try to find .chart-container instead
+    containerElement = document.querySelector(".chart-container");
+    if (!containerElement) {
+      console.error("Chart container not found");
+      return;
+    }
+  } else {
+    containerElement = document.getElementById(id);
+    if (!containerElement) {
+      const container = document.createElement("div");
+      container.id = id;
+      document.body.appendChild(container);
+      containerElement = container;
+    }
+  }
+
+  let chart = new OrgChart(containerElement, {
     collapse: {
       ...param.collapsed,
       // level: 2,
@@ -2400,6 +2415,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     assistantSeparation: 10,
     levelSeparation: 30,
     scaleInitial: OrgChart.match.boundary,
+    fit: true, // Enable auto-fit
     // nodes: testOrgBagan,
     // nodes: test,
     nodes: data,

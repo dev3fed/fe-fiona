@@ -3,13 +3,25 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <style>
-    .osContainerNew {
+    .chart-container {
         width: 100%;
         height: 600px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
     }
     
-
+    .chart-container svg {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+    
     #orgThree .no-children .jstree-icon {
         display: none !important;
         /* Use !important to ensure it overrides other styles */
@@ -190,9 +202,7 @@
                                             </div>
                                         </div>
                                         <div class="col-12 mt-2">
-                                            <div class="osContainerNew" style="">
-                                            </div>
-                                            @* <div id="osContainer" class="chart-container" style=""></div> *@
+                                            <div class="chart-container"></div>
                                             <button onclick="chart.exportImg()">Export Current</button>
                                             <button onclick="chart.exportImg({full:true})">Export Full</button>
                                             <button onclick="prepareAndExportSVG()">Export SVG (Clean)</button>

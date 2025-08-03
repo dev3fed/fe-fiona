@@ -797,7 +797,7 @@ function convertForeignObjectToSVGText(svgElement) {
 
 function prepareAndExportSVG() {
   try {
-    const svg = document.querySelector(".osContainerNew svg");
+    const svg = document.querySelector(".chart-container svg");
     if (!svg) {
       console.error("SVG element not found");
       return;
@@ -1384,13 +1384,42 @@ function initializeChart(processedDataResult, focusNodeId) {
               `;
       }
     })
-    .container(".osContainerNew")
+    .container(".chart-container")
     .data(processedDataResult.processedData)
-    .compact(true)
+    .compact(false)
     .render()
     .fit();
 
   console.log("Chart initialized successfully");
+
+  // Add resize event listener to make chart responsive
+  const resizeHandler = function () {
+    if (chart) {
+      chart.fit();
+      console.log("Chart resized and fitted to container");
+    }
+  };
+
+  // Remove existing resize listener if any
+  window.removeEventListener("resize", resizeHandler);
+  // Add new resize listener
+  window.addEventListener("resize", resizeHandler);
+
+  // Add ResizeObserver to detect container size changes
+  const containerElement = document.querySelector(".chart-container");
+  if (containerElement && window.ResizeObserver) {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        if (chart) {
+          setTimeout(() => {
+            chart.fit();
+            console.log("Chart container resized, refitting chart");
+          }, 100); // Small delay to ensure DOM updates are complete
+        }
+      }
+    });
+    resizeObserver.observe(containerElement);
+  }
 
   // Auto-expand node if focusNodeId is provided
   if (focusNodeId) {
@@ -1407,10 +1436,10 @@ function initializeChartSystemNew(dataObject) {
   // Step 1: Process the raw data
   const processedDataResult = processChartData(dataObject);
   console.log("Processed data:", processedDataResult.processedData.length, "items");
-  processedDataResult.processedData.forEach((item) => {
-    item.id = parseInt(item.id, 10);
-    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
-  });
+  // processedDataResult.processedData.forEach((item) => {
+  //   item.id = parseInt(item.id, 10);
+  //   item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+  // });
   console.log("Processed data:", processedDataResult.processedData, "items");
 
   // Step 2: Initialize chart with processed data

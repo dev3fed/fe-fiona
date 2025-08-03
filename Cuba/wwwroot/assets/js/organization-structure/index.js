@@ -29,8 +29,212 @@ async function initializeHelper(data) {
   //   `;
   // }
 
+  const data1 = [
+    {
+      id: 1,
+      parentId: null,
+      name: "node1",
+      position: "CEO", // Sangat singkat (3 chars) - akan 18px
+      prl: "18",
+      jumlah_formasi: "2000",
+      tags: ["create"],
+      isMergeFormation: false,
+      basket: false,
+    },
+
+    {
+      id: 99,
+      parentId: 1,
+      name: "node2",
+      position: "Direktur Teknologi Informasi", // Sedang (28 chars) - akan 12px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 2,
+      parentId: 1,
+      name: "node2",
+      position: "Direktur Sumber Daya Manusia dan Pengembangan Organisasi", // Panjang (57 chars) - akan 11px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 999,
+      parentId: 1,
+      name: "node2",
+      position: "Direktur Keuangan dan Administrasi Perusahaan serta Pengelolaan Investasi Strategis", // Sangat panjang (83 chars) - akan 10px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 3,
+      parentId: 1,
+      name: "node3",
+      position: "Chief Financial Officer untuk Divisi Keuangan Internasional dan Manajemen Risiko Bisnis Global", // Sangat panjang (95 chars) - akan 10px
+      tags: ["delete", "isCoordinator"],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 4,
+      parentId: 1,
+      name: "node4",
+      position: "Direktur Pemasaran dan Penjualan Regional Asia Pasifik dengan Fokus Pengembangan Pasar Baru asd", // Sangat panjang (92 chars) - akan 10px
+      tags: ["basket_3"],
+      bc_1_prl: "13-14",
+      bc_1_formation: "2",
+      bc_1_position: "Manager Senior Pemasaran Digital dan E-Commerce ", // Panjang (78 chars) - akan 10px
+      bc_2_prl: "12-13",
+      bc_2_formation: "2",
+      bc_2_position: "Koordinator Penjualan Ritel dan Distribusi Nasional", // Panjang (52 chars) - akan 11px
+      bc_1_flagMergeFormation: "A",
+      bc_2_flagMergeFormation: "B",
+      bc_3_flagMergeFormation: "B",
+      bc_4_flagMergeFormation: "B",
+      bc_1_jumlah_formasi: 2,
+      bc_2_jumlah_formasi: 3,
+      bc_3_jumlah_formasi: 3,
+      bc_4_jumlah_formasi: 3,
+      bc_3_prl: "11-12",
+      bc_3_formation: "2",
+      bc_3_position: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (63 chars) - akan 10px
+      bc_4_prl: "11-12",
+      bc_4_formation: "1",
+      bc_4_position: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (64 chars) - akan 10px
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: true,
+      basket: true,
+    },
+    {
+      id: 5,
+      parentId: 2,
+      name: "node5",
+      position: "Manager Rekrutmen", // Sedang (17 chars) - akan 18px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 16,
+      parentId: 2,
+      name: "node6",
+      position: "Manager Pengembangan Talenta dan Pelatihan Karyawan", // Panjang (52 chars) - akan 11px
+      tags: ["dot-dot"],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 17,
+      parentId: 2,
+      name: "node7",
+      position: "Manager Kompensasi dan Benefit serta Wellness Program untuk Seluruh Karyawan", // Panjang (76 chars) - akan 10px
+      tags: ["dot-dot", "basket_1"],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 18,
+      parentId: 2,
+      name: "node7",
+      position: "Manajer Hubungan Industrial dan Kepatuhan Regulasi Ketenagakerjaan Pemerintah", // Panjang (78 chars) - akan 10px
+      prl: "18",
+      jumlah_formasi: "2000",
+      tags: ["basket_3"],
+      bc_1_prl: "13-14",
+      bc_1_formation: "2000",
+      bc_1_position: "Specialist Hubungan Karyawan dan Penyelesaian Konflik Internal", // Panjang (63 chars) - akan 10px
+      bc_2_prl: "12-13",
+      bc_2_formation: "2000",
+      bc_2_position: "Koordinator Kepatuhan Hukum Ketenagakerjaan dan Audit Internal", // Panjang (63 chars) - akan 10px
+      bc_3_prl: "12-13",
+      bc_3_formation: "2000",
+      bc_3_position: "Analis Kebijakan SDM dan Prosedur Operasional Standar Perusahaan", // Panjang (66 chars) - akan 10px
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 19,
+      parentId: 2,
+      name: "node5",
+      position: "Supervisor Training", // Sedang (19 chars) - akan 18px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 20,
+      parentId: 2,
+      name: "node5",
+      position: "Koordinator Program Pengembangan Karir dan Mentoring untuk Karyawan Muda", // Panjang (73 chars) - akan 10px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 6,
+      parentId: 3,
+      name: "node6",
+      position: "Manager Audit Internal dan Compliance", // Sedang (38 chars) - akan 12px
+      tags: [],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 7,
+      parentId: 3,
+      name: "node7",
+      position: "Manager Perencanaan Keuangan Strategis dan Analisis Investasi Jangka Panjang untuk Ekspansi Bisnis", // Sangat panjang (100 chars) - akan 10px
+      tags: ["dot-dot", "basket_1"],
+      prl: "18",
+      jumlah_formasi: "2000",
+      isMergeFormation: false,
+      basket: false,
+    },
+    {
+      id: 8,
+      parentId: 3,
+      name: "node8",
+      position: "Manager Treasury dan Cash Management serta Pengelolaan Likuiditas Perusahaan Multinasional", // Sangat panjang (91 chars) - akan 10px
+      prl: "18",
+      jumlah_formasi: "2000",
+      tags: ["basket_2", "isCoordinator"],
+      bc_1_prl: "13-14",
+      bc_1_formation: "2000",
+      bc_1_position: "Senior Analyst Manajemen Kas dan Instrumen Keuangan Derivatif", // Panjang (62 chars) - akan 10px
+      bc_2_prl: "12-13",
+      bc_2_formation: "2000",
+      bc_2_position: "Specialist Perencanaan Budget dan Forecasting Keuangan Tahunan", // Panjang (63 chars) - akan 10px
+      isMergeFormation: false,
+      basket: false,
+    },
+  ];
+
   const dataSelected = [dataMaster[0]];
-  initializeChartSystemNew(dataMaster);
+  initializeChartSystemNew(data1);
   // Wait for DOM to be ready and initialize chart
   // setTimeout(async () => {
   //   console.log("Initializing chart system...");
@@ -66,7 +270,7 @@ async function initializeHelper(data) {
   // }, 500);
 
   // helperOrgTree(dataChart.data);
-  // helperOrgChart(true, "osContainer", dataChart.data, true);
+  helperOrgChart(true, "osContainer", data1, true);
 
   // helperOrgChart(true, "osContainer", asik2, true);
   // helperOrgChartTester(true, "osContainer", test, true);
@@ -546,7 +750,7 @@ async function confirmEditJob() {
     //   // update directReportId
     //   const indexPosition = lsListPosition.findIndex((x) => x.positionId == item.positionId);
     //   lsListPosition[indexPosition].directReportId = parseInt(item.directReportId);
-    //   lsListPosition[indexPosition].directReport = directReport.positionName;
+    //   lsListPosition[indexPosition].directReport = directReport.position;
 
     //   lsListPosition[indexPosition].draftId = organizationAttribute.orgUnitId;
     //   lsListPosition[indexPosition].type = "edit";
@@ -918,7 +1122,7 @@ $(document).ready(async function () {
       });
       data = data.data;
       // $("#searchOrgNode").val(focusNode).trigger("change");
-      $("#searchOrgNode").append(new Option(data.positionName, focusNode, true, true)).trigger("change");
+      $("#searchOrgNode").append(new Option(data.position, focusNode, true, true)).trigger("change");
     }, 1000);
   }
 
