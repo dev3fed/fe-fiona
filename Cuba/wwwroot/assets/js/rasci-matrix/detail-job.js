@@ -12,11 +12,16 @@ async function triggleDetailJob(val) {
     const resultDetail = await fetchDetailJob(queryString);
     const detailInfo = resultDetail.data;
     const infoSkillGroup = resultDetail.data.skillGroups;
+    const incumbents = resultDetail.data.incumbents;
     const JobName = `${val.positionName}`;
     const cardAttribute = `
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Directorate</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.directorate || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.directorate.directorateName || "-"}</label><br/>
+      </div>
+      <div class="col-2">
+          <label style="color:#9F9FA5;fonti-size:12px">Function</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.function.functionName || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Division</label><br/>
@@ -56,7 +61,7 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Direct Report</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.directReportTo || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.directReportTo.jobPositionName || "-"}</label><br/>
       </div>
       <div class="col-12">
       <hr style="margin-right: 10px">
@@ -64,15 +69,15 @@ async function triggleDetailJob(val) {
   
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Name</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelArea || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelArea.personnelAreaName || "-"}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Subname</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelSubArea || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelSubArea.personnelSubAreaName || "-"}</label><br/>
       </div>
        <div class="col-6">
           <label style="color:#9F9FA5;fonti-size:12px">SK Number</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.skNumber || "Field Belum ada"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${incumbents[0]?.sourceOfSk || "Field Belum ada"}</label><br/>
       </div>
     `;
     const cardsgContent = `
@@ -91,9 +96,8 @@ async function triggleDetailJob(val) {
           <div style="padding-top: 20px;display:flex">
               <div style="padding:10px;margin-top:10px;border:1px solid #BFBFC2;width: 100%;border-radius: 5px;">
                   <label style="color:#9F9FA5;fonti-size:12px">Second Skill Group</label><br/>
-                  <label style="font-weight: 600;font-size: 14px">${
-                    infoSkillGroup[1]?.skillGroupName || "-"
-                  }</label><br/>
+                  <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[1]?.skillGroupName || "-"
+      }</label><br/>
   
                   <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Second Sub Skill Group</label><br/>
                   <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[1]?.subSkillGroupName || "-"}</label>
@@ -104,9 +108,8 @@ async function triggleDetailJob(val) {
           <div style="padding-top: 20px;display:flex">
               <div style="padding:10px;margin-top:10px;margin-right:10px;border:1px solid #BFBFC2;width: 100%;border-radius: 5px;">
                   <label style="color:#9F9FA5;fonti-size:12px">Third Skill Group</label><br/>
-                  <label style="font-weight: 600;font-size: 14px">${
-                    infoSkillGroup[2]?.skillGroupName || "-"
-                  }</label><br/>
+                  <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[2]?.skillGroupName || "-"
+      }</label><br/>
   
                   <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Third Sub Skill Group</label><br/>
                   <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[2]?.subSkillGroupName || "-"}</label>
@@ -117,15 +120,15 @@ async function triggleDetailJob(val) {
     const cardIncumbent = `
           <div class="col-3">
               <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-              <label style="font-weight: 600;font-size: 14px">19251894</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${incumbents[0]?.employeeId || "-"}</label><br/>
           </div>
           <div class="col-3">
               <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-              <label style="font-weight: 600;font-size: 14px">Lily Desy Saptania Rahayu</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${incumbents[0]?.employeeName || "-"}</label><br/>
           </div>
           <div class="col-6">
               <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
-              <label style="font-weight: 600;font-size: 14px">23</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${incumbents[0]?.prlPlan || "-"}</label><br/>
           </div>
   `;
     const attributeContent = document.getElementById("job-attribute");
@@ -139,7 +142,7 @@ async function triggleDetailJob(val) {
       incContent.innerHTML = cardIncumbent;
       tabContent.innerHTML = JobName;
     }
-  } catch (error) {}
+  } catch (error) { }
 }
 
 const layoutTabRelatedBispro = async (data) => {
@@ -251,7 +254,7 @@ const layoutTabRelatedBispro = async (data) => {
     document.getElementById("prosbis-details-body").innerHTML = bodyContent;
     document.getElementById("total-prosbis").innerHTML = totalJob;
     initializeTooltips();
-  } catch (error) {}
+  } catch (error) { }
 };
 
 async function handleShowRasci() {
