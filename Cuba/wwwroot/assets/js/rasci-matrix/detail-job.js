@@ -1,8 +1,6 @@
 async function triggleDetailJob(val) {
   try {
-    const modal = new bootstrap.Modal(
-      document.getElementById("ModalDetailJob"),
-    );
+    const modal = new bootstrap.Modal(document.getElementById("ModalDetailJob"));
     const draftSoId = getState("draftSoId");
     modal.show();
     setState("detailJob", val);
@@ -18,33 +16,23 @@ async function triggleDetailJob(val) {
     const cardAttribute = `
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Directorate</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.directorate || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.directorate || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Division</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.division || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.division || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Sub Division</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.subDivision || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.subDivision || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Department</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.department || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.department || "-"}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Section</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.section || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.section || "-"}</label><br/>
       </div>
       <div class="col-12">
       <hr style="margin-right: 10px">
@@ -52,33 +40,23 @@ async function triggleDetailJob(val) {
   
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Org Unit Name</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.unit.unitName || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.unitName || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Org PRL</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.unit.prlOrg || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.prlOrg || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Career Type</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.unit.careerTypeName || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.careerTypeName || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Career Level</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.unit.careerLevelName || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.careerLevelName || "-"}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Direct Report</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.directReportTo || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.directReportTo || "-"}</label><br/>
       </div>
       <div class="col-12">
       <hr style="margin-right: 10px">
@@ -86,21 +64,15 @@ async function triggleDetailJob(val) {
   
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Name</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.personnelArea || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelArea || "-"}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Subname</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.personnelSubArea || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelSubArea || "-"}</label><br/>
       </div>
        <div class="col-6">
           <label style="color:#9F9FA5;fonti-size:12px">SK Number</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.skNumber || "Field Belum ada"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.skNumber || "Field Belum ada"}</label><br/>
       </div>
     `;
     const cardsgContent = `
@@ -108,14 +80,10 @@ async function triggleDetailJob(val) {
       <div style="padding-top: 20px;display:flex">
           <div style="padding:10px;margin-top:10px;border:1px solid #BFBFC2;width: 100%;border-radius: 5px;">
               <label style="color:#9F9FA5;fonti-size:12px">Main Skill Group</label><br/>
-              <label style="font-weight: 600;font-size: 14px">${
-                infoSkillGroup[0]?.skillGroupName || "-"
-              }</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[0]?.skillGroupName || "-"}</label><br/>
   
               <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Main Sub Skill Group</label><br/>
-              <label style="font-weight: 600;font-size: 14px">${
-                infoSkillGroup[0]?.subSkillGroupName || "-"
-              }</label>
+              <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[0]?.subSkillGroupName || "-"}</label>
           </div>
       </div>
       </div>
@@ -128,9 +96,7 @@ async function triggleDetailJob(val) {
                   }</label><br/>
   
                   <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Second Sub Skill Group</label><br/>
-                  <label style="font-weight: 600;font-size: 14px">${
-                    infoSkillGroup[1]?.subSkillGroupName || "-"
-                  }</label>
+                  <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[1]?.subSkillGroupName || "-"}</label>
               </div>
           </div>
       </div>
@@ -143,9 +109,7 @@ async function triggleDetailJob(val) {
                   }</label><br/>
   
                   <label class="mt-2" style="color:#9F9FA5;fonti-size:12px">Third Sub Skill Group</label><br/>
-                  <label style="font-weight: 600;font-size: 14px">${
-                    infoSkillGroup[2]?.subSkillGroupName || "-"
-                  }</label>
+                  <label style="font-weight: 600;font-size: 14px">${infoSkillGroup[2]?.subSkillGroupName || "-"}</label>
               </div>
           </div>
       </div>
