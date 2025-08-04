@@ -10,8 +10,10 @@ async function triggleDetailJob(val) {
     };
     const queryString = new URLSearchParams(payload).toString();
     const resultDetail = await fetchDetailJob(queryString);
+    console.log("resultDetail", resultDetail);
     const detailInfo = resultDetail.data;
     const infoSkillGroup = resultDetail.data.skillGroups;
+    const incumbent = resultDetail.data.incumbents[0];
     const JobName = `${val.positionName}`;
     const cardAttribute = `
       <div class="col-3">
@@ -64,15 +66,19 @@ async function triggleDetailJob(val) {
   
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Name</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelArea || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${
+            detailInfo.personnelArea.personnelAreaName || "-"
+          }</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Subname</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.personnelSubArea || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${
+            detailInfo.personnelSubArea.personnelSubAreaName || "-"
+          }</label><br/>
       </div>
        <div class="col-6">
           <label style="color:#9F9FA5;fonti-size:12px">SK Number</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.skNumber || "Field Belum ada"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${incumbent.sourceOfSk || "-"}</label><br/>
       </div>
     `;
     const cardsgContent = `
@@ -117,15 +123,15 @@ async function triggleDetailJob(val) {
     const cardIncumbent = `
           <div class="col-3">
               <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-              <label style="font-weight: 600;font-size: 14px">19251894</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeId || "-"}</label><br/>
           </div>
           <div class="col-3">
               <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-              <label style="font-weight: 600;font-size: 14px">Lily Desy Saptania Rahayu</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeName || "-"}</label><br/>
           </div>
           <div class="col-6">
               <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
-              <label style="font-weight: 600;font-size: 14px">23</label><br/>
+              <label style="font-weight: 600;font-size: 14px">${incumbent?.prlPlan || "-"}</label><br/>
           </div>
   `;
     const attributeContent = document.getElementById("job-attribute");
