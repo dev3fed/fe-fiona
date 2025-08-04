@@ -18,7 +18,11 @@ async function triggleDetailJob(val) {
     const cardAttribute = `
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Directorate</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.directorate || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.directorate.directorateName || "-"}</label><br/>
+      </div>
+      <div class="col-2">
+          <label style="color:#9F9FA5;fonti-size:12px">Function</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.function.functionName || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Division</label><br/>
@@ -58,7 +62,9 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Direct Report</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.directReportTo || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${
+            detailInfo.directReportTo.jobPositionName || "-"
+          }</label><br/>
       </div>
       <div class="col-12">
       <hr style="margin-right: 10px">
