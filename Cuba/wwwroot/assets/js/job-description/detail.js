@@ -349,21 +349,10 @@ $(document).ready(async function () {
   try {
     persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
-    console.log("persyaratanJabatan.data =========>>>>", persyaratanJabatan.data);
-    persyaratanJabatan.data = persyaratanJabatan.data.filter(
-      (item) =>
-        item.pendidikanMinimal &&
-        typeof item.pendidikanMinimal === "string" &&
-        item.pendidikanMinimal.trim() !== "" &&
-        item.pengalamanKerja &&
-        typeof item.pengalamanKerja === "string" &&
-        item.pengalamanKerja.trim() !== ""
-    );
-    console.log("persyaratanJabatan.data =========>>>>", persyaratanJabatan.data);
+
     persyaratanJabatan.data.map((item) => {
-      item.pj = [item.pendidikanMinimal, item.pengalamanKerja];
+      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
     });
-    console.log("persyaratanJabatan", persyaratanJabatan);
     updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
   } catch (error) {
     console.error("Error fetching persyaratanJabatan:", error);
