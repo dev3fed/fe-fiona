@@ -12,6 +12,11 @@
         justify-content: space-between;
         align-items: center;
     }
+
+    .spinner-border {
+        height: 16px;
+        width: 16px;
+    }
 </style>
 
 <div class="modal fade" id="modalDeleteActivitydraft" tabindex="-1" role="dialog"
@@ -34,8 +39,12 @@
             <div class="modal-footer  d-flex justify-content-end">
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"> Back</button>
-                    <button class="btn btn-primary" type="button">
-                        Delete
+                    <button class="btn btn-primary" type="button" onclick="deleteActivitydraft()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="btnDeleteActivitydraft" role="status"></div>
+                            <span class="btn-text">Delete</span>
+                        </div>
                     </button>
                 </div>
             </div>

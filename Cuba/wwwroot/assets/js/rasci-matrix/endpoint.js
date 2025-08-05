@@ -183,6 +183,22 @@ async function fetchDetailDraftActivity(param) {
   }
 }
 
+async function endpointDeleteDraftActivity(param) {
+  const url = `${url_api}/api/rasci-matrix/draft/list/delete/${param}`;
+  try {
+    const result = await ajaxRequest(url, "DELETE");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchRelatedJob(id, param) {
   const url = `${url_api}/api/rasci-matrix/business-process/detail/${id}?${param}`;
   try {

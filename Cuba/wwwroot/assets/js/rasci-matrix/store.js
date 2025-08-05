@@ -31,6 +31,8 @@ const appState = new Proxy(
     editRasciNotation: {},
     isShowRasciJob: false,
     draftRasciId: null,
+    draftActivityId: null,
+    draftActivityType: "",
     draftSoId: null,
     defaultIndexNumber: [
       "1",

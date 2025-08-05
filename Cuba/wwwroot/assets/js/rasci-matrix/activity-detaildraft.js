@@ -1,5 +1,7 @@
 async function handleDeleteDraftActivity(id, draftType) {
   const draftRasciId = getState("draftRasciId");
+  setState("draftActivityId", id);
+  setState("draftActivityType", draftType);
   console.log("first", id);
   console.log("draftRasciId", draftRasciId);
   const draftTypeMessages = {
@@ -14,12 +16,66 @@ async function handleDeleteDraftActivity(id, draftType) {
     const modal = new bootstrap.Modal(document.getElementById("modalDeleteActivitydraft"));
     modal.show();
     const contentDeleteActivitydraft = document.getElementById("contentInformation");
+
     if (contentDeleteActivitydraft) {
       contentDeleteActivitydraft.innerHTML = information;
     }
   } catch (error) {}
 }
 
+async function deleteActivitydraft() {
+  try {
+    const draftRasciId = getState("draftRasciId");
+    const id = getState("draftActivityId");
+    const draftType = getState("draftActivityType");
+    const draftTypeMessages = {
+      "Add New Business Process": "Add New Business Process activity data has been deleted",
+      "Delete Business Process": "Edit Business Process activity data has been deleted",
+      "Edit Business Process": "Delete Business Process activity data has been deleted",
+      "Add/Edit RASCI": "Add/Edit RASCI activity data has been deleted",
+    };
+    const information = draftTypeMessages[draftType] || "Are you sure want to delete this activity data?";
+    console.log("draftRasciId", draftRasciId);
+    console.log("id", id);
+    console.log("cek");
+    const spinner = document.getElementById("btnDeleteActivitydraft");
+    if (spinner) spinner.style.display = "inline-block";
+
+    const url = `${id}?draftId=${draftRasciId}`;
+    const deleteResult = await endpointDeleteDraftActivity(url);
+    console.log("deleteResult", deleteResult);
+    if (deleteResult.success === true) {
+      const modal = bootstrap.Modal.getInstance(document.getElementById("modalDeleteActivitydraft"));
+      if (modal) modal.hide();
+      setTimeout(() => {
+        swal({
+          title: "DELETED",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${information}</div>`,
+            },
+          },
+          customClass: {
+            popup: "swal-custom-popup",
+          },
+        }).then(async () => {
+          spinner.style.display = "none";
+          const payload = {
+            Page: 1,
+            PageSize: 5,
+          };
+          const queryString = new URLSearchParams(payload).toString();
+          const listData = await fetchDraftListProsbis(draftRasciId, queryString);
+          renderTableActivity(listData);
+        });
+      }, 200);
+    }
+  } catch (error) {}
+}
 async function triggleEditActivitybp(id) {
   const draftRasciId = getState("draftRasciId");
   console.log("first", id);
