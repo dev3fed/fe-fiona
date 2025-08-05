@@ -739,9 +739,7 @@ $("#continueButton").click(async function () {
 
   const saveDraft = await createDraftSO(draftName);
 
-  loader(true);
   if (saveDraft.status == 500) {
-    loader(false);
     swal("Failed", saveDraft.error, "error");
     return;
   }
@@ -758,7 +756,6 @@ $("#continueButton").click(async function () {
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
   changeOrganization(saveDraft.data.draftId, saveDraft.data.draftName);
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
-  loader(false);
   swal("Success", `Draft ${draftName} has been created`, "success");
 });
 
@@ -784,8 +781,6 @@ $("#selectDraftFilterByDataSource").on("change", async function () {
   const filter = $("#selectDraftFilterByDataSource").val();
   await changeDataSourceFilter(filter);
 });
-
-
 
 // click export org chart
 $("#exportOrgChart").click(function () {
@@ -821,12 +816,6 @@ $("#selectDraftOrganization").change(async function () {
   //         : [],
   //   },
   // ]);
-
-  loader(true);
-  // wait 1s for update data
-  setTimeout(() => {
-    loader(false);
-  }, 1000);
 });
 
 $(document).ready(async function () {
@@ -834,7 +823,7 @@ $(document).ready(async function () {
   const getDataApproval = await approvedList();
   storeData.listDraft = getDataDraft.data;
   await checkDataOrganization(storeData.listDraft);
-  loader(false);
+  // loader(false);
 
   // initialize table
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
@@ -856,7 +845,6 @@ $(document).ready(async function () {
       data: storeData.listDraft.map((item) => ({ id: item.draftId, text: item.draftName })),
     },
   ]);
-
 
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
   const focusNode = urlParams.get("focusNode");

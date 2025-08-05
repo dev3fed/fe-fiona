@@ -1915,8 +1915,27 @@ async function helperOrgTree(params) {
 // ======================
 
 async function focusNode(nodeId) {
-  // Show loading
-  showChartLoading("osContainer");
+  // Show loading with proper container detection
+  if (typeof showChartLoading === "function") {
+    showChartLoading("chart-container-custom");
+  } else {
+    // Fallback for legacy container
+    const container = document.getElementById("osContainer") || document.querySelector(".chart-container-custom");
+    if (container) {
+      container.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column;">
+          <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
+          <p style="margin-top: 10px; color: #666;">Loading chart focus...</p>
+        </div>
+        <style>
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      `;
+    }
+  }
 
   try {
     const dataChart = await chartShow({
@@ -1925,7 +1944,6 @@ async function focusNode(nodeId) {
       depth: 5,
     });
 
-    // change chartid id from id_org_unit
     if (!dataChart.data) {
       dataChart.data = [];
     }
@@ -1933,43 +1951,38 @@ async function focusNode(nodeId) {
       item.id = item.id_org_unit;
     });
 
-    // find parent node and make the id null
     const self = dataChart.data.find((item) => item.id == nodeId);
     const parent = dataChart.data.find((item) => item.id == self.pid);
-    // take out parent node from dataChart.data
     dataChart.data = dataChart.data.filter((item) => item.id != self.pid);
     if (parent) {
       parent.pid = null;
     }
-    console.log("parent", parent);
-    console.log("dataChart", dataChart.data);
-    // insert parent node to the first index of dataChart.data
     dataChart.data.unshift(parent);
-    updateDataChart(dataChart.data);
-    // find all children node and make the pid null
 
-    // setTimeout(async () => {
-    //   try {
-    //     await helperOrgChart(true, "osContainer", dataChart.data, true, { expand: true, nodeId: nodeId });
-    //     console.log("Chart focus completed successfully");
-    //   } catch (error) {
-    //     console.error("Error rendering chart:", error);
-    //     const container = document.getElementById("osContainer");
-    //     if (container) {
-    //       container.innerHTML =
-    //         '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed</div>';
-    //     }
-    //   } finally {
-    //     hideChartLoading("osContainer");
-    //   }
-    // }, 500);
+    // Update chart data (assuming this function handles chart rendering)
+    updateDataChart(dataChart.data, nodeId);
+
+    // Wait for chart to complete rendering before hiding loading
+    setTimeout(() => {
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
+      console.log("Chart focus completed successfully");
+    }, 1500); // Wait 1.5 seconds for chart to fully render
   } catch (error) {
     console.error("Error in focusNode:", error);
-    const container = document.getElementById("osContainer");
-    if (container) {
-      container.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed</div>';
+
+    // Hide loading on error
+    if (typeof hideChartLoading === "function") {
+      hideChartLoading("chart-container-custom");
     }
-    hideChartLoading("osContainer");
+
+    // Show error message
+    const container = document.querySelector(".chart-container-custom") || document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed. Please try again.</div>';
+    }
   }
 }
 
@@ -2010,6 +2023,12 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   if (!init) {
     return false;
   }
+
+  // Show loading at the start of chart rendering
+  if (typeof showChartLoading === "function") {
+    showChartLoading("chart-container-custom");
+  }
+
   const param = {};
   if (isFocusNode) {
     param.collapsed = {
@@ -2466,8 +2485,10 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     title.innerHTML = `<i class="fa fa-refresh"></i>`;
     // add id to title
     title.addEventListener("click", function () {
-      // Show loading for refresh
-      showChartLoading("osContainer");
+      // Show loading for refresh with proper container detection
+      if (typeof showChartLoading === "function") {
+        showChartLoading("chart-container-custom");
+      }
 
       setTimeout(() => {
         helperOrgChart(true, "osContainer", lsListOrgNode, true);
@@ -2475,9 +2496,11 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     });
     chart.element.appendChild(title);
 
-    // Hide loading when chart is ready
+    // Hide loading when chart is ready with proper container detection
     setTimeout(() => {
-      hideChartLoading("osContainer");
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
     }, 100);
 
     // console.log("node", chart.nodes);
@@ -2698,59 +2721,35 @@ async function changeDataSourceFilter(value) {
 }
 
 // Organization Chart Loading Functions
-function showChartLoading(containerId) {
-  const container = document.getElementById(containerId);
-  if (container) {
-    container.innerHTML = `
-      <div id="chart-loading-overlay" style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-color: rgba(255, 255, 255, 0.9);
-        z-index: 1000;
-      ">
-        <div style="
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
-          border-radius: 50%;
-          width: 50px;
-          height: 50px;
-          animation: chart-spin 1s linear infinite;
-        "></div>
-        <p style="
-          margin-top: 15px;
-          color: #666;
-          font-size: 16px;
-          font-weight: 500;
-          text-align: center;
-        ">Loading organization chart...</p>
-      </div>
-      <style>
-        @keyframes chart-spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      </style>
-    `;
+function showChartLoading(containerClass) {
+  let container = document.querySelector(`.${containerClass}`);
 
-    // Ensure container has relative positioning for absolute positioning to work
+  if (container) {
+    container.innerHTML = CHART_LOADING_HTML;
+
+    // Ensure container has proper positioning for loading overlay
     const containerStyle = window.getComputedStyle(container);
     if (containerStyle.position === "static") {
       container.style.position = "relative";
     }
+
+    // Ensure container has minimum dimensions for chart (1200x800)
+    if (containerStyle.width === "0px" || containerStyle.height === "0px") {
+      container.style.minWidth = "1200px";
+      container.style.minHeight = "800px";
+    }
+
+    console.log(`Chart loading shown for container: ${containerClass}`);
+  } else {
+    console.warn(`Container not found: ${containerClass}`);
   }
 }
 
-function hideChartLoading(containerId) {
-  const container = document.getElementById(containerId);
+function hideChartLoading(containerClass) {
+  let container = document.querySelector(`.${containerClass}`);
+
   if (container) {
-    // Remove loading overlay
+    // Remove loading overlay and styles
     const loadingOverlay = container.querySelector("#chart-loading-overlay");
     const loadingStyle = container.querySelector("style");
 
@@ -2761,6 +2760,8 @@ function hideChartLoading(containerId) {
       loadingStyle.remove();
     }
 
-    console.log(`Chart loading hidden for container: ${containerId}`);
+    console.log(`Chart loading hidden for container: ${containerClass}`);
+  } else {
+    console.warn(`Container not found for hiding loading: ${containerClass}`);
   }
 }

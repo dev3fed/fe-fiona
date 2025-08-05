@@ -221,28 +221,21 @@
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
                                         <div class="col-12 mt-2">
-                                            <button onclick="chart.exportImg()">Export Current</button>
-                                            <button onclick="chart.exportImg({full:true})">Export Full</button>
-                                            <button onclick="changeBackChartFit()">Export SVG (Clean)</button>
-                                            <button onclick="downloadPdf(chart)">Export PDF</button>
-                                            <button onclick="chart.fit();">Fit to the screen</button>
-                                            <button onclick="updateDataChart()">Update Data</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chart.exportImg()">Export Current</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chart.exportImg({full:true})">Export Full</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chartExportSVG()">Export SVG</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chartExportPDF(chart)">Export PDF</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chart.fit();">Fit to the screen</button>
                                             @* zoom in zoom out *@
-                                            <button
-                                                onclick="chart.zoomIn().render().fit();"
-                                                class="btn btn-action-button waves-effect waves-light">
+                                            <button onclick="chart.zoomIn().render().fit();" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-search-plus"></i> zoom in
                                             </button>
-                                            <button
-                                                onclick="chart.zoomOut().render().fit();"
-                                                class="btn btn-action-button waves-effect waves-light">
+                                            <button onclick="chart.zoomOut().render().fit();" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-search-minus"></i> zoom out
                                             </button>
-                                            <button
-                                            onclick="chart.compact(!!(compact++%2)).render().fit();"
-                                            class="btn btn-action-button waves-effect waves-light"
-                                            >
-                                            <i class="fas fa-sitemap"></i> compact
+                                            <button onclick="chartCompact()" class="btn btn-primary btn-sm">
+                                            @* <button onclick="chart.compact(!!(compact++%2)).render().fit();" class="btn btn-primary btn-sm"> *@
+                                                <i class="fas fa-sitemap"></i> compact
                                             </button>
                                         </div>
                                     </div>
@@ -372,13 +365,11 @@
     <script src="@Url.Content("~/assets/js/authentication.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3.v7.min.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-org-chart.js")"></script>
-    @* <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-org-chart_.js")"></script> *@
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-flextree.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/html2canvas.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/jspdf.umd.min.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/helper.js")"></script>
-    @* <script src="@Url.Content("~/assets/js/organization-structure/d3-chart.js")"></script> *@
-    <script src="@Url.Content("~/assets/js/organization-structure/d3-chart1.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/d3-chart.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/endpoint.js")"></script>
     @* <script src="@Url.Content("~/assets/js/organization-structure/balkan.js")"></script> *@
     <script src="@Url.Content("~/assets/js/organization-structure/index.js")"></script>

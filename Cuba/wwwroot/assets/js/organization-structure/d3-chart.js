@@ -1,62 +1,86 @@
-let index = 0;
-let compact = 0;
-let actNdCent = 0;
-let chart; // Global chart variable for access across functions
+var index = 0;
+var compact = 0;
+var actNdCent = 0;
 
 // Global font sizing function - used by both SVG export and chart rendering
-function initializeChartSystem(dataObject = data, idContainer = "osContainer") {
-  return new Promise((resolve, reject) => {
-    try {
-      console.log("Starting chart system initialization...");
-      console.log("Data object:", dataObject);
-      console.log("Container ID:", idContainer);
-
-      // Ensure container exists
-      const containerElement = document.getElementById(idContainer);
-      if (!containerElement) {
-        console.error(`Container element with ID '${idContainer}' not found`);
-        reject(new Error(`Container element with ID '${idContainer}' not found`));
-        return;
-      }
-
-      // Step 1: Process the raw data
-      const processedDataResult = processChartData(dataObject);
-      console.log("Processed data:", processedDataResult);
-
-      // Step 2: Initialize chart with processed data
-      initializeChart(processedDataResult, 18, `#${idContainer}`);
-
-      console.log("Chart system initialization completed");
-
-      // Resolve after a short delay to ensure chart is fully rendered and centered
-      setTimeout(() => {
-        // Final fit to ensure proper centering
-        if (chart && chart.fit) {
-          chart.fit();
-          console.log("Final chart fit applied for centering");
-        }
-        resolve(true);
-      }, 1000);
-    } catch (error) {
-      console.error("Error in chart system initialization:", error);
-      reject(error);
-    }
-  });
-}
-
 function getFontSize(text, isHeader = false) {
   if (isHeader) {
-    if (text.length > 60) return "10px";
-    if (text.length > 40) return "11px";
-    if (text.length > 20) return "12px";
+    if (text.length > 60) return "13px";
+    if (text.length > 40) return "14px";
+    if (text.length > 20) return "15px";
     return "18px";
   } else {
     // Apply dynamic sizing for non-header text as well
-    if (text.length > 60) return "10px";
-    if (text.length > 40) return "11px";
-    if (text.length > 20) return "12px";
+    if (text.length > 60) return "13px";
+    if (text.length > 40) return "14px";
+    if (text.length > 20) return "15px";
     return "14px";
   }
+}
+
+// SVG export font sizing function - 2px larger than regular font sizes for better readability in exports
+function getSVGFontSize(text, isHeader = false) {
+  console.log(`getSVGFontSize called with text: "${text}" and isHeader: ${isHeader}`);
+  if (isHeader) {
+    if (text.length > 60) return "18px"; // 13px + 2px
+    if (text.length > 40) return "20px"; // 14px + 2px
+    if (text.length > 20) return "22px"; // 15px + 2px
+    return "23px"; // 18px + 2px
+  } else {
+    // Apply dynamic sizing for non-header text as well
+    if (text.length > 60) return "15px"; // 13px + 2px
+    if (text.length > 40) return "16px"; // 14px + 2px
+    if (text.length > 20) return "17px"; // 15px + 2px
+    return "16px"; // 14px + 2px
+  }
+}
+
+// SVG export font sizing function for non-basket headers - 2px smaller than getSVGFontSize for headers
+function getSVGHeaderFontSize(text) {
+  console.log(`getSVGHeaderFontSize called with text: "${text}"`);
+  if (text.length > 60) return "16px"; // 18px - 2px
+  if (text.length > 40) return "18px"; // 20px - 2px
+  if (text.length > 20) return "20px"; // 22px - 2px
+  return "21px"; // 23px - 2px
+}
+
+// SVG export font sizing function for basket-merge headers - more aggressive sizing for long text
+function getSVGBasketMergeHeaderFontSize(text) {
+  console.log(`getSVGBasketMergeHeaderFontSize called with text: "${text}"`);
+  // More aggressive sizing to prevent text overflow and box expansion
+  if (text.length > 80) return "14px"; // Very long text
+  if (text.length > 60) return "15px"; // Long text
+  if (text.length > 40) return "16px"; // Medium text
+  if (text.length > 20) return "18px"; // Short text
+  return "20px"; // Very short text
+}
+
+// HTML font sizing function for basket-merge headers - matches SVG but for HTML display
+function getBasketMergeHeaderFontSize(text) {
+  // More aggressive sizing to prevent text overflow and box expansion
+  if (text.length > 80) return "12px"; // Very long text (2px smaller than SVG)
+  if (text.length > 60) return "13px"; // Long text
+  if (text.length > 40) return "14px"; // Medium text
+  if (text.length > 20) return "16px"; // Short text
+  return "18px"; // Very short text
+}
+
+// HTML font sizing function for basket-non-merge headers - smaller than regular header
+function getBasketNonMergeHeaderFontSize(text) {
+  // Slightly smaller than regular to prevent overflow in basket nodes
+  if (text.length > 60) return "11px"; // Long text
+  if (text.length > 40) return "12px"; // Medium text
+  if (text.length > 20) return "13px"; // Short text
+  return "16px"; // Very short text
+}
+
+// SVG export font sizing function for basket-non-merge headers - 2px larger than HTML version
+function getSVGBasketNonMergeHeaderFontSize(text) {
+  // Slightly smaller than regular to prevent overflow in basket nodes, but larger for SVG
+  if (text.length > 60) return "13px"; // Long text (2px larger than HTML)
+  if (text.length > 40) return "14px"; // Medium text
+  if (text.length > 20) return "15px"; // Short text
+  return "18px"; // Very short text
 }
 
 // Helper function to create and style SVG text elements with common attributes
@@ -91,8 +115,7 @@ function createStyledSVGRect(x, y, width, height, options = {}) {
   if (options.rx) rect.setAttribute("rx", options.rx);
   return rect;
 }
-
-function downloadPdf(chart) {
+function chartExportPDF(chart) {
   chart.exportImg({
     save: false,
     full: true,
@@ -106,6 +129,39 @@ function downloadPdf(chart) {
       };
     },
   });
+
+  applyStaticChartPositioning();
+}
+
+function chartCompact() {
+  chart
+    .compact(!!(compact++ % 2))
+    .render()
+    .fit();
+
+  // setTimeout(() => {
+  applyStaticChartPositioning();
+  // }, 500);
+}
+
+// Function to apply static chart positioning with custom transform values
+function applyStaticChartPositioning(translateX = 450, translateY = -100, scale = 0.6, delay = 3000) {
+  const chartContainer = document.querySelector(".chart-container-custom");
+  if (chartContainer) {
+    const chartGroup = chartContainer.querySelector("g.chart");
+    if (chartGroup) {
+      // Wait specified delay before applying static centering
+      setTimeout(() => {
+        chartGroup.classList.remove("transform");
+        chartGroup.setAttribute("transform", `translate(${translateX},${translateY}) scale(${scale})`);
+        console.log(`Applied static chart positioning: translate(${translateX},${translateY}) scale(${scale})`);
+      }, delay);
+    } else {
+      console.warn("Chart group not found for static positioning");
+    }
+  } else {
+    console.warn("Chart container not found for static positioning");
+  }
 }
 
 function convertForeignObjectToSVGText(svgElement) {
@@ -150,11 +206,90 @@ function convertForeignObjectToSVGText(svgElement) {
       textElement.appendChild(tspan);
     });
 
-    // Adjust y position to center the multi-line text
+    // Improved vertical centering logic for different line counts
     if (lines.length > 1) {
       const totalHeight = lines.length * lineHeight;
       const currentY = parseFloat(textElement.getAttribute("y"));
-      const adjustedY = currentY - totalHeight / 2 + lineHeight / 2;
+
+      // Better centering calculation for multi-line text
+      let adjustedY;
+      if (lines.length === 2) {
+        adjustedY = currentY - 20;
+      } else if (lines.length >= 3) {
+        adjustedY = currentY - totalHeight / 2 + lineHeight / 2 - 5;
+      } else {
+        adjustedY = currentY;
+      }
+
+      textElement.setAttribute("y", adjustedY);
+    }
+  };
+
+  const wrapSVGBasketText = (textElement, text, maxWidth, fontSize) => {
+    const words = text.split(" ").filter((word) => word.trim() !== "");
+    const lineHeight = parseInt(fontSize) * 1.2; // 120% of font size for line height
+    let line = "";
+    const lines = [];
+
+    // Calculate approximate character width based on font size - more generous for basket text
+    const charWidth = parseInt(fontSize) * 0.5; // Reduced from 0.6 to 0.5 for more space
+    const maxCharsPerLine = Math.floor(maxWidth / charWidth);
+    console.log("words", words);
+    console.log("maxCharsPerLine", maxCharsPerLine);
+    // remove inside words if they are ' '
+    // const filteredWords = words.filter((word) => word.trim() !== "");
+    // console.log("filteredWords", filteredWords);
+
+    // First check if entire text fits in one line
+    if (text.length <= maxCharsPerLine) {
+      // Text fits in one line, no need to wrap
+      textElement.textContent = text;
+      return;
+    }
+
+    words.forEach((word) => {
+      const testLine = line + (line ? " " : "") + word;
+      if (testLine.length <= maxCharsPerLine && line.length > 0) {
+        line = testLine;
+      } else if (line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = word;
+      }
+    });
+
+    if (line) {
+      lines.push(line);
+    }
+
+    // Clear existing text content
+    textElement.textContent = "";
+
+    // Add each line as a tspan
+    lines.forEach((lineText, index) => {
+      const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+      tspan.textContent = lineText;
+      tspan.setAttribute("x", textElement.getAttribute("x"));
+      tspan.setAttribute("dy", index === 0 ? "0" : `${lineHeight}px`);
+      textElement.appendChild(tspan);
+    });
+
+    // Improved vertical centering logic for different line counts
+    if (lines.length > 1) {
+      const totalHeight = lines.length * lineHeight;
+      const currentY = parseFloat(textElement.getAttribute("y"));
+
+      // Better centering calculation for multi-line text
+      let adjustedY;
+      if (lines.length === 2) {
+        adjustedY = currentY - 10;
+      } else if (lines.length >= 3) {
+        adjustedY = currentY - totalHeight / 2 + lineHeight / 2 - 5;
+      } else {
+        adjustedY = currentY;
+      }
+
       textElement.setAttribute("y", adjustedY);
     }
   };
@@ -162,7 +297,7 @@ function convertForeignObjectToSVGText(svgElement) {
   foreignObjects.forEach((foreignObject) => {
     const x = foreignObject.getAttribute("x") || "0";
     const y = foreignObject.getAttribute("y") || "0";
-    const width = foreignObject.getAttribute("width") || "220";
+    const width = foreignObject.getAttribute("width") || "300";
     const height = foreignObject.getAttribute("height") || "110";
 
     let div = foreignObject.querySelector("div");
@@ -185,14 +320,14 @@ function convertForeignObjectToSVGText(svgElement) {
       const prlDiv = div.querySelector("div:nth-child(2) div:first-child div");
       const formationDiv = div.querySelector("div:nth-child(2) div:nth-child(2) div");
 
-      const positionName = positionDiv?.textContent || "Unknown";
+      const position = positionDiv?.textContent || "Unknown";
       const prl = prlDiv?.textContent || "";
       const formation = formationDiv?.textContent || "";
 
-      // Get font sizes using dynamic sizing
-      const positionFontSize = getFontSize(positionName, true);
-      const prlFontSize = getFontSize(prl);
-      const formationFontSize = getFontSize(formation);
+      // Get font sizes using dynamic sizing for SVG export (2px larger)
+      const positionFontSize = getSVGHeaderFontSize(position); // Use smaller header font
+      const prlFontSize = getSVGFontSize(prl);
+      const formationFontSize = getSVGFontSize(formation);
 
       // Check for border style (detect dotted border from inline styles)
       const divStyle = div.getAttribute("style") || "";
@@ -211,9 +346,9 @@ function convertForeignObjectToSVGText(svgElement) {
       rect.setAttribute("stroke-dasharray", strokeDashArray);
       group.appendChild(rect);
 
-      // Position section (left side - 70% width)
+      // Position section (left side - 80% width to match HTML flex:2 vs flex:0.5 ratio)
       const positionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      const positionWidth = parseFloat(width) * 0.72; // 1.8/(1.8+0.7) = 0.72
+      const positionWidth = parseFloat(width) * 0.8; // 2/(2+0.5) = 0.8
       positionRect.setAttribute("x", x);
       positionRect.setAttribute("y", y);
       positionRect.setAttribute("width", positionWidth);
@@ -227,9 +362,9 @@ function convertForeignObjectToSVGText(svgElement) {
       // Position text
       const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       positionText.setAttribute("x", parseFloat(x) + positionWidth / 2);
-      positionText.setAttribute("y", parseFloat(y) + parseFloat(height) / 2 + 4);
+      positionText.setAttribute("y", parseFloat(y) + parseFloat(height) / 2);
       positionText.setAttribute("text-anchor", "middle");
-      positionText.setAttribute("dominant-baseline", "middle");
+      positionText.setAttribute("dominant-baseline", "central");
       positionText.setAttribute("font-size", positionFontSize);
       positionText.setAttribute("font-weight", "bold");
       positionText.setAttribute("fill", "#666");
@@ -239,10 +374,10 @@ function convertForeignObjectToSVGText(svgElement) {
       positionText.setAttribute("contenteditable", "false");
 
       // Apply text wrapping for long position names
-      wrapSVGText(positionText, positionName, positionWidth - 10, positionFontSize);
+      wrapSVGText(positionText, position, positionWidth - 10, positionFontSize);
       group.appendChild(positionText);
 
-      // Right section (30% width) - split into PRL and Formation
+      // Right section (20% width) - split into PRL and Formation to match HTML flex:0.5 ratio
       const rightX = parseFloat(x) + positionWidth;
       const rightWidth = parseFloat(width) - positionWidth;
       const halfHeight = parseFloat(height) / 2;
@@ -262,9 +397,9 @@ function convertForeignObjectToSVGText(svgElement) {
       // PRL text
       const prlText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       prlText.setAttribute("x", rightX + rightWidth / 2);
-      prlText.setAttribute("y", parseFloat(y) + halfHeight / 2 + 4);
+      prlText.setAttribute("y", parseFloat(y) + halfHeight / 2);
       prlText.setAttribute("text-anchor", "middle");
-      prlText.setAttribute("dominant-baseline", "middle");
+      prlText.setAttribute("dominant-baseline", "central");
       prlText.setAttribute("font-size", prlFontSize);
       prlText.setAttribute("font-weight", "bold");
       prlText.setAttribute("fill", "#666");
@@ -292,14 +427,16 @@ function convertForeignObjectToSVGText(svgElement) {
       // Formation text
       const formationText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       formationText.setAttribute("x", rightX + rightWidth / 2);
-      formationText.setAttribute("y", parseFloat(y) + halfHeight + halfHeight / 2 + 4);
+      formationText.setAttribute("y", parseFloat(y) + halfHeight + halfHeight / 2);
       formationText.setAttribute("text-anchor", "middle");
-      formationText.setAttribute("dominant-baseline", "middle");
+      formationText.setAttribute("dominant-baseline", "central");
       formationText.setAttribute("font-size", formationFontSize);
       formationText.setAttribute("font-weight", "bold");
       formationText.setAttribute("fill", "#666");
       formationText.setAttribute("font-family", "Arial, sans-serif");
       formationText.setAttribute("pointer-events", "none");
+      formationText.setAttribute("user-select", "none");
+      formationText.setAttribute("contenteditable", "false");
       formationText.setAttribute("user-select", "none");
       formationText.setAttribute("contenteditable", "false");
 
@@ -314,7 +451,7 @@ function convertForeignObjectToSVGText(svgElement) {
 
       // Get the position name from the first row
       const positionDiv = div.querySelector("div:first-child div");
-      const positionName = positionDiv?.textContent || "Unknown";
+      const position = positionDiv?.textContent || "Unknown";
 
       // Get all basket content rows (excluding the position name row)
       const basketRows = div.querySelectorAll("div.node-content");
@@ -352,10 +489,10 @@ function convertForeignObjectToSVGText(svgElement) {
       // Position name text
       const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       positionText.setAttribute("x", parseFloat(x) + parseFloat(width) / 2);
-      positionText.setAttribute("y", parseFloat(y) + rowHeight / 2 + 4);
+      positionText.setAttribute("y", parseFloat(y) + rowHeight / 2);
       positionText.setAttribute("text-anchor", "middle");
-      positionText.setAttribute("dominant-baseline", "middle");
-      positionText.setAttribute("font-size", getFontSize(positionName, true));
+      positionText.setAttribute("dominant-baseline", "central");
+      positionText.setAttribute("font-size", getSVGHeaderFontSize(position)); // Use smaller header font
       positionText.setAttribute("font-weight", "bold");
       positionText.setAttribute("fill", "#666");
       positionText.setAttribute("font-family", "Arial, sans-serif");
@@ -364,7 +501,7 @@ function convertForeignObjectToSVGText(svgElement) {
       positionText.setAttribute("contenteditable", "false");
 
       // Apply text wrapping for long position names
-      wrapSVGText(positionText, positionName, parseFloat(width) - 10, getFontSize(positionName, true));
+      wrapSVGText(positionText, position, parseFloat(width) - 10, getSVGHeaderFontSize(position));
       group.appendChild(positionText);
 
       // Process each basket row
@@ -396,10 +533,10 @@ function convertForeignObjectToSVGText(svgElement) {
 
         const col1Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         col1Text.setAttribute("x", parseFloat(x) + col1Width / 2);
-        col1Text.setAttribute("y", currentY + rowHeight / 2 + 4);
+        col1Text.setAttribute("y", currentY + rowHeight / 2);
         col1Text.setAttribute("text-anchor", "middle");
-        col1Text.setAttribute("dominant-baseline", "middle");
-        col1Text.setAttribute("font-size", getFontSize(basketName));
+        col1Text.setAttribute("dominant-baseline", "central");
+        col1Text.setAttribute("font-size", getSVGBasketNonMergeHeaderFontSize(basketName));
         col1Text.setAttribute("font-weight", "bold");
         col1Text.setAttribute("fill", "#666");
         col1Text.setAttribute("font-family", "Arial, sans-serif");
@@ -408,7 +545,7 @@ function convertForeignObjectToSVGText(svgElement) {
         col1Text.setAttribute("contenteditable", "false");
 
         // Apply text wrapping for basket name
-        wrapSVGText(col1Text, basketName, col1Width - 10, getFontSize(basketName));
+        wrapSVGText(col1Text, basketName, col1Width - 10, getSVGBasketNonMergeHeaderFontSize(basketName));
         group.appendChild(col1Text);
 
         // Column 2: PRL
@@ -426,10 +563,10 @@ function convertForeignObjectToSVGText(svgElement) {
 
         const col2Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         col2Text.setAttribute("x", col2X + col2Width / 2);
-        col2Text.setAttribute("y", currentY + rowHeight / 2 + 4);
+        col2Text.setAttribute("y", currentY + rowHeight / 2);
         col2Text.setAttribute("text-anchor", "middle");
-        col2Text.setAttribute("dominant-baseline", "middle");
-        col2Text.setAttribute("font-size", getFontSize(prl));
+        col2Text.setAttribute("dominant-baseline", "central");
+        col2Text.setAttribute("font-size", getSVGFontSize(prl));
         col2Text.setAttribute("font-weight", "bold");
         col2Text.setAttribute("fill", "#666");
         col2Text.setAttribute("font-family", "Arial, sans-serif");
@@ -438,7 +575,7 @@ function convertForeignObjectToSVGText(svgElement) {
         col2Text.setAttribute("contenteditable", "false");
 
         // Apply text wrapping for PRL text
-        wrapSVGText(col2Text, prl, col2Width - 10, getFontSize(prl));
+        wrapSVGText(col2Text, prl, col2Width - 10, getSVGFontSize(prl));
         group.appendChild(col2Text);
 
         // Column 3: Formation
@@ -456,10 +593,10 @@ function convertForeignObjectToSVGText(svgElement) {
 
         const col3Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         col3Text.setAttribute("x", col3X + col3Width / 2);
-        col3Text.setAttribute("y", currentY + rowHeight / 2 + 4);
+        col3Text.setAttribute("y", currentY + rowHeight / 2);
         col3Text.setAttribute("text-anchor", "middle");
-        col3Text.setAttribute("dominant-baseline", "middle");
-        col3Text.setAttribute("font-size", getFontSize(formation));
+        col3Text.setAttribute("dominant-baseline", "central");
+        col3Text.setAttribute("font-size", getSVGFontSize(formation));
         col3Text.setAttribute("font-weight", "bold");
         col3Text.setAttribute("fill", "#666");
         col3Text.setAttribute("font-family", "Arial, sans-serif");
@@ -468,7 +605,7 @@ function convertForeignObjectToSVGText(svgElement) {
         col3Text.setAttribute("contenteditable", "false");
 
         // Apply text wrapping for formation text
-        wrapSVGText(col3Text, formation, col3Width - 10, getFontSize(formation));
+        wrapSVGText(col3Text, formation, col3Width - 10, getSVGFontSize(formation));
         group.appendChild(col3Text);
       });
     } else if (nodeType === "basket-merge-node") {
@@ -498,7 +635,7 @@ function convertForeignObjectToSVGText(svgElement) {
 
       // Get the position name from the first row
       const positionDiv = div.querySelector("div:first-child div");
-      const positionName = positionDiv?.textContent || "Unknown";
+      const position = positionDiv?.textContent || "Unknown";
 
       // Get the main container with left and right sections
       const mainContainer = div.querySelector("div:nth-child(2)");
@@ -556,10 +693,10 @@ function convertForeignObjectToSVGText(svgElement) {
       // Position name text
       const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       positionText.setAttribute("x", parseFloat(x) + parseFloat(width) / 2);
-      positionText.setAttribute("y", parseFloat(y) + rowHeight / 2 + 4);
+      positionText.setAttribute("y", parseFloat(y) + rowHeight / 2);
       positionText.setAttribute("text-anchor", "middle");
-      positionText.setAttribute("dominant-baseline", "middle");
-      positionText.setAttribute("font-size", getFontSize(positionName, true));
+      positionText.setAttribute("dominant-baseline", "central");
+      positionText.setAttribute("font-size", getSVGBasketMergeHeaderFontSize(position));
       positionText.setAttribute("font-weight", "bold");
       positionText.setAttribute("fill", "#666");
       positionText.setAttribute("font-family", "Arial, sans-serif");
@@ -568,7 +705,7 @@ function convertForeignObjectToSVGText(svgElement) {
       positionText.setAttribute("contenteditable", "false");
 
       // Apply text wrapping for long position names
-      wrapSVGText(positionText, positionName, parseFloat(width) - 10, getFontSize(positionName, true));
+      wrapSVGBasketText(positionText, position, parseFloat(width), getSVGBasketMergeHeaderFontSize(position));
       group.appendChild(positionText);
 
       // Get the data for this node to extract bc_formation values properly
@@ -613,8 +750,8 @@ function convertForeignObjectToSVGText(svgElement) {
         const basketName = columns[0]?.textContent || "";
         const prlFromDOM = columns[1]?.textContent || "18";
 
-        // Left section: Position Name (70% width)
-        const leftWidth = parseFloat(width) * 0.8; // 80% for left section
+        // Left section: Position Name and PRL (85% width to match HTML)
+        const leftWidth = parseFloat(width) * 0.85; // 85% for left section (matches HTML)
         const leftRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         leftRect.setAttribute("x", x);
         leftRect.setAttribute("y", currentY);
@@ -626,39 +763,39 @@ function convertForeignObjectToSVGText(svgElement) {
         leftRect.setAttribute("stroke-dasharray", "none");
         group.appendChild(leftRect);
 
-        // Position Name (70% of left section)
-        const positionNameWidth = leftWidth * 0.7;
-        const positionNameRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        positionNameRect.setAttribute("x", x);
-        positionNameRect.setAttribute("y", currentY);
-        positionNameRect.setAttribute("width", positionNameWidth);
-        positionNameRect.setAttribute("height", rowHeight);
-        positionNameRect.setAttribute("fill", "none");
-        positionNameRect.setAttribute("stroke", "black");
-        positionNameRect.setAttribute("stroke-width", "1");
-        positionNameRect.setAttribute("stroke-dasharray", "none");
-        group.appendChild(positionNameRect);
+        // Position Name (80% of left section to match HTML proportions)
+        const positionWidth = leftWidth * 0.8;
+        const positionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        positionRect.setAttribute("x", x);
+        positionRect.setAttribute("y", currentY);
+        positionRect.setAttribute("width", positionWidth);
+        positionRect.setAttribute("height", rowHeight);
+        positionRect.setAttribute("fill", "none");
+        positionRect.setAttribute("stroke", "black");
+        positionRect.setAttribute("stroke-width", "1");
+        positionRect.setAttribute("stroke-dasharray", "none");
+        group.appendChild(positionRect);
 
-        const positionNameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        positionNameText.setAttribute("x", parseFloat(x) + positionNameWidth / 2);
-        positionNameText.setAttribute("y", currentY + rowHeight / 2 + 4);
-        positionNameText.setAttribute("text-anchor", "middle");
-        positionNameText.setAttribute("dominant-baseline", "middle");
-        positionNameText.setAttribute("font-size", getFontSize(basketName));
-        positionNameText.setAttribute("font-weight", "bold");
-        positionNameText.setAttribute("fill", "#666");
-        positionNameText.setAttribute("font-family", "Arial, sans-serif");
-        positionNameText.setAttribute("pointer-events", "none");
-        positionNameText.setAttribute("user-select", "none");
-        positionNameText.setAttribute("contenteditable", "false");
+        const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        positionText.setAttribute("x", parseFloat(x) + positionWidth / 2);
+        positionText.setAttribute("y", currentY + rowHeight / 2);
+        positionText.setAttribute("text-anchor", "middle");
+        positionText.setAttribute("dominant-baseline", "central");
+        positionText.setAttribute("font-size", getSVGFontSize(basketName));
+        positionText.setAttribute("font-weight", "bold");
+        positionText.setAttribute("fill", "#666");
+        positionText.setAttribute("font-family", "Arial, sans-serif");
+        positionText.setAttribute("pointer-events", "none");
+        positionText.setAttribute("user-select", "none");
+        positionText.setAttribute("contenteditable", "false");
 
         // Apply text wrapping for basket name in merge
-        wrapSVGText(positionNameText, basketName, positionNameWidth - 10, getFontSize(basketName));
-        group.appendChild(positionNameText);
+        wrapSVGBasketText(positionText, basketName, positionWidth, getSVGFontSize(basketName));
+        group.appendChild(positionText);
 
         // PRL (30% of left section)
-        const formationX = parseFloat(x) + positionNameWidth;
-        const formationWidth = leftWidth - positionNameWidth;
+        const formationX = parseFloat(x) + positionWidth;
+        const formationWidth = leftWidth - positionWidth;
         const formationRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         formationRect.setAttribute("x", formationX);
         formationRect.setAttribute("y", currentY);
@@ -672,10 +809,10 @@ function convertForeignObjectToSVGText(svgElement) {
 
         const formationText = document.createElementNS("http://www.w3.org/2000/svg", "text");
         formationText.setAttribute("x", formationX + formationWidth / 2);
-        formationText.setAttribute("y", currentY + rowHeight / 2 + 4);
+        formationText.setAttribute("y", currentY + rowHeight / 2);
         formationText.setAttribute("text-anchor", "middle");
-        formationText.setAttribute("dominant-baseline", "middle");
-        formationText.setAttribute("font-size", getFontSize(prlFromDOM));
+        formationText.setAttribute("dominant-baseline", "central");
+        formationText.setAttribute("font-size", getSVGFontSize(prlFromDOM));
         formationText.setAttribute("font-weight", "bold");
         formationText.setAttribute("fill", "#666");
         formationText.setAttribute("font-family", "Arial, sans-serif");
@@ -684,13 +821,13 @@ function convertForeignObjectToSVGText(svgElement) {
         formationText.setAttribute("contenteditable", "false");
 
         // Apply text wrapping for formation text in basket merge
-        wrapSVGText(formationText, prlFromDOM, formationWidth - 10, getFontSize(prlFromDOM));
+        wrapSVGText(formationText, prlFromDOM, formationWidth - 10, getSVGFontSize(prlFromDOM));
         group.appendChild(formationText);
       });
 
       // Now generate brackets using tag-based logic (same as HTML generation)
-      const rightX = parseFloat(x) + parseFloat(width) * 0.8;
-      const rightWidth = parseFloat(width) * 0.2;
+      const rightX = parseFloat(x) + parseFloat(width) * 0.85;
+      const rightWidth = parseFloat(width) * 0.15;
       let bracketCurrentY = parseFloat(y) + rowHeight; // Start after position name row
 
       if (bracketSplitted.length > 0) {
@@ -720,10 +857,10 @@ function convertForeignObjectToSVGText(svgElement) {
 
           const bracketText = document.createElementNS("http://www.w3.org/2000/svg", "text");
           bracketText.setAttribute("x", rightX + rightWidth / 2);
-          bracketText.setAttribute("y", bracketCurrentY + heightPerBracket / 2 + 4);
+          bracketText.setAttribute("y", bracketCurrentY + heightPerBracket / 2);
           bracketText.setAttribute("text-anchor", "middle");
-          bracketText.setAttribute("dominant-baseline", "middle");
-          bracketText.setAttribute("font-size", "12px");
+          bracketText.setAttribute("dominant-baseline", "central");
+          bracketText.setAttribute("font-size", getSVGFontSize(getJumlahFormasi));
           bracketText.setAttribute("font-weight", "bold");
           bracketText.setAttribute("fill", "#333");
           bracketText.setAttribute("font-family", "Arial, sans-serif");
@@ -770,10 +907,10 @@ function convertForeignObjectToSVGText(svgElement) {
 
             const bracketText = document.createElementNS("http://www.w3.org/2000/svg", "text");
             bracketText.setAttribute("x", rightX + rightWidth / 2);
-            bracketText.setAttribute("y", currentRowY + bracketHeight / 2 + 4);
+            bracketText.setAttribute("y", currentRowY + bracketHeight / 2);
             bracketText.setAttribute("text-anchor", "middle");
-            bracketText.setAttribute("dominant-baseline", "middle");
-            bracketText.setAttribute("font-size", "12px");
+            bracketText.setAttribute("dominant-baseline", "central");
+            bracketText.setAttribute("font-size", getSVGFontSize(formationValue));
             bracketText.setAttribute("font-weight", "bold");
             bracketText.setAttribute("fill", "#333");
             bracketText.setAttribute("font-family", "Arial, sans-serif");
@@ -809,7 +946,7 @@ function convertForeignObjectToSVGText(svgElement) {
       const text1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
       text1.setAttribute("x", parseFloat(x) + 10);
       text1.setAttribute("y", parseFloat(y) + 35);
-      text1.setAttribute("font-size", "14px");
+      text1.setAttribute("font-size", getFontSize(name, true));
       text1.setAttribute("font-weight", "bold");
       text1.setAttribute("fill", "#000");
       text1.setAttribute("font-family", "Arial, sans-serif");
@@ -822,7 +959,7 @@ function convertForeignObjectToSVGText(svgElement) {
       const text2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
       text2.setAttribute("x", parseFloat(x) + 10);
       text2.setAttribute("y", parseFloat(y) + 55);
-      text2.setAttribute("font-size", "12px");
+      text2.setAttribute("font-size", getFontSize(position));
       text2.setAttribute("fill", "#555");
       text2.setAttribute("font-family", "Arial, sans-serif");
       text2.setAttribute("pointer-events", "none");
@@ -836,385 +973,353 @@ function convertForeignObjectToSVGText(svgElement) {
   });
 }
 
+function chartExportSVG() {
+  // chart.fit();
+  // make sure the chart is ready before exporting
+  if (chart) {
+    chart.fit();
+  }
+  // Export the SVG after fitting the chart
+  setTimeout(() => {
+    prepareAndExportSVG();
+  }, 2000);
+
+  // change transform class to <g class="chart" transform="translate(100,279.4253393665158) scale(0.2402714932126697)"><g class="center-group" transform=""><g class="links-wrapper"><path class="link" d="
+  applyStaticChartPositioning();
+}
+
 function prepareAndExportSVG() {
   try {
-    const svg = document.querySelector(".osContainerNew svg");
+    const svg = document.querySelector(".chart-container-custom svg");
     if (!svg) {
       console.error("SVG element not found");
       return;
     }
 
-    // Ensure chart is properly centered before export
-    if (chart && chart.fit) {
-      chart.fit();
-    }
+    // just clone the SVG element, so we don't modify the original
+    const clonedSvg = svg.cloneNode(true);
 
-    // Wait a bit for chart to settle after fit
-    setTimeout(() => {
-      // Get the SVG element again after fit
-      const svgAfterFit = document.querySelector(".osContainerNew svg");
-      if (!svgAfterFit) {
-        console.error("SVG element not found after fit");
-        return;
-      }
+    // Remove node button elements before converting to SVG
+    const nodeButtonForeignObjects = clonedSvg.querySelectorAll(".node-button-foreign-object");
+    nodeButtonForeignObjects.forEach((button) => button.remove());
 
-      // Clone the SVG element
-      const clonedSvg = svgAfterFit.cloneNode(true);
+    // Remove paging button elements as well
+    const pagingButtonWrappers = clonedSvg.querySelectorAll(".paging-button-wrapper");
+    pagingButtonWrappers.forEach((button) => button.remove());
 
-      // Remove node button elements before converting to SVG
-      const nodeButtonForeignObjects = clonedSvg.querySelectorAll(".node-button-foreign-object");
-      nodeButtonForeignObjects.forEach((button) => button.remove());
+    convertForeignObjectToSVGText(clonedSvg);
 
-      // Remove paging button elements as well
-      const pagingButtonWrappers = clonedSvg.querySelectorAll(".paging-button-wrapper");
-      pagingButtonWrappers.forEach((button) => button.remove());
+    // Add metadata to help PowerPoint recognize individual nodes
+    clonedSvg.setAttribute("data-org-chart", "true");
+    clonedSvg.setAttribute("data-node-count", clonedSvg.querySelectorAll(".org-chart-node").length);
+    clonedSvg.setAttribute("style", "pointer-events: none; user-select: none;");
+    clonedSvg.setAttribute("data-text-editable", "false");
 
-      convertForeignObjectToSVGText(clonedSvg);
+    // Add specific PowerPoint compatibility attributes
+    clonedSvg.setAttribute("xmlns:ppt", "http://schemas.microsoft.com/office/powerpoint");
+    clonedSvg.setAttribute("ppt:editable", "false");
 
-      // Get current viewBox and dimensions
-      const currentViewBox = clonedSvg.getAttribute("viewBox");
-      const currentWidth = clonedSvg.getAttribute("width");
-      const currentHeight = clonedSvg.getAttribute("height");
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSvg);
+    console.log("SVG String length:", svgString.length);
 
-      console.log(`Current SVG - ViewBox: ${currentViewBox}, Width: ${currentWidth}, Height: ${currentHeight}`);
-
-      // Try to get the bounding box of the main chart group
-      const chartGroup = clonedSvg.querySelector("g");
-      if (chartGroup) {
-        try {
-          // Calculate tight bounding box for the content
-          const padding = 50;
-          let minX = 0,
-            minY = 0,
-            maxX = 800,
-            maxY = 600;
-
-          // Look for all node groups to calculate bounds
-          const nodeGroups = clonedSvg.querySelectorAll("g[data-n-id]");
-          if (nodeGroups.length > 0) {
-            minX = Infinity;
-            minY = Infinity;
-            maxX = -Infinity;
-            maxY = -Infinity;
-
-            nodeGroups.forEach((node) => {
-              const transform = node.getAttribute("transform");
-              if (transform) {
-                const match = transform.match(/translate\(([^,]+),([^)]+)\)/);
-                if (match) {
-                  const x = parseFloat(match[1]);
-                  const y = parseFloat(match[2]);
-                  minX = Math.min(minX, x - 125); // node width/2
-                  minY = Math.min(minY, y - 50); // node height/2
-                  maxX = Math.max(maxX, x + 125);
-                  maxY = Math.max(maxY, y + 50);
-                }
-              }
-            });
-          }
-
-          // Apply padding and center the content
-          const contentWidth = maxX - minX + 2 * padding;
-          const contentHeight = maxY - minY + 2 * padding;
-          const viewBoxX = minX - padding;
-          const viewBoxY = minY - padding;
-
-          // Update SVG attributes for centered export
-          clonedSvg.setAttribute("viewBox", `${viewBoxX} ${viewBoxY} ${contentWidth} ${contentHeight}`);
-          clonedSvg.setAttribute("width", contentWidth);
-          clonedSvg.setAttribute("height", contentHeight);
-
-          console.log(`Adjusted SVG - ViewBox: ${viewBoxX} ${viewBoxY} ${contentWidth} ${contentHeight}`);
-        } catch (bboxError) {
-          console.warn("Could not calculate tight bounding box, using default centering");
-        }
-      }
-
-      // Add metadata to help PowerPoint recognize individual nodes
-      clonedSvg.setAttribute("data-org-chart", "true");
-      clonedSvg.setAttribute("data-node-count", clonedSvg.querySelectorAll(".org-chart-node").length);
-      clonedSvg.setAttribute("style", "pointer-events: none; user-select: none;");
-      clonedSvg.setAttribute("data-text-editable", "false");
-
-      // Add specific PowerPoint compatibility attributes
-      clonedSvg.setAttribute("xmlns:ppt", "http://schemas.microsoft.com/office/powerpoint");
-      clonedSvg.setAttribute("ppt:editable", "false");
-
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(clonedSvg);
-      console.log("SVG String length:", svgString.length);
-
-      const blob = new Blob([svgString], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "org-chart.svg";
-      a.click();
-      URL.revokeObjectURL(url);
-    }, 500); // Wait for chart to settle
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "org-chart.svg";
+    a.click();
+    URL.revokeObjectURL(url);
   } catch (error) {
     console.error("Error in prepareAndExportSVG:", error);
   }
 }
 
-const data = [
-  {
-    id: 1,
-    parentId: null,
-    name: "node1",
-    positionName: "CEO", // Sangat singkat (3 chars) - akan 18px
-    prl: "18",
-    formation: "2000",
-    tags: ["create"],
-    isMergeFormation: false,
-    basket: false,
-  },
-
-  {
-    id: 99,
-    parentId: 1,
-    name: "node2",
-    positionName: "Direktur Teknologi Informasi", // Sedang (28 chars) - akan 12px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 2,
-    parentId: 1,
-    name: "node2",
-    positionName: "Direktur Sumber Daya Manusia dan Pengembangan Organisasi", // Panjang (57 chars) - akan 11px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 999,
-    parentId: 1,
-    name: "node2",
-    positionName: "Direktur Keuangan dan Administrasi Perusahaan serta Pengelolaan Investasi Strategis", // Sangat panjang (83 chars) - akan 10px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 3,
-    parentId: 1,
-    name: "node3",
-    positionName: "Chief Financial Officer untuk Divisi Keuangan Internasional dan Manajemen Risiko Bisnis Global", // Sangat panjang (95 chars) - akan 10px
-    tags: ["delete", "isCoordinator"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 4,
-    parentId: 1,
-    name: "node4",
-    positionName: "Direktur Pemasaran dan Penjualan Regional Asia Pasifik dengan Fokus Pengembangan Pasar Baru asd", // Sangat panjang (92 chars) - akan 10px
-    tags: ["basket_3"],
-    bc_1_prl: "13-14",
-    bc_1_formation: "2",
-    bc_1_positionName: "Manager Senior Pemasaran Digital dan E-Commerce ", // Panjang (78 chars) - akan 10px
-    bc_2_prl: "12-13",
-    bc_2_formation: "2",
-    bc_2_positionName: "Koordinator Penjualan Ritel dan Distribusi Nasional", // Panjang (52 chars) - akan 11px
-    bc_1_flagMergeFormation: "A",
-    bc_2_flagMergeFormation: "B",
-    bc_3_flagMergeFormation: "B",
-    bc_4_flagMergeFormation: "B",
-    bc_1_jumlah_formasi: 2,
-    bc_2_jumlah_formasi: 3,
-    bc_3_jumlah_formasi: 3,
-    bc_4_jumlah_formasi: 3,
-    bc_3_prl: "11-12",
-    bc_3_formation: "2",
-    bc_3_positionName: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (63 chars) - akan 10px
-    bc_4_prl: "11-12",
-    bc_4_formation: "1",
-    bc_4_positionName: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (64 chars) - akan 10px
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: true,
-    basket: true,
-  },
-  {
-    id: 5,
-    parentId: 2,
-    name: "node5",
-    positionName: "Manager Rekrutmen", // Sedang (17 chars) - akan 18px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 16,
-    parentId: 2,
-    name: "node6",
-    positionName: "Manager Pengembangan Talenta dan Pelatihan Karyawan", // Panjang (52 chars) - akan 11px
-    tags: ["dot-dot"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 17,
-    parentId: 2,
-    name: "node7",
-    positionName: "Manager Kompensasi dan Benefit serta Wellness Program untuk Seluruh Karyawan", // Panjang (76 chars) - akan 10px
-    tags: ["dot-dot", "basket_1"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 18,
-    parentId: 2,
-    name: "node7",
-    positionName: "Manajer Hubungan Industrial dan Kepatuhan Regulasi Ketenagakerjaan Pemerintah", // Panjang (78 chars) - akan 10px
-    prl: "18",
-    formation: "2000",
-    tags: ["basket_3"],
-    bc_1_prl: "13-14",
-    bc_1_formation: "2000",
-    bc_1_positionName: "Specialist Hubungan Karyawan dan Penyelesaian Konflik Internal", // Panjang (63 chars) - akan 10px
-    bc_2_prl: "12-13",
-    bc_2_formation: "2000",
-    bc_2_positionName: "Koordinator Kepatuhan Hukum Ketenagakerjaan dan Audit Internal", // Panjang (63 chars) - akan 10px
-    bc_3_prl: "12-13",
-    bc_3_formation: "2000",
-    bc_3_positionName: "Analis Kebijakan SDM dan Prosedur Operasional Standar Perusahaan", // Panjang (66 chars) - akan 10px
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 19,
-    parentId: 2,
-    name: "node5",
-    positionName: "Supervisor Training", // Sedang (19 chars) - akan 18px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 20,
-    parentId: 2,
-    name: "node5",
-    positionName: "Koordinator Program Pengembangan Karir dan Mentoring untuk Karyawan Muda", // Panjang (73 chars) - akan 10px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 6,
-    parentId: 3,
-    name: "node6",
-    positionName: "Manager Audit Internal dan Compliance", // Sedang (38 chars) - akan 12px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 7,
-    parentId: 3,
-    name: "node7",
-    positionName: "Manager Perencanaan Keuangan Strategis dan Analisis Investasi Jangka Panjang untuk Ekspansi Bisnis", // Sangat panjang (100 chars) - akan 10px
-    tags: ["dot-dot", "basket_1"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 8,
-    parentId: 3,
-    name: "node8",
-    positionName: "Manager Treasury dan Cash Management serta Pengelolaan Likuiditas Perusahaan Multinasional", // Sangat panjang (91 chars) - akan 10px
-    prl: "18",
-    formation: "2000",
-    tags: ["basket_2", "isCoordinator"],
-    bc_1_prl: "13-14",
-    bc_1_formation: "2000",
-    bc_1_positionName: "Senior Analyst Manajemen Kas dan Instrumen Keuangan Derivatif", // Panjang (62 chars) - akan 10px
-    bc_2_prl: "12-13",
-    bc_2_formation: "2000",
-    bc_2_positionName: "Specialist Perencanaan Budget dan Forecasting Keuangan Tahunan", // Panjang (63 chars) - akan 10px
-    isMergeFormation: false,
-    basket: false,
-  },
-];
-const dataku = [
-  {
-    id: 1,
-    parentId: null,
-    name: "node1",
-    positionName: "CEO", // Sangat singkat (3 chars) - akan 18px
-    prl: "18",
-    formation: "2000",
-    tags: ["create"],
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 4,
-    parentId: 1,
-    name: "node4",
-    positionName:
-      "Direktur Pemasaran dan Penjualan Strategis Global dengan Tanggung Jawab Internasional yang Sangat Luas",
-    tags: ["basket_3"],
-    bc_1_flagMergeFormation: "B",
-    bc_1_prl: "13-14",
-    bc_1_formation: "2",
-    bc_1_positionName: "Manager Senior Basket Utama dengan Spesialisasi Khusus",
-    bc_1_jumlah_formasi: 4,
-    bc_2_flagMergeFormation: "C",
-    bc_2_prl: "12-13",
-    bc_2_jumlah_formasi: 1,
-    bc_2_formation: "2",
-    bc_2_positionName: "Koordinator Basket Kedua untuk Operasional Harian",
-    bc_3_flagMergeFormation: "A",
-    bc_3_prl: "11-12",
-    bc_3_formation: "1",
-    bc_3_positionName: "Supervisor Basket Ketiga dengan Tanggung Jawab Teknis",
-    bc_3_jumlah_formasi: 1,
-    bc_4_flagMergeFormation: "A",
-    bc_4_prl: "11-12",
-    bc_4_formation: "1",
-    bc_4_positionName: "Analis Basket Keempat untuk Penelitian dan Pengembangan Berkelanjutan",
-    bc_4_jumlah_formasi: 2,
-    bc_5_flagMergeFormation: "A",
-    bc_5_prl: "11-12",
-    bc_5_formation: "1",
-    bc_5_positionName: "Specialist Basket Kelima dengan Fokus pada Inovasi Teknologi Terdepan",
-    bc_5_jumlah_formasi: 2,
-    bc_6_flagMergeFormation: "E",
-    bc_6_prl: "11-12",
-    bc_6_formation: "1",
-    bc_6_positionName: "Konsultan Senior Basket Keenam untuk Strategi Bisnis Jangka Panjang",
-    bc_6_jumlah_formasi: 2,
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: true,
-    basket: true,
-  },
-];
+let chart = null;
+// processedDataResult.processedData.forEach((item) => {
+//   item.id = parseInt(item.id, 10);
+//   item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+// });
+// const data = [
+//   {
+//     id: 1,
+//     parentId: null,
+//     name: "node1",
+//     position: "CEO", // Sangat singkat (3 chars) - akan 18px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["create"],
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 99,
+//     parentId: 1,
+//     name: "node2",
+//     position: "Direktur Teknologi Informasi", // Sedang (28 chars) - akan 12px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 2,
+//     parentId: 1,
+//     name: "node2",
+//     position:
+//       "Direktur Sumber Daya Manusia dan Pengembangan Organisasi", // Panjang (57 chars) - akan 11px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 999,
+//     parentId: 1,
+//     name: "node2",
+//     position:
+//       "Direktur Keuangan dan Administrasi Perusahaan serta Pengelolaan Investasi Strategis", // Sangat panjang (83 chars) - akan 10px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 3,
+//     parentId: 1,
+//     name: "node3",
+//     position:
+//       "Chief Financial Officer untuk Divisi Keuangan Internasional dan Manajemen Risiko Bisnis Global", // Sangat panjang (95 chars) - akan 10px
+//     tags: ["delete", "isCoordinator"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 4,
+//     parentId: 1,
+//     name: "node4",
+//     position:
+//       "Direktur Pemasaran dan Penjualan Regional Asia Pasifik dengan Fokus Pengembangan Pasar Baru asd", // Sangat panjang (92 chars) - akan 10px
+//     tags: ["basket_3"],
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2",
+//     bc_1_position: "Manager Senior Pemasaran Digital dan E-Commerce ", // Panjang (78 chars) - akan 10px
+//     bc_2_prl: "12-13",
+//     bc_2_formation: "2",
+//     bc_2_position:
+//       "Koordinator Penjualan Ritel dan Distribusi Nasional", // Panjang (52 chars) - akan 11px
+//     bc_1_flagMergeFormation: "A",
+//     bc_2_flagMergeFormation: "B",
+//     bc_3_flagMergeFormation: "B",
+//     bc_4_flagMergeFormation: "B",
+//     bc_1_jumlah_formasi: 2,
+//     bc_2_jumlah_formasi: 3,
+//     bc_3_jumlah_formasi: 3,
+//     bc_4_jumlah_formasi: 3,
+//     bc_3_prl: "11-12",
+//     bc_3_formation: "2",
+//     bc_3_position:
+//       "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (63 chars) - akan 10px
+//     bc_4_prl: "11-12",
+//     bc_4_formation: "1",
+//     bc_4_position:
+//       "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (64 chars) - akan 10px
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: true,
+//     basket: true,
+//   },
+//   {
+//     id: 5,
+//     parentId: 2,
+//     name: "node5",
+//     position: "Manager Rekrutmen", // Sedang (17 chars) - akan 18px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 16,
+//     parentId: 2,
+//     name: "node6",
+//     position: "Manager Pengembangan Talenta dan Pelatihan Karyawan", // Panjang (52 chars) - akan 11px
+//     tags: ["dot-dot"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 17,
+//     parentId: 2,
+//     name: "node7",
+//     position:
+//       "Manager Kompensasi dan Benefit serta Wellness Program untuk Seluruh Karyawan", // Panjang (76 chars) - akan 10px
+//     tags: ["dot-dot", "basket_1"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 18,
+//     parentId: 2,
+//     name: "node7",
+//     position:
+//       "Manajer Hubungan Industrial dan Kepatuhan Regulasi Ketenagakerjaan Pemerintah", // Panjang (78 chars) - akan 10px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["basket_3"],
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2000",
+//     bc_1_position:
+//       "Specialist Hubungan Karyawan dan Penyelesaian Konflik Internal", // Panjang (63 chars) - akan 10px
+//     bc_2_prl: "12-13",
+//     bc_2_formation: "2000",
+//     bc_2_position:
+//       "Koordinator Kepatuhan Hukum Ketenagakerjaan dan Audit Internal", // Panjang (63 chars) - akan 10px
+//     bc_3_prl: "12-13",
+//     bc_3_formation: "2000",
+//     bc_3_position:
+//       "Analis Kebijakan SDM dan Prosedur Operasional Standar Perusahaan", // Panjang (66 chars) - akan 10px
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 19,
+//     parentId: 2,
+//     name: "node5",
+//     position: "Supervisor Training", // Sedang (19 chars) - akan 18px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 20,
+//     parentId: 2,
+//     name: "node5",
+//     position:
+//       "Koordinator Program Pengembangan Karir dan Mentoring untuk Karyawan Muda", // Panjang (73 chars) - akan 10px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 6,
+//     parentId: 3,
+//     name: "node6",
+//     position: "Manager Audit Internal dan Compliance", // Sedang (38 chars) - akan 12px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 7,
+//     parentId: 3,
+//     name: "node7",
+//     position:
+//       "Manager Perencanaan Keuangan Strategis dan Analisis Investasi Jangka Panjang untuk Ekspansi Bisnis", // Sangat panjang (100 chars) - akan 10px
+//     tags: ["dot-dot", "basket_1"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 8,
+//     parentId: 3,
+//     name: "node8",
+//     position:
+//       "Manager Treasury dan Cash Management serta Pengelolaan Likuiditas Perusahaan Multinasional", // Sangat panjang (91 chars) - akan 10px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["basket_2", "isCoordinator"],
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2000",
+//     bc_1_position:
+//       "Senior Analyst Manajemen Kas dan Instrumen Keuangan Derivatif", // Panjang (62 chars) - akan 10px
+//     bc_2_prl: "12-13",
+//     bc_2_formation: "2000",
+//     bc_2_position:
+//       "Specialist Perencanaan Budget dan Forecasting Keuangan Tahunan", // Panjang (63 chars) - akan 10px
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+// ];
+// const dataku = [
+//   {
+//     id: 1,
+//     parentId: null,
+//     name: "node1",
+//     position: "CEO", // Sangat singkat (3 chars) - akan 18px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["create"],
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 4,
+//     parentId: 1,
+//     name: "node4",
+//     position:
+//       "Direktur Pemasaran dan Penjualan Strategis Global dengan Tanggung Jawab Internasional yang Sangat Luas",
+//     tags: ["basket_3"],
+//     bc_1_flagMergeFormation: "B",
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2",
+//     bc_1_position:
+//       "Manager Senior Basket Utama dengan Spesialisasi Khusus",
+//     bc_1_jumlah_formasi: 4,
+//     bc_2_flagMergeFormation: "C",
+//     bc_2_prl: "12-13",
+//     bc_2_jumlah_formasi: 1,
+//     bc_2_formation: "2",
+//     bc_2_position:
+//       "Koordinator Basket Kedua untuk Operasional Harian",
+//     bc_3_flagMergeFormation: "A",
+//     bc_3_prl: "11-12",
+//     bc_3_formation: "1",
+//     bc_3_position:
+//       "Supervisor Basket Ketiga dengan Tanggung Jawab Teknis",
+//     bc_3_jumlah_formasi: 1,
+//     bc_4_flagMergeFormation: "A",
+//     bc_4_prl: "11-12",
+//     bc_4_formation: "1",
+//     bc_4_position:
+//       "Analis Basket Keempat untuk Penelitian dan Pengembangan Berkelanjutan",
+//     bc_4_jumlah_formasi: 2,
+//     bc_5_flagMergeFormation: "A",
+//     bc_5_prl: "11-12",
+//     bc_5_formation: "1",
+//     bc_5_position:
+//       "Specialist Basket Kelima dengan Fokus pada Inovasi Teknologi Terdepan",
+//     bc_5_jumlah_formasi: 2,
+//     bc_6_flagMergeFormation: "E",
+//     bc_6_prl: "11-12",
+//     bc_6_formation: "1",
+//     bc_6_position:
+//       "Konsultan Senior Basket Keenam untuk Strategi Bisnis Jangka Panjang",
+//     bc_6_jumlah_formasi: 2,
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: true,
+//     basket: true,
+//   },
+// ];
 
 // Helper function to handle manual expand button clicking
 function handleManualExpandButton(focusNodeId) {
@@ -1327,15 +1432,20 @@ function processChartData(rawData) {
 }
 
 // Function to initialize the organizational chart
-function initializeChart(processedDataResult, focusNodeId, idContainer) {
+function initializeChart(processedDataResult, focusNodeId) {
   console.log("Initializing organizational chart...");
-  console.log("Container selector:", idContainer);
 
-  // Ensure container exists
-  const containerElement = d3.select(idContainer).node();
-  if (!containerElement) {
-    console.error(`Container element '${idContainer}' not found`);
-    return;
+  let isCompact = true;
+  if (focusNodeId) {
+    const selfObject = processedDataResult.processedData.find((item) => item.id == focusNodeId);
+    console.log("Self object for focus node:", selfObject);
+    const lengthRelative = processedDataResult.processedData.filter(
+      (item) => item.parentId === selfObject.parentId
+    ).length;
+
+    if (lengthRelative < 6) {
+      isCompact = false;
+    }
   }
 
   chart = new d3.OrgChart()
@@ -1348,7 +1458,7 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
       }
       return 100;
     })
-    .nodeWidth((d) => 250)
+    .nodeWidth((d) => 300)
     .childrenMargin((d) => 50)
     .compactMarginBetween((d) => 35)
     .compactMarginPair((d) => 30)
@@ -1381,7 +1491,7 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
       const borderDot = d.data.tags.includes("dot-dot") ? "dotted" : "solid";
       const borderStyle = `border:2px ${borderDot} ${colorSelected}`;
 
-      const positionFontSize = getFontSize(d.data.positionName, true);
+      const positionFontSize = getFontSize(d.data.position, true);
       const isBasket = d.data.tags.some((tag) => tag.includes("basket_"));
 
       if (isBasket && !d.data.isMergeFormation) {
@@ -1392,9 +1502,9 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
         let basketRows = "";
         for (let i = 1; i <= basketLevel; i++) {
           const bcPrl = d.data[`bc_${i}_prl`] || d.data.prl;
-          const bcFormation = d.data[`bc_${i}_formation`] || d.data.formation;
-          const bcPositionName = d.data[`bc_${i}_positionName`] || `Basket ${i}`;
-          const basketNameFontSize = getFontSize(bcPositionName);
+          const bcFormation = d.data[`bc_${i}_formation`] || d.data.jumlah_formasi;
+          const bcposition = d.data[`bc_${i}_position`] || `Basket ${i}`;
+          const basketNameFontSize = getBasketNonMergeHeaderFontSize(bcposition);
           const prlFontSize = getFontSize(bcPrl);
           const formationFontSize = getFontSize(bcFormation);
 
@@ -1402,7 +1512,7 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;${
                     i < basketLevel ? `border-bottom:2px ${borderDot} ${colorSelected};` : ""
                   }">
-                    <div style="flex:1.8;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;word-wrap:break-word;padding:2px;">${bcPositionName}</div>
+                    <div style="flex:1.8;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;word-wrap:break-word;padding:2px;">${bcposition}</div>
                     <div style="flex:0.6;font-size:${prlFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-left:2px ${borderDot} ${colorSelected};overflow:hidden;padding:2px;">${bcPrl}</div>
                     <div style="flex:0.6;font-size:${formationFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-left:2px ${borderDot} ${colorSelected};overflow:hidden;padding:2px;">${bcFormation}</div>
                   </div>
@@ -1412,7 +1522,7 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
         return `
                 <div id="basket-non-merge-node" style="width:${d.width}px;height:${d.height}px;display:flex;flex-direction:column;${borderStyle};background-color:white;">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:2px ${borderDot} ${colorSelected};overflow:hidden;">
-                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.positionName}</div>
+                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.position}</div>
                   </div>
                   ${basketRows}
                 </div>
@@ -1428,21 +1538,17 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
         // Generate bracket divs
         let bracketDivs = "";
         for (const bracket of bracketSplitted) {
-          console.log(`Processing bracket: ${bracket} for basket level ${basketLevel}`);
-          // contoh jika bracket = "3(2)"
-          // maka getJumlahFormasi = 2
-          // dan count = 3
           const matchResult = bracket.match(/(\d+)\((\d+)\)/) || [];
           const count = matchResult[1]; // ambil group pertama (angka sebelum kurung)
           const jumlahFormasiRaw = matchResult[2]; // ambil group kedua (angka dalam kurung)
-          console.log(`Bracket count: ${count}, jumlahFormasiRaw: ${jumlahFormasiRaw}`);
           const getJumlahFormasi = jumlahFormasiRaw || "1";
           const heightPerBracket = (count ? parseInt(count) : 1) * 50;
+          const bracketFontSize = getFontSize(getJumlahFormasi);
 
           bracketDivs += `
                   <div style="border-bottom:1px solid black;width:100%;height:${heightPerBracket}px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <div style="width:100%;height:${heightPerBracket}px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                      <div style="font-size:12px;color:#333;text-align:center;font-weight:bold;padding:2px;overflow:hidden;">${getJumlahFormasi}</div>
+                      <div style="font-size:${bracketFontSize};color:#333;text-align:center;font-weight:bold;padding:2px;overflow:hidden;">${getJumlahFormasi}</div>
                     </div>
                   </div>
                 `;
@@ -1452,14 +1558,14 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
         let basketRows = "";
         for (let i = 1; i <= basketLevel; i++) {
           const bcPrl = d.data[`bc_${i}_prl`] || d.data.prl;
-          const bcPositionName = d.data[`bc_${i}_positionName`] || `Basket ${i}`;
-          const basketNameFontSize = getFontSize(bcPositionName);
+          const bcposition = d.data[`bc_${i}_position`] || `Basket ${i}`;
+          const basketNameFontSize = getFontSize(bcposition);
           const prlFontSize = getFontSize(bcPrl);
 
           basketRows += `
                   <div class="position-prl-class" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid black;overflow:hidden;">
-                    <div style="width:70%;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-right:1px solid black;overflow:hidden;word-wrap:break-word;padding:2px;">${bcPositionName}</div>
-                    <div style="width:30%;font-size:${prlFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;padding:2px;">${bcPrl}</div>
+                    <div style="width:80%;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-right:1px solid black;overflow:hidden;word-wrap:break-word;padding:2px;">${bcposition}</div>
+                    <div style="width:20%;font-size:${prlFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;padding:2px;">${bcPrl}</div>
                   </div>
                 `;
         }
@@ -1471,15 +1577,17 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
           d.height
         }px;display:flex;flex-direction:column;${borderStyle};background-color:white;">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px ${borderDot} ${colorSelected};overflow:hidden;">
-                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${
-          d.data.positionName
+                    <div style="font-size:${getBasketMergeHeaderFontSize(
+                      d.data.position
+                    )};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${
+          d.data.position
         }</div>
                   </div>
                   <div style="display:flex;flex-direction:row;align-items:stretch;">
-                    <div style="width:80%;display:flex;flex-direction:column;">
+                    <div style="width:85%;display:flex;flex-direction:column;">
                       ${basketRows}
                     </div>
-                    <div style="width:20%;display:flex;flex-direction:column;border-left:1px solid black;">
+                    <div style="width:15%;display:flex;flex-direction:column;border-left:1px solid black;">
                       ${bracketDivs}
                     </div>
                   </div>
@@ -1488,71 +1596,161 @@ function initializeChart(processedDataResult, focusNodeId, idContainer) {
       } else {
         // ========= NON-BASKET NODE =========
         const prlFontSize = getFontSize(d.data.prl);
-        const formationFontSize = getFontSize(d.data.formation);
+        const formationFontSize = getFontSize(d.data.jumlah_formasi);
 
         return `
                 <div id="non-basket-node" style="width:${d.width}px;height:${d.height}px;display:flex;${borderStyle};background-color:white;">
-                  <div class="node-content" style="flex:1.8;height:100%;border-right:2px ${borderDot} ${colorSelected};display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.positionName}</div>
+                  <div class="node-content" style="flex:2;height:100%;border-right:2px ${borderDot} ${colorSelected};display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.position}</div>
                   </div>
-                  <div style="flex:0.7;height:100%;display:flex;flex-direction:column;">
+                  <div style="flex:0.5;height:100%;display:flex;flex-direction:column;">
                     <div class="node-content" style="width:100%;flex:1;border-bottom:2px ${borderDot} ${colorSelected};display:flex;align-items:center;justify-content:center;overflow:hidden;">
                       <div style="font-size:${prlFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;">${d.data.prl}</div>
                     </div>
                     <div class="node-content" style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                      <div style="font-size:${formationFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;">${d.data.formation}</div>
+                      <div style="font-size:${formationFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;">${d.data.jumlah_formasi}</div>
                     </div>
                   </div>
                 </div>
               `;
       }
     })
-    .container(".osContainerNew")
+    .container(".chart-container-custom")
     .data(processedDataResult.processedData)
-    .compact(false)
-    .initialZoom(0.8)
-    .svgWidth(1200)
-    .svgHeight(800)
+    .compact(isCompact)
     .render()
     .fit();
 
   console.log("Chart initialized successfully");
 
-  // Ensure chart is properly scaled and centered after render
-  setTimeout(() => {
-    if (chart && chart.fit) {
-      chart.fit();
-      console.log("Chart re-fitted and centered after initialization");
-    }
-  }, 300);
+  // Simple approach - let the library handle centering naturally
+  console.log("Chart ready with natural centering");
 
   // Auto-expand node if focusNodeId is provided
   if (focusNodeId) {
-    setTimeout(() => {
-      handleNodeExpansion(focusNodeId);
-      // Fit again after expansion
-      setTimeout(() => {
-        if (chart && chart.fit) {
-          chart.fit();
-          console.log("Chart fitted after node expansion");
-        }
-      }, 200);
-    }, 1000); // Wait 1 second for chart to fully render
+    const findChildren = processedDataResult.processedData.find((item) => item.parentId == focusNodeId);
+    console.log(`Auto-expanding node with ID ${findChildren}`);
+    setTimeout(() => handleNodeExpansion(findChildren.id), 500); // Wait 2 seconds for chart to fully render
+    if (findChildren) {
+    }
   } else {
     console.log("No focusNodeId provided, skipping auto-expand");
   }
+
+  const chartContainer = document.querySelector(".chart-container-custom");
+  if (chartContainer) {
+    const chartGroup = chartContainer.querySelector("g.chart");
+    if (chartGroup) {
+      // Wait 3 seconds before applying static centering
+      setTimeout(() => {
+        chartGroup.classList.remove("transform");
+        chartGroup.setAttribute("transform", "translate(450,-100) scale(0.6)");
+      }, 2000);
+    }
+  }
+}
+
+// Simplified approach - no complex method override
+
+// Function to override library centering with CSS-based centering (simplified)
+function overrideLibraryCentering() {
+  console.log("Simple centering applied");
+}
+
+// Function to apply simple static centering (simplified approach)
+function applyStaticCentering() {
+  console.log("Simple static centering applied");
+}
+
+// Function to setup continuous monitoring of chart positioning
+function setupCenteringMonitor() {
+  const containerElement = document.querySelector(".chart-container-custom");
+
+  if (!containerElement) {
+    console.log("Container not found, retrying in 500ms...");
+    setTimeout(setupCenteringMonitor, 500);
+    return;
+  }
+
+  // First, override the library's centering method
+  overrideLibraryCenteringMethod();
+
+  // Create a MutationObserver to watch for changes
+  const observer = new MutationObserver((mutations) => {
+    let needsOverride = false;
+
+    mutations.forEach((mutation) => {
+      // Check if any transform attributes or styles changed
+      if (
+        mutation.type === "attributes" &&
+        (mutation.attributeName === "transform" || mutation.attributeName === "style")
+      ) {
+        needsOverride = true;
+      }
+
+      // Check if new nodes were added (like when chart re-renders)
+      if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+        needsOverride = true;
+      }
+    });
+
+    if (needsOverride) {
+      // Apply our override after a small delay to ensure library changes are complete
+      setTimeout(() => {
+        overrideLibraryCentering();
+        console.log("Auto-override applied due to DOM changes");
+      }, 50);
+    }
+  });
+
+  // Start observing the container and all its children
+  observer.observe(containerElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["transform", "style"],
+    attributeOldValue: true,
+  });
+
+  console.log("Centering monitor setup complete");
+
+  // Also apply initial override
+  overrideLibraryCentering();
 }
 
 // Main function to initialize the entire chart system
+function initializeChartSystem(dataObject) {
+  console.log("Starting chart system initialization...");
 
-function updateDataChart() {
+  // Step 1: Process the raw data
+  const processedDataResult = processChartData(dataObject);
+  processedDataResult.processedData.forEach((item) => {
+    item.id = parseInt(item.id, 10);
+    // item.parentId = null; // Ensure parentId is a number or null
+    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+  });
+  console.log("Data processing result:", processedDataResult, "items processed");
+  // return;
+
+  // Step 2: Initialize chart with processed data
+  initializeChart(processedDataResult);
+
+  console.log("Chart system initialization completed");
+}
+
+function updateDataChart(dataObject, nodeId) {
   console.log("Updating chart data...");
 
   // Process the new data
-  const processedDataResult = processChartData(dataku);
+  const processedDataResult = processChartData(dataObject);
+  processedDataResult.processedData.forEach((item) => {
+    item.id = parseInt(item.id, 10);
+    // item.parentId = null; // Ensure parentId is a number or null
+    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+  });
 
   // Reinitialize the chart with the new data
-  initializeChart(processedDataResult);
+  initializeChart(processedDataResult, nodeId);
 
   // Fit the chart to view after update
   if (chart) {
@@ -1571,7 +1769,7 @@ function updateDataChart() {
 //   initializeChartSystem();
 
 //   // Add click event listener using event delegation for node info
-//   $(".chart-container").on("click", "foreignObject", function (e) {
+//   $(".chart-container-custom").on("click", "foreignObject", function (e) {
 //     // Check if the click is on the node content area, not on expand/collapse buttons
 //     const clickTarget = $(e.target);
 
@@ -1595,7 +1793,7 @@ function updateDataChart() {
 //       alertMessage += `ID: ${data.id}\n`;
 //       alertMessage += `Parent ID: ${data.parentId || "Root"}\n`;
 //       alertMessage += `Name: ${data.name}\n`;
-//       alertMessage += `Position: ${data.positionName}\n`;
+//       alertMessage += `Position: ${data.position}\n`;
 //       alertMessage += `PRL: ${data.prl}\n`;
 //       alertMessage += `Formation: ${data.formation}\n`;
 //       alertMessage += `Tags: ${data.tags.join(", ")}\n`;
@@ -1617,3 +1815,4 @@ function updateDataChart() {
 //     }
 //   });
 // });
+//

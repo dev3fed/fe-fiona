@@ -3,280 +3,77 @@ async function initializeHelper(data) {
     //
   }
 
-  // Show loading on osContainer
-  // const osContainer = document.getElementById("osContainer");
-  // if (!osContainer) {
-  //   console.error("osContainer element not found");
-  //   return;
-  // }
+  // Show loading before starting chart initialization
+  if (typeof showChartLoading === "function") {
+  } else {
+    // Fallback loading for legacy support
+    const osContainer = document.getElementById("osContainer");
+    if (osContainer) {
+      osContainer.innerHTML = `
+      <div style="display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column;">
+      <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
+      <p style="margin-top: 10px; color: #666;">Loading chart...</p>
+      </div>
+      <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+        }
+        </style>
+        `;
+    }
+  }
 
-  // // Use the new loading function if available
-  // if (typeof showChartLoading === "function") {
-  //   showChartLoading("osContainer");
-  // } else {
-  //   // Fallback loading
-  //   osContainer.innerHTML = `
-  //     <div style="display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column;">
-  //       <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
-  //       <p style="margin-top: 10px; color: #666;">Loading chart...</p>
-  //     </div>
-  //     <style>
-  //       @keyframes spin {
-  //         0% { transform: rotate(0deg); }
-  //         100% { transform: rotate(360deg); }
-  //       }
-  //     </style>
-  //   `;
-  // }
+  showChartLoading("chart-container-custom");
+  try {
+    const dataChart = await chartShow({
+      draftId: organizationAttribute.orgUnitId,
+      jobCode: "10132406",
+      depth: 5,
+    });
 
-  const data1 = [
-    {
-      id: 1,
-      parentId: null,
-      name: "node1",
-      position: "CEO", // Sangat singkat (3 chars) - akan 18px
-      prl: "18",
-      jumlah_formasi: "2000",
-      tags: ["create"],
-      isMergeFormation: false,
-      basket: false,
-    },
+    if (!dataChart.data) {
+      dataChart.data = [];
+    }
+    dataChart.data.forEach((item) => {
+      item.id = item.id_org_unit;
+    });
 
-    {
-      id: 99,
-      parentId: 1,
-      name: "node2",
-      position: "Direktur Teknologi Informasi", // Sedang (28 chars) - akan 12px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 2,
-      parentId: 1,
-      name: "node2",
-      position: "Direktur Sumber Daya Manusia dan Pengembangan Organisasi", // Panjang (57 chars) - akan 11px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 999,
-      parentId: 1,
-      name: "node2",
-      position: "Direktur Keuangan dan Administrasi Perusahaan serta Pengelolaan Investasi Strategis", // Sangat panjang (83 chars) - akan 10px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 3,
-      parentId: 1,
-      name: "node3",
-      position: "Chief Financial Officer untuk Divisi Keuangan Internasional dan Manajemen Risiko Bisnis Global", // Sangat panjang (95 chars) - akan 10px
-      tags: ["delete", "isCoordinator"],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 4,
-      parentId: 1,
-      name: "node4",
-      position: "Direktur Pemasaran dan Penjualan Regional Asia Pasifik dengan Fokus Pengembangan Pasar Baru asd", // Sangat panjang (92 chars) - akan 10px
-      tags: ["basket_3"],
-      bc_1_prl: "13-14",
-      bc_1_formation: "2",
-      bc_1_position: "Manager Senior Pemasaran Digital dan E-Commerce ", // Panjang (78 chars) - akan 10px
-      bc_2_prl: "12-13",
-      bc_2_formation: "2",
-      bc_2_position: "Koordinator Penjualan Ritel dan Distribusi Nasional", // Panjang (52 chars) - akan 11px
-      bc_1_flagMergeFormation: "A",
-      bc_2_flagMergeFormation: "B",
-      bc_3_flagMergeFormation: "B",
-      bc_4_flagMergeFormation: "B",
-      bc_1_jumlah_formasi: 2,
-      bc_2_jumlah_formasi: 3,
-      bc_3_jumlah_formasi: 3,
-      bc_4_jumlah_formasi: 3,
-      bc_3_prl: "11-12",
-      bc_3_formation: "2",
-      bc_3_position: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (63 chars) - akan 10px
-      bc_4_prl: "11-12",
-      bc_4_formation: "1",
-      bc_4_position: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (64 chars) - akan 10px
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: true,
-      basket: true,
-    },
-    {
-      id: 5,
-      parentId: 2,
-      name: "node5",
-      position: "Manager Rekrutmen", // Sedang (17 chars) - akan 18px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 16,
-      parentId: 2,
-      name: "node6",
-      position: "Manager Pengembangan Talenta dan Pelatihan Karyawan", // Panjang (52 chars) - akan 11px
-      tags: ["dot-dot"],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 17,
-      parentId: 2,
-      name: "node7",
-      position: "Manager Kompensasi dan Benefit serta Wellness Program untuk Seluruh Karyawan", // Panjang (76 chars) - akan 10px
-      tags: ["dot-dot", "basket_1"],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 18,
-      parentId: 2,
-      name: "node7",
-      position: "Manajer Hubungan Industrial dan Kepatuhan Regulasi Ketenagakerjaan Pemerintah", // Panjang (78 chars) - akan 10px
-      prl: "18",
-      jumlah_formasi: "2000",
-      tags: ["basket_3"],
-      bc_1_prl: "13-14",
-      bc_1_formation: "2000",
-      bc_1_position: "Specialist Hubungan Karyawan dan Penyelesaian Konflik Internal", // Panjang (63 chars) - akan 10px
-      bc_2_prl: "12-13",
-      bc_2_formation: "2000",
-      bc_2_position: "Koordinator Kepatuhan Hukum Ketenagakerjaan dan Audit Internal", // Panjang (63 chars) - akan 10px
-      bc_3_prl: "12-13",
-      bc_3_formation: "2000",
-      bc_3_position: "Analis Kebijakan SDM dan Prosedur Operasional Standar Perusahaan", // Panjang (66 chars) - akan 10px
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 19,
-      parentId: 2,
-      name: "node5",
-      position: "Supervisor Training", // Sedang (19 chars) - akan 18px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 20,
-      parentId: 2,
-      name: "node5",
-      position: "Koordinator Program Pengembangan Karir dan Mentoring untuk Karyawan Muda", // Panjang (73 chars) - akan 10px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 6,
-      parentId: 3,
-      name: "node6",
-      position: "Manager Audit Internal dan Compliance", // Sedang (38 chars) - akan 12px
-      tags: [],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 7,
-      parentId: 3,
-      name: "node7",
-      position: "Manager Perencanaan Keuangan Strategis dan Analisis Investasi Jangka Panjang untuk Ekspansi Bisnis", // Sangat panjang (100 chars) - akan 10px
-      tags: ["dot-dot", "basket_1"],
-      prl: "18",
-      jumlah_formasi: "2000",
-      isMergeFormation: false,
-      basket: false,
-    },
-    {
-      id: 8,
-      parentId: 3,
-      name: "node8",
-      position: "Manager Treasury dan Cash Management serta Pengelolaan Likuiditas Perusahaan Multinasional", // Sangat panjang (91 chars) - akan 10px
-      prl: "18",
-      jumlah_formasi: "2000",
-      tags: ["basket_2", "isCoordinator"],
-      bc_1_prl: "13-14",
-      bc_1_formation: "2000",
-      bc_1_position: "Senior Analyst Manajemen Kas dan Instrumen Keuangan Derivatif", // Panjang (62 chars) - akan 10px
-      bc_2_prl: "12-13",
-      bc_2_formation: "2000",
-      bc_2_position: "Specialist Perencanaan Budget dan Forecasting Keuangan Tahunan", // Panjang (63 chars) - akan 10px
-      isMergeFormation: false,
-      basket: false,
-    },
-  ];
+    const self = dataChart.data.find((item) => item.id == "10132406");
+    const parent = dataChart.data.find((item) => item.id == self.pid);
+    dataChart.data = dataChart.data.filter((item) => item.id != self.pid);
+    if (parent) {
+      parent.pid = null;
+    }
+    dataChart.data.unshift(parent);
 
-  const dataSelected = [dataMaster[0]];
-  initializeChartSystemNew(dataMaster);
-  // initializeChartSystemNew(dataMaster);
-  // Wait for DOM to be ready and initialize chart
-  // setTimeout(async () => {
-  //   console.log("Initializing chart system...");
-  //   try {
-  //     if (typeof initializeChartSystem === "function" && typeof dataObjectChartBaru !== "undefined") {
-  //       await initializeChartSystem(dataObjectChartBaru, "osContainer");
-  //       console.log("Chart initialization completed successfully");
+    initializeChartSystem(dataChart.data);
 
-  //       // Hide loading after successful initialization
-  //       if (typeof hideChartLoading === "function") {
-  //         hideChartLoading("osContainer");
-  //       }
-  //     } else {
-  //       console.error("Dependencies not available, using fallback data");
-  //       // Fallback to default data if available
-  //       if (typeof data !== "undefined") {
-  //         await initializeChartSystem(data, "osContainer");
-  //         console.log("Chart initialization completed with fallback data");
+    // testing dataMaster
+    // initializeChartSystem(dataMaster);
 
-  //         // Hide loading after successful fallback initialization
-  //         if (typeof hideChartLoading === "function") {
-  //           hideChartLoading("osContainer");
-  //         }
-  //       } else {
-  //         throw new Error("No data available for chart initialization");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Chart initialization failed:", error);
-  //     osContainer.innerHTML =
-  //       '<div style="text-align: center; padding: 20px; color: #999;">Chart initialization failed</div>';
-  //   }
-  // }, 500);
+    // Wait for chart to complete rendering before hiding loading
+    setTimeout(() => {
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
+      console.log("Chart initialization and loading completed");
+    }, 1500); // Wait 1.5 seconds for chart to fully render
+  } catch (error) {
+    console.error("Error in initializeHelper:", error);
 
-  // helperOrgTree(dataChart.data);
-  // helperOrgChart(true, "osContainer", dataMaster, true);
+    // Hide loading and show error message on failure
+    if (typeof hideChartLoading === "function") {
+      hideChartLoading("chart-container-custom");
+    }
 
-  // helperOrgChart(true, "osContainer", asik2, true);
-  // helperOrgChartTester(true, "osContainer", test, true);
-  // helperDatePicker();
-  // helperOrgChart(true, "osContainer", test, true);
+    // Show error message in chart container
+    const container = document.querySelector(".chart-container-custom") || document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed. Please try again.</div>';
+    }
+  }
 }
 
 function updateDataList(orgUnitId, orgUnitName) {
@@ -299,6 +96,27 @@ $("#searchOrgNode").on("change", function () {
   //   searchValue = "10132406"; // hardcode for testing
   // }
   focusNode(searchValue);
+});
+
+$(".chart-container-custom").on("click", "foreignObject", async function (e) {
+  const clickTarget = $(e.target);
+
+  // Skip if clicking on expand/collapse buttons or their children
+  if (
+    clickTarget.closest(".node-button-foreign-object").length > 0 ||
+    clickTarget.closest('[class*="button"]').length > 0
+  ) {
+    return; // Let the expand/collapse functionality work normally
+  }
+
+  e.stopPropagation();
+
+  // Get the node data from the __data__ property
+  const nodeData = this.__data__;
+  if (nodeData && nodeData.data) {
+    const data = nodeData.data;
+    await modalJobPopup(data.id);
+  }
 });
 
 function changeOrganization(value, text) {
@@ -1013,7 +831,6 @@ $("#continueButton").click(async function () {
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
   changeOrganization(saveDraft.data.draftId, saveDraft.data.draftName);
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
-  loader(false);
   swal("Success", `Draft ${draftName} has been created`, "success");
 });
 
@@ -1074,20 +891,15 @@ $("#selectDraftOrganization").change(async function () {
   //         : [],
   //   },
   // ]);
-
-  loader(true);
-  // wait 1s for update data
-  setTimeout(() => {
-    loader(false);
-  }, 1000);
 });
 
 $(document).ready(async function () {
+  loader(false);
+
   const getDataDraft = await chartDraftList();
   const getDataApproval = await approvedList();
   storeData.listDraft = getDataDraft.data;
   await checkDataOrganization(storeData.listDraft);
-  loader(false);
 
   // initialize table
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
@@ -1133,8 +945,4 @@ $(document).ready(async function () {
       $(linkTab).tab("show");
     }, 2000);
   }
-
-  setTimeout(() => {
-    // initializeChartSystemNew(dataMaster);
-  }, 2000);
 });
