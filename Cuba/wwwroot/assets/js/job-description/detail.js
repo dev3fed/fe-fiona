@@ -258,7 +258,7 @@ $(document).ready(async function () {
       ["para", ["ul", "ol", "paragraph"]],
     ],
   });
-  $(".summernote").summernote("enable");
+  $(".summernote").summernote("disable");
   $(".summernote").summernote("code", fungsiJabatan.deskripsi);
 
   let tugasTanggungJawabUmum;
