@@ -1933,21 +1933,36 @@ async function focusNode(nodeId) {
       item.id = item.id_org_unit;
     });
 
-    setTimeout(async () => {
-      try {
-        await helperOrgChart(true, "osContainer", dataChart.data, true, { expand: true, nodeId: nodeId });
-        console.log("Chart focus completed successfully");
-      } catch (error) {
-        console.error("Error rendering chart:", error);
-        const container = document.getElementById("osContainer");
-        if (container) {
-          container.innerHTML =
-            '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed</div>';
-        }
-      } finally {
-        hideChartLoading("osContainer");
-      }
-    }, 500);
+    // find parent node and make the id null
+    const self = dataChart.data.find((item) => item.id == nodeId);
+    const parent = dataChart.data.find((item) => item.id == self.pid);
+    // take out parent node from dataChart.data
+    dataChart.data = dataChart.data.filter((item) => item.id != self.pid);
+    if (parent) {
+      parent.pid = null;
+    }
+    console.log("parent", parent);
+    console.log("dataChart", dataChart.data);
+    // insert parent node to the first index of dataChart.data
+    dataChart.data.unshift(parent);
+    updateDataChart(dataChart.data);
+    // find all children node and make the pid null
+
+    // setTimeout(async () => {
+    //   try {
+    //     await helperOrgChart(true, "osContainer", dataChart.data, true, { expand: true, nodeId: nodeId });
+    //     console.log("Chart focus completed successfully");
+    //   } catch (error) {
+    //     console.error("Error rendering chart:", error);
+    //     const container = document.getElementById("osContainer");
+    //     if (container) {
+    //       container.innerHTML =
+    //         '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed</div>';
+    //     }
+    //   } finally {
+    //     hideChartLoading("osContainer");
+    //   }
+    // }, 500);
   } catch (error) {
     console.error("Error in focusNode:", error);
     const container = document.getElementById("osContainer");

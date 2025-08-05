@@ -50,7 +50,6 @@ function createStyledSVGRect(x, y, width, height, options = {}) {
   if (options.rx) rect.setAttribute("rx", options.rx);
   return rect;
 }
-
 function downloadPdf(chart) {
   chart.exportImg({
     save: false,
@@ -586,38 +585,38 @@ function convertForeignObjectToSVGText(svgElement) {
         group.appendChild(leftRect);
 
         // Position Name (70% of left section)
-        const positionNameWidth = leftWidth * 0.7;
-        const positionNameRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        positionNameRect.setAttribute("x", x);
-        positionNameRect.setAttribute("y", currentY);
-        positionNameRect.setAttribute("width", positionNameWidth);
-        positionNameRect.setAttribute("height", rowHeight);
-        positionNameRect.setAttribute("fill", "none");
-        positionNameRect.setAttribute("stroke", "black");
-        positionNameRect.setAttribute("stroke-width", "1");
-        positionNameRect.setAttribute("stroke-dasharray", "none");
-        group.appendChild(positionNameRect);
+        const positionWidth = leftWidth * 0.7;
+        const positionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        positionRect.setAttribute("x", x);
+        positionRect.setAttribute("y", currentY);
+        positionRect.setAttribute("width", positionWidth);
+        positionRect.setAttribute("height", rowHeight);
+        positionRect.setAttribute("fill", "none");
+        positionRect.setAttribute("stroke", "black");
+        positionRect.setAttribute("stroke-width", "1");
+        positionRect.setAttribute("stroke-dasharray", "none");
+        group.appendChild(positionRect);
 
-        const positionNameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        positionNameText.setAttribute("x", parseFloat(x) + positionNameWidth / 2);
-        positionNameText.setAttribute("y", currentY + rowHeight / 2 + 4);
-        positionNameText.setAttribute("text-anchor", "middle");
-        positionNameText.setAttribute("dominant-baseline", "middle");
-        positionNameText.setAttribute("font-size", getFontSize(basketName));
-        positionNameText.setAttribute("font-weight", "bold");
-        positionNameText.setAttribute("fill", "#666");
-        positionNameText.setAttribute("font-family", "Arial, sans-serif");
-        positionNameText.setAttribute("pointer-events", "none");
-        positionNameText.setAttribute("user-select", "none");
-        positionNameText.setAttribute("contenteditable", "false");
+        const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        positionText.setAttribute("x", parseFloat(x) + positionWidth / 2);
+        positionText.setAttribute("y", currentY + rowHeight / 2 + 4);
+        positionText.setAttribute("text-anchor", "middle");
+        positionText.setAttribute("dominant-baseline", "middle");
+        positionText.setAttribute("font-size", getFontSize(basketName));
+        positionText.setAttribute("font-weight", "bold");
+        positionText.setAttribute("fill", "#666");
+        positionText.setAttribute("font-family", "Arial, sans-serif");
+        positionText.setAttribute("pointer-events", "none");
+        positionText.setAttribute("user-select", "none");
+        positionText.setAttribute("contenteditable", "false");
 
         // Apply text wrapping for basket name in merge
-        wrapSVGText(positionNameText, basketName, positionNameWidth - 10, getFontSize(basketName));
-        group.appendChild(positionNameText);
+        wrapSVGText(positionText, basketName, positionWidth - 10, getFontSize(basketName));
+        group.appendChild(positionText);
 
         // PRL (30% of left section)
-        const formationX = parseFloat(x) + positionNameWidth;
-        const formationWidth = leftWidth - positionNameWidth;
+        const formationX = parseFloat(x) + positionWidth;
+        const formationWidth = leftWidth - positionWidth;
         const formationRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         formationRect.setAttribute("x", formationX);
         formationRect.setAttribute("y", currentY);
@@ -795,9 +794,34 @@ function convertForeignObjectToSVGText(svgElement) {
   });
 }
 
+function changeBackChartFit() {
+  // chart.fit();
+  // make sure the chart is ready before exporting
+  if (chart) {
+    chart.fit();
+  }
+  // Export the SVG after fitting the chart
+  setTimeout(() => {
+    prepareAndExportSVG();
+  }, 2000);
+
+  // change transform class to <g class="chart" transform="translate(100,279.4253393665158) scale(0.2402714932126697)"><g class="center-group" transform=""><g class="links-wrapper"><path class="link" d="
+  const chartContainer = document.querySelector(".chart-container-custom");
+  if (chartContainer) {
+    const chartGroup = chartContainer.querySelector("g.chart");
+    if (chartGroup) {
+      // Wait 3 seconds before applying static centering
+      setTimeout(() => {
+        chartGroup.classList.remove("transform");
+        chartGroup.setAttribute("transform", "translate(450,-100) scale(0.6)");
+      }, 3000);
+    }
+  }
+}
+
 function prepareAndExportSVG() {
   try {
-    const svg = document.querySelector(".chart-container svg");
+    const svg = document.querySelector(".chart-container-custom svg");
     if (!svg) {
       console.error("SVG element not found");
       return;
@@ -843,263 +867,290 @@ function prepareAndExportSVG() {
 }
 
 let chart = null;
-const data = [
-  {
-    id: 1,
-    parentId: null,
-    name: "node1",
-    position: "CEO", // Sangat singkat (3 chars) - akan 18px
-    prl: "18",
-    formation: "2000",
-    tags: ["create"],
-    isMergeFormation: false,
-    basket: false,
-  },
-
-  {
-    id: 99,
-    parentId: 1,
-    name: "node2",
-    position: "Direktur Teknologi Informasi", // Sedang (28 chars) - akan 12px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 2,
-    parentId: 1,
-    name: "node2",
-    position: "Direktur Sumber Daya Manusia dan Pengembangan Organisasi", // Panjang (57 chars) - akan 11px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 999,
-    parentId: 1,
-    name: "node2",
-    position: "Direktur Keuangan dan Administrasi Perusahaan serta Pengelolaan Investasi Strategis", // Sangat panjang (83 chars) - akan 10px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 3,
-    parentId: 1,
-    name: "node3",
-    position: "Chief Financial Officer untuk Divisi Keuangan Internasional dan Manajemen Risiko Bisnis Global", // Sangat panjang (95 chars) - akan 10px
-    tags: ["delete", "isCoordinator"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 4,
-    parentId: 1,
-    name: "node4",
-    position: "Direktur Pemasaran dan Penjualan Regional Asia Pasifik dengan Fokus Pengembangan Pasar Baru asd", // Sangat panjang (92 chars) - akan 10px
-    tags: ["basket_3"],
-    bc_1_prl: "13-14",
-    bc_1_formation: "2",
-    bc_1_position: "Manager Senior Pemasaran Digital dan E-Commerce ", // Panjang (78 chars) - akan 10px
-    bc_2_prl: "12-13",
-    bc_2_formation: "2",
-    bc_2_position: "Koordinator Penjualan Ritel dan Distribusi Nasional", // Panjang (52 chars) - akan 11px
-    bc_1_flagMergeFormation: "A",
-    bc_2_flagMergeFormation: "B",
-    bc_3_flagMergeFormation: "B",
-    bc_4_flagMergeFormation: "B",
-    bc_1_jumlah_formasi: 2,
-    bc_2_jumlah_formasi: 3,
-    bc_3_jumlah_formasi: 3,
-    bc_4_jumlah_formasi: 3,
-    bc_3_prl: "11-12",
-    bc_3_formation: "2",
-    bc_3_position: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (63 chars) - akan 10px
-    bc_4_prl: "11-12",
-    bc_4_formation: "1",
-    bc_4_position: "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (64 chars) - akan 10px
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: true,
-    basket: true,
-  },
-  {
-    id: 5,
-    parentId: 2,
-    name: "node5",
-    position: "Manager Rekrutmen", // Sedang (17 chars) - akan 18px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 16,
-    parentId: 2,
-    name: "node6",
-    position: "Manager Pengembangan Talenta dan Pelatihan Karyawan", // Panjang (52 chars) - akan 11px
-    tags: ["dot-dot"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 17,
-    parentId: 2,
-    name: "node7",
-    position: "Manager Kompensasi dan Benefit serta Wellness Program untuk Seluruh Karyawan", // Panjang (76 chars) - akan 10px
-    tags: ["dot-dot", "basket_1"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 18,
-    parentId: 2,
-    name: "node7",
-    position: "Manajer Hubungan Industrial dan Kepatuhan Regulasi Ketenagakerjaan Pemerintah", // Panjang (78 chars) - akan 10px
-    prl: "18",
-    formation: "2000",
-    tags: ["basket_3"],
-    bc_1_prl: "13-14",
-    bc_1_formation: "2000",
-    bc_1_position: "Specialist Hubungan Karyawan dan Penyelesaian Konflik Internal", // Panjang (63 chars) - akan 10px
-    bc_2_prl: "12-13",
-    bc_2_formation: "2000",
-    bc_2_position: "Koordinator Kepatuhan Hukum Ketenagakerjaan dan Audit Internal", // Panjang (63 chars) - akan 10px
-    bc_3_prl: "12-13",
-    bc_3_formation: "2000",
-    bc_3_position: "Analis Kebijakan SDM dan Prosedur Operasional Standar Perusahaan", // Panjang (66 chars) - akan 10px
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 19,
-    parentId: 2,
-    name: "node5",
-    position: "Supervisor Training", // Sedang (19 chars) - akan 18px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 20,
-    parentId: 2,
-    name: "node5",
-    position: "Koordinator Program Pengembangan Karir dan Mentoring untuk Karyawan Muda", // Panjang (73 chars) - akan 10px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 6,
-    parentId: 3,
-    name: "node6",
-    position: "Manager Audit Internal dan Compliance", // Sedang (38 chars) - akan 12px
-    tags: [],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 7,
-    parentId: 3,
-    name: "node7",
-    position: "Manager Perencanaan Keuangan Strategis dan Analisis Investasi Jangka Panjang untuk Ekspansi Bisnis", // Sangat panjang (100 chars) - akan 10px
-    tags: ["dot-dot", "basket_1"],
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 8,
-    parentId: 3,
-    name: "node8",
-    position: "Manager Treasury dan Cash Management serta Pengelolaan Likuiditas Perusahaan Multinasional", // Sangat panjang (91 chars) - akan 10px
-    prl: "18",
-    formation: "2000",
-    tags: ["basket_2", "isCoordinator"],
-    bc_1_prl: "13-14",
-    bc_1_formation: "2000",
-    bc_1_position: "Senior Analyst Manajemen Kas dan Instrumen Keuangan Derivatif", // Panjang (62 chars) - akan 10px
-    bc_2_prl: "12-13",
-    bc_2_formation: "2000",
-    bc_2_position: "Specialist Perencanaan Budget dan Forecasting Keuangan Tahunan", // Panjang (63 chars) - akan 10px
-    isMergeFormation: false,
-    basket: false,
-  },
-];
-const dataku = [
-  {
-    id: 1,
-    parentId: null,
-    name: "node1",
-    position: "CEO", // Sangat singkat (3 chars) - akan 18px
-    prl: "18",
-    formation: "2000",
-    tags: ["create"],
-    isMergeFormation: false,
-    basket: false,
-  },
-  {
-    id: 4,
-    parentId: 1,
-    name: "node4",
-    position: "Direktur Pemasaran dan Penjualan Strategis Global dengan Tanggung Jawab Internasional yang Sangat Luas",
-    tags: ["basket_3"],
-    bc_1_flagMergeFormation: "B",
-    bc_1_prl: "13-14",
-    bc_1_formation: "2",
-    bc_1_position: "Manager Senior Basket Utama dengan Spesialisasi Khusus",
-    bc_1_jumlah_formasi: 4,
-    bc_2_flagMergeFormation: "C",
-    bc_2_prl: "12-13",
-    bc_2_jumlah_formasi: 1,
-    bc_2_formation: "2",
-    bc_2_position: "Koordinator Basket Kedua untuk Operasional Harian",
-    bc_3_flagMergeFormation: "A",
-    bc_3_prl: "11-12",
-    bc_3_formation: "1",
-    bc_3_position: "Supervisor Basket Ketiga dengan Tanggung Jawab Teknis",
-    bc_3_jumlah_formasi: 1,
-    bc_4_flagMergeFormation: "A",
-    bc_4_prl: "11-12",
-    bc_4_formation: "1",
-    bc_4_position: "Analis Basket Keempat untuk Penelitian dan Pengembangan Berkelanjutan",
-    bc_4_jumlah_formasi: 2,
-    bc_5_flagMergeFormation: "A",
-    bc_5_prl: "11-12",
-    bc_5_formation: "1",
-    bc_5_position: "Specialist Basket Kelima dengan Fokus pada Inovasi Teknologi Terdepan",
-    bc_5_jumlah_formasi: 2,
-    bc_6_flagMergeFormation: "E",
-    bc_6_prl: "11-12",
-    bc_6_formation: "1",
-    bc_6_position: "Konsultan Senior Basket Keenam untuk Strategi Bisnis Jangka Panjang",
-    bc_6_jumlah_formasi: 2,
-    prl: "18",
-    formation: "2000",
-    isMergeFormation: true,
-    basket: true,
-  },
-];
+// processedDataResult.processedData.forEach((item) => {
+//   item.id = parseInt(item.id, 10);
+//   item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+// });
+// const data = [
+//   {
+//     id: 1,
+//     parentId: null,
+//     name: "node1",
+//     position: "CEO", // Sangat singkat (3 chars) - akan 18px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["create"],
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 99,
+//     parentId: 1,
+//     name: "node2",
+//     position: "Direktur Teknologi Informasi", // Sedang (28 chars) - akan 12px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 2,
+//     parentId: 1,
+//     name: "node2",
+//     position:
+//       "Direktur Sumber Daya Manusia dan Pengembangan Organisasi", // Panjang (57 chars) - akan 11px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 999,
+//     parentId: 1,
+//     name: "node2",
+//     position:
+//       "Direktur Keuangan dan Administrasi Perusahaan serta Pengelolaan Investasi Strategis", // Sangat panjang (83 chars) - akan 10px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 3,
+//     parentId: 1,
+//     name: "node3",
+//     position:
+//       "Chief Financial Officer untuk Divisi Keuangan Internasional dan Manajemen Risiko Bisnis Global", // Sangat panjang (95 chars) - akan 10px
+//     tags: ["delete", "isCoordinator"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 4,
+//     parentId: 1,
+//     name: "node4",
+//     position:
+//       "Direktur Pemasaran dan Penjualan Regional Asia Pasifik dengan Fokus Pengembangan Pasar Baru asd", // Sangat panjang (92 chars) - akan 10px
+//     tags: ["basket_3"],
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2",
+//     bc_1_position: "Manager Senior Pemasaran Digital dan E-Commerce ", // Panjang (78 chars) - akan 10px
+//     bc_2_prl: "12-13",
+//     bc_2_formation: "2",
+//     bc_2_position:
+//       "Koordinator Penjualan Ritel dan Distribusi Nasional", // Panjang (52 chars) - akan 11px
+//     bc_1_flagMergeFormation: "A",
+//     bc_2_flagMergeFormation: "B",
+//     bc_3_flagMergeFormation: "B",
+//     bc_4_flagMergeFormation: "B",
+//     bc_1_jumlah_formasi: 2,
+//     bc_2_jumlah_formasi: 3,
+//     bc_3_jumlah_formasi: 3,
+//     bc_4_jumlah_formasi: 3,
+//     bc_3_prl: "11-12",
+//     bc_3_formation: "2",
+//     bc_3_position:
+//       "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (63 chars) - akan 10px
+//     bc_4_prl: "11-12",
+//     bc_4_formation: "1",
+//     bc_4_position:
+//       "Supervisor Tim Analisis Pasar dan Riset Konsumen Berkelanjutan", // Panjang (64 chars) - akan 10px
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: true,
+//     basket: true,
+//   },
+//   {
+//     id: 5,
+//     parentId: 2,
+//     name: "node5",
+//     position: "Manager Rekrutmen", // Sedang (17 chars) - akan 18px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 16,
+//     parentId: 2,
+//     name: "node6",
+//     position: "Manager Pengembangan Talenta dan Pelatihan Karyawan", // Panjang (52 chars) - akan 11px
+//     tags: ["dot-dot"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 17,
+//     parentId: 2,
+//     name: "node7",
+//     position:
+//       "Manager Kompensasi dan Benefit serta Wellness Program untuk Seluruh Karyawan", // Panjang (76 chars) - akan 10px
+//     tags: ["dot-dot", "basket_1"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 18,
+//     parentId: 2,
+//     name: "node7",
+//     position:
+//       "Manajer Hubungan Industrial dan Kepatuhan Regulasi Ketenagakerjaan Pemerintah", // Panjang (78 chars) - akan 10px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["basket_3"],
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2000",
+//     bc_1_position:
+//       "Specialist Hubungan Karyawan dan Penyelesaian Konflik Internal", // Panjang (63 chars) - akan 10px
+//     bc_2_prl: "12-13",
+//     bc_2_formation: "2000",
+//     bc_2_position:
+//       "Koordinator Kepatuhan Hukum Ketenagakerjaan dan Audit Internal", // Panjang (63 chars) - akan 10px
+//     bc_3_prl: "12-13",
+//     bc_3_formation: "2000",
+//     bc_3_position:
+//       "Analis Kebijakan SDM dan Prosedur Operasional Standar Perusahaan", // Panjang (66 chars) - akan 10px
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 19,
+//     parentId: 2,
+//     name: "node5",
+//     position: "Supervisor Training", // Sedang (19 chars) - akan 18px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 20,
+//     parentId: 2,
+//     name: "node5",
+//     position:
+//       "Koordinator Program Pengembangan Karir dan Mentoring untuk Karyawan Muda", // Panjang (73 chars) - akan 10px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 6,
+//     parentId: 3,
+//     name: "node6",
+//     position: "Manager Audit Internal dan Compliance", // Sedang (38 chars) - akan 12px
+//     tags: [],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 7,
+//     parentId: 3,
+//     name: "node7",
+//     position:
+//       "Manager Perencanaan Keuangan Strategis dan Analisis Investasi Jangka Panjang untuk Ekspansi Bisnis", // Sangat panjang (100 chars) - akan 10px
+//     tags: ["dot-dot", "basket_1"],
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 8,
+//     parentId: 3,
+//     name: "node8",
+//     position:
+//       "Manager Treasury dan Cash Management serta Pengelolaan Likuiditas Perusahaan Multinasional", // Sangat panjang (91 chars) - akan 10px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["basket_2", "isCoordinator"],
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2000",
+//     bc_1_position:
+//       "Senior Analyst Manajemen Kas dan Instrumen Keuangan Derivatif", // Panjang (62 chars) - akan 10px
+//     bc_2_prl: "12-13",
+//     bc_2_formation: "2000",
+//     bc_2_position:
+//       "Specialist Perencanaan Budget dan Forecasting Keuangan Tahunan", // Panjang (63 chars) - akan 10px
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+// ];
+// const dataku = [
+//   {
+//     id: 1,
+//     parentId: null,
+//     name: "node1",
+//     position: "CEO", // Sangat singkat (3 chars) - akan 18px
+//     prl: "18",
+//     formation: "2000",
+//     tags: ["create"],
+//     isMergeFormation: false,
+//     basket: false,
+//   },
+//   {
+//     id: 4,
+//     parentId: 1,
+//     name: "node4",
+//     position:
+//       "Direktur Pemasaran dan Penjualan Strategis Global dengan Tanggung Jawab Internasional yang Sangat Luas",
+//     tags: ["basket_3"],
+//     bc_1_flagMergeFormation: "B",
+//     bc_1_prl: "13-14",
+//     bc_1_formation: "2",
+//     bc_1_position:
+//       "Manager Senior Basket Utama dengan Spesialisasi Khusus",
+//     bc_1_jumlah_formasi: 4,
+//     bc_2_flagMergeFormation: "C",
+//     bc_2_prl: "12-13",
+//     bc_2_jumlah_formasi: 1,
+//     bc_2_formation: "2",
+//     bc_2_position:
+//       "Koordinator Basket Kedua untuk Operasional Harian",
+//     bc_3_flagMergeFormation: "A",
+//     bc_3_prl: "11-12",
+//     bc_3_formation: "1",
+//     bc_3_position:
+//       "Supervisor Basket Ketiga dengan Tanggung Jawab Teknis",
+//     bc_3_jumlah_formasi: 1,
+//     bc_4_flagMergeFormation: "A",
+//     bc_4_prl: "11-12",
+//     bc_4_formation: "1",
+//     bc_4_position:
+//       "Analis Basket Keempat untuk Penelitian dan Pengembangan Berkelanjutan",
+//     bc_4_jumlah_formasi: 2,
+//     bc_5_flagMergeFormation: "A",
+//     bc_5_prl: "11-12",
+//     bc_5_formation: "1",
+//     bc_5_position:
+//       "Specialist Basket Kelima dengan Fokus pada Inovasi Teknologi Terdepan",
+//     bc_5_jumlah_formasi: 2,
+//     bc_6_flagMergeFormation: "E",
+//     bc_6_prl: "11-12",
+//     bc_6_formation: "1",
+//     bc_6_position:
+//       "Konsultan Senior Basket Keenam untuk Strategi Bisnis Jangka Panjang",
+//     bc_6_jumlah_formasi: 2,
+//     prl: "18",
+//     formation: "2000",
+//     isMergeFormation: true,
+//     basket: true,
+//   },
+// ];
 
 // Helper function to handle manual expand button clicking
 function handleManualExpandButton(focusNodeId) {
@@ -1270,8 +1321,8 @@ function initializeChart(processedDataResult, focusNodeId) {
         for (let i = 1; i <= basketLevel; i++) {
           const bcPrl = d.data[`bc_${i}_prl`] || d.data.prl;
           const bcFormation = d.data[`bc_${i}_formation`] || d.data.jumlah_formasi;
-          const bcPositionName = d.data[`bc_${i}_position`] || `Basket ${i}`;
-          const basketNameFontSize = getFontSize(bcPositionName);
+          const bcposition = d.data[`bc_${i}_position`] || `Basket ${i}`;
+          const basketNameFontSize = getFontSize(bcposition);
           const prlFontSize = getFontSize(bcPrl);
           const formationFontSize = getFontSize(bcFormation);
 
@@ -1279,7 +1330,7 @@ function initializeChart(processedDataResult, focusNodeId) {
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;${
                     i < basketLevel ? `border-bottom:2px ${borderDot} ${colorSelected};` : ""
                   }">
-                    <div style="flex:1.8;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;word-wrap:break-word;padding:2px;">${bcPositionName}</div>
+                    <div style="flex:1.8;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;word-wrap:break-word;padding:2px;">${bcposition}</div>
                     <div style="flex:0.6;font-size:${prlFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-left:2px ${borderDot} ${colorSelected};overflow:hidden;padding:2px;">${bcPrl}</div>
                     <div style="flex:0.6;font-size:${formationFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-left:2px ${borderDot} ${colorSelected};overflow:hidden;padding:2px;">${bcFormation}</div>
                   </div>
@@ -1329,13 +1380,13 @@ function initializeChart(processedDataResult, focusNodeId) {
         let basketRows = "";
         for (let i = 1; i <= basketLevel; i++) {
           const bcPrl = d.data[`bc_${i}_prl`] || d.data.prl;
-          const bcPositionName = d.data[`bc_${i}_position`] || `Basket ${i}`;
-          const basketNameFontSize = getFontSize(bcPositionName);
+          const bcposition = d.data[`bc_${i}_position`] || `Basket ${i}`;
+          const basketNameFontSize = getFontSize(bcposition);
           const prlFontSize = getFontSize(bcPrl);
 
           basketRows += `
                   <div class="position-prl-class" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid black;overflow:hidden;">
-                    <div style="width:70%;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-right:1px solid black;overflow:hidden;word-wrap:break-word;padding:2px;">${bcPositionName}</div>
+                    <div style="width:70%;font-size:${basketNameFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;border-right:1px solid black;overflow:hidden;word-wrap:break-word;padding:2px;">${bcposition}</div>
                     <div style="width:30%;font-size:${prlFontSize};color:#666;text-align:center;font-weight:bold;display:flex;align-items:center;justify-content:center;height:100%;overflow:hidden;padding:2px;">${bcPrl}</div>
                   </div>
                 `;
@@ -1384,42 +1435,16 @@ function initializeChart(processedDataResult, focusNodeId) {
               `;
       }
     })
-    .container(".chart-container")
+    .container(".chart-container-custom")
     .data(processedDataResult.processedData)
-    .compact(false)
+    .compact(true)
     .render()
     .fit();
 
   console.log("Chart initialized successfully");
 
-  // Add resize event listener to make chart responsive
-  const resizeHandler = function () {
-    if (chart) {
-      chart.fit();
-      console.log("Chart resized and fitted to container");
-    }
-  };
-
-  // Remove existing resize listener if any
-  window.removeEventListener("resize", resizeHandler);
-  // Add new resize listener
-  window.addEventListener("resize", resizeHandler);
-
-  // Add ResizeObserver to detect container size changes
-  const containerElement = document.querySelector(".chart-container");
-  if (containerElement && window.ResizeObserver) {
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        if (chart) {
-          setTimeout(() => {
-            chart.fit();
-            console.log("Chart container resized, refitting chart");
-          }, 100); // Small delay to ensure DOM updates are complete
-        }
-      }
-    });
-    resizeObserver.observe(containerElement);
-  }
+  // Simple approach - let the library handle centering naturally
+  console.log("Chart ready with natural centering");
 
   // Auto-expand node if focusNodeId is provided
   if (focusNodeId) {
@@ -1427,33 +1452,118 @@ function initializeChart(processedDataResult, focusNodeId) {
   } else {
     console.log("No focusNodeId provided, skipping auto-expand");
   }
+
+  const chartContainer = document.querySelector(".chart-container-custom");
+  if (chartContainer) {
+    const chartGroup = chartContainer.querySelector("g.chart");
+    if (chartGroup) {
+      // Wait 3 seconds before applying static centering
+      setTimeout(() => {
+        chartGroup.classList.remove("transform");
+        chartGroup.setAttribute("transform", "translate(450,-100) scale(0.6)");
+      }, 1500);
+    }
+  }
+}
+
+// Simplified approach - no complex method override
+
+// Function to override library centering with CSS-based centering (simplified)
+function overrideLibraryCentering() {
+  console.log("Simple centering applied");
+}
+
+// Function to apply simple static centering (simplified approach)
+function applyStaticCentering() {
+  console.log("Simple static centering applied");
+}
+
+// Function to setup continuous monitoring of chart positioning
+function setupCenteringMonitor() {
+  const containerElement = document.querySelector(".chart-container-custom");
+
+  if (!containerElement) {
+    console.log("Container not found, retrying in 500ms...");
+    setTimeout(setupCenteringMonitor, 500);
+    return;
+  }
+
+  // First, override the library's centering method
+  overrideLibraryCenteringMethod();
+
+  // Create a MutationObserver to watch for changes
+  const observer = new MutationObserver((mutations) => {
+    let needsOverride = false;
+
+    mutations.forEach((mutation) => {
+      // Check if any transform attributes or styles changed
+      if (
+        mutation.type === "attributes" &&
+        (mutation.attributeName === "transform" || mutation.attributeName === "style")
+      ) {
+        needsOverride = true;
+      }
+
+      // Check if new nodes were added (like when chart re-renders)
+      if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+        needsOverride = true;
+      }
+    });
+
+    if (needsOverride) {
+      // Apply our override after a small delay to ensure library changes are complete
+      setTimeout(() => {
+        overrideLibraryCentering();
+        console.log("Auto-override applied due to DOM changes");
+      }, 50);
+    }
+  });
+
+  // Start observing the container and all its children
+  observer.observe(containerElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["transform", "style"],
+    attributeOldValue: true,
+  });
+
+  console.log("Centering monitor setup complete");
+
+  // Also apply initial override
+  overrideLibraryCentering();
 }
 
 // Main function to initialize the entire chart system
-function initializeChartSystemNew(dataObject) {
+function initializeChartSystemNew(dataMasterKu) {
   console.log("Starting chart system initialization...");
 
   // Step 1: Process the raw data
-  const processedDataResult = processChartData(dataObject);
-  console.log("Processed data:", processedDataResult.processedData.length, "items");
-  // processedDataResult.processedData.forEach((item) => {
-  //   item.id = parseInt(item.id, 10);
-  //   item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
-  // });
-  console.log("Processed data:", processedDataResult.processedData, "items");
+  const processedDataResult = processChartData(dataMasterKu);
+  processedDataResult.processedData.forEach((item) => {
+    item.id = parseInt(item.id, 10);
+    // item.parentId = null; // Ensure parentId is a number or null
+    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+  });
+  console.log("Data processing result:", processedDataResult, "items processed");
+  // return;
 
   // Step 2: Initialize chart with processed data
-  // initializeChart(processedDataResult, 18);
   initializeChart(processedDataResult);
 
   console.log("Chart system initialization completed");
 }
 
-function updateDataChart() {
+function updateDataChart(newData) {
   console.log("Updating chart data...");
 
   // Process the new data
-  const processedDataResult = processChartData(dataku);
+  const processedDataResult = processChartData(newData);
+  processedDataResult.processedData.forEach((item) => {
+    item.id = parseInt(item.id, 10);
+    // item.parentId = null; // Ensure parentId is a number or null
+    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
+  });
 
   // Reinitialize the chart with the new data
   initializeChart(processedDataResult);
@@ -1475,7 +1585,7 @@ function updateDataChart() {
 //   initializeChartSystem();
 
 //   // Add click event listener using event delegation for node info
-//   $(".chart-container").on("click", "foreignObject", function (e) {
+//   $(".chart-container-custom").on("click", "foreignObject", function (e) {
 //     // Check if the click is on the node content area, not on expand/collapse buttons
 //     const clickTarget = $(e.target);
 
@@ -1499,7 +1609,7 @@ function updateDataChart() {
 //       alertMessage += `ID: ${data.id}\n`;
 //       alertMessage += `Parent ID: ${data.parentId || "Root"}\n`;
 //       alertMessage += `Name: ${data.name}\n`;
-//       alertMessage += `Position: ${data.positionName}\n`;
+//       alertMessage += `Position: ${data.position}\n`;
 //       alertMessage += `PRL: ${data.prl}\n`;
 //       alertMessage += `Formation: ${data.formation}\n`;
 //       alertMessage += `Tags: ${data.tags.join(", ")}\n`;

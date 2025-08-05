@@ -531,8 +531,9 @@
           (o.chart = t),
           this.update(o.root),
           u.select(window).on("resize." + o.id, () => {
-            var t = u.select(o.container).node().getBoundingClientRect();
-            o.svg.attr("width", t.width);
+            // Fixed sizing - ignore window resize and maintain static 1200x800
+            o.svg.attr("width", 1200).attr("height", 800);
+            console.log("Window resize ignored - maintaining fixed 1200x800 size");
           }),
           o.firstDraw && (o.firstDraw = !1);
       } else

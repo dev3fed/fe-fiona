@@ -5,22 +5,33 @@
 }
 
 <style>
-    .chart-container {
+    .chart-container-custom{
         width: 100%;
+        height: 700px;
+        }
+
+    .svg-chart-container {
+        width: 100%;
+        height: 700px;
+    }
+
+    .chart-exp-mid{
+        width: 1100px;
         height: 600px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        overflow: hidden;
+        position: relative
     }
     
-    .chart-container svg {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 0 auto;
+    
+    #orgThree .no-children .jstree-icon {
+        display: none !important;
+        /* Use !important to ensure it overrides other styles */
     }
+</style>
+        width: 1100px;
+        height: 600px;
+        position: relative
+    }
+    
     
     #orgThree .no-children .jstree-icon {
         display: none !important;
@@ -201,27 +212,34 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Chart Container - ISOLATED from Bootstrap Grid -->
+                                <div class="chart-container-custom" style="background-color: aliceblue;"></div>
+                                
+                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                    <div class="row">
                                         <div class="col-12 mt-2">
-                                            <div class="chart-container"></div>
                                             <button onclick="chart.exportImg()">Export Current</button>
                                             <button onclick="chart.exportImg({full:true})">Export Full</button>
-                                            <button onclick="prepareAndExportSVG()">Export SVG (Clean)</button>
+                                            <button onclick="changeBackChartFit()">Export SVG (Clean)</button>
                                             <button onclick="downloadPdf(chart)">Export PDF</button>
-                                            <button onclick="chart.fit()">Fit to the screen</button>
+                                            <button onclick="chart.fit();">Fit to the screen</button>
                                             <button onclick="updateDataChart()">Update Data</button>
                                             @* zoom in zoom out *@
                                             <button
-                                                onclick="chart.zoomIn().render().fit()"
+                                                onclick="chart.zoomIn().render().fit();"
                                                 class="btn btn-action-button waves-effect waves-light">
                                                 <i class="fas fa-search-plus"></i> zoom in
                                             </button>
                                             <button
-                                                onclick="chart.zoomOut().render().fit()"
+                                                onclick="chart.zoomOut().render().fit();"
                                                 class="btn btn-action-button waves-effect waves-light">
                                                 <i class="fas fa-search-minus"></i> zoom out
                                             </button>
                                             <button
-                                            onclick="chart.compact(!!(compact++%2)).render().fit()"
+                                            onclick="chart.compact(!!(compact++%2)).render().fit();"
                                             class="btn btn-action-button waves-effect waves-light"
                                             >
                                             <i class="fas fa-sitemap"></i> compact
@@ -317,6 +335,7 @@
         </div>
     </div>
 
+
     <partial name="~/Views/Organization/ModalOrgTree.cshtml" />
     <partial name="~/Views/Organization/ModalConfirm.cshtml" />
     <partial name="~/Views/Organization/ModalPreviewDesignCost.cshtml" />
@@ -353,6 +372,7 @@
     <script src="@Url.Content("~/assets/js/authentication.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3.v7.min.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-org-chart.js")"></script>
+    @* <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-org-chart_.js")"></script> *@
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-flextree.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/html2canvas.js")"></script>
     <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/jspdf.umd.min.js")"></script>

@@ -234,7 +234,8 @@ async function initializeHelper(data) {
   ];
 
   const dataSelected = [dataMaster[0]];
-  initializeChartSystemNew(data1);
+  initializeChartSystemNew(dataMaster);
+  // initializeChartSystemNew(dataMaster);
   // Wait for DOM to be ready and initialize chart
   // setTimeout(async () => {
   //   console.log("Initializing chart system...");
@@ -270,7 +271,7 @@ async function initializeHelper(data) {
   // }, 500);
 
   // helperOrgTree(dataChart.data);
-  helperOrgChart(true, "osContainer", data1, true);
+  // helperOrgChart(true, "osContainer", dataMaster, true);
 
   // helperOrgChart(true, "osContainer", asik2, true);
   // helperOrgChartTester(true, "osContainer", test, true);
@@ -1132,4 +1133,8 @@ $(document).ready(async function () {
       $(linkTab).tab("show");
     }, 2000);
   }
+
+  setTimeout(() => {
+    // initializeChartSystemNew(dataMaster);
+  }, 2000);
 });
