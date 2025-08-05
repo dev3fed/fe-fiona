@@ -10,7 +10,6 @@ async function triggleDetailJob(val) {
     };
     const queryString = new URLSearchParams(payload).toString();
     const resultDetail = await fetchDetailJob(queryString);
-    console.log("resultDetail", resultDetail);
     const detailInfo = resultDetail.data;
     const infoSkillGroup = resultDetail.data.skillGroups;
     const incumbent = resultDetail.data.incumbents[0];
@@ -22,7 +21,7 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Division</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.division || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo?.division.divisionName || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Sub Division</label><br/>
@@ -30,7 +29,7 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Department</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.department || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo?.department.departmentName || "-"}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Section</label><br/>
@@ -58,7 +57,9 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Direct Report</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.directReportTo || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${
+            detailInfo?.directReportTo.jobPositionName || "-"
+          }</label><br/>
       </div>
       <div class="col-12">
       <hr style="margin-right: 10px">
@@ -71,7 +72,7 @@ async function triggleDetailJob(val) {
           }</label><br/>
       </div>
        <div class="col-3">
-          <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Subname</label><br/>
+          <label style="color:#9F9FA5;fonti-size:12px">Personnel Sub Area Name</label><br/>
           <label style="font-weight: 600;font-size: 14px">${
             detailInfo.personnelSubArea.personnelSubAreaName || "-"
           }</label><br/>
