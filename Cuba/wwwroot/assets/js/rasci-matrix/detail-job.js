@@ -10,9 +10,17 @@ async function triggleDetailJob(val) {
     };
     const queryString = new URLSearchParams(payload).toString();
     const resultDetail = await fetchDetailJob(queryString);
-    const detailInfo = resultDetail.data;
-    const infoSkillGroup = resultDetail.data.skillGroups;
-    const incumbent = resultDetail.data.incumbents[0];
+    let detailInfo = resultDetail.data;
+    let infoSkillGroup = resultDetail.data.skillGroups;
+    let incumbent = resultDetail.data.incumbents[0];
+    let division = detailInfo?.division?.divisionName || "-";
+    let department = detailInfo?.department?.departmentName || "-";
+    let careerType = detailInfo?.unit.careerTypeName || "-";
+    let careerLevel = detailInfo?.unit.careerLevelName || "-";
+    let subDivision = detailInfo?.subDivision || "-";
+    let directReportTo = detailInfo?.directReportTo?.jobPositionName || "-";
+    let personArea = detailInfo?.personnelArea?.personnelAreaName || "-";
+    let personSubArea = detailInfo?.personnelSubArea?.personnelSubAreaName || "-";
     const JobName = `${val.positionName}`;
     const cardAttribute = `
       <div class="col-3">
@@ -21,15 +29,15 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Division</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo?.division.divisionName || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${division}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Sub Division</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.subDivision || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${subDivision}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Department</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo?.department.departmentName || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${department}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Section</label><br/>
@@ -38,7 +46,7 @@ async function triggleDetailJob(val) {
       <div class="col-12">
       <hr style="margin-right: 10px">
       </div>
-  
+
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Org Unit Name</label><br/>
           <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.unitName || "-"}</label><br/>
@@ -49,33 +57,27 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Career Type</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.careerTypeName || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${careerType}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Career Level</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.careerLevelName || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${careerLevel}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Direct Report</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo?.directReportTo.jobPositionName || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${directReportTo || "-"}</label><br/>
       </div>
       <div class="col-12">
       <hr style="margin-right: 10px">
       </div>
-  
+
       <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Area Name</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.personnelArea.personnelAreaName || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${personArea || "-"}</label><br/>
       </div>
        <div class="col-3">
           <label style="color:#9F9FA5;fonti-size:12px">Personnel Sub Area Name</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${
-            detailInfo.personnelSubArea.personnelSubAreaName || "-"
-          }</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${personSubArea || "-"}</label><br/>
       </div>
        <div class="col-6">
           <label style="color:#9F9FA5;fonti-size:12px">SK Number</label><br/>
@@ -122,19 +124,19 @@ async function triggleDetailJob(val) {
       </div>
       `;
     const cardIncumbent = `
-          <div class="col-3">
-              <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-              <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeId || "-"}</label><br/>
-          </div>
-          <div class="col-3">
-              <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-              <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeName || "-"}</label><br/>
-          </div>
-          <div class="col-6">
-              <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
-              <label style="font-weight: 600;font-size: 14px">${incumbent?.prlPlan || "-"}</label><br/>
-          </div>
-  `;
+            <div class="col-3">
+                <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeId || "-"}</label><br/>
+            </div>
+            <div class="col-3">
+                <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeName || "-"}</label><br/>
+            </div>
+            <div class="col-6">
+                <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${incumbent?.prlPlan || "-"}</label><br/>
+            </div>
+    `;
     const attributeContent = document.getElementById("job-attribute");
     const sgContent = document.getElementById("skill-group-content");
     const incContent = document.getElementById("incumbent-content");
