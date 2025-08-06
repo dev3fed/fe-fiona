@@ -770,3 +770,50 @@ const test = [
     bc_1_id_position: "302587423",
   },
 ];
+
+// Chart Loading HTML Template
+const CHART_LOADING_HTML = `
+  <div id="chart-loading-overlay" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgba(248, 249, 250, 0.95);
+    z-index: 2;
+    border-radius: 4px;
+  ">
+    <div style="
+      border: 4px solid #e9ecef;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: chart-spin 1.2s linear infinite;
+    "></div>
+    <p style="
+      margin-top: 20px;
+      color: #495057;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 8px;
+    ">Loading organization chart...</p>
+    <p style="
+      margin: 0;
+      color: #6c757d;
+      font-size: 14px;
+      text-align: center;
+    ">Please wait while we prepare your data</p>
+  </div>
+  <style>
+    @keyframes chart-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+`;

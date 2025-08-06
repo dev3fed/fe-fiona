@@ -3,6 +3,9 @@ async function initializeHelper(data) {
     //
   }
 
+  // Show loading spinner
+  showChartLoading("os-container");
+
   const dataChart = await chartShow({
     draftId: organizationAttribute.orgUnitId,
     jobCode: "10132406",
@@ -10,6 +13,7 @@ async function initializeHelper(data) {
   });
 
   if (!dataChart.data) {
+    hideChartLoading("os-container");
     swal("Warning", "Data not found", "warning");
     return;
   }
@@ -19,6 +23,9 @@ async function initializeHelper(data) {
 
   helperOrgTree(dataChart.data);
   helperOrgChart(true, "os-container", dataChart.data, true);
+
+  // Hide loading spinner after chart is rendered
+  hideChartLoading("os-container");
 
   // helperOrgChart(true, "os-container", asik2, true);
   // helperOrgChartTester(true, "os-container", test, true);

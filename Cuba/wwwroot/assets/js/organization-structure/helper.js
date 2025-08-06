@@ -1952,39 +1952,9 @@ async function helperOrgTree(params) {
 // ======================
 
 async function focusNode(nodeId) {
-  // let selfNode = lsListOrgNode.find((item) => item.id == nodeId);
-  // let parentNode = lsListOrgNode.find((item) => item.id == selfNode?.pid) || {};
-  // const childrenData = getallChildrenNode(parentNode);
-  // const data = [parentNode, ...childrenData].filter((item) => item.id != nodeId);
+  // Show loading spinner
+  showChartLoading("os-container");
 
-  // selfNode = {
-  //   ...selfNode,
-  //   tags: [...selfNode.tags, "pointed"],
-  // };
-  // data.push(selfNode);
-
-  // let grandParentNode = lsListOrgNode.find((item) => item.id == parentNode?.pid) || {};
-  // let childrenNode = lsListOrgNode.filter((item) => item.pid == nodeId) || [];
-  // let brotherNode = lsListOrgNode.filter((item) => item.pid == selfNode?.pid) || [];
-
-  // brotherNode = brotherNode.filter((item) => item.id != nodeId);
-
-  // if (brotherNode.length % 2 == 0 && brotherNode.length > 0) {
-  //   const middle = brotherNode.length / 2;
-  //   brotherNode.splice(middle, 0, selfNode);
-  // } else if (brotherNode.length % 2 != 0 && brotherNode.length > 0) {
-  //   const middle = (brotherNode.length - 1) / 2;
-  //   brotherNode.splice(middle, 0, selfNode);
-  // } else {
-  //   brotherNode = [selfNode];
-  // }
-
-  // const dataDated = [grandParentNode, parentNode, ...brotherNode, ...childrenNode];
-
-  // chart.load(dataDated);
-
-  // hide node 39020818
-  // chart.hide(39020818);
   const dataChart = await chartShow({
     draftId: organizationAttribute.orgUnitId,
     jobCode: nodeId,
@@ -1998,8 +1968,20 @@ async function focusNode(nodeId) {
   dataChart.data.forEach((item) => {
     item.id = item.id_org_unit;
   });
+  console.log("dataChart.data", dataChart.data);
+  console.log("nodeId", nodeId);
+  let selfNode = dataChart.data.find((item) => item.id == nodeId);
+  selfNode = {
+    ...selfNode,
+    tags: [...selfNode.tags, "pointed"],
+  };
+  dataChart.data = dataChart.data.filter((item) => item.id != nodeId);
+  dataChart.data.push(selfNode);
+  console.log("selfNode", selfNode);
   setTimeout(() => {
     helperOrgChart(true, "os-container", dataChart.data, true, { expand: true, nodeId: nodeId });
+    // Hide loading spinner after chart is rendered
+    hideChartLoading("os-container");
   }, 500);
 }
 
@@ -2142,7 +2124,6 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     const bracketSize = bracketSizeFormat.split("_")[0];
     const bracketSplitted = bracketSizeFormat.split("_").slice(1);
     // console.log({bracketSize})
-    console.log({ bracketSplitted });
     const template = Object.assign({}, OrgChart.templates.default_t);
     template.size = [220, 0];
     for (let i = 0; i < bracketSize; i++) {
@@ -2239,7 +2220,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   // console.log("data", data);
   const dataMerged = data.filter((item) => item.isMergeFormation === true && item.basket == true);
-  console.log("dataMerged", dataMerged);
+  // console.log("dataMerged", dataMerged);
   // const isMerge = dataMerged.some((item) =>
   //   Object.keys(item).some((key) => key.match(/^bc_\d+_isMerge$/) && item[key])
   // );
@@ -2281,7 +2262,6 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       const count = getType.filter((item) => item.value === value).length;
       storeValues.push({ value, count });
     });
-    console.log("uniqueValues", uniqueValues);
     // console.log("storeValues", storeValues);
 
     // storeValues.sort((a, b) => {
@@ -2290,13 +2270,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     //   if (b.value === null) return -1;
     //   return a.value.localeCompare(b.value);
     // });
-    console.log("storeValues sorted", storeValues);
 
     storeValues.forEach((itx, index) => {
-      console.log("stroreValues idx", index);
-      console.log("itx", itx);
       const tagFormation = `bc_${index + 1}_jumlah_formasi`;
-      console.log("tagFormation", tagFormation);
       // console.log("itx", itx);
       // console.log("item", item);
       // console.log("item[tagFormation]", item[tagFormation]);
@@ -2307,10 +2283,8 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
         .sort((a, b) => {
           return a.localeCompare(b);
         });
-      console.log("flagMergeFormationKey", flagMergeFormationKey);
 
       flagMergeFormationKey.forEach((key) => {
-        console.log("key", key);
         const separation = key.split("_");
         const bracketIndex = separation[1]; // get the index of the bracket
         item[tagFormation] = item[`bc_${bracketIndex}_jumlah_formasi`] || 0; // set jumlah_formasi to count
@@ -2369,7 +2343,6 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     });
     item.tags.push(tagCustomMerge);
     tagsCustomMergeArray.push(tagCustomMerge);
-    console.log("tagsCustomMergeArray before unique", tagCustomMerge);
   });
 
   // console.log("tagsCustomMergeArray", tagsCustomMergeArray);
@@ -2703,4 +2676,50 @@ async function changeDataSourceFilter(value) {
     <td>${data.totalFormationAdjustment}</td>
     <td>${data.totalCostYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
   </tr>`);
+}
+
+// Organization Chart Loading Functions
+function showChartLoading(containerClass) {
+  let container = document.querySelector(`.${containerClass}`);
+
+  if (container) {
+    container.innerHTML = CHART_LOADING_HTML;
+
+    // Ensure container has proper positioning for loading overlay
+    const containerStyle = window.getComputedStyle(container);
+    if (containerStyle.position === "static") {
+      container.style.position = "relative";
+    }
+
+    // Ensure container has minimum dimensions for chart (400px height to match os-container)
+    if (containerStyle.width === "0px" || containerStyle.height === "0px") {
+      container.style.minWidth = "100%";
+      container.style.minHeight = "400px";
+    }
+
+    console.log(`Chart loading shown for container: ${containerClass}`);
+  } else {
+    console.warn(`Container not found: ${containerClass}`);
+  }
+}
+
+function hideChartLoading(containerClass) {
+  let container = document.querySelector(`.${containerClass}`);
+
+  if (container) {
+    // Remove loading overlay and styles
+    const loadingOverlay = container.querySelector("#chart-loading-overlay");
+    const loadingStyle = container.querySelector("style");
+
+    if (loadingOverlay) {
+      loadingOverlay.remove();
+    }
+    if (loadingStyle) {
+      loadingStyle.remove();
+    }
+
+    console.log(`Chart loading hidden for container: ${containerClass}`);
+  } else {
+    console.warn(`Container not found for hiding loading: ${containerClass}`);
+  }
 }
