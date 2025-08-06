@@ -44,27 +44,13 @@ $(document).ready(function () {
     }
   });
 
-  const chartOsPositionLevel = document
-    .getElementById("chart-os-position-level")
-    .getContext("2d");
-  const chartOsJobGrade = document
-    .getElementById("chart-os-job-grade")
-    .getContext("2d");
-  const chartOsPersonGrade = document
-    .getElementById("chart-os-person-grade")
-    .getContext("2d");
-  const chartRasciBusPro = document
-    .getElementById("chart-rasci-buspro-level")
-    .getContext("2d");
-  const chartRasciPosition = document
-    .getElementById("chart-rasci-position-level")
-    .getContext("2d");
-  const chartRasciNotationsFormation = document
-    .getElementById("chart-rasci-notaions-formation")
-    .getContext("2d");
-  const chartCompetencySpesific = document
-    .getElementById("chart-competency-spesific")
-    .getContext("2d");
+  const chartOsPositionLevel = document.getElementById("chart-os-position-level").getContext("2d");
+  const chartOsJobGrade = document.getElementById("chart-os-job-grade").getContext("2d");
+  const chartOsPersonGrade = document.getElementById("chart-os-person-grade").getContext("2d");
+  const chartRasciBusPro = document.getElementById("chart-rasci-buspro-level").getContext("2d");
+  const chartRasciPosition = document.getElementById("chart-rasci-position-level").getContext("2d");
+  const chartRasciNotationsFormation = document.getElementById("chart-rasci-notaions-formation").getContext("2d");
+  const chartCompetencySpesific = document.getElementById("chart-competency-spesific").getContext("2d");
   const customTicks = [1, 5, 10, 50, 100, 1000, 10000];
 
   new Chart(chartOsPositionLevel, {
@@ -83,15 +69,14 @@ $(document).ready(function () {
       ],
       datasets: [
         {
-          label: "VP/EGM/SMOM",
+          label: "VP/EGM/GHO",
           data: [4, 3, 5, 3, 6, 2, 3, 3],
           backgroundColor: "#9999FC",
           barPercentage: 0.8, // Adjust bar width to create space
           categoryPercentage: 0.8, // Adjust category width to create space
         },
         {
-          label:
-            "Manager/Region Manager/Area Manager/Sales Area Manager/Setara",
+          label: "Manager/Region Manager/Area Manager/Sales Area Manager/Setara",
           data: [25, 11, 24, 11, 49, 12, 15, 6],
           backgroundColor: "#7EC67E",
           barPercentage: 0.8,
@@ -165,7 +150,7 @@ $(document).ready(function () {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Business Process Level",
+            text: "Directorate",
             font: {
               size: 22,
               weight: "400",
@@ -383,14 +368,7 @@ $(document).ready(function () {
     type: "bar",
     plugins: [ChartDataLabels],
     data: {
-      labels: [
-        "L1 (Category)",
-        "L2 (Process Group)",
-        "L3 (Process)",
-        "L4 (Activity)",
-        "L5 (Task)",
-        "L6 (Sub Task)",
-      ],
+      labels: ["L1 (Category)", "L2 (Process Group)", "L3 (Process)", "L4 (Activity)", "L5 (Task)", "L6 (Sub Task)"],
       datasets: [
         {
           label: "A (Accountable)",
@@ -495,7 +473,7 @@ $(document).ready(function () {
     data: {
       labels: [
         "Director",
-        "VP/EGM/SMOM",
+        "VP/EGM/GHO",
         "Manager / Region Manager / Area manager / Sales Area Manager / Setara",
         "Asst. Manager / Sr. Analyst / Setara",
         "Sr. Supervisor / Analyst / Setara",
@@ -686,7 +664,7 @@ $(document).ready(function () {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Position Level",
+            text: "Directorate",
             font: {
               size: 22,
               weight: "400",
@@ -748,68 +726,185 @@ $(document).ready(function () {
     },
   });
 
+  const dataCompetencySpecific = [
+    {
+      label: "Domestic Supply Management",
+      "VP/EGM/GHO": 0,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 19,
+      "Asst. Manager/Sr. Analyst/Setara": 3,
+      "Sr. Supervisor/Analyst/Setara": 5,
+      "Supervisor/Jr. Analyst/Setara": 2,
+      "Jr. Supervisor/Jr. Assistant/Setara": 3,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 4,
+      total: 36,
+    },
+    {
+      label: "Sales and Account Management",
+      "VP/EGM/GHO": 5,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 10,
+      "Asst. Manager/Sr. Analyst/Setara": 2,
+      "Sr. Supervisor/Analyst/Setara": 3,
+      "Supervisor/Jr. Analyst/Setara": 4,
+      "Jr. Supervisor/Jr. Assistant/Setara": 1,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 25,
+    },
+    {
+      label: "Promotion and Campaign Management",
+      "VP/EGM/GHO": 3,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 2,
+      "Asst. Manager/Sr. Analyst/Setara": 20,
+      "Sr. Supervisor/Analyst/Setara": 5,
+      "Supervisor/Jr. Analyst/Setara": 1,
+      "Jr. Supervisor/Jr. Assistant/Setara": 4,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 35,
+    },
+    {
+      label: "Channel Management",
+      "VP/EGM/GHO": 5,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 3,
+      "Asst. Manager/Sr. Analyst/Setara": 5,
+      "Sr. Supervisor/Analyst/Setara": 15,
+      "Supervisor/Jr. Analyst/Setara": 22,
+      "Jr. Supervisor/Jr. Assistant/Setara": 30,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 80,
+    },
+    {
+      label: "Handling Customer Complaint",
+      "VP/EGM/GHO": 2,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 4,
+      "Asst. Manager/Sr. Analyst/Setara": 1,
+      "Sr. Supervisor/Analyst/Setara": 22,
+      "Supervisor/Jr. Analyst/Setara": 30,
+      "Jr. Supervisor/Jr. Assistant/Setara": 15,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 8,
+      total: 82,
+    },
+    {
+      label: "Pipeline Transport Operations & Maintenance",
+      "VP/EGM/GHO": 3,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 1,
+      "Asst. Manager/Sr. Analyst/Setara": 4,
+      "Sr. Supervisor/Analyst/Setara": 30,
+      "Supervisor/Jr. Analyst/Setara": 45,
+      "Jr. Supervisor/Jr. Assistant/Setara": 25,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 12,
+      total: 120,
+    },
+    {
+      label: "Distribution Management",
+      "VP/EGM/GHO": 4,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
+      "Asst. Manager/Sr. Analyst/Setara": 0,
+      "Sr. Supervisor/Analyst/Setara": 0,
+      "Supervisor/Jr. Analyst/Setara": 0,
+      "Jr. Supervisor/Jr. Assistant/Setara": 0,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 4,
+    },
+    {
+      label: "Stakeholder Management",
+      "VP/EGM/GHO": 1,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
+      "Asst. Manager/Sr. Analyst/Setara": 0,
+      "Sr. Supervisor/Analyst/Setara": 0,
+      "Supervisor/Jr. Analyst/Setara": 0,
+      "Jr. Supervisor/Jr. Assistant/Setara": 0,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 1,
+    },
+    {
+      label: "Supply Planning & Scheduling",
+      "VP/EGM/GHO": 2,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
+      "Asst. Manager/Sr. Analyst/Setara": 0,
+      "Sr. Supervisor/Analyst/Setara": 0,
+      "Supervisor/Jr. Analyst/Setara": 0,
+      "Jr. Supervisor/Jr. Assistant/Setara": 0,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 2,
+    },
+    {
+      label: "Product/Service Development",
+      "VP/EGM/GHO": 3,
+      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
+      "Asst. Manager/Sr. Analyst/Setara": 0,
+      "Sr. Supervisor/Analyst/Setara": 0,
+      "Supervisor/Jr. Analyst/Setara": 0,
+      "Jr. Supervisor/Jr. Assistant/Setara": 0,
+      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
+      total: 3,
+    },
+  ];
+
+  // Sort dataCompetencySpecific by total (descending order)
+  const sortedCompetencyData = [...dataCompetencySpecific].sort((a, b) => b.total - a.total);
+
+  // Extract sorted labels and data for each position level
+  const sortedLabels = sortedCompetencyData.map((item) => item.label);
+  const vpData = sortedCompetencyData.map((item) => item["VP/EGM/GHO"]);
+  const managerData = sortedCompetencyData.map(
+    (item) => item["Manager/Region Manager/Area Manager/Sales Area Manager/Setara"]
+  );
+  const asstManagerData = sortedCompetencyData.map((item) => item["Asst. Manager/Sr. Analyst/Setara"]);
+  const srSupervisorData = sortedCompetencyData.map((item) => item["Sr. Supervisor/Analyst/Setara"]);
+  const supervisorData = sortedCompetencyData.map((item) => item["Supervisor/Jr. Analyst/Setara"]);
+  const jrSupervisorData = sortedCompetencyData.map((item) => item["Jr. Supervisor/Jr. Assistant/Setara"]);
+  const jrOperatorData = sortedCompetencyData.map((item) => item["Jr. Operator/Jr. Technician/Administrator/Setara"]);
+
   new Chart(chartCompetencySpesific, {
     type: "bar",
     plugins: [ChartDataLabels],
     data: {
-      labels: [
-        "Domestic Supply Management",
-        "Sales and Account Management",
-        "Promotion and Campaign Management",
-        "Channel Management",
-        "Handling Customer Complaint",
-        "Pipeline Transport Operations & Maintenance",
-        "Distribution Management",
-        "Stakeholder Management",
-        "Supply Planning & Scheduling",
-        "Product/Service Development",
-      ],
+      labels: sortedLabels,
       datasets: [
         {
-          label: "VP/EGM/SMOM",
-          data: [0, 19, 3, 5, 2, 3, 4, 1, 2, 3],
+          label: "VP/EGM/GHO",
+          data: vpData,
           backgroundColor: "#9999FC",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
         },
         {
           label: "Manager/ Region...",
-          data: [5, 10, 2, 3, 4, 1, 0, 0, 0, 0],
+          data: managerData,
           backgroundColor: "#7EC67E",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
         },
         {
           label: "Asst. Manager/Sr. Anal...",
-          data: [2, 3, 20, 5, 1, 4, 0, 0, 0, 0],
+          data: asstManagerData,
           backgroundColor: "#7BE5D1",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
         },
         {
           label: "Sr. Supervisor/Analyst...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
+          data: srSupervisorData,
           backgroundColor: "#FDC47E",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
         },
         {
           label: "Supervisor/Jr. Analyst...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
+          data: supervisorData,
           backgroundColor: "#76BFFF",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
         },
         {
           label: "Jr. Supervisor/Jr...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
+          data: jrSupervisorData,
           backgroundColor: "#FFA5C3",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
         },
         {
           label: "Jr. Operator/Jr. Techn...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
+          data: jrOperatorData,
           backgroundColor: "#B7B7B7",
           barPercentage: 0.8,
           categoryPercentage: 0.8,
@@ -842,7 +937,7 @@ $(document).ready(function () {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Position Level",
+            text: "Position Total",
             font: {
               size: 22,
               weight: "400",

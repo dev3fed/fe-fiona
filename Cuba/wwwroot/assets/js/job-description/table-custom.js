@@ -8,15 +8,16 @@ function getTableListJobDes(dataList) {
   $("#jobdescList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"d-flex justify-content-between bottom"lip><"clear">', // Make bottom flex as well
     buttons: [],
-    autoWidth: false,
+    autoWidth: true,
+    // autoWidth: false,
     processing: true,
     serverSide: true,
     fixedColumns: {
       start: 1,
       end: 1,
     },
-    scrollX: true,
-    scrollCollapse: true,
+    // scrollX: true,
+    // scrollCollapse: true,
     ajax: function (data, callback, settings) {
       $.ajax({
         url: `${url.baseUrl}/${url["job-description"]}/get-list-positions/${data.start}/${data.length}?position=${
