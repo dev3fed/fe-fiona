@@ -1414,7 +1414,6 @@ async function modalJobPopup(params) {
   $("#modalPersonnelAreaSub").text(checkValue(data?.personnelSubAreaCode));
   $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubAreaName));
   $("#modalSKNumber").text(checkValue(data?.sourceOfSK));
-  ss;
 
   $("#modalOrgPRL").text(checkValue(data?.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));

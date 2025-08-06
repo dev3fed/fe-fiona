@@ -63190,32 +63190,6 @@ const dataMaster = [
   },
 ];
 
-const dataMaster1 = [
-  {
-    basket: false,
-    project: false,
-    id_position_parent: "",
-    layering: "L0",
-    position: "Direktur Utama",
-    prl: "28",
-    isMergeFormation: true,
-    id: "10132405",
-    position_parent: "",
-    pid: "",
-    jumlah_formasi: 5020,
-    coordination: "",
-    tags: ["create"],
-    id_org_unit: "10132405",
-    id_position_atasan_langsung: "",
-    hasChildren: true,
-    org_unit_name: "PT Pertamina Patra Niaga",
-    id_position: "30258741",
-    gl: "GL0D",
-    isNeck: false,
-    assistant: false,
-  },
-];
-
 // Chart Loading HTML Template
 const CHART_LOADING_HTML = `
   <div id="chart-loading-overlay" style="
@@ -63229,7 +63203,7 @@ const CHART_LOADING_HTML = `
     align-items: center;
     flex-direction: column;
     background-color: rgba(248, 249, 250, 0.95);
-    z-index: 1000;
+    z-index: 2;
     border-radius: 4px;
   ">
     <div style="
