@@ -412,3 +412,23 @@ i.jstree-icon.jstree-ocl {
     transform: rotate(360deg);
   }
 }
+
+#tablePositionListBody thead,
+#tablePositionListBody tbody,
+#tablePositionListBody tfoot,
+#tablePositionListBody tr,
+#tablePositionListBody td,
+#tablePositionListBody th {
+  border-color: #dee2e6;
+  border: 1px solid #dee2e6;
+}
+
+#basketIncumbent thead,
+#basketIncumbent tbody,
+#basketIncumbent tfoot,
+#basketIncumbent tr,
+#basketIncumbent td,
+#basketIncumbent th {
+  border-color: #dee2e6;
+  border: 1px solid #dee2e6;
+}

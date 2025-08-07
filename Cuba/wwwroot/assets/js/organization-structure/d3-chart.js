@@ -1719,100 +1719,27 @@ function setupCenteringMonitor() {
 }
 
 // Main function to initialize the entire chart system
-function initializeChartSystem(dataObject) {
-  console.log("Starting chart system initialization...");
-
-  // Step 1: Process the raw data
-  const processedDataResult = processChartData(dataObject);
-  processedDataResult.processedData.forEach((item) => {
-    item.id = parseInt(item.id, 10);
-    // item.parentId = null; // Ensure parentId is a number or null
-    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
-  });
-  console.log("Data processing result:", processedDataResult, "items processed");
-  // return;
-
-  // Step 2: Initialize chart with processed data
-  initializeChart(processedDataResult);
-
-  console.log("Chart system initialization completed");
-}
-
-function updateDataChart(dataObject, nodeId) {
-  console.log("Updating chart data...");
-
-  // Process the new data
-  const processedDataResult = processChartData(dataObject);
-  processedDataResult.processedData.forEach((item) => {
-    item.id = parseInt(item.id, 10);
-    // item.parentId = null; // Ensure parentId is a number or null
-    item.parentId = parseInt(item.pid, 10) || null; // Ensure parentId is a number or null
-  });
-
-  // Reinitialize the chart with the new data
-  initializeChart(processedDataResult, nodeId);
-
-  // Fit the chart to view after update
-  if (chart) {
-    chart.fit();
-    console.log("Chart fitted to view after update");
+function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
+  if (!dataChart) {
+    dataChart = [];
   }
+  dataChart.forEach((item) => {
+    item.id = item.id_org_unit;
+  });
 
-  console.log("Chart data updated successfully");
+  const self = dataChart.find((item) => item.id == focusNodeId);
+  const parent = dataChart.find((item) => item.id == self.pid);
+  dataChart = dataChart.filter((item) => item.id != self.pid);
+  if (parent) {
+    parent.pid = null;
+  }
+  dataChart.unshift(parent);
+  const processed = processChartData(dataChart);
+  processed.processedData.forEach((item) => {
+    item.id = parseInt(item.id, 10);
+    item.parentId = parseInt(item.pid, 10) || null;
+  });
+  initializeChart(processed, isAutoExpand ? focusNodeId : null);
+  if (chart) chart.fit();
+  console.log("Org chart rendered");
 }
-
-// Initialize chart when document is ready
-// $(document).ready(function () {
-//   console.log("Document ready - starting chart system...");
-
-//   // Initialize the complete chart system
-//   initializeChartSystem();
-
-//   // Add click event listener using event delegation for node info
-//   $(".chart-container-custom").on("click", "foreignObject", function (e) {
-//     // Check if the click is on the node content area, not on expand/collapse buttons
-//     const clickTarget = $(e.target);
-
-//     // Skip if clicking on expand/collapse buttons or their children
-//     if (
-//       clickTarget.closest(".node-button-foreign-object").length > 0 ||
-//       clickTarget.closest('[class*="button"]').length > 0
-//     ) {
-//       return; // Let the expand/collapse functionality work normally
-//     }
-
-//     e.stopPropagation();
-
-//     // Get the node data from the __data__ property
-//     const nodeData = this.__data__;
-//     if (nodeData && nodeData.data) {
-//       const data = nodeData.data;
-
-//       // Create detailed info string
-//       let alertMessage = `=== INFORMASI NODE ===\n\n`;
-//       alertMessage += `ID: ${data.id}\n`;
-//       alertMessage += `Parent ID: ${data.parentId || "Root"}\n`;
-//       alertMessage += `Name: ${data.name}\n`;
-//       alertMessage += `Position: ${data.position}\n`;
-//       alertMessage += `PRL: ${data.prl}\n`;
-//       alertMessage += `Formation: ${data.formation}\n`;
-//       alertMessage += `Tags: ${data.tags.join(", ")}\n`;
-//       alertMessage += `Is Basket: ${data.basket ? "Yes" : "No"}\n`;
-//       alertMessage += `Is Merge Formation: ${data.isMergeFormation ? "Yes" : "No"}\n\n`;
-
-//       // Add basket-specific information if it's a basket node
-//       if (data.basket) {
-//         alertMessage += `=== BASKET DETAILS ===\n`;
-//         Object.keys(data).forEach((key) => {
-//           if (key.startsWith("bc_")) {
-//             alertMessage += `${key}: ${data[key]}\n`;
-//           }
-//         });
-//       }
-
-//       // Show the alert
-//       alert(alertMessage);
-//     }
-//   });
-// });
-//

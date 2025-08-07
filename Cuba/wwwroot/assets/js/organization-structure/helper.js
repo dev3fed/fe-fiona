@@ -94,7 +94,7 @@ async function checkDataOrganization(draftList) {
   // $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
 
   // disabled selectDraftOrganization
-  $("#selectDraftOrganization").prop("disabled", true);
+  // $("#selectDraftOrganization").prop("disabled", true);
 }
 
 function checkDataOrganizationLocalStorage() {
@@ -1341,44 +1341,6 @@ async function modalJobPopup(params) {
     alert("Data not found");
     return;
   }
-  // $("#jobName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
-  // $("#positionId").val(data.unitCode);
-  // $("#modalDirectorate").text("Pertamina Patra Niaga");
-  // $("#modalDivision").text(checkValue(data?.divisionName));
-  // $("#modalSubDivision").text(checkValue(data?.subDivisionName));
-  // $("#modalDepartment").text(checkValue(data?.departmentName));
-  // $("#modalSection").text(checkValue(data?.sectionName));
-  // $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
-  // $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubAreaName));
-  // $("#modalCareerType").text(checkValue(data?.careerTypeName));
-  // $("#modalCareerLevel").text(checkValue(data?.careerLevelName));
-  // $("#modalAbbrvPosition").text(checkValue(data?.abbrvPosition));
-  // $("#modalOrgUnitName").text(checkValue(data?.unitName));
-  // $("#modalPositionName").text(checkValue(data?.positionName));
-  // $("#modalOrgPRL").text(checkValue(data?.prlOrg));
-  // $("#modalFormation").text(checkValue(data?.formation));
-  // $("#modalDirectReport").text(checkValue(data?.parentName));
-  // $("#modalNeckFunction").text(checkValue(data?.neckFunction));
-  // $("#modalIsProject").text(checkValue(data?.isProject));
-  // $("#modalIsCoordination").text(checkValue(data?.isCoordination));
-  // $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
-  // $("#modalFunction").text(checkValue(data?.functionName));
-  // $("#modalSKNumber").text(checkValue(data?.skNumber));
-
-  // $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
-  // $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
-  // $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
-  // $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupCode ?? "");
-  // $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
-  // $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupCode ?? "");
-
-  // $("#incumbentId").text(data?.incumbents[0]?.personCode ?? "");
-  // $("#incumbentName").text(data?.incumbents[0]?.personName ?? "");
-  // $("#prlPlanComp").text(data?.incumbents[0]?.prlPlan ?? "");
-
-  // $("#modalDetailJob").modal("show");
-
-  console.log("data", data);
   $("#jobName").text(checkValue(data.positionName));
   $("#positionId").val(data.positionId);
   $("#modalPrlOrg").text(checkValue(data.prlOrg));
@@ -1418,17 +1380,17 @@ async function modalJobPopup(params) {
   $("#modalOrgPRL").text(checkValue(data?.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));
 
-  $("#modalNeckFunction").text(data?.neckFunction ?? "");
-  $("#modalIsProject").text(data?.isProject ?? "");
-  $("#modalIsCoordination").text(data?.isCoordination ?? "");
-  $("#modalCoordinationWith").text(data?.coordinationWith ?? "");
+  $("#modalNeckFunction").text(checkValue(data?.neckFunction));
+  $("#modalIsProject").text(checkValue(data?.isProject));
+  $("#modalIsCoordination").text(checkValue(data?.isCoordination));
+  $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
 
-  $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
-  $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupName ?? "");
-  $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
-  $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupName ?? "");
-  $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
-  $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupName ?? "");
+  $("#modalMainSkillGroup").text(checkValue(data?.skillGroups?.[0]?.skillGroupName));
+  $("#modalMainSubSkillGroup").text(checkValue(data?.skillGroups?.[0]?.subSkillGroupName));
+  $("#modalSecondSkillGroup").text(checkValue(data?.skillGroups?.[1]?.skillGroupName));
+  $("#modalSecondSubSkillGroup").text(checkValue(data?.skillGroups?.[1]?.subSkillGroupName));
+  $("#modalThirdSkillGroup").text(checkValue(data?.skillGroups?.[2]?.skillGroupName));
+  $("#modalThirdSubSkillGroup").text(checkValue(data?.skillGroups?.[2]?.subSkillGroupName));
 
   $("#modalDetailJob").modal("show");
   $("#nonBasketIncumbent").show();
@@ -1879,11 +1841,6 @@ function createHierarchy(data, parentId = null) {
 }
 
 async function helperOrgTree(params) {
-  // const olah = createHierarchy(test2, "10132405");
-  // console.log("olah", olah);
-  // return;
-  // console.log("olah", olah);
-  // refresh jsTree
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
     core: {
@@ -1953,26 +1910,7 @@ async function helperOrgTree(params) {
 
 async function focusNode(nodeId) {
   // Show loading with proper container detection
-  if (typeof showChartLoading === "function") {
-    showChartLoading("chart-container-custom");
-  } else {
-    // Fallback for legacy container
-    const container = document.getElementById("osContainer") || document.querySelector(".chart-container-custom");
-    if (container) {
-      container.innerHTML = `
-        <div style="display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column;">
-          <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
-          <p style="margin-top: 10px; color: #666;">Loading chart focus...</p>
-        </div>
-        <style>
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        </style>
-      `;
-    }
-  }
+  showChartLoading("chart-container-custom");
 
   try {
     const dataChart = await chartShow({
@@ -1981,23 +1919,8 @@ async function focusNode(nodeId) {
       depth: 5,
     });
 
-    if (!dataChart.data) {
-      dataChart.data = [];
-    }
-    dataChart.data.forEach((item) => {
-      item.id = item.id_org_unit;
-    });
-
-    const self = dataChart.data.find((item) => item.id == nodeId);
-    const parent = dataChart.data.find((item) => item.id == self.pid);
-    dataChart.data = dataChart.data.filter((item) => item.id != self.pid);
-    if (parent) {
-      parent.pid = null;
-    }
-    dataChart.data.unshift(parent);
-
     // Update chart data (assuming this function handles chart rendering)
-    updateDataChart(dataChart.data, nodeId);
+    renderOrgChart(dataChart.data, nodeId, true);
 
     // Wait for chart to complete rendering before hiding loading
     setTimeout(() => {

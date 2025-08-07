@@ -1,53 +1,14 @@
-async function initializeHelper(data) {
-  if (!data) {
-    //
-  }
-
-  // Show loading before starting chart initialization
-  if (typeof showChartLoading === "function") {
-  } else {
-    // Fallback loading for legacy support
-    const osContainer = document.getElementById("osContainer");
-    if (osContainer) {
-      osContainer.innerHTML = `
-      <div style="display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column;">
-      <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite;"></div>
-      <p style="margin-top: 10px; color: #666;">Loading chart...</p>
-      </div>
-      <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-        }
-        </style>
-        `;
-    }
-  }
-
+async function initializeHelper() {
   showChartLoading("chart-container-custom");
   try {
     const dataChart = await chartShow({
       draftId: organizationAttribute.orgUnitId,
-      jobCode: "10132406",
+      jobCode: defaultNodeId,
       depth: 5,
     });
 
-    if (!dataChart.data) {
-      dataChart.data = [];
-    }
-    dataChart.data.forEach((item) => {
-      item.id = item.id_org_unit;
-    });
-
-    const self = dataChart.data.find((item) => item.id == "10132406");
-    const parent = dataChart.data.find((item) => item.id == self.pid);
-    dataChart.data = dataChart.data.filter((item) => item.id != self.pid);
-    if (parent) {
-      parent.pid = null;
-    }
-    dataChart.data.unshift(parent);
-
-    initializeChartSystem(dataChart.data);
+    helperOrgTree(dataChart.data);
+    renderOrgChart(dataChart.data, defaultNodeId, false);
 
     // testing dataMaster
     // initializeChartSystem(dataMaster);
@@ -76,25 +37,8 @@ async function initializeHelper(data) {
   }
 }
 
-function updateDataList(orgUnitId, orgUnitName) {
-  if (organizationAttribute.orgUnitId == "" || organizationAttribute.orgUnitId == null) return;
-  // update bagan
-  // dotnet ef migrations remove; dotnet ef migrations add rasci; dotnet ef database update
-  // initializeHelper(data);
-  // update data list draft
-}
-
-$("#searchOrgNodeButton").on("click", function () {
-  const searchValue = $("#searchOrgNode").val();
-  // focusNode(searchValue);
-});
-
 $("#searchOrgNode").on("change", function () {
   let searchValue = $("#searchOrgNode").val();
-  // console.log("masuk sini", searchValue);
-  // if (searchValue == "10132405") {
-  //   searchValue = "10132406"; // hardcode for testing
-  // }
   focusNode(searchValue);
 });
 
@@ -857,19 +801,10 @@ $("#selectDraftFilterByDataSource").on("change", async function () {
   await changeDataSourceFilter(filter);
 });
 
-// click export org chart
-$("#exportOrgChart").click(function () {
-  // alert("exportOrgChart");
-});
-
 // change select draft organization
 $("#selectDraftOrganization").change(async function () {
   changeOrganization($("#selectDraftOrganization").val(), $("#selectDraftOrganization option:selected").text());
-  // getDataOrganization(organizationAttribute.orgUnitId);
   initializeHelper();
-  // const getListOrgNode = await chartOrgNodeList({
-  //   draftId: organizationAttribute.orgUnitId,
-  // });
   getDataListAsync([
     {
       id: "searchOrgNode",
@@ -877,20 +812,6 @@ $("#selectDraftOrganization").change(async function () {
       draftId: organizationAttribute.orgUnitId,
     },
   ]);
-  // storeData.listOrgNode = getListOrgNode.data.length > 0 ? getListOrgNode.data : [];
-  // if (typeof storeData.listOrgNode == "string") {
-  //   alert("masuk sini 2");
-  //   return;
-  // }
-  // getDataList([
-  //   {
-  //     dataId: "searchOrgNode",
-  //     data:
-  //       storeData.listOrgNode.length > 0
-  //         ? storeData.listOrgNode.map((item) => ({ id: item.unitCode, text: item.unitName }))
-  //         : [],
-  //   },
-  // ]);
 });
 
 $(document).ready(async function () {
@@ -920,21 +841,16 @@ $(document).ready(async function () {
     return true;
   });
 
-  // check data Initial
-  // getDataOrganization(organizationAttribute.orgUnitId);
-
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
   const focusNode = urlParams.get("focusNode");
   const activeTab = urlParams.get("activeTab");
   if (focusNode) {
     setTimeout(async () => {
-      // alert('masok')
       let data = await chartJobDetail({
         draftId: organizationAttribute.orgUnitId,
         jobCode: focusNode,
       });
       data = data.data;
-      // $("#searchOrgNode").val(focusNode).trigger("change");
       $("#searchOrgNode").append(new Option(data.position, focusNode, true, true)).trigger("change");
     }, 1000);
   }

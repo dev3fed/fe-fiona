@@ -63237,4 +63237,5 @@ const CHART_LOADING_HTML = `
   </style>
 `;
 
-const testt = 'ada'
+
+const defaultNodeId = "10132406";
