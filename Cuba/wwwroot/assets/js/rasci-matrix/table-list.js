@@ -31,7 +31,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   let selectElement = document.querySelector("#dataSource-rasci");
 
   if (selectElement.value === "master" || selectElement.value === "" || selectElement.value === null) {
-    document.getElementById("pills-warningtab").style.display = "none";
+    // document.getElementById("pills-warningtab").style.display = "none";
+    document.getElementById("pills-draft-tab").style.display = "none";
+    document.getElementById("pills-approval-tab").style.display = "none";
+    document.getElementById("pills-log-history-tab").style.display = "none";
     document.getElementById("btnAddBp").style.display = "none";
     document.getElementById("btnAddNotation").style.display = "none";
     document.getElementById("btnDeleteDetail").style.display = "none";
@@ -137,14 +140,21 @@ async function changeDataSource(dataSource, draftSo) {
     if (dataSource !== "master" && dataSource !== "" && dataSource !== null) {
       console.log("dataSource", dataSource);
 
-      document.getElementById("pills-warningtab").style.display = "flex";
+      // document.getElementById("pills-warningtab").style.display = "flex";
+
+      document.getElementById("pills-draft-tab").style.display = "flex";
+      document.getElementById("pills-approval-tab").style.display = "flex";
+      document.getElementById("pills-log-history-tab").style.display = "flex";
       document.getElementById("btnAddBp").style.display = "flex";
       document.getElementById("btnAddNotation").style.display = "flex";
       document.getElementById("btnDeleteDetail").style.display = "inline-block";
       document.getElementById("btnEditDetail").style.display = "inline-block";
       // document.getElementById("btnFormdraft").style.display = "none";
     } else {
-      document.getElementById("pills-warningtab").style.display = "none";
+      // document.getElementById("pills-warningtab").style.display = "none";
+      document.getElementById("pills-draft-tab").style.display = "none";
+      document.getElementById("pills-approval-tab").style.display = "none";
+      document.getElementById("pills-log-history-tab").style.display = "none";
       document.getElementById("btnAddBp").style.display = "none";
       document.getElementById("btnAddNotation").style.display = "none";
       document.getElementById("btnDeleteDetail").style.display = "none";

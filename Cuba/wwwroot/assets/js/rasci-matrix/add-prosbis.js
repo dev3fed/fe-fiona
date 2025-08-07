@@ -1,7 +1,5 @@
 async function onModalChoose(type, jobId, prosbisId) {
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalChoosedraft"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("modalChoosedraft"));
   modal.show();
   const body = document.getElementById("body-choosedraft");
   body.innerHTML = `
@@ -211,13 +209,13 @@ function onSelectDraft(event) {
 // }
 async function onModalAddBp() {
   try {
-    const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
-    modal.show();
     const rasciNotation = getState("rasciNotation") || [];
     const dataProsbis = getState("insertProsbis");
     const draftidRasci = $("#dataSource-rasci").val();
     const draftName = $("#dataSource-rasci option:selected").text();
     const resultLevel = await fetchSelectLevel(draftidRasci);
+    const modal = new bootstrap.Modal(document.getElementById("modalAddBp"));
+    modal.show();
     if (resultLevel.status === 200) {
       const listLevel = resultLevel?.data.result;
       const formContent = `
@@ -235,9 +233,7 @@ async function onModalAddBp() {
         <label class="form-label">Level</label>
         <select class="form-select digits" onchange="onSelect(event)" id="idprosbisLevel">
           <option>Choose</option>
-          ${listLevel.map(
-            (opt) => `<option value="${opt.id}">${opt.text}</option>`,
-          )}
+          ${listLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
         </select>
       </div>
     </div>
@@ -267,8 +263,7 @@ async function onModalAddBp() {
       tblNotation(rasciNotation);
       cardSelectedJoblist(dataProsbis);
       document.getElementById("select-job").innerHTML = bodySelectJob;
-      document.getElementById("tbl-add-prosbis-header").innerHTML =
-        theadContent;
+      document.getElementById("tbl-add-prosbis-header").innerHTML = theadContent;
 
       const bodyContent = document.getElementById("form-content");
       if (bodyContent) {
@@ -285,15 +280,11 @@ async function onModalAddBp() {
 const cardSelectedJoblist = (param) => {
   const bodyJoblist = param.jobMapped
     .map((value) => {
-      const rasciNotation = value.rasciNotation.filter(
-        (item) => item.isChecked,
-      );
+      const rasciNotation = value.rasciNotation.filter((item) => item.isChecked);
       return `<div class="card-listjob mb-2">
           <div class="row">
             <div class="col-10">
-              <span style="font-size:13px;font-weight:bold">${
-                value.jobName
-              }</span>
+              <span style="font-size:13px;font-weight:bold">${value.jobName}</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
               <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteJoblist(${
@@ -323,9 +314,7 @@ const cardSelectedJoblist = (param) => {
 };
 const deleteJoblist = (id) => {
   const dataProsbis = getState("insertProsbis");
-  const removeData = dataProsbis.jobMapped.filter(
-    (item) => Number(item.jobId) !== Number(id),
-  );
+  const removeData = dataProsbis.jobMapped.filter((item) => Number(item.jobId) !== Number(id));
   const result = { ...dataProsbis, jobMapped: removeData };
   setState("insertProsbis", result);
   cardSelectedJoblist(result);
@@ -351,9 +340,7 @@ const tblNotation = (rasciNotation) => {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
-          letter.rasciCode
-        }" 
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
                value="${letter.comment || ""}" 
                ${!letter.isChecked ? "disabled" : ""} 
                oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -656,9 +643,7 @@ function handleInputDraftName(value) {
   btnSave.disabled = value.length > 3 ? false : true;
 }
 function openModalConfrim() {
-  const openModal = new bootstrap.Modal(
-    document.getElementById("modalAprroval"),
-  );
+  const openModal = new bootstrap.Modal(document.getElementById("modalAprroval"));
   openModal.show();
 }
 function backFromModalBp() {

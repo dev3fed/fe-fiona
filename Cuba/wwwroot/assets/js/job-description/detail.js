@@ -104,7 +104,6 @@ $(document).ready(async function () {
     }
 
     function callPopover(param, dataDetail) {
-      console.log("callPopover", param, dataDetail);
       // Generate popoverContent dynamically with if-else for status
       const popoverContent = (dataDetail?.data || [])
         .map((item) => {
@@ -259,7 +258,7 @@ $(document).ready(async function () {
       ["para", ["ul", "ol", "paragraph"]],
     ],
   });
-  $(".summernote").summernote("enable");
+  $(".summernote").summernote("disable");
   $(".summernote").summernote("code", fungsiJabatan.deskripsi);
 
   let tugasTanggungJawabUmum;
@@ -335,9 +334,7 @@ $(document).ready(async function () {
   try {
     relasiEksternal = await getRelasiEksternal(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/relasi-eksternal/show", relasiEksternalData);
-    console.log("relasiEksternal", relasiEksternal);
   } catch (error) {
-    console.error("Error fetching koordinasiInternal:", error);
     showEndpointErrorAlert("job-description/relasi-eksternal/show", relasiEksternalData);
     relasiEksternal = relasiEksternalData;
   }
@@ -349,21 +346,10 @@ $(document).ready(async function () {
   try {
     persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
-    console.log("persyaratanJabatan.data =========>>>>", persyaratanJabatan.data);
-    persyaratanJabatan.data = persyaratanJabatan.data.filter(
-      (item) =>
-        item.pendidikanMinimal &&
-        typeof item.pendidikanMinimal === "string" &&
-        item.pendidikanMinimal.trim() !== "" &&
-        item.pengalamanKerja &&
-        typeof item.pengalamanKerja === "string" &&
-        item.pengalamanKerja.trim() !== ""
-    );
-    console.log("persyaratanJabatan.data =========>>>>", persyaratanJabatan.data);
+
     persyaratanJabatan.data.map((item) => {
-      item.pj = [item.pendidikanMinimal, item.pengalamanKerja];
+      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
     });
-    console.log("persyaratanJabatan", persyaratanJabatan);
     updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
   } catch (error) {
     console.error("Error fetching persyaratanJabatan:", error);
@@ -411,8 +397,6 @@ $(document).ready(async function () {
       divKompetensiTeknisMandatory.empty().append($ul);
     }
 
-    console.log("kompetensiTeknis.data.komtekGeneral", kompetensiTeknis.data.komtekGeneral);
-
     if (Array.isArray(kompetensiTeknis.data.komtekGeneral) && kompetensiTeknis.data.komtekGeneral.length > 0) {
       const $ul = $('<ul style=""></ul>');
       kompetensiTeknis.data.komtekGeneral.forEach((item) => {
@@ -423,8 +407,6 @@ $(document).ready(async function () {
       });
       divKompetensiTeknisGeneral.empty().append($ul);
     }
-
-    console.log("kompetensiTeknis.data.komtekSpesifik", kompetensiTeknis.data.komtekSpesifik);
 
     if (Array.isArray(kompetensiTeknis.data.komtekSpesifik) && kompetensiTeknis.data.komtekSpesifik.length > 0) {
       const $ul = $('<ul style=""></ul>');
@@ -446,7 +428,6 @@ $(document).ready(async function () {
     kompetensiPerilaku = await getKompetensiPerilaku(dataDetailJobDesc);
     logWewenangFetchSuccess("job-description/kompetensi-perilaku/show", kompetensiPerilaku);
     const divKompetensiPerilaku = $("#kompetensiPerilaku");
-    console.log("kompetensiPerilaku ==========", kompetensiPerilaku.data);
     divKompetensiPerilaku.empty();
     if (Array.isArray(kompetensiPerilaku.data) && kompetensiPerilaku.data.length > 0) {
       const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
@@ -482,8 +463,6 @@ $(document).ready(async function () {
     if (bagan && bagan.data) {
       globalBaganData = bagan.data;
       globalDataBaganSelf = bagan.data.find((item) => item.id == jobId);
-      console.log("dataBaganSelf", globalDataBaganSelf);
-      console.log("bagan?.data", bagan.data);
       focusNode(globalDataBaganSelf, bagan.data);
     }
   });

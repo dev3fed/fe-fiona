@@ -80,9 +80,107 @@ async function triggleEditActivitybp(id) {
   const draftRasciId = getState("draftRasciId");
   console.log("first", id);
   console.log("draftRasciId", draftRasciId);
+  const rasciNotation = getState("rasciNotation") || [];
+  const dataProsbis = getState("insertProsbis");
+  const draftName = $("#dataSource-rasci option:selected").text();
+  console.log("first", draftName);
+  const resultLevel = await fetchSelectLevel(draftRasciId);
+  const modal = new bootstrap.Modal(document.getElementById("ModalEditActivitybp"));
+  modal.show();
+  if (resultLevel.status === 200) {
+    const listLevel = resultLevel?.data.result;
+    console.log("first", listLevel);
+    const formContent = `
+    <div class="col-2">
+      <div class="mb-3">
+        <label class="form-label">Level</label>
+         <select class="form-select digits" disabled>
+          <option value="${draftRasciId}">${draftName}</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-10">
+        <div class="mb-3">
+          <label class="form-label">Parent</label>
+          <select class="form-select digits" disabled>
+          <option value="${draftRasciId}">${draftName}</option>
+        </select>
+        </div>
+    </div>
+    <div class="col-12">
+      <div>
+        <label class="form-label">Business Process Name</label>
+        <textarea class="form-control"></textarea>
+      </div>
+    </div>`;
+    const bodySelectJob = `
+    <select class="form-select digits" name="jobeditId" id="jobeditId">
+    </select>
+    `;
+    theadContent = `<tr>
+        <th scope="col" style="width: 50px">Check</th>
+        <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
+        <th scope="col">Comment (Optional)</th>
+        </tr>`;
+
+    // tblNotation(rasciNotation);
+    // cardSelectedJoblist(dataProsbis);
+    document.getElementById("select-edit-job").innerHTML = bodySelectJob;
+    document.getElementById("tbl-edit-bp-header").innerHTML = theadContent;
+
+    const bodyContent = document.getElementById("form-edit-content");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+    select2EditJob();
+  }
   try {
   } catch (error) {}
 }
+function select2EditJob() {
+  const draftRasciId = $("#dataSource-rasci").val();
+  let $select = $("#dataSource-rasci");
+  let selectedOption = $select.find(":selected"); // Ambil elemen option yang terpilih
+  let selectedDraftSo = selectedOption.attr("data-draftso");
+  $("#jobeditId")
+    .select2({
+      dropdownParent: $("#ModalEditActivitybp"),
+      placeholder: "Choose",
+      allowClear: true,
+      delay: 250,
+      ajax: {
+        url: `${url_api}/api/Utilities/selection`,
+        dataType: "json",
+        data: function (params) {
+          return {
+            search: params.term || "",
+            page: params.page || 1,
+            type: "position",
+            draftId: selectedDraftSo,
+          };
+        },
+        processResults: function (data) {
+          if (data && data.data) {
+            return {
+              results: data.data.result,
+              pagination: {
+                more: data.data.pagination.more,
+              },
+            };
+          }
+          return { results: [] };
+        },
+        cache: true,
+      },
+      templateResult: function (item) {
+        return item.text;
+      },
+    })
+    .on("select2:open", function () {
+      page = 1;
+    });
+}
+
 async function triggleDetailActivity(id, draftType) {
   const draftRasciId = getState("draftRasciId");
   try {

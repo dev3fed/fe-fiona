@@ -34,7 +34,7 @@ const renderTableBehavior = async (behaviorList) => {
                     <button class="btn btn-outline-primary" type="button" onclick="handleBehavior('Behavior','${
                       val.id
                     }')">
-                      <i class="icon-eye"> Detail</i>
+                      <i class="icon-eye" style="font-size: 12px;"> Detail</i>
                     </button>
                   </td>
                 </tr>`;
