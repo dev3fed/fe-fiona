@@ -304,12 +304,11 @@ function appendDynamicHeader(jobTitleList) {
         <li onclick="triggleDetailJob(${valString})">
           <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Filter Icon">Detail</a>
         </li>
-        <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
       </ul>
     </div>
       </th>
     `;
-
+    //  <li><a class="dropdown-item"><img src="/assets/images/rasci/clipboard.svg" alt="Filter Icon">Job Description</a></li>
     dynamicHeaders += headerHTML;
   });
 

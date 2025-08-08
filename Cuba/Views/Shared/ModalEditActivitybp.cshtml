@@ -7,7 +7,7 @@
         margin: 30px auto;
     }
 
-    .tbl-border-add-prosbis {
+    .tbl-border-edit-bp {
         width: 100%;
         border-top: 1px solid #b0d1e4;
         border-right: 1px solid #b0d1e4;
@@ -17,13 +17,13 @@
         font-size: 12px !important;
     }
 
-    .tbl-border-add-prosbis th {
+    .tbl-border-edit-bp th {
         color: #006CA9;
         font-weight: bold;
         height: 40px;
     }
 
-    .tbl-border-add-prosbis thead th {
+    .tbl-border-edit-bp thead th {
         position: sticky;
         top: 0;
         background-color: #E6F0F6;
@@ -31,8 +31,8 @@
         /* To ensure it stays above the content */
     }
 
-    .tbl-border-add-prosbis th,
-    .tbl-border-add-prosbis td {
+    .tbl-border-edit-bp th,
+    .tbl-border-edit-bp td {
         padding: 8px !important;
         border-right: 1px solid #b0d1e4;
         border-bottom: 1px solid #b0d1e4;
@@ -89,26 +89,26 @@
     }
 
     /* Custom scrollbar styles */
-    .scrollable-addbusiness::-webkit-scrollbar {
+    .scrollable-editbp::-webkit-scrollbar {
         width: 10px;
         height: 8px;
     }
 
-    .scrollable-addbusiness::-webkit-scrollbar-track {
+    .scrollable-editbp::-webkit-scrollbar-track {
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         border-radius: 10px;
     }
 
-    .scrollable-addbusiness::-webkit-scrollbar-thumb {
+    .scrollable-editbp::-webkit-scrollbar-thumb {
         background: #006ca9;
         border-radius: 10px;
     }
 
-    .scrollable-addbusiness::-webkit-scrollbar-thumb:hover {
+    .scrollable-editbp::-webkit-scrollbar-thumb:hover {
         background: #006ca9;
     }
 
-    .scrollable-addbusiness {
+    .scrollable-editbp {
         max-height: 620px;
         overflow-y: auto;
         margin-right: 5px;
@@ -151,17 +151,17 @@
                 <h5 class="modal-title" id="ModalEditActivitybpTitle">Edit Data</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body scrollable-addbusiness" id="modal-body-content">
+            <div class="modal-body scrollable-editbp" id="modal-body-content">
                 <div class="row">
                     <div class="col-12">
-                        <div class="row" id="form-edit-content">
+                        <div class="row" id="formedit-content">
 
                         </div>
                     </div>
                     <div class="col-6">
-                        <label class="form-label mt-3">Job</label>
+                        <label class="form-label mt-3">Position</label>
                         <div class="card-tbljob">
-                            <div id="select-job">
+                            <div id="edit-select-job">
                             </div>
                             <div class="table-responsive mt-2" style=" max-height: 450px;">
                                 <table class="table tbl-border-edit-bp">
@@ -174,7 +174,7 @@
                             <div class="d-flex mt-2 justify-content-end">
                                 <button class="btn btn btn-primary" type="button">
                                     Selected
-                                    Job</button>
+                                    Position</button>
                             </div>
                         </div>
                     </div>

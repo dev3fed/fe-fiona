@@ -580,7 +580,7 @@ const triggleSelectJob = () => {
 async function saveAsDraft() {
   try {
     const dataProsbis = getState("insertProsbis");
-    const spinner = document.getElementById("saveDraftBtn");
+    const spinner = document.getElementById("saveNewbp");
     const draftId = $("#dataSource-rasci").val();
     spinner.style.display = "inline-block";
     const inputValue = {
@@ -589,13 +589,12 @@ async function saveAsDraft() {
       draftJobSource: null,
       draftType: "Add New Business Process",
     };
-    console.log("cek");
     const result = await submitDraftProsbis(inputValue);
     if (result.status === 200) {
       const modalAddBp = document.getElementById("modalAddBp");
       const modalAdd = bootstrap.Modal.getInstance(modalAddBp);
       document.getElementById("draftName").value = "";
-      const btnDraft = document.getElementById("saveDraftBtn");
+      const btnDraft = document.getElementById("saveNewbp");
       btnDraft.disabled = true;
       const resultMatrix = await lastStateTableMatrix();
       if (resultMatrix) {

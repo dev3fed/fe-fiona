@@ -87,10 +87,11 @@ async function triggleEditActivitybp(id) {
   const resultLevel = await fetchSelectLevel(draftRasciId);
   const modal = new bootstrap.Modal(document.getElementById("ModalEditActivitybp"));
   modal.show();
-  if (resultLevel.status === 200) {
-    const listLevel = resultLevel?.data.result;
-    console.log("first", listLevel);
-    const formContent = `
+  try {
+    if (resultLevel.status === 200) {
+      const listLevel = resultLevel?.data.result;
+      console.log("first", listLevel);
+      const formContent = `
     <div class="col-2">
       <div class="mb-3">
         <label class="form-label">Level</label>
@@ -113,30 +114,96 @@ async function triggleEditActivitybp(id) {
         <textarea class="form-control"></textarea>
       </div>
     </div>`;
-    const bodySelectJob = `
-    <select class="form-select digits" name="jobeditId" id="jobeditId">
-    </select>
-    `;
-    theadContent = `<tr>
-        <th scope="col" style="width: 50px">Check</th>
-        <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
-        <th scope="col">Comment (Optional)</th>
-        </tr>`;
+      const bodySelectJob = `
+      <select class="form-select digits" name="jobeditId" id="jobeditId">
+      </select>
+      `;
+      theadContent = `<tr>
+          <th scope="col" style="width: 50px">Check</th>
+          <th scope="col" style="width: 120px;text-align:center">RASCI Notation</th>
+          <th scope="col">Comment (Optional)</th>
+          </tr>`;
 
-    // tblNotation(rasciNotation);
-    // cardSelectedJoblist(dataProsbis);
-    document.getElementById("select-edit-job").innerHTML = bodySelectJob;
-    document.getElementById("tbl-edit-bp-header").innerHTML = theadContent;
+      editTblNotation(rasciNotation);
+      cardSelectedEditJoblist(dataProsbis);
+      document.getElementById("edit-select-job").innerHTML = bodySelectJob;
+      document.getElementById("tbl-edit-bp-header").innerHTML = theadContent;
 
-    const bodyContent = document.getElementById("form-edit-content");
-    if (bodyContent) {
-      bodyContent.innerHTML = formContent;
+      const bodyContent = document.getElementById("formedit-content");
+      if (bodyContent) {
+        bodyContent.innerHTML = formContent;
+      }
+      select2EditJob();
     }
-    select2EditJob();
-  }
-  try {
   } catch (error) {}
 }
+const cardSelectedEditJoblist = (param) => {
+  const bodyJoblist = param.jobMapped
+    .map((value) => {
+      const rasciNotation = value.rasciNotation.filter((item) => item.isChecked);
+      return `<div class="card-listjob mb-2">
+          <div class="row">
+            <div class="col-10">
+              <span style="font-size:13px;font-weight:bold">${value.jobName}</span>
+            </div>
+            <div class="col-2 d-flex justify-content-end">
+              <button class="btn btn-outline-danger btn-sm " type="button"  style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
+                <i class="icon-trash" style="font-size: 14px;padding-right:2px"></i>
+              </button>
+            </div> 
+              ${rasciNotation
+                .map((letter) => {
+                  return `<div class="col-1 mb-1">
+                          <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
+                    letter.rasciCode
+                  } Icon" style="padding-right:2px">
+                  </div>
+                  <div class="col-11" style="text-align:left">
+                  <span>: ${letter.comment}</span>
+                  </div>
+                  `;
+                })
+                .join("")}
+          </div>
+        </div>`;
+    })
+    .join("");
+  document.getElementById("selected-edit-job").innerHTML = bodyJoblist;
+};
+
+const editTblNotation = (rasciNotation) => {
+  const rasciRows = rasciNotation
+    .map(
+      (letter) => `
+  <tr>
+      <th scope="row">
+        <label class="radio-label" for="checked-body-bp">
+          <input class="checkbox_animated" 
+                 id="checked-${letter.rasciCode.toLowerCase()}" 
+                 type="checkbox" 
+                 data-rasci="${letter.rasciCode}" 
+                 ${letter.isChecked ? "checked" : ""} 
+                 onclick="onCheck(event, '${letter.rasciCode}')">
+        </label>
+      </th>
+      <td style="text-align:center">
+        <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
+        letter.rasciCode
+      } Icon" style="padding-right:2px">
+      </td>
+      <td>
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
+               value="${letter.comment || ""}" 
+               ${!letter.isChecked ? "disabled" : ""} 
+               oninput="updateComment('${letter.rasciCode}', this.value)">
+      </td>
+    </tr>
+`,
+    )
+    .join("");
+  tdBody = rasciRows;
+  document.getElementById("tbl-edit-bp-body").innerHTML = tdBody;
+};
 function select2EditJob() {
   const draftRasciId = $("#dataSource-rasci").val();
   let $select = $("#dataSource-rasci");
@@ -353,7 +420,7 @@ async function detailAddNotation(id, draftRasciId) {
             <hr style="margin-top: 0;" />
         </div>
         <div class="col-12 mb-2 d-flex justify-content-end">
-         <button class="btn btn-primary btn-sm">  
+         <button class="btn btn-primary btn-sm" onclick="onModalAddNotation()">  
            <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;"> Add RASCI
          </button>
         </div>
@@ -391,7 +458,7 @@ async function detailAddNotation(id, draftRasciId) {
                           <img src="/assets/images/rasci/c.svg" alt="C Icon" style="height: 16px; width: 16px;">
                       </td>
                       <td style="text-align:center">
-                          <button class="btn btn-outline-light btn-small-icon" type="button">
+                          <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditNotation()">
                                     <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
                                   </button>
                       </td>
@@ -413,3 +480,13 @@ async function detailAddNotation(id, draftRasciId) {
   // const dataActivity = await fetchDetailDraftActivity(url);
   // console.log("dataActivity", dataActivity);
 }
+
+const handleEditNotation = () => {
+  console.log("first");
+
+  // console.log("data", data);
+  // console.log("dataChangeNotasi", dataChangeNotasi);
+  // const dataChangeNotasi = getState("dataChangeNotasi");
+  // setState("editRasciNotation", data);
+  // openModalEditRascinotation(dataChangeNotasi, data);
+};

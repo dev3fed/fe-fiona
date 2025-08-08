@@ -11,12 +11,8 @@ async function handleEditComment(data) {
 async function handleDeleteProsbis(param) {
   try {
     const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
-    const deleted = listSelectedProsbisref.filter(
-      (item) => item.indexNumber !== param.indexNumber,
-    );
-    const checkbox = document.getElementById(
-      `checked-prosbisref-${param.indexNumber}`,
-    );
+    const deleted = listSelectedProsbisref.filter((item) => item.indexNumber !== param.indexNumber);
+    const checkbox = document.getElementById(`checked-prosbisref-${param.indexNumber}`);
     if (checkbox) {
       checkbox.checked = false;
     }
@@ -28,9 +24,7 @@ async function handleDeleteProsbis(param) {
 
 async function openModalEditRascinotation(result, dataProsbis) {
   try {
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalNotationRef"),
-    );
+    const modal = new bootstrap.Modal(document.getElementById("modalNotationRef"));
     modal.show();
     const rasciNotation = getState("rasciNotation") || [];
     const notation = dataProsbis.rasciNotation.map((item) => {
@@ -58,9 +52,7 @@ async function openModalEditRascinotation(result, dataProsbis) {
             <div >
                 <label class="form-label" style="width:19%">Business Process</label>
                  <label> : </label>
-            <b class="form-label">${dataProsbis.indexNumber} - ${
-      dataProsbis.description
-    }</b>
+            <b class="form-label">${dataProsbis.indexNumber} - ${dataProsbis.description}</b>
             </div>
           </div>
           <div class="col-12">
@@ -81,8 +73,7 @@ async function openModalEditRascinotation(result, dataProsbis) {
     const output = mergeRasciData(notation, rasciNotation);
     setState("rasciNotation", output);
     tblChangeNotationRef(output);
-    document.getElementById("tbl-notatationref-header").innerHTML =
-      theadContent;
+    document.getElementById("tbl-notatationref-header").innerHTML = theadContent;
 
     const bodyContent = document.getElementById("form-notatationref");
     if (bodyContent) {
@@ -103,9 +94,7 @@ async function cardSelectedProsbisref() {
        </div>`;
   if (listSelectedProsbisref.length > 0) {
     const tblProsbisref = `
-      <label class="form-label">Selected Business Process (${
-        listSelectedProsbisref.length
-      })</label>
+      <label class="form-label">Selected Business Process (${listSelectedProsbisref.length})</label>
        <div class="card-tblbusiness" style=" max-height: 300px;">
            <div class="table-responsive scrollable mt-2" style=" max-height: 260px;">
                <table class="table tbl-border-notation">
@@ -144,9 +133,7 @@ async function cardSelectedProsbisref() {
                        }
 
                        if (value.comment) {
-                         comments.push(
-                           `<li>${value.notation}: ${value.comment}</li>`,
-                         );
+                         comments.push(`<li>${value.notation}: ${value.comment}</li>`);
                        }
                      });
 
@@ -223,9 +210,7 @@ function tblChangeNotationRef(rasciNotation) {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
-          letter.rasciCode
-        }"
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
           value="${letter.comment || ""}"
           ${!letter.isChecked ? "disabled" : ""}
           oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -243,9 +228,7 @@ async function saveNotationRef() {
   const listSelectedProsbisref = getState("listSelectedProsbisref");
   const editRasciNotation = getState("editRasciNotation");
   const dataChangeNotasi = getState("dataChangeNotasi");
-  const selectedRasciNotation = rasciNotation.filter(
-    (item) => item.isChecked === true,
-  );
+  const selectedRasciNotation = rasciNotation.filter((item) => item.isChecked === true);
   const output = selectedRasciNotation.map((item) => {
     return {
       notation: item.rasciCode,
@@ -254,10 +237,7 @@ async function saveNotationRef() {
   });
   const updateData = { ...editRasciNotation, rasciNotation: output };
   setState("editRasciNotation", updateData);
-  const updateList = updateListSelectedProsbisref(
-    listSelectedProsbisref,
-    updateData,
-  );
+  const updateList = updateListSelectedProsbisref(listSelectedProsbisref, updateData);
   setState("listSelectedProsbisref", updateList);
   const updatePayload = updateBusProsMapped(dataChangeNotasi, updateData);
   if (updateList.length > 0) {
