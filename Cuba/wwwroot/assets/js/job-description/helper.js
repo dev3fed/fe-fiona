@@ -1017,11 +1017,13 @@ function focusNode(nodeId, dataBagan) {
     tags: [...selfNode.tags, "pointed"],
   };
 
+  console.log("filteredData", filteredData);
   filteredData.push(selfNode);
   filteredData.map((item) => {
     item.id = parseInt(item.id);
     item.pid = parseInt(item.pid);
   });
+  console.log("filteredData", filteredData);
   setTimeout(() => {
     helperOrgChart(true, "os-container", filteredData, true, {
       expand: true,
@@ -1030,11 +1032,346 @@ function focusNode(nodeId, dataBagan) {
   }, 1500);
 }
 
+// function helperOrgChart(init, id, data, isFocusNode, object) {
+//   const lsListOrgNode = JSON.parse(localStorage.getItem("listOrgNode") || "[]");
+//   console.log("data ==>", data);
+//   if (!init) {
+//     return false;
+//   }
+//   const param = {};
+//   if (isFocusNode) {
+//     param.collapsed = {
+//       level: 2,
+//       allChildren: true,
+//     };
+//   }
+
+//   const default_t = Object.assign({}, OrgChart.templates.base);
+//   default_t.size = [220, 70];
+//   default_t.ripple = null;
+//   default_t.img_0 = null;
+//   default_t.node = `<rect x="0" y="0" height="{h}" width="{w}" fill="#ffffff" stroke-width="1" stroke="#000"></rect>`;
+//   default_t.position = `<g><text data-width="180" style="font-size:11px;" text-anchor="middle" dominant-baseline="middle" fill="#353238" x="105" y="25" data-text-overflow="multiline">{val}</text></g>`;
+//   // default_t.prl = `<g><rect x="180" y="0" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px;text-anchor: middle;" fill="#353238" x="200" y="22.5">{val}</text></g>`;
+//   // default_t.jumlah_formasi = `<g><rect x="180" y="35" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px; text-anchor: middle;" fill="#353238" x="200" y="57.5">{val}</text></g>`;
+
+//   default_t.expandCollapseSize = 10;
+//   // default_t.link = `<path stroke-linejoin="round" stroke-width="1" fill="none" d="{edge}" />`;
+//   default_t.plus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
+//   <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line>
+//   <line x1="5" y1="3" x2="5" y2="7" stroke-width="1" stroke="#000"></line></g>`;
+//   default_t.minus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
+//   <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line></g>`;
+//   // chaert separation
+//   OrgChart.templates.split = Object.assign({}, OrgChart.templates.base);
+//   // RESET_MOVABLE_ONEXPANDCOLLAPSE
+
+//   OrgChart.templates.split.size = [0, 0];
+//   OrgChart.templates.split.node = "";
+//   OrgChart.templates.default_t = default_t;
+//   OrgChart.templates.default_t.menuButton =
+//     '<div style="position:absolute;right:0px;top:20px; width:40px;height:50px;cursor:pointer;" data-ctrl-menu="">' +
+//     '<hr style="background-color: black; height: 3px;margin:0px; border: none;">' +
+//     '<hr style="background-color: black; height: 3px; border: none;">' +
+//     '<hr style="background-color: black; height: 3px; border: none;">' +
+//     "</div>";
+
+//   const baseNodeBinding = {
+//     position: "position",
+//     prl: "prl",
+//     jumlah_formasi: "jumlah_formasi",
+//     org_unit: "org_unit_name",
+//     level: "level",
+//   };
+
+//   // function bracketTemplateGenerator(bracketSize) {
+//   //   const template = Object.assign({}, OrgChart.templates.default_t);
+//   //   template.size = [220, 0];
+//   //   for (let i = 0; i < bracketSize; i++) {
+//   //     template.size = [template.size[0], 120];
+//   //   }
+//   //   template.position = null;
+//   //   template.prl = null;
+//   //   template.jumlah_formasi = null;
+//   //   template.position =
+//   //     `<g>` +
+//   //     '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
+//   //     `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
+//   //     `</g>`;
+
+//   //   let height = 40;
+//   //   for (let i = 1; i <= bracketSize; i++) {
+//   //     const yPosition = 40 + (i - 1) * 40;
+//   //     const yTextPosition = 60 + (i - 1) * 40;
+//   //     height += 40;
+//   //     template.size = [template.size[0], height];
+//   //     template[`bc_${i}_position`] =
+//   //       `<g>` +
+//   //       `<rect x="0" y="${yPosition}" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+//   //       `<text data-width="120" style="font-size:10px;text-anchor: middle;" fill="#353238" x="110" y="${yTextPosition}" data-text-overflow="multiline">{val}</text>` +
+//   //       `</g>`;
+//   //     // template[`bc_${i}_prl`] =
+//   //     //   `<g>` +
+//   //     //   `<rect x="140" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+//   //     //   `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="160" y="${
+//   //     //     yTextPosition + 4
+//   //     //   }">{val}</text>` +
+//   //     //   `</g>`;
+//   //     // template[`bc_${i}_level`] =
+//   //     //   `<g>` +
+//   //     //   // `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="transparent" stroke-width="1" stroke="#000"></rect>` +
+//   //     //   `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+//   //     //   `</g>`;
+//   //     // template[`bc_${i}_jumlah_formasi`] =
+//   //     //   `<g>` +
+//   //     //   `<rect x="180" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
+//   //     //   `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="200" y="${
+//   //     //     yTextPosition + 4
+//   //     //   }">{val}</text>` +
+//   //     //   `</g>`;
+//   //   }
+
+//   //   return template;
+//   // }
+
+//   const bracketLimit = 20;
+
+//   for (let i = 1; i <= bracketLimit; i++) {
+//     OrgChart.templates[`bracket_${i}_t`] = bracketTemplateGenerator(i);
+//   }
+
+//   const nodeBinding = {
+//     ...baseNodeBinding,
+//   };
+
+//   const tags = {};
+
+//   for (let i = 1; i <= bracketLimit; i++) {
+//     for (let key in baseNodeBinding) {
+//       nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
+//     }
+//     tags[`bracket_${i}`] = {
+//       template: `bracket_${i}_t`,
+//     };
+//   }
+
+//   console.log("tags", tags);
+
+//   OrgChart.RESET_MOVABLE_ONEXPANDCOLLAPSE = true;
+//   OrgChart.SEARCH_CLOSE_RESULT_ON_ESCAPE_OR_CLICKOUTSIDE = true;
+//   let chart = new OrgChart(document.getElementById(id), {
+//     collapse: {
+//       ...param.collapsed,
+//       // level: 2,
+//       // allChildren: true,
+//     },
+//     template: "default_t",
+//     nodeBinding,
+//     enableSearch: false,
+//     assistantSeparation: 10,
+//     levelSeparation: 30,
+//     scaleInitial: OrgChart.match.boundary,
+//     nodes: data,
+//     align: OrgChart.ORIENTATION,
+//     movable: OrgChart.movable.node,
+//     nodeMouseClick: false,
+//     // menu
+//     // menu: {
+//     //   pdf: { text: "Export PDF" },
+//     //   png: { text: "Export PNG" },
+//     //   svg: { text: "Export SVG" },
+//     // },
+//     toolbar: {
+//       fullScreen: true,
+//       zoom: true,
+//       fit: true,
+//     },
+//     tags,
+//   });
+
+//   chart.on("init", function (sender) {
+//     // const title = document.createElement("button");
+//     // title.style.position = "absolute";
+//     // title.style.right = "0px";
+//     // title.style.top = "87px";
+//     // title.style.width = "50px";
+//     // title.style.textAlign = "center";
+//     // title.style.color = "#757575";
+//     // title.style.backgroundColor = "transparent";
+//     // title.style.border = "none";
+//     // title.style.fontSize = "42px";
+//     // title.style.color = "grey";
+//     // title.innerHTML = `<i class="fa fa-refresh"></i>`;
+//     // // add id to title
+//     // title.addEventListener("click", function () {
+//     //   // myData.forEach((item) => {
+//     //   //   item.tags = item.tags.filter((tag) => tag !== "edit");
+//     //   // });
+//     //   // chart.load(myData);
+//     //   helperOrgChart(true, "os-container", lsListOrgNode, true);
+//     // });
+//     // chart.element.appendChild(title);
+//   });
+
+//   chart.onExportStart((args) => {
+//     args.styles += document.getElementById("myStyle").outerHTML;
+//   });
+
+//   chart.onExportEnd((args) => {
+//     console.log(args);
+//   });
+
+//   chart.onUpdated(() => {});
+
+//   chart.on("expcollclick", function (sender, collapse, id, ids) {});
+
+//   chart.on("node-layout", function (sender, args) {
+//     const childrenCount = args?.childrenIds?.length;
+//     if (childrenCount > 10) {
+//       args.layout = OrgChart.treeRightOffset;
+//     } else {
+//       args.layout = OrgChart.normal;
+//     }
+//   });
+
+//   chart.on("click", async (sender, node) => {
+//     const param = {};
+//     const nodeID = node.node.id;
+//     // await modalJobPopup(nodeID);
+//   });
+
+//   chart.on("searchclick", (sender, node) => {
+//     return false;
+//   });
+
+//   $("#handleExportPdf")
+//     .off("click")
+//     .on("click", function () {
+//       const nodeId = $("#positionId").val();
+//       chart.exportPDF({
+//         filename: `${nodeId}.pdf`,
+//         expandChildren: false,
+//       });
+//       $("#modalDetailJob").modal("hide");
+//     });
+
+//   $("#handleExportPng").on("click", function () {
+//     const nodeId = $("#positionId").val();
+//     exportChartAsBlob();
+//     $("#modalDetailJob").modal("hide");
+//   });
+
+//   function exportChartAsBlob() {
+//     //  create canvas from div id os-container, then create png from canvas
+//     const osContainer = document.getElementById("os-container");
+
+//     if (typeof window.html2canvas === "undefined") {
+//       console.error("html2canvas is not loaded.");
+//       return;
+//     }
+
+//     window.html2canvas(osContainer).then((canvas) => {
+//       // Get the image data
+//       const ctx = canvas.getContext("2d");
+//       const { width, height } = canvas;
+//       const imageData = ctx.getImageData(0, 0, width, height);
+//       const data = imageData.data;
+
+//       // Find bounds
+//       let top = null,
+//         bottom = null,
+//         left = null,
+//         right = null;
+//       for (let y = 0; y < height; y++) {
+//         for (let x = 0; x < width; x++) {
+//           const idx = (y * width + x) * 4;
+//           // If not white and not fully transparent
+//           if (
+//             !(data[idx] === 255 && data[idx + 1] === 255 && data[idx + 2] === 255 && data[idx + 3] === 255) &&
+//             data[idx + 3] !== 0
+//           ) {
+//             if (top === null) top = y;
+//             if (left === null || x < left) left = x;
+//             if (right === null || x > right) right = x;
+//             bottom = y;
+//           }
+//         }
+//       }
+
+//       if (top !== null && left !== null && right !== null && bottom !== null) {
+//         const croppedWidth = right - left + 1;
+//         const croppedHeight = bottom - top + 1;
+//         const croppedCanvas = document.createElement("canvas");
+//         croppedCanvas.width = croppedWidth;
+//         croppedCanvas.height = croppedHeight;
+//         const croppedCtx = croppedCanvas.getContext("2d");
+//         croppedCtx.putImageData(ctx.getImageData(left, top, croppedWidth, croppedHeight), 0, 0);
+
+//         croppedCanvas.toBlob((blob) => {
+//           if (blob) {
+//             console.log("PNG Blob created (cropped)", blob);
+//             // print blob
+//             const url = URL.createObjectURL(blob);
+//             const img = document.createElement("img");
+//             img.src = url;
+//             img.onload = () => {
+//               // Optionally, you can revoke the object URL after use
+//               URL.revokeObjectURL(url);
+//               // Append the image to the body or any other element
+//               document.body.appendChild(img);
+//             };
+//             // Download the image as well
+//             const a = document.createElement("a");
+//             a.href = url;
+//             a.download = "orgchart-cropped.png";
+//             document.body.appendChild(a);
+//             a.click();
+//             document.body.removeChild(a);
+//           }
+//         }, "image/png");
+//       } else {
+//         // fallback: no non-white content found
+//         canvas.toBlob((blob) => {
+//           if (blob) {
+//             console.log("PNG Blob created (original)", blob);
+//             // Download the original image as well
+//             const url = URL.createObjectURL(blob);
+//             const a = document.createElement("a");
+//             a.href = url;
+//             a.download = "orgchart.png";
+//             document.body.appendChild(a);
+//             a.click();
+//             document.body.removeChild(a);
+//           }
+//         }, "image/png");
+//       }
+//     });
+//   }
+
+//   if (object?.expand) {
+//     let selfNode = data.find((item) => item.id == object.nodeId);
+//     const getChildrenNode = data.filter((item) => item.pid == object.nodeId).map((item) => item.id) || [];
+//     const siblingNode = data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
+//     const getAll = [...getChildrenNode, ...siblingNode];
+//     setTimeout(() => {
+//       chart.expand(selfNode.id, getAll);
+//     }, 1000);
+//     setTimeout(() => {
+//       chart.fit();
+//     }, 2000);
+//   }
+// }
+
 function helperOrgChart(init, id, data, isFocusNode, object) {
-  const lsListOrgNode = JSON.parse(localStorage.getItem("listOrgNode") || "[]");
   if (!init) {
     return false;
   }
+
+  // Show loading at the start of chart rendering
+  if (typeof showChartLoading === "function") {
+    showChartLoading("chart-container-custom");
+  }
+
   const param = {};
   if (isFocusNode) {
     param.collapsed = {
@@ -1093,7 +1430,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     template.position =
       `<g>` +
       '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
-      `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
+      `<foreignObject x="5" y="5" width="210" height="30">` +
+      `<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:11px;text-align:center;color:#353238;font-family:Arial,sans-serif;line-height:1.2;word-wrap:break-word;overflow:hidden;display:flex;align-items:center;justify-content:center;height:30px;">{val}</div>` +
+      `</foreignObject>` +
       `</g>`;
 
     let height = 40;
@@ -1143,18 +1482,80 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   const tags = {};
 
+  // console.log({baseNodeBinding})
   for (let i = 1; i <= bracketLimit; i++) {
     for (let key in baseNodeBinding) {
       nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
     }
-    tags[`bracket_${i}`] = {
+    tags[`basket_${i}`] = {
       template: `bracket_${i}_t`,
     };
   }
 
+  // for (let i = 1; i <= bracketLimit; i++) {
+  //   for (let key in baseNodeBinding) {
+  //     nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
+  //   }
+  //   tags[`basket_${i}`] = {
+  //     template: `bracket_${i}_t`,
+  //   };
+  // }
+  // console.log(OrgChart.templates);
+  // console.log({tags})
+
+  // add tags
+  // "hasChildren": {
+  //   template: "withChildren"
+  // }
+  // tags["hasChildren"] = {
+  //   template: "withChildren",
+  // };
+
+  //  templates: {
+  //     withChildren: Object.assign({}, OrgChart.templates.base, {
+  //       node: '<rect x="0" y="0" width="250" height="100" fill="lightblue"></rect>',
+  //       plus: '<circle cx="225" cy="50" r="15" fill="green" stroke="black" stroke-width="2"></circle>',
+  //   })
+  // }
+
+  // templates["withChildren"] = Object.assign({}, OrgChart.templates.base, {
+
+  // console.log("testOrgBagan", testOrgBagan);
+
+  // remove duplicate id in array data
+  // data = data.filter((item, index, self) => self.findIndex((t) => t.id === item.id) === index);
+
   OrgChart.RESET_MOVABLE_ONEXPANDCOLLAPSE = true;
   OrgChart.SEARCH_CLOSE_RESULT_ON_ESCAPE_OR_CLICKOUTSIDE = true;
-  let chart = new OrgChart(document.getElementById(id), {
+  // remove chart first, then create new chart
+  const chartContainer = document.getElementById(id);
+  if (chartContainer) {
+    chartContainer.innerHTML = "";
+  }
+  if (document.getElementById(id)) {
+    document.getElementById(id).innerHTML = "";
+  }
+
+  // Check if container exists, if not create it
+  let containerElement;
+  if (id === "osContainer") {
+    // For legacy osContainer, try to find .chart-container instead
+    containerElement = document.querySelector(".chart-container");
+    if (!containerElement) {
+      console.error("Chart container not found");
+      return;
+    }
+  } else {
+    containerElement = document.getElementById(id);
+    if (!containerElement) {
+      const container = document.createElement("div");
+      container.id = id;
+      document.body.appendChild(container);
+      containerElement = container;
+    }
+  }
+
+  let chart = new OrgChart(containerElement, {
     collapse: {
       ...param.collapsed,
       // level: 2,
@@ -1166,11 +1567,13 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     assistantSeparation: 10,
     levelSeparation: 30,
     scaleInitial: OrgChart.match.boundary,
+    fit: true, // Enable auto-fit
+    // nodes: testOrgBagan,
+    // nodes: test,
     nodes: data,
     align: OrgChart.ORIENTATION,
-    movable: OrgChart.movable.node,
+    // movable: OrgChart.movable.node,
     nodeMouseClick: false,
-    // menu
     // menu: {
     //   pdf: { text: "Export PDF" },
     //   png: { text: "Export PNG" },
@@ -1184,29 +1587,57 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     tags,
   });
 
-  chart.on("init", function (sender) {
-    // const title = document.createElement("button");
-    // title.style.position = "absolute";
-    // title.style.right = "0px";
-    // title.style.top = "87px";
-    // title.style.width = "50px";
-    // title.style.textAlign = "center";
-    // title.style.color = "#757575";
-    // title.style.backgroundColor = "transparent";
-    // title.style.border = "none";
-    // title.style.fontSize = "42px";
-    // title.style.color = "grey";
-    // title.innerHTML = `<i class="fa fa-refresh"></i>`;
-    // // add id to title
-    // title.addEventListener("click", function () {
-    //   // myData.forEach((item) => {
-    //   //   item.tags = item.tags.filter((tag) => tag !== "edit");
-    //   // });
-    //   // chart.load(myData);
-    //   helperOrgChart(true, "os-container", lsListOrgNode, true);
-    // });
-    // chart.element.appendChild(title);
-  });
+  // chart.on("init", function (sender) {
+  //   const title = document.createElement("button");
+  //   title.style.position = "absolute";
+  //   title.style.right = "0px";
+  //   title.style.top = "87px";
+  //   title.style.width = "50px";
+  //   title.style.textAlign = "center";
+  //   title.style.color = "#757575";
+  //   title.style.backgroundColor = "transparent";
+  //   title.style.border = "none";
+  //   title.style.fontSize = "42px";
+  //   title.style.color = "grey";
+
+  //   title.innerHTML = `<i class="fa fa-refresh"></i>`;
+  //   // add id to title
+  //   title.addEventListener("click", function () {
+  //     // Show loading for refresh with proper container detection
+  //     if (typeof showChartLoading === "function") {
+  //       showChartLoading("chart-container-custom");
+  //     }
+
+  //     setTimeout(() => {
+  //       helperOrgChart(true, "osContainer", lsListOrgNode, true);
+  //     }, 100);
+  //   });
+  //   chart.element.appendChild(title);
+
+  //   // Hide loading when chart is ready with proper container detection
+  //   setTimeout(() => {
+  //     if (typeof hideChartLoading === "function") {
+  //       hideChartLoading("chart-container-custom");
+  //     }
+  //   }, 100);
+
+  //   // console.log("node", chart.nodes);
+  //   // const nodes = chart.nodes;
+  //   // // node object to array
+  //   // const nodesArray = Object.keys(nodes).map((key) => nodes[key]);
+  //   // nodesArray.forEach((node) => {
+  //   //   if (!chart.getNode(node.id).children || chart.getNode(node.id).children.length === 0) {
+  //   //     // add tags
+  //   //     chart.addTag(node.id, "hidePlus");
+  //   //   }
+  //   //   console.log("node", chart.getNode(node.id).children);
+  //   // });
+  //   // chart.node.forEach((node) => {
+  //   // if (!chart.getNode(node.id).children || chart.getNode(node.id).children.length === 0) {
+  //   //   chart.addTag(node.id, "hidePlus");
+  //   // }
+  //   // });
+  // });
 
   chart.onExportStart((args) => {
     args.styles += document.getElementById("myStyle").outerHTML;
@@ -1218,7 +1649,9 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
 
   chart.onUpdated(() => {});
 
-  chart.on("expcollclick", function (sender, collapse, id, ids) {});
+  chart.on("expcollclick", function (sender, collapse, id, ids) {
+    // alert("masd");
+  });
 
   chart.on("node-layout", function (sender, args) {
     const childrenCount = args?.childrenIds?.length;
@@ -1230,9 +1663,48 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
   });
 
   chart.on("click", async (sender, node) => {
-    const param = {};
+    // const param = {};
     const nodeID = node.node.id;
-    // await modalJobPopup(nodeID);
+    await modalJobPopup(nodeID);
+
+    // expandCollapse
+    // chart.expand(node.node.id);
+
+    // const nodeID = node.node.id;
+    // console.log("nodeID", nodeID);
+    // const dataChart = await chartShow({
+    //   draftId: organizationAttribute.orgUnitId,
+    //   jobCode: nodeID,
+    //   depth: 2,
+    // });
+    // dataChart.data.forEach((item) => {
+    //   item.id = item.id_org_unit;
+    // });
+
+    // remove find where pid = nodeID
+    // const dataChartFiltered = dataChart.data
+    //   .filter((item) => !data.find((element) => element.id === item.id_org_unit))
+    //   .filter((item) => item.pid == nodeID);
+    // console.log("dataChartFiltered", dataChartFiltered);
+    // dataChartFiltered.forEach((item) => {
+    //   setTimeout(() => {
+    //     chart.addNode(item);
+    //   }, 300);
+    // });
+
+    // check if node have children
+    //  check if node have children expanded
+  });
+
+  // chart on right click
+  chart.on("contextmenu", function (sender, args) {
+    args.event.preventDefault(); // Prevent default browser menu
+
+    // Remove existing menu
+    let existingMenu = document.getElementById("custom-menu");
+    if (existingMenu) {
+      existingMenu.remove();
+    }
   });
 
   chart.on("searchclick", (sender, node) => {
@@ -1250,98 +1722,53 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
       $("#modalDetailJob").modal("hide");
     });
 
-  $("#handleExportPng").on("click", function () {
-    const nodeId = $("#positionId").val();
-    exportChartAsBlob();
-    $("#modalDetailJob").modal("hide");
-  });
-
-  function exportChartAsBlob() {
-    //  create canvas from div id os-container, then create png from canvas
-    const osContainer = document.getElementById("os-container");
-
-    if (typeof window.html2canvas === "undefined") {
-      console.error("html2canvas is not loaded.");
-      return;
-    }
-
-    window.html2canvas(osContainer).then((canvas) => {
-      // Get the image data
-      const ctx = canvas.getContext("2d");
-      const { width, height } = canvas;
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const data = imageData.data;
-
-      // Find bounds
-      let top = null,
-        bottom = null,
-        left = null,
-        right = null;
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const idx = (y * width + x) * 4;
-          // If not white and not fully transparent
-          if (
-            !(data[idx] === 255 && data[idx + 1] === 255 && data[idx + 2] === 255 && data[idx + 3] === 255) &&
-            data[idx + 3] !== 0
-          ) {
-            if (top === null) top = y;
-            if (left === null || x < left) left = x;
-            if (right === null || x > right) right = x;
-            bottom = y;
-          }
-        }
-      }
-
-      if (top !== null && left !== null && right !== null && bottom !== null) {
-        const croppedWidth = right - left + 1;
-        const croppedHeight = bottom - top + 1;
-        const croppedCanvas = document.createElement("canvas");
-        croppedCanvas.width = croppedWidth;
-        croppedCanvas.height = croppedHeight;
-        const croppedCtx = croppedCanvas.getContext("2d");
-        croppedCtx.putImageData(ctx.getImageData(left, top, croppedWidth, croppedHeight), 0, 0);
-
-        croppedCanvas.toBlob((blob) => {
-          if (blob) {
-            console.log("PNG Blob created (cropped)", blob);
-            // print blob
-            const url = URL.createObjectURL(blob);
-            const img = document.createElement("img");
-            img.src = url;
-            img.onload = () => {
-              // Optionally, you can revoke the object URL after use
-              URL.revokeObjectURL(url);
-              // Append the image to the body or any other element
-              document.body.appendChild(img);
-            };
-            // Download the image as well
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "orgchart-cropped.png";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          }
-        }, "image/png");
-      } else {
-        // fallback: no non-white content found
-        canvas.toBlob((blob) => {
-          if (blob) {
-            console.log("PNG Blob created (original)", blob);
-            // Download the original image as well
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "orgchart.png";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          }
-        }, "image/png");
-      }
+  $("#handleExportPng")
+    .off("click")
+    .on("click", function () {
+      const nodeId = $("#positionId").val();
+      chart.exportPNG({
+        // expandChildren: true,
+        // min: false,
+        openInNewTab: true,
+        filename: `${nodeId}.png`,
+        // parentLevels: 1,
+        // childLevels: 1,
+        expandChildren: false,
+      });
+      $("#modalDetailJob").modal("hide");
     });
-  }
+
+  $("#handleExportSvg")
+    .off("click")
+    .on("click", function () {
+      const nodeId = $("#positionId").val();
+      chart.exportSVG({
+        // expandChildren: true,
+        // min: false,
+        filename: `${nodeId}.svg`,
+        // parentLevels: 1,
+        // childLevels: 1,
+        expandChildren: false,
+      });
+      $("#modalDetailJob").modal("hide");
+    });
+
+  // $("#handleExport").on("click", function () {
+  //   const nodeId = $("#positionId").val();
+  //   const position = lsListPosition.find((item) => item.positionId == nodeId);
+  //   console.log("masuk 3");
+  //   // exportPDF(nodeId);
+  //   chart.exportPDF({ filename: `${position.positionName}.pdf`, expandChildren: false, nodeId: nodeId });
+  //   // chart remove certain tags
+  //   chart.removeTags(["pointed"]);
+
+  //   $("#modalDetailJob").modal("hide");
+  // });
+
+  // function handleExport() {
+  //   const nodeId = $("#positionId").val();
+  //   console.log("masuk 2");
+  // }
 
   if (object?.expand) {
     let selfNode = data.find((item) => item.id == object.nodeId);
@@ -1349,10 +1776,10 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     const siblingNode = data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
     const getAll = [...getChildrenNode, ...siblingNode];
     setTimeout(() => {
-      chart.expand(selfNode.id, getAll);
-    }, 1000);
+      chart.expand(object.nodeId, getAll);
+    }, 500);
     setTimeout(() => {
       chart.fit();
-    }, 2000);
+    }, 800);
   }
 }
