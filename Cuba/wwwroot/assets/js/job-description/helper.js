@@ -1363,6 +1363,10 @@ function focusNode(nodeId, dataBagan) {
 // }
 
 function helperOrgChart(init, id, data, isFocusNode, object) {
+  console.log(data);
+  const dataWithIdNull = data.filter((item) => item.id !== null || item.pid !== null);
+  console.log("dataWithIdNull", dataWithIdNull);
+
   if (!init) {
     return false;
   }
