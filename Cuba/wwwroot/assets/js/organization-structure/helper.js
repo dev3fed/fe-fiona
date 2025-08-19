@@ -1379,7 +1379,8 @@ async function modalJobPopup(params) {
   // $("#modalDetailJob").modal("show");
 
   console.log("data", data);
-  $("#jobName").text(checkValue(data.positionName));
+  const jobName = data?.isBasket ? `${data?.unitName}` : data?.positionName;
+  $("#jobName").text(jobName);
   $("#positionId").val(data.positionId);
   $("#modalPrlOrg").text(checkValue(data.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));
@@ -1452,6 +1453,8 @@ async function modalJobPopup(params) {
         index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg)
     );
 
+    const positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
+
     // cari data di data.positionList yang memiliki mergeFormation yang sama
     // exp output nya ke grouping berdasakarkan persamaan mergeFormation
     const filteredPositions = data.positionList.filter((item) => item.mergeFormation != null);
@@ -1523,13 +1526,22 @@ async function modalJobPopup(params) {
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
-      if (item?.personCode == 0) {
+      if (item?.personCode == 0 || item?.personCode == "0") {
         item.personCode = "-";
         item.personName = "Vacant";
         item.prlPlan = "-";
         item.positionCode = "-";
         item.positionName = "-";
       }
+
+      if (item.prlPlan !== "-" && data.positionList && Array.isArray(data.positionList)) {
+        const findPosition = positionList.find((pos) => pos.prlOrg.includes(String(item.prlPlan)));
+        if (findPosition) {
+          item.positionName = findPosition.positionName;
+          item.positionCode = findPosition.positionCode;
+        }
+      }
+
       $basketBody.append(`<tr>
       <td>${i + 1}</td>
       <td>${item.personCode}</td>

@@ -3,34 +3,32 @@ async function initializeHelper(data) {
     //
   }
 
-  // Show loading spinner
-  showChartLoading("os-container");
+  // showChartLoading("os-container");
 
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: "10132406",
-    depth: 5,
-  });
+  // const dataChart = await chartShow({
+  //   draftId: organizationAttribute.orgUnitId,
+  //   jobCode: "10132406",
+  //   depth: 5,
+  // });
 
-  if (!dataChart.data) {
-    hideChartLoading("os-container");
-    swal("Warning", "Data not found", "warning");
-    return;
-  }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
+  // if (!dataChart.data) {
+  //   hideChartLoading("os-container");
+  //   swal("Warning", "Data not found", "warning");
+  //   return;
+  // }
+  // dataChart.data.forEach((item) => {
+  //   item.id = item.id_org_unit;
+  // });
 
-  helperOrgTree(dataChart.data);
-  helperOrgChart(true, "os-container", dataChart.data, true);
+  // helperOrgTree(dataChart.data);
+  // helperOrgChart(true, "os-container", dataChart.data, true);
 
-  // Hide loading spinner after chart is rendered
-  hideChartLoading("os-container");
+  // hideChartLoading("os-container");
 
   // helperOrgChart(true, "os-container", asik2, true);
   // helperOrgChartTester(true, "os-container", test, true);
   // helperDatePicker();
-  // helperOrgChart(true, "os-container", test, true);
+  helperOrgChart(true, "os-container", test, true);
 }
 
 function updateDataList(orgUnitId, orgUnitName) {
