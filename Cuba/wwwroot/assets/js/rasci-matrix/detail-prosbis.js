@@ -56,7 +56,7 @@ const layoutTabProsbis = (data) => {
     });
   });
   const totalJob = `
-  <p>Total Job : ${data.length} |
+  <p>Total Position : ${data.length} |
     <img src="/assets/images/rasci/r.svg" alt="R Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">${countR}</label> 
     <img src="/assets/images/rasci/a.svg" alt="A Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">${countA}</label> 
     <img src="/assets/images/rasci/s.svg" alt="S Icon" style="margin-top:-4px;padding-left:5px"><label style="padding-left:5px">${countS}</label> 
@@ -68,7 +68,7 @@ const layoutTabProsbis = (data) => {
           <th scope="col" style="width: 50px;text-align:center">
           No 
           </th>
-          <th scope="col" style="width: 230px">Job Title</th>
+          <th scope="col" style="width: 230px">Position</th>
           <th scope="col" style="width: 120px">Directorate</th>
           <th scope="col">Division</th>
           <th scope="col">Sub Division</th>

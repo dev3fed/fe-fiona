@@ -254,9 +254,9 @@ async function triggleDetailActivity(id, draftType) {
     if (draftType === "Add New Business Process") {
       detailAddprosbis(id, draftRasciId);
     } else if (draftType === "Delete Business Process") {
-      detailDeleteBp(id, draftType);
+      detailDeleteBp(id, draftRasciId);
     } else if (draftType === "Edit Business Process") {
-      detailEditBp(id, draftType);
+      detailEditBp(id, draftRasciId);
     } else if (draftType === "Add/Edit RASCI") {
       detailAddNotation(id, draftRasciId);
     }
@@ -348,11 +348,14 @@ async function detailAddprosbis(id, draftRasciId) {
   } catch (error) {}
 }
 
-async function detailDeleteBp(id) {
+async function detailDeleteBp(id, draftRasciId) {
   try {
+    const url = `${draftRasciId}?draftListId=${id}`;
+    const dataActivity = await fetchDetailDraftActivity(url);
+    console.log("dataActivity", dataActivity);
     const modal = new bootstrap.Modal(document.getElementById("modalDetailDeletebp"));
     modal.show();
-    const dataActivity = await fetchDetailDraftActivity(id);
+    // const dataActivity = await fetchDetailDraftActivity(id);
     const dataInfo = dataActivity.data.businessProcess;
     const formContent = `
       <div class="col-12">
@@ -397,30 +400,83 @@ async function detailDeleteBp(id) {
   } catch (error) {}
 }
 
-async function detailEditBp(id) {
+async function detailEditBp(id, draftRasciId) {
+  const url = `${draftRasciId}?draftListId=${id}`;
+  const dataActivity = await fetchDetailDraftActivity(url);
+  console.log("dataActivity", dataActivity);
   const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
   modal.show();
   console.log("cek");
+
+  const formContent = `
+      <div class="col-12">
+        <div >
+          <label class="form-label" style="width:25%">RASCI Matrix Draft</label>
+          <label> : </label>
+        <b class="form-label"></b>
+        </div>
+      </div>
+      <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Level</label>
+             <label> : </label>
+        <b class="form-label"></b>
+        </div>
+      </div>
+       <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Index</label>
+             <label> : </label>
+        <b class="form-label"></b>
+        </div>
+      </div>
+             <div class="col-12">
+        <div >
+            <label class="form-label" style="width:25%">Business Process Name (before)</label>
+             <label> : </label>
+        <b class="form-label"></b>
+        </div>
+      </div>
+     <div class="col-12 mt-2">
+      <div>
+        <label class="form-label">Business Process Name (after)</label>
+        <textarea class="form-control"  disabled></textarea>
+      </div>
+    </div>
+    `;
+
+  const bodyContent = document.getElementById("detail-editbp");
+  if (bodyContent) {
+    bodyContent.innerHTML = formContent;
+  }
+
   // const dataActivity = await fetchDetailDraftActivity(id);
   // const dataInfo = dataActivity.data.businessProcess;
 }
 
 async function detailAddNotation(id, draftRasciId) {
   console.log("first", id);
+  const url = `${draftRasciId}?draftListId=${id}`;
+  const dataActivity = await fetchDetailDraftActivity(url);
+  console.log("dataActivity", dataActivity);
+  const detailInfo = dataActivity?.data.mappingData;
   const modal = new bootstrap.Modal(document.getElementById("modalActivityEnot"));
   modal.show();
   const modalTitle = document.getElementById("modalActivityEnotTitle");
   if (modalTitle) {
     modalTitle.innerHTML = `Add/Edit RASCI Activity Detail `;
   }
+  // Looping detailInfo.mappingData untuk membuat baris tabel dinamis
+
+  // Generate table body with comment icons for old and new notation
   const contentBody = `
       <div class="row">
         <div class="col-12 ">
-            <label>Position:</label>
+            <label>Position: ${detailInfo[0].positionCode} - ${detailInfo[0].positionName}</label>
             <hr style="margin-top: 0;" />
         </div>
         <div class="col-12 mb-2 d-flex justify-content-end">
-         <button class="btn btn-primary btn-sm" onclick="onModalAddNotation()">  
+         <button class="btn btn-primary btn-sm" onclick="openModalActivityAddnot()">  
            <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;"> Add RASCI
          </button>
         </div>
@@ -440,30 +496,90 @@ async function detailAddNotation(id, draftRasciId) {
                  </tr>
                  </thead>
                  <tbody>
-                  <tr>
-                      <td>1</td>
-                      <td>1</td>
-                      <td style="text-align:center">1.1</td>
-                      <td>Business Process Name <br>
-                      <small style="color:#9F9FA5">
-                        (Reference from Manager Organization Capability)
-                      </small>
-                      </td>
-                      <td style="text-align:center">
-                          <img src="/assets/images/rasci/r.svg" alt="R Icon" style="height: 16px; width: 16px;">
-                          <img src="/assets/images/rasci/a.svg" alt="A Icon" style="height: 16px; width: 16px;">
-                      </td>
-                      <td style="text-align:center">
-                          <img src="/assets/images/rasci/s.svg" alt="S Icon" style="height: 16px; width: 16px;">
-                          <img src="/assets/images/rasci/c.svg" alt="C Icon" style="height: 16px; width: 16px;">
-                      </td>
-                      <td style="text-align:center">
-                          <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditNotation()">
-                                    <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
-                                  </button>
-                      </td>
-                  </tr>
-                  <!-- Add more rows as needed -->
+                  ${
+                    detailInfo.length === 0
+                      ? `<tr><td colspan="7" style="text-align:center">No data</td></tr>`
+                      : detailInfo
+                          .map((item, idx) => {
+                            // OLD COMMENT TOOLTIP
+                            let oldCommentTooltip = "";
+                            if (Array.isArray(item.oldNotation) && item.oldComment && item.oldComment.length > 0) {
+                              oldCommentTooltip = item.oldComment
+                                .map((c, i) => {
+                                  const code = item.oldNotation[i]?.value || "";
+                                  return code && c.value ? `${code} : ${c.value}` : "";
+                                })
+                                .filter(Boolean)
+                                .join("<br>");
+                            }
+                            // If oldComment is empty, try to fallback to empty string
+                            // NEW COMMENT TOOLTIP
+                            let newCommentTooltip = "";
+                            if (
+                              item.newNotation &&
+                              item.newNotation.value &&
+                              item.newComment &&
+                              item.newComment.value
+                            ) {
+                              newCommentTooltip = `${item.newNotation.value} : ${item.newComment.value}`;
+                            }
+
+                            return `
+                          <tr>
+                          <td>${idx + 1}</td>
+                          <td>${item.level || "-"}</td>
+                          <td style="text-align:center">${item.indexNo || "-"}</td>
+                          <td>
+                            ${item.businessProcessName || "-"}
+                            ${
+                              item.businessProcessReference
+                                ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
+                                : ""
+                            }
+                          </td>
+                          <td style="text-align:center">
+                            ${
+                              Array.isArray(item.oldNotation)
+                                ? item.oldNotation
+                                    .map(
+                                      (n, i) =>
+                                        `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                                          n.value
+                                        } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                                    )
+                                    .join("")
+                                : "-"
+                            }
+                            ${
+                              oldCommentTooltip
+                                ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
+                                : ""
+                            }
+                          </td>
+                          <td style="text-align:center">
+                            ${
+                              item.newNotation && item.newNotation.value
+                                ? `<img src="/assets/images/rasci/${item.newNotation.value.toLowerCase()}.svg" alt="${
+                                    item.newNotation.value
+                                  } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`
+                                : "-"
+                            }
+                            ${
+                              newCommentTooltip && item.newComment.value
+                                ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${newCommentTooltip}">`
+                                : ""
+                            }
+                          </td>
+                          <td style="text-align:center">
+                            <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditNotation()">
+                            <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
+                            </button>
+                          </td>
+                          </tr>
+                        `;
+                          })
+                          .join("")
+                  }
                </tbody>
              </table>
             </div>
@@ -483,10 +599,16 @@ async function detailAddNotation(id, draftRasciId) {
 
 const handleEditNotation = () => {
   console.log("first");
-
+  const modal = new bootstrap.Modal(document.getElementById("modalActivityEditnot"));
+  modal.show();
   // console.log("data", data);
   // console.log("dataChangeNotasi", dataChangeNotasi);
   // const dataChangeNotasi = getState("dataChangeNotasi");
   // setState("editRasciNotation", data);
   // openModalEditRascinotation(dataChangeNotasi, data);
+};
+
+const openModalActivityAddnot = () => {
+  const modal = new bootstrap.Modal(document.getElementById("modalActivityAddnot"));
+  modal.show();
 };

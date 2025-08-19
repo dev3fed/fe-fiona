@@ -1,4 +1,4 @@
-let selectedText = "RASCI by Job";
+let selectedText = "RASCI by Pos...";
 let selectedJobIds = [];
 let selectedPrlIds = [];
 let SelectedProsbisId = [];
@@ -11,65 +11,63 @@ function setSelectedText(text) {
   document.getElementById("inputText").value = "";
 }
 
-document
-  .getElementById("searchButton")
-  .addEventListener("click", async function () {
-    const inputText = document.getElementById("inputText").value;
-    const spinner = document.getElementById("loadingSearch");
-    spinner.style.display = "inline-block";
-    //
-    const searchType =
-      selectedText == "RASCI by Job"
-        ? "job"
-        : selectedText == "RASCI by Bus..."
-        ? "businessprocess"
-        : "businessprocess";
-    const draftSoId = getState("draftSoId");
-    const selectedValue = $("#dataSource-rasci").val();
-    let resultTblRbp = [];
-    let resultTblJob = [];
+document.getElementById("searchButton").addEventListener("click", async function () {
+  const inputText = document.getElementById("inputText").value;
+  const spinner = document.getElementById("loadingSearch");
+  spinner.style.display = "inline-block";
+  //
+  const searchType =
+    selectedText == "RASCI by Pos..."
+      ? "job"
+      : selectedText == "RASCI by Bus..."
+      ? "businessprocess"
+      : "businessprocess";
+  const draftSoId = getState("draftSoId");
+  const selectedValue = $("#dataSource-rasci").val();
+  let resultTblRbp = [];
+  let resultTblJob = [];
 
-    let resultTblBp = [];
-    const payload = {
-      Type: searchType,
-      Search: inputText,
-      DraftSoId: draftSoId || null,
-      DraftRasciId: selectedValue === "master" ? null : selectedValue,
-    };
-    const queryString = new URLSearchParams(payload).toString();
-    const dataTbl = await SearchMatrix(queryString);
-    if (dataTbl.status == 200) {
-      spinner.style.display = "none";
-      switch (selectedText) {
-        case "RASCI by Job":
-          resultTblJob = dataTbl.data;
-          break;
-        case "RASCI by Bus...":
-          resultTblRbp = dataTbl.data;
-          break;
-        default:
-          resultTblBp = dataTbl.data;
-          break;
-      }
-    }
-    let modalSearchTitle = "";
-    let searchLabel = "";
+  let resultTblBp = [];
+  const payload = {
+    Type: searchType,
+    Search: inputText,
+    DraftSoId: draftSoId || null,
+    DraftRasciId: selectedValue === "master" ? null : selectedValue,
+  };
+  const queryString = new URLSearchParams(payload).toString();
+  const dataTbl = await SearchMatrix(queryString);
+  if (dataTbl.status == 200) {
+    spinner.style.display = "none";
     switch (selectedText) {
-      case "RASCI by Job":
-        modalSearchTitle = `Search RASCI by job `;
-        searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblJob?.length} result)`;
-        theadContent = `<tr>
+      case "RASCI by Pos...":
+        resultTblJob = dataTbl.data;
+        break;
+      case "RASCI by Bus...":
+        resultTblRbp = dataTbl.data;
+        break;
+      default:
+        resultTblBp = dataTbl.data;
+        break;
+    }
+  }
+  let modalSearchTitle = "";
+  let searchLabel = "";
+  switch (selectedText) {
+    case "RASCI by Pos...":
+      modalSearchTitle = `Search RASCI by Position `;
+      searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblJob?.length} result)`;
+      theadContent = `<tr>
           <th scope="col" style="width: 50px">
             <label class="checkbox-label" for="checked-head-job">
               <input class="checkbox_animated" id="checked-head-job" type="checkbox" onchange="selectAllJob(event)">
             </label>
           </th>
-          <th scope="col">Job Level</th>
-          <th scope="col">Job Title</th>
+          <th scope="col">Position Level</th>
+          <th scope="col">Position</th>
         </tr>`;
-        bodyContent = resultTblJob
-          ?.map((item, i) => {
-            return `<tr>
+      bodyContent = resultTblJob
+        ?.map((item, i) => {
+          return `<tr>
             <th scope="row">
              <label class="checkbox-label" for="checked-body-job-${i}">
               <input class="checkbox_animated checkbox-body-job" id="checked-body-job" type="checkbox" 
@@ -80,13 +78,13 @@ document
             <td>${item.jobPositionAbbreviation || ""}</td>
             <td>${item.positionName || ""}</td>
         </tr>`;
-          })
-          .join("");
-        break;
-      case "RASCI by Bus...":
-        modalSearchTitle = "Search RASCI by Business Process";
-        searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblRbp?.length} result)`;
-        theadContent = `<tr>
+        })
+        .join("");
+      break;
+    case "RASCI by Bus...":
+      modalSearchTitle = "Search RASCI by Business Process";
+      searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblRbp?.length} result)`;
+      theadContent = `<tr>
           <th scope="col" style="width: 50px"> 
             <label class="checkbox-label" for="checked-head-rbp">
               <input class="checkbox_animated" id="checked-head-rbp" type="checkbox" onchange="selectAllProsbis(event)">
@@ -96,9 +94,9 @@ document
           <th scope="col" style="width: 80px">Index</th>
           <th scope="col">Business Process</th>
         </tr>`;
-        bodyContent = resultTblRbp
-          ?.map((item, i) => {
-            return `<tr>
+      bodyContent = resultTblRbp
+        ?.map((item, i) => {
+          return `<tr>
             <th scope="row">
               <label class="checkbox-label" for="checked-body-rbp">
               <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.indexNumber}">
@@ -108,13 +106,13 @@ document
             <td>${item.indexNumber}</td>
             <td>${item.description}</td>
         </tr>`;
-          })
-          .join("");
-        break;
-      case "Business Pro...":
-        modalSearchTitle = "Search Business Process";
-        searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblBp?.length} result)`;
-        theadContent = `<tr>
+        })
+        .join("");
+      break;
+    case "Business Pro...":
+      modalSearchTitle = "Search Business Process";
+      searchLabel = `Search result for <b>"${inputText}"</b> (${resultTblBp?.length} result)`;
+      theadContent = `<tr>
           <th scope="col" style="width: 50px">
           Choose
           </th>
@@ -122,9 +120,9 @@ document
           <th scope="col" style="width: 80px">Index</th>
           <th scope="col">Business Process</th>
         </tr>`;
-        bodyContent = resultTblBp
-          ?.map((item, i) => {
-            return `<tr>
+      bodyContent = resultTblBp
+        ?.map((item, i) => {
+          return `<tr>
             <th scope="row">
               <label class="radio-label" for="checked-body-bp">
                 <input class="radio_animated" id="checked-body-bp" type="radio" name="rdo-ani" onchange="selectProsbisId(event)" value="${item.indexNumber}">
@@ -134,35 +132,35 @@ document
             <td>${item.indexNumber}</td>
             <td>${item.description}</td>
         </tr>`;
-          })
-          .join("");
-        break;
-      default:
-        modalSearchTitle = "No content available";
-    }
-    document.getElementById("modalSearchTitle").innerHTML = modalSearchTitle;
-    document.getElementById("searchLabel").innerHTML = searchLabel;
-    document.getElementById("tbl-search-header").innerHTML = theadContent;
-    document.getElementById("tbl-search-body").innerHTML = bodyContent;
+        })
+        .join("");
+      break;
+    default:
+      modalSearchTitle = "No content available";
+  }
+  document.getElementById("modalSearchTitle").innerHTML = modalSearchTitle;
+  document.getElementById("searchLabel").innerHTML = searchLabel;
+  document.getElementById("tbl-search-header").innerHTML = theadContent;
+  document.getElementById("tbl-search-body").innerHTML = bodyContent;
 
-    document.querySelectorAll("#checked-body-job").forEach((checkbox) => {
-      checkbox.addEventListener("change", selectSingleJob);
-    });
-    const headCheckboxJob = document.getElementById("checked-head-job");
-    if (headCheckboxJob) {
-      headCheckboxJob.addEventListener("change", selectAllJob);
-    }
-    document.querySelectorAll("#checked-body-rbp").forEach((checkbox) => {
-      checkbox.addEventListener("change", selectSingleProsbis);
-    });
-    const headCheckboxProsbis = document.getElementById("checked-head-rbp");
-    if (headCheckboxProsbis) {
-      headCheckboxProsbis.addEventListener("change", selectAllProsbis);
-    }
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById("modalSearch"));
-    modal.show();
+  document.querySelectorAll("#checked-body-job").forEach((checkbox) => {
+    checkbox.addEventListener("change", selectSingleJob);
   });
+  const headCheckboxJob = document.getElementById("checked-head-job");
+  if (headCheckboxJob) {
+    headCheckboxJob.addEventListener("change", selectAllJob);
+  }
+  document.querySelectorAll("#checked-body-rbp").forEach((checkbox) => {
+    checkbox.addEventListener("change", selectSingleProsbis);
+  });
+  const headCheckboxProsbis = document.getElementById("checked-head-rbp");
+  if (headCheckboxProsbis) {
+    headCheckboxProsbis.addEventListener("change", selectAllProsbis);
+  }
+  // Show the modal
+  const modal = new bootstrap.Modal(document.getElementById("modalSearch"));
+  modal.show();
+});
 // Add event listener to the select-all checkbox
 
 function selectProsbisId(event) {

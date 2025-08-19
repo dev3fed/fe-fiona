@@ -27,7 +27,11 @@ document.addEventListener("dataLoaded", async function () {
               <td>${formattedDate}</td>
               <td>-</td>
               <td>${data.status}</td>
-              <td></td>
+              <td style="width: 100px;text-align:center">
+               <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval()">
+                  <i class="icon-eye"></i> 
+                </button>
+              </td>
             </tr>
           `;
         })

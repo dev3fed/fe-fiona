@@ -311,6 +311,23 @@ async function fetchDetailJob(param) {
     };
   }
 }
+
+async function fetchLoghistoryList(payload) {
+  const url = `${url_api}/api/log-history/list`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchData() {
   try {
     const payload = {

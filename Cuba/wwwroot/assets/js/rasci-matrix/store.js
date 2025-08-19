@@ -114,6 +114,7 @@ const appState = new Proxy(
     },
     //end filter rasci matrix
     dataDetailDraft: {},
+    dataDetailAproval: {},
     editDrafProsbis: {
       rasciNotation: [],
     },
@@ -157,70 +158,11 @@ const appState = new Proxy(
         status: "On Review",
       },
     ],
-    logHistoryData: [
-      {
-        no: 8,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail: "Create draft Pembuatan Bisnis Proses Baru",
-      },
-      {
-        no: 7,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail:
-          "Add/Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5 Pengelolaan brand, RASCI notation before: -, RASCI notation after: R) reference from Manager B2C Loyalty & Marketing Program.",
-      },
-      {
-        no: 6,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail:
-          "Add/Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5.2 Melakukan brand positioning, RASCI notation before: -, RASCI notation after: A) reference from Manager B2C Loyalty & Marketing Program.",
-      },
-      {
-        no: 5,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail:
-          "Add/Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5.3 Mengelola brand identity, RASCI notation before: -, RASCI notation after: A) reference from Manager B2C Loyalty & Marketing Program.",
-      },
-      {
-        no: 4,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail:
-          "Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5 Pengelolaan brand, RASCI notation before: R, RASCI notation after: A)",
-      },
-      {
-        no: 3,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail:
-          "Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5.2 Melakukan brand positioning, RASCI notation before: A, RASCI notation after: A)",
-      },
-      {
-        no: 2,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail:
-          "Edit RASCI notation for Manager B2C Brand & Loyalty Program (Business process: 2.1.5 Pengelolaan brand, RASCI notation before: R, RASCI notation after: A)",
-      },
-      {
-        no: 1,
-        dateTime: "",
-        user: "Superadmin",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        detail: "Submit to Approval draft Pembuatan Bisnis Proses Baru",
-      },
-    ],
+    payloadLogHistory: {
+      page: 1,
+      limit: 5,
+    },
+    logHistoryData: [],
   },
   {
     set(target, property, value) {

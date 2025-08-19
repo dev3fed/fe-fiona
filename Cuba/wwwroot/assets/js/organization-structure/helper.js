@@ -1951,7 +1951,7 @@ async function helperOrgTree(params) {
 // helper bagan org
 // ======================
 
-async function focusNode(nodeId) {
+async function focusNode(nodeId, focusNodeSpecial = "") {
   // Show loading spinner
   showChartLoading("os-container");
 
@@ -1970,12 +1970,22 @@ async function focusNode(nodeId) {
   });
   console.log("dataChart.data", dataChart.data);
   console.log("nodeId", nodeId);
-  let selfNode = dataChart.data.find((item) => item.id == nodeId);
-  selfNode = {
-    ...selfNode,
-    tags: [...selfNode.tags, "pointed"],
-  };
-  dataChart.data = dataChart.data.filter((item) => item.id != nodeId);
+  let selfNode;
+  if (focusNodeSpecial !== "") {
+    selfNode = dataChart.data.find((item) => item.id == focusNodeSpecial);
+    selfNode = {
+      ...selfNode,
+      tags: ["pointed"],
+    };
+    dataChart.data = dataChart.data.filter((item) => item.id != focusNodeSpecial);
+  } else {
+    selfNode = dataChart.data.find((item) => item.id == nodeId);
+    selfNode = {
+      ...selfNode,
+      tags: [...selfNode.tags, "pointed"],
+    };
+    dataChart.data = dataChart.data.filter((item) => item.id != nodeId);
+  }
   dataChart.data.push(selfNode);
   console.log("selfNode", selfNode);
   setTimeout(() => {
@@ -2450,7 +2460,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     title.style.fontSize = "42px";
     title.style.color = "grey";
 
-    title.innerHTML = `<i class="fa fa-refresh"></i>`;
+    // title.innerHTML = `<i class="fa fa-refresh"></i>`;
     // add id to title
     title.addEventListener("click", function () {
       // myData.forEach((item) => {

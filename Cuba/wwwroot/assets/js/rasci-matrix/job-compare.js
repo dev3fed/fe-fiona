@@ -55,25 +55,22 @@ async function searchJobCompare(event) {
               jobSelectedList.appendChild(selectedItem);
             }
           } else {
-            const itemToRemove = document.getElementById(
-              `selected-job-${value};${prlOrg}`,
-            );
+            const itemToRemove = document.getElementById(`selected-job-${value};${prlOrg}`);
             if (itemToRemove) itemToRemove.remove();
+          }
+          if (jobSelectedList.childElementCount > 1) {
+            document.getElementById("apply-compare").removeAttribute("disabled");
+          } else {
+            document.getElementById("apply-compare").setAttribute("disabled", "disabled");
           }
         }
       });
 
       jobSelectedList.addEventListener("click", (e) => {
         if (e.target.closest(".remove-item")) {
-          const value = e.target
-            .closest(".remove-item")
-            .getAttribute("data-value");
-          const prlOrg = e.target
-            .closest(".remove-item")
-            .getAttribute("prlOrg");
-          const checkbox = document.querySelector(
-            `input[type="checkbox"][value="${value}"][prlOrg="${prlOrg}"]`,
-          );
+          const value = e.target.closest(".remove-item").getAttribute("data-value");
+          const prlOrg = e.target.closest(".remove-item").getAttribute("prlOrg");
+          const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"][prlOrg="${prlOrg}"]`);
           if (checkbox) checkbox.checked = false;
           document.getElementById(`selected-job-${value};${prlOrg}`).remove();
         }
@@ -89,9 +86,7 @@ async function applyCompare() {
   const draftRasciId = getState("draftRasciId");
   const spinner = document.getElementById("applyCompare");
   spinner.style.display = "inline-block";
-  const selectedItems = Array.from(
-    document.querySelectorAll("#job-selected-list .selected-item"),
-  ).map((item) => {
+  const selectedItems = Array.from(document.querySelectorAll("#job-selected-list .selected-item")).map((item) => {
     const span = item.querySelector(".remove-item");
     return {
       id: span.getAttribute("data-value"),

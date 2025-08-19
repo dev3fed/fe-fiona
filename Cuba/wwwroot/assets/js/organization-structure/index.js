@@ -51,10 +51,11 @@ $("#searchOrgNode").on("change", function () {
   // console.log("masuk sini", searchValue);
   if (searchValue == "10132405") {
     searchValue = "10132406"; // hardcode for testing
+    focusNode(searchValue, "10132405");
+    return;
   }
   focusNode(searchValue);
 });
-
 function changeOrganization(value, text) {
   organizationAttribute.orgUnitId = value;
   organizationAttribute.orgUnitName = text;
