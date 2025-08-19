@@ -1558,7 +1558,7 @@ async function modalJobPopup(params) {
       group.dataPosition.forEach((item, j) => {
         if (j == 0) {
           $positionBody.append(`<tr>
-            <td>${i + 1}</td>
+            <td>${j + 1}</td>
             <td>${item.positionName}</td>
             <td>${item.careerLevel}</td>
             <td>${item.prlOrg}</td>
@@ -1566,7 +1566,7 @@ async function modalJobPopup(params) {
             </tr>`);
         } else {
           $positionBody.append(`<tr>
-        <td>${i + 1}</td>
+        <td>${j + 1}</td>
         <td>${item.positionName}</td>
         <td>${item.careerLevel}</td>
         <td>${item.prlOrg}</td>
