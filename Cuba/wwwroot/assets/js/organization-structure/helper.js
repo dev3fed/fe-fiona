@@ -1379,7 +1379,8 @@ async function modalJobPopup(params) {
   // $("#modalDetailJob").modal("show");
 
   console.log("data", data);
-  $("#jobName").text(checkValue(data.positionName));
+  const jobName = data?.isBasket ? `${data?.unitName}` : data?.positionName;
+  $("#jobName").text(jobName);
   $("#positionId").val(data.positionId);
   $("#modalPrlOrg").text(checkValue(data.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));
@@ -1452,6 +1453,8 @@ async function modalJobPopup(params) {
         index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg)
     );
 
+    const positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
+
     // cari data di data.positionList yang memiliki mergeFormation yang sama
     // exp output nya ke grouping berdasakarkan persamaan mergeFormation
     const filteredPositions = data.positionList.filter((item) => item.mergeFormation != null);
@@ -1467,27 +1470,78 @@ async function modalJobPopup(params) {
     }, {});
 
     // Transform to expected output format
+    let arrayPrlOrg = [];
     data.positionList = Object.keys(groupedByMergeFormation).map((mergeFormationKey) => {
       const dataPosition = groupedByMergeFormation[mergeFormationKey];
+      const arrayKeys = dataPosition
+        .map((item) => item.prlOrg)
+        .map((prl) => {
+          // Handle both range format ("14-15") and single number format ("12")
+          const getPrlNumber = (prlOrg) => {
+            if (prlOrg.includes("-")) {
+              // Range format: extract first number (e.g., "14-15" -> 14)
+              return parseInt(prlOrg.split("-")[0]);
+            } else {
+              // Single number format: parse directly (e.g., "12" -> 12)
+              return parseInt(prlOrg);
+            }
+          };
+          return getPrlNumber(prl);
+        })
+        .sort((a, b) => b - a); // Sort descending (besar ke
+      arrayPrlOrg.push(...arrayKeys);
       return {
         mergerFormation: mergeFormationKey,
         totalRow: dataPosition.length,
         dataPosition: dataPosition,
+        prlOrgs: arrayKeys,
       };
     });
-    console.log("data.positionList grouped by mergeFormation:", data.positionList);
+    arrayPrlOrg.sort((a, b) => b - a); // Sort descending (besar ke kecil)
+
+    let sortedPositionList = [];
+    let count = 0;
+    for (let i = 0; i < arrayPrlOrg.length; i++) {
+      const matching = data.positionList.find((itx) => itx.prlOrgs.includes(arrayPrlOrg[i]));
+      if (count < arrayPrlOrg.length && matching) {
+        count += matching.totalRow;
+        // Sort matching.dataPosition by prlOrg descending (besar ke kecil)
+        matching.dataPosition.sort((a, b) => {
+          // Handle both range format ("14-15") and single number format ("12")
+          const getPrlNumber = (prlOrg) => {
+            if (prlOrg.includes("-")) {
+              return parseInt(prlOrg.split("-")[0]);
+            } else {
+              return parseInt(prlOrg);
+            }
+          };
+          return getPrlNumber(b.prlOrg) - getPrlNumber(a.prlOrg);
+        });
+        sortedPositionList.push(matching);
+      }
+    }
+    console.log("sortedPositionList:", sortedPositionList);
 
     // data.positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
-      if (item?.personCode == 0) {
+      if (item?.personCode == 0 || item?.personCode == "0") {
         item.personCode = "-";
         item.personName = "Vacant";
         item.prlPlan = "-";
         item.positionCode = "-";
         item.positionName = "-";
       }
+
+      if (item.prlPlan !== "-" && data.positionList && Array.isArray(data.positionList)) {
+        const findPosition = positionList.find((pos) => pos.prlOrg.includes(String(item.prlPlan)));
+        if (findPosition) {
+          item.positionName = findPosition.positionName;
+          item.positionCode = findPosition.positionCode;
+        }
+      }
+
       $basketBody.append(`<tr>
       <td>${i + 1}</td>
       <td>${item.personCode}</td>
@@ -1500,11 +1554,11 @@ async function modalJobPopup(params) {
 
     // Render position list table
     const $positionBody = $("#tablePositionListBody").empty();
-    (data?.positionList || []).forEach((group, i) => {
+    (sortedPositionList || []).forEach((group, i) => {
       group.dataPosition.forEach((item, j) => {
         if (j == 0) {
           $positionBody.append(`<tr>
-            <td>${i + 1}</td>
+            <td>${j + 1}</td>
             <td>${item.positionName}</td>
             <td>${item.careerLevel}</td>
             <td>${item.prlOrg}</td>
@@ -1512,7 +1566,7 @@ async function modalJobPopup(params) {
             </tr>`);
         } else {
           $positionBody.append(`<tr>
-        <td>${i + 1}</td>
+        <td>${j + 1}</td>
         <td>${item.positionName}</td>
         <td>${item.careerLevel}</td>
         <td>${item.prlOrg}</td>
@@ -2029,6 +2083,9 @@ function helperOrgChartTester(init, id, data, isFocusNode, object) {
 }
 
 function helperOrgChart(init, id, data, isFocusNode, object) {
+  console.log(data);
+  const dataWithIdNull = data.filter((item) => item.id !== null || item.pid !== null);
+  console.log("dataWithIdNull", dataWithIdNull);
   if (!init) {
     return false;
   }
@@ -2266,28 +2323,33 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     });
 
     // check ada yang value nilai value getType yang sama atu tidak. contoh = [{a:1},{b:2},{c:1}]
+    // const storeValues = [];
+    // const uniqueValues = new Set(getType.map((item) => item.value));
+    // uniqueValues.forEach((value) => {
+    //   const count = getType.filter((item) => item.value === value).length;
+    //   storeValues.push({ value, count });
+    // });
     const storeValues = [];
     const uniqueValues = new Set(getType.map((item) => item.value));
     uniqueValues.forEach((value) => {
       const count = getType.filter((item) => item.value === value).length;
-      storeValues.push({ value, count });
+      //  find whic bc_1_flagMergeFormation, bc_2_flagMergeFormation, etc. that matches this value
+      const matchingKeys = Object.keys(item).filter((key) => key.includes("flagMergeFormation") && item[key] === value);
+      const arrayKeys = matchingKeys.map((key) => parseInt(key.split("_")[1]));
+      storeValues.push({ value, count, arrayKeys });
     });
-    // console.log("storeValues", storeValues);
-
-    // storeValues.sort((a, b) => {
-    //   if (a.value === null && b.value === null) return 0;
-    //   if (a.value === null) return 1;
-    //   if (b.value === null) return -1;
-    //   return a.value.localeCompare(b.value);
-    // });
-
-    storeValues.forEach((itx, index) => {
+    // urutan storeValues berdasarkan dari uturan arrayKeys
+    let sorted = [];
+    let count = 0;
+    for (let i = 0; i < totalBAsket; i++) {
+      const matching = storeValues.find((itx) => itx.arrayKeys.includes(i + 1));
+      if (count < totalBAsket && matching) {
+        count += matching.count;
+        sorted.push(matching);
+      }
+    }
+    sorted.forEach((itx, index) => {
       const tagFormation = `bc_${index + 1}_jumlah_formasi`;
-      // console.log("itx", itx);
-      // console.log("item", item);
-      // console.log("item[tagFormation]", item[tagFormation]);
-
-      // find in item ke includes _flagMergeFormation and value matches itx.value
       const flagMergeFormationKey = Object.keys(item)
         .filter((key) => key.includes("_flagMergeFormation") && item[key] === itx.value)
         .sort((a, b) => {
@@ -2300,56 +2362,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
         item[tagFormation] = item[`bc_${bracketIndex}_jumlah_formasi`] || 0; // set jumlah_formasi to count
       });
 
-      // item["bc_1_jumlah_formasi"] = 1; // example to set jumlah_formasi
-      // item["bc_2_jumlah_formasi"] = 2; // example to set jumlah_formasi
-      // item["bc_3_jumlah_formasi"] = 3; // set jumlah_formasi to count
-
-      // find in item if key includes _jumlah_formasi and value matches itx.value (type-safe)
-      // const keyFound = Object.keys(item)
-      //   .filter((key) => key.includes("_jumlah_formasi"))
-      //   .sort((a, b) => {
-      //     return a.localeCompare(b);
-      //   });
-      // const mergeKeyFound = Object.keys(item)
-      //   .filter((key) => key.includes("_flagMergeFormation"))
-      //   .sort((a, b) => {
-      //     return a.localeCompare(b);
-      //   });
-      // console.log("keyFound", keyFound);
-      // console.log("mergeKeyFound", mergeKeyFound);
-      // // console.log("keyFound", keyFound);
-      // // console.log("item", item);
-      // keyFound.forEach((key, idz) => {
-      //   // console.log("key", key);
-      //   // console.log(mergeKeyFound[idz]);
-      //   // console.log("item[key]", item[key]);
-      //   // console.log("itx.value", itx.value);
-      //   // if (item[key] == itx.value) {
-      //   // console.log("key", key);
-      //   // console.log("item[key]", item[key]);
-      //   // item[tagFormation] = itx.count;
-      //   // console.log("masuk", key);
-      //   // item[key] = itx.count;
-      //   // }
-      //   // console.log("key", key);
-      //   // console.log("item[key]", item[key]);
-      //   // console.log("item[key]", item[key]);
-      //   // if (item[key] == 0) return;
-      //   // console.log("key 2", key);
-      //   // item[tagFormation] = itx.count;
-      //   // if (item[key] == itx.value) {
-      //   //   item[tagFormation] = item[key];
-      //   //   console.log("masuk", key);
-      //   //   // item[key] = itx.count;
-      //   // }
-      // });
-
-      // const keyFound = Object.keys(dataSelected).find((key) => key.includes(itx.value));
-      // console.log("keyFound", keyFound);
-      // tagCustomMerge
-      // console.log("itx.counte", itx.counte);
       tagCustomMerge += `_${itx.count}`;
-      // console.log("tagFormation", tagFormation);
     });
     item.tags.push(tagCustomMerge);
     tagsCustomMergeArray.push(tagCustomMerge);
