@@ -103,7 +103,7 @@
     <div class="modal-dialog modal-createdraft bounceInDown  animated" role="document">
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalcreateDraftTitle">Create RASCI Matrix Draft qqqq</h5>
+                <h5 class="modal-title" id="modalcreateDraftTitle">Create RASCI Matrix Draft</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -125,7 +125,8 @@
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
                             class="icon-arrow-left"></i> Back</button>
-                    <button class="btn btn-primary" type="button" onclick="handleSaveCreateDraft()">
+                    <button class="btn btn-primary" id="btn-save-draft" type="button" onclick="handleSaveCreateDraft()"
+                        disabled>
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
                                 id="loadingDraftmain" role="status"></div>

@@ -284,7 +284,7 @@ async function applySearch() {
   spinner.style.display = "inline-block";
 
   switch (selectedText) {
-    case "RASCI by Job":
+    case "RASCI by Pos...":
       const payload = {
         draftRasciId: draftRasciId == "master" ? null : draftRasciId,
         unitCode: selectedJobIds, // Menggabungkan ID job
