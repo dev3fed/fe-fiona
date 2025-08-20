@@ -172,7 +172,7 @@
                                 </table>
                             </div>
                             <div class="d-flex mt-2 justify-content-end">
-                                <button class="btn btn btn-primary" type="button" id="btn-selectedjob"
+                                <button class="btn btn btn-primary" type="button" id="btn-selectedjob" disabled
                                     onclick="triggleSelectJob()">
                                     Selected
                                     Job</button>
@@ -191,7 +191,7 @@
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
                         onclick="backFromModalBp()"><i class="icon-arrow-left"></i> Back</button>
-                    <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="saveAsDraft()">
+                    <button id="btn-savebp" class="btn btn-primary" type="button" onclick="saveAsDraft()" disabled>
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
                                 id="saveNewbp" role="status"></div>
