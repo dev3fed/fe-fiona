@@ -78,7 +78,7 @@ async function saveAsDraft() {
   let type = "create";
   if (positionId) type = "edit";
   loader(true);
-  // return;  
+  // return;
   const save = await saveInputAttribut(type);
   console.log("save", save);
   if (save) {
@@ -91,25 +91,7 @@ async function saveAsDraft() {
   }
 }
 
-// function saveAsDraft() {
-//   const positionId = urlParams.get("unitCode");
-//   let type = "create";
-//   let data = {};
-//   if (positionId) {
-//     type = "edit";
-//     data = lsListPosition.find((item) => item.positionId == positionId);
-//     saveInputAttribut(type, data);
-//     // swal("Saved", "Save as Draft", "success");
-//     // window.location.href = "/organization/index?focusNode=" + positionId;
-//   } else {
-//     // swal("Saved", "Save as Draft", "success");
-//     saveInputAttribut(type, data);
-//     // const getDirectReport = $("#selectDirectReport").val();
-//     // window.location.href = "/organization/index?focusNode=" + getDirectReport;
-//   }
-// }
-
-function addSubPos() {
+function addSubPosition() {
   const positionId = urlParams.get("unitCode");
   let type = "create";
   if (positionId) type = "edit";
@@ -224,56 +206,14 @@ function checkBasketSelected(selectBasket) {
 }
 
 $(document).ready(async function () {
-  loader(false);
-  // check query url
-  // check data organization from local storage
-  checkDataOrganizationLocalStorage();
-  console.log(organizationAttribute);
+  loader(true);
 
-  const positionId = urlParams.get("unitCode");
-
-  const updateDataDraft = await initializeList();
-  getDataList(updateDataDraft);
-  starter();
-  if (positionId) {
-    $("#headerForm").text("Edit Position");
-    $("#breadcrumbForm").text("Edit Position");
-    insertFormPostion(positionId);
-  }
-  // changes inside detail
-  // $("#selectCareerType").on("change", function (event) {
-  //   const selectCareerType = event.target.value;
-  //   $("#selectBasket").prop("disabled", false);
-  //   if (selectCareerType == "Managerial") {
-  //     $("#selectBasket").prop("disabled", true);
-  //     $("#selectBasket").val("No");
-  //   }
-  //   updateCareerLevel(selectCareerType);
-  // });
-
-  // $("#selectCareerLevel").on("change", function (event) {
-  //   const selectCareerType = $("#selectCareerType").val();
-  //   const selectCareerLevel = event.target.value;
-  //   openAll();
-  //   updateAbbrvPosition(selectCareerType, selectCareerLevel);
-  //   updatePrlOrg(selectCareerType, selectCareerLevel);
-  // });
-
-  // $("#modalSelectCareerLevel").on("change", function (event) {
-  //   const selectCareerType = $("#modalInputCareerType").val();
-  //   const selectCareerLevel = event.target.value;
-
-  //   // modalSelectAbbrvPosition disable false
-  //   $("#modalSelectAbbrvPosition").attr("disabled", false);
-  //   $("#modalInputSubPositionName").attr("disabled", false);
-  //   $("#modalSelectPrlOrgSubPos").attr("disabled", false);
-  //   $("#modalInputFormation").attr("disabled", false);
-
-  //   updateAbbrvPositionModal(selectCareerType, selectCareerLevel);
-  //   // const selectCareerLevel = event.target.value;
-  //   // openAll();
-  //   // updatePrlOrg(selectCareerType, selectCareerLevel);
-  // });
+  $("#selectBasket").on("change", function (event) {
+    // console.log("basket selected");
+    const selectBasket = event.target.value;
+    alert("Basket selected: " + selectBasket);
+    checkBasketSelected(selectBasket);
+  });
 
   $("#selectCoordination").on("change", function (event) {
     const value = event.target.value;
@@ -281,12 +221,6 @@ $(document).ready(async function () {
     if (value == "Yes") {
       $("#selectCoordinationWith").attr("disabled", false);
     }
-  });
-
-  $("#selectBasket").on("change", function (event) {
-    // console.log("basket selected");
-    const selectBasket = event.target.value;
-    checkBasketSelected(selectBasket);
   });
 
   // click new subordinate
@@ -319,10 +253,114 @@ $(document).ready(async function () {
 
   $("#saveSubPos").click(function () {
     // swal("Saved", "Save Sub Position", "success");
-    addSubPos();
+    addSubPosition();
   });
 
+  // Bootstrap form validation
+  function initializeFormValidation() {
+    // Add CSS for Select2 invalid styling if not already added
+    if (!document.getElementById("select2-validation-styles")) {
+      const style = document.createElement("style");
+      style.id = "select2-validation-styles";
+      style.textContent = `
+        .select2-container.is-invalid .select2-selection {
+          border-color: #dc3545 !important;
+          box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .select2-container.is-invalid .select2-selection--single {
+          border-color: #dc3545 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Check all form controls with required attribute
+    const form = document.querySelectorAll(".form-control[required], .form-select[required]");
+    let hasErrors = false;
+
+    form.forEach((input) => {
+      const type = input.type || input.tagName.toLowerCase();
+      const value = input.value.trim();
+
+      if (type === "text" || type === "number" || type === "email") {
+        if (!value) {
+          input.classList.add("is-invalid");
+          hasErrors = true;
+        } else {
+          input.classList.remove("is-invalid");
+        }
+      } else if (input.tagName.toLowerCase() === "select" || type === "select-one") {
+        // For Select2 dropdowns, find the Select2 container
+        const select2Container = input.parentElement.querySelector(".select2-container");
+        if (select2Container) {
+          if (!value || value === "" || value === "null") {
+            select2Container.classList.add("is-invalid");
+            hasErrors = true;
+          } else {
+            select2Container.classList.remove("is-invalid");
+          }
+        } else {
+          // Fallback for regular select elements
+          if (!value || value === "" || value === "null") {
+            input.classList.add("is-invalid");
+            hasErrors = true;
+          } else {
+            input.classList.remove("is-invalid");
+          }
+        }
+      }
+    });
+
+    return !hasErrors; // Return true if no errors, false if there are errors
+  }
+
+  // Real-time validation - remove invalid class when user fills the field
+  function setupRealTimeValidation() {
+    const form = document.querySelectorAll(".form-control[required], .form-select[required]");
+
+    form.forEach((input) => {
+      const type = input.type || input.tagName.toLowerCase();
+
+      if (type === "text" || type === "number" || type === "email") {
+        // Add event listener for input fields
+        input.addEventListener("input", function () {
+          if (this.value.trim()) {
+            this.classList.remove("is-invalid");
+          }
+        });
+      } else if (input.tagName.toLowerCase() === "select" || type === "select-one") {
+        // Add event listener for select fields (including Select2)
+        $(input).on("change", function () {
+          const value = $(this).val();
+          const select2Container = this.parentElement.querySelector(".select2-container");
+
+          if (value && value !== "" && value !== "null") {
+            if (select2Container) {
+              select2Container.classList.remove("is-invalid");
+            } else {
+              this.classList.remove("is-invalid");
+            }
+          }
+        });
+      }
+    });
+  }
+
+  // Initialize real-time validation
+  setupRealTimeValidation();
+
+  // Initialize form validation
+
   $("#saveAsDraft").click(function () {
+    // Validate form before proceeding
+    const isValid = initializeFormValidation();
+
+    if (!isValid) {
+      swal("Validation Error", "Please fill in all required fields before saving.", "warning");
+      return;
+    }
+
+    // Proceed with save if validation passes
     const positionId = urlParams.get("unitCode");
     const positionName = $("#inputPositionName").val();
     const draftName = organizationAttribute.orgUnitName;
@@ -356,4 +394,22 @@ $(document).ready(async function () {
   $("#back").click(function () {
     window.location.href = "/organization/index";
   });
+
+  localStorage.setItem("logState", JSON.stringify(logData));
+  checkDataOrganizationLocalStorage();
+  const positionId = urlParams.get("unitCode");
+  const updateDataDraft = await initializeList();
+  getDataList(updateDataDraft);
+  starter();
+  if (positionId) {
+    $("#headerForm").text("Edit Position");
+    $("#breadcrumbForm").text("Edit Position");
+    await insertFormPostion(positionId);
+    const formattedParams = formattedInputAttribut("edit");
+    let logState = JSON.parse(localStorage.getItem("logState"));
+    logState.status = "edit";
+    logState.initParams = formattedParams;
+    localStorage.setItem("logState", JSON.stringify(logState));
+  }
+  loader(false);
 });

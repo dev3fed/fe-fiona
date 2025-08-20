@@ -155,7 +155,7 @@ async function createDraftSO(params) {
 async function renameDraftSO(params) {
   const api = `${url.baseUrl}/${url["api-organization"]}/draft/rename/${params.id}/${params.name}`; // http://localhost:5095/api/organization-structure/draft/rename/1/tes
   try {
-    const result = await ajaxRequest(api, "POST", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(api, "PUT", params); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -251,7 +251,7 @@ async function deleteJobAndSubordinates(params) {
 }
 
 // /api/organization-structure/draft/rollback/{draftId}
-async function rollback(params) {
+async function rollbackDraftSO(params) {
   const api = `${url.baseUrl}/${url["api-organization"]}/draft/rollback/${params}`;
   try {
     const result = await ajaxRequest(api, "POST", {}); // Menggunakan ajaxRequest

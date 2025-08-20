@@ -63,11 +63,37 @@ function updateTable(params, data, rowHeader, refer) {
       }
 
       if (header === "index") {
-        row += `<td class="tdClass text-primary">
-          <span data-bs-toggle="tooltip"  title="${item?.tanggungJawabProses[0]?.description}">
-            ${item?.tanggungJawabProses[0]?.indexNumber}
-          </span>
-        </td>`;
+        console.log("item?.tanggungJawabProses", item?.tanggungJawabProses);
+        //  unique tanggungJawabProses
+        const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+        );
+        console.log("uniqueTanggungJawab", uniqueTanggungJawab);
+
+        if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
+          // Single item - display as span with tooltip
+          row += `<td class="tdClass text-primary">
+            <span data-bs-toggle="tooltip" data-bs-trigger="click" title="${uniqueTanggungJawab[0]?.description}">
+              ${uniqueTanggungJawab[0]?.indexNumber}
+            </span>
+          </td>`;
+        } else if (uniqueTanggungJawab && uniqueTanggungJawab.length > 1) {
+          // Multiple items - display as list
+          const listItems = uniqueTanggungJawab
+            .map(
+              (process) =>
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
+            )
+            .join("");
+          row += `<td class="tdClass">
+            <ul style="margin: 0; padding-left: 15px; list-style-type: disc;">
+              ${listItems}
+            </ul>
+          </td>`;
+        } else {
+          // No data
+          row += `<td class="tdClass text-primary">-</td>`;
+        }
         return;
       }
       // header inside customTableHeader
@@ -108,6 +134,10 @@ function updateTable(params, data, rowHeader, refer) {
 
     row += `</tr>`;
     tableBody.append(row);
+  });
+
+  $('[data-bs-toggle="tooltip"]').tooltip({
+    trigger: "click",
   });
 }
 

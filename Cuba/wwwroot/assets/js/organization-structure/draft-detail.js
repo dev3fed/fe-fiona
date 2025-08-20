@@ -112,21 +112,19 @@ async function backToOrg(params) {
 }
 
 async function confirmDeleteDraft(id) {
-  // alert("confirmDeleteDraft" + id);
-  // lsListDraft = lsListDraft.filter((x) => x.draftId != id);
-  // lsListDetailDraft = lsListDetailDraft.filter((x) => x.draftId != id);
-  // lsListPosition = lsListPosition.filter((x) => x.draftId != id);
-  // lsListOrgNode = lsListOrgNode.filter((x) => x.draftId != id);
-  // localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
-  // localStorage.setItem("listDetailDraft", JSON.stringify(lsListDetailDraft));
-  // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-  // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  // changeOrganization(0, "Master Data SO");
-  let rollback = await rollback(id);
+  console.log("confirmDeleteDraft", id);
+  let rollback = await rollbackDraftSO(id);
   if (rollback) {
     swal("Success", "Draft has been deleted", "success");
-    window.location.href = "/organization/index";
+    // wait 2s
+    // setTimeout(() => {
+    //   window.location.href = "/organization/index";
+    // }, 3000);
   }
+  // wait 2s then redirect to organization index
+  setTimeout(() => {
+    window.location.href = "/organization/index";
+  }, 2000);
 }
 
 function deleteDraft() {
@@ -191,12 +189,12 @@ async function confirmRejectApproval(id) {
 }
 
 async function previewDesignCost() {
-  await changeDataSourceFilter($("#selectDraftFilterByDataSource").val());
+  await changeDataDesignCostFilter($("#selectDraftFilterByDataSource").val());
   $("#modalPreviewDesignCost").modal("show");
 }
 
 $("#selectDraftFilterByDataSource").on("change", async function () {
-  await changeDataSourceFilter($(this).val());
+  await changeDataDesignCostFilter($(this).val());
 });
 
 async function previewOrgChart() {
@@ -565,10 +563,11 @@ $(document).ready(async function () {
   $("#editDraftName").on("click", function () {
     $("#inputDraftName").val($("#draftName").text());
     $("#modalLabelOSDraft").text("Edit Draft Name");
+    $("#createDraftSO").text("Update Draft Name");
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
   });
 
-  $("#continueButton").on("click", async function () {
+  $("#createDraftSO").on("click", async function () {
     const draftName = $("#inputDraftName").val();
     const draftId = urlParams.get("draftId");
     $("#draftName").text(draftName);
@@ -583,5 +582,8 @@ $(document).ready(async function () {
     });
     localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
     changeOrganization();
+    $("#modalLabelOSDraft").text("Create Draft SO");
+    $("#inputDraftName").val("");
+    $("#createDraftSO").text("Create Draft");
   });
 });

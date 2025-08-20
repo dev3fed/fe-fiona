@@ -234,8 +234,8 @@ function convertForeignObjectToSVGText(svgElement) {
     // Calculate approximate character width based on font size - more generous for basket text
     const charWidth = parseInt(fontSize) * 0.5; // Reduced from 0.6 to 0.5 for more space
     const maxCharsPerLine = Math.floor(maxWidth / charWidth);
-    console.log("words", words);
-    console.log("maxCharsPerLine", maxCharsPerLine);
+    // console.log("words", words);
+    // console.log("maxCharsPerLine", maxCharsPerLine);
     // remove inside words if they are ' '
     // const filteredWords = words.filter((word) => word.trim() !== "");
     // console.log("filteredWords", filteredWords);
@@ -609,23 +609,14 @@ function convertForeignObjectToSVGText(svgElement) {
         group.appendChild(col3Text);
       });
     } else if (nodeType === "basket-merge-node") {
-      console.log("Processing basket-merge node:", div);
-
       // Get the data for this node to see the tags
       const nodeData = div.closest("foreignObject")?.__data__?.data;
-      console.log("=== BASKET MERGE NODE DEBUG ===");
-      console.log("Node data:", nodeData);
-      console.log("Node tags:", nodeData?.tags);
 
       // Find basket tag and analyze it
       const basketTag = nodeData?.tags?.find((tag) => tag.includes("basket_"));
-      console.log("Basket tag:", basketTag);
 
       if (basketTag) {
         const basketParts = basketTag.split("_");
-        console.log("Basket tag parts:", basketParts);
-        console.log("Basket level:", basketParts[1]);
-        console.log("Formation info:", basketParts.slice(2));
       }
 
       // Check for border style (detect dotted border from inline styles)
@@ -641,7 +632,6 @@ function convertForeignObjectToSVGText(svgElement) {
       const mainContainer = div.querySelector("div:nth-child(2)");
       const leftSection = mainContainer?.querySelector("div:first-child");
       const rightSection = mainContainer?.querySelector("div:nth-child(2)");
-      console.log("rightSection section:", rightSection);
 
       // Get position-PRL rows from left section
       const positionPrlRows = leftSection?.querySelectorAll("div.position-prl-class") || [];
@@ -649,16 +639,11 @@ function convertForeignObjectToSVGText(svgElement) {
       // Get formation bracket rows from right section
       const bracketRows = rightSection?.querySelectorAll("div") || [];
 
-      console.log("Position-PRL rows count:", positionPrlRows.length);
-      console.log("Bracket rows count:", bracketRows.length);
-
       // Log each bracket row's style for height analysis
       bracketRows.forEach((bracketDiv, idx) => {
         const bracketStyle = bracketDiv.getAttribute("style") || "";
-        console.log(`Bracket ${idx} style:`, bracketStyle);
         const heightMatch = bracketStyle.match(/height:(\d+)px/);
         const bracketHeight = heightMatch ? parseInt(heightMatch[1]) : 50;
-        console.log(`Bracket ${idx} height:`, bracketHeight);
       });
 
       // Calculate total height based on number of rows
@@ -1367,7 +1352,7 @@ function handleNodeExpansion(focusNodeId) {
 
 // Function to process and prepare chart data
 function processChartData(rawData) {
-  console.log("Processing chart data...");
+  console.log("Processing chart data...", rawData);
 
   const dataMerged = rawData.filter((item) => item.isMergeFormation && item.basket);
 
@@ -1398,10 +1383,23 @@ function processChartData(rawData) {
     const uniqueValues = new Set(getType.map((item) => item.value));
     uniqueValues.forEach((value) => {
       const count = getType.filter((item) => item.value === value).length;
-      storeValues.push({ value, count });
+      //  find whic bc_1_flagMergeFormation, bc_2_flagMergeFormation, etc. that matches this value
+      const matchingKeys = Object.keys(item).filter((key) => key.includes("flagMergeFormation") && item[key] === value);
+      const arrayKeys = matchingKeys.map((key) => parseInt(key.split("_")[1]));
+      storeValues.push({ value, count, arrayKeys });
     });
+    // urutan storeValues berdasarkan dari uturan arrayKeys
+    let sorted = [];
+    let count = 0;
+    for (let i = 0; i < totalBAsket; i++) {
+      const matching = storeValues.find((itx) => itx.arrayKeys.includes(i + 1));
+      if (count < totalBAsket && matching) {
+        count += matching.count;
+        sorted.push(matching);
+      }
+    }
 
-    storeValues.forEach((itx, index) => {
+    sorted.forEach((itx, index) => {
       const tagFormation = `bc_${index + 1}_jumlah_formasi`;
       // find in item ke includes _flagMergeFormation and value matches itx.value
       const flagMergeFormationKey = Object.keys(item)
@@ -1409,7 +1407,6 @@ function processChartData(rawData) {
         .sort((a, b) => {
           return a.localeCompare(b);
         });
-
       flagMergeFormationKey.forEach((key) => {
         const separation = key.split("_");
         const bracketIndex = separation[1]; // get the index of the bracket
@@ -1488,7 +1485,7 @@ function initializeChart(processedDataResult, focusNodeId) {
         colorSelected = color.black;
       }
 
-      const borderDot = d.data.tags.includes("dot-dot") ? "dotted" : "solid";
+      const borderDot = d.data.project ? "dotted" : "solid";
       const borderStyle = `border:2px ${borderDot} ${colorSelected}`;
 
       const positionFontSize = getFontSize(d.data.position, true);
@@ -1522,7 +1519,7 @@ function initializeChart(processedDataResult, focusNodeId) {
         return `
                 <div id="basket-non-merge-node" style="width:${d.width}px;height:${d.height}px;display:flex;flex-direction:column;${borderStyle};background-color:white;">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:2px ${borderDot} ${colorSelected};overflow:hidden;">
-                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.position}</div>
+                    <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.org_unit_name}</div>
                   </div>
                   ${basketRows}
                 </div>
@@ -1578,9 +1575,9 @@ function initializeChart(processedDataResult, focusNodeId) {
         }px;display:flex;flex-direction:column;${borderStyle};background-color:white;">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px ${borderDot} ${colorSelected};overflow:hidden;">
                     <div style="font-size:${getBasketMergeHeaderFontSize(
-                      d.data.position
+                      d.data.org_unit_name
                     )};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${
-          d.data.position
+          d.data.org_unit_name
         }</div>
                   </div>
                   <div style="display:flex;flex-direction:row;align-items:stretch;">
@@ -1621,11 +1618,6 @@ function initializeChart(processedDataResult, focusNodeId) {
     .render()
     .fit();
 
-  console.log("Chart initialized successfully");
-
-  // Simple approach - let the library handle centering naturally
-  console.log("Chart ready with natural centering");
-
   // Auto-expand node if focusNodeId is provided
   if (focusNodeId) {
     const findChildren = processedDataResult.processedData.find((item) => item.parentId == focusNodeId);
@@ -1650,18 +1642,6 @@ function initializeChart(processedDataResult, focusNodeId) {
   }
 }
 
-// Simplified approach - no complex method override
-
-// Function to override library centering with CSS-based centering (simplified)
-function overrideLibraryCentering() {
-  console.log("Simple centering applied");
-}
-
-// Function to apply simple static centering (simplified approach)
-function applyStaticCentering() {
-  console.log("Simple static centering applied");
-}
-
 // Function to setup continuous monitoring of chart positioning
 function setupCenteringMonitor() {
   const containerElement = document.querySelector(".chart-container-custom");
@@ -1671,9 +1651,6 @@ function setupCenteringMonitor() {
     setTimeout(setupCenteringMonitor, 500);
     return;
   }
-
-  // First, override the library's centering method
-  overrideLibraryCenteringMethod();
 
   // Create a MutationObserver to watch for changes
   const observer = new MutationObserver((mutations) => {
@@ -1695,9 +1672,9 @@ function setupCenteringMonitor() {
     });
 
     if (needsOverride) {
-      // Apply our override after a small delay to ensure library changes are complete
+      // Apply static chart positioning after DOM changes
       setTimeout(() => {
-        overrideLibraryCentering();
+        applyStaticChartPositioning();
         console.log("Auto-override applied due to DOM changes");
       }, 50);
     }
@@ -1713,9 +1690,6 @@ function setupCenteringMonitor() {
   });
 
   console.log("Centering monitor setup complete");
-
-  // Also apply initial override
-  overrideLibraryCentering();
 }
 
 // Main function to initialize the entire chart system
@@ -1723,23 +1697,20 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   if (!dataChart) {
     dataChart = [];
   }
-  dataChart.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
+  dataChart.forEach((item) => (item.id = item.id_org_unit));
 
   const self = dataChart.find((item) => item.id == focusNodeId);
-  const parent = dataChart.find((item) => item.id == self.pid);
-  dataChart = dataChart.filter((item) => item.id != self.pid);
+  const parent = dataChart.find((item) => item.id == self?.pid);
   if (parent) {
     parent.pid = null;
+    dataChart = dataChart.filter((item) => item.id != parent.id);
+    dataChart.unshift(parent);
   }
-  dataChart.unshift(parent);
+
   const processed = processChartData(dataChart);
   processed.processedData.forEach((item) => {
-    item.id = parseInt(item.id, 10);
-    item.parentId = parseInt(item.pid, 10) || null;
+    item.parentId = item.pid || null;
   });
   initializeChart(processed, isAutoExpand ? focusNodeId : null);
   if (chart) chart.fit();
-  console.log("Org chart rendered");
 }
