@@ -1554,11 +1554,14 @@ async function modalJobPopup(params) {
 
     // Render position list table
     const $positionBody = $("#tablePositionListBody").empty();
+    let globalCount = 0;
     (sortedPositionList || []).forEach((group, i) => {
       group.dataPosition.forEach((item, j) => {
+        globalCount++;
+        console.log("globalCount:", globalCount);
         if (j == 0) {
           $positionBody.append(`<tr>
-            <td>${j + 1}</td>
+            <td>${globalCount}</td>
             <td>${item.positionName}</td>
             <td>${item.careerLevel}</td>
             <td>${item.prlOrg}</td>
@@ -1566,7 +1569,7 @@ async function modalJobPopup(params) {
             </tr>`);
         } else {
           $positionBody.append(`<tr>
-        <td>${j + 1}</td>
+        <td>${globalCount}</td>
         <td>${item.positionName}</td>
         <td>${item.careerLevel}</td>
         <td>${item.prlOrg}</td>
