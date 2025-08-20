@@ -99,7 +99,7 @@
     <div class="modal-dialog modal-compare bounceInDown  animated" role="document">
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalJobCompareLabel">Job Compare</h5>
+                <h5 class="modal-title" id="modalJobCompareLabel">Position Compare</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -110,9 +110,9 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="col-form-label mb-0"
-                                        style="margin-top: -4px; margin-left: 5px;">Search & Select job</label>
+                                        style="margin-top: -4px; margin-left: 5px;">Search & Select Position</label>
                                 </div>
-                                <label class="reset-label-compare mb-0">Choose minimum 2 job title</label>
+                                <label class="reset-label-compare mb-0">Choose minimum 2 positions</label>
                             </div>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                             <div class="media-body switch-sm d-flex align-items-center justify-content-between w-100">
                                 <div class="d-flex align-items-center">
                                     <label class="col-form-label mb-0"
-                                        style="margin-top: -4px; margin-left: 5px;">Selected Job</label>
+                                        style="margin-top: -4px; margin-left: 5px;">Selected Position</label>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +152,7 @@
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
                         onclick="handleCloseModal()"><i class="icon-arrow-left"></i> Back</button>
-                    <button id="apply-compare" class="btn btn-primary" type="button" onclick="applyCompare()">
+                    <button id="apply-compare" class="btn btn-primary" type="button" onclick="applyCompare()" disabled>
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
                                 id="applyCompare" role="status"></div>

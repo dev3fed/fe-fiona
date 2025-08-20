@@ -104,12 +104,14 @@
                 <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
                         class="fa fa-calendar"></i></div>
                 <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Created Date">
+                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Created Date"
+                    id="createdDateInput">
+
             </div>
         </div>
         <div class="col-4">
             <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
+                <input class="form-control" type="text" placeholder="Search.." id="searchInput"><i class="search-icon"
                     data-feather="search"></i>
             </div>
         </div>
@@ -133,7 +135,14 @@
                 </table>
             </div>
         </div>
-
+        <div class="col-9 mt-3">
+            <div id="total-loghistory-page">
+            </div>
+        </div>
+        <div class="col-3 mt-3 d-flex justify-content-end">
+            <div id="list-loghistory-page">
+            </div>
+        </div>
     </div>
 </div>
 <!-- Bootstrap JS and Popper.js -->

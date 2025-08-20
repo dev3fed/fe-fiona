@@ -126,7 +126,7 @@ function handleDetailApproval() {
   if (headerMatrix) {
     headerMatrix.style.display = "none";
   }
-
+  setState("dataDetailAproval", {});
   // const url = new URL(window.location);
   // url.searchParams.set("id", 1);
   // window.history.pushState({}, "", url);
