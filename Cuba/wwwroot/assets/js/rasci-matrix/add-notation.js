@@ -1,9 +1,7 @@
 // start section add notation by column row
 async function onModalAddNotation() {
   try {
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalAddNotation"),
-    );
+    const modal = new bootstrap.Modal(document.getElementById("modalAddNotation"));
     modal.show();
     const rasciNotation = getState("rasciNotation") || [];
     const dataChangeNotasi = getState("dataChangeNotasi");
@@ -53,9 +51,7 @@ async function onModalAddNotation() {
         <div class="col-3">
           <select class="form-select digits" onchange="onSelectLevel(event)" name="levelId" id="levelId">
            <option value="" disabled selected>Level</option>
-              ${listLevel.map(
-                (opt) => `<option value="${opt.id}">${opt.text}</option>`,
-              )}
+              ${listLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
           </select>
         </div>
         <div class="col-9">
@@ -92,15 +88,11 @@ async function onModalAddNotation() {
 const cardSelectedNotasilist = (param) => {
   const bodyBisuness = param.busProsMapped
     .map((value) => {
-      const rasciNotation = value.rasciNotation.filter(
-        (item) => item.isChecked,
-      );
+      const rasciNotation = value.rasciNotation.filter((item) => item.isChecked);
       return `<div class="card-listjob mb-2">
           <div class="row">
             <div class="col-10">
-              <span style="font-size:13px;font-weight:bold">${
-                value.businessName
-              }</span>
+              <span style="font-size:13px;font-weight:bold">${value.businessName}</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
               <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteBusinesslist('${
@@ -130,9 +122,7 @@ const cardSelectedNotasilist = (param) => {
 };
 const deleteBusinesslist = (id) => {
   const dataChangeNotasi = getState("dataChangeNotasi");
-  const removeData = dataChangeNotasi.busProsMapped.filter(
-    (item) => item.parentId !== id,
-  );
+  const removeData = dataChangeNotasi.busProsMapped.filter((item) => item.parentId !== id);
   const result = { ...dataChangeNotasi, busProsMapped: removeData };
   setState("dataChangeNotasi", result);
   cardSelectedNotasilist(result);
@@ -213,10 +203,8 @@ async function onSelectJobRef(event) {
       const result = await fetchProsbisByJob(queryString);
       if (result.success === true) {
         const dataTbl = result.data;
-        const elementSelectedBispro =
-          document.getElementById("table-prosbisref");
-        const elementSelectedBisproref =
-          document.getElementById("selectedBisproref");
+        const elementSelectedBispro = document.getElementById("table-prosbisref");
+        const elementSelectedBisproref = document.getElementById("selectedBisproref");
         elementSelectedBisproref.style.display = "block";
         elementSelectedBispro.style.display = "block";
         const contentRefProsbis = `
@@ -259,9 +247,7 @@ async function onSelectJobRef(event) {
                       }
 
                       if (value.comment) {
-                        comments.push(
-                          `<li>${value.notation}: ${value.comment}</li>`,
-                        );
+                        comments.push(`<li>${value.notation}: ${value.comment}</li>`);
                       }
                     });
 
@@ -272,13 +258,9 @@ async function onSelectJobRef(event) {
                     return `
                     <th scope="row">
                       <label class="radio-label" for="checked-body-bp">
-                        <input class="checkbox_animated" id="checked-prosbisref-${
-                          item.indexNumber
-                        }" 
+                        <input class="checkbox_animated" id="checked-prosbisref-${item.indexNumber}" 
                           type="checkbox" value="${item.indexNumber}" 
-                          onclick="onSelectProsbisRef(${JSON.stringify(
-                            item,
-                          ).replace(/"/g, "&quot;")});">
+                          onclick="onSelectProsbisRef(${JSON.stringify(item).replace(/"/g, "&quot;")});">
                       </label>
                     </th>
                     <td style="text-align:center">
@@ -327,9 +309,7 @@ function onSelectPosition(item) {
   setState("dataChangeNotasi", updatedPayload);
 }
 function onSelectProsbisRef(item) {
-  const elementChecked = document.getElementById(
-    `checked-prosbisref-${item.indexNumber}`,
-  );
+  const elementChecked = document.getElementById(`checked-prosbisref-${item.indexNumber}`);
   const isChecked = elementChecked.checked;
   const jobRefName = $("#jobIdRef").find(":selected").text();
   const draftName = $("#dataSource-rasci option:selected").text();
@@ -347,9 +327,7 @@ function onSelectProsbisRef(item) {
       ...dataChangeNotasi,
       draftName: draftName,
       busProsMapped: [
-        ...dataChangeNotasi.busProsMapped.filter(
-          (entry) => entry.parentId !== item.indexNumber,
-        ),
+        ...dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNumber),
         {
           parentId: item.indexNumber,
           rasciNotation: notation,
@@ -362,13 +340,9 @@ function onSelectProsbisRef(item) {
   } else {
     const updatedPayload = {
       ...dataChangeNotasi,
-      busProsMapped: dataChangeNotasi.busProsMapped.filter(
-        (entry) => entry.parentId !== item.indexNumber,
-      ),
+      busProsMapped: dataChangeNotasi.busProsMapped.filter((entry) => entry.parentId !== item.indexNumber),
     };
-    const removeList = listSelectedProsbisref.filter(
-      (entry) => entry.indexNumber !== item.indexNumber,
-    );
+    const removeList = listSelectedProsbisref.filter((entry) => entry.indexNumber !== item.indexNumber);
     setState("listSelectedProsbisref", removeList);
     setState("dataChangeNotasi", updatedPayload);
   }
@@ -568,9 +542,7 @@ const tblRasciNotation = (rasciNotation) => {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
-          letter.rasciCode
-        }" 
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
                value="${letter.comment || ""}" 
                ${!letter.isChecked ? "disabled" : ""} 
                oninput="updateRasciComment('${letter.rasciCode}', this.value)">
@@ -612,9 +584,7 @@ function backChangeNotation() {
 function formValidationNotation() {
   const { jobId, busProsMapped } = getState("dataChangeNotasi");
   const listSelectedProsbisref = getState("listSelectedProsbisref");
-  const isValid =
-    (jobId && busProsMapped.length > 0) ||
-    (jobId && listSelectedProsbisref.length > 0);
+  const isValid = (jobId && busProsMapped.length > 0) || (jobId && listSelectedProsbisref.length > 0);
   document.getElementById("btnDraftnotation").disabled = !isValid;
 }
 
@@ -660,9 +630,7 @@ function tblChangeNotation(rasciNotation) {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
-          letter.rasciCode
-        }"
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
           value="${letter.comment || ""}"
           ${!letter.isChecked ? "disabled" : ""}
           oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -695,9 +663,7 @@ function tblChangeNotationRow(rasciNotation) {
       } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${
-          letter.rasciCode
-        }"
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
           value="${letter.comment || ""}"
           ${!letter.isChecked ? "disabled" : ""}
           oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -721,7 +687,7 @@ function backChangeNotationRow() {
 
 async function saveDraftnotation() {
   try {
-    const spinner = document.getElementById("spinBtnNotation");
+    const spinner = document.getElementById("spinBtnNotation2");
     spinner.style.display = "inline-block";
     const dataChangeNotasi = getState("dataChangeNotasi");
     const draftRasciId = $("#dataSource-rasci").val();

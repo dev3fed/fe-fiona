@@ -53,7 +53,7 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Org PRL</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.prlOrg || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.unit.prlPlan || "-"}</label><br/>
       </div>
        <div class="col-2">
           <label style="color:#9F9FA5;fonti-size:12px">Career Type</label><br/>

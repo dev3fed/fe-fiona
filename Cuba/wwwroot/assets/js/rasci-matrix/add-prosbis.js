@@ -247,7 +247,7 @@ async function onModalAddBp() {
     <div class="col-12">
       <div>
         <label class="form-label">Business Process Name</label>
-        <textarea class="form-control" oninput="onInputProsbis(event)"></textarea>
+        <textarea class="form-control" id="inputProsbis" oninput="onInputProsbis(event)"></textarea>
       </div>
     </div>`;
       const bodySelectJob = `
@@ -287,8 +287,8 @@ const cardSelectedJoblist = (param) => {
               <span style="font-size:13px;font-weight:bold">${value.jobName}</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
-              <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteJoblist(${
-                value.jobId
+              <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteJoblistBp(${
+                value.orgUnitCode
               })" style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
                 <i class="icon-trash" style="font-size: 14px;padding-right:2px"></i>
               </button>
@@ -310,11 +310,18 @@ const cardSelectedJoblist = (param) => {
         </div>`;
     })
     .join("");
+  const dataProsbis = getState("insertProsbis");
+  const btnSaveBp = document.getElementById("btn-savebp");
+  if (btnSaveBp) {
+    btnSaveBp.disabled = !(dataProsbis.jobMapped && dataProsbis.jobMapped.length > 0);
+  }
   document.getElementById("selected-job").innerHTML = bodyJoblist;
 };
-const deleteJoblist = (id) => {
+const deleteJoblistBp = (id) => {
+  console.log("first", id);
   const dataProsbis = getState("insertProsbis");
-  const removeData = dataProsbis.jobMapped.filter((item) => Number(item.jobId) !== Number(id));
+  console.log("first", dataProsbis);
+  const removeData = dataProsbis.jobMapped.filter((item) => Number(item.orgUnitCode) !== Number(id));
   const result = { ...dataProsbis, jobMapped: removeData };
   setState("insertProsbis", result);
   cardSelectedJoblist(result);
@@ -576,6 +583,18 @@ const triggleSelectJob = () => {
     cardSelectedJoblist(payload);
   }, 200);
 };
+
+$(document).on("change", "#idprosbisLevel, #jobId", function () {
+  const level = $("#idprosbisLevel").val();
+  const jobId = $("#jobId").val();
+  const inputProsbis = $("#inputProsbis").val();
+  const btn = $("#btn-selectedjob");
+  if (level && level !== "Choose" && jobId && inputProsbis && inputProsbis.trim().length > 0) {
+    btn.prop("disabled", false);
+  } else {
+    btn.prop("disabled", true);
+  }
+});
 
 async function saveAsDraft() {
   try {
