@@ -41,6 +41,7 @@ async function detailDraft() {
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
     if (listData.data.length > 0) {
+      console.log("first", listData.data);
       renderTableActivity(listData);
     } else {
       const bodyEmpty = `

@@ -16,12 +16,8 @@ tableContainer.addEventListener(
   "scroll",
   debounce(async function () {
     const topReached = tableContainer.scrollTop <= 10;
-    const bottomReached =
-      tableContainer.scrollTop + tableContainer.clientHeight >=
-      tableContainer.scrollHeight - 10;
-    const rightReached =
-      tableContainer.scrollLeft + tableContainer.clientWidth >=
-      tableContainer.scrollWidth - 10;
+    const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
+    const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
     const leftReached = tableContainer.scrollLeft === 0;
     const loader = document.getElementById("loader");
     let currentPageY = getState("currentPageY");
@@ -68,21 +64,12 @@ async function loadMoreCompetency(page) {
     };
     setState("payloadCompetency", payload);
     const resultCompetency = await fetchCompetencyList(payload);
-    console.log("payload", payload);
-    console.log("page", page);
-    console.log("first", resultCompetency);
     const compeList = getState("resultCompetency");
     const resultJob = getState("resultJob");
     const mappingList = getState("resultMapping");
-    console.log("first", compeList);
-    console.log("resultJob", resultJob);
-    console.log("mappingList", mappingList);
-    const posCode = resultJob.map((val) => val.positionCode);
-    console.log("posCode", posCode);
+    const posCode = resultJob.map((value) => `${value.unitCode};${value.prlOrg}`);
     const allCompeList = [...compeList, ...resultCompetency.data.competency];
     const allMappingList = [...mappingList, ...resultCompetency.data.level];
-    console.log("first", allCompeList);
-    console.log("allMappingList", allMappingList);
     if (allCompeList.length > 20) {
       const cuttingCompe = allCompeList.slice(10); // Pangkas 10 data di awal
       setState("resultCompetency", cuttingCompe);
@@ -141,24 +128,18 @@ const restoreJob = async () => {
       page: currentPageY - 3,
       pageSize: 15,
     };
-    const rowToRemove =
-      resultJob.length != 45 ? Math.max(0, resultJob.length + 15 - 45) : 15;
+    const rowToRemove = resultJob.length != 45 ? Math.max(0, resultJob.length + 15 - 45) : 15;
     const queryString = "?" + new URLSearchParams(payload).toString();
     const jobList = await fetchJobList(queryString);
     const cuttingJob = resultJob.slice(0, -rowToRemove);
     const combinedJob = [...jobList.data, ...cuttingJob];
-    const posCode = combinedJob.map((val) => val.positionCode);
+    const posCode = combinedJob.map((value) => `${value.unitCode};${value.prlOrg}`);
     setState("resultJob", combinedJob);
     if (resultCompetency.length > 10) {
       const numberLoop = [currentPageX - 1, currentPageX];
       const competencyList = await fetchMultiplePage(numberLoop, posCode);
-      console.log("competencyList", competencyList);
-      const combinedCompetency = competencyList.flatMap(
-        (item) => item.data.competency,
-      );
+      const combinedCompetency = competencyList.flatMap((item) => item.data.competency);
       const combinedlevel = competencyList.flatMap((item) => item.data.level);
-      console.log("combinedlevel", combinedlevel);
-      console.log("combinedCompetency", combinedCompetency);
       setTimeout(() => {
         loadTableHeader(combinedCompetency);
         loadTableBody(combinedJob);
@@ -178,15 +159,10 @@ const restoreJob = async () => {
         jobCode: posCode,
       };
       const competencyList = await fetchCompetencyList(body);
-      console.log("competencyList", competencyList);
       setTimeout(() => {
         loadTableHeader(competencyList?.data.competency);
         loadTableBody(combinedJob);
-        mapCompetencyCells(
-          posCode,
-          competencyList.data.competency,
-          competencyList.data.level,
-        );
+        mapCompetencyCells(posCode, competencyList.data.competency, competencyList.data.level);
         setState("currentPageY", currentPageY - 1);
         loader.style.display = "none";
         onLoadData = false;
@@ -218,33 +194,22 @@ const loadMoreJob = async (currentPageY, currentPageX) => {
         pageSize: 15,
       };
       loader.style.display = "flex";
-      console.log("payload", payload);
       const queryString = "?" + new URLSearchParams(payload).toString();
       const jobList = await fetchJobList(queryString);
-      console.log("first", jobList);
       const combineJob = [...resultJob, ...jobList.data];
       const allJob = combineJob.length > 45 ? combineJob.slice(15) : combineJob;
-      console.log("allJob", allJob);
-      const combineIndex = allJob.map((val) => val.positionCode);
-
+      const combineIndex = allJob.map((value) => `${value.unitCode};${value.prlOrg}`);
       // const resultCompetency = getState("resultCompetency");
       // console.log("storageDataCompetency", storageDataCompetency);
-      const posCode = resultJob.map((val) => val.positionCode);
+      const posCode = resultJob.map((value) => `${value.unitCode};${value.prlOrg}`);
+
       setState("resultJob", allJob);
       if (combineIndex.length > 0 && jobList.success === true) {
         if (resultCompetency.length > 10) {
           const numberLoop = [currentPageX - 1, currentPageX];
-          console.log("numberLoop", numberLoop);
           const competencyList = await fetchMultiplePage(numberLoop, posCode);
-          console.log("competencyList", competencyList);
-          const combinedCompetency = competencyList.flatMap(
-            (item) => item.data.competency,
-          );
-          const combinedlevel = competencyList.flatMap(
-            (item) => item.data.level,
-          );
-          console.log("combinedlevel", combinedlevel);
-          console.log("combinedCompetency", combinedCompetency);
+          const combinedCompetency = competencyList.flatMap((item) => item.data.competency);
+          const combinedlevel = competencyList.flatMap((item) => item.data.level);
           setTimeout(() => {
             loadTableHeader(combinedCompetency);
             loadTableBody(allJob);
@@ -265,15 +230,10 @@ const loadMoreJob = async (currentPageY, currentPageX) => {
           };
           setState("payloadCompetency", body);
           const competencyList = await fetchCompetencyList(body);
-          console.log("competencyList", competencyList);
           setTimeout(() => {
             loadTableHeader(competencyList?.data.competency);
             loadTableBody(allJob);
-            mapCompetencyCells(
-              combineIndex,
-              competencyList.data.competency,
-              competencyList.data.level,
-            );
+            mapCompetencyCells(combineIndex, competencyList.data.competency, competencyList.data.level);
             setState("currentPageY", currentPageY + 1);
             loader.style.display = "none";
             onLoadData = false;
@@ -285,7 +245,6 @@ const loadMoreJob = async (currentPageY, currentPageX) => {
           }, 50);
         }
       }
-      console.log("loadMoreProsbisAndPosition", combineJob);
       if (combineJob.length > 45) {
         tableContainer.scrollTop -= 550;
       }
@@ -313,26 +272,16 @@ async function restoreCompetency() {
     const loader = document.getElementById("loader");
     if (currentPageX > 2) {
       const payloadCompetency = getState("payloadCompetency");
-      const posCode = resultJob.map((val) => val.positionCode);
+      const posCode = resultJob.map((value) => `${value.unitCode};${value.prlOrg}`);
+
       const payload = {
         ...payloadCompetency,
         page: currentPageX - 2,
       };
-      console.log("payload", payload);
-      console.log("posCode", posCode);
-      console.log("first", compeList);
-      console.log("resultJob", resultJob);
-      const rowToRemove =
-        compeList.length != 20 ? Math.max(0, compeList.length + 10 - 20) : 10;
-      console.log("rowToRemove", rowToRemove);
+      const rowToRemove = compeList.length != 20 ? Math.max(0, compeList.length + 10 - 20) : 10;
       const cuttingCompe = compeList.slice(0, -rowToRemove);
-      console.log("cuttingCompe", cuttingCompe);
       const resultCompetency = await fetchCompetencyList(payload);
-      console.log("resultCompetency", resultCompetency);
-      const combinedCompe = [
-        ...resultCompetency.data.competency,
-        ...cuttingCompe,
-      ];
+      const combinedCompe = [...resultCompetency.data.competency, ...cuttingCompe];
       loadTableHeader(combinedCompe);
       mapCompetencyCells(posCode, combinedCompe, mappingList);
       setState("currentPageX", currentPageX - 1);

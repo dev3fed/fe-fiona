@@ -1,6 +1,5 @@
 // ================== modified checkbox handling with id+prl key (full sync with user code) ==================
 document.addEventListener("dataLoaded", async function () {
-  console.log("cek");
   const result = await getState("filterJobList");
   const levels = [1, 2, 3, 4, 5, 6, 7, 8];
   levels.forEach((lvl) => {

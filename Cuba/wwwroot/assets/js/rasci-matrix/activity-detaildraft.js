@@ -403,44 +403,43 @@ async function detailDeleteBp(id, draftRasciId) {
 async function detailEditBp(id, draftRasciId) {
   const url = `${draftRasciId}?draftListId=${id}`;
   const dataActivity = await fetchDetailDraftActivity(url);
-  console.log("dataActivity", dataActivity);
+  console.log("dataActivity", dataActivity.data);
   const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
   modal.show();
-  console.log("cek");
-
+  const dataInfo = dataActivity.data;
   const formContent = `
       <div class="col-12">
         <div >
           <label class="form-label" style="width:25%">RASCI Matrix Draft</label>
-          <label> : </label>
+          <label> : ${dataInfo.draftName}</label>
         <b class="form-label"></b>
         </div>
       </div>
       <div class="col-12">
         <div >
             <label class="form-label" style="width:25%">Business Process Level</label>
-             <label> : </label>
+             <label> : ${dataInfo.level}</label>
         <b class="form-label"></b>
         </div>
       </div>
        <div class="col-12">
         <div >
             <label class="form-label" style="width:25%">Business Process Index</label>
-             <label> : </label>
+             <label> : ${dataInfo.indexNumber}</label>
         <b class="form-label"></b>
         </div>
       </div>
              <div class="col-12">
         <div >
             <label class="form-label" style="width:25%">Business Process Name (before)</label>
-             <label> : </label>
+             <label> : ${dataInfo.oldBusinessProcess}</label>
         <b class="form-label"></b>
         </div>
       </div>
      <div class="col-12 mt-2">
       <div>
         <label class="form-label">Business Process Name (after)</label>
-        <textarea class="form-control"  disabled></textarea>
+        <textarea class="form-control"  disabled>${dataInfo.newBusinessProcess}</textarea>
       </div>
     </div>
     `;
