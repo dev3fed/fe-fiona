@@ -1462,7 +1462,7 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     template.position = null;
     template.prl = null;
     template.jumlah_formasi = null;
-    template.position =
+    template.org_unit =
       `<g>` +
       '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
       `<foreignObject x="5" y="5" width="210" height="30">` +
