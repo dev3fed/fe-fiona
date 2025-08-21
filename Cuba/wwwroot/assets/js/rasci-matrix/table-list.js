@@ -86,7 +86,6 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
       ...jobList?.level7.map((item) => ({ ...item, type: "level7" })),
       ...jobList?.level8.map((item) => ({ ...item, type: "level8" })),
     ];
-    console.log("first combinedData", combinedData);
     setState("filterJobList", combinedData);
     ChangeSourceDraft();
     changeDataSource(selectedValue, selectedDraftSo);
@@ -134,12 +133,9 @@ function fetchDatasource(draftId = null) {
 }
 
 async function changeDataSource(dataSource, draftSo) {
-  console.log("dataSource", dataSource);
   try {
     const defaultIndexNumber = getState("defaultIndexNumber");
     if (dataSource !== "master" && dataSource !== "" && dataSource !== null) {
-      console.log("dataSource", dataSource);
-
       // document.getElementById("pills-warningtab").style.display = "flex";
 
       document.getElementById("pills-draft-tab").style.display = "flex";

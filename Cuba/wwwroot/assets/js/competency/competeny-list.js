@@ -99,7 +99,8 @@ async function handleSearchCompetency() {
     };
     const queryString = "?" + new URLSearchParams(payload).toString();
     const resultJob = await fetchJobList(queryString);
-    const listJobCode = resultJob.data.map((value) => value.positionCode);
+    // const listJobCode = resultJob.data.map((value) => value.positionCode);
+    const listJobCode = resultJob.data.map((value) => `${value.unitCode};${value.prlOrg}`);
     if (resultJob.data.length > 0) {
       const body = {
         dataSource: selectElement.value,
@@ -223,9 +224,8 @@ function loadTableBody(jobList) {
 
   jobList?.forEach((val) => {
     const valString = JSON.stringify(val).replace(/"/g, "&quot;");
-
     bodyContent += `
-      <tr id="tr-${val.positionCode}" class="clusterize-cluster">
+      <tr id="tr-${val.unitCode};${val.prlOrg}" class="clusterize-cluster">
         <td class="headcol" style="text-align:left;font-size:12px;font-weight: 500 !important;">
           <div class="joblist-cell-wrapper">
             <div class="flex-fill joblist-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
@@ -260,7 +260,6 @@ function loadTableBody(jobList) {
 function handleClickPosition(positionCode) {
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
   modal.show();
-  console.log("cek");
   modalInfoPosition(positionCode);
   cardTblMandatory(positionCode);
   cardTblGeneral(positionCode);
@@ -287,9 +286,7 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
     const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");
     listCompetency.forEach((comp) => {
-      const compItem = competencyMapping.find(
-        (item) => item.positionCode === jobCode && item.compCode === comp.compCode,
-      );
+      const compItem = competencyMapping.find((item) => item.uniqueKey === jobCode && item.compCode === comp.compCode);
       const level = compItem?.level || "";
       const compTd = `
         <td data-index="${jobCode}-${comp.compCode}">
