@@ -25,7 +25,7 @@ if (listMenu) {
     const menuName = menu.menuName;
     const iconPath = `${baseImageUrl}${iconMainmenu[menuName]}`;
     const navigationUrl = `${mainMenuInfo[menuName]}`;
-    console.log(iconPath, navigationUrl);
+    console.log(iconPath, { navigationUrl }, { baseUrl });
 
     return `
       <div class="col-2">

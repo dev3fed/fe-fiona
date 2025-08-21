@@ -1535,7 +1535,25 @@ async function modalJobPopup(params) {
       }
 
       if (item.prlPlan !== "-" && data.positionList && Array.isArray(data.positionList)) {
-        const findPosition = positionList.find((pos) => pos.prlOrg.includes(String(item.prlPlan)));
+        // Function to expand PRL range (e.g., "12-13" becomes "12,13", "16-18" becomes "16,17,18")
+        const expandPrlRange = (prlOrg) => {
+          if (prlOrg.includes("-")) {
+            const [start, end] = prlOrg.split("-").map((num) => parseInt(num));
+            const expanded = [];
+            for (let i = start; i <= end; i++) {
+              expanded.push(i.toString());
+            }
+            return expanded.join(",");
+          }
+          return prlOrg;
+        };
+
+        const prlOrgCustom = positionList
+          .map((pos) => expandPrlRange(pos.prlOrg))
+          .filter((prl) => prl.includes(String(item.prlPlan)));
+        const findPosition = positionList.find((pos) => expandPrlRange(pos.prlOrg).includes(String(item.prlPlan)));
+        console.log("findPosition:", findPosition);
+        console.log("prlOrgCustom:", prlOrgCustom);
         if (findPosition) {
           item.positionName = findPosition.positionName;
           item.positionCode = findPosition.positionCode;
@@ -1554,11 +1572,14 @@ async function modalJobPopup(params) {
 
     // Render position list table
     const $positionBody = $("#tablePositionListBody").empty();
+    let globalCount = 0;
     (sortedPositionList || []).forEach((group, i) => {
       group.dataPosition.forEach((item, j) => {
+        globalCount++;
+        console.log("globalCount:", globalCount);
         if (j == 0) {
           $positionBody.append(`<tr>
-            <td>${j + 1}</td>
+            <td>${globalCount}</td>
             <td>${item.positionName}</td>
             <td>${item.careerLevel}</td>
             <td>${item.prlOrg}</td>
@@ -1566,7 +1587,7 @@ async function modalJobPopup(params) {
             </tr>`);
         } else {
           $positionBody.append(`<tr>
-        <td>${j + 1}</td>
+        <td>${globalCount}</td>
         <td>${item.positionName}</td>
         <td>${item.careerLevel}</td>
         <td>${item.prlOrg}</td>
