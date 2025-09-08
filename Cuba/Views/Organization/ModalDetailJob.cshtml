@@ -1,305 +1,284 @@
 <link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
 
-<div class="modal fade" id="modalDetailJob" tabindex="-1" role="dialog" aria-labelledby="modalJobInfo" aria-hidden="true">
+<div class="modal fade" id="modalDetailJob" tabindex="-1" role="dialog" aria-labelledby="modalJobInfo"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalJobInfoHeader">position Detail </h5>
+                <h5 class="modal-title" id="modalJobInfoHeader">Position Detail </h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div style="padding:5px">
                     <h5 class="f-w-600" id="jobName">jobName</h5>
-                    <span class="f-w-200 text-muted" style="font-size: 15px;">PRL Org: <span id="modalPrlOrg">-</span>, Formation Total: <span id="modalFormation">-</span>
-                    <input type="text" class="form-control" id="positionId" hidden>
-                    <!-- Card info start-->
-                    <div class="custom-card-draft">
-                        <div class="header-card-draft">
-                            Job Attribute
+                    <span class="f-w-200 text-muted" style="font-size: 15px;">PRL Org: <span id="modalPrlOrg">-</span>,
+                        Formation Total: <span id="modalFormation">-</span>
+                        <input type="text" class="form-control" id="positionId" hidden>
+                        <!-- Card info start-->
+                        <div class="custom-card-draft">
+                            <div class="header-card-draft">
+                                Job Attribute
+                            </div>
+                            <div class="row p-20 p-t-30">
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Organization Unit ID</span>
+                                    <br>
+                                    <span id="modalOrgUnitId" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Organization Unit Name</span>
+                                    <br>
+                                    <span id="modalOrgUnitName" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3 no-basket" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Position ID</span>
+                                    <br>
+                                    <span id="modalPositionId" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3 no-basket" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Position Name</span>
+                                    <br>
+                                    <span id="modalPositionName" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                @* <hr class="m-t-20"> *@
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Direct Report Org Unit ID</span>
+                                    <br>
+                                    <span id="modalDirectReportOrgUnitId" style="font-size:16px"
+                                        class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Direct Report Org Unit Name</span>
+                                    <br>
+                                    <span id="modalDirectReportOrgUnitName" style="font-size:16px"
+                                        class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Direct Report ID</span>
+                                    <br>
+                                    <span id="modalDirectReportId" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Direct Report Name</span>
+                                    <br>
+                                    <span id="modalDirectReportName" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                @* <hr class="m-t-20"> *@
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Directorate</span>
+                                    <br>
+                                    <span id="modalDirectorate" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Function</span>
+                                    <br>
+                                    <span id="modalFunction" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Division</span>
+                                    <br>
+                                    <span id="modalDivision" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Sub Division</span>
+                                    <br>
+                                    <span id="modalSubDivision" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Department</span>
+                                    <br>
+                                    <span id="modalDepartment" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                @* <hr class="m-t-20"> *@
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Section</span>
+                                    <br>
+                                    <span id="modalSection" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Career Type</span>
+                                    <br>
+                                    <span id="modalCareerType" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3 no-basket" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Career Level</span>
+                                    <br>
+                                    <span id="modalCareerLevel" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3 no-basket" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Abbrv Position</span>
+                                    <br>
+                                    <span id="modalAbbrvPosition" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                @* <hr class="m-t-20"> *@
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">KBO</span>
+                                    <br>
+                                    <span id="modalKBO" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Cost Center</span>
+                                    <br>
+                                    <span id="modalCostCenter" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Personnel Area</span>
+                                    <br>
+                                    <span id="modalPersonnelArea" style="font-size:16px" class="f-w-600">KP
+                                        Jakarta</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Personnel Area Name</span>
+                                    <br>
+                                    <span id="modalPersonnelAreaName" style="font-size:16px" class="f-w-600">KP
+                                        Jakarta</span>
+                                </div>
+                                @* <hr class="m-t-20"> *@
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Personnel Sub Area</span>
+                                    <br>
+                                    <span id="modalPersonnelAreaSub" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">Personnel Sub Area Name</span>
+                                    <br>
+                                    <span id="modalPersonnelAreaSubname" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                <div class="col-3" style="padding: 15px;">
+                                    <span style="font-size: 12px;">SK Number</span>
+                                    <br>
+                                    <span id="modalSKNumber" style="font-size:16px" class="f-w-600">-</span>
+                                </div>
+                                @* <hr class="m-t-20"> *@
+                            </div>
                         </div>
-                        <div class="row p-20 p-t-30" >
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Organization Unit ID</span>
-                                <br>
-                                <span id="modalOrgUnitId"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Organization Unit Name</span>
-                                <br>
-                                <span id="modalOrgUnitName"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3 no-basket" style="padding: 15px;">
-                                <span style="font-size: 12px;">Position ID</span>
-                                <br>
-                                <span id="modalPositionId"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3 no-basket" style="padding: 15px;">
-                                <span style="font-size: 12px;">Position Name</span>
-                                <br>
-                                <span id="modalPositionName"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            @* <hr class="m-t-20"> *@
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Direct Report Org Unit ID</span>
-                                <br>
-                                <span id="modalDirectReportOrgUnitId"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Direct Report Org Unit Name</span>
-                                <br>
-                                <span id="modalDirectReportOrgUnitName"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Direct Report ID</span>
-                                <br>
-                                <span id="modalDirectReportId"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Direct Report Name</span>
-                                <br>
-                                <span id="modalDirectReportName"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            @* <hr class="m-t-20"> *@
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Directorate</span>
-                                <br>
-                                <span id="modalDirectorate"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Function</span>
-                                <br>
-                                <span id="modalFunction"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Division</span>
-                                <br>
-                                <span id="modalDivision"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Sub Division</span>
-                                <br>
-                                <span id="modalSubDivision"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Department</span>
-                                <br>
-                                <span id="modalDepartment"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            @* <hr class="m-t-20"> *@
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Section</span>
-                                <br>
-                                <span id="modalSection"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Career Type</span>
-                                <br>
-                                <span id="modalCareerType"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3 no-basket" style="padding: 15px;">
-                                <span style="font-size: 12px;">Career Level</span>
-                                <br>
-                                <span id="modalCareerLevel"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3 no-basket" style="padding: 15px;">
-                                <span style="font-size: 12px;">Abbrv Position</span>
-                                <br>
-                                <span id="modalAbbrvPosition"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            @* <hr class="m-t-20"> *@
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">KBO</span>
-                                <br>
-                                <span id="modalKBO"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Cost Center</span>
-                                <br>
-                                <span id="modalCostCenter"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Personnel Area</span>
-                                <br>
-                                <span id="modalPersonnelArea"
-                                style="font-size:16px" class="f-w-600">KP Jakarta</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Personnel Area Name</span>
-                                <br>
-                                <span id="modalPersonnelAreaName"
-                                style="font-size:16px" class="f-w-600">KP Jakarta</span>
-                            </div>
-                            @* <hr class="m-t-20"> *@
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Personnel Sub Area</span>
-                                <br>
-                                <span id="modalPersonnelAreaSub"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">Personnel Sub Area Name</span>
-                                <br>
-                                <span id="modalPersonnelAreaSubname"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            <div class="col-3" style="padding: 15px;">
-                                <span style="font-size: 12px;">SK Number</span>
-                                <br>
-                                <span id="modalSKNumber"
-                                style="font-size:16px" class="f-w-600">-</span>
-                            </div>
-                            @* <hr class="m-t-20"> *@
-                        </div>
-                    </div>
-                    <!-- Card info end-->
+                        <!-- Card info end-->
 
-                    <div class="custom-card-draft">
-                        <div class="header-card-draft">
-                            Skill Group & Sub Skill Group
-                        </div>
-                        <div style="padding-top: 20px;display:flex" >
-                            <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
-                                <div style="margin: 10px;">
-                                    <span style="font-size: 12px;">Main Skill Group</span>
-                                    <br>
-                                    <span 
-                                    id="modalMainSkillGroup"
-                                    class="f-w-600" style="font-size: 16px;">-</span>
-                                    <br>
-                                </div>
-                                <div style="margin: 10px;">
-                                    <span style="font-size: 12px;">Main Sub Skill Group</span>
-                                    <br>
-                                    <span 
-                                    id="modalMainSubSkillGroup"
-                                    class="f-w-600" style="font-size: 16px;">-</span>
-                                    <br>
-                                </div>
+                        <div class="custom-card-draft">
+                            <div class="header-card-draft">
+                                Skill Group & Sub Skill Group
                             </div>
-                            <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
-                                <div style="margin: 10px;">
-                                    <span style="font-size: 12px;">Second Skill Group</span>
-                                    <br>
-                                    <span 
-                                    id="modalSecondSkillGroup"
-                                    class="f-w-600" style="font-size: 16px;">-</span>
-                                    <br>
+                            <div style="padding-top: 20px;display:flex">
+                                <div
+                                    style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
+                                    <div style="margin: 10px;">
+                                        <span style="font-size: 12px;">Main Skill Group</span>
+                                        <br>
+                                        <span id="modalMainSkillGroup" class="f-w-600" style="font-size: 16px;">-</span>
+                                        <br>
+                                    </div>
+                                    <div style="margin: 10px;">
+                                        <span style="font-size: 12px;">Main Sub Skill Group</span>
+                                        <br>
+                                        <span id="modalMainSubSkillGroup" class="f-w-600"
+                                            style="font-size: 16px;">-</span>
+                                        <br>
+                                    </div>
                                 </div>
-                                <div style="margin: 10px;">
-                                    <span style="font-size: 12px;">Second Sub Skill Group</span>
-                                    <br>
-                                    <span 
-                                    id="modalSecondSubSkillGroup"
-                                    class="f-w-600" style="font-size: 16px;">-</span>
-                                    <br>
+                                <div
+                                    style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
+                                    <div style="margin: 10px;">
+                                        <span style="font-size: 12px;">Second Skill Group</span>
+                                        <br>
+                                        <span id="modalSecondSkillGroup" class="f-w-600"
+                                            style="font-size: 16px;">-</span>
+                                        <br>
+                                    </div>
+                                    <div style="margin: 10px;">
+                                        <span style="font-size: 12px;">Second Sub Skill Group</span>
+                                        <br>
+                                        <span id="modalSecondSubSkillGroup" class="f-w-600"
+                                            style="font-size: 16px;">-</span>
+                                        <br>
+                                    </div>
                                 </div>
-                            </div>
-                            <div style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
-                                <div style="margin: 10px;">
-                                    <span style="font-size: 12px;">Third Skill Group</span>
-                                    <br>
-                                    <span 
-                                    id="modalThirdSkillGroup"
-                                    class="f-w-600" style="font-size: 16px;">-</span>
-                                    <br>
-                                </div>
-                                <div style="margin: 10px;">
-                                    <span style="font-size: 12px;">Third Sub Skill Group</span>
-                                    <br>
-                                    <span 
-                                    id="modalThirdSubSkillGroup"
-                                    class="f-w-600" style="font-size: 16px;">-</span>
-                                    <br>
+                                <div
+                                    style="padding:10px;margin:10px;border:1px solid #EAEAEB;width: 33%;border-radius: 5px;">
+                                    <div style="margin: 10px;">
+                                        <span style="font-size: 12px;">Third Skill Group</span>
+                                        <br>
+                                        <span id="modalThirdSkillGroup" class="f-w-600"
+                                            style="font-size: 16px;">-</span>
+                                        <br>
+                                    </div>
+                                    <div style="margin: 10px;">
+                                        <span style="font-size: 12px;">Third Sub Skill Group</span>
+                                        <br>
+                                        <span id="modalThirdSubSkillGroup" class="f-w-600"
+                                            style="font-size: 16px;">-</span>
+                                        <br>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="custom-card-draft" id="positionListCard" style="">
-                        <div class="header-card-draft">
-                            Position List
-                        </div>
-                        <div class="row m-t-10">
-                            <div class="col-12 m-t-12" id="positionList" style="">
-                                <table class="tableMasterData table table-hover w-100" id="tablePositionList" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Position Name</th>
-                                            <th>Career Level</th>
-                                            <th>PRL Org</th>
-                                            <th>Formation</th>
-                                        </tr> 
-                                    </thead>
-                                    <tbody id="tablePositionListBody">
-                                    </tbody>
-                                </table>
+                        <div class="custom-card-draft" id="positionListCard" style="">
+                            <div class="header-card-draft">
+                                Position List
                             </div>
-                        </div>
-                    </div>
-                    <div class="custom-card-draft" id="incumbentCard" style="display:none">
-                        <div class="header-card-draft">
-                            Incumbent
-                        </div>
-                        <div class="row m-t-10">
-                            <div class="col-7" id="nonBasketIncumbent" style="display: flex;justify-content: space-between;padding:20px;">
-                                <div>
-                                    <span style="font-size: 12px;">Employee ID</span>
-                                    <br>
-                                    <span id="incumbentId""
-                                    style="font-size:16px" class="f-w-600">746757</span>
-                                </div>
-                                <div>
-                                    <span style="font-size: 12px;">Employee Name</span>
-                                    <br>
-                                    <span id="incumbentName""
-                                    style="font-size:16px" class="f-w-600">John Doe</span>
-                                </div>
-                                <div>
-                                    <span style="font-size: 12px;">PRL Plan Comp</span>
-                                    <br>
-                                    <span id="prlPlanComp"
-                                    style="font-size:16px" class="f-w-600">19</span>
+                            <div class="row m-t-10">
+                                <div class="col-12" id="positionList" style="">
+                                    <table class="tableMasterData table table-hover w-100" id="tablePositionList"
+                                        style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Position Name</th>
+                                                <th>Career Level</th>
+                                                <th>PRL Org</th>
+                                                <th>Formation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tablePositionListBody">
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                        <div class="row m-t-10">
-                            <div class="col-12" id="basketIncumbent"  style="display:none;width:100%">
-                                <table class="tableMasterData table table-hover w-100" id="tableBasketIncumbent">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Person ID</th>
-                                            <th>Person Name</th>
-                                            <th>PRL Plan Comp</th>
-                                            <th>Position ID</th>
-                                            <th>Position Name</th>
-                                        </tr> 
-                                    </thead>
-                                    <tbody id="basketIncumbentBody">
-                                    </tbody>
-                                </table>
+                        <div class="custom-card-draft" id="incumbentCard" style="display:none">
+                            <div class="header-card-draft">
+                                Incumbent
+                            </div>
+                            <div class="row m-t-10">
+                                <div class="col-7" id="nonBasketIncumbent"
+                                    style="display: flex;justify-content: space-between;padding:20px;">
+                                    <div>
+                                        <span style="font-size: 12px;">Employee ID</span>
+                                        <br>
+                                        <span id="incumbentId""
+                                    style=" font-size:16px" class="f-w-600">746757</span>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 12px;">Employee Name</span>
+                                        <br>
+                                        <span id="incumbentName""
+                                    style=" font-size:16px" class="f-w-600">John Doe</span>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 12px;">PRL Plan Comp</span>
+                                        <br>
+                                        <span id="prlPlanComp" style="font-size:16px" class="f-w-600">19</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row m-t-10">
+                                <div class="col-12" id="basketIncumbent" style="display:none;width:100%">
+                                    <table class="tableMasterData table table-hover w-100" id="tableBasketIncumbent">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Person ID</th>
+                                                <th>Person Name</th>
+                                                <th>PRL Plan Comp</th>
+                                                <th>Position ID</th>
+                                                <th>Position Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="basketIncumbentBody">
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                 </div>
             </div>
@@ -308,27 +287,31 @@
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
                         Back
                     </button>
-                    <button class="d-none btn btn-outline-light" type="button" id="deleteJob" onclick="handleDeleteJob()">
+                    <button class=" btn btn-outline-light" type="button" id="deleteJob" onclick="handleDeleteJob()">
                         <i class="icon-trash" style="font-size: 1em;"></i> Delete
                     </button>
                     <button class=" d-none btn btn-outline-light" type="button" id="editJob" onclick="handleEditJob()">
-                        <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit
+                        <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon"
+                            style="margin-right: 8px;">Edit
                     </button>
-                    <button class=" btn btn-primary btn-icon dropdown-toggle" id="handleExport" style="" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export</button>
+                    <button class=" btn btn-primary btn-icon dropdown-toggle" id="handleExport" style="" type="button"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export</button>
                     <div class=" dropdown-menu" aria-labelledby="handleExport">
                         <a class="dropdown-item" href="javascript:void(0);" id="handleExportPdf" style="padding: 12px;">
                             Export PDF
                         </a>
-                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportPng"  style="padding: 12px;">
+                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportPng" style="padding: 12px;">
                             Export PNG
                         </a>
-                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportSvg"  style="padding: 12px;">
+                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportSvg" style="padding: 12px;">
                             Export SVG
                         </a>
                     </div>
-                    <button class="d-none btn btn-primary" type="button" id="duplicateJob" onclick="handleDuplicate()">Duplicate</button>
+                    <button class="d-none btn btn-primary" type="button" id="duplicateJob"
+                        onclick="handleDuplicate()">Duplicate</button>
                     <button class="d-none btn btn-primary" type="button" onclick="showJobDesc()"> Show Jobdesc </button>
-                    <button class="d-none btn btn-primary" type="button" onclick="showRasciMatrix()"> Show RASCI Matrix </button>
+                    <button class="d-none btn btn-primary" type="button" onclick="showRasciMatrix()"> Show RASCI Matrix
+                    </button>
                 </div>
             </div>
         </div>

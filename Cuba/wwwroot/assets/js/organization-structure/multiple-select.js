@@ -747,6 +747,7 @@ function updateSSG(select, type) {
 }
 
 function getAllMutiselect() {
+  alert("masok sini");
   updateCareerType();
   updateFunction();
   updateDivision();

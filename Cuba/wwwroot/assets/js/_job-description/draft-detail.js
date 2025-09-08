@@ -388,6 +388,7 @@ function editJobDesc() {
 }
 
 $(document).ready(async function () {
+  alert("masok");
   const draftId = urlParams.get("draftId");
   const data = await listDraftDetailJobDesc(draftId, 1, 10);
 

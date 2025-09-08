@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -193,34 +194,38 @@
     <partial name="~/Views/Organization/ModalConfirm.cshtml" />
     <partial name="~/Views/Organization/ModalUploadFinalized.cshtml" />
 </div>
-@section Script {
+    @section Script {
     <!-- Plugins JS start-->
-    <script src="@Url.Content("~assets/js/sidebar-menu.js")"></script>
-    <script src="@Url.Content("~assets/js/slick/slick.min.js")"></script>
-    <script src="@Url.Content("~assets/js/slick/slick.js")"></script>
-    <script src="@Url.Content("~assets/js/header-slick.js")"></script>
-    <script src="@Url.Content("~assets/js/scrollable/perfect-scrollbar.min.js")"></script>
-    <script src="@Url.Content("~assets/js/scrollable/scrollable-custom.js")"></script>
-    <script src="@Url.Content("~assets/js/select2/select2.full.min.js")"></script>
-    <script src="@Url.Content("~assets/js/select2/select2-custom.js")"></script>
-    <script src="@Url.Content("~assets/js/sweet-alert/sweetalert.min.js")"></script>
-    <script src="@Url.Content("~assets/js/dropzone/dropzone.js")"></script>
-    @* <script src="@Url.Content("~assets/js/dropzone/dropzone-script.js")"></script> *@
-    <script src="@Url.Content("~assets/js/tooltip-init.js")"></script>
+    <script>
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
+    </script>
+    
+    <script src="@Url.Content("~/assets/js/sidebar-menu.js")"></script>
+    <script src="@Url.Content("~/assets/js/slick/slick.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/slick/slick.js")"></script>
+    <script src="@Url.Content("~/assets/js/header-slick.js")"></script>
+    <script src="@Url.Content("~/assets/js/scrollable/perfect-scrollbar.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/scrollable/scrollable-custom.js")"></script>
+    <script src="@Url.Content("~/assets/js/select2/select2.full.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/select2/select2-custom.js")"></script>
+    <script src="@Url.Content("~/assets/js/sweet-alert/sweetalert.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/dropzone/dropzone.js")"></script>
+    @* <script src="@Url.Content("~/assets/js/dropzone/dropzone-script.js")"></script> *@
+    <script src="@Url.Content("~/assets/js/tooltip-init.js")"></script>
 
 
     @* datatable *@
-    <script src="@Url.Content("~assets/js/datatable/datatables/jquery.dataTables.min.js")"></script>
-    <script src="@Url.Content("~assets/js/datatable/datatable-extension/dataTables.buttons.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/datatable/datatables/jquery.dataTables.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/datatable/datatable-extension/dataTables.buttons.min.js")"></script>
 
     @* custom js *@
-    <script src="@Url.Content("~assets/js/organization-structure/multiple-select.js")"></script>
-    <script src="@Url.Content("~assets/js/organization-structure/constant.js")"></script>
-    <script src="@Url.Content("~assets/js/organization-structure/endpoint.js")"></script>
-    <script src="@Url.Content("~assets/js/organization-structure/table-custom.js")"></script>
-    <script src="@Url.Content("~assets/js/organization-structure/helper.js")"></script>
-    @* <script src="@Url.Content("~assets/js/organization-structure/balkan.js")"></script> *@
-    <script src="@Url.Content("~assets/js/organization-structure/draft-detail.js")"></script>
-    <script src="@Url.Content("~assets/js/script.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/multiple-select.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/constant.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/endpoint.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/table-custom.js")"></script>
+    <script src="@Url.Content("~/assets/js/authentication.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/helper.js")"></script>
+    @* <script src="@Url.Content("~/assets/js/organization-structure/balkan.js")"></script> *@
+    <script src="@Url.Content("~/assets/js/organization-structure/draft-detail.js")"></script>
+    <script src="@Url.Content("~/assets/js/script.js")"></script>
 }
-

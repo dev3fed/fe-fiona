@@ -66,7 +66,7 @@ function updateTable(params, data, rowHeader, refer) {
         console.log("item?.tanggungJawabProses", item?.tanggungJawabProses);
         //  unique tanggungJawabProses
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
         );
         console.log("uniqueTanggungJawab", uniqueTanggungJawab);
 
@@ -82,7 +82,7 @@ function updateTable(params, data, rowHeader, refer) {
           const listItems = uniqueTanggungJawab
             .map(
               (process) =>
-                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`,
             )
             .join("");
           row += `<td class="tdClass">
@@ -136,7 +136,6 @@ function updateTable(params, data, rowHeader, refer) {
     tableBody.append(row);
   });
 
-  // Initialize tooltips with click trigger
   $('[data-bs-toggle="tooltip"]').tooltip({
     trigger: "click",
   });
@@ -761,7 +760,7 @@ async function checkboxReference(val) {
 async function saveReference() {
   const dataSelected = selectedData.selectedJobDesc;
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
-    (item) => !item.id.includes("all") && item.checked
+    (item) => !item.id.includes("all") && item.checked,
   );
   console.log("checkboxList", checkboxList);
   const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
@@ -986,7 +985,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     `<div class="f-14" role="alert">` +
       message +
       `
-    </div>`
+    </div>`,
   );
 
   if (note) {
@@ -995,7 +994,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
         <strong>Note:</strong> ` +
         note +
         `
-      </div>`
+      </div>`,
     );
   }
 
@@ -1009,7 +1008,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
             item.callback +
             `)()">` +
             item.button +
-            `</button>`
+            `</button>`,
         );
         return;
       }
@@ -1018,7 +1017,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           item.className +
           ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
           item.button +
-          `</button>`
+          `</button>`,
       );
     });
   }
