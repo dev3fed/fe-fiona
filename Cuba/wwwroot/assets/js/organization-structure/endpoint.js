@@ -496,6 +496,58 @@ async function draftJobUpdateAsDraft(params) {
   }
 }
 
+// /api/organization-structure/draft/jobs/add-job-non-basket
+async function draftJobAddNonBasket(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/add-job-non-basket`;
+  try {
+    const result = await ajaxRequest(api, "POST", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/organization-structure/draft/jobs/add-job-basket
+async function draftJobAddBasket(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/add-job-basket`;
+  try {
+    const result = await ajaxRequest(api, "POST", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/organization-structure/draft/jobs/update-job-non-basket
+async function draftJobUpdateNonBasket(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/update-job-non-basket`;
+  try {
+    const result = await ajaxRequest(api, "PUT", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/organization-structure/draft/jobs/update-job-basket
+async function draftJobUpdateBasket(params) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/update-job-basket`;
+  try {
+    const result = await ajaxRequest(api, "PUT", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
 // http://localhost:5095/api/organization-structure/draft/jobs/delete-job
 async function draftJobDelete(params) {
   const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/delete-job`;

@@ -569,6 +569,10 @@ $(document).ready(async function () {
 
   $("#createDraftSO").on("click", async function () {
     const draftName = $("#inputDraftName").val();
+    if (!draftName) {
+      swal("Failed", "Draft name is required", "error");
+      return;
+    }
     const draftId = urlParams.get("draftId");
     $("#draftName").text(draftName);
     $("#modalCreateDraftSO").modal("hide");

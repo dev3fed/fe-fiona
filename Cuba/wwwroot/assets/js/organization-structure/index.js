@@ -59,15 +59,19 @@ $(".chart-container-custom").on("click", "foreignObject", async function (e) {
 function changeOrganization(value, text) {
   organizationAttribute.orgUnitId = value;
   organizationAttribute.orgUnitName = text;
+  organizationAttribute.isMasterData = organizationAttribute.orgUnitId == "1" ? true : false;
   localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
   const buttons = ["#createJob", "#designCost", "#editJob", "#deleteJob", "#duplicateJob"];
   buttons.forEach((button) => $(button).toggle(organizationAttribute.orgUnitId !== "1"));
-  if (organizationAttribute.orgUnitId == "1") {
+  if (organizationAttribute.isMasterData) {
     $("#pillsSoSection").attr("style", "display:none !important");
     $("#labelChart").attr("style", "display:none !important");
-    // $("#createDraft").show();
+    $("#showJobdesc").show();
+    $("#showRasciMatrix").show();
   } else {
-    // $("#createDraft").attr("style", "display:none !important");
+    // $("#incumbentCard").attr("style", "display:none !important");
+    $("#showJobdesc").hide();
+    $("#showRasciMatrix").hide();
     $("#pillsSoSection").show();
     $("#labelChart").show();
   }
@@ -754,7 +758,7 @@ $("#createDraftSO").click(async function () {
     return;
   }
   if (!draftName) {
-    alert("Draft Name is required");
+    swal("Failed", "Draft name is required", "error");
     return;
   }
   loader(true);
@@ -805,7 +809,7 @@ $("#selectDraftFilterByDataSource").on("change", async function () {
 // change select draft organization
 $("#selectDraftOrganization").change(async function () {
   changeOrganization($("#selectDraftOrganization").val(), $("#selectDraftOrganization option:selected").text());
-  initializeHelper();
+
   getDataListAsync([
     {
       id: "searchOrgNode",
@@ -819,10 +823,13 @@ $(document).ready(async function () {
   const getDataDraft = await chartDraftList();
   const getDataApproval = await approvedList();
   storeData.listDraft = getDataDraft.data;
-  await checkDataOrganization(storeData.listDraft);
-
   // initialize table
-  getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
+  await checkDataOrganization(storeData.listDraft);
+  const focusNode = urlParams.get("focusNode");
+  const activeTab = urlParams.get("activeTab");
+  const positionName = urlParams.get("positionName");
+
+  getTableListDraft(storeData.listDraft.filter((x) => !x.isMasterData));
   getTableListApproval(getDataApproval.data);
   getDataList([
     {
@@ -840,17 +847,23 @@ $(document).ready(async function () {
   });
 
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
-  const focusNode = urlParams.get("focusNode");
-  const activeTab = urlParams.get("activeTab");
+
   if (focusNode) {
     setTimeout(async () => {
-      let data = await chartJobDetail({
-        draftId: organizationAttribute.orgUnitId,
-        jobCode: focusNode,
-      });
-      data = data.data;
-      $("#searchOrgNode").append(new Option(data.position, focusNode, true, true)).trigger("change");
+      // alert("test");
+      // let data = await chartJobDetail({
+      //   draftId: organizationAttribute.orgUnitId,
+      //   jobCode: focusNode,
+      // });
+      // data = data.data;
+      // console.log("data", data);
+
+      // Positioname & satinize before     const sanitizedPosition = getPosition.replace(/&/g, "%26"), replace back to & when display
+
+      $("#searchOrgNode").append(new Option(positionName, focusNode, true, true)).trigger("change");
     }, 1000);
+  } else {
+    initializeHelper();
   }
 
   if (activeTab) {

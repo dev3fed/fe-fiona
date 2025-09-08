@@ -30,9 +30,13 @@ async function checkDataOrganization(draftList) {
   // If organizationAttribute is empty or null, select the first available draft
   if (!organizationAttribute.orgUnitId || !organizationAttribute.orgUnitName) {
     if (draftList && draftList.length > 0) {
-      const firstDraft = draftList[0];
+      console.log("draftList", draftList);
+      const firstDraft = draftList.find((item) => item.draftId == "1");
+      console.log("firstDraft", firstDraft);
       organizationAttribute.orgUnitId = firstDraft.draftId;
       organizationAttribute.orgUnitName = firstDraft.draftName;
+      organizationAttribute.isMasterData = true;
+      console.log(organizationAttribute);
       localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
     }
   }
@@ -47,16 +51,19 @@ function checkDataOrganizationLocalStorage() {
   const data = JSON.parse(localStorage.getItem("organizationAttribute"));
   if (data) {
     Object.keys(organizationAttribute).forEach((key) => {
+      console.log(data[key]);
       if (data[key]) {
         organizationAttribute[key] = data[key];
       }
     });
+    organizationAttribute.isMasterData = organizationAttribute.draftId == "1" ? true : false;
   }
 }
 
 function setOrganizationAttribute() {
   organizationAttribute.orgUnitId = null;
   organizationAttribute.orgUnitName = "";
+  organizationAttribute.isMasterData = false;
 }
 
 function clearAllInput() {
@@ -114,6 +121,12 @@ async function insertFormPostion(paramId) {
   }
   if (data?.sectionCode) {
     $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
+  }
+  if (data?.kbo) {
+    $("#selectKBO").append(new Option(data?.kbo, data?.kbo, true, true));
+  }
+  if (data?.costCenterDescription) {
+    $("#selectCostCenter").append(new Option(data?.costCenterDescription, data?.costCenterDescription, true, true));
   }
   if (data?.personnelAreaCode) {
     $("#selectPersonalAreaName").append(new Option(data?.personnelAreaName, data?.personnelAreaCode, true, true));
@@ -524,6 +537,8 @@ function formattedInputAttribut(type) {
   payload.unit.isNeckFunction = $("#selectNeckFunction").prop("checked") ? true : false;
   payload.unit.isProject = $("#selectIsProject").prop("checked") ? true : false;
   payload.unit.isCoordinate = $("#selectCoordination").prop("checked") ? true : false;
+  payload.unit.kbo = $("#selectKBO").val();
+  payload.unit.costCenter = $("#selectCostCenter").val();
   // career type
   payload.careerType.careerTypeCode = $("#selectCareerType").val();
   payload.careerType.careerTypeName = $("#selectCareerType option:selected").text();
@@ -648,6 +663,10 @@ function formattedInputAttribut(type) {
 
 async function saveInputAttribut(type) {
   const formPositionParam = formattedInputAttribut(type);
+  // console.log("formPositionParam", formPositionParam);
+  // console.log("formPositionParam", formPositionParam.unit.isBasket);
+  const basket = formPositionParam.unit.isBasket;
+  // return;
   // compare formPositionParam with localStorage logState.initParams
   const logState = JSON.parse(localStorage.getItem("logState"));
   if (logState && logState.initParams && type === "edit") {
@@ -750,9 +769,20 @@ async function saveInputAttribut(type) {
     }
   }
 
-  // return;
-  const result =
-    type === "edit" ? await draftJobUpdateAsDraft(formPositionParam) : await draftJobSaveAsDraft(formPositionParam);
+  console.log("basket", basket);
+  console.log("type", type);
+
+  // Check if basket is selected and type is "edit"
+  let result;
+  if (basket) {
+    result =
+      type === "edit" ? await draftJobUpdateBasket(formPositionParam) : await draftJobAddBasket(formPositionParam);
+  } else {
+    result =
+      type === "edit"
+        ? await draftJobUpdateNonBasket(formPositionParam)
+        : await draftJobAddNonBasket(formPositionParam);
+  }
   return result;
 }
 
@@ -784,7 +814,7 @@ function saveEmployeeDetails(payload, data) {
   payload.section = $("#selectSection").val() ? $("#selectSection").val() : $("#inputSection").val();
   payload.careerLevel = $("#selectCareerLevel").val() ? $("#selectCareerLevel").val() : $("#inputCareerLevel").val();
   payload.careerType = $("#selectCareerType").val() ? $("#selectCareerType").val() : $("#inputCareerType").val();
-  payload.abbrvPositon = $("#selectAbbrvPosition").val()
+  payload.abbrvPosition = $("#selectAbbrvPosition").val()
     ? $("#selectAbbrvPosition").val()
     : $("#inputAbbrvPosition").val();
   payload.orgUnitId = payload.type == "edit" ? payload.orgUnitId : Math.floor(1000000000 + Math.random() * 9000000000);
@@ -1480,6 +1510,12 @@ async function modalJobPopup(params) {
     $("#prlPlanComp").text("-");
     $("#incumbentCard").show();
   }
+
+  if (organizationAttribute.isMasterData) {
+    $("#incumbentCard").show();
+  } else {
+    $("#incumbentCard").hide();
+  }
 }
 
 function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
@@ -1695,11 +1731,12 @@ function helperDatePicker() {
 // helper orgTree
 // ======================
 function createHierarchy(data, parentId = null) {
+  console.log("createHierarchy called data:", data);
   return data
     .filter((item) => item.pid === parentId)
     .map((item) => ({
       id: item.id,
-      text: item.position,
+      text: item.basket ? item.org_unit_name : item.position,
       icon: "icofont icofont-plus font-theme",
       a_attr: item.a_attr ? null : { class: "no-children" }, // add class if no children
       children: createHierarchy(data, item.id) ?? null,

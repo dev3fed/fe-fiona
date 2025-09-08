@@ -116,7 +116,7 @@ const payloadPosition = {
   section: "",
   careerLevel: "",
   careerType: "",
-  abbrvPositon: "",
+  abbrvPosition: "",
   orgUnitId: null,
   orgUnitName: "",
   kbo: "",
@@ -63237,4 +63237,4 @@ const CHART_LOADING_HTML = `
   </style>
 `;
 
-const testt = 'ada'
+const testt = "ada";

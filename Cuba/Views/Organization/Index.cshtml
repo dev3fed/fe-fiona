@@ -221,10 +221,11 @@
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                     <div class="row">
                                         <div class="col-12 mt-2">
-                                            <button class="btn btn-primary btn-sm" onclick="chart.exportImg()">Export Current</button>
-                                            <button class="btn btn-primary btn-sm" onclick="chart.exportImg({full:true})">Export Full</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chartExportIMG()">Export Image</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chart.exportImg()">Export Image</button>
                                             <button class="btn btn-primary btn-sm" onclick="chartExportSVG()">Export SVG</button>
-                                            <button class="btn btn-primary btn-sm" onclick="chartExportPDF(chart)">Export PDF</button>
+                                            <button class="btn btn-primary btn-sm" onclick="chartExportPDF()">Export PDF</button>
+                                            @* <button class="btn btn-primary btn-sm" onclick="chartExportPDFTest()">Export Test</button> *@
                                             <button class="btn btn-primary btn-sm" onclick="chart.fit();">Fit to the screen</button>
                                             @* zoom in zoom out *@
                                             <button onclick="chart.zoomIn().render().fit();" class="btn btn-primary btn-sm">

@@ -38,6 +38,8 @@ async function initializeList() {
     { id: "selectCareerType", endpoint: "draft/career-type/list", draftId: draftId },
     { id: "selectCareerLevel", endpoint: "draft/career-level/list", draftId: draftId },
     // { id: "selectAbbrvPosition", endpoint: "draft/job-abbriviation/list", draftId: draftId },
+    { id: "selectKBO", endpoint: "draft/kbo/list", draftId: draftId },
+    { id: "selectCostCenter", endpoint: "draft/cost-center/list", draftId: draftId },
     { id: "selectPersonalAreaName", endpoint: "draft/personnel-area/list", draftId: draftId },
     { id: "selectPersonalSubareaName", endpoint: "draft/personnel-sub-area/list", draftId: draftId },
     { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId },
@@ -56,7 +58,7 @@ async function initializeList() {
     },
     {
       dataId: "selectAbbrvPosition",
-      data: _abbrv.data.map((item) => ({ id: item.id, text: item.name })),
+      data: _abbrv.data.map((item) => ({ id: item.id, text: item.abbreviation })),
     },
     {
       dataId: "selectPrlOrg",
@@ -78,16 +80,26 @@ async function saveAsDraft() {
   let type = "create";
   if (positionId) type = "edit";
   loader(true);
-  // return;
   const save = await saveInputAttribut(type);
   console.log("save", save);
   if (save) {
     hideModal(`modalConfirm`);
     loader(false);
     swal("Saved", "Save as Draft", "success");
+    // replace & inside string getPosition
+    // .replace(/&/g, '%26')
+    const getPosition =
+      $("#selectBasket").val() == "Yes" && save.data.jobFormations && save.data.jobFormations.length > 0
+        ? save.data.jobFormations[0].unitName
+        : $("#inputPositionName").val();
+
+    // Properly encode the position name for URL parameter
+    const sanitizedPosition = encodeURIComponent(getPosition);
+    console.log("sanitizedPosition", sanitizedPosition);
     setTimeout(() => {
-      window.location.href = "/organization/index?focusNode=" + save.data.unitCode;
-    }, 2000);
+      window.location.href =
+        "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
+    }, 2500);
   }
 }
 
@@ -211,7 +223,7 @@ $(document).ready(async function () {
   $("#selectBasket").on("change", function (event) {
     // console.log("basket selected");
     const selectBasket = event.target.value;
-    alert("Basket selected: " + selectBasket);
+    // alert("Basket selected: " + selectBasket);
     checkBasketSelected(selectBasket);
   });
 
