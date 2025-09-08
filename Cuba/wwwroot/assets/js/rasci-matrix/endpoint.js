@@ -114,10 +114,10 @@ async function updateDraftProsbis(payload, id) {
   }
 }
 
-async function draftSubmittoApproval(payload, id) {
-  const url = `${url_api}/api/BusinessProcess/draft-submission/${id}`;
+async function draftSubmittoApproval(id) {
+  const url = `${url_api}/api/rasci-matrix/draft/submission/${id}`;
   try {
-    const result = await ajaxRequest(url, "PUT", payload);
+    const result = await ajaxRequest(url, "POST");
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -328,6 +328,21 @@ async function fetchLoghistoryList(payload) {
   }
 }
 
+async function fetchApprovalList(payload) {
+  const url = `${url_api}/api/rasci-matrix/draft/list/approval?${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 async function fetchData() {
   try {
     const payload = {

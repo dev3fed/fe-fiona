@@ -24,8 +24,25 @@
             </div>
             <div class="modal-footer  d-flex justify-content-end">
                 <div>
-                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                    <button class="btn btn-outline-light" type="button" onclick="closeModaleditbp()"><i
                             class="icon-arrow-left"></i> Back</button>
+                    <button id="deleteBpActivity" class="btn btn-outline-danger" type="button">
+                        <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
+                    </button>
+                    <button id="editBpactivity" class=" btn btn-outline-light" type="button"
+                        onclick="triggleEditBpActivity()">
+                        <i class="icon-marker-alt"></i>
+                        Edit
+                    </button>
+                    <button id="cancelEditBp" class="btn btn-outline-light d-none" type="button"
+                        onclick="handleCancelEditbp()">Cancel Edit</button>
+                    <button id="saveBpactivity" class="btn btn-primary d-none" type="button">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="loadingBpactivity" role="status"></div>
+                            <span class="btn-text"> Save Change</span>
+                        </div>
+                    </button>
                 </div>
             </div>
 

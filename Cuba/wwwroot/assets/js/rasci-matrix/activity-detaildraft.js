@@ -35,13 +35,11 @@ async function deleteActivitydraft() {
       "Add/Edit RASCI": "Add/Edit RASCI activity data has been deleted",
     };
     const information = draftTypeMessages[draftType] || "Are you sure want to delete this activity data?";
-    console.log("draftRasciId", draftRasciId);
-    console.log("id", id);
-    console.log("cek");
     const spinner = document.getElementById("btnDeleteActivitydraft");
     if (spinner) spinner.style.display = "inline-block";
 
     const url = `${id}?draftId=${draftRasciId}`;
+    console.log("url", url);
     const deleteResult = await endpointDeleteDraftActivity(url);
     console.log("deleteResult", deleteResult);
     if (deleteResult.success === true) {
@@ -84,9 +82,14 @@ async function triggleEditActivitybp(id) {
   const dataProsbis = getState("insertProsbis");
   const draftName = $("#dataSource-rasci option:selected").text();
   console.log("first", draftName);
+  const url = `${draftRasciId}?draftListId=${id}`;
+  const dataActivity = await fetchDetailDraftActivity(url);
+  console.log("dataActivity", dataActivity);
   const resultLevel = await fetchSelectLevel(draftRasciId);
   const modal = new bootstrap.Modal(document.getElementById("ModalEditActivitybp"));
   modal.show();
+  const dataHeader = dataActivity?.data.businessProcess;
+  const dataFooter = dataActivity?.data.rasciMapping;
   try {
     if (resultLevel.status === 200) {
       const listLevel = resultLevel?.data.result;
@@ -96,7 +99,7 @@ async function triggleEditActivitybp(id) {
       <div class="mb-3">
         <label class="form-label">Level</label>
          <select class="form-select digits" disabled>
-          <option value="${draftRasciId}">${draftName}</option>
+          <option value="${dataHeader.level}">${dataHeader.level}</option>
         </select>
       </div>
     </div>
@@ -104,14 +107,14 @@ async function triggleEditActivitybp(id) {
         <div class="mb-3">
           <label class="form-label">Parent</label>
           <select class="form-select digits" disabled>
-          <option value="${draftRasciId}">${draftName}</option>
+          <option value="${dataHeader.parentId}">${dataHeader.parentName}</option>
         </select>
         </div>
     </div>
     <div class="col-12">
       <div>
         <label class="form-label">Business Process Name</label>
-        <textarea class="form-control"></textarea>
+        <textarea class="form-control">${dataHeader.businessProcessName}</textarea>
       </div>
     </div>`;
       const bodySelectJob = `
@@ -125,7 +128,7 @@ async function triggleEditActivitybp(id) {
           </tr>`;
 
       editTblNotation(rasciNotation);
-      cardSelectedEditJoblist(dataProsbis);
+      cardSelectedEditJoblist(dataFooter);
       document.getElementById("edit-select-job").innerHTML = bodySelectJob;
       document.getElementById("tbl-edit-bp-header").innerHTML = theadContent;
 
@@ -138,24 +141,24 @@ async function triggleEditActivitybp(id) {
   } catch (error) {}
 }
 const cardSelectedEditJoblist = (param) => {
-  const bodyJoblist = param.jobMapped
+  const bodyJoblist = param
     .map((value) => {
-      const rasciNotation = value.rasciNotation.filter((item) => item.isChecked);
+      // const rasciNotation = value.rasciData.filter((item) => item.isChecked);
       return `<div class="card-listjob mb-2">
           <div class="row">
             <div class="col-10">
-              <span style="font-size:13px;font-weight:bold">${value.jobName}</span>
+              <span style="font-size:13px;font-weight:bold">${value.positionName}</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
               <button class="btn btn-outline-danger btn-sm " type="button"  style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
                 <i class="icon-trash" style="font-size: 14px;padding-right:2px"></i>
               </button>
             </div> 
-              ${rasciNotation
+              ${value.rasciData
                 .map((letter) => {
                   return `<div class="col-1 mb-1">
-                          <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
-                    letter.rasciCode
+                          <img src="/assets/images/rasci/${letter.notation.toLowerCase()}.svg" alt="${
+                    letter.notation
                   } Icon" style="padding-right:2px">
                   </div>
                   <div class="col-11" style="text-align:left">
@@ -204,6 +207,43 @@ const editTblNotation = (rasciNotation) => {
   tdBody = rasciRows;
   document.getElementById("tbl-edit-bp-body").innerHTML = tdBody;
 };
+
+const selectProsbisPosition = () => {
+  // const selectedJobId = $("#jobId");
+  // const selectedParentId = document.getElementById("parentId");
+  // const selectedValue = selectedJobId.val();
+  // const selectedParentValue = selectedParentId.value;
+  // const jobName = selectedJobId.find(":selected").text();
+  // const dataProsbis = getState("insertProsbis") || {};
+  const rasciNotation = getState("rasciNotation") || [];
+  console.log("first", rasciNotation);
+  // const [orgUnitCode, orgPrl] = selectedValue.split(";");
+
+  // const payload = {
+  //   ...dataProsbis,
+  //   parentId: selectedParentValue,
+  //   jobMapped: [
+  //     ...dataProsbis.jobMapped,
+  //     {
+  //       jobName,
+  //       orgUnitCode: orgUnitCode,
+  //       orgPrl: orgPrl,
+  //       rasciNotation: rasciNotation,
+  //     },
+  //   ],
+  // };
+  // setState("insertProsbis", payload);
+  // setTimeout(() => {
+  //   selectedJobId.val(null).trigger("change");
+  //   const updatedRasciNotation = rasciNotation.map((letter) => {
+  //     return { ...letter, comment: "", isChecked: false };
+  //   });
+  //   setState("rasciNotation", updatedRasciNotation);
+  //   tblNotation(updatedRasciNotation);
+  //   cardSelectedJoblist(payload);
+  // }, 200);
+};
+
 function select2EditJob() {
   const draftRasciId = $("#dataSource-rasci").val();
   let $select = $("#dataSource-rasci");
@@ -250,6 +290,8 @@ function select2EditJob() {
 
 async function triggleDetailActivity(id, draftType) {
   const draftRasciId = getState("draftRasciId");
+  setState("draftActivityType", draftType);
+  setState("draftActivityId", id);
   try {
     if (draftType === "Add New Business Process") {
       detailAddprosbis(id, draftRasciId);
@@ -305,7 +347,6 @@ async function detailAddprosbis(id, draftRasciId) {
         `;
       })
       .join("");
-
     const contentBody = `
     <div class="custom-card-draft">
         <div class="header-card-draft">
@@ -315,7 +356,7 @@ async function detailAddprosbis(id, draftRasciId) {
           <div class="col-7 custom-col" style="text-align: left">
             <label label style="color:#9F9FA5">Business Process Name</label>
             <div style="display: flex;  font-weight: 600; font-size: 14px;">
-              <span>${dataHeader.indexGroup || "0"} - ${dataHeader.businessProcessName}</span>
+              <span>${dataHeader.indexNumber || "0"} - ${dataHeader.businessProcessName}</span>
             </div>
          </div>
           <div class="col-5 custom-col" style="text-align: left; border-right:none">
@@ -403,7 +444,7 @@ async function detailDeleteBp(id, draftRasciId) {
 async function detailEditBp(id, draftRasciId) {
   const url = `${draftRasciId}?draftListId=${id}`;
   const dataActivity = await fetchDetailDraftActivity(url);
-  console.log("dataActivity", dataActivity.data);
+  setState("dataDetailProsbis", dataActivity.data);
   const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
   modal.show();
   const dataInfo = dataActivity.data;
@@ -453,6 +494,117 @@ async function detailEditBp(id, draftRasciId) {
   // const dataInfo = dataActivity.data.businessProcess;
 }
 
+async function triggleEditBpActivity() {
+  try {
+    ["saveBpactivity", "cancelEditBp"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.style.display = "inline-block";
+        btn.classList.remove("d-none");
+      }
+    });
+
+    ["editBpactivity", "deleteBpActivity"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.style.display = "none";
+    });
+
+    document.querySelectorAll("textarea.form-control[disabled]").forEach((textarea) => {
+      textarea.removeAttribute("disabled");
+    });
+  } catch (error) {}
+}
+
+async function closeModaleditbp() {
+  try {
+    const modal = bootstrap.Modal.getInstance(document.getElementById("ModalDetaileditbp"));
+    if (modal) modal.hide();
+    changeConditionEdit();
+  } catch (error) {}
+}
+
+async function handleCancelEditbp() {
+  try {
+    changeConditionEdit();
+  } catch (error) {}
+}
+
+async function changeConditionEdit() {
+  try {
+    ["saveBpactivity", "cancelEditBp"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.style.display = "none";
+        btn.classList.add("d-none");
+      }
+    });
+
+    ["editBpactivity", "deleteBpActivity"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.style.display = "inline-block";
+    });
+
+    document.querySelectorAll("textarea.form-control").forEach((textarea) => {
+      textarea.setAttribute("disabled", "true");
+    });
+  } catch (error) {}
+}
+$(document).on("click", "#deleteBpActivity", async function () {
+  try {
+    const id = getState("draftActivityId");
+    const draftType = getState("draftActivityType");
+    const modalEditBp = bootstrap.Modal.getInstance(document.getElementById("ModalDetaileditbp"));
+    if (modalEditBp) modalEditBp.hide();
+    handleDeleteDraftActivity(id, draftType);
+  } catch (error) {}
+});
+$(document).on("click", "#saveBpactivity", async function () {
+  try {
+    const { draftId, draftName, indexNumber } = getState("dataDetailProsbis");
+    const businessProcessName = $("textarea.form-control").val();
+    const spinner = document.getElementById("loadingBpactivity");
+    spinner.style.display = "inline-block";
+
+    const payload = {
+      draftId,
+      draftType: "Edit Business Process",
+      draftName,
+      parentId: indexNumber,
+      businessProcessName,
+    };
+
+    const result = await submitDraftProsbis(payload);
+    if (result.status === 200) {
+      const modal = bootstrap.Modal.getInstance(document.getElementById("ModalDetaileditbp"));
+      spinner.style.display = "none";
+      modal?.hide();
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2500,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;"><b>SUCCESS</b></span><br><span>Data change has been saved.</span>`,
+          },
+        },
+      }).then(async () => {
+        const queryString = new URLSearchParams({ Page: 1, PageSize: 5 }).toString();
+        const listData = await fetchDraftListProsbis(draftId, queryString);
+        changeConditionEdit();
+        renderTableActivity(listData);
+      });
+    }
+  } catch (error) {
+    swal({
+      title: "Error",
+      text: "An error occurred while saving.",
+      icon: "error",
+      button: "OK",
+    });
+  }
+});
 async function detailAddNotation(id, draftRasciId) {
   console.log("first", id);
   const url = `${draftRasciId}?draftListId=${id}`;

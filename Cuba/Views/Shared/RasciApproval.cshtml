@@ -109,7 +109,8 @@
                 <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
                         data-feather="calendar" style="width: 20px;"></i></div>
                 <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date">
+                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date"
+                    id="submittedDate">
             </div>
         </div>
         <div class="col-3">
@@ -117,25 +118,22 @@
                 <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
                         data-feather="calendar" style="width: 20px;"></i></div>
                 <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date">
+                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date"
+                    id="approvalDate">
             </div>
         </div>
 
         <div class="col-2">
-            <select class="form-select digits">
-                <option>Status</option>
-                <option>L1</option>
-                <option>L2</option>
-                <option>L3</option>
-                <option>L4</option>
-                <option>L5</option>
-                <option>L6</option>
+            <select class="form-select digits" id="statusApproval">
+                <option value="Status:submitted" selected>Submit</option>
+                <option value="Status:approved">Approval</option>
+                <option value="Status:rejected">Reject</option>
             </select>
         </div>
         <div class="col-4">
             <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
-                    data-feather="search"></i>
+                <input class="form-control" type="text" placeholder="Search.." id="searchApproval"><i
+                    class="search-icon" data-feather="search"></i>
             </div>
         </div>
         <div class="col-12 mt-3">
@@ -160,7 +158,14 @@
                 </table>
             </div>
         </div>
-
+        <div class="col-9 mt-3">
+            <div id="total-approval-page">
+            </div>
+        </div>
+        <div class="col-3 mt-3 d-flex justify-content-end">
+            <div id="list-approval-page">
+            </div>
+        </div>
     </div>
 </div>
 <!-- Bootstrap JS and Popper.js -->

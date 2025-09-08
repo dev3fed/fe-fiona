@@ -714,11 +714,9 @@ async function openDetailApproval() {
 }
 async function handleSubmitApproval() {
   const dataDraft = getState("dataDetailDraft");
+  console.log("dataDraft", dataDraft);
   try {
-    const payload = {
-      type: "submission",
-    };
-    const result = await draftSubmittoApproval(payload, dataDraft.draftInfo.id);
+    const result = await draftSubmittoApproval(dataDraft.draftId);
     const modalDetailAprroval = document.getElementById("modalDraftAprroval");
     const modal = bootstrap.Modal.getInstance(modalDetailAprroval);
     if (result.status === 200) {

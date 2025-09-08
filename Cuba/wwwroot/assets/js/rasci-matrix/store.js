@@ -150,14 +150,18 @@ const appState = new Proxy(
       parentId: null,
       jobMapped: [],
     },
-    approvalData: [
-      {
-        requestId: "Req/RM/01122024/001",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        organizationSource: "Usulan Perubahan Fungsi Marketing",
-        status: "On Review",
-      },
-    ],
+    payloadApproval: {
+      Page: 1,
+      PageSize: 5,
+    },
+    // approvalData: [
+    //   {
+    //     requestId: "Req/RM/01122024/001",
+    //     draftName: "Usulan Perubahan Fungsi Marketing",
+    //     organizationSource: "Usulan Perubahan Fungsi Marketing",
+    //     status: "On Review",
+    //   },
+    // ],
     payloadLogHistory: {
       page: 1,
       limit: 5,
