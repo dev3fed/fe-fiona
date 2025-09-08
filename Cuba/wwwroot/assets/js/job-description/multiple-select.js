@@ -87,9 +87,7 @@ function updateCareerType() {
     .on("select2:open", function () {
       page = 1;
     });
-  $("#selectCareerType")
-    .next(".select2-container")
-    .attr("id", "selectCareerType");
+  $("#selectCareerType").next(".select2-container").attr("id", "selectCareerType");
 }
 
 function updateCareerLevel(careerTypeName) {
@@ -368,6 +366,7 @@ function updateFunction() {
 
 // selectDivision
 function updateDivision() {
+  alert("test");
   $("#selectDivision")
     .select2({
       placeholder: "Choose",
@@ -439,9 +438,7 @@ function updateSubDivision() {
       page = 1;
     });
 
-  $("#selectSubDivision")
-    .next(".select2-container")
-    .attr("id", "selectSubDivision");
+  $("#selectSubDivision").next(".select2-container").attr("id", "selectSubDivision");
 }
 
 // department
@@ -479,9 +476,7 @@ function updateDepartment() {
       page = 1;
     });
 
-  $("#selectDepartment")
-    .next(".select2-container")
-    .attr("id", "selectDepartment");
+  $("#selectDepartment").next(".select2-container").attr("id", "selectDepartment");
 }
 
 // selectDirectReport
@@ -631,9 +626,7 @@ function updatePersonalSubareaName() {
       page = 1;
     });
 
-  $("#selectPersonalSubareaName")
-    .next(".select2-container")
-    .attr("id", "selectPersonalSubareaName");
+  $("#selectPersonalSubareaName").next(".select2-container").attr("id", "selectPersonalSubareaName");
 }
 
 // org-unit
@@ -671,9 +664,7 @@ function updateOrgUnit() {
       page = 1;
     });
 
-  $("#selectOrgUnitName")
-    .next(".select2-container")
-    .attr("id", "selectOrgUnitName");
+  $("#selectOrgUnitName").next(".select2-container").attr("id", "selectOrgUnitName");
 }
 
 // org-section

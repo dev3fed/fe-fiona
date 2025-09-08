@@ -1,73 +1,19 @@
 function loader(status) {
-  status == true ? $("#loader").show() : $("#loader").hide();
+  if (status == true) {
+    $("#loading-overlay").addClass("show").show();
+  } else {
+    $("#loading-overlay").removeClass("show").hide();
+  }
 }
 
-async function checkUniqueCode(typeId, identifier) {
-  uuid.uniqueCode = localStorage.getItem("uniqueCode");
-  uuid.uniquePosCode = localStorage.getItem("uniquePosCode");
-  const draftId = urlParams.get("draftId");
-  const duplicate = urlParams.get("duplicate");
-  const editUrl = urlParams.get("edit");
-  const positionId = urlParams.get("positionId");
-  if (editUrl) {
-    $("#selectDraftType").append(new Option("Edit Job", "1", true, true));
-  }
-  codeId = uuid.uniqueCode;
-  if (draftId) {
-    codeId = draftId;
-  }
-  if (positionId) {
-    const res = await detailJobPositionByCode(positionId);
-    const data = res.data;
-    duplicateJob(data);
-  }
-
-  $("#duplicateDiv").hide();
-  $("#contentDiv").show();
-  if (duplicate) {
-    $("#duplicateDiv").show();
-    // $("#selectJobReference").attr("disabled", false);
-    // $("#contentDiv").hide();
-    updateJobReference();
-  }
-  // if (uuid.uniqueCode != null && uuid.uniquePosCode != null) {
-  if (uuid.uniqueCode != null) {
-    try {
-      const res = await detailDraftOrganizationStructure(codeId);
-      if (res.status == 404) {
-        dataAvailable = false;
-        return;
-      }
-      if (draftId) {
-        uuid.uniqueCode = res.data.draft?.uniqueCode;
-        localStorage.setItem("uniqueCode", uuid.uniqueCode);
-      }
-      const dataObject = res.data;
-      updatedAll(dataObject);
-
-      detailChartPreview("os-preview-container", dataObject?.draftDetail?.directReport, res.data);
-
-      const resSubordinate = await listDraftJobSubordinate(uuid.uniqueCode);
-      const dataSubordinate = resSubordinate.data;
-
-      const resSubPosition = await listDraftJobSubPosition(uuid.uniqueCode);
-      const dataSubPosition = resSubPosition.data;
-
-      // console.log("kesini lagi ga ya");
-      updateDivSubPosition(dataSubPosition, dataObject);
-      updateDivSubordinate(dataSubordinate, dataObject);
-    } catch (error) {
-      $("#resultJabatan").html("Error fetching data from API");
-      throw error;
-    }
-  }
-
-  if (uuid.uniqueCode == null) {
-    dataAvailable = false;
-    localStorage.setItem("uniqueCode", uuidv4());
-    localStorage.setItem("uniquePosCode", uuidv4());
-    uuid.uniqueCode = localStorage.getItem("uniqueCode");
-    uuid.uniquePosCode = localStorage.getItem("uniquePosCode");
+// Helper function to extract PRL number from both range and single formats
+function getPrlNumber(prlOrg) {
+  if (prlOrg.includes("-")) {
+    // Range format: extract first number (e.g., "14-15" -> 14)
+    return parseInt(prlOrg.split("-")[0]);
+  } else {
+    // Single number format: parse directly (e.g., "12" -> 12)
+    return parseInt(prlOrg);
   }
 }
 
@@ -84,9 +30,13 @@ async function checkDataOrganization(draftList) {
   // If organizationAttribute is empty or null, select the first available draft
   if (!organizationAttribute.orgUnitId || !organizationAttribute.orgUnitName) {
     if (draftList && draftList.length > 0) {
-      const firstDraft = draftList[0];
+      console.log("draftList", draftList);
+      const firstDraft = draftList.find((item) => item.draftId == "1");
+      console.log("firstDraft", firstDraft);
       organizationAttribute.orgUnitId = firstDraft.draftId;
       organizationAttribute.orgUnitName = firstDraft.draftName;
+      organizationAttribute.isMasterData = true;
+      console.log(organizationAttribute);
       localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
     }
   }
@@ -94,23 +44,26 @@ async function checkDataOrganization(draftList) {
   // $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
 
   // disabled selectDraftOrganization
-  $("#selectDraftOrganization").prop("disabled", true);
+  // $("#selectDraftOrganization").prop("disabled", true);
 }
 
 function checkDataOrganizationLocalStorage() {
   const data = JSON.parse(localStorage.getItem("organizationAttribute"));
   if (data) {
     Object.keys(organizationAttribute).forEach((key) => {
+      console.log(data[key]);
       if (data[key]) {
         organizationAttribute[key] = data[key];
       }
     });
+    organizationAttribute.isMasterData = organizationAttribute.draftId == "1" ? true : false;
   }
 }
 
 function setOrganizationAttribute() {
   organizationAttribute.orgUnitId = null;
   organizationAttribute.orgUnitName = "";
+  organizationAttribute.isMasterData = false;
 }
 
 function clearAllInput() {
@@ -130,12 +83,22 @@ async function insertFormPostion(paramId) {
     draftId: organizationAttribute.orgUnitId,
     jobCode: paramId,
   });
-  const data = getDetailPosition.data;
+  const form = document.querySelectorAll(".form-control[required], .form-select[required]");
+  // remove class is-invalid from all form elements
+  form.forEach((element) => {
+    element.classList.remove("is-invalid");
 
+    // For Select2 dropdowns, also remove is-invalid from the Select2 container
+    const select2Container = element.parentElement.querySelector(".select2-container");
+    if (select2Container) {
+      select2Container.classList.remove("is-invalid");
+    }
+  });
+  const data = getDetailPosition.data;
   // clear all input
   clearAllInput();
-
-  $("#inputPositionName").val(data?.positionName);
+  const positionName = data?.isBasket ? data?.unitName : data?.positionName;
+  $("#inputPositionName").val(positionName);
   $("#selectPrlOrg").val(data?.prlOrgFrom).trigger("change");
   $("#selectPrlOrgTo").val(data?.prlOrgTo).trigger("change");
   $("#selectFunction").val(data?.functionCode).trigger("change");
@@ -159,8 +122,14 @@ async function insertFormPostion(paramId) {
   if (data?.sectionCode) {
     $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
   }
-  if (data?.personalAreaCode) {
-    $("#selectPersonalAreaName").append(new Option(data?.personalAreaName, data?.personalAreaCode, true, true));
+  if (data?.kbo) {
+    $("#selectKBO").append(new Option(data?.kbo, data?.kbo, true, true));
+  }
+  if (data?.costCenterDescription) {
+    $("#selectCostCenter").append(new Option(data?.costCenterDescription, data?.costCenterDescription, true, true));
+  }
+  if (data?.personnelAreaCode) {
+    $("#selectPersonalAreaName").append(new Option(data?.personnelAreaName, data?.personnelAreaCode, true, true));
   }
   if (data?.personnelSubAreaCode) {
     $("#selectPersonalSubareaName").append(
@@ -186,27 +155,28 @@ async function insertFormPostion(paramId) {
     });
   }
   const arrayBasket = [];
-  if (basket.length > 0) {
-    data.basket.forEach((item, index) => {
+  if (data.isBasket) {
+    data.positionList.forEach((item, index) => {
+      const [prlFrom, prlTo] = item.prlOrg.includes("-") ? item.prlOrg.split("-") : [item.prlOrg, item.prlOrg];
       const params = { ...subOrdinates };
       params.subPosId = index + 1;
       params.unitCode = item.unitCode;
       params.unitName = item.unitName;
       params.unitParentCode = data?.parentCode;
       params.unitParentName = data?.parentName;
-      params.jobPositionName = item.jobPositionName || "";
+      params.jobPositionName = item.positionName || "";
       params.layer = item.layer;
-      params.prlFrom = item.prlOrgFrom;
-      params.prlTo = item.prlOrgTo;
+      params.prlFrom = prlFrom;
+      params.prlTo = prlTo;
       params.formation = item.formation;
       params.prlPlan = 4;
       params.careerLevel = {
-        careerLevelCode: "",
-        careerLevelName: "",
+        careerLevelCode: data?.careerLevelCode || "",
+        careerLevelName: data?.careerLevelName || "",
       };
       params.careerType = {
-        careerTypeCode: "",
-        careerTypeName: data?.careerTypeName,
+        careerTypeCode: data?.careerTypeCode || "",
+        careerTypeName: data?.careerTypeName || "",
       };
       params.abbrivation = {
         careerJobName: "",
@@ -225,78 +195,16 @@ async function insertFormPostion(paramId) {
   return;
 }
 
-async function checkUniqueCodeSubordinate() {
-  const id = urlParams.get("id");
-  const edit = urlParams.get("edit");
-  if (edit) {
-    statusAction = "edit";
-  }
-
-  uuid.uniqueCode = localStorage.getItem("uniqueCode");
-  uuid.uniquePosCode = localStorage.getItem("uniquePosCode");
-  uuid.directReport = localStorage.getItem("directReport");
-
-  if (uuid.uniqueCode != null && uuid.uniquePosCode != null) {
-    try {
-      dataAvailable = false;
-      const res = await detailDraftOrganizationStructure(uuid.uniqueCode);
-      const dataObject = res.data;
-      if (id) {
-        const findDataSubordinate = res.data.listJobSubordinate.find((item) => item.id == id);
-        // console.log(findDataSubordinate);
-        uuid.uniqueCode = findDataSubordinate.uniqueCode;
-        uuid.uniquePosCode = findDataSubordinate.uniquePosCode;
-        localStorage.setItem("uniqueCode", uuid.uniqueCode);
-        localStorage.setItem("uniquePosCode", uuid.uniquePosCode);
-        updatedAllSubordinate(findDataSubordinate);
-      }
-      $("#selectDirectReport").append(new Option(uuid.directReport, uuid.directReport, true, true)).trigger("change");
-
-      const resSubPosition = await listDraftJobSubPosition(uuid.uniquePosCode);
-      const dataSubPosition = resSubPosition.data;
-      dataStorage = dataObject;
-      console.log("dataStorage", dataStorage);
-      if (dataSubPosition?.length > 0) {
-        dataAvailable = true;
-      }
-
-      updateDivSubPositionSubordinate(dataSubPosition, dataObject);
-    } catch (error) {
-      $("#resultJabatan").html("Error fetching data from API");
-      throw error;
-    }
-  }
-
-  if ($("#selectDraftType").val() == 0 && uuid.uniqueCode == null && uuid.uniquePosCode == null) {
-    localStorage.setItem("uniqueCode", uuidv4());
-    localStorage.setItem("uniquePosCode", uuidv4());
-    uuid.uniqueCode = localStorage.getItem("uniqueCode");
-    uuid.uniquePosCode = localStorage.getItem("uniquePosCode");
-  }
-}
-
-function uuidv4() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
 function defaultState() {
-  $("#subPositionDiv").hide();
+  // Hide UI elements and set default values
+  $("#subPositionDiv, #dataSubPosition, #joinFormationDiv").hide();
   $("#inputFormation").val("1");
-  // dataSubPosition hide
-  $("#dataSubPosition").hide();
-  $("#joinFormationDiv").hide();
 
-  $("[id^=select]").attr("disabled", true);
-  $("[id^=input]").attr("disabled", true);
+  // Disable all form elements
+  $("[id^=select], [id^=input]").attr("disabled", true);
 
-  // inputdraftname dan career type tidak bisa di disable
-  $("#inputDraftName").attr("disabled", false);
-  $("#selectCareerType").attr("disabled", false);
-  $("#selectJobReference").attr("disabled", false);
+  // Enable specific fields that should remain enabled
+  $("#inputDraftName, #selectCareerType, #selectJobReference").attr("disabled", false);
 }
 
 function defaultStateMOdal() {
@@ -611,9 +519,10 @@ function previousTab() {
 //   }
 // }
 
-async function saveInputAttribut(type) {
+function formattedInputAttribut(type) {
   const unitCode = urlParams.get("unitCode");
   const payload = formPositionParam;
+  console.log(payload.personnelSubAreaCode);
   payload.draftId = organizationAttribute.orgUnitId;
   payload.userId = "system";
   payload.unit.unitCode = type == "edit" ? unitCode : null;
@@ -628,6 +537,8 @@ async function saveInputAttribut(type) {
   payload.unit.isNeckFunction = $("#selectNeckFunction").prop("checked") ? true : false;
   payload.unit.isProject = $("#selectIsProject").prop("checked") ? true : false;
   payload.unit.isCoordinate = $("#selectCoordination").prop("checked") ? true : false;
+  payload.unit.kbo = $("#selectKBO").val();
+  payload.unit.costCenter = $("#selectCostCenter").val();
   // career type
   payload.careerType.careerTypeCode = $("#selectCareerType").val();
   payload.careerType.careerTypeName = $("#selectCareerType option:selected").text();
@@ -685,7 +596,7 @@ async function saveInputAttribut(type) {
     : $("#selectPersonalAreaName option:selected").text();
   // personnelSubArea
   payload.personnelSubArea.isNew = $("#PersonalSubareaNameSwitch").prop("checked");
-  payload.personnelSubArea.personnelSubAreaCode = payload.personnelSubArea.personnelSubAreaCode
+  payload.personnelSubArea.personnelSubAreaCode = payload.personnelSubArea.isNew
     ? ""
     : $("#selectPersonalSubareaName").val();
   if (
@@ -747,10 +658,131 @@ async function saveInputAttribut(type) {
     payload.subOrdinates = subJobPos;
   }
 
-  console.log("payload", payload);
-  // return;
+  return payload;
+}
 
-  const result = type === "edit" ? await draftJobUpdateAsDraft(payload) : await draftJobSaveAsDraft(payload);
+async function saveInputAttribut(type) {
+  const formPositionParam = formattedInputAttribut(type);
+  // console.log("formPositionParam", formPositionParam);
+  // console.log("formPositionParam", formPositionParam.unit.isBasket);
+  const basket = formPositionParam.unit.isBasket;
+  // return;
+  // compare formPositionParam with localStorage logState.initParams
+  const logState = JSON.parse(localStorage.getItem("logState"));
+  if (logState && logState.initParams && type === "edit") {
+    const initParams = logState.initParams;
+    if (JSON.stringify(formPositionParam) === JSON.stringify(initParams)) {
+      swal("No changes detected", "Please make changes before saving.", "info");
+      return;
+    } else {
+      // Helper function to deep compare objects and find actual differences
+      function findDeepDifferences(newObj, oldObj, path = "") {
+        const differences = {};
+
+        // Get all unique keys from both objects
+        const allKeys = new Set([...Object.keys(newObj || {}), ...Object.keys(oldObj || {})]);
+
+        for (const key of allKeys) {
+          const newValue = newObj?.[key];
+          const oldValue = oldObj?.[key];
+          const currentPath = path ? `${path}.${key}` : key;
+
+          // Skip if both values are exactly the same
+          if (JSON.stringify(newValue) === JSON.stringify(oldValue)) {
+            continue;
+          }
+
+          // If both are objects (not arrays or null), recursively compare
+          if (
+            newValue &&
+            oldValue &&
+            typeof newValue === "object" &&
+            typeof oldValue === "object" &&
+            !Array.isArray(newValue) &&
+            !Array.isArray(oldValue)
+          ) {
+            const nestedDiffs = findDeepDifferences(newValue, oldValue, currentPath);
+            Object.assign(differences, nestedDiffs);
+          } else {
+            // Only add if there's an actual difference
+            if (newValue !== oldValue) {
+              differences[currentPath] = {
+                oldValue: oldValue,
+                newValue: newValue,
+              };
+            }
+          }
+        }
+
+        return differences;
+      }
+
+      // Helper function to group differences by parent object
+      function groupDifferencesByParent(differences) {
+        const grouped = {};
+
+        for (const [path, diff] of Object.entries(differences)) {
+          const parts = path.split(".");
+
+          if (parts.length === 1) {
+            // Top-level property
+            grouped[path] = diff;
+          } else {
+            // Nested property - group by parent
+            const parentKey = parts[0];
+            const childKey = parts.slice(1).join(".");
+
+            if (!grouped[parentKey]) {
+              grouped[parentKey] = {};
+            }
+
+            // Create nested structure
+            grouped[parentKey][childKey] = {
+              oldValue: { [childKey]: diff.oldValue },
+              newValue: { [childKey]: diff.newValue },
+            };
+          }
+        }
+
+        return grouped;
+      }
+
+      // Find actual differences between the objects
+      const differences = findDeepDifferences(formPositionParam, initParams);
+
+      // Remove entries where both old and new values are falsy
+      Object.keys(differences).forEach((key) => {
+        const diff = differences[key];
+        if (!diff.oldValue && !diff.newValue) {
+          delete differences[key];
+        }
+      });
+
+      // Group differences by parent object
+      const groupedDifferences = groupDifferencesByParent(differences);
+
+      if (Object.keys(groupedDifferences).length > 0) {
+        console.log("Differences found:", groupedDifferences);
+      } else {
+        console.log("No differences found.");
+      }
+    }
+  }
+
+  console.log("basket", basket);
+  console.log("type", type);
+
+  // Check if basket is selected and type is "edit"
+  let result;
+  if (basket) {
+    result =
+      type === "edit" ? await draftJobUpdateBasket(formPositionParam) : await draftJobAddBasket(formPositionParam);
+  } else {
+    result =
+      type === "edit"
+        ? await draftJobUpdateNonBasket(formPositionParam)
+        : await draftJobAddNonBasket(formPositionParam);
+  }
   return result;
 }
 
@@ -782,7 +814,7 @@ function saveEmployeeDetails(payload, data) {
   payload.section = $("#selectSection").val() ? $("#selectSection").val() : $("#inputSection").val();
   payload.careerLevel = $("#selectCareerLevel").val() ? $("#selectCareerLevel").val() : $("#inputCareerLevel").val();
   payload.careerType = $("#selectCareerType").val() ? $("#selectCareerType").val() : $("#inputCareerType").val();
-  payload.abbrvPositon = $("#selectAbbrvPosition").val()
+  payload.abbrvPosition = $("#selectAbbrvPosition").val()
     ? $("#selectAbbrvPosition").val()
     : $("#inputAbbrvPosition").val();
   payload.orgUnitId = payload.type == "edit" ? payload.orgUnitId : Math.floor(1000000000 + Math.random() * 9000000000);
@@ -1084,14 +1116,6 @@ function refreshData() {
   // getTablePositionList refresh data
 }
 
-function refreshDataSubordinate() {
-  checkUniqueCodeSubordinate();
-  // defaultState();
-  // getAllMutiselect();
-  // defaultTab();
-  // getTablePositionList refresh data
-}
-
 async function editSubPosition(id) {
   // addSubPos("edit", id);
   await modalSubPosition(true);
@@ -1202,108 +1226,8 @@ async function helperSaveSubordinate() {
 
 async function handleDuplicate(params) {
   const draftId = organizationAttribute.orgUnitId;
-  const positionId = $("#positionId").val();
+  const positionId = $("#inputOUCode").val();
   duplicateJob(draftId, positionId);
-}
-
-// async function handleExport(params) {
-//   // alert("Export");
-// }
-
-function saveOrgDetailBulk(draftId, dataObject) {
-  dataObject.forEach((payload) => {
-    const orgPayload = {
-      type: payload.type,
-      draft_id: payload.draftId,
-      id_position: payload.positionId,
-      position: payload.positionName,
-      id_position_atasan_langsung: payload.directReportId,
-      layering: "L3",
-      gl: "GL1",
-      prl: payload.prlOrg == payload.prlOrgTo ? payload.prlOrg : `${payload.prlOrg} - ${payload.prlOrgTo}`,
-      org_unit_name: payload.orgUnitName,
-      id_org_unit: payload.orgUnitId,
-      bracket: payload.listSubPosition.length > 0 ? true : false,
-      assistant: payload.neckFunction,
-      depth: 0,
-      jumlah_formasi: payload.formation,
-      id: payload.positionId,
-      pid: payload.directReportId,
-      tags: [],
-    };
-    if (payload.type == "create") {
-      orgPayload.tags.push("create");
-    }
-    if (payload.type == "edit") {
-      orgPayload.tags.push("edit");
-    }
-    if (payload.neckFunction == true) {
-      orgPayload.tags.push("assistant");
-    }
-    // if (payload.isBasket == "Yes") {
-    if (payload.listSubPosition.length > 0) {
-      const bracket = `bracket_${payload.listSubPosition.length}`;
-      orgPayload.tags.push(bracket);
-    }
-    payload.listSubPosition.forEach((item, idx) => {
-      orgPayload[`bc_${idx + 1}_id_position`] = item.subPositionId;
-      orgPayload[`bc_${idx + 1}_position`] = item.subPositionName;
-      orgPayload[`bc_${idx + 1}_id_position_atasan_langsung`] = payload.directReportId;
-      orgPayload[`bc_${idx + 1}_layering`] = "L3";
-      orgPayload[`bc_${idx + 1}_gl`] = "GL1";
-      orgPayload[`bc_${idx + 1}_prl`] =
-        item.prlOrg == item.prlOrgTo ? item.prlOrg : `${item.prlOrg} - ${item.prlOrgTo}`;
-      orgPayload[`bc_${idx + 1}_org_unit_name`] = payload.orgUnitName;
-      orgPayload[`bc_${idx + 1}_id_org_unit`] = payload.orgUnitId;
-      orgPayload[`bc_${idx + 1}_bracket`] = false;
-      orgPayload[`bc_${idx + 1}_assistant`] = false;
-      orgPayload[`bc_${idx + 1}_depth`] = 0;
-      orgPayload[`bc_${idx + 1}_jumlah_formasi`] = item.formation;
-    });
-
-    const checkData = lsListDraftOrgNode.find(
-      (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
-    );
-    if (checkData) {
-      const index = lsListDraftOrgNode.findIndex(
-        (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
-      );
-      lsListDraftOrgNode[index] = orgPayload;
-    } else {
-      lsListDraftOrgNode.push(orgPayload);
-    }
-    console.log("orgPayload", orgPayload);
-  });
-  console.log("lsListDraftOrgNode", lsListDraftOrgNode);
-
-  localStorage.setItem("listDraftOrgNode", JSON.stringify(lsListDraftOrgNode));
-}
-
-function getallChildrenOrg(parentNode) {
-  let children = lsListOrgNode.filter((item) => parseInt(item.pid) === parseInt(parentNode.id));
-  children.forEach((child) => {
-    children = children.concat(getallChildrenNode(child));
-  });
-  return children;
-}
-
-function getallChildrenPosition(parentNode) {
-  let children = lsListPosition.filter((item) => parseInt(item.directReportId) == parseInt(parentNode));
-  children.forEach((child) => {
-    children = children.concat(getallChildrenPosition(child.positionId));
-  });
-  return children;
-}
-
-function correctedDirectReport(parentNode) {
-  let parent = lsListPosition.find((item) => item.positionId == parentNode);
-  const positionIdCopy = parent.positionIdCopy;
-  let children = lsListPosition.filter((item) => parseInt(item.directReportId) == parseInt(parentNode));
-  children.forEach((child) => {
-    child.directReportIdCopy = positionIdCopy;
-    children = children.concat(correctedDirectReport(child.positionId));
-  });
-  return children;
 }
 
 async function handleDelete() {
@@ -1341,47 +1265,10 @@ async function modalJobPopup(params) {
     alert("Data not found");
     return;
   }
-  // $("#jobName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
-  // $("#positionId").val(data.unitCode);
-  // $("#modalDirectorate").text("Pertamina Patra Niaga");
-  // $("#modalDivision").text(checkValue(data?.divisionName));
-  // $("#modalSubDivision").text(checkValue(data?.subDivisionName));
-  // $("#modalDepartment").text(checkValue(data?.departmentName));
-  // $("#modalSection").text(checkValue(data?.sectionName));
-  // $("#modalPersonnelAreaName").text(checkValue(data?.personnelAreaName));
-  // $("#modalPersonnelAreaSubname").text(checkValue(data?.personnelSubAreaName));
-  // $("#modalCareerType").text(checkValue(data?.careerTypeName));
-  // $("#modalCareerLevel").text(checkValue(data?.careerLevelName));
-  // $("#modalAbbrvPosition").text(checkValue(data?.abbrvPosition));
-  // $("#modalOrgUnitName").text(checkValue(data?.unitName));
-  // $("#modalPositionName").text(checkValue(data?.positionName));
-  // $("#modalOrgPRL").text(checkValue(data?.prlOrg));
-  // $("#modalFormation").text(checkValue(data?.formation));
-  // $("#modalDirectReport").text(checkValue(data?.parentName));
-  // $("#modalNeckFunction").text(checkValue(data?.neckFunction));
-  // $("#modalIsProject").text(checkValue(data?.isProject));
-  // $("#modalIsCoordination").text(checkValue(data?.isCoordination));
-  // $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
-  // $("#modalFunction").text(checkValue(data?.functionName));
-  // $("#modalSKNumber").text(checkValue(data?.skNumber));
-
-  // $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
-  // $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupCode ?? "");
-  // $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
-  // $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupCode ?? "");
-  // $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
-  // $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupCode ?? "");
-
-  // $("#incumbentId").text(data?.incumbents[0]?.personCode ?? "");
-  // $("#incumbentName").text(data?.incumbents[0]?.personName ?? "");
-  // $("#prlPlanComp").text(data?.incumbents[0]?.prlPlan ?? "");
-
-  // $("#modalDetailJob").modal("show");
-
-  console.log("data", data);
-  const jobName = data?.isBasket ? `${data?.unitName}` : data?.positionName;
-  $("#jobName").text(jobName);
-  $("#positionId").val(data.positionId);
+  const positionName = data?.isBasket ? data?.unitName : data?.positionName;
+  $("#jobName").text(checkValue(positionName));
+  $("#inputOUCode").val(data.unitCode);
+  $("#inputPositionCode").val(data.positionCode);
   $("#modalPrlOrg").text(checkValue(data.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));
 
@@ -1419,17 +1306,17 @@ async function modalJobPopup(params) {
   $("#modalOrgPRL").text(checkValue(data?.prlOrg));
   $("#modalFormation").text(checkValue(data?.formation));
 
-  $("#modalNeckFunction").text(data?.neckFunction ?? "");
-  $("#modalIsProject").text(data?.isProject ?? "");
-  $("#modalIsCoordination").text(data?.isCoordination ?? "");
-  $("#modalCoordinationWith").text(data?.coordinationWith ?? "");
+  $("#modalNeckFunction").text(checkValue(data?.neckFunction));
+  $("#modalIsProject").text(checkValue(data?.isProject));
+  $("#modalIsCoordination").text(checkValue(data?.isCoordination));
+  $("#modalCoordinationWith").text(checkValue(data?.coordinationWith));
 
-  $("#modalMainSkillGroup").text(data?.skillGroups?.[0]?.skillGroupName ?? "");
-  $("#modalMainSubSkillGroup").text(data?.skillGroups?.[0]?.subSkillGroupName ?? "");
-  $("#modalSecondSkillGroup").text(data?.skillGroups?.[1]?.skillGroupName ?? "");
-  $("#modalSecondSubSkillGroup").text(data?.skillGroups?.[1]?.subSkillGroupName ?? "");
-  $("#modalThirdSkillGroup").text(data?.skillGroups?.[2]?.skillGroupName ?? "");
-  $("#modalThirdSubSkillGroup").text(data?.skillGroups?.[2]?.subSkillGroupName ?? "");
+  $("#modalMainSkillGroup").text(checkValue(data?.skillGroups?.[0]?.skillGroupName));
+  $("#modalMainSubSkillGroup").text(checkValue(data?.skillGroups?.[0]?.subSkillGroupName));
+  $("#modalSecondSkillGroup").text(checkValue(data?.skillGroups?.[1]?.skillGroupName));
+  $("#modalSecondSubSkillGroup").text(checkValue(data?.skillGroups?.[1]?.subSkillGroupName));
+  $("#modalThirdSkillGroup").text(checkValue(data?.skillGroups?.[2]?.skillGroupName));
+  $("#modalThirdSubSkillGroup").text(checkValue(data?.skillGroups?.[2]?.subSkillGroupName));
 
   $("#modalDetailJob").modal("show");
   $("#nonBasketIncumbent").show();
@@ -1476,16 +1363,7 @@ async function modalJobPopup(params) {
       const arrayKeys = dataPosition
         .map((item) => item.prlOrg)
         .map((prl) => {
-          // Handle both range format ("14-15") and single number format ("12")
-          const getPrlNumber = (prlOrg) => {
-            if (prlOrg.includes("-")) {
-              // Range format: extract first number (e.g., "14-15" -> 14)
-              return parseInt(prlOrg.split("-")[0]);
-            } else {
-              // Single number format: parse directly (e.g., "12" -> 12)
-              return parseInt(prlOrg);
-            }
-          };
+          // Use global getPrlNumber function
           return getPrlNumber(prl);
         })
         .sort((a, b) => b - a); // Sort descending (besar ke
@@ -1507,14 +1385,7 @@ async function modalJobPopup(params) {
         count += matching.totalRow;
         // Sort matching.dataPosition by prlOrg descending (besar ke kecil)
         matching.dataPosition.sort((a, b) => {
-          // Handle both range format ("14-15") and single number format ("12")
-          const getPrlNumber = (prlOrg) => {
-            if (prlOrg.includes("-")) {
-              return parseInt(prlOrg.split("-")[0]);
-            } else {
-              return parseInt(prlOrg);
-            }
-          };
+          // Use global getPrlNumber function
           return getPrlNumber(b.prlOrg) - getPrlNumber(a.prlOrg);
         });
         sortedPositionList.push(matching);
@@ -1533,15 +1404,31 @@ async function modalJobPopup(params) {
         item.positionCode = "-";
         item.positionName = "-";
       }
-
       if (item.prlPlan !== "-" && data.positionList && Array.isArray(data.positionList)) {
-        const findPosition = positionList.find((pos) => pos.prlOrg.includes(String(item.prlPlan)));
+        // Function to expand PRL range (e.g., "12-13" becomes "12,13", "16-18" becomes "16,17,18")
+        const expandPrlRange = (prlOrg) => {
+          if (prlOrg.includes("-")) {
+            const [start, end] = prlOrg.split("-").map((num) => parseInt(num));
+            const expanded = [];
+            for (let i = start; i <= end; i++) {
+              expanded.push(i.toString());
+            }
+            return expanded.join(",");
+          }
+          return prlOrg;
+        };
+
+        const prlOrgCustom = positionList
+          .map((pos) => expandPrlRange(pos.prlOrg))
+          .filter((prl) => prl.includes(String(item.prlPlan)));
+        const findPosition = positionList.find((pos) => expandPrlRange(pos.prlOrg).includes(String(item.prlPlan)));
+        console.log("findPosition:", findPosition);
+        console.log("prlOrgCustom:", prlOrgCustom);
         if (findPosition) {
           item.positionName = findPosition.positionName;
           item.positionCode = findPosition.positionCode;
         }
       }
-
       $basketBody.append(`<tr>
       <td>${i + 1}</td>
       <td>${item.personCode}</td>
@@ -1554,11 +1441,14 @@ async function modalJobPopup(params) {
 
     // Render position list table
     const $positionBody = $("#tablePositionListBody").empty();
+    let globalCount = 0;
     (sortedPositionList || []).forEach((group, i) => {
       group.dataPosition.forEach((item, j) => {
+        globalCount++;
+        console.log("globalCount:", globalCount);
         if (j == 0) {
           $positionBody.append(`<tr>
-            <td>${j + 1}</td>
+            <td>${globalCount}</td>
             <td>${item.positionName}</td>
             <td>${item.careerLevel}</td>
             <td>${item.prlOrg}</td>
@@ -1566,7 +1456,7 @@ async function modalJobPopup(params) {
             </tr>`);
         } else {
           $positionBody.append(`<tr>
-        <td>${j + 1}</td>
+        <td>${globalCount}</td>
         <td>${item.positionName}</td>
         <td>${item.careerLevel}</td>
         <td>${item.prlOrg}</td>
@@ -1621,91 +1511,11 @@ async function modalJobPopup(params) {
     $("#incumbentCard").show();
   }
 
-  // $("#incumbentCard").hide();
-  // $("#incumbentCard").addClass("d-none");
-  // if (organizationAttribute?.orgUnitId == "1") {
-  //   $("#incumbentCard").show();
-  //   $("#incumbentCard").removeClass("d-none");
-  // }
-
-  // let totalFormationSelf = 0;
-  // if (data.isBasket == "Yes") {
-  //   const tableBasketBody = $("#tableBasketIncumbent tbody");
-  //   const tablePositionListBody = $("#tablePositionList tbody");
-  //   tableBasketBody.html("");
-  //   tablePositionListBody.html("");
-  //   data.listSubPosition.forEach((item, index) => {
-  //     const incumbent = item.incumbent && item.incumbent[0] ? item.incumbent[0] : null;
-
-  //     const no = index + 1;
-  //     const prlOrgSum = item.prlOrg == item.prlOrgTo ? item.prlOrg : `${item.prlOrg} - ${item.prlOrgTo}`;
-  //     if (incumbent) {
-  //       $("#tableBasketIncumbent tbody").append(
-  //         `<tr>
-  //               <td>` +
-  //           no +
-  //           `</td>
-  //               <td>` +
-  //           item.incumbent[0].employeeId +
-  //           `</td>
-  //               <td>` +
-  //           item.incumbent[0].employeeName +
-  //           `</td>
-  //               <td>` +
-  //           item.incumbent[0].prlPlanComp +
-  //           `</td>
-  //               <td>` +
-  //           item.subPositionId +
-  //           `</td>
-  //               <td>` +
-  //           item.subPositionName +
-  //           `</td>
-  //             </tr>`
-  //       );
-  //     }
-  //     $("#tablePositionListBody").append(
-  //       `<tr>
-  //         <td>` +
-  //         no +
-  //         `</td>
-  //         <td>` +
-  //         item.subPositionName +
-  //         `</td>
-  //         <td>` +
-  //         item.careerLevel +
-  //         `</td>
-  //         <td>` +
-  //         prlOrgSum +
-  //         `</td>
-  //         <td>` +
-  //         item.formation +
-  //         `</td>
-
-  //       </tr>`
-  //     );
-  //   });
-  // }
-
-  // if (data.isBasket == "Yes") {
-  //   $("#positionListCard").show();
-  //   $("#nonBasketIncumbent").hide();
-  //   $("#basketIncumbent").show();
-
-  //   if (dataOrg.tags.some((tag) => tag.startsWith("bracket_"))) {
-  //     // console.log("bracket_");
-  //     const bracket = dataOrg.tags.find((tag) => tag.startsWith("bracket_"));
-  //     const bracketValue = bracket.split("_")[1];
-  //     totalFormationSelf += parseInt(bracketValue);
-  //   } else {
-  //     // console.log("no bracket_");
-  //     totalFormationSelf += findChildrenOrg.jumlah_formasi;
-  //   }
-  //   $("#modalFormation").text(totalFormationSelf ?? "");
-  // } else {
-  //   $("#positionListCard").hide();
-  //   $("#nonBasketIncumbent").show();
-  //   $("#basketIncumbent").hide();
-  // }
+  if (organizationAttribute.isMasterData) {
+    $("#incumbentCard").show();
+  } else {
+    $("#incumbentCard").hide();
+  }
 }
 
 function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
@@ -1717,14 +1527,14 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-      ? '<i class="fas fa-check-circle text-success"></i>'
-      : '<i class="fas fa-exclamation-circle text-warning"></i>';
+        ? '<i class="fas fa-check-circle text-success"></i>'
+        : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
-      message +
-      `
+    message +
+    `
     </div>`
   );
 
@@ -1732,8 +1542,8 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     $("#modalConfirmBody").append(
       `<div class="alert alert-danger-custom m-t-10" role="alert">
         <strong>Note:</strong> ` +
-        note +
-        `
+      note +
+      `
       </div>`
     );
   }
@@ -1743,21 +1553,21 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
       if (item.callback) {
         $("#modalConfirmFooter").append(
           `<button type="button" class="btn ` +
-            item.className +
-            ` m-r-5" onclick="(` +
-            item.callback +
-            `)()">` +
-            item.button +
-            `</button>`
+          item.className +
+          ` m-r-5" onclick="(` +
+          item.callback +
+          `)()">` +
+          item.button +
+          `</button>`
         );
         return;
       }
       $("#modalConfirmFooter").append(
         `<button type="button" class="btn ` +
-          item.className +
-          ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
-          item.button +
-          `</button>`
+        item.className +
+        ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
+        item.button +
+        `</button>`
       );
     });
   }
@@ -1921,11 +1731,12 @@ function helperDatePicker() {
 // helper orgTree
 // ======================
 function createHierarchy(data, parentId = null) {
+  console.log("createHierarchy called data:", data);
   return data
     .filter((item) => item.pid === parentId)
     .map((item) => ({
       id: item.id,
-      text: item.position,
+      text: item.basket ? item.org_unit_name : item.position,
       icon: "icofont icofont-plus font-theme",
       a_attr: item.a_attr ? null : { class: "no-children" }, // add class if no children
       children: createHierarchy(data, item.id) ?? null,
@@ -1933,11 +1744,6 @@ function createHierarchy(data, parentId = null) {
 }
 
 async function helperOrgTree(params) {
-  // const olah = createHierarchy(test2, "10132405");
-  // console.log("olah", olah);
-  // return;
-  // console.log("olah", olah);
-  // refresh jsTree
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
     core: {
@@ -2004,650 +1810,46 @@ async function helperOrgTree(params) {
 // ======================
 // helper bagan org
 // ======================
+async function focusNode(nodeId) {
+  // Show loading with proper container detection
+  showChartLoading("chart-container-custom");
 
-async function focusNode(nodeId, focusNodeSpecial = "") {
-  // Show loading spinner
-  showChartLoading("os-container");
-
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: nodeId,
-    depth: 5,
-  });
-
-  // change chartid id from id_org_unit
-  if (!dataChart.data) {
-    dataChart.data = [];
-  }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
-  console.log("dataChart.data", dataChart.data);
-  console.log("nodeId", nodeId);
-  let selfNode;
-  if (focusNodeSpecial !== "") {
-    selfNode = dataChart.data.find((item) => item.id == focusNodeSpecial);
-    selfNode = {
-      ...selfNode,
-      tags: ["pointed"],
-    };
-    dataChart.data = dataChart.data.filter((item) => item.id != focusNodeSpecial);
-  } else {
-    selfNode = dataChart.data.find((item) => item.id == nodeId);
-    selfNode = {
-      ...selfNode,
-      tags: [...selfNode.tags, "pointed"],
-    };
-    dataChart.data = dataChart.data.filter((item) => item.id != nodeId);
-  }
-  dataChart.data.push(selfNode);
-  console.log("selfNode", selfNode);
-  setTimeout(() => {
-    helperOrgChart(true, "os-container", dataChart.data, true, { expand: true, nodeId: nodeId });
-    // Hide loading spinner after chart is rendered
-    hideChartLoading("os-container");
-  }, 500);
-}
-
-function getallChildrenNode(parentNode) {
-  let children = lsListOrgNode.filter((item) => item.pid === parentNode.id);
-  children.forEach((child) => {
-    children = children.concat(getallChildrenNode(child));
-  });
-  return children;
-}
-
-function helperOrgChartTester(init, id, data, isFocusNode, object) {
-  OrgChart.templates.myTemplate = Object.assign({}, OrgChart.templates.ana);
-  OrgChart.templates.myTemplate.size = [200, 200];
-  OrgChart.templates.myTemplate.node = `
-    <circle cx="100" cy="100" r="100" fill="#4D4D4D" stroke-width="1" stroke="#aeaeae"></circle>
-    <text style="font-size: 24px;" fill="#ffffff" x="100" y="90" text-anchor="middle">{val}</text>
-    <text style="font-size: 16px;" fill="#ffffff" x="100" y="60" text-anchor="middle">{val}</text>
-    <circle cx="150" cy="50" r="20" fill="#ffffff" stroke="#aeaeae" stroke-width="1"></circle>
-    <text style="font-size: 24px;" fill="#4D4D4D" x="150" y="55" text-anchor="middle">+</text>
-`;
-
-  var chart = new OrgChart("#os-container", {
-    template: "myTemplate",
-    nodes: [
-      { id: 1, name: "Parent Node" },
-      // { id: 2, pid: 1, name: "Child Node" },
-    ],
-  });
-
-  // click event on plus
-  chart.on("plus", function (sender, node) {
-    console.log("plus", node);
-  });
-}
-
-function helperOrgChart(init, id, data, isFocusNode, object) {
-  console.log(data);
-  const dataWithIdNull = data.filter((item) => item.id !== null || item.pid !== null);
-  console.log("dataWithIdNull", dataWithIdNull);
-  if (!init) {
-    return false;
-  }
-  const param = {};
-  if (isFocusNode) {
-    param.collapsed = {
-      level: 2,
-      allChildren: true,
-    };
-  }
-
-  const default_t = Object.assign({}, OrgChart.templates.base);
-  default_t.size = [220, 70];
-  default_t.ripple = null;
-  default_t.img_0 = null;
-  default_t.node = `<rect x="0" y="0" height="{h}" width="{w}" fill="#ffffff" stroke-width="1" stroke="#000"></rect>`;
-  default_t.position = `<g><text data-width="140" style="font-size:12px;" text-anchor="middle" dominant-baseline="middle" fill="#353238" x="80" y="25" data-text-overflow="multiline">{val}</text></g>`;
-  default_t.prl = `<g><rect x="180" y="0" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px;text-anchor: middle;" fill="#353238" x="200" y="22.5">{val}</text></g>`;
-  default_t.jumlah_formasi = `<g><rect x="180" y="35" height="35" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect><text style="font-size:12px; text-anchor: middle;" fill="#353238" x="200" y="57.5">{val}</text></g>`;
-
-  default_t.expandCollapseSize = 10;
-  default_t.link = `<path stroke-linejoin="round" stroke-width="1" fill="none" d="{edge}" />`;
-  default_t.plus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
-  <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line>
-  <line x1="5" y1="3" x2="5" y2="7" stroke-width="1" stroke="#000"></line></g>`;
-  default_t.minus = `<g><circle cx="5" cy="5" r="5" class="boc-fill" stroke="#000" stroke-width="1"></circle>
-  <line x1="3" y1="5" x2="7" y2="5" stroke-width="1" stroke="#000"></line></g>`;
-  // default_t.plus = ``;
-  // default_t.minus = ``;
-  // chaert separation
-  OrgChart.templates.split = Object.assign({}, OrgChart.templates.base);
-  // RESET_MOVABLE_ONEXPANDCOLLAPSE
-
-  OrgChart.templates.split.size = [0, 0];
-  OrgChart.templates.split.node = "";
-  OrgChart.templates.default_t = default_t;
-  OrgChart.templates.default_t.menuButton =
-    '<div style="position:absolute;right:0px;top:20px; width:40px;height:50px;cursor:pointer;" data-ctrl-menu="">' +
-    '<hr style="background-color: black; height: 3px;margin:0px; border: none;">' +
-    '<hr style="background-color: black; height: 3px; border: none;">' +
-    '<hr style="background-color: black; height: 3px; border: none;">' +
-    "</div>";
-
-  const baseNodeBinding = {
-    position: "position",
-    prl: "prl",
-    jumlah_formasi: "jumlah_formasi",
-    org_unit: "org_unit_name",
-    level: "level",
-  };
-
-  function bracketTemplateGenerator(bracketSize) {
-    const template = Object.assign({}, OrgChart.templates.default_t);
-    template.size = [220, 0];
-    for (let i = 0; i < bracketSize; i++) {
-      template.size = [template.size[0], 120];
-    }
-    template.position = null;
-    template.prl = null;
-    template.jumlah_formasi = null;
-    template.org_unit =
-      `<g>` +
-      '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
-      `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
-      `</g>`;
-
-    let height = 40;
-    for (let i = 1; i <= bracketSize; i++) {
-      const yPosition = 40 + (i - 1) * 40;
-      const yTextPosition = 60 + (i - 1) * 40;
-      height += 40;
-      template.size = [template.size[0], height];
-      template[`bc_${i}_position`] =
-        `<g>` +
-        `<rect x="0" y="${yPosition}" height="40" width="140" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text data-width="120" style="font-size:10px;text-anchor: middle;" fill="#353238" x="70" y="${yTextPosition}" data-text-overflow="multiline">{val}</text>` +
-        `</g>`;
-      template[`bc_${i}_prl`] =
-        `<g>` +
-        `<rect x="140" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="160" y="${
-          yTextPosition + 4
-        }">{val}</text>` +
-        `</g>`;
-      template[`bc_${i}_level`] =
-        `<g>` +
-        // `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="transparent" stroke-width="1" stroke="#000"></rect>` +
-        `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `</g>`;
-      template[`bc_${i}_jumlah_formasi`] =
-        `<g>` +
-        `<rect x="180" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="200" y="${
-          yTextPosition + 4
-        }">{val}</text>` +
-        `</g>`;
-    }
-
-    return template;
-  }
-
-  function bracketTemplateGeneratorJoinFormation(bracketSizeFormat) {
-    const bracketSize = bracketSizeFormat.split("_")[0];
-    const bracketSplitted = bracketSizeFormat.split("_").slice(1);
-    // console.log({bracketSize})
-    const template = Object.assign({}, OrgChart.templates.default_t);
-    template.size = [220, 0];
-    for (let i = 0; i < bracketSize; i++) {
-      template.size = [template.size[0], 120];
-    }
-    template.position = null;
-    template.prl = null;
-    template.jumlah_formasi = null;
-    template.org_unit =
-      `<g>` +
-      '<rect x="0" y="0" height="40" width="220" fill="#ffffff" stroke-width="1" stroke="#000"></rect>' +
-      `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="110" y="20">{val}</text>` +
-      `</g>`;
-
-    let height = 40;
-    for (let i = 1; i <= bracketSize; i++) {
-      // alert('masuk 3')
-      const yPosition = 40 + (i - 1) * 40;
-      const yTextPosition = 60 + (i - 1) * 40;
-      height += 40;
-      template.size = [template.size[0], height];
-      template[`bc_${i}_position`] =
-        `<g>` +
-        `<rect x="0" y="${yPosition}" height="40" width="140" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text data-width="120" style="font-size:8px;text-anchor: middle;" fill="#353238" x="70" y="${
-          yTextPosition - 5
-        }" data-text-overflow="multiline">{val}</text>` +
-        `</g>`;
-      template[`bc_${i}_prl`] =
-        `<g>` +
-        `<rect x="140" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="160" y="${
-          yTextPosition + 4
-        }">{val}</text>` +
-        `</g>`;
-      template[`bc_${i}_level`] =
-        `<g>` +
-        `<rect x="180" y="${yPosition}" id="{val}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `</g>`;
-      // template[`bc_${i}_jumlah_formasi`] =
-      //   `<g>` +
-      //   `<rect x="180" y="${yPosition}" height="40" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-      //   `<text style="font-size:11px;text-anchor: middle;" fill="#353238" x="200" y="${
-      //     yTextPosition + 4
-      //   }">{val}</text>` +
-      //   `</g>`;
-    }
-    let yHeight = 0;
-    let yTextPosition = 0;
-    let yPosition = 0;
-    for (let i = 0; i < bracketSplitted.length; i++) {
-      if (i == 0) {
-        yPosition = 40;
-        yHeight = 40 * parseInt(bracketSplitted[i]);
-        yTextPosition = yHeight / 2 + yPosition;
-        // yTextPosition = yHeight + 20;
-        // console.log(bracketSplitted[i])
-      } else {
-        yPosition = yHeight + yPosition;
-        yHeight = 40 * bracketSplitted[i];
-        yTextPosition = yHeight / 2 + yPosition;
-      }
-      template[`bc_${i + 1}_jumlah_formasi`] =
-        `<g>` +
-        `<rect x="180" y="${yPosition}" height="${yHeight}" width="40" fill="#ffffff" stroke-width="1" stroke="#000"></rect>` +
-        `<text style="font-size:11px;text-anchor: middle;"  x="200" y="${yTextPosition}">{val}</text>` +
-        `</g>`;
-    }
-
-    return template;
-  }
-
-  const bracketLimit = 20;
-
-  for (let i = 1; i <= bracketLimit; i++) {
-    OrgChart.templates[`bracket_${i}_t`] = bracketTemplateGenerator(i);
-  }
-
-  const nodeBinding = {
-    ...baseNodeBinding,
-  };
-
-  const tags = {};
-
-  // console.log({baseNodeBinding})
-  for (let i = 1; i <= bracketLimit; i++) {
-    for (let key in baseNodeBinding) {
-      nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
-    }
-    tags[`basket_${i}`] = {
-      template: `bracket_${i}_t`,
-    };
-  }
-
-  // console.log("data", data);
-  const dataMerged = data.filter((item) => item.isMergeFormation === true && item.basket == true);
-  // console.log("dataMerged", dataMerged);
-  // const isMerge = dataMerged.some((item) =>
-  //   Object.keys(item).some((key) => key.match(/^bc_\d+_isMerge$/) && item[key])
-  // );
-  // console.log("isMerge", isMerge);
-  // console.log("dataMerged", dataMerged);
-
-  let tagsCustomMergeArray = [];
-
-  dataMerged.forEach((item) => {
-    // if (!item.isMerge) return;
-    // const isMerge = Object.keys(item).some((key) => key.match(/^bc_\d+_isMerge$/) && item[key]);
-    // console.log("isMerge", isMerge);
-    // if (!isMerge) return;
-    const dataSelected = item;
-    // console.log("dataSelected", dataSelected);
-    // remove insie item.tags where tag starts with basket_
-    item.tags = item.tags.filter((tag) => !tag.startsWith("basket_"));
-    // cari yang key nya ada text "type"
-    const getType = Object.entries(dataSelected)
-      .filter(([key]) => key.includes("flagMergeFormation"))
-      .map(([key, value]) => ({ key, value }));
-    const totalBAsket = getType.length;
-    let tagCustomMerge = "";
-    if (totalBAsket > 0) {
-      tagCustomMerge = `basket_${totalBAsket}`;
-    }
-    const customMergeLabel = "Z";
-    getType.forEach((ita, ida) => {
-      if (item[ita.key] == null) {
-        item[ita.key] = customMergeLabel + String(ida + 1);
-        ita.value = customMergeLabel + String(ida + 1);
-      }
+  try {
+    const dataChart = await chartShow({
+      draftId: organizationAttribute.orgUnitId,
+      jobCode: nodeId,
+      depth: 5,
     });
 
-    // check ada yang value nilai value getType yang sama atu tidak. contoh = [{a:1},{b:2},{c:1}]
-    // const storeValues = [];
-    // const uniqueValues = new Set(getType.map((item) => item.value));
-    // uniqueValues.forEach((value) => {
-    //   const count = getType.filter((item) => item.value === value).length;
-    //   storeValues.push({ value, count });
-    // });
-    const storeValues = [];
-    const uniqueValues = new Set(getType.map((item) => item.value));
-    uniqueValues.forEach((value) => {
-      const count = getType.filter((item) => item.value === value).length;
-      //  find whic bc_1_flagMergeFormation, bc_2_flagMergeFormation, etc. that matches this value
-      const matchingKeys = Object.keys(item).filter((key) => key.includes("flagMergeFormation") && item[key] === value);
-      const arrayKeys = matchingKeys.map((key) => parseInt(key.split("_")[1]));
-      storeValues.push({ value, count, arrayKeys });
-    });
-    // urutan storeValues berdasarkan dari uturan arrayKeys
-    let sorted = [];
-    let count = 0;
-    for (let i = 0; i < totalBAsket; i++) {
-      const matching = storeValues.find((itx) => itx.arrayKeys.includes(i + 1));
-      if (count < totalBAsket && matching) {
-        count += matching.count;
-        sorted.push(matching);
-      }
-    }
-    sorted.forEach((itx, index) => {
-      const tagFormation = `bc_${index + 1}_jumlah_formasi`;
-      const flagMergeFormationKey = Object.keys(item)
-        .filter((key) => key.includes("_flagMergeFormation") && item[key] === itx.value)
-        .sort((a, b) => {
-          return a.localeCompare(b);
-        });
+    // Update chart data (assuming this function handles chart rendering)
+    renderOrgChart(dataChart.data, nodeId, true);
 
-      flagMergeFormationKey.forEach((key) => {
-        const separation = key.split("_");
-        const bracketIndex = separation[1]; // get the index of the bracket
-        item[tagFormation] = item[`bc_${bracketIndex}_jumlah_formasi`] || 0; // set jumlah_formasi to count
-      });
-
-      tagCustomMerge += `_${itx.count}`;
-    });
-    item.tags.push(tagCustomMerge);
-    tagsCustomMergeArray.push(tagCustomMerge);
-  });
-
-  // console.log("tagsCustomMergeArray", tagsCustomMergeArray);
-  tagsCustomMergeArray = [...new Set(tagsCustomMergeArray)];
-  // console.log("tagsCustomMergeArray", tagsCustomMergeArray);
-
-  tagsCustomMergeArray.forEach((ity) => {
-    // remove basket_ from ity
-    const itemReplaced = ity.replace("basket_", "");
-    tags[ity] = {
-      template: `${ity}_t`,
-    };
-    OrgChart.templates[`${ity}_t`] = bracketTemplateGeneratorJoinFormation(itemReplaced);
-  });
-
-  // for (let i = 1; i <= bracketLimit; i++) {
-  //   for (let key in baseNodeBinding) {
-  //     nodeBinding[`bc_${i}_${key}`] = `bc_${i}_${key}`;
-  //   }
-  //   tags[`basket_${i}`] = {
-  //     template: `bracket_${i}_t`,
-  //   };
-  // }
-  // console.log(OrgChart.templates);
-  // console.log({tags})
-
-  // add tags
-  // "hasChildren": {
-  //   template: "withChildren"
-  // }
-  // tags["hasChildren"] = {
-  //   template: "withChildren",
-  // };
-
-  //  templates: {
-  //     withChildren: Object.assign({}, OrgChart.templates.base, {
-  //       node: '<rect x="0" y="0" width="250" height="100" fill="lightblue"></rect>',
-  //       plus: '<circle cx="225" cy="50" r="15" fill="green" stroke="black" stroke-width="2"></circle>',
-  //   })
-  // }
-
-  // templates["withChildren"] = Object.assign({}, OrgChart.templates.base, {
-
-  // console.log("testOrgBagan", testOrgBagan);
-
-  // remove duplicate id in array data
-  // data = data.filter((item, index, self) => self.findIndex((t) => t.id === item.id) === index);
-
-  OrgChart.RESET_MOVABLE_ONEXPANDCOLLAPSE = true;
-  OrgChart.SEARCH_CLOSE_RESULT_ON_ESCAPE_OR_CLICKOUTSIDE = true;
-  // remove chart first, then create new chart
-  const chartContainer = document.getElementById(id);
-  if (chartContainer) {
-    chartContainer.innerHTML = "";
-  }
-  if (document.getElementById(id)) {
-    document.getElementById(id).innerHTML = "";
-  } else {
-    const container = document.createElement("div");
-    container.id = id;
-    document.body.appendChild(container);
-  }
-
-  let chart = new OrgChart(document.getElementById(id), {
-    collapse: {
-      ...param.collapsed,
-      // level: 2,
-      // allChildren: true,
-    },
-    template: "default_t",
-    nodeBinding,
-    enableSearch: false,
-    assistantSeparation: 10,
-    levelSeparation: 30,
-    scaleInitial: OrgChart.match.boundary,
-    // nodes: testOrgBagan,
-    // nodes: test,
-    nodes: data,
-    align: OrgChart.ORIENTATION,
-    // movable: OrgChart.movable.node,
-    nodeMouseClick: false,
-    // menu: {
-    //   pdf: { text: "Export PDF" },
-    //   png: { text: "Export PNG" },
-    //   svg: { text: "Export SVG" },
-    // },
-    toolbar: {
-      fullScreen: true,
-      zoom: true,
-      fit: true,
-    },
-    tags,
-  });
-
-  chart.on("init", function (sender) {
-    const title = document.createElement("button");
-    title.style.position = "absolute";
-    title.style.right = "0px";
-    title.style.top = "87px";
-    title.style.width = "50px";
-    title.style.textAlign = "center";
-    title.style.color = "#757575";
-    title.style.backgroundColor = "transparent";
-    title.style.border = "none";
-    title.style.fontSize = "42px";
-    title.style.color = "grey";
-
-    // title.innerHTML = `<i class="fa fa-refresh"></i>`;
-    // add id to title
-    title.addEventListener("click", function () {
-      // myData.forEach((item) => {
-      //   item.tags = item.tags.filter((tag) => tag !== "edit");
-      // });
-      // chart.load(myData);
-      helperOrgChart(true, "os-container", lsListOrgNode, true);
-    });
-    chart.element.appendChild(title);
-
-    // console.log("node", chart.nodes);
-    // const nodes = chart.nodes;
-    // // node object to array
-    // const nodesArray = Object.keys(nodes).map((key) => nodes[key]);
-    // nodesArray.forEach((node) => {
-    //   if (!chart.getNode(node.id).children || chart.getNode(node.id).children.length === 0) {
-    //     // add tags
-    //     chart.addTag(node.id, "hidePlus");
-    //   }
-    //   console.log("node", chart.getNode(node.id).children);
-    // });
-    // chart.node.forEach((node) => {
-    // if (!chart.getNode(node.id).children || chart.getNode(node.id).children.length === 0) {
-    //   chart.addTag(node.id, "hidePlus");
-    // }
-    // });
-  });
-
-  chart.onExportStart((args) => {
-    args.styles += document.getElementById("myStyle").outerHTML;
-  });
-
-  chart.onExportEnd((args) => {
-    console.log(args);
-  });
-
-  chart.onUpdated(() => {});
-
-  chart.on("expcollclick", function (sender, collapse, id, ids) {
-    // alert("masd");
-  });
-
-  chart.on("node-layout", function (sender, args) {
-    const childrenCount = args?.childrenIds?.length;
-    if (childrenCount > 10) {
-      args.layout = OrgChart.treeRightOffset;
-    } else {
-      args.layout = OrgChart.normal;
-    }
-  });
-
-  chart.on("click", async (sender, node) => {
-    // const param = {};
-    const nodeID = node.node.id;
-    await modalJobPopup(nodeID);
-
-    // expandCollapse
-    // chart.expand(node.node.id);
-
-    // const nodeID = node.node.id;
-    // console.log("nodeID", nodeID);
-    // const dataChart = await chartShow({
-    //   draftId: organizationAttribute.orgUnitId,
-    //   jobCode: nodeID,
-    //   depth: 2,
-    // });
-    // dataChart.data.forEach((item) => {
-    //   item.id = item.id_org_unit;
-    // });
-
-    // remove find where pid = nodeID
-    // const dataChartFiltered = dataChart.data
-    //   .filter((item) => !data.find((element) => element.id === item.id_org_unit))
-    //   .filter((item) => item.pid == nodeID);
-    // console.log("dataChartFiltered", dataChartFiltered);
-    // dataChartFiltered.forEach((item) => {
-    //   setTimeout(() => {
-    //     chart.addNode(item);
-    //   }, 300);
-    // });
-
-    // check if node have children
-    //  check if node have children expanded
-  });
-
-  // chart on right click
-  chart.on("contextmenu", function (sender, args) {
-    args.event.preventDefault(); // Prevent default browser menu
-
-    // Remove existing menu
-    let existingMenu = document.getElementById("custom-menu");
-    if (existingMenu) {
-      existingMenu.remove();
-    }
-  });
-
-  chart.on("searchclick", (sender, node) => {
-    return false;
-  });
-
-  $("#handleExportPdf")
-    .off("click")
-    .on("click", function () {
-      const nodeId = $("#positionId").val();
-      chart.exportPDF({
-        filename: `${nodeId}.pdf`,
-        expandChildren: false,
-      });
-      $("#modalDetailJob").modal("hide");
-    });
-
-  $("#handleExportPng")
-    .off("click")
-    .on("click", function () {
-      const nodeId = $("#positionId").val();
-      chart.exportPNG({
-        // expandChildren: true,
-        // min: false,
-        openInNewTab: true,
-        filename: `${nodeId}.png`,
-        // parentLevels: 1,
-        // childLevels: 1,
-        expandChildren: false,
-      });
-      $("#modalDetailJob").modal("hide");
-    });
-
-  $("#handleExportSvg")
-    .off("click")
-    .on("click", function () {
-      const nodeId = $("#positionId").val();
-      chart.exportSVG({
-        // expandChildren: true,
-        // min: false,
-        filename: `${nodeId}.svg`,
-        // parentLevels: 1,
-        // childLevels: 1,
-        expandChildren: false,
-      });
-      $("#modalDetailJob").modal("hide");
-    });
-
-  // $("#handleExport").on("click", function () {
-  //   const nodeId = $("#positionId").val();
-  //   const position = lsListPosition.find((item) => item.positionId == nodeId);
-  //   console.log("masuk 3");
-  //   // exportPDF(nodeId);
-  //   chart.exportPDF({ filename: `${position.positionName}.pdf`, expandChildren: false, nodeId: nodeId });
-  //   // chart remove certain tags
-  //   chart.removeTags(["pointed"]);
-
-  //   $("#modalDetailJob").modal("hide");
-  // });
-
-  // function handleExport() {
-  //   const nodeId = $("#positionId").val();
-  //   console.log("masuk 2");
-  // }
-
-  if (object?.expand) {
-    let selfNode = data.find((item) => item.id == object.nodeId);
-    const getChildrenNode = data.filter((item) => item.pid == object.nodeId).map((item) => item.id) || [];
-    const siblingNode = data.filter((item) => item.pid == selfNode?.pid).map((item) => item.id) || [];
-    const getAll = [...getChildrenNode, ...siblingNode];
+    // Wait for chart to complete rendering before hiding loading
     setTimeout(() => {
-      chart.expand(object.nodeId, getAll);
-    }, 500);
-    setTimeout(() => {
-      chart.fit();
-    }, 800);
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
+      console.log("Chart focus completed successfully");
+    }, 1500); // Wait 1.5 seconds for chart to fully render
+  } catch (error) {
+    console.error("Error in focusNode:", error);
+
+    // Hide loading on error
+    if (typeof hideChartLoading === "function") {
+      hideChartLoading("chart-container-custom");
+    }
+
+    // Show error message
+    const container = document.querySelector(".chart-container-custom") || document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed. Please try again.</div>';
+    }
   }
 }
 
-async function changeDataSourceFilter(value) {
+// get data design cost by function, division, or level
+async function changeDataDesignCostFilter(value) {
   const tableBody = $("#tableDesignCostBody").empty();
   const tableFooter = $("#tableDesignCostFooter").empty();
   const data = {
@@ -2663,12 +1865,12 @@ async function changeDataSourceFilter(value) {
   const result = await (value === "function"
     ? designCostByFunction
     : value === "division"
-    ? designCostByDivision
-    : designCostByLevel)({
-    draftId: organizationAttribute.orgUnitId,
-    page: 1,
-    pageSize: 10,
-  });
+      ? designCostByDivision
+      : designCostByLevel)({
+        draftId: organizationAttribute.orgUnitId,
+        page: 1,
+        pageSize: 10,
+      });
 
   result.data.forEach((item, idx) => {
     data.addHtml += `<tr>
@@ -2704,45 +1906,30 @@ async function changeDataSourceFilter(value) {
 // Organization Chart Loading Functions
 function showChartLoading(containerClass) {
   let container = document.querySelector(`.${containerClass}`);
+  container.innerHTML = CHART_LOADING_HTML;
 
-  if (container) {
-    container.innerHTML = CHART_LOADING_HTML;
+  // Ensure container has proper positioning for loading overlay
+  const containerStyle = window.getComputedStyle(container);
+  if (containerStyle.position === "static") {
+    container.style.position = "relative";
+  }
 
-    // Ensure container has proper positioning for loading overlay
-    const containerStyle = window.getComputedStyle(container);
-    if (containerStyle.position === "static") {
-      container.style.position = "relative";
-    }
-
-    // Ensure container has minimum dimensions for chart (400px height to match os-container)
-    if (containerStyle.width === "0px" || containerStyle.height === "0px") {
-      container.style.minWidth = "100%";
-      container.style.minHeight = "400px";
-    }
-
-    console.log(`Chart loading shown for container: ${containerClass}`);
-  } else {
-    console.warn(`Container not found: ${containerClass}`);
+  // Ensure container has minimum dimensions for chart (1200x800)
+  if (containerStyle.width === "0px" || containerStyle.height === "0px") {
+    container.style.minWidth = "1200px";
+    container.style.minHeight = "800px";
   }
 }
-
 function hideChartLoading(containerClass) {
   let container = document.querySelector(`.${containerClass}`);
+  // Remove loading overlay and styles
+  const loadingOverlay = container.querySelector("#chart-loading-overlay");
+  const loadingStyle = container.querySelector("style");
 
-  if (container) {
-    // Remove loading overlay and styles
-    const loadingOverlay = container.querySelector("#chart-loading-overlay");
-    const loadingStyle = container.querySelector("style");
-
-    if (loadingOverlay) {
-      loadingOverlay.remove();
-    }
-    if (loadingStyle) {
-      loadingStyle.remove();
-    }
-
-    console.log(`Chart loading hidden for container: ${containerClass}`);
-  } else {
-    console.warn(`Container not found for hiding loading: ${containerClass}`);
+  if (loadingOverlay) {
+    loadingOverlay.remove();
+  }
+  if (loadingStyle) {
+    loadingStyle.remove();
   }
 }
