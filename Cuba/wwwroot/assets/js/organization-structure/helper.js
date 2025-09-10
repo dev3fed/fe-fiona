@@ -164,12 +164,13 @@ async function insertFormPostion(paramId) {
       console.log("item", item);
       const [prlFrom, prlTo] = item.prlOrg.includes("-") ? item.prlOrg.split("-") : [item.prlOrg, item.prlOrg];
       const params = { ...subOrdinates };
+      const positionName = item?.formationBasket?.length > 0 ? item.formationBasket[0].positionName : item.positionName;
       params.subPosId = index + 1;
       params.unitCode = item.unitCode;
       params.unitName = item.unitName;
       params.unitParentCode = item.parentCode;
       params.unitParentName = item.parentName;
-      params.jobPositionName = item.positionName || "";
+      params.jobPositionName = positionName || "";
       params.layer = item.layer;
       params.prlFrom = prlFrom;
       params.prlTo = prlTo;
