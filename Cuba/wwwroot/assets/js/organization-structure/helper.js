@@ -105,10 +105,14 @@ async function insertFormPostion(paramId) {
   $("#inputOrgUnitName").val(data?.unitName);
   $("#inputFormation").val(data?.formation);
   if (data?.directReportCode) {
-    $("#selectDirectReport").append(new Option(data?.directReportName, data?.directReportCode, true, true));
+    $("#selectDirectReport").append(
+      new Option(`${data?.directReportName} (${data?.directReportCode})`, data?.directReportCode, true, true)
+    );
   }
   if (data?.parentCode) {
-    $("#selectOrgUnitParentName").append(new Option(data?.parentName, data?.parentCode, true, true));
+    $("#selectOrgUnitParentName").append(
+      new Option(`${data?.parentName} (${data?.parentCode})`, data?.parentCode, true, true)
+    );
   }
   if (data?.divisionCode) {
     $("#selectDivision").append(new Option(data?.divisionName, data?.divisionCode, true, true));
@@ -156,20 +160,22 @@ async function insertFormPostion(paramId) {
   }
   const arrayBasket = [];
   if (data.isBasket) {
-    data.positionList.forEach((item, index) => {
+    data.subOrdinates.forEach((item, index) => {
+      console.log("item", item);
       const [prlFrom, prlTo] = item.prlOrg.includes("-") ? item.prlOrg.split("-") : [item.prlOrg, item.prlOrg];
       const params = { ...subOrdinates };
       params.subPosId = index + 1;
       params.unitCode = item.unitCode;
       params.unitName = item.unitName;
-      params.unitParentCode = data?.parentCode;
-      params.unitParentName = data?.parentName;
+      params.unitParentCode = item.parentCode;
+      params.unitParentName = item.parentName;
       params.jobPositionName = item.positionName || "";
       params.layer = item.layer;
       params.prlFrom = prlFrom;
       params.prlTo = prlTo;
-      params.formation = item.formation;
+      params.formation = item.formation || 1;
       params.prlPlan = 4;
+      params.formationBasket = item.formationBasket || [];
       params.careerLevel = {
         careerLevelCode: data?.careerLevelCode || "",
         careerLevelName: data?.careerLevelName || "",
@@ -522,11 +528,11 @@ function previousTab() {
 function formattedInputAttribut(type) {
   const unitCode = urlParams.get("unitCode");
   const payload = formPositionParam;
-  console.log(payload.personnelSubAreaCode);
   payload.draftId = organizationAttribute.orgUnitId;
   payload.userId = "system";
   payload.unit.unitCode = type == "edit" ? unitCode : null;
-  payload.unit.unitName = $("#inputPositionName").val();
+  payload.unit.unitName = $("#inputOrgUnitName").val();
+  payload.unit.positionName = $("#inputPositionName").val();
   payload.unit.layer = 4;
   payload.unit.isBasket = $("#selectBasket").val() == "Yes" ? true : false;
   const isBasket = payload.unit.isBasket;
@@ -611,7 +617,7 @@ function formattedInputAttribut(type) {
   // costCenter
   payload.unitParent.isNew = false;
   payload.unitParent.unitCode = $("#selectOrgUnitParentName").val() || "";
-  payload.unitParent.unitName = $("#selectOrgUnitParentName option:selected").text() || "Operational Risk Papua-Maluku";
+  payload.unitParent.unitName = $("#selectOrgUnitParentName option:selected").text() || "";
   // directReport
   payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
   payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
@@ -1072,6 +1078,14 @@ function clearInputModal() {
   $("#modalSelectPrlOrgSubPos").val("").trigger("change");
   $("#modalSelectPrlOrgToSubPos").val("").trigger("change");
   $("#modalInputFormation").val("");
+
+  // find subPosDiv
+  const subPosDivs = $("[id^=subPosDiv]");
+  subPosDivs.each(function (index) {
+    if (index !== 0) {
+      $(this).remove();
+    }
+  });
 }
 
 async function modalSubPosition() {
@@ -1091,13 +1105,23 @@ async function modalSubPosition() {
   getDataList([
     // modalSelectPrlOrgSubPos
     {
-      dataId: "modalSelectPrlOrgSubPos",
+      dataId: "modalSelectPrlOrg",
       data: prl.map((item) => ({ id: item, text: item })),
       dropdownParent: $("#modalAddSubPosition"),
     },
     {
-      dataId: "modalSelectPrlOrgToSubPos",
+      dataId: "modalSelectPrlOrgTo",
       data: prl.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+    {
+      dataId: "modalSelectPrlOrgSubPos",
+      data: prlRange.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+    {
+      dataId: "modalSelectPrlOrgToSubPos",
+      data: prlRange.map((item) => ({ id: item, text: item })),
       dropdownParent: $("#modalAddSubPosition"),
     },
     {
@@ -1122,9 +1146,7 @@ async function editSubPosition(id) {
   // get local storage subJobPos
   const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
   const data = subJobPos.find((item) => item.subPosId == id);
-  console.log("id", id);
   console.log(data);
-  console.log(data.jobPositionName);
   $("#modalInputSubPosId").val(data.subPosId);
   if (data.careerLevel.careerLevelCode) {
     $("#modalSelectCareerLevel").append(
@@ -1138,8 +1160,23 @@ async function editSubPosition(id) {
   }
 
   $("#modalInputSubPositionName").val(data.jobPositionName);
-  $("#modalSelectPrlOrgSubPos").val(data.prlFrom).trigger("change");
-  $("#modalSelectPrlOrgToSubPos").val(data.prlTo).trigger("change");
+  $("#modalSelectPrlOrg").val(data.prlFrom).trigger("change");
+  $("#modalSelectPrlOrgTo").val(data.prlTo).trigger("change");
+
+  const prlOrg = data.prlFrom == data.prlTo ? data.prlFrom : `${data.prlFrom}-${data.prlTo}`;
+  if (data.formationBasket.length > 0) {
+    data.formationBasket.forEach((item, idx) => {
+      if (idx !== 0) addSubPos(item);
+      $("#modalSelectPrlOrgSubPos" + (idx === 0 ? "" : idx + 1)).append(
+        new Option(item.prlOrg, item.prlOrg, true, true)
+      );
+      $("#modalInputSubPositionName" + (idx === 0 ? "" : idx + 1)).val(item.positionName);
+    });
+  } else {
+    console.log("masuk basket non merge");
+    console.log({ prlOrg });
+    $("#modalSelectPrlOrgSubPos").val(prlOrg).trigger("change");
+  }
   $("#modalInputFormation").val(data.formation);
 }
 

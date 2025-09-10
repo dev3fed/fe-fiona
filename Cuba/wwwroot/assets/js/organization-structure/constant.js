@@ -34,7 +34,8 @@ const statusApprovalClass = {
   4: "label-primary-custom",
 };
 
-const prl = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28];
+const prl = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
+const prlRange = ["8-9", "10-11", "12-13", "14-15", "16-18", "19-21", "22-24", "25-26", "27-28"];
 
 // form position data
 const formPositionData = {
@@ -218,6 +219,7 @@ const formPositionParam = {
     isBasket: false,
     kbo: "",
     costCenter: "",
+    positionName: "",
   },
   careerType: {
     careerTypeCode: "",
@@ -297,10 +299,11 @@ const formPositionParam = {
       unitParentName: null,
       jobPositionName: null,
       layer: 1,
-      prlFrom: 8,
-      prlTo: 9,
+      prlFrom: 12,
+      prlTo: 15,
       prlPlan: 1,
       formation: 1,
+      formationBasket: [],
       careerLevel: {
         careerLevelCode: "",
         careerLevelName: "",
