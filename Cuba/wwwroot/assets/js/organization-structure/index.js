@@ -185,6 +185,7 @@ function confirmDeleteOption(value) {
 // modal confirm delete job
 async function confirmDeleteJob(unitCode) {
   const positionId = $("#inputOUCode").val();
+  const positionName = $("#jobName").val();
   const deleteOption = $("input[name='deleteOption']:checked").val();
   const tableVarious = $("#editMoveVariousTable");
   const data = tableVarious.DataTable().rows().data().toArray();
@@ -194,6 +195,14 @@ async function confirmDeleteJob(unitCode) {
   }));
   const dataSelectFiltered = dataSelect.filter((item) => item.unitCodeParent != "" && item.unitCodeParent != null);
   if (deleteOption == "deleteAll") {
+    const willProceed = await confirmFunction(
+      "Confirm Delete",
+      "Are you sure you want to delete " + positionName + " ?"
+    );
+    if (!willProceed) {
+      return; // User cancelled, exit function
+    }
+    loader(true);
     const deleteData = await draftJobDelete({
       draftId: organizationAttribute.orgUnitId,
       unitCode: positionId,
@@ -205,12 +214,26 @@ async function confirmDeleteJob(unitCode) {
       // hide modal
       $("#modalConfirm").modal("hide");
     }
+    loader(false);
   } else if (deleteOption == "deleteMoveSpesific") {
     const geteditSelectNewValue = $("#editSelectNew").val();
+    console.log("geteditSelectNewValue", geteditSelectNewValue);
+    if (geteditSelectNewValue == "" || geteditSelectNewValue == null) {
+      swal("Error", "Please select direct report", "error");
+      return;
+    }
+    const willProceed = await confirmFunction(
+      "Confirm Delete & Move",
+      "Are you sure you want to delete " + positionName + " & move subordinates?"
+    );
+    if (!willProceed) {
+      return; // User cancelled, exit function
+    }
     const movePosition = dataSelect.map((item) => ({
       unitCode: item.unitCode,
       unitCodeParent: geteditSelectNewValue,
     }));
+    loader(true);
     await moveJob(movePosition);
     const deleteData = await draftJobDelete({
       draftId: organizationAttribute.orgUnitId,
@@ -223,7 +246,24 @@ async function confirmDeleteJob(unitCode) {
       // hide modal
       $("#modalConfirm").modal("hide");
     }
+    loader(false);
   } else {
+    if (!dataSelectFiltered.length) {
+      swal("Error", "Please select direct report", "error");
+      return;
+    }
+    if (!dataSelectFiltered.length) {
+      swal("Error", "Please select direct report", "error");
+      return;
+    }
+    const willProceed = await confirmFunction(
+      "Confirm Delete & Move",
+      "Are you sure you want to delete " + positionName + " & move subordinates?"
+    );
+    if (!willProceed) {
+      return; // User cancelled, exit function
+    }
+    loader(true);
     await moveJob(dataSelectFiltered);
     const deleteData = await draftJobDelete({
       draftId: organizationAttribute.orgUnitId,
@@ -236,7 +276,10 @@ async function confirmDeleteJob(unitCode) {
       // hide modal
       $("#modalConfirm").modal("hide");
     }
+    loader(false);
   }
+  changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
+  focusNode(positionId);
 }
 
 // handle edit job
@@ -482,11 +525,25 @@ async function moveJob(dataSelectFiltered) {
   }
 }
 
+function confirmFunction(title, text) {
+  // give alert confirm
+  return swal({
+    title: title || "Are you sure?",
+    text: text || "Make sure all data is correct before proceeding.",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((willProceed) => {
+    return willProceed; // true if user clicks OK, false if user clicks Cancel
+  });
+}
+
 // confirm edit job
 async function confirmEditJob() {
   const positionId = $("#inputOUCode").val();
   const editPositionBox = $("input[name='editPositionBox']:checked").val();
   if (editPositionBox == "editSelf") {
+    loader(true);
     window.location.href = "/organization/form-position?unitCode=" + positionId;
   } else {
     const table = $("#editMoveVariousTable");
@@ -499,95 +556,22 @@ async function confirmEditJob() {
 
     // takeout data if directReportId is empty or ''
     const dataSelectFiltered = dataSelect.filter((item) => item.unitCodeParent != "" && item.unitCodeParent != null);
-    console.log("dataSelectFiltered", dataSelectFiltered);
+    if (!dataSelectFiltered.length) {
+      swal("Error", "Please select direct report", "error");
+      return;
+    }
+    const willProceed = await confirmFunction("Confirm Move", "Are you sure you want to move subordinates?");
+    if (!willProceed) {
+      return; // User cancelled, exit function
+    }
 
+    loader(true);
     const result = await moveJob(dataSelectFiltered);
-    swal("Success", "position has been moved to new  parent position", "success");
-    $("#modalConfirm").modal("hide");
-    return;
-    // if (!dataSelectFiltered.length) {
-    //   alert("Please select direct report");
-    //   return;
-    // }
-    // dataSelectFiltered.forEach((item) => {
-    //   const position = lsListPosition.find((x) => x.positionId == item.positionId);
-    //   const directReport = lsListPosition.find((x) => x.positionId == item.directReportId);
-
-    //   // update listPosition
-    //   // update directReportId
-    //   const indexPosition = lsListPosition.findIndex((x) => x.positionId == item.positionId);
-    //   lsListPosition[indexPosition].directReportId = parseInt(item.directReportId);
-    //   lsListPosition[indexPosition].directReport = directReport.position;
-
-    //   lsListPosition[indexPosition].draftId = organizationAttribute.orgUnitId;
-    //   lsListPosition[indexPosition].type = "edit";
-
-    //   const payload = {
-    //     positionId: item.positionId,
-    //     draftId: organizationAttribute.orgUnitId,
-    //     // add other necessary properties here
-    //   };
-
-    //   console.log("item.directReportId", item.directReportId);
-    //   const checkData = lsListDetailDraft.find(
-    //     (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-    //   );
-
-    //   if (checkData) {
-    //     const index = lsListDetailDraft.findIndex(
-    //       (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-    //     );
-    //     lsListDetailDraft[index] = lsListPosition[indexPosition];
-    //   } else {
-    //     lsListDetailDraft.push(lsListPosition[indexPosition]);
-    //   }
-
-    //   // update listDraftOrgNode and listOrgNode
-    //   const indexOrgNode = lsListOrgNode.findIndex((x) => x.id_position == item.positionId);
-    //   console.log(indexOrgNode);
-    //   lsListOrgNode[indexOrgNode].id_position_atasan_langsung = parseInt(item.directReportId);
-    //   lsListOrgNode[indexOrgNode].pid = parseInt(item.directReportId);
-    //   lsListOrgNode[indexOrgNode].tags.push("edit");
-    //   lsListOrgNode[indexOrgNode].draft_id = organizationAttribute.orgUnitId;
-    //   lsListOrgNode[indexOrgNode].type = "edit";
-
-    //   const checkData2 = lsListDraftOrgNode.find(
-    //     (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
-    //   );
-    //   if (checkData2) {
-    //     const index = lsListDraftOrgNode.findIndex(
-    //       (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
-    //     );
-    //     lsListDraftOrgNode[index] = lsListOrgNode[indexOrgNode];
-    //   } else {
-    //     lsListDraftOrgNode.push(lsListOrgNode[indexOrgNode]);
-    //   }
-    //   // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-    //   localStorage.setItem("listDraftDetail", JSON.stringify(lsListDetailDraft));
-    //   // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-    //   localStorage.setItem("listDraftOrgNode", JSON.stringify(lsListDraftOrgNode));
-    // });
-
-    // return;
-
     changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
-    getDataOrganization(organizationAttribute.orgUnitId);
     $("#modalConfirm").modal("hide");
     swal("Success", "Job has been edited", "success");
+    loader(false);
     focusNode(positionId);
-    // const checkData = lsListDetailDraft.find(
-    //   (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-    // );
-    // console.log("checkData 1", checkData, payload.draftId);
-
-    // if (checkData) {
-    //   const index = lsListDetailDraft.findIndex(
-    //     (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
-    //   );
-    //   lsListDetailDraft[index] = payload;
-    // } else {
-    //   lsListDetailDraft.push(payload);
-    // }
   }
 }
 

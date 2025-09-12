@@ -80,10 +80,10 @@ async function saveAsDraft() {
   const positionId = urlParams.get("unitCode");
   let type = "create";
   if (positionId) type = "edit";
+  hideModal(`modalConfirm`);
   loader(true);
   const save = await saveInputAttribut(type);
-  if (save) {
-    hideModal(`modalConfirm`);
+  if (save.status == 200) {
     loader(false);
     swal("Saved", "Save as Draft", "success");
     const getPosition =
@@ -95,6 +95,10 @@ async function saveAsDraft() {
       window.location.href =
         "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
     }, 2500);
+  } else {
+    const message = save.message || save.title || "Failed to save job .";
+    swal("Error", message, "error");
+    loader(false);
   }
 }
 
@@ -232,6 +236,7 @@ function checkBasketSelected(selectBasket) {
   $("#inputOrgUnitName").prop("disabled", false);
   // alert("masuk");
   if (selectBasket == "Yes") {
+    $("#inputOrgUnitName").val($("#inputPositionName").val());
     // alert("masuk 1");
     const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
     // $("#prlOrgDiv, #prlOrgToDiv").removeClass("col-md-4").addClass("col-md-6");
@@ -396,12 +401,24 @@ $(document).ready(async function () {
     // Check all form controls with required attribute
     const form = document.querySelectorAll(".form-control[required], .form-select[required]");
     let hasErrors = false;
+    const isBasket = $("#selectBasket").val();
 
     form.forEach((input) => {
       const type = input.type || input.tagName.toLowerCase();
       const value = input.value.trim();
+      if (isBasket === "Yes" && (input.name === "selectCareerLevel" || input.id === "inputFormation")) {
+        // Skip validation for career level and job family if basket is "Yes"
+        return;
+      } else {
+        if (input.name === "prlOrgTo") {
+          return;
+        }
+      }
+
+      // Skip validation for certain fields if basket is "Yes"
 
       if (type === "text" || type === "number" || type === "email") {
+        console.log("masuk sini", value);
         if (!value) {
           input.classList.add("is-invalid");
           hasErrors = true;
@@ -428,7 +445,11 @@ $(document).ready(async function () {
           }
         }
       }
+      console.log("hasErrors", hasErrors);
+      console.log("input", input);
+      console.log("value", value);
     });
+    // console.log errornya dimana
 
     return !hasErrors; // Return true if no errors, false if there are errors
   }

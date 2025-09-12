@@ -407,40 +407,14 @@ function getTableListApproval(params) {
   });
 }
 
-function getTableListDraftDetail(params, lastPath) {
+function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "user" }) {
   if ($.fn.DataTable.isDataTable("#draftListDetail")) {
     $("#draftListDetail").DataTable().destroy();
   }
-  const buttons =
-    lastPath === "draft-detail"
-      ? [
-          {
-            text: '<img src="/assets/images/rasci/plus.svg" alt="" style="margin-top: -1px;margin-right: 2px;"> Add Job Title',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              addJobTitle();
-            },
-          },
-          {
-            text: '<img src="/assets/images/rasci/download.svg" alt="download icon" style="margin-top: -1px;margin-right: 2px;"> Import',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              importDraft();
-            },
-          },
-          {
-            text: '<img src="/assets/images/rasci/upload.svg" alt="upload icon" style="margin-top: -1px;margin-right: 2px;"> Export',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              exportDraft();
-            },
-          },
-        ]
-      : [];
 
   $("#draftListDetail").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-    buttons: buttons,
+    buttons: [],
     autoWidth: false,
     data: params,
     sort: false,
@@ -488,7 +462,12 @@ function getTableListDraftDetail(params, lastPath) {
         width: "25%",
         data: null,
         render: function (data) {
-          return checkButtonTable("positionList", data.unitCode, window.location.pathname.split("/").pop());
+          return checkButtonTable(
+            "positionList",
+            data.unitCode,
+            window.location.pathname.split("/").pop(),
+            getStatusDraft
+          );
         },
       },
     ],

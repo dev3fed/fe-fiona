@@ -172,20 +172,24 @@ async function confirmSubmit(id) {
 }
 
 async function confirmSubmitApproval(id) {
+  loader(true);
   const draftId = urlParams.get("draftId");
   await draftApprove(draftId);
   const getDataDraft = await draftDetailById(draftId);
   checkButtonDraftDetail(getDataDraft.data);
   $("#modalConfirm").modal("hide");
   swal("Approved", "draft has been approved.", "success");
+  loader(false);
 }
 async function confirmRejectApproval(id) {
+  loader(true);
   const draftId = urlParams.get("draftId");
   await draftReject(draftId, rejectReason);
   const getDataDraft = await draftDetailById(draftId);
   checkButtonDraftDetail(getDataDraft.data);
   $("#modalConfirm").modal("hide");
   swal("Rejected", "draft has been rejected.", "success");
+  loader(false);
 }
 
 async function previewDesignCost() {
@@ -350,6 +354,10 @@ async function detailPositionDraft(id) {
   await modalJobPopup(id);
 }
 
+async function detailapproval(id) {
+  await modalJobPopup(id);
+}
+
 async function confirmRollback(unitCode) {
   // alert("confirmRollback" + unitCode);
   const rollback = await deleteJobAndSubordinates({
@@ -434,6 +442,9 @@ function rejectApproval() {
 }
 
 function checkButtonDraftDetail(data) {
+  const urlParts = window.location.pathname.split("/");
+  const lastPath = urlParts.pop() || urlParts.pop();
+  console.log("lastPath", lastPath);
   // hideModal(`modalConfirm`);
   // console.log("getDataDraft.data", data);
   const submitApprovalButton = $("#submitApproval");
@@ -451,19 +462,25 @@ function checkButtonDraftDetail(data) {
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
   finalizeConfirm.hide();
-  if (data.isSubmitted) {
+  // data.isRejected = true;
+  let step = 0;
+  let userRole = "admin";
+  if (data?.isSubmitted) {
+    step = 1;
     submitApprovalButton.hide();
     acceptApprovalButton.show();
     rejectApprovalButton.show();
   }
 
-  if (data.isRejected) {
+  if (data?.isRejected) {
+    step = 2;
     submitApprovalButton.show();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
   }
 
-  if (data.isApproved) {
+  if (data?.isApproved) {
+    step = 3;
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
@@ -471,7 +488,8 @@ function checkButtonDraftDetail(data) {
     deleteDraft.hide();
   }
 
-  if (data.isFinalized) {
+  if (data?.isFinalized) {
+    step = 4;
     submitApprovalButton.hide();
     finalizeConfirm.hide();
     deleteDraft.hide();
@@ -482,15 +500,27 @@ function checkButtonDraftDetail(data) {
   } else {
     finalizeConfirm.hide();
   }
+
+  if (lastPath === "approval-detail") {
+    $("#editDraftName,#submitApproval,#downloadTemplate, #exportDataDraft, #importDataDraft").hide();
+  }
+
+  return { step, userRole };
 }
 
 $("#finalizeConfirm").on("click", async function () {
   // alert('masok')
+  loader(true);
   const file = $("#file-input")[0].files[0];
   const sendFinalize = await draftFinalize(organizationAttribute.orgUnitId, file);
-  if (sendFinalize) {
+  if (sendFinalize.status == 200) {
     hideModal(`modalUploadFinalized`);
+    loader(false);
     swal("Success", "Draft has been finalized", "success");
+  } else {
+    const message = sendFinalize?.message ?? "Failed to finalize draft";
+    swal("Failed", message, "error");
+    loader(false);
   }
 });
 
@@ -510,9 +540,10 @@ $(document).ready(async function () {
   checkDataOrganization();
   await initializeDraftDetail(getDataDraft.data);
 
-  checkButtonDraftDetail(getDataDraft.data);
+  const getStatusDraft = checkButtonDraftDetail(getDataDraft.data);
+  console.log("getStatusDraft", getStatusDraft);
   // checkPage();
-  getTableListDraftDetail(getDataListDraft.data);
+  getTableListDraftDetail(getDataListDraft.data, getStatusDraft);
   uploadFinalizeHandler();
 
   $(".tab-custom").on("click", function () {

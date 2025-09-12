@@ -438,7 +438,8 @@ i.jstree-icon.jstree-ocl {
 }
 
 @media (min-width: 1200px) {
-  .modal-xl {
-    max-width: 1500px;
+  /*  */
+  .modal-xl-custom-larger {
+    max-width: 1400px !important;
   }
 }

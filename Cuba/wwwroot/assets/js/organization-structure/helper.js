@@ -1644,9 +1644,9 @@ function hideModal(id) {
   $("#" + id).modal("hide");
 }
 
-function checkButtonTable(buttonTable, id, lastPath) {
-  const user = localStorage.getItem("user") === "admin" ? "admin" : "admin";
-  const status = "2";
+function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0, userRole: "user" }) {
+  const user = getStatusDraft.userRole;
+  const status = getStatusDraft.step;
   // swith case by parameter buttonTable and lastPath
   switch (buttonTable) {
     case "deleteMoveVariousTable":
@@ -1673,6 +1673,9 @@ function checkButtonTable(buttonTable, id, lastPath) {
         const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailPositionDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+        if (status >= 3) {
+          return `${detailPositionDraft}`;
+        }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
       } else {
         const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
@@ -1681,6 +1684,7 @@ function checkButtonTable(buttonTable, id, lastPath) {
     case "draftList":
       const detailDraft = `<button class="btn-custom-outline-dark" onclick="detailDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
       const deleteDraft = `<button class="btn-custom-outline-danger" onclick="deleteDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+
       return `${detailDraft} ${deleteDraft}`;
     case "approvalList":
       const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
