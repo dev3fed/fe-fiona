@@ -328,6 +328,22 @@ async function fetchLoghistoryList(payload) {
   }
 }
 
+async function fetchExportRasciMatrix(payload) {
+  const url = `${url_api}/api/rasci-matrix/draft/export`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchApprovalList(payload) {
   const url = `${url_api}/api/rasci-matrix/draft/list/approval?${payload}`;
   try {

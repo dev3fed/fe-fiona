@@ -1,4 +1,7 @@
 const handleDetailCompetency = async (type, id) => {
+  console.log("first", id);
+  console.log("first", type);
+
   // open modal dengan id modalDetailCompe
   const dataDetail = await fetchCompetencyDetail(id);
   const modal = new bootstrap.Modal(document.getElementById("modalDetailCompe"));

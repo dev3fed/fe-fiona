@@ -316,6 +316,7 @@ async function applySearch() {
           setState("payloadPosition", payloadJob);
           setState("payloadProsbis", payload);
           setState("actionType", "POS_THEN_BP");
+          setState("actionExport", "searchByPosition");
           setState("resultProsbis", resultMatrix.data);
           setState("resultJabatan", resultPosition.data);
           setState("totalProsbis", resultMatrix.totalResult);
@@ -368,6 +369,7 @@ async function applySearch() {
           setState("payloadProsbis", payloadByBusiness);
           setState("payloadPosition", payloadJob);
           setState("actionType", "BP_THEN_JOB");
+          setState("actionExport", "searchByBusiness");
           setState("resultProsbis", resultMatrix.data);
           setState("resultJabatan", resultPosition.data);
           setState("totalProsbis", resultMatrix.totalResult);
@@ -408,6 +410,7 @@ async function applySearch() {
           setState("payloadProsbis", payloadBusiness);
           setState("resultProsbis", resultMatrix.data);
           setState("actionType", "BP_ONLY");
+          setState("actionExport", "searchBusinessProcess");
           setState("resultJabatan", []);
           setState("totalProsbis", resultMatrix.totalResult);
           setState("totalJob", 0);
@@ -426,3 +429,76 @@ async function applySearch() {
       break;
   }
 }
+const handleExportMatrix = async () => {
+  try {
+    const payloadProsbis = getState("payloadProsbis");
+    const payloadPosition = getState("payloadPosition");
+    const actionExport = getState("actionExport");
+
+    let payload = {};
+    let filename = "rasci_matrix_export.xlsx";
+
+    switch (actionExport) {
+      case "searchBusinessProcess":
+        payload = {
+          draftRasciId: payloadProsbis.draftRasciId || null,
+          indexNumber: payloadProsbis.indexNumber || [],
+          type: "BusinessProcess",
+          unitCode: null,
+          prlOrg: null,
+          level: null,
+          rasciNotation: null,
+        };
+        break;
+      case "searchByBusiness":
+        payload = {
+          draftRasciId: payloadProsbis.draftRasciId || null,
+          indexNumber: payloadProsbis.indexNumber || [],
+          type: null,
+          unitCode: null,
+          prlOrg: null,
+          level: null,
+          rasciNotation: null,
+        };
+        break;
+      case "searchByPosition":
+        payload = {
+          draftRasciId: payloadPosition.draftRasciId || null,
+          indexNumber: null,
+          type: null,
+          unitCode: payloadPosition.unitCode,
+          prlOrg: payloadProsbis.prlOrg,
+          level: null,
+          rasciNotation: null,
+        };
+        break;
+      case "filterRasci":
+        payload = {
+          draftRasciId: payloadProsbis.draftRasciId || null,
+          indexNumber: null,
+          type: "filter",
+          unitCode: payloadProsbis.unitCode || [],
+          prlOrg: payloadProsbis.prlOrg || [],
+          level: payloadProsbis.level || [],
+          rasciNotation: payloadProsbis.rasciNotation || [],
+        };
+        break;
+      default:
+        return;
+    }
+
+    const result = await fetchExportRasciMatrix(payload);
+    if (result.status === 200) {
+      const blob = new Blob([result.data], { type: "application/vnd.ms-excel" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch (error) {
+    console.error("Export failed:", error);
+  }
+};

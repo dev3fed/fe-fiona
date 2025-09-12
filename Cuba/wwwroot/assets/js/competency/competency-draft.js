@@ -51,7 +51,7 @@ function loadTableBodyDraft(dataList) {
             </small>
           </td>
           <td style="width: 120px;text-align:center">
-            <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail(${val.id})">
+            <button class="btn btn-outline-primary" type="button" onclick="handleOpenDetail('${val.draftId}')">
               <i class="icon-eye"></i> 
             </button>
             <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="handleDeleteCompeDraft('${
@@ -416,6 +416,7 @@ const confirmDeletecompeDraft = async () => {
 };
 
 async function handleOpenDetail(id) {
+  console.log("first", id);
   try {
     const draftDetail = document.getElementById("draft-detail");
     const mainCompetency = document.getElementById("main-competency");

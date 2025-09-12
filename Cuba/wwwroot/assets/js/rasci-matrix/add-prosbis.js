@@ -683,7 +683,7 @@ function formValidation() {
   // console.log("selectedValue", selectedValue);
   // const btnSelectedJob = document.getElementById("btn-selectedjob");
   // btnSelectedJob.disabled = true;
-  document.getElementById("saveDraftBtn").disabled = !isValid;
+  document.getElementById("btn-savebp").disabled = !isValid;
 }
 
 document.querySelectorAll("input, select, textarea").forEach((input) => {

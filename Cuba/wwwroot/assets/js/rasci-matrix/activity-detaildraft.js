@@ -76,24 +76,41 @@ async function deleteActivitydraft() {
 }
 async function triggleEditActivitybp(id) {
   const draftRasciId = getState("draftRasciId");
-  console.log("first", id);
-  console.log("draftRasciId", draftRasciId);
   const rasciNotation = getState("rasciNotation") || [];
-  const dataProsbis = getState("insertProsbis");
   const draftName = $("#dataSource-rasci option:selected").text();
-  console.log("first", draftName);
+  const selectedOption = $("#dataSource-rasci option:selected");
+  const draftSoId = selectedOption.data("draftso");
   const url = `${draftRasciId}?draftListId=${id}`;
   const dataActivity = await fetchDetailDraftActivity(url);
-  console.log("dataActivity", dataActivity);
+  const dataHeader = dataActivity?.data.businessProcess;
+  const dataFooter = dataActivity?.data.rasciMapping;
+  const detailActivity = {
+    draftId: draftRasciId,
+    draftType: "Edit Business Notation",
+    draftName,
+    parentId: dataHeader?.parentId,
+    businessProcessName: dataHeader?.businessProcessName,
+    level: dataHeader?.level,
+    draftJobSource: draftSoId,
+    jobMapped: dataFooter.map(({ unitCode, prlOrg, rasciData, positionName }) => ({
+      jobName: positionName,
+      orgUnitCode: unitCode,
+      orgPrl: prlOrg,
+      rasciNotation: rasciData.map(({ notation, comment }) => ({
+        rasciCode: notation,
+        comment,
+        isChecked: Boolean(notation),
+      })),
+    })),
+  };
+  setState("insertProsbis", detailActivity);
   const resultLevel = await fetchSelectLevel(draftRasciId);
   const modal = new bootstrap.Modal(document.getElementById("ModalEditActivitybp"));
   modal.show();
-  const dataHeader = dataActivity?.data.businessProcess;
-  const dataFooter = dataActivity?.data.rasciMapping;
+
   try {
     if (resultLevel.status === 200) {
       const listLevel = resultLevel?.data.result;
-      console.log("first", listLevel);
       const formContent = `
     <div class="col-2">
       <div class="mb-3">
@@ -114,7 +131,7 @@ async function triggleEditActivitybp(id) {
     <div class="col-12">
       <div>
         <label class="form-label">Business Process Name</label>
-        <textarea class="form-control">${dataHeader.businessProcessName}</textarea>
+        <textarea class="form-control" id="editBpName">${dataHeader.businessProcessName}</textarea>
       </div>
     </div>`;
       const bodySelectJob = `
@@ -128,7 +145,7 @@ async function triggleEditActivitybp(id) {
           </tr>`;
 
       editTblNotation(rasciNotation);
-      cardSelectedEditJoblist(dataFooter);
+      cardSelectedEditJoblist(detailActivity);
       document.getElementById("edit-select-job").innerHTML = bodySelectJob;
       document.getElementById("tbl-edit-bp-header").innerHTML = theadContent;
 
@@ -141,24 +158,26 @@ async function triggleEditActivitybp(id) {
   } catch (error) {}
 }
 const cardSelectedEditJoblist = (param) => {
-  const bodyJoblist = param
+  const bodyJoblist = param.jobMapped
     .map((value) => {
-      // const rasciNotation = value.rasciData.filter((item) => item.isChecked);
+      const rasciNotation = value.rasciNotation.filter((item) => item.isChecked);
       return `<div class="card-listjob mb-2">
           <div class="row">
             <div class="col-10">
-              <span style="font-size:13px;font-weight:bold">${value.positionName}</span>
+              <span style="font-size:13px;font-weight:bold">${value.jobName}</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
-              <button class="btn btn-outline-danger btn-sm " type="button"  style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
+              <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteActivityJob(${
+                value.orgUnitCode
+              })" style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
                 <i class="icon-trash" style="font-size: 14px;padding-right:2px"></i>
               </button>
             </div> 
-              ${value.rasciData
+              ${rasciNotation
                 .map((letter) => {
                   return `<div class="col-1 mb-1">
-                          <img src="/assets/images/rasci/${letter.notation.toLowerCase()}.svg" alt="${
-                    letter.notation
+                          <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
+                    letter.rasciCode
                   } Icon" style="padding-right:2px">
                   </div>
                   <div class="col-11" style="text-align:left">
@@ -172,6 +191,14 @@ const cardSelectedEditJoblist = (param) => {
     })
     .join("");
   document.getElementById("selected-edit-job").innerHTML = bodyJoblist;
+};
+
+const deleteActivityJob = (id) => {
+  const dataProsbis = getState("insertProsbis");
+  const removeData = dataProsbis.jobMapped.filter((item) => Number(item.orgUnitCode) !== Number(id));
+  const result = { ...dataProsbis, jobMapped: removeData };
+  setState("insertProsbis", result);
+  cardSelectedEditJoblist(result);
 };
 
 const editTblNotation = (rasciNotation) => {
@@ -209,41 +236,92 @@ const editTblNotation = (rasciNotation) => {
 };
 
 const selectProsbisPosition = () => {
-  // const selectedJobId = $("#jobId");
-  // const selectedParentId = document.getElementById("parentId");
-  // const selectedValue = selectedJobId.val();
-  // const selectedParentValue = selectedParentId.value;
-  // const jobName = selectedJobId.find(":selected").text();
-  // const dataProsbis = getState("insertProsbis") || {};
+  const selectedJobId = $("#jobeditId");
+  const selectedValue = selectedJobId.val();
+  const jobName = selectedJobId.find(":selected").text();
+  const dataProsbis = getState("insertProsbis") || {};
   const rasciNotation = getState("rasciNotation") || [];
   console.log("first", rasciNotation);
-  // const [orgUnitCode, orgPrl] = selectedValue.split(";");
+  const [orgUnitCode, orgPrl] = selectedValue.split(";");
 
-  // const payload = {
-  //   ...dataProsbis,
-  //   parentId: selectedParentValue,
-  //   jobMapped: [
-  //     ...dataProsbis.jobMapped,
-  //     {
-  //       jobName,
-  //       orgUnitCode: orgUnitCode,
-  //       orgPrl: orgPrl,
-  //       rasciNotation: rasciNotation,
-  //     },
-  //   ],
-  // };
-  // setState("insertProsbis", payload);
-  // setTimeout(() => {
-  //   selectedJobId.val(null).trigger("change");
-  //   const updatedRasciNotation = rasciNotation.map((letter) => {
-  //     return { ...letter, comment: "", isChecked: false };
-  //   });
-  //   setState("rasciNotation", updatedRasciNotation);
-  //   tblNotation(updatedRasciNotation);
-  //   cardSelectedJoblist(payload);
-  // }, 200);
+  const payload = {
+    ...dataProsbis,
+    jobMapped: [
+      ...dataProsbis.jobMapped,
+      {
+        jobName,
+        orgUnitCode: orgUnitCode,
+        orgPrl: orgPrl,
+        rasciNotation: rasciNotation,
+      },
+    ],
+  };
+  console.log("first", payload);
+  setState("insertProsbis", payload);
+  setTimeout(() => {
+    selectedJobId.val(null).trigger("change");
+    const updatedRasciNotation = rasciNotation.map((letter) => {
+      return { ...letter, comment: "", isChecked: false };
+    });
+    setState("rasciNotation", updatedRasciNotation);
+    editTblNotation(updatedRasciNotation);
+    cardSelectedEditJoblist(payload);
+  }, 200);
 };
-
+$(document).on("change", "#jobeditId", function () {
+  const jobId = $("#jobeditId").val();
+  const inputProsbis = $("#editBpName").val();
+  const btn = $("#btnSelectPosition");
+  if (jobId && inputProsbis && inputProsbis.trim().length > 0) {
+    btn.prop("disabled", false);
+  } else {
+    btn.prop("disabled", true);
+  }
+});
+const saveEditBpchange = async () => {
+  try {
+    const dataProsbis = getState("insertProsbis");
+    const draftRasciId = getState("draftRasciId");
+    const spinner = document.getElementById("saveChangeSpinner");
+    const editBpNameValue = document.getElementById("editBpName")?.value;
+    spinner.style.display = "inline-block";
+    const inputValue = {
+      ...dataProsbis,
+      businessProcessName: editBpNameValue,
+    };
+    console.log("dataProsbis", inputValue);
+    const result = await submitDraftProsbis(inputValue);
+    if (result.status === 200) {
+      const ModalEditActivitybp = document.getElementById("ModalEditActivitybp");
+      const modal = bootstrap.Modal.getInstance(ModalEditActivitybp);
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Data change has been saved</span>
+              `,
+          },
+        },
+      }).then(async () => {
+        spinner.style.display = "none";
+        if (modal) modal.hide();
+        const payload = {
+          Page: 1,
+          PageSize: 5,
+        };
+        const queryString = new URLSearchParams(payload).toString();
+        const listData = await fetchDraftListProsbis(draftRasciId, queryString);
+        renderTableActivity(listData);
+      });
+    }
+  } catch (error) {
+    console.error("Error saving draft:", error);
+  }
+};
 function select2EditJob() {
   const draftRasciId = $("#dataSource-rasci").val();
   let $select = $("#dataSource-rasci");
@@ -617,9 +695,7 @@ async function detailAddNotation(id, draftRasciId) {
   if (modalTitle) {
     modalTitle.innerHTML = `Add/Edit RASCI Activity Detail `;
   }
-  // Looping detailInfo.mappingData untuk membuat baris tabel dinamis
-
-  // Generate table body with comment icons for old and new notation
+  setState("dataEditNotActivity", detailInfo);
   const contentBody = `
       <div class="row">
         <div class="col-12 ">
@@ -631,8 +707,21 @@ async function detailAddNotation(id, draftRasciId) {
            <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;"> Add RASCI
          </button>
         </div>
-        <div class="col-12 ">
-       <div class="card-tblbusiness" style=" max-height: 300px;">
+        ${renderTableEditnotActivity(detailInfo)}
+      </div>
+  `;
+
+  const contentDetailDraftEditnotComponent = document.getElementById("contentdetailEditnitation");
+  if (contentDetailDraftEditnotComponent) {
+    contentDetailDraftEditnotComponent.innerHTML = contentBody;
+  }
+  feather.replace();
+  initializeTooltips();
+}
+const renderTableEditnotActivity = (detailInfo) => {
+  try {
+    `<div class="col-12 ">
+        <div class="card-tblbusiness" style=" max-height: 300px;">
          <div class="table-responsive scrollable mt-1" style=" max-height: 260px;">
              <table class="table tbl-border-notation">
                  <thead>
@@ -676,58 +765,68 @@ async function detailAddNotation(id, draftRasciId) {
                             }
 
                             return `
-                          <tr>
-                          <td>${idx + 1}</td>
-                          <td>${item.level || "-"}</td>
-                          <td style="text-align:center">${item.indexNo || "-"}</td>
-                          <td>
-                            ${item.businessProcessName || "-"}
-                            ${
-                              item.businessProcessReference
-                                ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
-                                : ""
-                            }
-                          </td>
-                          <td style="text-align:center">
-                            ${
-                              Array.isArray(item.oldNotation)
-                                ? item.oldNotation
-                                    .map(
-                                      (n, i) =>
-                                        `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
-                                          n.value
-                                        } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
-                                    )
-                                    .join("")
-                                : "-"
-                            }
-                            ${
-                              oldCommentTooltip
-                                ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
-                                : ""
-                            }
-                          </td>
-                          <td style="text-align:center">
-                            ${
-                              item.newNotation && item.newNotation.value
-                                ? `<img src="/assets/images/rasci/${item.newNotation.value.toLowerCase()}.svg" alt="${
-                                    item.newNotation.value
-                                  } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`
-                                : "-"
-                            }
-                            ${
-                              newCommentTooltip && item.newComment.value
-                                ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${newCommentTooltip}">`
-                                : ""
-                            }
-                          </td>
-                          <td style="text-align:center">
-                            <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditNotation()">
-                            <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
-                            </button>
-                          </td>
-                          </tr>
-                        `;
+                              <tr>
+                              <td>${idx + 1}</td>
+                              <td>${item.level || "-"}</td>
+                              <td style="text-align:center">${item.indexNo || "-"}</td>
+                              <td>
+                                ${item.businessProcessName || "-"}
+                                ${
+                                  item.businessProcessReference
+                                    ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
+                                    : ""
+                                }
+                              </td>
+                              <td style="text-align:center">
+                                ${
+                                  Array.isArray(item.oldNotation)
+                                    ? item.oldNotation
+                                        .map(
+                                          (n, i) =>
+                                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                                              n.value
+                                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                                        )
+                                        .join("")
+                                    : "-"
+                                }
+                                ${
+                                  oldCommentTooltip
+                                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
+                                    : ""
+                                }
+                              </td>
+                              <td style="text-align:center">
+                                ${
+                                  Array.isArray(item.newNotation) && item.newNotation.length > 0
+                                    ? item.newNotation
+                                        .map(
+                                          (n, i) =>
+                                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                                              n.value
+                                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                                        )
+                                        .join("")
+                                    : "-"
+                                }
+                                ${
+                                  Array.isArray(item.newNotation) && item.newNotation.some((n) => n.comment)
+                                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${item.newNotation
+                                        .filter((n) => n.comment)
+                                        .map((n) => `${n.value} : ${n.comment}`)
+                                        .join("<br>")}">`
+                                    : ""
+                                }
+                              </td>
+                              <td style="text-align:center">
+                                <button class="btn btn-outline-light btn-small-icon" type="button" onclick='handleEditNotation(JSON.parse(this.getAttribute("data-detail")), "${
+                                  dataActivity.data.businessProcess
+                                }","${dataActivity.data.indexNumber}")' data-detail='${JSON.stringify(item)}'>
+                                <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
+                                </button>
+                              </td>
+                              </tr>
+                            `;
                           })
                           .join("")
                   }
@@ -735,30 +834,126 @@ async function detailAddNotation(id, draftRasciId) {
              </table>
             </div>
           </div>
-        </div>
-      </div>
-  `;
-
-  const contentDetailDraftEditnotComponent = document.getElementById("contentdetailEditnitation");
-  if (contentDetailDraftEditnotComponent) {
-    contentDetailDraftEditnotComponent.innerHTML = contentBody;
-  }
-  // const url = `${draftRasciId}?draftListId=${id}`;
-  // const dataActivity = await fetchDetailDraftActivity(url);
-  // console.log("dataActivity", dataActivity);
+        </div>`;
+  } catch (error) {}
+};
+function tblChangeNotationActivity(rasciNotation) {
+  const rasciRows = rasciNotation
+    .map(
+      (letter) => `
+    <tr>
+      <th scope="row">
+        <label class="radio-label" for="checked-body-bp">
+          <input class="checkbox_animated" 
+                 id="checked-${letter.rasciCode.toLowerCase()}" 
+                 type="checkbox" 
+                 data-rasci="${letter.rasciCode}" 
+                 ${letter.isChecked ? "checked" : ""} 
+                 onclick="onCheck(event, '${letter.rasciCode}')">
+        </label>
+      </th>
+      <td style="text-align:center">
+        <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
+        letter.rasciCode
+      } Icon" style="padding-right:2px">
+      </td>
+      <td>
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
+          value="${letter.comment || ""}"
+          ${!letter.isChecked ? "disabled" : ""}
+          oninput="updateComment('${letter.rasciCode}', this.value)">
+      </td>
+    </tr>
+  `,
+    )
+    .join("");
+  let tdBody = rasciRows;
+  document.getElementById("tbl-activityeditnot-body").innerHTML = tdBody;
 }
 
-const handleEditNotation = () => {
-  console.log("first");
-  const modal = new bootstrap.Modal(document.getElementById("modalActivityEditnot"));
-  modal.show();
+const handleEditNotation = (detail, prosbisName, indexNumber) => {
+  console.log("first", detail);
+  console.log("first", prosbisName);
+
   // console.log("data", data);
   // console.log("dataChangeNotasi", dataChangeNotasi);
   // const dataChangeNotasi = getState("dataChangeNotasi");
   // setState("editRasciNotation", data);
   // openModalEditRascinotation(dataChangeNotasi, data);
-};
 
+  try {
+    const selectedValue = $("#dataSource-rasci").val();
+    const draftName = $("#dataSource-rasci option:selected").text();
+    const rasciNotation = getState("rasciNotation") || [];
+    const dataDetailProsbis = getState("dataDetailProsbis");
+    console.log("dataDetailProsbis", dataDetailProsbis);
+    const notation = detail.newNotation.map((item) => {
+      return {
+        rasciCode: item.value,
+        comment: item.comment,
+        isChecked: item.isChecked,
+      };
+    });
+    console.log("notation", notation);
+    const modal = new bootstrap.Modal(document.getElementById("modalActivityEditnot"));
+    modal.show();
+    const formContent = `
+        <div class="col-12">
+          <div >
+            <label class="form-label" style="width:19%">RASCI Matrix Draft</label>
+            <label> : </label>
+          <b class="form-label">${draftName}</b>
+          </div>
+        </div>
+        <div class="col-12">
+          <div >
+              <label class="form-label" style="width:19%">Position</label>
+               <label> : </label>
+          <b class="form-label">${detail.positionName}</b>
+          </div>
+        </div>
+        <div class="col-12">
+          <div >
+              <label class="form-label" style="width:19%">Business Process</label>
+               <label> : </label>
+          <b class="form-label">${indexNumber} - ${prosbisName}</b>
+          </div>
+        </div>
+      `;
+
+    theadContent = `<tr>
+          <th scope="col" style="width: 50px">Check</th>
+          <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
+          <th scope="col">Comment (Optional)</th>
+          </tr>`;
+    const output = mergeRasciData(notation, rasciNotation);
+    setState("rasciNotation", output);
+    // setState("dataDetailProsbis", {
+    //   ...dataDetailProsbis,
+    //   draftId: selectedValue,
+    //   draftName: draftName,
+    //   prlOrg: result.prlOrg,
+    //   unitCode: result.unitCode,
+    //   indexGroup: result.indexNumber,
+    // });
+    console.log("output", output);
+    tblChangeNotationActivity(output);
+    document.getElementById("tbl-activityeditnot-header").innerHTML = theadContent;
+
+    const bodyContent = document.getElementById("form-activityeditnot");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+  } catch (error) {}
+};
+const editNotActivity = async () => {
+  try {
+    const rasciNotation = getState("rasciNotation");
+    const dataEditNotActivity = getState("dataEditNotActivity");
+    console.log("first", rasciNotation);
+    console.log("dataEditNotActivity", dataEditNotActivity);
+  } catch (error) {}
+};
 const openModalActivityAddnot = () => {
   const modal = new bootstrap.Modal(document.getElementById("modalActivityAddnot"));
   modal.show();

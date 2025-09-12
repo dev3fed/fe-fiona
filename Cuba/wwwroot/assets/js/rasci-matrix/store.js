@@ -57,6 +57,7 @@ const appState = new Proxy(
       "20",
     ],
     actionType: "BP_THEN_JOB",
+    actionExport: "",
     totalProsbis: 0,
     totalJob: 0,
     expandNumber: [],
@@ -146,6 +147,7 @@ const appState = new Proxy(
         isChecked: false,
       },
     ],
+    dataEditNotActivity: {},
     insertProsbis: {
       parentId: null,
       jobMapped: [],
