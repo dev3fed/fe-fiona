@@ -6,6 +6,7 @@ function starter() {
 
 async function initializeList() {
   const _function = await functionList(organizationAttribute.orgUnitId);
+  console.log("_function", _function);
   const _abbrv = await abbrvPositionList(organizationAttribute.orgUnitId);
   const draftId = organizationAttribute.orgUnitId;
   getDataListAsync([
@@ -54,7 +55,7 @@ async function initializeList() {
   return [
     {
       dataId: "selectFunction",
-      data: _function.data.map((item) => ({ id: item.functionCode, text: item.functionName })),
+      data: _function.data.map((item) => ({ id: item.Id, text: item.Name })),
     },
     {
       dataId: "selectAbbrvPosition",

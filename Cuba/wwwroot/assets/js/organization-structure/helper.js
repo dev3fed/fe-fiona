@@ -1932,33 +1932,40 @@ async function changeDataDesignCostFilter(value) {
   });
 
   result.data.forEach((item, idx) => {
+    let name = item.functionName || item.divisionName || item.jobLevel;
+    let formationProposed = item.formationProposed || item.proposedTotalFormation || 0;
+    let costYearProposed = item.costYearProposed || item.proposedCostYear || 0;
+    let formationExisting = item.formationExisting || item.existingTotalFormation || 0;
+    let costYearExisting = item.costYearExisting || item.existingCostYear || 0;
+    let formationAdjustment = item.formationAdjustment || item.adjustmentTotalFormation || 0;
+    let costYearAdjustment = item.costYearAdjustment || item.adjusmentCostYear || 0;
     data.addHtml += `<tr>
       <td>${idx + 1}</td>
-      <td>${item.functionName || item.divisionName || item.layerName}</td>
-      <td>${item.formationProposed}</td>
-      <td>${item.costYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
-      <td>${item.formationExisting}</td>
-      <td>${item.costYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
-      <td>${item.formationAdjustment}</td>
-      <td>${item.costYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${name}</td>
+      <td>${formationProposed}</td>
+      <td>${costYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${formationExisting}</td>
+      <td>${costYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${formationAdjustment}</td>
+      <td>${costYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
     </tr>`;
-    data.totalFormationProposed += item.formationProposed;
-    data.totalCostYearProposed += item.costYearProposed;
-    data.totalFormationExisting += item.formationExisting;
-    data.totalCostYearExisting += item.costYearExisting;
-    data.totalFormationAdjustment += item.formationAdjustment;
-    data.totalCostYearAdjustment += item.costYearAdjustment;
+    data.totalFormationProposed += formationProposed;
+    data.totalCostYearProposed += costYearProposed;
+    data.totalFormationExisting += formationExisting;
+    data.totalCostYearExisting += costYearExisting;
+    data.totalFormationAdjustment += formationAdjustment;
+    data.totalCostYearAdjustment += costYearAdjustment;
   });
 
   tableBody.append(data.addHtml);
   tableFooter.append(`<tr>
     <td colspan="2">Total</td>
     <td>${data.totalFormationProposed}</td>
-    <td>${data.totalCostYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data?.totalCostYearProposed?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
     <td>${data.totalFormationExisting}</td>
-    <td>${data.totalCostYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data?.totalCostYearExisting?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
     <td>${data.totalFormationAdjustment}</td>
-    <td>${data.totalCostYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data?.totalCostYearAdjustment?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
   </tr>`);
 }
 
