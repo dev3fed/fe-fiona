@@ -829,7 +829,9 @@ $(document).ready(async function () {
   const activeTab = urlParams.get("activeTab");
   const positionName = urlParams.get("positionName");
 
-  getTableListDraft(storeData.listDraft.filter((x) => !x.isMasterData));
+  console.log("storeData.listDraft", storeData.listDraft);
+
+  getTableListDraft(storeData.listDraft.filter((x) => x.id !== 1));
   getTableListApproval(getDataApproval.data);
   getDataList([
     {

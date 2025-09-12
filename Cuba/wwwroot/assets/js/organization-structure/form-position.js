@@ -42,8 +42,8 @@ async function initializeList() {
     { id: "selectCostCenter", endpoint: "draft/cost-center/list", draftId: draftId },
     { id: "selectPersonalAreaName", endpoint: "draft/personnel-area/list", draftId: draftId },
     { id: "selectPersonalSubareaName", endpoint: "draft/personnel-sub-area/list", draftId: draftId },
-    { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId },
-    { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId },
+    { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId, showId: true },
+    { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
     { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId },
     { id: "selectSubSkillGroupMain", endpoint: "draft/sub-skill-group/list", draftId: draftId },
     { id: "selectSkillGroupSecond", endpoint: "draft/skill-group/list", draftId: draftId },
@@ -81,21 +81,15 @@ async function saveAsDraft() {
   if (positionId) type = "edit";
   loader(true);
   const save = await saveInputAttribut(type);
-  console.log("save", save);
   if (save) {
     hideModal(`modalConfirm`);
     loader(false);
     swal("Saved", "Save as Draft", "success");
-    // replace & inside string getPosition
-    // .replace(/&/g, '%26')
     const getPosition =
       $("#selectBasket").val() == "Yes" && save.data.jobFormations && save.data.jobFormations.length > 0
         ? save.data.jobFormations[0].unitName
         : $("#inputPositionName").val();
-
-    // Properly encode the position name for URL parameter
     const sanitizedPosition = encodeURIComponent(getPosition);
-    console.log("sanitizedPosition", sanitizedPosition);
     setTimeout(() => {
       window.location.href =
         "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
@@ -222,11 +216,19 @@ function addSubPosition() {
   checkBasketSelected("Yes");
 }
 
+$("#inputPositionName").on("input", function () {
+  const checkBasketSelected = $("#selectBasket").val();
+  if (checkBasketSelected == "Yes") {
+    $("#inputOrgUnitName").val($(this).val());
+  }
+});
+
 function checkBasketSelected(selectBasket) {
   // $("#prlOrgDiv, #prlOrgToDiv").toggleClass("col-md-6 col-md-4");
   $("#subPositionDiv").hide();
   $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").show();
   $("#selectPrlOrgTo").prop("disabled", true);
+  $("#inputOrgUnitName").prop("disabled", false);
   // alert("masuk");
   if (selectBasket == "Yes") {
     // alert("masuk 1");
@@ -235,7 +237,10 @@ function checkBasketSelected(selectBasket) {
     $("#subPositionDiv").show();
     $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").hide();
     $("#selectPrlOrgTo").prop("disabled", false);
+    $("#inputOrgUnitName").prop("disabled", true);
     updateDivSubPosition(subJobPos);
+  } else {
+    localStorage.setItem("subJobPos", JSON.stringify([]));
   }
 }
 
@@ -318,6 +323,8 @@ function deleteSubPos(countSubPosDiv) {
 
 $(document).ready(async function () {
   loader(true);
+  // remove local storage subJobPos
+  localStorage.setItem("subJobPos", JSON.stringify([]));
 
   $("#selectBasket").on("change", function (event) {
     // console.log("basket selected");

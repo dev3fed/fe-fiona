@@ -207,25 +207,36 @@ async function previewOrgChart() {
     },
   ]);
   $("#modalPreviewOrgChart").modal("show");
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: "10132405",
-    depth: 3,
-  });
-
-  if (!dataChart.data) {
-    swal("Warning", "Data not found", "warning");
-    return;
+  showChartLoading("chart-container-custom");
+  try {
+    const dataChart = await chartShow({
+      draftId: organizationAttribute.orgUnitId,
+      jobCode: defaultNodeId,
+      depth: 5,
+    });
+    renderOrgChart(dataChart.data, defaultNodeId, false);
+    setTimeout(() => {
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
+      console.log("Chart initialization and loading completed");
+    }, 1500); // Wait 1.5 seconds for chart to fully render
+  } catch (error) {
+    console.error("Error in initializeHelper:", error);
+    // Hide loading and show error message on failure
+    if (typeof hideChartLoading === "function") {
+      hideChartLoading("chart-container-custom");
+    }
+    // Show error message in chart container
+    const container = document.querySelector(".chart-container-custom") || document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed. Please try again.</div>';
+    }
   }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
-  helperOrgChart(true, "os-container", dataChart.data, true);
-
-  $("#modalPreviewOrgChart").modal("show");
 }
 
-$("#searchOrgNodeButton").on("click", function () {
+$("#searchOrgNode").on("change", function () {
   const searchValue = $("#searchOrgNode").val();
   focusNode(searchValue);
 });
@@ -267,7 +278,7 @@ function editPositionDraft(id) {
   window.location.href = "/organization/form-position?unitCode=" + id;
 }
 
-async function detailPositionDraft(id) {
+async function detailPositionDraftOld(id) {
   let findPosition = await chartJobDetail({
     draftId: organizationAttribute.orgUnitId,
     jobCode: id,
@@ -276,9 +287,7 @@ async function detailPositionDraft(id) {
   if (findPosition == undefined) {
     alert("Data not found");
     return;
-    // data = lsListPosition.find((item) => item.positionId == dataDefault);
   }
-  // const findPosition = lsListDetailDraft.find((x) => x.positionId == id);
   console.log("findPosition", findPosition);
   $("#jobName").text(
     findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
@@ -337,6 +346,10 @@ async function detailPositionDraft(id) {
   $("#modalDetailJobDraft").modal("show");
 }
 
+async function detailPositionDraft(id) {
+  await modalJobPopup(id);
+}
+
 async function confirmRollback(unitCode) {
   // alert("confirmRollback" + unitCode);
   const rollback = await deleteJobAndSubordinates({
@@ -379,12 +392,6 @@ function deletePositionDraft(positionId) {
     positionId
   );
 }
-
-$(".tab-custom").on("click", function () {
-  $(this).attr("id");
-  $(".tab-custom").removeClass("active");
-  $(this).addClass("active");
-});
 
 function acceptApproval() {
   const action = [
@@ -507,6 +514,21 @@ $(document).ready(async function () {
   // checkPage();
   getTableListDraftDetail(getDataListDraft.data);
   uploadFinalizeHandler();
+
+  $(".tab-custom").on("click", function () {
+    $(this).attr("id");
+    $(".tab-custom").removeClass("active");
+    $(this).addClass("active");
+
+    const value = $(this).attr("id");
+    if (value == "all") {
+      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.draftId == draftId));
+    } else {
+      console.log("value", value);
+      console.log("getDataListDraft.data", getDataListDraft.data);
+      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.draftId == draftId && x.actionType == value));
+    }
+  });
 
   // // tab-custom class on change
   // $(".tab-custom").on("click", function () {

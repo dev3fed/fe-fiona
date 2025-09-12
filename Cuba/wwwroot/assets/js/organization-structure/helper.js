@@ -164,7 +164,10 @@ async function insertFormPostion(paramId) {
       console.log("item", item);
       const [prlFrom, prlTo] = item.prlOrg.includes("-") ? item.prlOrg.split("-") : [item.prlOrg, item.prlOrg];
       const params = { ...subOrdinates };
-      const positionName = item?.formationBasket?.length > 0 ? item.formationBasket[0].positionName : item.positionName;
+      const positionName =
+        item?.formationBasket?.length > 0
+          ? item.formationBasket.map((x) => x.positionName).join(", ")
+          : item.positionName;
       params.subPosId = index + 1;
       params.unitCode = item.unitCode;
       params.unitName = item.unitName;
@@ -237,6 +240,8 @@ function openAll() {
 function onChangeSwith(value, target) {
   const selectId = "#select" + target;
   const inputId = "#input" + target;
+  console.log("selectId", selectId);
+  console.log("inputId", inputId);
   $(inputId).val(null);
   $(inputId).hide();
   $(selectId).next(".select2-container").show();
@@ -533,6 +538,8 @@ function formattedInputAttribut(type) {
   payload.userId = "system";
   payload.unit.unitCode = type == "edit" ? unitCode : null;
   payload.unit.unitName = $("#inputOrgUnitName").val();
+  //  remove jika ada text didalam kurung
+  payload.unit.unitName = payload.unit.unitName.replace(/\s*\(.*?\)\s*/g, "");
   payload.unit.positionName = $("#inputPositionName").val();
   payload.unit.layer = 4;
   payload.unit.isBasket = $("#selectBasket").val() == "Yes" ? true : false;
@@ -548,10 +555,14 @@ function formattedInputAttribut(type) {
   payload.unit.costCenter = $("#selectCostCenter").val();
   // career type
   payload.careerType.careerTypeCode = $("#selectCareerType").val();
-  payload.careerType.careerTypeName = $("#selectCareerType option:selected").text();
+  payload.careerType.careerTypeName = $("#selectCareerType option:selected")
+    .text()
+    .replace(/\s*\(.*?\)\s*/g, "");
   // career level
   payload.careerLevel.careerLevelCode = $("#selectCareerLevel").val();
-  payload.careerLevel.careerLevelName = $("#selectCareerLevel option:selected").text();
+  payload.careerLevel.careerLevelName = $("#selectCareerLevel option:selected")
+    .text()
+    .replace(/\s*\(.*?\)\s*/g, "");
   // function
   payload.function.isNew = $("#FunctionSwitch").prop("checked");
   payload.function.functionCode = payload.function.isNew ? "" : $("#selectFunction").val();
@@ -600,7 +611,9 @@ function formattedInputAttribut(type) {
   }
   payload.personnelArea.personnelAreaName = payload.personnelArea.isNew
     ? $("#inputPersonalAreaName").val()
-    : $("#selectPersonalAreaName option:selected").text();
+    : $("#selectPersonalAreaName option:selected")
+        .text()
+        .replace(/\s*\(.*?\)\s*/g, "") || "";
   // personnelSubArea
   payload.personnelSubArea.isNew = $("#PersonalSubareaNameSwitch").prop("checked");
   payload.personnelSubArea.personnelSubAreaCode = payload.personnelSubArea.isNew
@@ -614,29 +627,38 @@ function formattedInputAttribut(type) {
   }
   payload.personnelSubArea.personnelSubAreaName = payload.personnelSubArea.isNew
     ? $("#inputPersonalSubareaName").val()
-    : $("#selectPersonalSubareaName option:selected").text();
+    : $("#selectPersonalSubareaName option:selected")
+        .text()
+        .replace(/\s*\(.*?\)\s*/g, "") || "";
   // costCenter
   payload.unitParent.isNew = false;
   payload.unitParent.unitCode = $("#selectOrgUnitParentName").val() || "";
-  payload.unitParent.unitName = $("#selectOrgUnitParentName option:selected").text() || "";
+  // remove jika ada text didalam kurung
+  payload.unitParent.unitName =
+    $("#selectOrgUnitParentName option:selected")
+      .text()
+      .replace(/\s*\(.*?\)\s*/g, "") || "";
   // directReport
   payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
   payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
   // abbreviation
-  payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked");
-  payload.abbrivation.jobAbbrivationCode = payload.abbrivation.isNew ? "" : $("#selectAbbrvPosition").val();
-  if (payload.abbrivation.jobAbbrivationCode == "null" || payload.abbrivation.jobAbbrivationCode == null) {
-    payload.abbrivation.jobAbbrivationCode = "";
-  }
-  payload.abbrivation.careerJobName = payload.abbrivation.isNew
-    ? $("#inputAbbrvPosition").val()
-    : $("#selectAbbrvPosition option:selected").text();
 
-  payload.abbrivation.jobAbbrivationName = payload.abbrivation.isNew
-    ? $("#inputAbbrvPosition").val()
-    : $("#selectAbbrvPosition option:selected").text();
-  // get first 12 character
-  payload.abbrivation.jobAbbrivationName = payload.abbrivation.jobAbbrivationName.substring(0, 12);
+  if (!isBasket) {
+    payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked");
+    payload.abbrivation.jobAbbrivationCode = payload.abbrivation.isNew ? "" : $("#selectAbbrvPosition").val();
+    if (payload.abbrivation.jobAbbrivationCode == "null" || payload.abbrivation.jobAbbrivationCode == null) {
+      payload.abbrivation.jobAbbrivationCode = "";
+    }
+    payload.abbrivation.careerJobName = payload.abbrivation.isNew
+      ? $("#inputAbbrvPosition").val()
+      : $("#selectAbbrvPosition option:selected").text() || "";
+
+    payload.abbrivation.jobAbbrivationName = payload.abbrivation.isNew
+      ? $("#inputAbbrvPosition").val()
+      : $("#selectAbbrvPosition option:selected").text() || "";
+    // get first 12 character
+    payload.abbrivation.jobAbbrivationName = payload.abbrivation.jobAbbrivationName.substring(0, 12);
+  }
 
   // coordinateWith
   payload.coordinateWith.unitCode = payload.unit.isCoordinate ? $("#selectCoordinationWith").val() : "";
@@ -651,9 +673,13 @@ function formattedInputAttribut(type) {
     if (skillGroup != "null" && skillGroup != null) {
       payload.skillGroups.push({
         skillGroupCode: skillGroup,
-        skillGroupName: $(`#selectSkillGroup${level} option:selected`).text(),
+        skillGroupName: $(`#selectSkillGroup${level} option:selected`)
+          .text()
+          .replace(/\s*\(.*?\)\s*/g, ""),
         subSkillGroupCode: subSkillGroup,
-        subSkillGroupName: $(`#selectSubSkillGroup${level} option:selected`).text(),
+        subSkillGroupName: $(`#selectSubSkillGroup${level} option:selected`)
+          .text()
+          .replace(/\s*\(.*?\)\s*/g, ""),
         subSkillGroupSequence: index + 1,
       });
     }
@@ -670,10 +696,8 @@ function formattedInputAttribut(type) {
 
 async function saveInputAttribut(type) {
   const formPositionParam = formattedInputAttribut(type);
-  // console.log("formPositionParam", formPositionParam);
-  // console.log("formPositionParam", formPositionParam.unit.isBasket);
+  console.log("formPositionParam", formPositionParam);
   const basket = formPositionParam.unit.isBasket;
-  // return;
   // compare formPositionParam with localStorage logState.initParams
   const logState = JSON.parse(localStorage.getItem("logState"));
   if (logState && logState.initParams && type === "edit") {
@@ -775,9 +799,6 @@ async function saveInputAttribut(type) {
       }
     }
   }
-
-  console.log("basket", basket);
-  console.log("type", type);
 
   // Check if basket is selected and type is "edit"
   let result;
