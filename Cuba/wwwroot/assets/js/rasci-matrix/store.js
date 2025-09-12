@@ -147,7 +147,6 @@ const appState = new Proxy(
         isChecked: false,
       },
     ],
-    dataEditNotActivity: {},
     insertProsbis: {
       parentId: null,
       jobMapped: [],

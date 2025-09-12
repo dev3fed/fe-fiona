@@ -681,6 +681,7 @@ function backChangeNotationRow() {
   const updatedRasciNotation = rasciNotation.map((letter) => {
     return { ...letter, comment: "", isChecked: false };
   });
+  console.log("rasciNotation", rasciNotation);
   setState("dataDetailProsbis", {});
   setState("rasciNotation", updatedRasciNotation);
 }

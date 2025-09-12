@@ -367,18 +367,18 @@ function select2EditJob() {
 }
 
 async function triggleDetailActivity(id, draftType) {
-  const draftRasciId = getState("draftRasciId");
+  const dataDetailDraft = getState("dataDetailDraft");
   setState("draftActivityType", draftType);
   setState("draftActivityId", id);
   try {
     if (draftType === "Add New Business Process") {
-      detailAddprosbis(id, draftRasciId);
+      detailAddprosbis(id, dataDetailDraft.draftId);
     } else if (draftType === "Delete Business Process") {
-      detailDeleteBp(id, draftRasciId);
+      detailDeleteBp(id, dataDetailDraft.draftId);
     } else if (draftType === "Edit Business Process") {
-      detailEditBp(id, draftRasciId);
+      detailEditBp(id, dataDetailDraft.draftId);
     } else if (draftType === "Add/Edit RASCI") {
-      detailAddNotation(id, draftRasciId);
+      detailAddNotation(id, dataDetailDraft.draftId);
     }
   } catch (error) {}
 }
@@ -685,18 +685,22 @@ $(document).on("click", "#saveBpactivity", async function () {
 });
 async function detailAddNotation(id, draftRasciId) {
   console.log("first", id);
-  const url = `${draftRasciId}?draftListId=${id}`;
-  const dataActivity = await fetchDetailDraftActivity(url);
-  console.log("dataActivity", dataActivity);
-  const detailInfo = dataActivity?.data.mappingData;
   const modal = new bootstrap.Modal(document.getElementById("modalActivityEnot"));
   modal.show();
   const modalTitle = document.getElementById("modalActivityEnotTitle");
   if (modalTitle) {
     modalTitle.innerHTML = `Add/Edit RASCI Activity Detail `;
   }
-  setState("dataEditNotActivity", detailInfo);
-  const contentBody = `
+  renderTableEditnotActivity(id, draftRasciId);
+}
+const renderTableEditnotActivity = async (id, draftRasciId) => {
+  try {
+    const url = `${draftRasciId}?draftListId=${id}`;
+    const dataActivity = await fetchDetailDraftActivity(url);
+    console.log("dataActivity", dataActivity);
+    setState("dataDetailDraft", dataActivity.data);
+    const detailInfo = dataActivity?.data.mappingData;
+    const contentBody = `
       <div class="row">
         <div class="col-12 ">
             <label>Position: ${detailInfo[0].positionCode} - ${detailInfo[0].positionName}</label>
@@ -707,27 +711,7 @@ async function detailAddNotation(id, draftRasciId) {
            <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;"> Add RASCI
          </button>
         </div>
-        ${renderTableEditnotActivity(detailInfo)}
-      </div>
-  `;
-
-  const contentDetailDraftEditnotComponent = document.getElementById("contentdetailEditnitation");
-  if (contentDetailDraftEditnotComponent) {
-    contentDetailDraftEditnotComponent.innerHTML = contentBody;
-  }
-  feather.replace();
-  initializeTooltips();
-}
-const renderTableEditnotActivity = (detailInfo) => {
-  console.log("detailInfo", detailInfo);
-  try {
-    // detailInfo is an array of objects with the structure you provided
-    if (!Array.isArray(detailInfo) || detailInfo.length === 0) {
-      return `<tr><td colspan="7" style="text-align:center">No data</td></tr>`;
-    }
-
-    return `
-      <div class="col-12 ">
+         <div class="col-12 ">
       <div class="card-tblbusiness" style="max-height: 300px;">
         <div class="table-responsive scrollable mt-1" style="max-height: 260px;">
         <table class="table tbl-border-notation">
@@ -769,7 +753,7 @@ const renderTableEditnotActivity = (detailInfo) => {
               <td>${item.level || "-"}</td>
               <td style="text-align:center">${item.indexNo || "-"}</td>
               <td>
-                ${item.businessProcessName || "-"}
+                ${item.businessProcess || "-"}
                 ${
                   item.businessProcessReference
                     ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
@@ -816,7 +800,7 @@ const renderTableEditnotActivity = (detailInfo) => {
               </td>
               <td style="text-align:center">
                 <button class="btn btn-outline-light btn-small-icon" type="button" onclick='handleEditNotation(JSON.parse(this.getAttribute("data-detail")), "${
-                  item.businessProcessName || ""
+                  item.businessProcess || ""
                 }","${item.indexNo || ""}")' data-detail='${JSON.stringify(item)}'>
                 <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
                 </button>
@@ -830,7 +814,14 @@ const renderTableEditnotActivity = (detailInfo) => {
         </div>
       </div>
       </div>
-    `;
+      </div>
+  `;
+    const contentDetailDraftEditnotComponent = document.getElementById("contentdetailEditnitation");
+    if (contentDetailDraftEditnotComponent) {
+      contentDetailDraftEditnotComponent.innerHTML = contentBody;
+    }
+    feather.replace();
+    initializeTooltips();
   } catch (error) {}
 };
 function tblChangeNotationActivity(rasciNotation) {
@@ -870,7 +861,7 @@ function tblChangeNotationActivity(rasciNotation) {
 const handleEditNotation = (detail, prosbisName, indexNumber) => {
   console.log("first", detail);
   console.log("first", prosbisName);
-
+  const dataDetailDraft = getState("dataDetailDraft");
   // console.log("data", data);
   // console.log("dataChangeNotasi", dataChangeNotasi);
   // const dataChangeNotasi = getState("dataChangeNotasi");
@@ -898,7 +889,8 @@ const handleEditNotation = (detail, prosbisName, indexNumber) => {
           <div >
             <label class="form-label" style="width:19%">RASCI Matrix Draft</label>
             <label> : </label>
-          <b class="form-label">${draftName}</b>
+          <b class="form-label">${dataDetailDraft.draftName}</b>
+          <input type="hidden" id="activityIndexno" value="${detail.indexNo}" />
           </div>
         </div>
         <div class="col-12">
@@ -945,24 +937,100 @@ const handleEditNotation = (detail, prosbisName, indexNumber) => {
 const editNotActivity = async () => {
   try {
     const rasciNotation = getState("rasciNotation");
-    const dataEditNotActivity = getState("dataEditNotActivity");
-    console.log("first", rasciNotation);
-    // Ambil hanya yang isChecked true dari rasciNotation
+    const detail = getState("dataDetailDraft");
+    const draftActivityId = getState("draftActivityId");
+    const activityIndexno = document.getElementById("activityIndexno")?.value;
+    const spinner = document.getElementById("loadingEditActivity");
+
+    if (spinner) spinner.style.display = "inline-block";
+
+    // Get checked notations
     const checkedNotations = rasciNotation
       .filter((item) => item.isChecked)
       .map((item) => ({
-        value: item.rasciCode,
+        rasciCode: item.rasciCode,
         isChecked: true,
         comment: item.comment || "",
       }));
 
-    // Update dataEditNotActivity[0].newNotation
-    if (Array.isArray(dataEditNotActivity) && dataEditNotActivity.length > 0) {
-      dataEditNotActivity[0].newNotation = checkedNotations;
-      setState("dataEditNotActivity", dataEditNotActivity);
+    // Find mapping item by indexNo
+    const mappingItem = Array.isArray(detail.mappingData)
+      ? detail.mappingData.find((item) => String(item.indexNo) === String(activityIndexno))
+      : null;
+
+    if (!mappingItem) {
+      if (spinner) spinner.style.display = "none";
+      swal({
+        title: "Error",
+        text: "Mapping item not found.",
+        icon: "error",
+        button: "OK",
+      });
+      return;
     }
-    console.log("dataEditNotActivity", dataEditNotActivity);
-  } catch (error) {}
+
+    mappingItem.newNotation = checkedNotations;
+
+    const payload = {
+      draftId: detail.draftId,
+      draftListId: draftActivityId,
+      draftType: "Add/Edit RASCI",
+      draftJobSource: null,
+      orgUnitCode: detail.unitCodeOrg,
+      orgPrl: detail.prlOrg,
+      busProsMapped: [
+        {
+          parentId: mappingItem.indexNo,
+          rasciNotation: mappingItem.newNotation,
+        },
+      ],
+    };
+
+    const result = await submitDraftProsbis(payload);
+
+    if (result.status === 200) {
+      const modalEl = document.getElementById("modalActivityEditnot");
+      const modal = bootstrap.Modal.getInstance(modalEl);
+
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Your activity has been saved as draft.</span>
+              <br>
+              <span>You can check in <b>${result?.data.draftName}</b> at draft tab.</span>`,
+          },
+        },
+      }).then(async () => {
+        if (spinner) spinner.style.display = "none";
+        if (modal) modal.hide();
+        backChangeNotationRow();
+        await renderTableEditnotActivity(draftActivityId, detail.draftId);
+      });
+    } else {
+      if (spinner) spinner.style.display = "none";
+      swal({
+        title: "Error",
+        text: "Failed to save draft.",
+        icon: "error",
+        button: "OK",
+      });
+    }
+  } catch (error) {
+    const spinner = document.getElementById("loadingEditActivity");
+    if (spinner) spinner.style.display = "none";
+    swal({
+      title: "Error",
+      text: "An error occurred while saving.",
+      icon: "error",
+      button: "OK",
+    });
+    console.error("editNotActivity error:", error);
+  }
 };
 const openModalActivityAddnot = () => {
   const modal = new bootstrap.Modal(document.getElementById("modalActivityAddnot"));
