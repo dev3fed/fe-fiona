@@ -331,15 +331,30 @@ async function fetchLoghistoryList(payload) {
 async function fetchExportRasciMatrix(payload) {
   const url = `${url_api}/api/rasci-matrix/draft/export`;
   try {
-    const result = await ajaxRequest(url, "POST", payload);
-    return {
-      success: true,
-      data: result.data,
-    };
+    const response = await $.ajax({
+      url,
+      type: "POST",
+      data: JSON.stringify(payload),
+      contentType: "application/json",
+      xhrFields: {
+        responseType: "blob",
+      },
+    });
+
+    // Create a link to download the file
+    const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "rasci-matrix.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return { success: true };
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || "Error exporting file",
     };
   }
 }

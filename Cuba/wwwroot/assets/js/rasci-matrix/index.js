@@ -488,15 +488,12 @@ const handleExportMatrix = async () => {
     }
 
     const result = await fetchExportRasciMatrix(payload);
-    if (result.status === 200) {
-      const blob = new Blob([result.data], { type: "application/vnd.ms-excel" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    if (result.success) {
+      console.log("result", result);
+      // File download already handled inside fetchExportRasciMatrix
+      // Optionally show a success message here
+    } else {
+      console.error("Export failed:", result.error);
     }
   } catch (error) {
     console.error("Export failed:", error);
