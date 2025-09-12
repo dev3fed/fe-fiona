@@ -729,7 +729,6 @@ const renderTableEditnotActivity = async (id, draftRasciId) => {
           <tbody>
           ${detailInfo
             .map((item, idx) => {
-              // OLD COMMENT TOOLTIP
               let oldCommentTooltip = "";
               if (Array.isArray(item.oldNotation)) {
                 oldCommentTooltip = item.oldNotation
@@ -738,7 +737,6 @@ const renderTableEditnotActivity = async (id, draftRasciId) => {
                   .join("<br>");
               }
 
-              // NEW COMMENT TOOLTIP
               let newCommentTooltip = "";
               if (Array.isArray(item.newNotation)) {
                 newCommentTooltip = item.newNotation
@@ -747,23 +745,32 @@ const renderTableEditnotActivity = async (id, draftRasciId) => {
                   .join("<br>");
               }
 
+              const rasciOrder = ["R", "A", "S", "C", "I"];
+              const sortByRasci = (arr) =>
+                Array.isArray(arr)
+                  ? arr.slice().sort((a, b) => rasciOrder.indexOf(a.value) - rasciOrder.indexOf(b.value))
+                  : [];
+
+              const sortedOldNotation = sortByRasci(item.oldNotation);
+              const sortedNewNotation = sortByRasci(item.newNotation);
+
               return `
-              <tr>
-              <td>${idx + 1}</td>
-              <td>${item.level || "-"}</td>
-              <td style="text-align:center">${item.indexNo || "-"}</td>
-              <td>
+                <tr>
+                <td>${idx + 1}</td>
+                <td>${item.level || "-"}</td>
+                <td style="text-align:center">${item.indexNo || "-"}</td>
+                <td>
                 ${item.businessProcess || "-"}
                 ${
                   item.businessProcessReference
                     ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
                     : ""
                 }
-              </td>
-              <td style="text-align:center">
+                </td>
+                <td style="text-align:center">
                 ${
-                  Array.isArray(item.oldNotation) && item.oldNotation.length > 0
-                    ? item.oldNotation
+                  sortedOldNotation.length > 0
+                    ? sortedOldNotation
                         .map(
                           (n) =>
                             `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
@@ -778,11 +785,11 @@ const renderTableEditnotActivity = async (id, draftRasciId) => {
                     ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
                     : ""
                 }
-              </td>
-              <td style="text-align:center">
+                </td>
+                <td style="text-align:center">
                 ${
-                  Array.isArray(item.newNotation) && item.newNotation.length > 0
-                    ? item.newNotation
+                  sortedNewNotation.length > 0
+                    ? sortedNewNotation
                         .map(
                           (n) =>
                             `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
@@ -797,16 +804,16 @@ const renderTableEditnotActivity = async (id, draftRasciId) => {
                     ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${newCommentTooltip}">`
                     : ""
                 }
-              </td>
-              <td style="text-align:center">
+                </td>
+                <td style="text-align:center">
                 <button class="btn btn-outline-light btn-small-icon" type="button" onclick='handleEditNotation(JSON.parse(this.getAttribute("data-detail")), "${
                   item.businessProcess || ""
                 }","${item.indexNo || ""}")' data-detail='${JSON.stringify(item)}'>
                 <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
                 </button>
-              </td>
-              </tr>
-            `;
+                </td>
+                </tr>
+              `;
             })
             .join("")}
           </tbody>
@@ -916,15 +923,6 @@ const handleEditNotation = (detail, prosbisName, indexNumber) => {
           </tr>`;
     const output = mergeRasciData(notation, rasciNotation);
     setState("rasciNotation", output);
-    // setState("dataDetailProsbis", {
-    //   ...dataDetailProsbis,
-    //   draftId: selectedValue,
-    //   draftName: draftName,
-    //   prlOrg: result.prlOrg,
-    //   unitCode: result.unitCode,
-    //   indexGroup: result.indexNumber,
-    // });
-    console.log("output", output);
     tblChangeNotationActivity(output);
     document.getElementById("tbl-activityeditnot-header").innerHTML = theadContent;
 
@@ -944,16 +942,6 @@ const editNotActivity = async () => {
 
     if (spinner) spinner.style.display = "inline-block";
 
-    // Get checked notations
-    const checkedNotations = rasciNotation
-      .filter((item) => item.isChecked)
-      .map((item) => ({
-        rasciCode: item.rasciCode,
-        isChecked: true,
-        comment: item.comment || "",
-      }));
-
-    // Find mapping item by indexNo
     const mappingItem = Array.isArray(detail.mappingData)
       ? detail.mappingData.find((item) => String(item.indexNo) === String(activityIndexno))
       : null;
@@ -969,7 +957,7 @@ const editNotActivity = async () => {
       return;
     }
 
-    mappingItem.newNotation = checkedNotations;
+    mappingItem.newNotation = rasciNotation;
 
     const payload = {
       draftId: detail.draftId,
