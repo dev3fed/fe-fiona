@@ -345,7 +345,8 @@ async function fetchExportRasciMatrix(payload) {
     const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-    link.download = "rasci-matrix.xlsx";
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    link.download = `rasci-matrix-${timestamp}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

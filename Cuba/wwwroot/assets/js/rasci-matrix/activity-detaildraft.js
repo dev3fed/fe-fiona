@@ -719,122 +719,118 @@ async function detailAddNotation(id, draftRasciId) {
   initializeTooltips();
 }
 const renderTableEditnotActivity = (detailInfo) => {
+  console.log("detailInfo", detailInfo);
   try {
-    `<div class="col-12 ">
-        <div class="card-tblbusiness" style=" max-height: 300px;">
-         <div class="table-responsive scrollable mt-1" style=" max-height: 260px;">
-             <table class="table tbl-border-notation">
-                 <thead>
-                 <tr>
-                      <th scope="col" style="width: 50px">No</th>
-                     <th scope="col" style="width: 50px">Level</th>
-                     <th scope="col" style="width: 80px;text-align:center">Index</th>
-                     <th scope="col" >Business Process</th>
-                     <th scope="col" style="width: 120px;text-align:center">RASCI (Before)</th>
-                     <th scope="col" style="width: 120px;text-align:center">RASCI (After)</th>
-                     <th scope="col" style="width: 100px;text-align:center">Action</th>
-                 </tr>
-                 </thead>
-                 <tbody>
-                  ${
-                    detailInfo.length === 0
-                      ? `<tr><td colspan="7" style="text-align:center">No data</td></tr>`
-                      : detailInfo
-                          .map((item, idx) => {
-                            // OLD COMMENT TOOLTIP
-                            let oldCommentTooltip = "";
-                            if (Array.isArray(item.oldNotation) && item.oldComment && item.oldComment.length > 0) {
-                              oldCommentTooltip = item.oldComment
-                                .map((c, i) => {
-                                  const code = item.oldNotation[i]?.value || "";
-                                  return code && c.value ? `${code} : ${c.value}` : "";
-                                })
-                                .filter(Boolean)
-                                .join("<br>");
-                            }
-                            // If oldComment is empty, try to fallback to empty string
-                            // NEW COMMENT TOOLTIP
-                            let newCommentTooltip = "";
-                            if (
-                              item.newNotation &&
-                              item.newNotation.value &&
-                              item.newComment &&
-                              item.newComment.value
-                            ) {
-                              newCommentTooltip = `${item.newNotation.value} : ${item.newComment.value}`;
-                            }
+    // detailInfo is an array of objects with the structure you provided
+    if (!Array.isArray(detailInfo) || detailInfo.length === 0) {
+      return `<tr><td colspan="7" style="text-align:center">No data</td></tr>`;
+    }
 
-                            return `
-                              <tr>
-                              <td>${idx + 1}</td>
-                              <td>${item.level || "-"}</td>
-                              <td style="text-align:center">${item.indexNo || "-"}</td>
-                              <td>
-                                ${item.businessProcessName || "-"}
-                                ${
-                                  item.businessProcessReference
-                                    ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
-                                    : ""
-                                }
-                              </td>
-                              <td style="text-align:center">
-                                ${
-                                  Array.isArray(item.oldNotation)
-                                    ? item.oldNotation
-                                        .map(
-                                          (n, i) =>
-                                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
-                                              n.value
-                                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
-                                        )
-                                        .join("")
-                                    : "-"
-                                }
-                                ${
-                                  oldCommentTooltip
-                                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
-                                    : ""
-                                }
-                              </td>
-                              <td style="text-align:center">
-                                ${
-                                  Array.isArray(item.newNotation) && item.newNotation.length > 0
-                                    ? item.newNotation
-                                        .map(
-                                          (n, i) =>
-                                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
-                                              n.value
-                                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
-                                        )
-                                        .join("")
-                                    : "-"
-                                }
-                                ${
-                                  Array.isArray(item.newNotation) && item.newNotation.some((n) => n.comment)
-                                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${item.newNotation
-                                        .filter((n) => n.comment)
-                                        .map((n) => `${n.value} : ${n.comment}`)
-                                        .join("<br>")}">`
-                                    : ""
-                                }
-                              </td>
-                              <td style="text-align:center">
-                                <button class="btn btn-outline-light btn-small-icon" type="button" onclick='handleEditNotation(JSON.parse(this.getAttribute("data-detail")), "${
-                                  dataActivity.data.businessProcess
-                                }","${dataActivity.data.indexNumber}")' data-detail='${JSON.stringify(item)}'>
-                                <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
-                                </button>
-                              </td>
-                              </tr>
-                            `;
-                          })
-                          .join("")
-                  }
-               </tbody>
-             </table>
-            </div>
-          </div>
-        </div>`;
+    return `
+      <div class="col-12 ">
+      <div class="card-tblbusiness" style="max-height: 300px;">
+        <div class="table-responsive scrollable mt-1" style="max-height: 260px;">
+        <table class="table tbl-border-notation">
+          <thead>
+          <tr>
+            <th scope="col" style="width: 50px">No</th>
+            <th scope="col" style="width: 50px">Level</th>
+            <th scope="col" style="width: 80px;text-align:center">Index</th>
+            <th scope="col">Business Process</th>
+            <th scope="col" style="width: 120px;text-align:center">RASCI (Before)</th>
+            <th scope="col" style="width: 120px;text-align:center">RASCI (After)</th>
+            <th scope="col" style="width: 100px;text-align:center">Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          ${detailInfo
+            .map((item, idx) => {
+              // OLD COMMENT TOOLTIP
+              let oldCommentTooltip = "";
+              if (Array.isArray(item.oldNotation)) {
+                oldCommentTooltip = item.oldNotation
+                  .filter((n) => n.comment)
+                  .map((n) => `${n.value} : ${n.comment}`)
+                  .join("<br>");
+              }
+
+              // NEW COMMENT TOOLTIP
+              let newCommentTooltip = "";
+              if (Array.isArray(item.newNotation)) {
+                newCommentTooltip = item.newNotation
+                  .filter((n) => n.comment)
+                  .map((n) => `${n.value} : ${n.comment}`)
+                  .join("<br>");
+              }
+
+              return `
+              <tr>
+              <td>${idx + 1}</td>
+              <td>${item.level || "-"}</td>
+              <td style="text-align:center">${item.indexNo || "-"}</td>
+              <td>
+                ${item.businessProcessName || "-"}
+                ${
+                  item.businessProcessReference
+                    ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
+                    : ""
+                }
+              </td>
+              <td style="text-align:center">
+                ${
+                  Array.isArray(item.oldNotation) && item.oldNotation.length > 0
+                    ? item.oldNotation
+                        .map(
+                          (n) =>
+                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                              n.value
+                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                        )
+                        .join("")
+                    : "-"
+                }
+                ${
+                  oldCommentTooltip
+                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
+                    : ""
+                }
+              </td>
+              <td style="text-align:center">
+                ${
+                  Array.isArray(item.newNotation) && item.newNotation.length > 0
+                    ? item.newNotation
+                        .map(
+                          (n) =>
+                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                              n.value
+                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                        )
+                        .join("")
+                    : "-"
+                }
+                ${
+                  newCommentTooltip
+                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${newCommentTooltip}">`
+                    : ""
+                }
+              </td>
+              <td style="text-align:center">
+                <button class="btn btn-outline-light btn-small-icon" type="button" onclick='handleEditNotation(JSON.parse(this.getAttribute("data-detail")), "${
+                  item.businessProcessName || ""
+                }","${item.indexNo || ""}")' data-detail='${JSON.stringify(item)}'>
+                <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
+                </button>
+              </td>
+              </tr>
+            `;
+            })
+            .join("")}
+          </tbody>
+        </table>
+        </div>
+      </div>
+      </div>
+    `;
   } catch (error) {}
 };
 function tblChangeNotationActivity(rasciNotation) {
@@ -951,6 +947,20 @@ const editNotActivity = async () => {
     const rasciNotation = getState("rasciNotation");
     const dataEditNotActivity = getState("dataEditNotActivity");
     console.log("first", rasciNotation);
+    // Ambil hanya yang isChecked true dari rasciNotation
+    const checkedNotations = rasciNotation
+      .filter((item) => item.isChecked)
+      .map((item) => ({
+        value: item.rasciCode,
+        isChecked: true,
+        comment: item.comment || "",
+      }));
+
+    // Update dataEditNotActivity[0].newNotation
+    if (Array.isArray(dataEditNotActivity) && dataEditNotActivity.length > 0) {
+      dataEditNotActivity[0].newNotation = checkedNotations;
+      setState("dataEditNotActivity", dataEditNotActivity);
+    }
     console.log("dataEditNotActivity", dataEditNotActivity);
   } catch (error) {}
 };
