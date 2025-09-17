@@ -1,515 +1,512 @@
+const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+
+// Debounce function untuk search
+let searchTimeout;
+function debounceSearchJobCompare(event, delay = 800) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    searchJobCompare(event, false);
+  }, delay);
+}
+
 function confirmApply() {
   swal("Success", "Job Description has been applied", "success");
 }
 
-$(document).ready(async function () {
-  const urlParams = new URLSearchParams(window.location.search);
+function refreshDataLocalStorage() {
+  const keys = [
+    "fungsi",
+    "lsAvailable",
+    "tugasHa",
+    "wewenang",
+    "koordinasiInternal",
+    "relasiEksternal",
+    "persyaratanKhusus",
+    "stk",
+  ];
+  keys.forEach((key) => localStorage.removeItem(key));
+}
 
-  // from query string
-  const jobId = urlParams.get("jobId");
-  const prlOrg = urlParams.get("prlOrg");
-  const positionCode = urlParams.get("positionCode");
-  // console.log("positionCode", jobId);
-  // initialize popover
-  async function searchJobCompare(event, isPercentage) {
-    const chkJobList = document.getElementById("chk-job-list");
-    // const jobSelectedList = document.getElementById("job-selected-list");
-    if (isPercentage) {
-      const value = event;
-      const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
-      const params = {
-        draftId: getDraftExisting.draftId,
-        jobId: jobId,
-        prlOrg: prlOrg,
-        percentage: value,
-      };
+async function getAllJobDescData(draftExisting, id, prlOrgParam, prlOrgTarget) {
+  const dataDetailJobDesc = {
+    draftId: draftExisting.draftId,
+    jobId: id,
+    prlRange: prlOrgTarget,
+    prlOrg: prlOrgTarget,
+  };
+  console.log("dataDetailJobDesc", dataDetailJobDesc);
 
-      const result = await getSimilarities(params);
-      console.log("result", result.data);
+  // Helper function to handle errors gracefully
+  const safeApiCall = async (apiCall, fallbackValue = null) => {
+    try {
+      return await apiCall();
+    } catch (error) {
+      console.error(`API call failed:`, error);
+      return fallbackValue;
+    }
+  };
 
-      // dan urutan berdasarkan percentage yang paling tinggi
-      const dataCompare = result?.data
-        .map((item) => ({
-          id: item?.jobIdTarget,
-          name: item?.positionNameTarget,
-          percentage: item?.matchPercentage,
-          jobIdFrom: item?.jobIdSource,
-          prlOrgFrom: item?.prlOrgSource,
-          jobIdTarget: item?.jobIdTarget,
-          prlOrgTo: item?.prlOrgTarget,
-        }))
-        .sort((a, b) => b.percentage - a.percentage);
+  // Execute all API calls in parallel with error handling
+  const [
+    identifikasiJabatan,
+    fungsiJabatan,
+    tugasTanggungJawabUmum,
+    countTugasHa,
+    tugasTanggungJawabAkhir,
+    wewenang,
+    koordinasiInternal,
+    relasiEksternal,
+    persyaratanJabatan,
+    persyaratanKhusus,
+    kompetensiTeknis,
+    kompetensiPerilaku,
+    stk,
+  ] = await Promise.allSettled([
+    safeApiCall(() => getIdentifikasiJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getFungsiJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getTugasTanggungJawabUmum(dataDetailJobDesc)),
+    safeApiCall(() => getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 })),
+    safeApiCall(() => getTugasTanggungJawabAkhir(dataDetailJobDesc)),
+    safeApiCall(() => getWewenang(dataDetailJobDesc)),
+    safeApiCall(() => getKoordinasiInternal(dataDetailJobDesc)),
+    safeApiCall(() => getRelasiEksternal(dataDetailJobDesc)),
+    safeApiCall(() => getPersyaratanJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getPersyaratanKhusus(dataDetailJobDesc)),
+    safeApiCall(() => getKompetensiTeknis(dataDetailJobDesc)),
+    safeApiCall(() => getKompetensiPerilaku(dataDetailJobDesc)),
+    safeApiCall(() => getStk(dataDetailJobDesc)),
+  ]);
 
-      // Fetch all details in parallel instead of sequentially
-      const detailPromises = dataCompare.map((item) =>
-        getAllTanggungJawabJobToJob({
-          draftId: getDraftExisting.draftId,
-          jobIdFrom: jobId,
-          prlOrgFrom: prlOrg,
-          jobIdTo: item.jobIdTarget,
-          prlOrgTo: item.prlOrgTo,
-          page: 1,
-          pageSize: 99,
-        }).then((res) => ({
-          jobIdTo: item.jobIdTarget,
-          data: res.data,
-        }))
-      );
+  // Return the results, extracting values from settled promises
+  return {
+    identifikasiJabatan: identifikasiJabatan.status === "fulfilled" ? identifikasiJabatan.value : null,
+    fungsiJabatan: fungsiJabatan.status === "fulfilled" ? fungsiJabatan.value : null,
+    tugasTanggungJawabUmum: tugasTanggungJawabUmum.status === "fulfilled" ? tugasTanggungJawabUmum.value : null,
+    countTugasHa: countTugasHa.status === "fulfilled" ? countTugasHa.value : null,
+    tugasTanggungJawabAkhir: tugasTanggungJawabAkhir.status === "fulfilled" ? tugasTanggungJawabAkhir.value : null,
+    wewenang: wewenang.status === "fulfilled" ? wewenang.value : null,
+    koordinasiInternal: koordinasiInternal.status === "fulfilled" ? koordinasiInternal.value : null,
+    relasiEksternal: relasiEksternal.status === "fulfilled" ? relasiEksternal.value : null,
+    persyaratanJabatan: persyaratanJabatan.status === "fulfilled" ? persyaratanJabatan.value : null,
+    persyaratanKhusus: persyaratanKhusus.status === "fulfilled" ? persyaratanKhusus.value : null,
+    kompetensiTeknis: kompetensiTeknis.status === "fulfilled" ? kompetensiTeknis.value : null,
+    kompetensiPerilaku: kompetensiPerilaku.status === "fulfilled" ? kompetensiPerilaku.value : null,
+    stk: stk.status === "fulfilled" ? stk.value : null,
+  };
+}
 
-      const details = await Promise.all(detailPromises);
+async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
+  // showChartLoading("chk-job-list-percentage");
+  const getDataJobDesc = await getAllJobDescData(getDraftExisting, id, prlOrgParam, prlOrgTarget);
 
-      for (const item of dataCompare) {
-        let color = "";
-        if (item.percentage >= 90) {
-          color = "background-color: #28a745";
-        } else if (item.percentage >= 80) {
-          color = "background-color: #17a2b8";
-        } else if (item.percentage >= 70) {
-          color = "background-color: #ffc107";
-        } else if (item.percentage >= 60) {
-          color = "background-color: #007bff";
-        } else if (item.percentage >= 50) {
-          color = "background-color: #dc3545";
+  // const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
+  // arrayId.forEach((item) => {
+  //   $(`#${item}`).empty();
+  // });
+  localStorage.setItem("selectedJobDescReference", JSON.stringify(getDataJobDesc));
+
+  $("#jobNameReference").text(getDataJobDesc?.identifikasiJabatan?.jobName || DATA_NOT_FOUND);
+  $("#functionReference").text(getDataJobDesc?.identifikasiJabatan?.unitKerjaFungsi || DATA_NOT_FOUND);
+  $("#locationReference").text(getDataJobDesc?.identifikasiJabatan?.lokasiKerja || DATA_NOT_FOUND);
+  $("#directoratReference").text(getDataJobDesc?.identifikasiJabatan?.direktorat || DATA_NOT_FOUND);
+  $("#directReportReference").text(getDataJobDesc?.identifikasiJabatan?.atasanLangsung || DATA_NOT_FOUND);
+  $("#skReference").text(getDataJobDesc?.identifikasiJabatan?.noSuratKeputusan || DATA_NOT_FOUND);
+  $("#skDateReference").text(getDataJobDesc?.identifikasiJabatan?.tanggalSuratKeputusan || DATA_NOT_FOUND);
+
+  $("#fungsiTextReference").text(getDataJobDesc?.fungsiJabatan?.deskripsi || DATA_NOT_FOUND);
+
+  updateTableSelected("tugasHaReference", getDataJobDesc?.tugasTanggungJawabAkhir?.data || [], tabCusJD.tugasHa);
+  updateTableSelected(
+    "koordinasiInternalReference",
+    getDataJobDesc?.koordinasiInternal?.data || [],
+    tabCusJD.koordinasi
+  );
+  updateTableSelected("relasiEksternalReference", getDataJobDesc?.relasiEksternal?.data || [], tabCusJD.relation);
+  updateTableSelected(
+    "stkReference",
+    getDataJobDesc?.stk?.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined) || [],
+    ["no", ...tabCusJD.stk]
+  );
+  // hideChartLoading("chk-job-list-percentage");
+  return;
+}
+
+async function searchJobCompare(event, isPercentage = false) {
+  console.log("searchJobCompare", event, isPercentage, getDraftExisting);
+  // return;
+
+  const chkJobList = document.getElementById("chk-job-list");
+  // const jobSelectedList = document.getElementById("job-selected-list");
+
+  function callPopover(param, dataDetail) {
+    console.log("callPopover", param, dataDetail);
+    // Generate popoverContent dynamically with if-else for status
+    const popoverContent = (dataDetail?.data || [])
+      .map((item) => {
+        let statusText = "";
+        let statusColor = "";
+        let statusIcon = "";
+        if (item?.status === "AVAILABLE") {
+          statusText = "Available";
+          statusColor = "#06BE00";
+          statusIcon = "available";
+        } else if (item?.status === "NOT AVAILABLE") {
+          statusText = "Not Available";
+          statusColor = "#D02138";
+          statusIcon = "nonavail";
+        } else {
+          statusText = "Unknown";
+          statusColor = "#999";
+          statusIcon = "unknown";
         }
-        item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
-      }
-      const storeId = [];
-      let innerHTML = "";
-      for (let item of dataCompare) {
-        innerHTML += `
-          <div class="row-item">
-        <div class="column-item-name pointer" onClick="applyCompare(${item.id})">
-          <span class="text-primary  text-decoration-none"><u>${item.name}</u></span> 
-          ${item.badge}
-        </div>
-        <i class="pl-1 icon-nm fas fa-info-circle align-self-center"  href="#" tabindex="0" data-toggle="popOver${item.id}"></i>
-          </div>
-        `;
-        storeId.push(item.id);
-      }
-      if (result?.data?.length === 0) {
-        innerHTML = `<div class="text-center">No data found</div>`;
-      }
-      chkJobListPercentage.innerHTML = innerHTML;
-      storeId.forEach((item) => {
-        const dataDetail = details.find((detail) => detail.jobIdTo === item);
-        callPopover(item, dataDetail);
-      });
-
-      // Reinitialize popovers after updating the inner HTML
-
-      // $('[data-toggle="popover"]').popover();
-
-      return;
-    }
-
-    function callPopover(param, dataDetail) {
-      console.log("callPopover", param, dataDetail);
-      // Generate popoverContent dynamically with if-else for status
-      const popoverContent = (dataDetail?.data || [])
-        .map((item) => {
-          let statusText = "";
-          let statusColor = "";
-          let statusIcon = "";
-          if (item?.status === "AVAILABLE") {
-            statusText = "Available";
-            statusColor = "#06BE00";
-            statusIcon = "available";
-          } else if (item?.status === "NOT AVAILABLE") {
-            statusText = "Not Available";
-            statusColor = "#D02138";
-            statusIcon = "nonavail";
-          } else {
-            statusText = "Unknown";
-            statusColor = "#999";
-            statusIcon = "unknown";
-          }
-          return `
+        return `
+          <tr>
+          <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
+          <td style="place-items:center">
+            <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+            <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
+            </div>
+          </td>
+          <td style="color:${statusColor};text-align:center">
+            <span>${statusText}</span>
+            <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
+          </td>
+          </tr>
+          `;
+      })
+      .join("");
+    $(`[data-toggle="popOver${param}"]`).popover({
+      html: true,
+      sanitize: false,
+      content: `
+        <div style="width: 550px;">
+        <h6 style="margin-bottom:10px">RASCI Similarities Detail</h6>
+        <table class="display tableRasciSimilarities" style="width: 100%">
+        <thead>
             <tr>
-            <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
-            <td style="place-items:center">
-              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
-              <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
-              </div>
-            </td>
-            <td style="color:${statusColor};text-align:center">
-              <span>${statusText}</span>
-              <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
-            </td>
-            </tr>
-            `;
-        })
-        .join("");
-      $(`[data-toggle="popOver${param}"]`).popover({
-        html: true,
-        sanitize: false,
-        content: `
-          <div style="width: 550px;">
-          <h6 style="margin-bottom:10px">RASCI Similarities Detail</h6>
-          <table class="display tableRasciSimilarities" style="width: 100%">
-          <thead>
-              <tr>
-              <th style="width: 55%;">Business Process</th>
-              <th style="width: 15%;">Notation</th>
-              <th style="width: 30%;">Availability of reference</th>
-              <tr>
-          </thead>
-          <tbody>
-          ${popoverContent}
-          </tbody>
-          </table>
-          </div>
-        `,
-        trigger: "focus",
-      });
+            <th style="width: 55%;">Business Process</th>
+            <th style="width: 15%;">Notation</th>
+            <th style="width: 30%;">Availability of reference</th>
+            <tr>
+        </thead>
+        <tbody>
+        ${popoverContent}
+        </tbody>
+        </table>
+        </div>
+      `,
+      trigger: "focus",
+    });
+  }
+
+  if (isPercentage) {
+    console.log("getDraftExisting", getDraftExisting);
+    showChartLoading("chk-job-list-percentage", true, "480px", "100%", "Please wait, fetching data...");
+    const value = event;
+    const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
+    const params = {
+      draftId: getDraftExisting.draftId,
+      jobId: jobId,
+      prlOrg: prlOrg,
+      percentage: value,
+    };
+
+    const result = await getSimilarities(params);
+    // dan urutan berdasarkan percentage yang paling tinggi
+    const dataCompare = result?.data
+      .map((item) => ({
+        id: item?.jobIdTarget,
+        name: item?.positionNameTarget,
+        percentage: item?.matchPercentage,
+        jobIdFrom: item?.jobIdSource,
+        prlOrgFrom: item?.prlOrgSource,
+        jobIdTarget: item?.jobIdTarget,
+        prlOrgTo: item?.prlOrgTarget,
+      }))
+      .sort((a, b) => b.percentage - a.percentage);
+
+    // Fetch all details in parallel instead of sequentially
+    const detailPromises = dataCompare.map((item) =>
+      getAllTanggungJawabJobToJob({
+        draftId: getDraftExisting.draftId,
+        jobIdFrom: jobId,
+        prlOrgFrom: prlOrg,
+        jobIdTo: item.jobIdTarget,
+        prlOrgTo: item.prlOrgTo,
+        page: 1,
+        pageSize: 99,
+      }).then((res) => ({
+        jobIdTo: item.jobIdTarget,
+        data: res.data,
+      }))
+    );
+
+    const details = await Promise.all(detailPromises);
+
+    for (const item of dataCompare) {
+      let color = "";
+      if (item.percentage >= 90) {
+        color = "background-color: #28a745";
+      } else if (item.percentage >= 80) {
+        color = "background-color: #17a2b8";
+      } else if (item.percentage >= 70) {
+        color = "background-color: #ffc107";
+      } else if (item.percentage >= 60) {
+        color = "background-color: #007bff";
+      } else if (item.percentage >= 50) {
+        color = "background-color: #dc3545";
+      }
+      item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
     }
+    const storeId = [];
+    let innerHTML = "";
+    for (let item of dataCompare) {
+      innerHTML += `
+        <div class="row-item">
+      <div class="column-item-name pointer" onClick="applyCompare(${item.id},${item.prlOrgTo},'${item.prlOrgTo}')">
+        <span class="text-primary  text-decoration-none"><u>${item.name}</u></span> 
+        ${item.badge}
+      </div>
+      <i class="pl-1 icon-nm fas fa-info-circle align-self-center"  href="#" tabindex="0" data-toggle="popOver${item.id}"></i>
+        </div>
+      `;
+      storeId.push(item.id);
+    }
+    if (result?.data?.length === 0) {
+      innerHTML = DATA_NOT_FOUND_HTML;
+    }
+    chkJobListPercentage.innerHTML = innerHTML;
+    storeId.forEach((item) => {
+      const dataDetail = details.find((detail) => detail.jobIdTo === item);
+      callPopover(item, dataDetail);
+    });
 
-    // const data = dataJobDescCompare
-    //   .map((item) => ({
-    //     id: item?.identifikasi?.id,
-    //     name: item?.identifikasi?.jobName,
-    //   }))
-    //   .filter((item) =>
-    //     item.name.toLowerCase().includes(event?.target?.value.toLowerCase())
-    //   );
+    // Hide loading after processing is complete
+    hideChartLoading("animate-chk");
 
-    // chkJobList.innerHTML = data
-    //   .map(
-    //     (item) => `
-    //       <div class="row-item">
-    //         <div class="column-item-name" onClick="applyCompare(${item.id})">
-    //           ${item.name}
-    //         </div>
-    //       </div>
-    //     `
-    //   )
-    //   .join("");
+    // Reinitialize popovers after updating the inner HTML
 
     // $('[data-toggle="popover"]').popover();
-  }
-
-  const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
-
-  function logWewenangFetchSuccess(params, data) {
-    console.log(`get data ${params} berhasil, jika tabel belum muncul cek format data, exp:`, data);
-  }
-  function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
-    // alert(
-    //   `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/${endpoint} tidak valid atau kosong, data yang keluar hanya contoh. cek di console log`
-    // );
-    console.error(
-      `${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. contoh data expected:`,
-      data
-    );
-  }
-
-  const dataDetailJobDesc = {
-    draftId: getDraftExisting.draftId,
-    jobId: jobId,
-    prlRange: prlOrg,
-    prlOrg: prlOrg,
-  };
-
-  const dataBagan = {
-    draftId: getDraftExisting.draftOrganizationId,
-    jobCode: jobId,
-    depth: 2,
-  };
-
-  let identifikasiJabatan = await getIdentifikasiJabatan(dataDetailJobDesc);
-  const identifikasiJabatanData = {
-    jobId: "Data Not Found",
-    jobName: "Data Not Found",
-    prlOrg: "Data Not Found",
-    unitKerjaFungsi: "Data Not Found",
-    lokasiKerja: "Data Not Found",
-    direktorat: "Data Not Found",
-    atasanLangsung: "Data Not Found",
-    noSuratKeputusan: "Data Not Found",
-    tanggalSuratKeputusan: "Data Not Found",
-    jobReference: "Data Not Found",
-    jobReferences: [],
-  };
-  if (!identifikasiJabatan.jobName) {
-    showEndpointErrorAlert("job-description/identifikasi-jabatan/show", identifikasiJabatanData);
-    identifikasiJabatan = identifikasiJabatanData;
-  }
-
-  updateIdentifikasiJob(identifikasiJabatan);
-
-  // get fungsi jabatan = getFungsiJabatan
-  let fungsiJabatan = await getFungsiJabatan(dataDetailJobDesc);
-  const fungsiJabatanData = {
-    deskripsi: "Data Not Found",
-    "...": "...",
-  };
-  if (!fungsiJabatan.deskripsi) {
-    showEndpointErrorAlert("job-description/fungsi-jabatan/show", fungsiJabatanData);
-    fungsiJabatan = fungsiJabatanData;
-  }
-
-  $(".summernote").summernote({
-    height: 300,
-    tabsize: 2,
-    // disable font type button
-    toolbar: [
-      // [groupName, [list of button]]
-      ["style", ["bold", "italic", "underline", "clear"]],
-      ["font", ["strikethrough", "superscript", "subscript"]],
-      ["para", ["ul", "ol", "paragraph"]],
-    ],
-  });
-  $(".summernote").summernote("enable");
-  $(".summernote").summernote("code", fungsiJabatan.deskripsi);
-
-  let tugasTanggungJawabUmum;
-  try {
-    tugasTanggungJawabUmum = await getTugasTanggungJawabUmum(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-umum/show", tugasTanggungJawabUmum.data);
-    updateTable("tugasUmum", tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
-  } catch (error) {
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-umum/show", [], error.message);
-  }
-
-  try {
-    const countTugasHa = await getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 });
-    const countAll = countTugasHa.data.length;
-    const countAvailable = countTugasHa.data.filter((item) => item.status === "AVAILABLE").length;
-    const $label = $("#labelFulfillTugasHa");
-    $label
-      .toggleClass("label-success-custom", countAvailable === countAll)
-      .toggleClass("label-danger-custom", countAvailable !== countAll)
-      .text(`${countAvailable}/${countAll} business processes have been fulfilled.`);
-  } catch (error) {
-    console.error("Error fetching countTugasHa:", error);
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/count", [], error.message);
-  }
-
-  let tugasTanggungJawabAkhir;
-  const tugasTanggungJawabAkhirData = {
-    data: dataJobDescCompare[0].tugasHa.filter((item) => item.responsible.length > 0),
-  };
-  try {
-    tugasTanggungJawabAkhir = await getTugasTanggungJawabAkhir(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
-    updateTable(
-      "tugasHa",
-      tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0),
-      tabCusJD.tugasHa
-    );
-  } catch (error) {
-    console.error("Error fetching tugasTanggungJawabAkhir:", error);
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
-  }
-
-  let wewenang;
-  const wewenangData = { data: dataJobDescCompare[0].wewenang };
-  try {
-    wewenang = await getWewenang(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/wewenang/show", wewenangData);
-  } catch (error) {
-    console.error("Error fetching wewenang:", error);
-    showEndpointErrorAlert("job-description/wewenang/show", wewenangData);
-    wewenang = wewenangData;
-  }
-  updateTable("wewenang", wewenang.data, tabCusJD.wewenang);
-
-  let koordinasiInternal;
-  const koordinasiInternalData = {
-    data: dataJobDescCompare[0].koordinasi,
-  };
-  try {
-    koordinasiInternal = await getKoordinasiInternal(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/koordinasi-internal/show", koordinasiInternalData);
-  } catch (error) {
-    console.error("Error fetching koordinasiInternal:", error);
-    showEndpointErrorAlert("job-description/koordinasi-internal/show", dataJobDescCompare[0].koordinasi);
-    koordinasiInternal = koordinasiInternalData;
-  }
-
-  updateTable("koordinasi", koordinasiInternal.data, tabCusJD.koordinasi);
-
-  let relasiEksternal;
-  const relasiEksternalData = { data: dataJobDescCompare[0].relation };
-
-  try {
-    relasiEksternal = await getRelasiEksternal(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/relasi-eksternal/show", relasiEksternalData);
-    console.log("relasiEksternal", relasiEksternal);
-  } catch (error) {
-    console.error("Error fetching koordinasiInternal:", error);
-    showEndpointErrorAlert("job-description/relasi-eksternal/show", relasiEksternalData);
-    relasiEksternal = relasiEksternalData;
-  }
-  updateTable("relation", relasiEksternal.data, tabCusJD.relation);
-
-  let persyaratanJabatan;
-  const persyaratanJabatanData = { data: dataJobDescCompare[0].relation };
-
-  try {
-    persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
-
-    persyaratanJabatan.data.map((item) => {
-      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
-    });
-    updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
-  } catch (error) {
-    console.error("Error fetching persyaratanJabatan:", error);
-    showEndpointErrorAlert("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
-    persyaratanJabatan = persyaratanJabatanData;
-  }
-
-  let persyaratanKhusus;
-  const persyaratanKhususData = { data: dataJobDescCompare[0].relation };
-
-  try {
-    persyaratanKhusus = await getPersyaratanKhusus(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanKhususData);
-
-    persyaratanKhusus.data.map((item) => {
-      item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
-    });
-    // updateTable(
-    //   "persyaratanKhususTable",
-    //   persyaratanKhusus.data,
-    //   tabCusJD.persyaratan
-    // );
-  } catch (error) {
-    console.error("Error fetching persyaratanKhusus:", error);
-    persyaratanKhusus = persyaratanKhususData;
-  }
-
-  const divKompetensiTeknisGeneral = $("#kompetensiGeneral");
-  const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
-  const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
-  // const divKompetensiPerilaku = $("#kompetensiPerilaku");
-
-  let kompetensiTeknis;
-  try {
-    kompetensiTeknis = await getKompetensiTeknis(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/kompetensi-teknis/show", kompetensiTeknis);
-
-    if (Array.isArray(kompetensiTeknis.data.komtekMandatori) && kompetensiTeknis.data.komtekMandatori.length > 0) {
-      const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
-      kompetensiTeknis.data.komtekMandatori.forEach((item) => {
-        $ul.append(
-          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
-        );
-      });
-      divKompetensiTeknisMandatory.empty().append($ul);
-    }
-
-    console.log("kompetensiTeknis.data.komtekGeneral", kompetensiTeknis.data.komtekGeneral);
-
-    if (Array.isArray(kompetensiTeknis.data.komtekGeneral) && kompetensiTeknis.data.komtekGeneral.length > 0) {
-      const $ul = $('<ul style=""></ul>');
-      kompetensiTeknis.data.komtekGeneral.forEach((item) => {
-        console.log("ada data komtekGeneral", item);
-        $ul.append(
-          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
-        );
-      });
-      divKompetensiTeknisGeneral.empty().append($ul);
-    }
-
-    console.log("kompetensiTeknis.data.komtekSpesifik", kompetensiTeknis.data.komtekSpesifik);
-
-    if (Array.isArray(kompetensiTeknis.data.komtekSpesifik) && kompetensiTeknis.data.komtekSpesifik.length > 0) {
-      const $ul = $('<ul style=""></ul>');
-      kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
-        console.log("ada data komtekSpesifik", item);
-        $ul.append(
-          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
-        );
-      });
-      divKompetensiTeknisSpesifik.empty().append($ul);
-    }
-  } catch (error) {
-    console.error("Error fetching persyaratanKhusus:", error);
-    showEndpointErrorAlert("job-description/persyaratan-jabatan/show", []);
-  }
-
-  let kompetensiPerilaku;
-  try {
-    kompetensiPerilaku = await getKompetensiPerilaku(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/kompetensi-perilaku/show", kompetensiPerilaku);
-    const divKompetensiPerilaku = $("#kompetensiPerilaku");
-    console.log("kompetensiPerilaku ==========", kompetensiPerilaku.data);
-    divKompetensiPerilaku.empty();
-    if (Array.isArray(kompetensiPerilaku.data) && kompetensiPerilaku.data.length > 0) {
-      const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
-      kompetensiPerilaku.data.forEach((item) => {
-        $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
-      });
-      divKompetensiPerilaku.append($ul);
+  } else {
+    const value = event?.target?.value || "";
+    showChartLoading("chk-job-list", true, "480px", "100%", "Please wait, fetching data...");
+    if (value === "") {
+      chkJobList.innerHTML = DATA_NOT_FOUND_HTML;
     } else {
-      divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
+      const result = await draftListJobDesc({
+        draftId: getDraftExisting.draftId,
+        position: value,
+      });
+      console.log("result", result);
+      const data = result?.data
+        .map((item) => ({
+          id: item?.jobId,
+          name: item?.positionName,
+          prlOrg: item?.prlOrg,
+          prlRange: item?.prlRange,
+        }))
+        .filter((item) => item.name.toLowerCase().includes(value.toLowerCase()));
+
+      let innerHTML = "";
+      for (let item of data) {
+        innerHTML += `
+        <div class="row-item">
+          <div class="column-item-name pointer" onClick="applyCompare(${item.id},${item.prlOrg},'${item.prlOrg}')">
+            <span class="text-primary  text-decoration-none"><u>${item.name}</u></span>
+          </div>
+        </div>
+      `;
+      }
+      if (data.length === 0) {
+        innerHTML = DATA_NOT_FOUND_HTML;
+      }
+      chkJobList.innerHTML = innerHTML;
     }
-  } catch (error) {
-    console.error("Error fetching kompetensiPerilaku:", error);
-    showEndpointErrorAlert("job-description/kompetensi-perilaku/show", []);
+    hideChartLoading("animate-chk");
   }
+}
 
-  let stk;
-  try {
-    stk = await getStk(dataDetailJobDesc);
-    // filter stk.data to remove items with empty stkNumber is null or undefined
-    stk.data = stk.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
-    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", stk.data);
-    updateTable("stk", stk.data, tabCusJD.stk);
-  } catch (error) {
-    console.error("Error fetching stk:", error);
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", []);
-  }
-
-  // Store bagan data globally for tab navigation
-  let globalBaganData = null;
-  let globalDataBaganSelf = null;
-
-  chartShow(dataBagan).then((bagan) => {
-    if (bagan && bagan.data) {
-      globalBaganData = bagan.data;
-      globalDataBaganSelf = bagan.data.find((item) => item.id == jobId);
-      console.log("dataBaganSelf", globalDataBaganSelf);
-      console.log("bagan?.data", bagan.data);
-      focusNode(globalDataBaganSelf, bagan.data);
-    }
-  });
-
-  checkLocalStorage();
+function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
+  console.error(`${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. `);
+}
+$(document).ready(async function () {
+  refreshDataLocalStorage();
   let activeTab = "identifikasi";
   if (activeTab) {
     const linkTab = "#v-pills-" + activeTab + "-tab";
     $(linkTab).tab("show");
   }
 
-  const idPos = urlParams.get("id");
-  const isCrete = urlParams.get("create");
-  if (idPos) {
-    if (isCrete) {
-      const findData = dataJobDesc.find((item) => item.identifikasi.id == idPos);
-      $("#selectJobReference").val(findData.identifikasi.id);
-      getJobReference(findData);
-    } else {
-      const findData = await dataJobDescCompare.find((item) => item.identifikasi.id == idPos);
-      $("#selectJobReference").append(
-        `<option value="${findData.identifikasi.id}">${findData.identifikasi.jobName}</option>`
-      );
-      $("#selectJobReference").val(findData.identifikasi.id);
-      let dataFungsi = [{ fungsi: findData.fungsi }];
-      let tugasHa = findData.tugasHa;
-      let koordinasi = findData.koordinasi;
-      let relation = findData.relation;
-      localStorage.setItem("fungsi", JSON.stringify(dataFungsi));
-      localStorage.setItem("tugasHa", JSON.stringify(tugasHa));
-      localStorage.setItem("koordinasi", JSON.stringify(koordinasi));
-      localStorage.setItem("relation", JSON.stringify(relation));
-
-      getJobReference(findData);
-      await getJobReferenceDetail();
+  const getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
+  for (const key in getDataJobDesc) {
+    if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
+      showEndpointErrorAlert(`job-description/${key}/show`, getDataJobDesc[key]);
+      getDataJobDesc[key] = null;
     }
   }
+  if (getDataJobDesc?.identifikasiJabatan) {
+    updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
+  }
+
+  if (getDataJobDesc.fungsiJabatan) {
+    const lsFungsi = [
+      {
+        fungsi: getDataJobDesc?.fungsiJabatan.deskripsi,
+        jobReference: {},
+      },
+    ];
+    localStorage.setItem("fungsi", JSON.stringify(lsFungsi));
+    $(".summernote").summernote({
+      height: 300,
+      tabsize: 2,
+      // disable font type button
+      toolbar: [
+        // [groupName, [list of button]]
+        ["style", ["bold", "italic", "underline", "clear"]],
+        ["font", ["strikethrough", "superscript", "subscript"]],
+        ["para", ["ul", "ol", "paragraph"]],
+      ],
+    });
+    $(".summernote").summernote("enable");
+    let summernoteContent = "";
+    lsFungsi.forEach((item) => {
+      summernoteContent += item.fungsi + "<br><br>";
+      if (item.jobReference.jobName) {
+        const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
+        summernoteContent += textReference + "<br><br>";
+      }
+    });
+    $(".summernote").summernote("code", summernoteContent);
+  }
+
+  if (getDataJobDesc.tugasTanggungJawabUmum) {
+    updateTable("tugasUmum", getDataJobDesc.tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
+  }
+
+  if (getDataJobDesc.countTugasHa) {
+    const countAll = getDataJobDesc.countTugasHa.data.length;
+    const available = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "AVAILABLE");
+    const notAvailable = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "NOT AVAILABLE");
+    const countAvailable = available.length;
+    const countNotAvailable = notAvailable.length;
+    const codeAvailable = available.map((item) => item.indexNumber);
+    const codeNotAvailable = notAvailable.map((item) => item.indexNumber);
+
+    const lsAvailable = {
+      available,
+      notAvailable,
+      countAll,
+      codeAvailable,
+      codeNotAvailable,
+      countAvailable,
+      countNotAvailable,
+    };
+    localStorage.setItem("lsAvailable", JSON.stringify(lsAvailable));
+
+    const $label = $("#labelFulfillTugasHa");
+    $label
+      .toggleClass("label-success-custom", countAvailable === countAll)
+      .toggleClass("label-danger-custom", countAvailable !== countAll)
+      .css("cursor", "pointer")
+      .html(`${countAvailable}/${countAll} business processes have been fulfilled. <b>see detail</b>`);
+  }
+  if (getDataJobDesc.tugasTanggungJawabAkhir) {
+    const cleanObj = getDataJobDesc.tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0);
+    localStorage.setItem("tugasHa", JSON.stringify(cleanObj));
+    updateTable("tugasHa", cleanObj, [...tabCusJD.tugasHa, "action"]);
+  }
+
+  if (getDataJobDesc.wewenang) {
+    updateTable("wewenang", getDataJobDesc.wewenang.data, tabCusJD.wewenang);
+  }
+
+  if (getDataJobDesc.koordinasiInternal) {
+    localStorage.setItem("koordinasiInternal", JSON.stringify(getDataJobDesc.koordinasiInternal.data));
+    updateTable("koordinasi", getDataJobDesc.koordinasiInternal.data, [...tabCusJD.koordinasi, "action"]);
+  }
+
+  if (getDataJobDesc.relasiEksternal) {
+    localStorage.setItem("relasiEksternal", JSON.stringify(getDataJobDesc.relasiEksternal.data));
+    updateTable("relation", getDataJobDesc.relasiEksternal.data, [...tabCusJD.relation, "action"]);
+  }
+  if (getDataJobDesc.persyaratanJabatan) {
+    getDataJobDesc.persyaratanJabatan.data.map((item) => {
+      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
+    });
+    updateTable("persyaratan", getDataJobDesc.persyaratanJabatan.data, tabCusJD.pj);
+  }
+
+  if (getDataJobDesc.persyaratanKhusus) {
+    getDataJobDesc.persyaratanKhusus.data.map((item) => {
+      item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
+    });
+    localStorage.setItem("persyaratanKhusus", JSON.stringify(getDataJobDesc.persyaratanKhusus.data));
+    updateTable("persyaratanKhusus", getDataJobDesc.persyaratanKhusus.data, [...tabCusJD.pk, "action"]);
+  }
+  const divKompetensiTeknisGeneral = $("#kompetensiGeneral");
+  const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
+  const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
+  const divKompetensiPerilaku = $("#kompetensiPerilaku");
+
+  if (
+    Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekMandatori) &&
+    getDataJobDesc.kompetensiTeknis.data.komtekMandatori.length > 0
+  ) {
+    const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
+    getDataJobDesc.kompetensiTeknis.data.komtekMandatori.forEach((item) => {
+      $ul.append(
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
+      );
+    });
+    divKompetensiTeknisMandatory.empty().append($ul);
+  }
+
+  if (
+    Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekGeneral) &&
+    getDataJobDesc.kompetensiTeknis.data.komtekGeneral.length > 0
+  ) {
+    const $ul = $('<ul style=""></ul>');
+    getDataJobDesc.kompetensiTeknis.data.komtekGeneral.forEach((item) => {
+      $ul.append(
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
+      );
+    });
+    divKompetensiTeknisGeneral.empty().append($ul);
+  }
+
+  if (
+    Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekSpesifik) &&
+    getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.length > 0
+  ) {
+    const $ul = $('<ul style=""></ul>');
+    getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
+      $ul.append(
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
+      );
+    });
+    divKompetensiTeknisSpesifik.empty().append($ul);
+  }
+
+  if (Array.isArray(getDataJobDesc.kompetensiPerilaku.data) && getDataJobDesc.kompetensiPerilaku.data.length > 0) {
+    const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
+    getDataJobDesc.kompetensiPerilaku.data.forEach((item) => {
+      $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
+    });
+    divKompetensiPerilaku.append($ul);
+  } else {
+    divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
+  }
+
+  if (getDataJobDesc.stk) {
+    // filter stk.data to remove items with empty stkNumber is null or undefined
+    getDataJobDesc.stk.data = getDataJobDesc.stk.data.filter(
+      (item) => item.stkNumber !== null && item.stkNumber !== undefined
+    );
+    localStorage.setItem("stk", JSON.stringify(getDataJobDesc.stk.data));
+    updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
+  }
+
+  focusNode(jobId);
 
   // $(".summernote").summernote("disable");
 
@@ -526,6 +523,10 @@ $(document).ready(async function () {
   // await getJobReferenceDetail();
 
   // multiSelect({ selectID: "JobReference", type: "jobposition" });
+
+  // $("#inputSearchCompare").on("input", function (e) {
+  //   searchJobCompare(e, false, getDraftExisting);
+  // });
 
   // on change selectJobReference
   $("#selectJobReference").on("change", function (e) {
@@ -573,12 +574,14 @@ $(document).ready(async function () {
   dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
   dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 
-  //  radio button with name debt-amount
+  //  radio button with name percentage-amount
   // ...existing code...
 
-  // Listen for changes on the radio buttons within the form with ID 'debt-amount-form'
-  $("#debt-amount-form input[name='debt-amount']").on("change", function () {
+  // Listen for changes on the radio buttons within the form with ID 'percentage-amount-form'
+  $("#percentage-amount-form input[name='percentage-amount']").on("change", function () {
     const value = $(this).val();
+    console.log("Selected debt amount option:", value);
+    console.log(getDraftExisting, "getDraftExisting");
     searchJobCompare(value, true);
   });
 
@@ -587,12 +590,7 @@ $(document).ready(async function () {
   // Listen for tab navigation events
   $('#v-pills-tab-modal a[data-bs-toggle="pill"]').on("shown.bs.tab", function (e) {
     const target = $(e.target).attr("href"); // activated tab
-    console.log("target", target);
     activeTab = target.split("#v-pills-")[1];
-    console.log("activeTab", activeTab);
-    if (activeTab === "bagan-primary" && globalDataBaganSelf && globalBaganData) {
-      focusNode(globalDataBaganSelf, globalBaganData);
-    }
     const element = document.getElementById(activeTab);
     if (element) {
       element.scrollIntoView();
@@ -883,8 +881,6 @@ $(document).ready(async function () {
       for (let j = 0; j < item?.tugas_ha_li.length; j++) {
         const listItemOutput = await addList(item?.tugas_ha_li[j].output);
         const listItemLeadingIndicator = await addList(item?.tugas_ha_li[j].lead);
-        console.log("listItemOutput", listItemOutput);
-
         bodyTugasHa += `
             <tr>
         <td class="p-3" style="place-content: flex-start">

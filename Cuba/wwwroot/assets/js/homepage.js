@@ -27,13 +27,17 @@ if (listMenu) {
     const navigationUrl = `${mainMenuInfo[menuName]}`;
     console.log(iconPath, navigationUrl);
 
+    // icon bell
+    //
+    // const bell = <span class="badge-icon-menu rounded-pill badge-secondary">4 </span>
+    const bell = "";
     return `
       <div class="col-2">
       <div class="card wow animate__animated animate__flipInY" onclick="location.href='${baseUrl}${navigationUrl}'">
         <div class="card-body">
         <div class="notification-box-main-menu">
-          <i data-feather="bell" style="stroke: white;"></i><span
-            class="badge-icon-menu rounded-pill badge-secondary">4 </span>
+          <i data-feather="bell" style="stroke: white;"></i>
+          ${bell}
         </div>
         <img src="${iconPath}" alt="${menuName}" onerror="this.src='https://via.placeholder.com/150'" />
         </div>
