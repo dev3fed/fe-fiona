@@ -1,4 +1,5 @@
-﻿@{
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -122,29 +123,7 @@
         display: none !important;
         } *@
         /* Change the background color of the Select2 dropdown */
-        .select2-container .select2-selection--single {
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        /* Change the color of the selected text */
-        .select2-container .select2-selection__rendered {
-            color: #333;
-            font-weight: bold;
-        }
-
-        /* Style the dropdown arrow */
-        .select2-container .select2-selection__arrow {
-            height: 100%;
-        }
-
-        /* Style the dropdown list */
-        .select2-container .select2-dropdown {
-            background: #fff;
-            border: 1px solid #aaa;
-        }
-
+       
 </style>
 
 <div id="xTickTooltip" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px 10px; font-size:12px; z-index:9999; pointer-events:none; border-radius:4px;"></div>
@@ -201,7 +180,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">8</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Director" data-bs-original-title="Director">Director</span>
+                                                <h3 class="f-w-700" id="count-director">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Director" data-bs-original-title="Director">Director</span>
                                             </div>
                                         </div>
                                     </div>
@@ -220,7 +199,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">37</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="VP/EGM/SMOM">VP/EGM/SMOM</span>
+                                                <h3 class="f-w-700" id="count-vp">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="VP/EGM/SMOM">VP/EGM/SMOM</span>
                                             </div>
                                         </div>
                                     </div>
@@ -239,7 +218,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">185</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                <h3 class="f-w-700" id="count-manager">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
                                                 Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara">Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara</span>
                                             </div>
                                         </div>
@@ -259,7 +238,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">662</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Asst. Manager/Sr. Analyst/Setara">Asst. Manager/ Sr. Analyst/ Setara</span>
+                                                <h3 class="f-w-700" id="count-ass-manager">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Asst. Manager/Sr. Analyst/Setara">Asst. Manager/ Sr. Analyst/ Setara</span>
                                             </div>
                                         </div>
                                     </div>
@@ -278,7 +257,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">811</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                <h3 class="f-w-700" id="count-sr-supervisor">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
                                                 Sr. Supervisor/Analyst/Setara">Sr. Supervisor/Analyst/Setara</span>
                                             </div>
                                         </div>
@@ -298,7 +277,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">1679</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                <h3 class="f-w-700" id="count-supervisor">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
                                                 Supervisor/Analyst/Setara">Supervisor/Analyst/Setara</span>
                                             </div>
                                         </div>
@@ -318,7 +297,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">990</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                <h3 class="f-w-700" id="count-jr-supervisor">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
                                                 Jr. Supervisor/Jr. Assistant/Setara
                                                 ">Jr. Supervisor/Jr. Assistant/Setara</span>
                                             </div>
@@ -339,7 +318,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3 class="f-w-700">648</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
+                                                <h3 class="f-w-700" id="count-jr-operator">0</h3><span class="f-light f-14 ellipsis" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="
                                                 Jr. Operator/Jr. Technician/Administrator/Setara
                                                 ">Jr. Operator/Jr. Technician/Administrator/Setara</span>
                                             </div>
@@ -356,7 +335,7 @@
                                 <div class="card widget-1 no-box-shadow mb-0">
                                     <div class="card-body" style="padding:20px;border: 1px solid #EAEAEB;justify-content:center;">
                                         <div class="d-flex-row" style="text-align:center;">
-                                            <h4>5020</h4>
+                                            <h4 id="total-formation">0</h4>
                                             <span>Total Formation</span>
                                         </div>
                                     </div>
@@ -366,7 +345,7 @@
                                 <div class="card widget-1 no-box-shadow mb-0">
                                     <div class="card-body" style="padding:20px;border: 1px solid #EAEAEB;justify-content:center;">
                                         <div class="d-flex-row" style="text-align:center;">
-                                            <h4>242</h4>
+                                            <h4 id="total-project">0</h4>
                                             <span>Total Position Project</span>
                                         </div>
                                     </div>
@@ -391,6 +370,10 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-12 d-flex justify-content-between mb-4">
+                                            <div class="d-flex" style="gap:10px;"> 
+                                                <div style="background:#E87777;width: 22px;height: 18px;padding-top: 16px;"></div>
+                                                <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="Director" data-bs-original-title="Director">Director</span>
+                                            </div>
                                             <div class="d-flex" style="gap:10px;"> 
                                                 <div style="background:#9999FC;width: 22px;height: 18px;padding-top: 16px;"></div>
                                                 <span class="f-12" data-container="body" data-bs-toggle="tooltip" data-bs-placement="top" title="VP/EGM/SMOM" data-bs-original-title="VP/EGM/SMOM">VP/EGM/SMOM</span>
@@ -488,7 +471,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
-                                                    <canvas id="chart-os-job-grade" height="300"></canvas>
+                                                    <div id="chart-os-job-grade-container" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; border: 1px solid #eee;">
+                                                        <canvas id="chart-os-job-grade"></canvas>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -501,7 +486,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
-                                                    <canvas id="chart-os-person-grade" height="300"></canvas>
+                                                    <div id="chart-os-person-grade-container" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; border: 1px solid #eee;">
+                                                        <canvas id="chart-os-person-grade"></canvas>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -948,11 +935,14 @@
 
 @section Script {
     <!-- Plugins JS start-->
-    <script src="../assets/js/sidebar-menu.js"></script>
-    <script src="../assets/js/slick/slick.min.js"></script>
-    <script src="../assets/js/slick/slick.js"></script>
-    <script src="../assets/js/header-slick.js"></script>
-    <script src="../assets/js/organization-structure/multiple-select.js"></script>
+    <script>
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
+    </script>
+    <script src="@Url.Content("../assets/js/sidebar-menu.js")"></script>
+    <script src="@Url.Content("../assets/js/slick/slick.min.js")"></script>
+    <script src="@Url.Content("../assets/js/slick/slick.js")"></script>
+    <script src="@Url.Content("../assets/js/header-slick.js")"></script>
+    <script src="@Url.Content("../assets/js/organization-structure/multiple-select.js")"></script>
 
     <script>
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (tooltipTriggerEl) {
@@ -962,11 +952,10 @@
             new bootstrap.Tooltip(tooltipTriggerEl);
         });
     </script>
-    <script src="../assets/js/dashboard/constant.js"></script>
-    <!-- Plugins JS Ends-->
-    <!-- Theme js-->
-    <script src="../assets/js/dashboard/helper.js"></script>
-    <script src="../assets/js/dashboard/index.js"></script>
+    <script src="@Url.Content("../assets/js/dashboard/constant.js")"></script>
+    <script src="@Url.Content("../assets/js/dashboard/helper.js")"></script>
+    <script src="@Url.Content("../assets/js/dashboard/endpoint.js")"></script>
+    <script src="@Url.Content("../assets/js/dashboard/index.js")"></script>
 
-    <script src="../assets/js/script.js"></script>
+    <script src="@Url.Content("../assets/js/script.js")"></script>
 }
