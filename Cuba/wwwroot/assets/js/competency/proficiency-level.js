@@ -1,15 +1,16 @@
-const openModalEditDepth = async (jobCode, compCode) => {
+const openModalEditDepth = async (jobCode, compCode, compeType) => {
   const selectedValue = $("#dataSource-competency").val();
   const payload = {
     dataSource: selectedValue,
     positionCode: jobCode,
+    compeType: compeType,
     competencyCode: compCode,
   };
   const queryString = "?" + new URLSearchParams(payload).toString();
   const result = await fetchProficiencyLevel(queryString);
-  setState("detailProficiency", result.data);
+  setState("detailProficiency", { ...result.data, compeType: compeType });
   const competencyLevel = result.data.proficiencyLevel;
-  const compeCategory = result.data.competencyType;
+  const compeCategory = result.data.competencyType || compeType;
   const detailData = result.data;
 
   const btnApproval = document.getElementById("btnSubmitApproval");
@@ -164,13 +165,12 @@ const openModalApprovalDepthLevel = async () => {
     const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
     const draftId = $("#dataSource-competency").val();
     const detailProficiency = getState("detailProficiency");
-    console.log("detailProficiency", detailProficiency);
-    console.log("cek", selectedValue);
     const payload = {
       draftId: draftId,
       positionCode: detailProficiency.positionCode,
       compCode: detailProficiency.compCode,
       proficiencyLevel: selectedValue,
+      compeType: detailProficiency.compeType,
     };
     console.log("payload", payload);
     const result = await fetchSaveProficiencyLevel(payload);

@@ -11,6 +11,7 @@ const modalInfoPosition = async (code, prl) => {
     const result = await fetchDetailPositionInfo(queryString);
     if (result.success === true) {
       const detailInformation = result?.data.jobDetail[0];
+      console.log("detailInformation", detailInformation);
       setState("jobInformation", detailInformation);
       if (detailInformation) {
         const positionName = `
@@ -381,7 +382,7 @@ const cardTblBehavior = async (code, prl) => {
   try {
     const result = await fetchDetailPositionBehavior(queryString);
     if (result.success === true) {
-      const listBehavior = result?.data.behaviourList[0].behaviouralDictionary || [];
+      const listBehavior = result?.data.behaviourList[0]?.behaviouralDictionary || [];
       const theadMandatory = `
           <tr>
             <th scope="col" style="width: 40px;text-align:center">No</th>

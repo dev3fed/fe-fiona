@@ -11,7 +11,7 @@ const getSummaryList = async (draftId) => {
       keySearch: "",
       searchValue: "",
       filter: [statusValue],
-      page: 2,
+      page: 1,
       limit: 10,
     };
     const resultList = await fetchSummalyList(payload);

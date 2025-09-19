@@ -19,6 +19,7 @@ const appState = new Proxy(
       page: 1,
       pageSize: 10,
     },
+    payloadDeleteActivity: {},
     payloadTblBehavior: {},
     payloadTblTechnical: {},
     jobInformation: {},

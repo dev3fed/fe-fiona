@@ -138,6 +138,8 @@
                 <partial name="~/Views/Competency/ModalDraftDetailCompe.cshtml" />
                 <partial name="~/Views/Competency/ModalEditDraftDepth.cshtml" />
                 <partial name="~/Views/Competency/ModalDraftDeleteNotif.cshtml" />
+                <partial name="~/Views/Competency/ModalNotifdeleteactivity.cshtml" />
+                <partial name="~/Views/Competency/ModalActivityCompe.cshtml" />
                 <partial name="~/Views/Competency/ModalRenameDraft.cshtml" />
                 <partial name="~/Views/Competency/DetailDraft.cshtml" />
             </div>
@@ -278,7 +280,7 @@
     <script>
         const url_api = "@Configuration["AppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->
@@ -297,6 +299,7 @@
     <script src="../assets/js/competency/summary-list.js"></script>
     <script src="../assets/js/competency/proficiency-level.js"></script>
     <script src="../assets/js/competency/detail-competency.js"></script>
+    <script src="../assets/js/competency/activity-detaildraft.js"></script>
     <script src="../assets/js/competency/scroll-table.js"></script>
     <script src="../assets/js/competency/competency-draft.js"></script>
     <script src="../assets/js/competency/detail-draft.js"></script>

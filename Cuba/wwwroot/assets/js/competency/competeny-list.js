@@ -285,7 +285,9 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
     const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");
     listCompetency.forEach((comp) => {
-      const compItem = competencyMapping.find((item) => item.uniqueKey === jobCode && item.compCode === comp.compCode);
+      const compItem = competencyMapping.find(
+        (item) => item.uniqueKey === jobCode && item.compCode === comp.compCode && item.compType === comp.compType,
+      );
       const level = compItem?.level || "";
       const compTd = `
         <td data-index="${jobCode}-${comp.compCode}">
@@ -296,7 +298,7 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
             <img style="display: ${
               isMaster ? "none" : "flex"
             }" src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" 
-              onclick="openModalEditDepth('${jobCode}', '${comp.compCode}')">
+              onclick="openModalEditDepth('${jobCode}', '${comp.compCode}','${comp.compType}')">
           </div>
         </td>
       `;

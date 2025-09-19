@@ -1020,7 +1020,3 @@ const editNotActivity = async () => {
     console.error("editNotActivity error:", error);
   }
 };
-const openModalActivityAddnot = () => {
-  const modal = new bootstrap.Modal(document.getElementById("modalActivityAddnot"));
-  modal.show();
-};

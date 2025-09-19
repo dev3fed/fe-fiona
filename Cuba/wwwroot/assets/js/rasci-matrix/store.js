@@ -175,6 +175,8 @@ const appState = new Proxy(
         // Set the new value
         target[property] = value;
         updateSelect2ByProsbis();
+        select2Activityprosbis();
+        updateSelect2ByNotation();
         updateSelect2ByJob();
         formValidation();
         formValidationNotation();

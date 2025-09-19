@@ -384,9 +384,10 @@ function changeemptyPageDraft(length) {
 }
 const confirmDeletecompeDraft = async () => {
   const id = getState("deleteDraftCompetency");
+  const spinBtn = document.getElementById("btnspin-deletedraft");
+  if (spinBtn) spinBtn.style.display = "inline-block";
   try {
     const deleteResult = await fetchDeleteDraft(id);
-    console.log("deleteResult", deleteResult);
     if (deleteResult.success === true) {
       const modalDelDraft = document.getElementById("modalDelete");
       const modal = bootstrap.Modal.getInstance(modalDelDraft);
@@ -409,6 +410,8 @@ const confirmDeletecompeDraft = async () => {
             innerHTML: `<div style="text-align: center;">${deleteResult.data.draftName} draft has been deleted.</div>`,
           },
         },
+      }).then(() => {
+        if (spinBtn) spinBtn.style.display = "none";
       });
     }
   } catch (error) {}
@@ -464,6 +467,13 @@ function handleBack() {
   const mainCompetency = document.getElementById("main-competency");
   const headerCompetency = document.getElementById("header-competency");
   const headerDetail = document.getElementById("header-detail-draft");
+  setState("dataDetailDraft", {});
+  const draftInfo = document.getElementById("draft-competencyinfo");
+  if (draftInfo) draftInfo.innerHTML = "";
+  const emptyActivity = document.getElementById("empty-activity");
+  if (emptyActivity) emptyActivity.innerHTML = "";
+  const tblActivity = document.getElementById("draftactivity-competency");
+  if (tblActivity) tblActivity.innerHTML = "";
 
   if (draftDetail) {
     draftDetail.style.display = "none";
