@@ -17,44 +17,37 @@ const mappingLevelName = {
   "jr-operator": "Jr. Operator/Jr. Technician/Administrator/Setara",
 };
 
+// "L1 (Category)", "L2 (Process Group)", "L3 (Process)", "L4 (Activity)", "L5 (Task)", "L6 (Sub Task)"
+const businessProcessLevels = [
+  "L1 (Category)",
+  "L2 (Process Group)",
+  "L3 (Process)",
+  "L4 (Activity)",
+  "L5 (Task)",
+  "L6 (Sub Task)",
+];
+
+const colorsRasci = {
+  A: "#4E9ECA",
+  R: "#45C6C1",
+  S: "#8DC2B5",
+  C: "#EF9D91",
+  I: "#FFDF6F",
+};
+
+const mappingRasciName = {
+  A: "Accountable",
+  R: "Responsible",
+  S: "Support",
+  C: "Consulted",
+  I: "Informed",
+};
+
+const rasciNotations = ["A", "R", "S", "C", "I"];
+
 const COLOR = ["#E87777", "#9999FC", "#7EC67E", "#7BE5D1", "#FDC47E", "#76BFFF", "#FFA5C3", "#B7B7B7"];
 const BAR_PERCENTAGE = 0.8;
 const CATEGORY_PERCENTAGE = 0.8;
-
-const asik = [
-  {
-    jobLevelName: "Asst. Manager/Sr. Analyst/Setara",
-    totalPositions: 606,
-  },
-  {
-    jobLevelName: "Director",
-    totalPositions: 8,
-  },
-  {
-    jobLevelName: "Jr. Operator/Jr. Technician/Administrator/Setara",
-    totalPositions: 5,
-  },
-  {
-    jobLevelName: "Jr. Supervisor/Jr. Assistant/Setara",
-    totalPositions: 631,
-  },
-  {
-    jobLevelName: "Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara",
-    totalPositions: 181,
-  },
-  {
-    jobLevelName: "Sr. Supervisor/Analyst/Setara",
-    totalPositions: 835,
-  },
-  {
-    jobLevelName: "Supervisor/Jr. Analyst/Setara",
-    totalPositions: 870,
-  },
-  {
-    jobLevelName: "VP/EGM/SMOM",
-    totalPositions: 38,
-  },
-];
 
 const dataDesinCost = {
   dataFunction: [

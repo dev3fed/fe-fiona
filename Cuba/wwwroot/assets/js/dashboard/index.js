@@ -1,37 +1,3 @@
-// function checkStickyBlockingParents(stickySelector) {
-//   const stickyElement = document.querySelector(stickySelector);
-//   if (!stickyElement) {
-//     console.warn("Sticky element tidak ditemukan.");
-//     return;
-//   }
-
-//   let parent = stickyElement.parentElement;
-//   while (parent) {
-//     const overflow = window.getComputedStyle(parent).overflow;
-//     const overflowY = window.getComputedStyle(parent).overflowY;
-//     const overflowX = window.getComputedStyle(parent).overflowX;
-
-//     if (
-//       ["auto", "scroll", "hidden"].includes(overflow) ||
-//       ["auto", "scroll", "hidden"].includes(overflowY) ||
-//       ["auto", "scroll", "hidden"].includes(overflowX)
-//     ) {
-//       console.warn("⚠️ Parent ini bisa mencegah sticky:", parent);
-//       console.log(
-//         "overflow:",
-//         overflow,
-//         "| overflowY:",
-//         overflowY,
-//         "| overflowX:",
-//         overflowX
-//       );
-//     }
-
-//     parent = parent.parentElement;
-//   }
-
-//   console.info("✅ Pemeriksaan selesai.");
-// }
 $(document).ready(async function () {
   // fetch data from API endpoint.js using async promise.
   const apiCalls = [
@@ -41,6 +7,13 @@ $(document).ready(async function () {
     { name: "totalPositionsByDirectorate", promise: fetchTotalPositionsByDirectorate() },
     { name: "totalOrganizationShapeJobGradeByArea", promise: fetchTotalOrganizationShapeJobGradeByArea() },
     { name: "totalOrganizationShapePersonGradeByArea", promise: fetchTotalOrganizationShapePersonGradeByArea() },
+    { name: "totalBusinessProcessValueChain", promise: fetchTotalBusinessProcessValueChain() },
+    { name: "totalRasciContentNotations", promise: fetchTotalRasciContentNotations() },
+    { name: "totalRasciNotationsByLevelBusinessProcess", promise: fetchRasciNotationsByLevelBusinessProcess() },
+    { name: "totalRasciNotationsByJobNameLevel", promise: fetchRasciNotationsByJobNameLevel() },
+    { name: "totalRasciNotationsVsFormation", promise: fetchRasciNotationsVsFormation() },
+    { name: "totalCompetencies", promise: fetchTotalCompetencies() },
+    { name: "top10SpecificCompetencies", promise: fetchTop10SpecificCompetencies() },
   ];
 
   const dataAllResults = await Promise.allSettled(apiCalls.map((call) => call.promise));
@@ -56,11 +29,53 @@ $(document).ready(async function () {
     }
   });
 
+  // console.log("dataAll", dataAll);
+
   if (dataAll.totalFormation) {
     $("#total-formation").text(dataAll.totalFormation.data);
   }
   if (dataAll.totalProject) {
     $("#total-project").text(dataAll.totalProject.data);
+  }
+
+  if (dataAll.totalBusinessProcessValueChain) {
+    $("#total-category").text(
+      dataAll.totalBusinessProcessValueChain.data.find((item) => item.levelName === "L1").total || 0
+    );
+    $("#total-process-group").text(
+      dataAll.totalBusinessProcessValueChain.data.find((item) => item.levelName === "L2").total || 0
+    );
+    $("#total-process").text(
+      dataAll.totalBusinessProcessValueChain.data.find((item) => item.levelName === "L3").total || 0
+    );
+    $("#total-activity").text(
+      dataAll.totalBusinessProcessValueChain.data.find((item) => item.levelName === "L4").total || 0
+    );
+    $("#total-task").text(
+      dataAll.totalBusinessProcessValueChain.data.find((item) => item.levelName === "L5").total || 0
+    );
+    $("#total-sub-task").text(
+      dataAll.totalBusinessProcessValueChain.data.find((item) => item.levelName === "L6").total || 0
+    );
+  }
+  if (dataAll.totalRasciContentNotations) {
+    $("#total-accountable").text(
+      dataAll.totalRasciContentNotations.data.find((item) => item.notation === "A").total || 0
+    );
+    $("#total-responsible").text(
+      dataAll.totalRasciContentNotations.data.find((item) => item.notation === "R").total || 0
+    );
+    $("#total-support").text(dataAll.totalRasciContentNotations.data.find((item) => item.notation === "S").total || 0);
+    $("#total-consulted").text(
+      dataAll.totalRasciContentNotations.data.find((item) => item.notation === "C").total || 0
+    );
+    $("#total-informed").text(dataAll.totalRasciContentNotations.data.find((item) => item.notation === "I").total || 0);
+  }
+
+  if (dataAll.totalCompetencies) {
+    $("#total-skill-group").text(dataAll.totalCompetencies.data.totalSkillGroup);
+    $("#total-sub-skill-group").text(dataAll.totalCompetencies.data.totalSubSkillGroup);
+    $("#total-technical-competencies").text(dataAll.totalCompetencies.data.totalCompetencies);
   }
 
   if (dataAll.totalPositionsByLevel) {
@@ -82,8 +97,6 @@ $(document).ready(async function () {
   });
 
   const chartOsPositionLevel = document.getElementById("chart-os-position-level").getContext("2d");
-  const chartOsJobGrade = document.getElementById("chart-os-job-grade").getContext("2d");
-  const chartOsPersonGrade = document.getElementById("chart-os-person-grade").getContext("2d");
   const chartRasciBusPro = document.getElementById("chart-rasci-buspro-level").getContext("2d");
   const chartRasciPosition = document.getElementById("chart-rasci-position-level").getContext("2d");
   const chartRasciNotationsFormation = document.getElementById("chart-rasci-notaions-formation").getContext("2d");
@@ -94,6 +107,10 @@ $(document).ready(async function () {
     dataPositionLevelByDirectorate: {},
     dataOsJobGrade: {},
     dataOsPersonGrade: {},
+    dataRasciBusProLevel: {},
+    dataRasciPositionLevel: {},
+    dataRasciNotationsFormation: {},
+    dataCompetencySpesific: {},
   };
 
   // Global chart instances
@@ -107,8 +124,6 @@ $(document).ready(async function () {
 
     // Calculate dynamic height based on data length (minimum 400px, 50px per item)
     const dynamicHeight = Math.max(400, data.length * 18);
-    console.log(`${data.length} data.length:`, data.length);
-    console.log(`${chartId} dynamic height:`, dynamicHeight);
 
     // Get canvas element
     const canvas = document.getElementById(chartId);
@@ -126,9 +141,6 @@ $(document).ready(async function () {
     // Set only the container height via CSS, let Chart.js handle canvas dimensions
     canvas.style.height = dynamicHeight + "px";
     canvas.style.width = "100%";
-
-    console.log(`${chartId} labels:`, labels);
-    console.log(`${chartId} dynamic height:`, dynamicHeight);
 
     // Get context after potential destroy and reset
     const ctx = canvas.getContext("2d");
@@ -378,8 +390,6 @@ $(document).ready(async function () {
   ]);
 
   if (dataAll.totalOrganizationShapeJobGradeByArea) {
-    console.log("dataAll.totalOrganizationShapeJobGradeByArea", dataAll.totalOrganizationShapeJobGradeByArea.data);
-
     // Store data for potential future updates
     dataChart.dataOsJobGrade.data = dataAll.totalOrganizationShapeJobGradeByArea.data;
 
@@ -392,11 +402,6 @@ $(document).ready(async function () {
   }
 
   if (dataAll.totalOrganizationShapePersonGradeByArea) {
-    console.log(
-      "dataAll.totalOrganizationShapePersonGradeByArea",
-      dataAll.totalOrganizationShapePersonGradeByArea.data
-    );
-
     // Store data for potential future updates
     dataChart.dataOsPersonGrade.data = dataAll.totalOrganizationShapePersonGradeByArea.data;
 
@@ -408,95 +413,76 @@ $(document).ready(async function () {
     );
   }
 
-  new Chart(chartRasciBusPro, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: ["L1 (Category)", "L2 (Process Group)", "L3 (Process)", "L4 (Activity)", "L5 (Task)", "L6 (Sub Task)"],
-      datasets: [
-        {
-          label: "A (Accountable)",
-          data: [13, 144, 1747, 7088, 32711, 66],
-          backgroundColor: "#4E9ECA",
-        },
-        {
-          label: "R (Responsible)",
-          data: [63, 683, 3273, 20126, 174484, 48723],
-          backgroundColor: "#45C6C1",
-        },
-        {
-          label: "S (Support)",
-          data: [0, 0, 39, 572, 20, 0],
-          backgroundColor: "#8DC2B5",
-        },
-        {
-          label: "C (Consulted)",
-          data: [0, 0, 1, 170, 4, 0],
-          backgroundColor: "#EF9D91",
-        },
-        {
-          label: "I (Informed)",
-          data: [0, 0, 13, 234, 10, 37],
-          backgroundColor: "#FFDF6F",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
-      plugins: {
-        datalabels: {
-          color: "#000", // Changed to black
-          anchor: "end", // Position at the top of the chart
-          align: "top", // Align at the top
-          font: {
-            weight: "bold",
-          },
-          formatter: function (value) {
-            // pasang format ribuan
-            thaousandFormatter = new Intl.NumberFormat("en-US", {
-              notation: "compact",
-              compactDisplay: "short",
-              maximumFractionDigits: 1,
-            });
-            return thaousandFormatter.format(value);
-          },
-        },
-        legend: {
-          labels: {
-            font: {
-              size: 13,
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          stacked: false, // Disable stacking
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Business Process Level",
-            font: {
-              size: 22,
-              weight: "400",
-            },
-            padding: {
-              top: 20,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            },
+  // totalRasciNotationsByLevelBusinessProcess => RASCI Notations by Business Process Level
+  if (dataAll.totalRasciNotationsByLevelBusinessProcess) {
+    // Create chart data for RASCI Business Process Level
+    dataChart.dataRasciBusProLevel.labels = businessProcessLevels;
+    dataChart.dataRasciBusProLevel.datasets = [];
 
-            color: "#9F9FA5", // Text color
-          },
-        },
-        y: {
-          stacked: false, // Disable stacking
-          type: "logarithmic",
-          min: 1,
-          max: 300000,
-          ticks: {
+    rasciNotations.forEach((notation, idx) => {
+      let notationDataArray = [];
+      businessProcessLevels.map((level) => {
+        const levelKey = level.split(" ")[0]; // Extract L1, L2, etc.
+        const found = dataAll.totalRasciNotationsByLevelBusinessProcess.data.find(
+          (item) => item.levelName === levelKey
+        );
+        const total = found.notations.find((n) => n.notation === notation)?.total || 0;
+        notationDataArray.push(total);
+        // return total;
+      });
+
+      const label = `${notation} (${mappingRasciName[notation]})`;
+      dataChart.dataRasciBusProLevel.datasets.push({
+        label: label,
+        data: notationDataArray,
+        backgroundColor: colorsRasci[notation],
+      });
+    });
+  }
+
+  // totalRasciNotationsByJobNameLevel => RASCI Notations by Job Name Level
+  if (dataAll.totalRasciNotationsByJobNameLevel) {
+    console.log("dataAll.totalRasciNotationsByJobNameLevel", dataAll.totalRasciNotationsByJobNameLevel);
+    dataChart.dataRasciPositionLevel.labels = dataAll.totalRasciNotationsByJobNameLevel.data.map(
+      (item) => item.jobLevelName
+    );
+    dataChart.dataRasciPositionLevel.datasets = [];
+    rasciNotations.forEach((notation, idx) => {
+      let notationDataArray = [];
+      Object.keys(mappingLevelName).forEach((level, idx) => {
+        const levelName = mappingLevelName[level];
+        const found = dataAll.totalRasciNotationsByJobNameLevel.data.find((item) => item.jobLevelName === levelName);
+        const total = found?.notations.find((n) => n.notation === notation)?.total || 0;
+        notationDataArray.push(total);
+        // return total;
+      });
+      console.log("notationDataArray", notationDataArray);
+      const label = `${notation} (${mappingRasciName[notation]})`;
+      dataChart.dataRasciPositionLevel.datasets.push({
+        label: label,
+        data: notationDataArray,
+        backgroundColor: colorsRasci[notation],
+      });
+    });
+
+    new Chart(chartRasciBusPro, {
+      type: "bar",
+      plugins: [ChartDataLabels],
+      data: {
+        labels: dataChart.dataRasciBusProLevel.labels,
+        datasets: dataChart.dataRasciBusProLevel.datasets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
+        plugins: {
+          datalabels: {
+            color: "#000", // Changed to black
+            anchor: "end", // Position at the top of the chart
+            align: "top", // Align at the top
+            font: {
+              weight: "bold",
+            },
             formatter: function (value) {
               // pasang format ribuan
               thaousandFormatter = new Intl.NumberFormat("en-US", {
@@ -507,168 +493,188 @@ $(document).ready(async function () {
               return thaousandFormatter.format(value);
             },
           },
-        },
-      },
-    },
-  });
-  new Chart(chartRasciPosition, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: [
-        "Director",
-        "VP/EGM/SMOM",
-        "Manager / Region Manager / Area manager / Sales Area Manager / Setara",
-        "Asst. Manager / Sr. Analyst / Setara",
-        "Sr. Supervisor / Analyst / Setara",
-        "Supervisor/Jr. Analyst/Setara",
-        "Jr. Supervisor / Jr. Assistant / Setara",
-        "Jr. Operator / Jr. Technician / Administrator / Setara",
-      ],
-      datasets: [
-        {
-          label: "A (Accountable)",
-          data: [80, 144, 1300, 970, 2800, 1800, 5500, 1800],
-          backgroundColor: "#4E9ECA",
-        },
-        {
-          label: "R (Responsible)",
-          data: [40, 683, 800, 2000, 4000, 2000, 7000, 800],
-          backgroundColor: "#45C6C1",
-        },
-        {
-          label: "S (Support)",
-          data: [0, 20, 50, 15, 15, 8, 56, 65],
-          backgroundColor: "#8DC2B5",
-        },
-        {
-          label: "C (Consulted)",
-          data: [0, 10, 40, 8, 8, 5, 23, 40],
-          backgroundColor: "#EF9D91",
-        },
-        {
-          label: "I (Informed)",
-          data: [0, 5, 10, 5, 5, 3, 51, 5],
-          backgroundColor: "#FFDF6F",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
-      plugins: {
-        datalabels: {
-          color: "#000", // Changed to black
-          anchor: "end", // Position at the top of the chart
-          align: "top", // Align at the top
-          font: {
-            weight: "bold",
-          },
-          formatter: function (value) {
-            // pasang format ribuan
-            thaousandFormatter = new Intl.NumberFormat("en-US", {
-              notation: "compact",
-              compactDisplay: "short",
-              maximumFractionDigits: 1,
-            });
-            return thaousandFormatter.format(value);
+          legend: {
+            labels: {
+              font: {
+                size: 13,
+              },
+            },
           },
         },
-        legend: {
-          labels: {
-            font: {
-              size: 13,
+        scales: {
+          x: {
+            stacked: false, // Disable stacking
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Business Process Level",
+              font: {
+                size: 22,
+                weight: "400",
+              },
+              padding: {
+                top: 20,
+                bottom: 0,
+                left: 0,
+                right: 0,
+              },
+
+              color: "#9F9FA5", // Text color
+            },
+          },
+          y: {
+            stacked: false, // Disable stacking
+            type: "logarithmic",
+            min: 1,
+            max: 300000,
+            ticks: {
+              formatter: function (value) {
+                // pasang format ribuan
+                thaousandFormatter = new Intl.NumberFormat("en-US", {
+                  notation: "compact",
+                  compactDisplay: "short",
+                  maximumFractionDigits: 1,
+                });
+                return thaousandFormatter.format(value);
+              },
             },
           },
         },
       },
-      scales: {
-        x: {
-          stacked: false, // Disable stacking
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Position Level",
+    });
+
+    new Chart(chartRasciPosition, {
+      type: "bar",
+      plugins: [ChartDataLabels],
+      data: {
+        labels: Object.keys(mappingLevelName).map((key) => mappingLevelName[key]),
+        datasets: dataChart.dataRasciPositionLevel.datasets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
+        plugins: {
+          datalabels: {
+            color: "#000", // Changed to black
+            anchor: "end", // Position at the top of the chart
+            align: "top", // Align at the top
             font: {
-              size: 22,
-              weight: "400",
+              weight: "bold",
             },
-            padding: {
-              top: 20,
-              bottom: 0,
-              left: 0,
-              right: 0,
+            formatter: function (value) {
+              // pasang format ribuan
+              thaousandFormatter = new Intl.NumberFormat("en-US", {
+                notation: "compact",
+                compactDisplay: "short",
+                maximumFractionDigits: 1,
+              });
+              return thaousandFormatter.format(value);
             },
-
-            color: "#9F9FA5", // Text color
           },
-          ticks: {
-            callback: function (value, index, ticks) {
-              const label = this.chart.data.labels[index]; // Access label from chart data
-              const maxCharsPerLine = 20; // Maximum characters per line
-              const words = label.split(" ");
-              let lines = [];
-              let currentLine = "";
+          legend: {
+            labels: {
+              font: {
+                size: 13,
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            stacked: false, // Disable stacking
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Position Level",
+              font: {
+                size: 22,
+                weight: "400",
+              },
+              padding: {
+                top: 20,
+                bottom: 0,
+                left: 0,
+                right: 0,
+              },
 
-              words.forEach((word) => {
-                if ((currentLine + word).length > maxCharsPerLine) {
+              color: "#9F9FA5", // Text color
+            },
+            ticks: {
+              callback: function (value, index, ticks) {
+                const label = this.chart.data.labels[index]; // Access label from chart data
+                const maxCharsPerLine = 20; // Maximum characters per line
+                const words = label.split(" ");
+                let lines = [];
+                let currentLine = "";
+
+                words.forEach((word) => {
+                  if ((currentLine + word).length > maxCharsPerLine) {
+                    lines.push(currentLine.trim());
+                    currentLine = "";
+                  }
+                  currentLine += word + " ";
+                });
+
+                if (currentLine.trim()) {
                   lines.push(currentLine.trim());
-                  currentLine = "";
                 }
-                currentLine += word + " ";
-              });
 
-              if (currentLine.trim()) {
-                lines.push(currentLine.trim());
-              }
-
-              return lines; // Return the lines array directly
+                return lines; // Return the lines array directly
+              },
             },
           },
-        },
-        y: {
-          stacked: false, // Disable stacking
-          type: "logarithmic",
-          min: 1,
-          max: 10000,
-          ticks: {
-            formatter: function (value) {
-              // pasang format ribuan
-              thaousandFormatter = new Intl.NumberFormat("en-US", {
-                notation: "compact",
-                compactDisplay: "short",
-                maximumFractionDigits: 1,
-              });
-              return thaousandFormatter.format(value);
+          y: {
+            stacked: false, // Disable stacking
+            type: "logarithmic",
+            min: 1,
+            max: 10000,
+            ticks: {
+              formatter: function (value) {
+                // pasang format ribuan
+                thaousandFormatter = new Intl.NumberFormat("en-US", {
+                  notation: "compact",
+                  compactDisplay: "short",
+                  maximumFractionDigits: 1,
+                });
+                return thaousandFormatter.format(value);
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+  }
+
+  // totalRasciNotationsVsFormation =>  RASCI Notations vs Formation
+  if (dataAll.totalRasciNotationsVsFormation) {
+    console.log("dataAll.totalRasciNotationsVsFormation", dataAll.totalRasciNotationsVsFormation);
+    dataChart.dataRasciNotationsFormation = dataAll.totalRasciNotationsVsFormation.data;
+    dataChart.dataRasciNotationsFormation = { ...dataChart.dataRasciNotationsFormation, labels: [], datasets: [] };
+    dataChart.dataRasciNotationsFormation.labels = dataAll.totalRasciNotationsVsFormation.data.map((item) =>
+      item.directorateName.includes("Direktorat") ? item.directorateName : `Direktorat ${item.directorateName}`
+    );
+    dataChart.dataRasciNotationsFormation.totalNotation = dataAll.totalRasciNotationsVsFormation.data.map(
+      (item) => item.totalNotation
+    );
+    dataChart.dataRasciNotationsFormation.totalFormation = dataAll.totalRasciNotationsVsFormation.data.map(
+      (item) => item.totalFormation
+    );
+  }
+
   new Chart(chartRasciNotationsFormation, {
     type: "bar",
     plugins: [ChartDataLabels],
     data: {
-      labels: [
-        "Direktorat Utama",
-        "Direktorat Perencanaan & Pengembangan Bisnis",
-        "Direktorat Pemasaran Pusat & Niaga",
-        "Direktorat Pemasaran Regional",
-        "Direktorat Rekayasa & Infrastruktur Darat",
-        "Direktorat Keuangan",
-        "Direktorat SDM & Penunjang Bisnis",
-        "Direktorat Manajemen Risiko",
-      ],
+      labels: dataChart.dataRasciNotationsFormation.labels,
       datasets: [
         {
           label: "Total RASCI Notation",
-          data: [5184, 5391, 9225, 73722, 206502, 1330, 5597, 1920],
+          data: dataChart.dataRasciNotationsFormation.totalNotation,
           backgroundColor: "#3389BA",
         },
         {
           label: "Total Formation",
-          data: [157, 81, 216, 1219, 3030, 104, 181, 32],
+          data: dataChart.dataRasciNotationsFormation.totalFormation,
           backgroundColor: "#56C5F8",
         },
       ],
@@ -770,140 +776,111 @@ $(document).ready(async function () {
     },
   });
 
-  new Chart(chartCompetencySpesific, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: [
-        "Domestic Supply Management",
-        "Sales and Account Management",
-        "Promotion and Campaign Management",
-        "Channel Management",
-        "Handling Customer Complaint",
-        "Pipeline Transport Operations & Maintenance",
-        "Distribution Management",
-        "Stakeholder Management",
-        "Supply Planning & Scheduling",
-        "Product/Service Development",
-      ],
-      datasets: [
-        {
-          label: "VP/EGM/SMOM",
-          data: [0, 19, 3, 5, 2, 3, 4, 1, 2, 3],
-          backgroundColor: "#9999FC",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Manager/ Region...",
-          data: [5, 10, 2, 3, 4, 1, 0, 0, 0, 0],
-          backgroundColor: "#7EC67E",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Asst. Manager/Sr. Anal...",
-          data: [2, 3, 20, 5, 1, 4, 0, 0, 0, 0],
-          backgroundColor: "#7BE5D1",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Sr. Supervisor/Analyst...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
-          backgroundColor: "#FDC47E",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Supervisor/Jr. Analyst...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
-          backgroundColor: "#76BFFF",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Jr. Supervisor/Jr...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
-          backgroundColor: "#FFA5C3",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Jr. Operator/Jr. Techn...",
-          data: [3, 10, 13, 15, 22, 30, 0, 0, 0, 0],
-          backgroundColor: "#B7B7B7",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: "y",
-      plugins: {
-        datalabels: {
-          color: "#fff",
-          anchor: "center",
-          align: "center",
-          font: {
-            weight: "bold",
-          },
-          formatter: function (value) {
-            return value;
-          },
-        },
-        legend: {
-          display: false,
-        },
+  if (dataAll.top10SpecificCompetencies) {
+    dataChart.dataCompetencySpesific.data = dataAll.top10SpecificCompetencies.data;
+    // unique label only
+    dataChart.dataCompetencySpesific.label = dataAll.top10SpecificCompetencies.data
+      .map((item) => item.competencyName)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    dataChart.dataCompetencySpesific.datasets = [];
+    Object.keys(mappingLevelName).forEach((level, idx) => {
+      if (idx === 0) return true;
+      let countPositionsArray = [];
+      dataChart.dataCompetencySpesific.data.forEach((item) => {
+        const findObject = item.competencies.find((obj) => obj.jobLevelName === mappingLevelName[level]);
+        let totalPositions = 0;
+        if (findObject) {
+          totalPositions = findObject.total;
+        }
+        countPositionsArray.push(totalPositions);
+      });
+      dataChart.dataCompetencySpesific.datasets.push({
+        label: mappingLevelName[level],
+        data: countPositionsArray,
+        backgroundColor: COLOR[idx] || "#9999FC",
+        barPercentage: BAR_PERCENTAGE, // Adjust bar width to create space
+        categoryPercentage: CATEGORY_PERCENTAGE, // Adjust category width to create space
+      });
+    });
+    new Chart(chartCompetencySpesific, {
+      type: "bar",
+      plugins: [ChartDataLabels],
+      data: {
+        labels: dataChart.dataCompetencySpesific.label,
+        datasets: dataChart.dataCompetencySpesific.datasets,
       },
-      scales: {
-        x: {
-          stacked: true,
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Position Level",
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "y",
+        plugins: {
+          datalabels: {
+            color: "black",
+            anchor: "center",
+            align: "center",
             font: {
-              size: 22,
-              weight: "400",
+              weight: "bold",
             },
-            padding: {
-              top: 20,
+            formatter: function (value) {
+              if (value === 0) {
+                return "";
+              }
+              return value;
             },
-            color: "#9F9FA5",
+          },
+          legend: {
+            display: false,
           },
         },
-        y: {
-          stacked: true,
-          ticks: {
-            callback: function (value, index) {
-              const label = this.chart.data.labels[index];
-              const maxCharsPerLine = 20;
-              const words = label.split(" ");
-              let lines = [];
-              let currentLine = "";
+        scales: {
+          x: {
+            stacked: true,
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Position Level",
+              font: {
+                size: 22,
+                weight: "400",
+              },
+              padding: {
+                top: 20,
+              },
+              color: "#9F9FA5",
+            },
+          },
+          y: {
+            stacked: true,
+            ticks: {
+              callback: function (value, index) {
+                const label = this.chart.data.labels[index];
+                return label;
+                const maxCharsPerLine = 20;
+                const words = label.split(" ");
+                let lines = [];
+                let currentLine = "";
 
-              words.forEach((word) => {
-                if ((currentLine + word).length > maxCharsPerLine) {
+                words.forEach((word) => {
+                  if ((currentLine + word).length > maxCharsPerLine) {
+                    lines.push(currentLine.trim());
+                    currentLine = "";
+                  }
+                  currentLine += word + " ";
+                });
+
+                if (currentLine.trim()) {
                   lines.push(currentLine.trim());
-                  currentLine = "";
                 }
-                currentLine += word + " ";
-              });
 
-              if (currentLine.trim()) {
-                lines.push(currentLine.trim());
-              }
-
-              return lines;
+                return lines;
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+  }
 
   //   check query string if has ?tab=iconhome
   const urlParams = new URLSearchParams(window.location.search);
@@ -944,11 +921,9 @@ $(document).ready(async function () {
           if (item === "Direktorat Utama") {
             return item;
           } else {
-            console.log("item masuk", item);
             return item.replace("Direktorat ", "");
           }
         });
-        console.log("selectedDirectorates after map", processedDirectorates);
         params.directorate = processedDirectorates[0];
       }
       if (params.areaType === "Regional" && selectedRegionals && selectedRegionals.length > 0) {
@@ -965,7 +940,6 @@ $(document).ready(async function () {
         promise: fetchTotalOrganizationShapePersonGradeByArea(params),
       },
     ];
-    console.log("apiCallsUpdated", apiCallsUpdated);
 
     // Execute the API calls and update charts
     Promise.allSettled(apiCallsUpdated.map((call) => call.promise))

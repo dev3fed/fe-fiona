@@ -76,3 +76,82 @@ async function fetchTotalOrganizationShapePersonGradeByArea(params = {}) {
     console.error("Error fetching data from API (total-organization-shape-person-grade-by-area):", error);
   }
 }
+
+// /api/dashboard/rasci-matrix/total-business-process-value-chain
+async function fetchTotalBusinessProcessValueChain() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/total-business-process-value-chain`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (total-business-process-value-chain):", error);
+  }
+}
+
+// /api/dashboard/rasci-matrix/total-rasci-content-notations
+async function fetchTotalRasciContentNotations() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/total-rasci-content-notations`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (total-rasci-content-notations):", error);
+  }
+}
+
+// /api/dashboard/rasci-matrix/rasci-notations-by-level-business-process
+async function fetchRasciNotationsByLevelBusinessProcess() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/rasci-notations-by-level-business-process`;
+
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (rasci-notations-by-level-business-process):", error);
+  }
+}
+
+// /api/dashboard/rasci-matrix/rasci-notations-by-job-name-level
+async function fetchRasciNotationsByJobNameLevel() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/rasci-notations-by-job-name-level`;
+
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (rasci-notations-by-job-name-level):", error);
+  }
+}
+
+// /api/dashboard/rasci-matrix/rasci-notations-vs-formation
+async function fetchRasciNotationsVsFormation() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/rasci-notations-vs-formation`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (rasci-notations-vs-formation):", error);
+  }
+}
+
+// /api/dashboard/competency/total-competencies
+async function fetchTotalCompetencies() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["competency"]}/total-competencies`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (total-competencies):", error);
+  }
+}
+
+// /api/dashboard/competency/top-10-specific-competencies
+async function fetchTop10SpecificCompetencies() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["competency"]}/top-10-specific-competencies`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (top-10-specific-competencies):", error);
+  }
+}

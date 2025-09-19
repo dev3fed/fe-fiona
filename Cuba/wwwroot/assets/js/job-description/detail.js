@@ -104,6 +104,29 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   //   $(`#${item}`).empty();
   // });
   localStorage.setItem("selectedJobDescReference", JSON.stringify(getDataJobDesc));
+  localStorage.setItem("isFullRefer", JSON.stringify(false));
+
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const countNotAvailable = lsAvailable.countNotAvailable;
+  const codeNotAvailable = lsAvailable.codeNotAvailable;
+  const codeAvailable = lsAvailable.codeAvailable;
+
+  const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference"));
+  const tugasHaSelected =
+    selectedJobDescReference.countTugasHa?.data.filter((item) => item.status === "AVAILABLE") || [];
+  const countTugasHaSelected = tugasHaSelected.length;
+  const codeAvailableSelected = tugasHaSelected.map((item) => item.indexNumber);
+  // const codeAvailableSelected = tugasHaSelected.map((item) => item.indexNumber);
+
+  // check if codeAvailableSelected contains all codeNotAvailable
+  // const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
+  const isFullRefer = false;
+  localStorage.setItem("isFullRefer", JSON.stringify(isFullRefer));
+
+  $(".notifWarning").hide();
+  if (!isFullRefer) {
+    $(".notifWarning").show();
+  }
 
   $("#jobNameReference").text(getDataJobDesc?.identifikasiJabatan?.jobName || DATA_NOT_FOUND);
   $("#functionReference").text(getDataJobDesc?.identifikasiJabatan?.unitKerjaFungsi || DATA_NOT_FOUND);
@@ -345,6 +368,7 @@ $(document).ready(async function () {
     }
   }
   if (getDataJobDesc?.identifikasiJabatan) {
+    console.log("getDataJobDesc.identifikasiJabatan", getDataJobDesc.identifikasiJabatan);
     updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
   }
 
@@ -403,12 +427,21 @@ $(document).ready(async function () {
     };
     localStorage.setItem("lsAvailable", JSON.stringify(lsAvailable));
 
+    const isFullFilled = countAvailable === countAll || countNotAvailable === 0;
     const $label = $("#labelFulfillTugasHa");
     $label
-      .toggleClass("label-success-custom", countAvailable === countAll)
-      .toggleClass("label-danger-custom", countAvailable !== countAll)
+      .toggleClass("label-success-custom", isFullFilled)
+      .toggleClass("label-danger-custom", !isFullFilled)
       .css("cursor", "pointer")
-      .html(`${countAvailable}/${countAll} business processes have been fulfilled. <b>see detail</b>`);
+      .attr("title", "Click to see detail");
+
+    if (!isFullFilled) {
+      $label.html(
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`
+      );
+    } else {
+      $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
+    }
   }
   if (getDataJobDesc.tugasTanggungJawabAkhir) {
     const cleanObj = getDataJobDesc.tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0);
@@ -574,9 +607,6 @@ $(document).ready(async function () {
   dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
   dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 
-  //  radio button with name percentage-amount
-  // ...existing code...
-
   // Listen for changes on the radio buttons within the form with ID 'percentage-amount-form'
   $("#percentage-amount-form input[name='percentage-amount']").on("change", function () {
     const value = $(this).val();
@@ -655,50 +685,41 @@ $(document).ready(async function () {
     );
   });
 
-  $("#popUpBispro").on("click", async function () {
+  $("#labelFulfillTugasHa").on("click", function () {
     $("#modalBusinessProcess").modal("show");
+
+    const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+    const countAll = lsAvailable.countAll;
+    const countAvailable = lsAvailable.countAvailable;
+    const countNotAvailable = lsAvailable.countNotAvailable;
+    const isFullFilled = countAvailable === countAll || countNotAvailable === 0;
+    const $label = $("#notifWarningModalBP");
+    $label
+      .toggleClass("label-success-custom", isFullFilled)
+      .toggleClass("label-danger-custom", !isFullFilled)
+      .toggleClass("p-2", true);
+
+    if (!isFullFilled) {
+      $label.html(
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button`
+      );
+    } else {
+      $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
+    }
+    console.log("lsAvailable", lsAvailable);
     // get modalBusinessProcessBody
     const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
+    const allBusPro = lsAvailable.available.concat(lsAvailable.notAvailable);
+
     modalBusinessProcessBody.innerHTML = "";
-    let dataBispro = [
-      {
-        index: "9.1.2",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.3",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.4",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.5",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-    ];
     let content = `
       <div class="table-responsive" style="overflow-x: auto;">
         <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
           <thead>
             <tr>
-              <th style="width:40%">Business Process</th>
-              <th style="width:10%">Notation</th>
-              <th style="width:35%">Availibity</th>
-              <th style="width:15%">Desc No</th>
+              <th style="width:50%">Business Process</th>
+              <th style="width:20%">Notation</th>
+              <th style="width:30%">Availibity</th>
             </tr>
           </thead>
           <tbody class="tbodBispro">
@@ -708,258 +729,66 @@ $(document).ready(async function () {
         `;
     modalBusinessProcessBody.innerHTML = content;
     let tbodBispro = document.querySelector(".tbodBispro");
-    for (let item of dataBispro) {
+    for (let item of allBusPro) {
+      const statusIcon = item.status === "AVAILABLE" ? "available" : "nonavail";
+      const statusText = item.status === "AVAILABLE" ? "Available" : "Not Available";
+      const statusColor = item.status === "AVAILABLE" ? "#06BE00" : "#D02138";
       tbodBispro.innerHTML += `
         <tr>
           
           <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.index} - ${item.name}</span>
+            <span class="">${item.indexNumber} - ${item.description}</span>
           </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.notation}</span>
+          <td style="place-items:center">
+            <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+            <span style="font-weight:bold;font-size: 12px;">R</span>
+            </div>
           </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.availability}</span>
-          </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.descriptionNo}</span>
-          </td>
-        </tr>
-      `;
-    }
-  });
-
-  $("#popUpMergeBisPro").on("click", async function () {
-    $("#modalBusinessProcess").modal("show");
-    // get modalBusinessProcessBody
-    const modalBusinessProcessHeader = document.getElementById("modalBusinessProcessHeader");
-    modalBusinessProcessHeader.innerHTML = "Merge With Other Business sentences";
-    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
-    modalBusinessProcessBody.innerHTML = "";
-    let dataBispro = [
-      {
-        index: "9.1.2",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.3",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.4",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.5",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-    ];
-    let content = `
-      <div class="table-responsive" style="overflow-x: auto;">
-        <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
-          <thead>
-            <tr>
-              <th style="width:15%"></th>
-              <th style="width:25%">Desc No</th>
-              <th style="width:60%">Related Business Process</th>
-            </tr>
-          </thead>
-          <tbody class="tbodBispro">
-          </tbody>
-        </table>
-      </div>
-        `;
-    modalBusinessProcessBody.innerHTML = content;
-    let tbodBispro = document.querySelector(".tbodBispro");
-    for (let item of dataBispro) {
-      tbodBispro.innerHTML += `
-        <tr>
-        <td class="p-3" style="place-content: flex-start">
-          <span class="">${item.descriptionNo}</span>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <span class="">${item.descriptionNo}</span>
-        </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.index} - ${item.name}</span>
+          <td style="color:${statusColor};text-align:center">
+            <span>${statusText}</span>
+            <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
           </td>
         </tr>
       `;
     }
   });
 
-  $("#otherRec").on("click", async function () {
-    $("#modalRecomendation").modal("show");
-    const dataAll = [
-      {
-        index: "9.1.2",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        tugas_ha_li: [
-          {
-            id: 1,
-            responsible:
-              "Melakukan kegiatan pengelolaan relasi dengan pelanggan terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-            output: [
-              "Pelaksanaan tindak lanjut penanganan saran dan keluhan pelanggan;",
-              "Pelaksanaan tindak lanjut permintaan pelanggan;",
-              "Program pembinaan relasi dengan pelanggan;",
-              "Pelaksanaan kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-            ],
-            lead: [
-              "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-              "Customer satisfaction index;",
-              "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-            ],
-          },
-          {
-            id: 2,
-            responsible:
-              "Melakukan kegiatan pengelolaan relasi dengan pelanggan terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-            output: [
-              "Pelaksanaan tindak lanjut penanganan saran dan keluhan pelanggan;",
-              "Pelaksanaan tindak lanjut permintaan pelanggan;",
-              "Program pembinaan relasi dengan pelanggan;",
-              "Pelaksanaan kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-            ],
-            lead: [
-              "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-              "Customer satisfaction index;",
-              "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-            ],
-          },
-        ],
-      },
-    ];
+  $("#searchBusinessProcess").on("input", function () {
+    const searchTerm = $(this).val().toLowerCase();
+    $("#tugasHaRecTable tbody tr").each(function () {
+      const rowText = $(this).text().toLowerCase();
+      $(this).toggle(rowText.includes(searchTerm));
+    });
+  });
 
-    // let bodyTugasHa = document.querySelector(".tbodyTugasHa");
-    // for (let j = 0; j < data?.tugasHa.length; j++) {
-    //   const listItemOutput = addList(data?.tugasHa[j].output);
-    //   const listItemLeadingIndicator = addList(data?.tugasHa[j].lead);
-
-    //   bodyTugasHa.innerHTML += `
-    //   <tr>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;">${data?.tugasHa[j].id}</span>
-    //         <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha_rec_${data?.tugasHa[j].id}" class="checkbox_animated checbox-compare" checked>
-    //         <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-    //       </label>
-    //     </td>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <span class="">${data?.tugasHa[j].responsible}</span>
-    //     </td>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <ul class="" style="list-style-type:disc">
-    //         ${listItemOutput}
-    //       </ul>
-    //     </td>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <ul class="" style="list-style-type:disc">
-    //         ${listItemLeadingIndicator}
-    //       </ul>
-    //     </td>
-    //   </tr>
-    //   `;
-    // }
-
-    // update modalRecomendationBody
-    const modalRecomendationBody = document.getElementById("modalRecomendationBody");
-    let content = "";
-    for (let item of dataAll) {
-      let bodyTugasHa = ``;
-      for (let j = 0; j < item?.tugas_ha_li.length; j++) {
-        const listItemOutput = await addList(item?.tugas_ha_li[j].output);
-        const listItemLeadingIndicator = await addList(item?.tugas_ha_li[j].lead);
-        bodyTugasHa += `
-            <tr>
-        <td class="p-3" style="place-content: flex-start">
-          <label class="container-radio m-0"><span style="padding-top: 9px;padding-left: 5px;">${item?.tugas_ha_li[j].id}</span>
-            <input onclick="radioReference(this)" type="radio" name="radio_tugas_ha_rec" id="radio_tugas_ha_rec_${item?.tugas_ha_li[j].id}" class="radio_animated radio-compare">
-            <span class="radiomark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-          </label>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <span class="">${item?.tugas_ha_li[j].responsible}</span>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <ul class="" style="list-style-type:disc">
-            ${listItemOutput}
-          </ul>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <ul class="" style="list-style-type:disc">
-            ${listItemLeadingIndicator}
-          </ul>
-        </td>
-            </tr>
-            `;
-      }
-
-      let tugasHaRow =
-        `
-      <div class="table-responsive" style="overflow-x: auto;">
-        <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
-          <thead>
-            <tr>
-              <th style="width:10%">
-              </th>
-              <th style="width:30%">Tugas & Tanggung Jawab</th>
-              <th style="width:30%">Hasil Akhir Yang Diharapkan</th>
-              <th style="width:30%">Leading Indicator</th>
-            </tr>
-          </thead>
-          <tbody class="tbodyTugasHaRec">
-          ` +
-        bodyTugasHa +
-        `
-          </tbody>
-        </table>
-      </div>
-    `;
-
-      const tugasHaDiv =
-        `
-      <div class="col-md-12 mb-3">
-      ` +
-        tugasHaRow +
-        `
-      </div>
-      `;
-
-      content +=
-        `
-        <div class="card-body">
-          <div class="default-according" id="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">${item.index} - ${item.name}
-                        </button>
-                    </h5>
-                </div>
-                <div class="collapse" id="collapseOne" aria-labelledby="headingOne" data-bs-parent="#accordion">
-                    <div class="card-body">
-        ` +
-        tugasHaDiv +
-        `
+  /* <div id="filterBusinessProcess" class="m-b-3">
+                    <input type="text" id="searchBusinessProcess" placeholder="Search Business Process..." class="form-control mb-2" />
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="availableCheckbox" value="available" checked>
+                        <label class="form-check-label" for="availableCheckbox">Available</label>   
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="notAvailableCheckbox" value="notAvailable">
+                        <label class="form-check-label" for="notAvailableCheckbox">Not Available</label>
                     </div>
                 </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-    modalRecomendationBody.innerHTML = content;
-  });
+                 */
+  function filterBusinessProcessTable() {
+    const availableChecked = $("#availableCheckbox").is(":checked");
+    const notAvailableChecked = $("#notAvailableCheckbox").is(":checked");
+
+    $("#tugasHaRecTable tbody tr").each(function () {
+      const rowText = $(this).text();
+      const isAvailable = rowText.includes("Available") && !rowText.includes("Not Available");
+      const isNotAvailable = rowText.includes("Not Available");
+
+      let shouldShow = false;
+      if (availableChecked && isAvailable) shouldShow = true;
+      if (notAvailableChecked && isNotAvailable) shouldShow = true;
+
+      $(this).toggle(shouldShow);
+    });
+  }
+
+  $("#availableCheckbox, #notAvailableCheckbox").on("change", filterBusinessProcessTable);
 });

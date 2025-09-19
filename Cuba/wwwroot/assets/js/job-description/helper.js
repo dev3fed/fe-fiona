@@ -513,12 +513,50 @@ function confirmFunction(title, text) {
   });
 }
 
-async function saveReference() {
-  const confirm = await confirmFunction("Save Reference", "Are you sure you want to save the selected references?");
-  if (!confirm) return;
+function callOtherRecommendations(data) {
+  $("#modalRecomendation").modal("show");
+}
+
+function callConfirmReference() {
+  const action = [
+    {
+      button: "Back",
+      className: "btn-outline-dark",
+      callback: function () {
+        hideModal(`modalConfirm`);
+      },
+    },
+    {
+      button: "No, Skip",
+      className: "btn-outline-dark",
+      callback: function () {
+        hideModal(`modalConfirm`);
+        saveReferenceAttribute();
+      },
+    },
+    {
+      button: "Yes, Continue",
+      className: "btn-primary",
+      callback: function () {
+        hideModal(`modalConfirm`);
+        callOtherRecommendations("asikin aja");
+      },
+    },
+  ];
+  modalConfrimHelper(
+    "confirm",
+    "Warning",
+    `<span class="notifWarning">One or more tasks and responsibilities require references, which are unavailable in this position. Therefore, it is necessary to seek references from other positions.</span><br>Do you want to seek references from other positions?`,
+    "",
+    action,
+    "50%",
+    1
+  );
+}
+
+async function saveReferenceAttribute() {
   loader(true);
 
-  const dataSelected = selectedData.selectedJobDesc;
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
     (item) => !item.id.includes("all") && item.checked
   );
@@ -623,7 +661,18 @@ async function saveReference() {
   $("#modalJobCompareDetail").modal("hide");
   loader(false);
   swal("Success!", "Reference saved to your job description", "success");
-  return;
+}
+
+async function saveReference() {
+  const isFullRefer = JSON.parse(localStorage.getItem("isFullRefer")) ?? false;
+  console.log("isFullRefer", isFullRefer);
+  if (!isFullRefer) {
+    callConfirmReference();
+    return;
+  }
+  const confirm = await confirmFunction("Save Reference", "Are you sure you want to save the selected references?");
+  if (!confirm) return;
+  await saveReferenceAttribute();
 }
 
 function checkButtonTable(buttonTable, id, lastPath) {
@@ -682,7 +731,6 @@ function checkButtonTable(buttonTable, id, lastPath) {
 
 function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
   if (modalSize) {
-    alert(modalSize);
     // update modal size css width, exm: 90%
     $("#modalConfirm")
       .find(".modal-dialog")
@@ -720,14 +768,16 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
   }
 
   if (action) {
-    action.forEach((item) => {
+    action.forEach((item, index) => {
       if (item.callback) {
+        // Store the callback function globally with a unique identifier
+        const callbackId = `modalCallback_${Date.now()}_${index}`;
+        window[callbackId] = item.callback;
+
         $("#modalConfirmFooter").append(
           `<button type="button" class="btn ` +
             item.className +
-            ` m-r-5" onclick="(` +
-            item.callback +
-            `)()">` +
+            ` m-r-5" onclick="window.${callbackId}()">` +
             item.button +
             `</button>`
         );
