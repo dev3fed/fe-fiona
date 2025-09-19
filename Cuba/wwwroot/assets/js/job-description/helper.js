@@ -1,31 +1,22 @@
-function checkLocalStorage() {
-  localStorage.removeItem("fungsi");
-  localStorage.removeItem("tugasHa");
-  localStorage.removeItem("koordinasi");
-  localStorage.removeItem("relation");
-  localStorage.removeItem("mandatori");
-  localStorage.removeItem("general");
-  localStorage.removeItem("spesifik");
-  localStorage.getItem("fungsi") ? localStorage.getItem("fungsi") : localStorage.setItem("fungsi", "");
-  localStorage.getItem("tugasHa") ? localStorage.getItem("tugasHa") : localStorage.setItem("tugasHa", "");
-  localStorage.getItem("koordinasi") ? localStorage.getItem("koordinasi") : localStorage.setItem("koordinasi", "");
-  localStorage.getItem("relation") ? localStorage.getItem("relation") : localStorage.setItem("relation", "");
-  localStorage.getItem("mandatori") ? localStorage.getItem("mandatori") : localStorage.setItem("mandatori", "");
-  localStorage.getItem("general") ? localStorage.getItem("general") : localStorage.setItem("general", "");
-  localStorage.getItem("spesifik") ? localStorage.getItem("spesifik") : localStorage.setItem("spesifik", "");
+function loader(status) {
+  if (status == true) {
+    $("#loading-overlay").addClass("show").show();
+  } else {
+    $("#loading-overlay").removeClass("show").hide();
+  }
 }
 
 function updateIdentifikasiJob(params) {
-  $("#jabatan").text(params.jobName);
-  $("#function").text(params.unitKerjaFungsi);
-  $("#location").text(params.lokasiKerja);
-  $("#directorat").text(params.direktorat);
-  $("#directReport").text(params.atasanLangsung);
-  $("#sk").text(params.noSuratKeputusan);
-  $("#skDate").text(params.tanggalSuratKeputusan);
+  $("#jabatan").text(params.jobName ?? "Data not found");
+  $("#function").text(params.unitKerjaFungsi ?? "Data not found");
+  $("#location").text(params.lokasiKerja ?? "Data not found");
+  $("#directorat").text(params.direktorat ?? "Data not found");
+  $("#directReport").text(params.atasanLangsung ?? "Data not found");
+  $("#sk").text(params.noSuratKeputusan ?? "Data not found");
+  $("#skDate").text(params.tanggalSuratKeputusan ?? "Data not found");
 }
 
-function updateTable(params, data, rowHeader, refer) {
+function updateTable(params, data, rowHeader) {
   // get table body
   const tableBody = $(`#${params}Table tbody`);
   tableBody.empty();
@@ -46,9 +37,11 @@ function updateTable(params, data, rowHeader, refer) {
   }
 
   data.forEach((item, inc) => {
-    const reference = item.reference ? item.reference : "";
+    const reference = item.jobReference ? item.jobReference : "";
     const referenceHtml =
-      reference !== "" ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>` : "";
+      reference !== ""
+        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference.jobName} - ${reference.noSuratKeputusan})</span>`
+        : "";
     row = `<tr>`;
     if (!rowHeader) {
       row += `<td class="tdClass">${item}</td>`;
@@ -63,13 +56,9 @@ function updateTable(params, data, rowHeader, refer) {
       }
 
       if (header === "index") {
-        console.log("item?.tanggungJawabProses", item?.tanggungJawabProses);
-        //  unique tanggungJawabProses
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
           (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
         );
-        console.log("uniqueTanggungJawab", uniqueTanggungJawab);
-
         if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
           // Single item - display as span with tooltip
           row += `<td class="tdClass text-primary">
@@ -110,9 +99,124 @@ function updateTable(params, data, rowHeader, refer) {
       const arrayType = Array.isArray(item[header]);
       if (arrayType) {
         const isHeaderArray = customTableHeaderHeader.includes(header);
-        console.log(`Header: ${header}, isHeaderArray: ${isHeaderArray}`);
         row += `<td class="tdClass" ><ul style="list-style-type:
-        ${isHeaderArray ? "none" : "disc"}; padding-left: 20px; margin: 0; padding: 0;
+        ${isHeaderArray ? "none" : "disc"}; padding-left: 20px; margin: 0; padding: 15px !important;
+        ">`;
+        item[header].forEach((arrayItem) => {
+          row += `<li>${arrayItem}</li>`;
+        });
+        row += `</ul>
+              ${referenceHtml}
+              </td>`;
+        return;
+      }
+      if (header === "action") {
+        row += `<td class="p-3">
+          <button type="button" class="btn btn-primary" id="editData${idx}" onclick="editData(${idx})"> <i class="fas fa-edit"></i></button>
+          <button type="button" class="btn btn-danger" id="deleteData${idx}" onclick="deleteData(${idx})"> <i class="fas fa-trash"></i></button>
+        </td>`;
+        return;
+      }
+      row += `<td class="tdClass">${item[header]}${header !== "id" ? referenceHtml : ""}</td>`;
+    });
+
+    row += `</tr>`;
+    tableBody.append(row);
+  });
+
+  $('[data-bs-toggle="tooltip"]').tooltip({
+    trigger: "click",
+  });
+}
+
+function updateTableSelected(params, data, rowHeader, refer) {
+  const tableBody = $(`#${params}Table tbody`);
+  tableBody.empty();
+  let row = "";
+  if (data.length === 0) {
+    row = `<tr>
+      <td colspan="100%" class="text-center p-30">Data not found</td>
+    </tr>`;
+    tableBody.append(row);
+    return;
+  }
+
+  // if items in data is not array, convert to array
+  if (!Array.isArray(data)) {
+    // data = [data];
+    console.warn(`Data for ${params} is not an array, converting to array`);
+    return false;
+  }
+
+  data.forEach((item, inc) => {
+    const reference = item.reference ? item.reference : "";
+    const referenceHtml =
+      reference !== "" ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>` : "";
+    row = `<tr>`;
+    if (!rowHeader) {
+      row += `<td class="tdClass">${item}</td>`;
+      row += `</tr>`;
+      tableBody.append(row);
+      return;
+    }
+    rowHeader.forEach((header, idx) => {
+      if (header === "no") {
+        // row += `<td class="tdClass">${inc + 1}</td>`;
+        row += `<td class="p-3" style="place-content: flex-start">
+        <label class="container-checkbox m-0">
+          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_${params}_${inc}" class="checkbox_animated checbox-compare" checked>
+          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
+        </label>
+      </td>`;
+        return;
+      }
+
+      if (header === "index") {
+        const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+        );
+        if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
+          // Single item - display as span with tooltip
+          row += `<td class="tdClass text-primary">
+            <span data-bs-toggle="tooltip" data-bs-trigger="click" title="${uniqueTanggungJawab[0]?.description}">
+              ${uniqueTanggungJawab[0]?.indexNumber}
+            </span>
+          </td>`;
+        } else if (uniqueTanggungJawab && uniqueTanggungJawab.length > 1) {
+          // Multiple items - display as list
+          const listItems = uniqueTanggungJawab
+            .map(
+              (process) =>
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
+            )
+            .join("");
+          row += `<td class="tdClass" style="padding-left:10px !important">
+            <ul style="margin: 0; list-style-type: disc; padding-left: 15px !important;">
+              ${listItems}
+            </ul>
+          </td>`;
+        } else {
+          // No data
+          row += `<td class="tdClass text-primary">-</td>`;
+        }
+        return;
+      }
+      // header inside customTableHeader
+      if (customTableHeaderNoArray.includes(header)) {
+        if (Array.isArray(item[header])) {
+          item[header] = item[header].join(", ");
+        }
+      }
+
+      if (customTableHeaderCleaned.includes(header)) {
+        item[header] = item[header].toString().replace(/[\[\]"]/g, "");
+      }
+
+      const arrayType = Array.isArray(item[header]);
+      if (arrayType) {
+        const isHeaderArray = customTableHeaderHeader.includes(header);
+        row += `<td class="tdClass" ><ul style="list-style-type:
+        ${isHeaderArray ? "none" : "disc"}; padding-left: 20px; margin: 0; padding-left: 15px !important;
         ">`;
         item[header].forEach((arrayItem) => {
           row += `<li>${arrayItem}</li>`;
@@ -149,80 +253,32 @@ function getJobReference(params) {
 }
 
 async function getJobReferenceDetail() {
-  // alert("masok");
+  const lsFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
+  const lsTugasHa = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
+  const lsKoordinasiInternal =
+    localStorage.getItem("koordinasiInternal") !== "" ? JSON.parse(localStorage.getItem("koordinasiInternal")) : [];
+  const lsRelasiEksternal =
+    localStorage.getItem("relasiEksternal") !== "" ? JSON.parse(localStorage.getItem("relasiEksternal")) : [];
+  const lsStk = localStorage.getItem("stk") !== "" ? JSON.parse(localStorage.getItem("stk")) : [];
 
-  // checkbox_id_ where class contains "checbox-compare"
-  // const selectedJob = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare:checked"))
-  //   .map((item) => item.id.replace("checkbox_id_", "")) // to number
-  //   .map((item) => parseInt(item));
-
-  // const findData = dataJobDescCompare.filter((item) => selectedJob.includes(item.identifikasi.id));
-  isDisableButton(false);
-  $(".summernote").summernote("enable");
-
-  const dataFungsi = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
-  let codeFungsi = "";
-  dataFungsi.map((item) => {
-    codeFungsi += `${item?.fungsi}<br/><span style="font-size:10px;color:grey">(reference from : ${item?.reference})</span><br/><br/>`;
+  let summernoteContent = "";
+  lsFungsi.forEach((item) => {
+    summernoteContent += item.fungsi + "<br><br>";
+    if (item.jobReference.jobName) {
+      const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
+      summernoteContent += textReference + "<br><br>";
+    }
   });
-  $(".summernote").summernote("code", codeFungsi ?? "");
-  // input to fungsi jabatan in summernote
-  const dataTugasHa = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
-  const dataKoordinasi =
-    localStorage.getItem("koordinasi") !== "" ? JSON.parse(localStorage.getItem("koordinasi")) : [];
-  const dataRelation = localStorage.getItem("relation") !== "" ? JSON.parse(localStorage.getItem("relation")) : [];
-  const dataMandatori = localStorage.getItem("mandatori") !== "" ? JSON.parse(localStorage.getItem("mandatori")) : [];
-  const dataGeneral = localStorage.getItem("general") !== "" ? JSON.parse(localStorage.getItem("general")) : [];
-  const dataSpesifik = localStorage.getItem("spesifik") !== "" ? JSON.parse(localStorage.getItem("spesifik")) : [];
+  $(".summernote").summernote("code", summernoteContent);
 
-  updateTable("tugasHa", dataTugasHa, ["id", "responsible", "output", "lead", "action"]);
-  updateTable("koordinasi", dataKoordinasi, ["id", "internal", "aktivitas", "action"]);
-  updateTable("relation", dataRelation, ["id", "eksternal", "aktivitas", "action"]);
-  // updateTable("mandatori", dataMandatori, ["id", "mandatori", "action"]);
-  // kompetensiTable tbody empty
-  const tableBody = $(`#kompetensiTable tbody`);
-  tableBody.empty();
-  // generalTable tbody empty
-  let row = "<tr>";
-  row += `<td class="tdClass"><b>Kompetensi Teknis Mandatory</b></td>`;
-  row += `<td class="tdClass"><b>Level</b></td>`;
-  row += `</tr>`;
-  dataMandatori.forEach((item) => {
-    const reference = item.reference
-      ? `<br/><span style="font-size:10px;color:grey">(reference from : ${item.reference})</span>`
-      : "";
-    row += `<tr>`;
-    row += `<td class="tdClass">${item?.komtekMandatoriName}${reference}</td>`;
-    row += `<td class="tdClass">${item?.level}</td>`;
-    row += `</tr>`;
-  });
+  // Filter data arrays properly
+  const filteredTugasHa = lsTugasHa.filter((item) => item.responsible && item.responsible.length > 0);
+  const filteredStk = lsStk.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
 
-  row += `<tr>`;
-  row += `<td class="tdClass"><b>Kompetensi Teknis General</b></td>`;
-  row += `<td class="tdClass"><b>Level</b></td>`;
-  row += `<tr>`;
-  dataGeneral.forEach((item) => {
-    const reference = item.reference
-      ? `<br/><span style="font-size:10px;color:grey">(reference from : ${item.reference})</span>`
-      : "";
-    row += `<tr>`;
-    row += `<td class="tdClass">${item?.komtekGeneralName}${reference}</td>`;
-    row += `<td class="tdClass">${item?.level}</td>`;
-    row += `</tr>`;
-  });
-  row += `<td class="tdClass"><b>Kompetensi Teknis Spesifik</b></td>`;
-  row += `<td class="tdClass"><b>Level</b></td>`;
-  row += `</tr>`;
-  dataSpesifik.forEach((item) => {
-    const reference = item.reference
-      ? `<br/><span style="font-size:10px;color:grey">(reference from : ${item.reference})</span>`
-      : "";
-    row += `<tr>`;
-    row += `<td class="tdClass">${item?.komtekSpesifikName}${reference}</td>`;
-    row += `<td class="tdClass">${item?.level}</td>`;
-    row += `</tr>`;
-  });
-  tableBody.append(row);
+  updateTable("tugasHa", filteredTugasHa, tabCusJD.tugasHa);
+  updateTable("koordinasi", lsKoordinasiInternal, tabCusJD.koordinasi);
+  updateTable("relation", lsRelasiEksternal, tabCusJD.relation);
+  updateTable("stk", filteredStk, tabCusJD.stk);
 }
 
 async function addList(data) {
@@ -390,9 +446,9 @@ function isDisableButton(isDisabled) {
 //   // });
 // }
 
-async function applyCompare(id) {
+async function applyCompare(id, prlOrg, prlOrgTarget) {
   $("#modalJobCompareDetail").modal("show");
-  await applySelectedData(id);
+  await applySelectedData(id, prlOrg, prlOrgTarget);
 }
 
 async function addJobReference() {
@@ -401,319 +457,6 @@ async function addJobReference() {
   // $("#detailJob").show();
 
   // searchJobCompare();
-}
-
-async function applySelectedData(id) {
-  const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
-  arrayId.forEach((item) => {
-    $(`#${item}`).empty();
-  });
-  let data = dataJobDescCompare.find((item) => item.identifikasi.id === id);
-  selectedData.selectedJobDesc = data;
-  let row = "<div class='row'>";
-  const identifikasi = document.getElementById("identifikasi");
-  const fungsi = document.getElementById("fungsi");
-  const tugasHa = document.getElementById("tugas-ha");
-  const koordinasiInternal = document.getElementById("koordinasi-internal");
-  const relasiEksternal = document.getElementById("relasi-eksternal");
-  const stk = document.getElementById("stk");
-
-  // jaga-jaga kalau data tidak ada
-  /* <div class="">
-  <label class="container-checkbox" id="detailJobName">${data?.identifikasi?.jobName}
-    <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_jobdesc_all" class="checkbox_animated checbox-compare" checked>
-    <span class="checkmark"></span>
-  </label>
-</div> */
-  const identifikasiDiv = `
-    <div class="col-md-12 mb-4">
-        <span class="section-name mb-2 ">IDENTIFIKASI JABATAN</span>
-        <div class="table-responsive ">
-          <table class="tableIndentifikasiCompareModal">
-            <tbody>
-              <tr>
-                <td class="identifikasi-header">Unit Kerja / Fungsi</td>
-                <td><span class="content-class" id="function">${data?.identifikasi?.function}</span></td>
-              </tr>
-              <tr>
-                <td class="identifikasi-header">Lokasi</td>
-                <td><span class="content-class" id="location">${data?.identifikasi?.location}</span></td>
-              </tr>
-              <tr>
-                <td class="identifikasi-header">Direktorat</td>
-                <td><span class="content-class" id="directorat">${data?.identifikasi?.directorat}</span></td>
-              </tr>
-              <tr>
-                <td class="identifikasi-header">Atasan Langsung</td>
-                <td><span class="content-class" id="directReport">${data?.identifikasi?.directReport}</span></td>
-              </tr>
-              <tr>
-                <td class="identifikasi-header">Surat Keputusan</td>
-                <td><span class="content-class" id="sk">${data?.identifikasi?.location}</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-    </div>
-        `;
-  identifikasi.innerHTML = identifikasiDiv;
-
-  const fungsiDiv = `
-    <div class="col-md-12 mb-4">
-        <label class="container-checkbox mt-3"><span class="section-name mb-2 ">FUNGSI JABATAN</span>
-          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_fungsi" class="checkbox_animated checbox-compare" checked>
-          <span class="checkmark" style="width:20px;height:20px" ></span>
-        </label>
-        <span class="content-class" id="fungsiText">${data?.fungsi}.</span>
-    </div>
-    `;
-  fungsi.innerHTML = fungsiDiv;
-
-  let tugasHaRow = `
-    <div class="table-responsive" style="overflow-x: auto;">
-      <table class="tableMasterData" id="tugasHaTable" style="width:100%">
-        <thead>
-          <tr>
-            <th style="width:10%">
-              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
-                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha" class="checkbox_animated checbox-compare" checked>
-                <span class="checkmark" style="width:20px;height:20px" ></span>
-              </label>
-            </th>
-            <th style="width:30%">Tugas & Tanggung Jawab</th>
-            <th style="width:30%">Hasil Akhir Yang Diharapkan</th>
-            <th style="width:30%">Leading Indicator</th>
-          </tr>
-        </thead>
-        <tbody class="tbodyTugasHa">
-        </tbody>
-      </table>
-    </div>
-    `;
-
-  const tugasHaDiv =
-    `
-    <div class="col-md-12 mb-3">
-      <span class="section-name mb-1 ">TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span>
-      <span class="text-muted f-12" style="">Merupakan acuan dalam melaksanakan tugasnya. Jika dibutuhkan, dalam situasi tertentu tingkat prioritas dan perubahan tugas dan tanggung jawab dapat disesuaikan dengan kebutuhan perusahaan.</span>
-    </div>
-    <div class="col-md-12 mb-3">
-    ` +
-    tugasHaRow +
-    `
-    </div>
-    <div class="col-12 mb-3">
-        <span class="notifWarning">There are one or more tasks & responsibilities for which references are not available in this position, so it is necessary to seek references from other positions.</span>
-    </div>
-    `;
-
-  tugasHa.innerHTML = tugasHaDiv;
-
-  // tbodyTugasHa
-  let bodyTugasHa = document.querySelector(".tbodyTugasHa");
-  for (let j = 0; j < data?.tugasHa.length; j++) {
-    const listItemOutput = await addList(data?.tugasHa[j].output);
-    const listItemLeadingIndicator = await addList(data?.tugasHa[j].lead);
-
-    bodyTugasHa.innerHTML += `
-    <tr>
-      <td class="p-3" style="place-content: flex-start">
-        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;">${data?.tugasHa[j].id}</span>
-          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha_${data?.tugasHa[j].id}" class="checkbox_animated checbox-compare" checked>
-          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-        </label>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <span class="">${data?.tugasHa[j].responsible}</span>
-      </td> 
-      <td class="p-3" style="place-content: flex-start">
-        <ul class="" style="list-style-type:disc">
-          ${listItemOutput}
-        </ul>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <ul class="" style="list-style-type:disc">
-          ${listItemLeadingIndicator}
-        </ul>
-      </td>
-    </tr>
-    `;
-  }
-
-  let koordinasiInternalRow = `
-    <div class="table-responsive" style="overflow-x: auto;">
-      <table class="tableMasterData" id="koordinasiInternalTable" style="width:100%">
-        <thead>
-          <tr>
-            <th style="width:10%">
-              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
-                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_ki" class="checkbox_animated checbox-compare" checked>
-                <span class="checkmark" style="width:20px;height:20px" ></span>
-              </label>
-            </th>
-            <th style="width:35%">Pihak Internal</th>
-            <th style="width:55%">Aktivitas</th>
-          </tr>
-        </thead>
-        <tbody class="tbodyKoordinasiInternal">
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  const koordinasiInternalDiv =
-    `
-    <div class="col-md-12 mb-3">
-      <span class="section-name mb-1 ">KOORDINASI INTERNAL</span>
-    </div>
-    <div class="col-md-12 mb-3">
-    ` +
-    koordinasiInternalRow +
-    `
-    </div>
-  `;
-
-  koordinasiInternal.innerHTML = koordinasiInternalDiv;
-
-  let bodyKoordinasiInternal = document.querySelector(".tbodyKoordinasiInternal");
-  const listInternal = data?.koordinasi;
-  for (let j = 0; j < listInternal.length; j++) {
-    let listItemOutput = await addList(listInternal[j].aktivitas);
-    bodyKoordinasiInternal.innerHTML += `
-    <tr>
-      <td class="p-3" style="place-content: flex-start">
-        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;"></span>
-          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_ki_${listInternal[j].id}" class="checkbox_animated checbox-compare" checked>
-          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-        </label>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <span class="">${listInternal[j].internal}</span>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <ul class="" style="list-style-type:disc">
-          ${listItemOutput}
-        </ul>
-      </td>
-    </tr>
-    `;
-  }
-
-  let relasiEksternalRow = `
-    <div class="table-responsive" style="overflow-x: auto;">
-      <table class="tableMasterData" id="relasiEksternalTable" style="width:100%">
-        <thead>
-          <tr>
-            <th style="width:10%">
-              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
-                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_re" class="checkbox_animated checbox-compare" checked>
-                <span class="checkmark" style="width:20px;height:20px" ></span>
-              </label>
-            </th>
-            <th style="width:35%">Pihak Eksternal</th>
-            <th style="width:55%">Aktivitas</th>
-          </tr>
-        </thead>
-        <tbody class="tbodyRelasiEksternal">
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  const relasiEksternalDiv =
-    `
-    <div class="col-md-12 mb-3">
-      <span class="section-name mb-1 ">RELASI EKSTERNAL</span>
-    </div>
-    <div class="col-md-12 mb-3">
-    ` +
-    relasiEksternalRow +
-    `
-    </div>
-  `;
-
-  relasiEksternal.innerHTML = relasiEksternalDiv;
-
-  const listExternal = data?.relation;
-  let bodyRelasiEksternal = document.querySelector(".tbodyRelasiEksternal");
-  for (let j = 0; j < listExternal.length; j++) {
-    let listItemOutput = await addList(listExternal[j].aktivitas);
-    bodyRelasiEksternal.innerHTML += `
-    <tr>
-      <td class="p-3" style="place-content: flex-start">
-        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;"></span>
-          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_re_${listExternal[j].id}" class="checkbox_animated checbox-compare" checked>
-          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-        </label>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <span class="">${listExternal[j].eksternal}</span>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <ul class="" style="list-style-type:disc">
-          ${listItemOutput}
-        </ul>
-      </td>
-    </tr>
-    `;
-  }
-
-  let stkRow = `
-    <div class="table-responsive" style="overflow-x: auto;">
-      <table class="tableMasterData" id="stkTable" style="width:100%">
-        <thead>
-          <tr>
-            <th style="width:10%">
-              <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
-                <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_stk" class="checkbox_animated checbox-compare" checked>
-                <span class="checkmark" style="width:20px;height:20px" ></span>
-              </label>
-            </th>
-            <th style="width:30%">No. STK</th>
-            <th style="width:60%">Judul STK</th>
-          </tr>
-        </thead>
-        <tbody class="tbodyStk">
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  const stkDiv =
-    `
-    <div class="col-md-12 mb-3">
-      <span class="section-name mb-1 ">KOORDINASI INTERNAL</span>
-    </div>
-    <div class="col-md-12 mb-3">
-    ` +
-    stkRow +
-    `</div>
-  `;
-  stk.innerHTML = stkDiv;
-  const listSk = [
-    { id: 1, noStk: "1", titleStk: "title 1" },
-    { id: 2, noStk: "2", titleStk: "title 2" },
-    { id: 3, noStk: "3", titleStk: "title 3" },
-  ];
-  let bodyStk = document.querySelector(".tbodyStk");
-  for (let j = 0; j < listSk.length; j++) {
-    bodyStk.innerHTML += `
-    <tr>
-      <td class="p-3" style="place-content: flex-start">
-        <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;"></span>
-          <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_stk_${listSk[j].id}" class="checkbox_animated checbox-compare" checked>
-          <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-        </label>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <span class="">${listSk[j].noStk}</span>
-      </td>
-      <td class="p-3" style="place-content: flex-start">
-        <span class="">${listSk[j].titleStk}</span>
-      </td>
-    </tr>
-    `;
-  }
 }
 
 function filterListJobDesc(value, search) {
@@ -757,6 +500,7 @@ async function checkboxReference(val) {
   $("[id^=checkbox_]").prop("checked", true);
 }
 
+<<<<<<< HEAD
 async function saveReference() {
   const dataSelected = selectedData.selectedJobDesc;
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
@@ -892,17 +636,181 @@ async function saveReference() {
   swal({
     title: "Are you sure?",
     text: "You will save this reference to your job description",
+=======
+function confirmFunction(title, text) {
+  // give alert confirm
+  return swal({
+    title: title || "Are you sure?",
+    text: text || "Make sure all data is correct before proceeding.",
+>>>>>>> e74399481b1764dd27736a160520eeeee58124dd
     icon: "warning",
     buttons: true,
     dangerMode: true,
-  }).then(async (willSave) => {
-    if (willSave) {
-      // redirectTo("job-description");
-      await getJobReferenceDetail();
-      $("#modalJobCompareDetail").modal("hide");
-      swal("Success!", "Reference has been saved", "success");
-    }
+  }).then((willProceed) => {
+    return willProceed; // true if user clicks OK, false if user clicks Cancel
   });
+}
+
+function callOtherRecommendations(data) {
+  $("#modalRecomendation").modal("show");
+}
+
+function callConfirmReference() {
+  const action = [
+    {
+      button: "Back",
+      className: "btn-outline-dark",
+      callback: function () {
+        hideModal(`modalConfirm`);
+      },
+    },
+    {
+      button: "No, Skip",
+      className: "btn-outline-dark",
+      callback: function () {
+        hideModal(`modalConfirm`);
+        saveReferenceAttribute();
+      },
+    },
+    {
+      button: "Yes, Continue",
+      className: "btn-primary",
+      callback: function () {
+        hideModal(`modalConfirm`);
+        callOtherRecommendations("asikin aja");
+      },
+    },
+  ];
+  modalConfrimHelper(
+    "confirm",
+    "Warning",
+    `<span class="notifWarning">One or more tasks and responsibilities require references, which are unavailable in this position. Therefore, it is necessary to seek references from other positions.</span><br>Do you want to seek references from other positions?`,
+    "",
+    action,
+    "50%",
+    1
+  );
+}
+
+async function saveReferenceAttribute() {
+  loader(true);
+
+  const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
+    (item) => !item.id.includes("all") && item.checked
+  );
+  const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) ?? "[]";
+  const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
+  const checboxTugasHa = checkboxList.filter((item) => item.id.includes("checkbox_tugasHaReference"));
+  const checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_koordinasiInternalReference"));
+  const checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_relasiEksternalReference"));
+  const checkboxStk = checkboxList.filter((item) => item.id.includes("checkbox_stkReference"));
+
+  // Dynamic function to process checkbox references
+  const processCheckboxReference = (checkboxes, config) => {
+    if (checkboxes.length === 0) return;
+
+    const { checkAllId, dataPath, localStorageKey, checkboxPrefix } = config;
+    const isCheckedAll = checkboxes.find((item) => item.id === checkAllId);
+
+    if (isCheckedAll !== undefined) {
+      // Process all items
+      selectedJobDescReference?.[dataPath]?.data?.forEach((item) => {
+        item.jobReference = {
+          jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
+          jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
+          noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+        };
+      });
+    } else {
+      // Process selected items only
+      const selectedItems = checkboxes
+        .map((item) => {
+          const id = item.id.split(`${checkboxPrefix}_`)[1];
+          return selectedJobDescReference?.[dataPath]?.data?.[id];
+        })
+        .filter((item) => item)
+        .map((item) => {
+          item.jobReference = {
+            jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
+            jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
+            noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+          };
+          return item;
+        });
+
+      selectedJobDescReference[dataPath].data = selectedItems;
+    }
+
+    // Update localStorage
+    const localData =
+      localStorage.getItem(localStorageKey) !== "" ? JSON.parse(localStorage.getItem(localStorageKey)) : [];
+    localData.push(...(selectedJobDescReference?.[dataPath]?.data ?? []));
+    localStorage.setItem(localStorageKey, JSON.stringify(localData));
+  };
+
+  if (checboxFungsi != undefined) {
+    const localData = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
+    const dataFungsi = $("#fungsiTextReference").summernote("code");
+    localData.push({
+      jobReference: {
+        jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
+        jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
+        noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+      },
+      fungsi: dataFungsi,
+    });
+    localStorage.setItem("fungsi", JSON.stringify(localData));
+  }
+
+  // Process tugas ha
+  processCheckboxReference(checboxTugasHa, {
+    checkAllId: "checkbox_tugasHaReference",
+    dataPath: "tugasTanggungJawabAkhir",
+    localStorageKey: "tugasHa",
+    checkboxPrefix: "checkbox_tugasHaReference",
+  });
+
+  // Process coordination internal
+  processCheckboxReference(checboxInternal, {
+    checkAllId: "checkbox_koordinasiInternalReference",
+    dataPath: "koordinasiInternal",
+    localStorageKey: "koordinasiInternal",
+    checkboxPrefix: "checkbox_koordinasiInternalReference",
+  });
+
+  // Process external relations
+  processCheckboxReference(checboxEksternal, {
+    checkAllId: "checkbox_relasiEksternalReference",
+    dataPath: "relasiEksternal",
+    localStorageKey: "relasiEksternal",
+    checkboxPrefix: "checkbox_relasiEksternalReference",
+  });
+
+  // Process STK
+  processCheckboxReference(checkboxStk, {
+    checkAllId: "checkbox_stkReference",
+    dataPath: "stk",
+    localStorageKey: "stk",
+    checkboxPrefix: "checkbox_stkReference",
+  });
+
+  await getJobReferenceDetail();
+  $("#modalJobCompare").modal("hide");
+  $("#modalJobCompareDetail").modal("hide");
+  loader(false);
+  swal("Success!", "Reference saved to your job description", "success");
+}
+
+async function saveReference() {
+  const isFullRefer = JSON.parse(localStorage.getItem("isFullRefer")) ?? false;
+  console.log("isFullRefer", isFullRefer);
+  if (!isFullRefer) {
+    callConfirmReference();
+    return;
+  }
+  const confirm = await confirmFunction("Save Reference", "Are you sure you want to save the selected references?");
+  if (!confirm) return;
+  await saveReferenceAttribute();
 }
 
 function checkButtonTable(buttonTable, id, lastPath) {
@@ -961,7 +869,6 @@ function checkButtonTable(buttonTable, id, lastPath) {
 
 function modalConfrimHelper(type, titleModal, message, note, action, modalSize, paramsId) {
   if (modalSize) {
-    alert(modalSize);
     // update modal size css width, exm: 90%
     $("#modalConfirm")
       .find(".modal-dialog")
@@ -999,14 +906,16 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
   }
 
   if (action) {
-    action.forEach((item) => {
+    action.forEach((item, index) => {
       if (item.callback) {
+        // Store the callback function globally with a unique identifier
+        const callbackId = `modalCallback_${Date.now()}_${index}`;
+        window[callbackId] = item.callback;
+
         $("#modalConfirmFooter").append(
           `<button type="button" class="btn ` +
             item.className +
-            ` m-r-5" onclick="(` +
-            item.callback +
-            `)()">` +
+            ` m-r-5" onclick="window.${callbackId}()">` +
             item.button +
             `</button>`,
         );
@@ -1038,15 +947,16 @@ function getallChildrenNode(parentNode) {
   return children;
 }
 
-function focusNode(nodeId, dataBagan) {
-  console.log("nodeId", nodeId);
-  let selfNode = dataBagan.find((item) => item.id == nodeId.id) || {};
-  const filteredData = dataBagan.filter((item) => item.id !== nodeId.id);
-  selfNode = {
-    ...selfNode,
-    tags: [...selfNode.tags, "pointed"],
-  };
+// ======================
+// helper bagan org
+// ======================
+async function focusNode(nodeId) {
+  // Show loading with proper container detection
+  showChartLoading("chart-container-custom");
+  // console.log("Focusing on node:", organizationAttribute);
+  const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc") || "{}");
 
+<<<<<<< HEAD
   console.log("filteredData", filteredData);
   filteredData.push(selfNode);
   filteredData.map((item) => {
@@ -1058,10 +968,43 @@ function focusNode(nodeId, dataBagan) {
     helperOrgChart(true, "os-container", filteredData, true, {
       expand: true,
       nodeId: selfNode.id,
+=======
+  try {
+    const dataChart = await chartShow({
+      draftId: getDraftExisting.draftOrganizationId,
+      jobCode: nodeId,
+      depth: 5,
+>>>>>>> e74399481b1764dd27736a160520eeeee58124dd
     });
-  }, 1500);
+
+    // Update chart data (assuming this function handles chart rendering)
+    renderOrgChart(dataChart.data, nodeId, true);
+
+    // Wait for chart to complete rendering before hiding loading
+    setTimeout(() => {
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
+      console.log("Chart focus completed successfully");
+    }, 1500); // Wait 1.5 seconds for chart to fully render
+  } catch (error) {
+    console.error("Error in focusNode:", error);
+
+    // Hide loading on error
+    if (typeof hideChartLoading === "function") {
+      hideChartLoading("chart-container-custom");
+    }
+
+    // Show error message
+    const container = document.querySelector(".chart-container-custom") || document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed. Please try again.</div>';
+    }
+  }
 }
 
+<<<<<<< HEAD
 // function helperOrgChart(init, id, data, isFocusNode, object) {
 //   const lsListOrgNode = JSON.parse(localStorage.getItem("listOrgNode") || "[]");
 //   console.log("data ==>", data);
@@ -1691,9 +1634,40 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     const childrenCount = args?.childrenIds?.length;
     if (childrenCount > 10) {
       args.layout = OrgChart.treeRightOffset;
+=======
+// Organization Chart Loading Functions
+function showChartLoading(
+  containerClass,
+  isCustom = false,
+  height = "480px",
+  width = "100%",
+  text = "Loading Chart..."
+) {
+  let container = document.querySelector(`.${containerClass}`);
+  container.innerHTML = CHART_LOADING_HTML;
+  console.log({ containerClass, isCustom, height, width, text });
+
+  // Ensure container has proper positioning for loading overlay
+  const containerStyle = window.getComputedStyle(container);
+  if (containerStyle.position === "static") {
+    container.style.position = "relative";
+  }
+
+  // Ensure container has minimum dimensions for chart (1200x800)
+  if (containerStyle.width === "0px" || containerStyle.height === "0px") {
+    if (isCustom) {
+      container.style.minHeight = height;
+      container.style.minWidth = width;
+      const headerLoading = container.querySelector("#header-loading-chart");
+      if (headerLoading) {
+        headerLoading.innerText = text;
+      }
+>>>>>>> e74399481b1764dd27736a160520eeeee58124dd
     } else {
-      args.layout = OrgChart.normal;
+      container.style.minWidth = "1200px";
+      container.style.minHeight = "800px";
     }
+<<<<<<< HEAD
   });
 
   chart.on("click", async (sender, node) => {
@@ -1815,5 +1789,32 @@ function helperOrgChart(init, id, data, isFocusNode, object) {
     setTimeout(() => {
       chart.fit();
     }, 800);
+=======
+  } else {
+    if (isCustom) {
+      container.style.minHeight = height;
+      container.style.minWidth = width;
+      const headerLoading = container.querySelector("#header-loading-chart");
+      if (headerLoading) {
+        headerLoading.innerText = text;
+      }
+    } else {
+      container.style.minWidth = "1200px";
+      container.style.minHeight = "800px";
+    }
+  }
+}
+function hideChartLoading(containerClass) {
+  let container = document.querySelector(`.${containerClass}`);
+  // Remove loading overlay and styles
+  const loadingOverlay = container.querySelector("#chart-loading-overlay");
+  const loadingStyle = container.querySelector("style");
+
+  if (loadingOverlay) {
+    loadingOverlay.remove();
+  }
+  if (loadingStyle) {
+    loadingStyle.remove();
+>>>>>>> e74399481b1764dd27736a160520eeeee58124dd
   }
 }

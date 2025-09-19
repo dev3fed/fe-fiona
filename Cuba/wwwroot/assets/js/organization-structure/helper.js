@@ -105,10 +105,14 @@ async function insertFormPostion(paramId) {
   $("#inputOrgUnitName").val(data?.unitName);
   $("#inputFormation").val(data?.formation);
   if (data?.directReportCode) {
-    $("#selectDirectReport").append(new Option(data?.directReportName, data?.directReportCode, true, true));
+    $("#selectDirectReport").append(
+      new Option(`${data?.directReportName} (${data?.directReportCode})`, data?.directReportCode, true, true)
+    );
   }
   if (data?.parentCode) {
-    $("#selectOrgUnitParentName").append(new Option(data?.parentName, data?.parentCode, true, true));
+    $("#selectOrgUnitParentName").append(
+      new Option(`${data?.parentName} (${data?.parentCode})`, data?.parentCode, true, true)
+    );
   }
   if (data?.divisionCode) {
     $("#selectDivision").append(new Option(data?.divisionName, data?.divisionCode, true, true));
@@ -156,20 +160,26 @@ async function insertFormPostion(paramId) {
   }
   const arrayBasket = [];
   if (data.isBasket) {
-    data.positionList.forEach((item, index) => {
+    data.subOrdinates.forEach((item, index) => {
+      console.log("item", item);
       const [prlFrom, prlTo] = item.prlOrg.includes("-") ? item.prlOrg.split("-") : [item.prlOrg, item.prlOrg];
       const params = { ...subOrdinates };
+      const positionName =
+        item?.formationBasket?.length > 0
+          ? item.formationBasket.map((x) => x.positionName).join(", ")
+          : item.positionName;
       params.subPosId = index + 1;
       params.unitCode = item.unitCode;
       params.unitName = item.unitName;
-      params.unitParentCode = data?.parentCode;
-      params.unitParentName = data?.parentName;
-      params.jobPositionName = item.positionName || "";
+      params.unitParentCode = item.parentCode;
+      params.unitParentName = item.parentName;
+      params.jobPositionName = positionName || "";
       params.layer = item.layer;
       params.prlFrom = prlFrom;
       params.prlTo = prlTo;
-      params.formation = item.formation;
+      params.formation = item.formation || 1;
       params.prlPlan = 4;
+      params.formationBasket = item.formationBasket || [];
       params.careerLevel = {
         careerLevelCode: data?.careerLevelCode || "",
         careerLevelName: data?.careerLevelName || "",
@@ -230,6 +240,8 @@ function openAll() {
 function onChangeSwith(value, target) {
   const selectId = "#select" + target;
   const inputId = "#input" + target;
+  console.log("selectId", selectId);
+  console.log("inputId", inputId);
   $(inputId).val(null);
   $(inputId).hide();
   $(selectId).next(".select2-container").show();
@@ -522,11 +534,13 @@ function previousTab() {
 function formattedInputAttribut(type) {
   const unitCode = urlParams.get("unitCode");
   const payload = formPositionParam;
-  console.log(payload.personnelSubAreaCode);
   payload.draftId = organizationAttribute.orgUnitId;
   payload.userId = "system";
   payload.unit.unitCode = type == "edit" ? unitCode : null;
-  payload.unit.unitName = $("#inputPositionName").val();
+  payload.unit.unitName = $("#inputOrgUnitName").val();
+  //  remove jika ada text didalam kurung
+  payload.unit.unitName = payload.unit.unitName.replace(/\s*\(.*?\)\s*/g, "");
+  payload.unit.positionName = $("#inputPositionName").val();
   payload.unit.layer = 4;
   payload.unit.isBasket = $("#selectBasket").val() == "Yes" ? true : false;
   const isBasket = payload.unit.isBasket;
@@ -541,10 +555,14 @@ function formattedInputAttribut(type) {
   payload.unit.costCenter = $("#selectCostCenter").val();
   // career type
   payload.careerType.careerTypeCode = $("#selectCareerType").val();
-  payload.careerType.careerTypeName = $("#selectCareerType option:selected").text();
+  payload.careerType.careerTypeName = $("#selectCareerType option:selected")
+    .text()
+    .replace(/\s*\(.*?\)\s*/g, "");
   // career level
   payload.careerLevel.careerLevelCode = $("#selectCareerLevel").val();
-  payload.careerLevel.careerLevelName = $("#selectCareerLevel option:selected").text();
+  payload.careerLevel.careerLevelName = $("#selectCareerLevel option:selected")
+    .text()
+    .replace(/\s*\(.*?\)\s*/g, "");
   // function
   payload.function.isNew = $("#FunctionSwitch").prop("checked");
   payload.function.functionCode = payload.function.isNew ? "" : $("#selectFunction").val();
@@ -593,7 +611,9 @@ function formattedInputAttribut(type) {
   }
   payload.personnelArea.personnelAreaName = payload.personnelArea.isNew
     ? $("#inputPersonalAreaName").val()
-    : $("#selectPersonalAreaName option:selected").text();
+    : $("#selectPersonalAreaName option:selected")
+        .text()
+        .replace(/\s*\(.*?\)\s*/g, "") || "";
   // personnelSubArea
   payload.personnelSubArea.isNew = $("#PersonalSubareaNameSwitch").prop("checked");
   payload.personnelSubArea.personnelSubAreaCode = payload.personnelSubArea.isNew
@@ -607,29 +627,38 @@ function formattedInputAttribut(type) {
   }
   payload.personnelSubArea.personnelSubAreaName = payload.personnelSubArea.isNew
     ? $("#inputPersonalSubareaName").val()
-    : $("#selectPersonalSubareaName option:selected").text();
+    : $("#selectPersonalSubareaName option:selected")
+        .text()
+        .replace(/\s*\(.*?\)\s*/g, "") || "";
   // costCenter
   payload.unitParent.isNew = false;
   payload.unitParent.unitCode = $("#selectOrgUnitParentName").val() || "";
-  payload.unitParent.unitName = $("#selectOrgUnitParentName option:selected").text() || "Operational Risk Papua-Maluku";
+  // remove jika ada text didalam kurung
+  payload.unitParent.unitName =
+    $("#selectOrgUnitParentName option:selected")
+      .text()
+      .replace(/\s*\(.*?\)\s*/g, "") || "";
   // directReport
   payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
   payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
   // abbreviation
-  payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked");
-  payload.abbrivation.jobAbbrivationCode = payload.abbrivation.isNew ? "" : $("#selectAbbrvPosition").val();
-  if (payload.abbrivation.jobAbbrivationCode == "null" || payload.abbrivation.jobAbbrivationCode == null) {
-    payload.abbrivation.jobAbbrivationCode = "";
-  }
-  payload.abbrivation.careerJobName = payload.abbrivation.isNew
-    ? $("#inputAbbrvPosition").val()
-    : $("#selectAbbrvPosition option:selected").text();
 
-  payload.abbrivation.jobAbbrivationName = payload.abbrivation.isNew
-    ? $("#inputAbbrvPosition").val()
-    : $("#selectAbbrvPosition option:selected").text();
-  // get first 12 character
-  payload.abbrivation.jobAbbrivationName = payload.abbrivation.jobAbbrivationName.substring(0, 12);
+  if (!isBasket) {
+    payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked");
+    payload.abbrivation.jobAbbrivationCode = payload.abbrivation.isNew ? "" : $("#selectAbbrvPosition").val();
+    if (payload.abbrivation.jobAbbrivationCode == "null" || payload.abbrivation.jobAbbrivationCode == null) {
+      payload.abbrivation.jobAbbrivationCode = "";
+    }
+    payload.abbrivation.careerJobName = payload.abbrivation.isNew
+      ? $("#inputAbbrvPosition").val()
+      : $("#selectAbbrvPosition option:selected").text() || "";
+
+    payload.abbrivation.jobAbbrivationName = payload.abbrivation.isNew
+      ? $("#inputAbbrvPosition").val()
+      : $("#selectAbbrvPosition option:selected").text() || "";
+    // get first 12 character
+    payload.abbrivation.jobAbbrivationName = payload.abbrivation.jobAbbrivationName.substring(0, 12);
+  }
 
   // coordinateWith
   payload.coordinateWith.unitCode = payload.unit.isCoordinate ? $("#selectCoordinationWith").val() : "";
@@ -644,9 +673,13 @@ function formattedInputAttribut(type) {
     if (skillGroup != "null" && skillGroup != null) {
       payload.skillGroups.push({
         skillGroupCode: skillGroup,
-        skillGroupName: $(`#selectSkillGroup${level} option:selected`).text(),
+        skillGroupName: $(`#selectSkillGroup${level} option:selected`)
+          .text()
+          .replace(/\s*\(.*?\)\s*/g, ""),
         subSkillGroupCode: subSkillGroup,
-        subSkillGroupName: $(`#selectSubSkillGroup${level} option:selected`).text(),
+        subSkillGroupName: $(`#selectSubSkillGroup${level} option:selected`)
+          .text()
+          .replace(/\s*\(.*?\)\s*/g, ""),
         subSkillGroupSequence: index + 1,
       });
     }
@@ -663,10 +696,8 @@ function formattedInputAttribut(type) {
 
 async function saveInputAttribut(type) {
   const formPositionParam = formattedInputAttribut(type);
-  // console.log("formPositionParam", formPositionParam);
-  // console.log("formPositionParam", formPositionParam.unit.isBasket);
+  console.log("formPositionParam", formPositionParam);
   const basket = formPositionParam.unit.isBasket;
-  // return;
   // compare formPositionParam with localStorage logState.initParams
   const logState = JSON.parse(localStorage.getItem("logState"));
   if (logState && logState.initParams && type === "edit") {
@@ -768,9 +799,6 @@ async function saveInputAttribut(type) {
       }
     }
   }
-
-  console.log("basket", basket);
-  console.log("type", type);
 
   // Check if basket is selected and type is "edit"
   let result;
@@ -1072,6 +1100,14 @@ function clearInputModal() {
   $("#modalSelectPrlOrgSubPos").val("").trigger("change");
   $("#modalSelectPrlOrgToSubPos").val("").trigger("change");
   $("#modalInputFormation").val("");
+
+  // find subPosDiv
+  const subPosDivs = $("[id^=subPosDiv]");
+  subPosDivs.each(function (index) {
+    if (index !== 0) {
+      $(this).remove();
+    }
+  });
 }
 
 async function modalSubPosition() {
@@ -1091,13 +1127,23 @@ async function modalSubPosition() {
   getDataList([
     // modalSelectPrlOrgSubPos
     {
-      dataId: "modalSelectPrlOrgSubPos",
+      dataId: "modalSelectPrlOrg",
       data: prl.map((item) => ({ id: item, text: item })),
       dropdownParent: $("#modalAddSubPosition"),
     },
     {
-      dataId: "modalSelectPrlOrgToSubPos",
+      dataId: "modalSelectPrlOrgTo",
       data: prl.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+    {
+      dataId: "modalSelectPrlOrgSubPos",
+      data: prlRange.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+    {
+      dataId: "modalSelectPrlOrgToSubPos",
+      data: prlRange.map((item) => ({ id: item, text: item })),
       dropdownParent: $("#modalAddSubPosition"),
     },
     {
@@ -1122,9 +1168,7 @@ async function editSubPosition(id) {
   // get local storage subJobPos
   const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
   const data = subJobPos.find((item) => item.subPosId == id);
-  console.log("id", id);
   console.log(data);
-  console.log(data.jobPositionName);
   $("#modalInputSubPosId").val(data.subPosId);
   if (data.careerLevel.careerLevelCode) {
     $("#modalSelectCareerLevel").append(
@@ -1138,8 +1182,23 @@ async function editSubPosition(id) {
   }
 
   $("#modalInputSubPositionName").val(data.jobPositionName);
-  $("#modalSelectPrlOrgSubPos").val(data.prlFrom).trigger("change");
-  $("#modalSelectPrlOrgToSubPos").val(data.prlTo).trigger("change");
+  $("#modalSelectPrlOrg").val(data.prlFrom).trigger("change");
+  $("#modalSelectPrlOrgTo").val(data.prlTo).trigger("change");
+
+  const prlOrg = data.prlFrom == data.prlTo ? data.prlFrom : `${data.prlFrom}-${data.prlTo}`;
+  if (data.formationBasket.length > 0) {
+    data.formationBasket.forEach((item, idx) => {
+      if (idx !== 0) addSubPos(item);
+      $("#modalSelectPrlOrgSubPos" + (idx === 0 ? "" : idx + 1)).append(
+        new Option(item.prlOrg, item.prlOrg, true, true)
+      );
+      $("#modalInputSubPositionName" + (idx === 0 ? "" : idx + 1)).val(item.positionName);
+    });
+  } else {
+    console.log("masuk basket non merge");
+    console.log({ prlOrg });
+    $("#modalSelectPrlOrgSubPos").val(prlOrg).trigger("change");
+  }
   $("#modalInputFormation").val(data.formation);
 }
 
@@ -1585,9 +1644,9 @@ function hideModal(id) {
   $("#" + id).modal("hide");
 }
 
-function checkButtonTable(buttonTable, id, lastPath) {
-  const user = localStorage.getItem("user") === "admin" ? "admin" : "admin";
-  const status = "2";
+function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0, userRole: "user" }) {
+  const user = getStatusDraft.userRole;
+  const status = getStatusDraft.step;
   // swith case by parameter buttonTable and lastPath
   switch (buttonTable) {
     case "deleteMoveVariousTable":
@@ -1614,6 +1673,9 @@ function checkButtonTable(buttonTable, id, lastPath) {
         const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailPositionDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+        if (status >= 3) {
+          return `${detailPositionDraft}`;
+        }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
       } else {
         const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
@@ -1622,6 +1684,7 @@ function checkButtonTable(buttonTable, id, lastPath) {
     case "draftList":
       const detailDraft = `<button class="btn-custom-outline-dark" onclick="detailDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
       const deleteDraft = `<button class="btn-custom-outline-danger" onclick="deleteDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+
       return `${detailDraft} ${deleteDraft}`;
     case "approvalList":
       const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
@@ -1873,33 +1936,40 @@ async function changeDataDesignCostFilter(value) {
       });
 
   result.data.forEach((item, idx) => {
+    let name = item.functionName || item.divisionName || item.jobLevel;
+    let formationProposed = item.formationProposed || item.proposedTotalFormation || 0;
+    let costYearProposed = item.costYearProposed || item.proposedCostYear || 0;
+    let formationExisting = item.formationExisting || item.existingTotalFormation || 0;
+    let costYearExisting = item.costYearExisting || item.existingCostYear || 0;
+    let formationAdjustment = item.formationAdjustment || item.adjustmentTotalFormation || 0;
+    let costYearAdjustment = item.costYearAdjustment || item.adjusmentCostYear || 0;
     data.addHtml += `<tr>
       <td>${idx + 1}</td>
-      <td>${item.functionName || item.divisionName || item.layerName}</td>
-      <td>${item.formationProposed}</td>
-      <td>${item.costYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
-      <td>${item.formationExisting}</td>
-      <td>${item.costYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
-      <td>${item.formationAdjustment}</td>
-      <td>${item.costYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${name}</td>
+      <td>${formationProposed}</td>
+      <td>${costYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${formationExisting}</td>
+      <td>${costYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+      <td>${formationAdjustment}</td>
+      <td>${costYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
     </tr>`;
-    data.totalFormationProposed += item.formationProposed;
-    data.totalCostYearProposed += item.costYearProposed;
-    data.totalFormationExisting += item.formationExisting;
-    data.totalCostYearExisting += item.costYearExisting;
-    data.totalFormationAdjustment += item.formationAdjustment;
-    data.totalCostYearAdjustment += item.costYearAdjustment;
+    data.totalFormationProposed += formationProposed;
+    data.totalCostYearProposed += costYearProposed;
+    data.totalFormationExisting += formationExisting;
+    data.totalCostYearExisting += costYearExisting;
+    data.totalFormationAdjustment += formationAdjustment;
+    data.totalCostYearAdjustment += costYearAdjustment;
   });
 
   tableBody.append(data.addHtml);
   tableFooter.append(`<tr>
     <td colspan="2">Total</td>
     <td>${data.totalFormationProposed}</td>
-    <td>${data.totalCostYearProposed.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data?.totalCostYearProposed?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
     <td>${data.totalFormationExisting}</td>
-    <td>${data.totalCostYearExisting.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data?.totalCostYearExisting?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
     <td>${data.totalFormationAdjustment}</td>
-    <td>${data.totalCostYearAdjustment.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+    <td>${data?.totalCostYearAdjustment?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
   </tr>`);
 }
 

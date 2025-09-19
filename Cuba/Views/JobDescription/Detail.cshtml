@@ -3,10 +3,28 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <style>
-    #os-container {
-        height: 480px !important;
-        background-color: #F5F5F5;
+    .chart-container-custom{
+        width: 100%;
+        height: 700px;
+        }
+
+    .svg-chart-container {
+        width: 100%;
+        height: 700px;
+    }
+
+    .chart-exp-mid{
+        width: 1100px;
+        height: 600px;
+        position: relative
+    }
+    
+    
+    #orgThree .no-children .jstree-icon {
+        display: none !important;
+        /* Use !important to ensure it overrides other styles */
     }
 </style>
 <style id="myStyle">
@@ -14,54 +32,72 @@
         stroke: #000000;
         stroke-width: 0.6px;
     }
+
     [data-n-id] circle {
         stroke: #000000;
         stroke-width: 0.6px;
     }
+
     [data-n-id] rect {
         stroke: #000000;
         stroke-width: 0.6px;
     }
+
     [data-ctrl-ec-id] circle,
     [data-ctrl-ec-id] line {
         stroke: #000000;
         stroke-width: 0.6px;
     }
-    [data-l-id].direktur > path {
+
+    [data-l-id].direktur>path {
         stroke-dasharray: 3, 3;
     }
 
     @* class edit *@
-    
+    [data-n-id].edit rect {
+        fill: #e6f6fe;
+        stroke: #03a9f4;
+    }
+    [data-n-id].create rect {
+        fill: #e6f6fe;
+        stroke: #03a9f4;
+    }
+    [data-n-id].update rect {
+        fill: #e6f6fe;
+        stroke: #03a9f4;
+    }
+
     [data-n-id].delete rect {
         fill: #f8d7da;
         stroke: #dc3545;
     }
+
     [data-n-id].pointed rect {
-        fill: #cec9c9 !important;
+        stroke: #03A9F4;
+        stroke-width: 3;
     }
-    .match rect:nth-child(2){
+
+    .match rect:nth-child(2) {
         fill: #F57C00;
         stroke: #F57C00;
     }
 
-    .match path, .match circle{
+    .match path,
+    .match circle {
         stroke: #F57C00;
     }
 
     [data-n-id].bracket_4_edit rect {
         fill: #FFD700;
     }
-
-    
 </style>
-<script src="../assets/js/balkan/orgchart.js"></script>
-<script src="../assets/js/organization-structure/data_cnt.js"></script>
-
 <link rel="stylesheet" type="text/css" href="~/assets/css/job-description.css">
 @* style link *@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -86,12 +122,12 @@
     </div>
     <!-- Container-fluid starts-->
     <div class="container-fluid">
-        <div style="display: none;">
-            <button class="btn btn-primary d-nonebtn-md" id="modalCon" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">modal Confirm</button>
-            <button class="btn btn-primary d-nonebtn-md" id="otherRec" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">other recommend</button>
-            <button class="btn btn-primary d-nonebtn-md" id="applyRef" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">apply Reference</button>
-            <button class="btn btn-primary d-nonebtn-md" id="popUpBispro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popup kesesuain bispro</button>h
-            <button class="btn btn-primary d-nonebtn-md" id="popUpMergeBisPro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popUpMergeBisPro</button>h
+        <div style="">
+            @* <button class="btn btn-primary btn-md" id="modalCon" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">modal Confirm</button> *@
+            @* <button class="btn btn-primary btn-md" id="otherRec" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">other recommend</button> *@
+            @* <button class="btn btn-primary btn-md" id="applyRef" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">apply Reference</button> *@
+            <button class="btn btn-primary btn-md" id="popUpBispro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popup kesesuain bispro</button>h
+            <button class="btn btn-primary btn-md" id="popUpMergeBisPro" > <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">popUpMergeBisPro</button>h
         </div>
         
         <div class="row">
@@ -119,7 +155,7 @@
                                         <div class="m-20">
                                             <div class="d-flex justify-content-between"> 
                                                 <span style="font-size: 17px;">1. IDENTIFIKASI JABATAN</span>
-                                                <button class="btn btn-primary d-none btn-sm " id="addJobReference" onclick="addJobReference()"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">Add Job desc Reference</button>
+                                                <button class="btn btn-primary  btn-sm " id="addJobReference" onclick="addJobReference()"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">Add Job desc Reference</button>
                                             </div>
                                             <div class="table-responsive">
                                                 <table class="tableIndentifikasi">
@@ -169,8 +205,8 @@
                                             <div class="summernote ">
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobJabatan" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataJabatan" disabled> Edit Data</button>
+                                                <button class="btn btn-primary " id="addJobJabatan" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataJabatan" disabled> Edit Data</button>
                                             </div>
                                         </div>
                                     </div>
@@ -179,7 +215,7 @@
                                             <span style="font-size: 17px;">3. TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span>
                                             <span class="text-mtued" style="font-size: 12px;color: grey;">Merupakan acuan dalam melaksanakan tugasnya. Jika dibutuhkan, dalam situasi tertentu tingkat prioritas dan perubahan tugas dan tanggung jawab dapat disesuaikan dengan kebutuhan perusahaan</span>
                                             @* <span class="label-success-custom">4/4 business processes have been fulfilled. [See detail]</span> *@
-                                            <span class="label-danger-custom m-b-5 m-t-5" id="labelFulfillTugasHa" style="display: none;">4/4 business processes have been fulfilled.</span>
+                                            <span class="label-danger-custom m-b-5 m-t-5 p-2" style="border-radius:4px" id="labelFulfillTugasHa">-/-.</span>
                                             @* <span>4/4 business processes have been fulfilled. [See detail]</span> *@
                                             <div class="table-responsive m-t-10">
                                                 <table class="tableMasterData w-100" id="tugasHaTable">
@@ -187,11 +223,10 @@
                                                         <tr>
                                                             <th style="width:2%">No</th>
                                                             <th style="width:10%">Index</th>
-                                                            @* <th style="width:25%">Tugas & Tanggung Jawab</th> *@
-                                                            <th style="width:38%">Tugas & Tanggung Jawab</th>
+                                                            <th style="width:25%">Tugas & Tanggung Jawab</th>
                                                             <th style="width:25%">Hasil Akhir Yang Diharapkan</th>
                                                             <th style="width:25%">Leading Indicator</th>
-                                                            @* <th style="width:13%">Actions</th> *@
+                                                            <th style="width:13%">Actions</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -202,8 +237,8 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobTugasHa" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataTugasHa" disabled> Edit Data</button>
+                                                <button class="btn btn-primary " id="addJobTugasHa" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataTugasHa" disabled> Edit Data</button>
                                             </div>
                                         </div>
                                     </div>
@@ -253,10 +288,10 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="width:4%">No</th>
-                                                            @* <th style="width:32%">Pihak Eksternal</th> *@
-                                                            <th style="width:46%">Pihak Internal</th>
+                                                            <th style="width:32%">Pihak Internal</th>
+                                                            @* <th style="width:46%">Pihak Internal</th> *@
                                                             <th style="width:50%">Aktivitas</th>
-                                                            @* <th style="width:14%">Action</th> *@
+                                                            <th style="width:14%">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -267,8 +302,8 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobRelasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataRelasi" disabled> Edit Data</button>
+                                                <button class="btn btn-primary " id="addJobRelasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataRelasi" disabled> Edit Data</button>
                                             </div>
                                         </div>
                                     </div>
@@ -280,10 +315,10 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="width:4%">Id</th>
-                                                            <th style="width:46%">Pihak Eksternal</th>
-                                                            @* <th style="width:32%">Pihak Internal</th> *@
+                                                            @* <th style="width:46%">Pihak Eksternal</th> *@
+                                                            <th style="width:32%">Pihak Eksternal</th>
                                                             <th style="width:50%">Aktivitas</th>
-                                                            @* <th style="width:14%">Action</th> *@
+                                                            <th style="width:14%">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -294,8 +329,8 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobKoordinasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataKoordinasi" disabled> Edit Data</button>
+                                                <button class="btn btn-primary " id="addJobKoordinasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataKoordinasi" disabled> Edit Data</button>
                                             </div>
                                         </div>
                                     </div>
@@ -316,10 +351,10 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobPersyaratan" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataPersyaratan" disabled> Edit Data</button>
-                                            </div>
+                                            @* <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary " id="addJobPersyaratan" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataPersyaratan" disabled> Edit Data</button>
+                                            </div> *@
                                             <div class="table-responsive m-t-20">
                                                 <table class="tableMasterData w-100" id="persyaratanKhususTable">
                                                     <thead>
@@ -335,8 +370,8 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobKhusus" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataKhusus" disabled> Edit Data</button>
+                                                <button class="btn btn-primary " id="addJobKhusus" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataKhusus" disabled> Edit Data</button>
                                             </div>
                                             <div class="table-responsive m-t-20">
                                                 <table class="tableMasterData w-100" id="kompetensiTable">
@@ -398,10 +433,10 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobKompetensi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataKompetensi" disabled> Edit Data</button>
-                                            </div>
+                                            @* <div class="d-flex justify-content-end m-t-20 gap-2">
+                                                <button class="btn btn-primary " id="addJobKompetensi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataKompetensi" disabled> Edit Data</button>
+                                            </div> *@
                                         </div>
                                     </div>
                                     <div class="p-t-5" id="stk-primary">
@@ -412,8 +447,9 @@
                                                     <thead>
                                                         <tr>
                                                             <th style="width:30%">No.STK</th>
-                                                            <th style="width:70%">Judul STK</th>
-                                                            @* <th style="width:20%">Action</th> *@
+                                                            @* <th style="width:70%">Judul STK</th> *@
+                                                            <th style="width:50%">Judul STK</th>
+                                                            <th style="width:20%">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -424,26 +460,42 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary d-none" id="addJobRelasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
-                                                <button class="btn btn-primary d-none" id="editDataRelasi" disabled> Edit Data</button>
+                                                <button class="btn btn-primary " id="addJobRelasi" disabled> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="editDataRelasi" disabled> Edit Data</button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="p-t-5" id="bagan-primary">
                                         <span style="font-size: 17px;">10. POSISI DALAM STRUKTUR ORGANISASI</span>
-                                        <div class="table-responsive m-t-10">
-                                            <div id="os-container"></div>
+                                        <div class="row">
+                                            <div class="col-12 mt-2">
+                                                <button class="btn btn-primary btn-sm" onclick="chartExportIMG()">Export Image</button>
+                                                <button class="btn btn-primary btn-sm" onclick="chart.exportImg()">Export Image</button>
+                                                <button class="btn btn-primary btn-sm" onclick="chartExportSVG()">Export SVG</button>
+                                                <button class="btn btn-primary btn-sm" onclick="chartExportPDF()">Export PDF</button>
+                                                <button class="btn btn-primary btn-sm" onclick="chart.fit();">Fit to the screen</button>
+                                                <button onclick="chart.zoomIn().render().fit();" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-search-plus"></i> zoom in
+                                                </button>
+                                                <button onclick="chart.zoomOut().render().fit();" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-search-minus"></i> zoom out
+                                                </button>
+                                                <button onclick="chartCompact()" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-sitemap"></i> compact
+                                                </button>
+                                            </div>
                                         </div>
+                                        <div class="chart-container-custom" style="background-color: aliceblue;"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer d-flex justify-content-end">
-                        <button class="btn btn-outline-primary d-none  m-r-10" type="button" id="handleExportPng">
+                        <button class="btn btn-outline-primary   m-r-10" type="button" id="handleExportPng">
                             download
                         </button>
-                        <button class="btn btn-primary d-none" type="button" id="saveDraft">
+                        <button class="btn btn-primary " type="button" id="saveDraft">
                             Save as Draft
                         </button>
                     </div>
@@ -465,22 +517,22 @@
     </script>
     <!-- Plugins JS start-->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="../assets/js/sidebar-menu.js"></script>
-    <script src="../assets/js/jquery.ui.min.js"></script>
-    <script src="../assets/js/slick/slick.min.js"></script>
-    <script src="../assets/js/slick/slick.js"></script>
-    <script src="../assets/js/header-slick.js"></script>
-    <script src="../assets/js/editor/summernote/summernote.js"></script>
-    <script src="../assets/js/range-slider/ion.rangeSlider.min.js"></script>
-    <script src="../assets/js/range-slider/rangeslider-script.js"></script>
+    <script src="@Url.Content("~/assets/js/sidebar-menu.js")"></script>
+    <script src="@Url.Content("~/assets/js/jquery.ui.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/slick/slick.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/slick/slick.js")"></script>
+    <script src="@Url.Content("~/assets/js/header-slick.js")"></script>
+    <script src="@Url.Content("~/assets/js/editor/summernote/summernote.js")"></script>
+    <script src="@Url.Content("~/assets/js/range-slider/ion.rangeSlider.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/range-slider/rangeslider-script.js")"></script>
 
     @* <script src="../assets/js/editor/summernote/summernote.custom.js"></script> *@
     @* <script src="../assets/js/tooltip-init.js"></script> *@
-    <script src="../assets/js/scrollable/perfect-scrollbar.min.js"></script>
-    <script src="../assets/js/scrollable/scrollable-custom.js"></script>
-    <script src="../assets/js/select2/select2.full.min.js"></script>
-    <script src="../assets/js/select2/select2-custom.js"></script>
-    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <script src="@Url.Content("~/assets/js/scrollable/perfect-scrollbar.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/scrollable/scrollable-custom.js")"></script>
+    <script src="@Url.Content("~/assets/js/select2/select2.full.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/select2/select2-custom.js")"></script>
+    <script src="@Url.Content("~/assets/js/sweet-alert/sweetalert.min.js")"></script>
 
     @* <script src="https://cdn.jsdelivr.net/npm/docx@9.1.0/build/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> *@
@@ -493,10 +545,10 @@
 
 
     @* datatable *@
-    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/datatable/datatable-extension/dataTables.buttons.min.js"></script>
+    <script src="@Url.Content("~/assets/js/datatable/datatables/jquery.dataTables.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/datatable/datatable-extension/dataTables.buttons.min.js")"></script>
 
-     <script>
+    <script>
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (tooltipTriggerEl) {
             if (bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
                 bootstrap.Tooltip.getInstance(tooltipTriggerEl).dispose();
@@ -506,15 +558,20 @@
     </script>
 
     @* custom js *@
-    <script src="../assets/js/job-description/table-custom.js"></script>
-    <script src="../assets/js/authentication.js"></script>
-    <script src="../assets/js/job-description/multiple-select.js"></script>
-    <script src="../assets/js/job-description/helper.js"></script>
-    <script src="../assets/js/job-description/constant.js"></script>
-    <script src="../assets/js/job-description/endpoint.js"></script>
-    <script src="../assets/js/job-description/detail.js"></script>
-    <script type="module" src="../assets/js/job-description/detail-bundle.js"></script>
-    <script src="../assets/js/script.js"></script>
-
+    <script src="@Url.Content("~/assets/js/job-description/constant.js")"></script>
+    <script src="@Url.Content("~/assets/js/job-description/table-custom.js")"></script>
+    <script src="@Url.Content("~/assets/js/authentication.js")"></script>
+    <script src="@Url.Content("~/assets/js/job-description/multiple-select.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3.v7.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-org-chart.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/d3-flextree.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/html2canvas.js")"></script>
+    <script src="@Url.Content("~/assets/js/organization-structure/js-d3-chart/jspdf.umd.min.js")"></script>
+    <script src="@Url.Content("~/assets/js/job-description/d3-chart.js")"></script>
+    <script src="@Url.Content("~/assets/js/job-description/helper.js")"></script>
+    <script src="@Url.Content("~/assets/js/job-description/endpoint.js")"></script>
+    <script src="@Url.Content("~/assets/js/job-description/detail.js")"></script>
+    <script type="module" src="@Url.Content("~/assets/js/job-description/detail-bundle.js")"></script>
+    <script src="@Url.Content("~/assets/js/script.js")"></script>
 }
 

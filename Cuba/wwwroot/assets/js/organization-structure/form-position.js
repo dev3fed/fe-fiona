@@ -6,6 +6,7 @@ function starter() {
 
 async function initializeList() {
   const _function = await functionList(organizationAttribute.orgUnitId);
+  console.log("_function", _function);
   const _abbrv = await abbrvPositionList(organizationAttribute.orgUnitId);
   const draftId = organizationAttribute.orgUnitId;
   getDataListAsync([
@@ -42,8 +43,8 @@ async function initializeList() {
     { id: "selectCostCenter", endpoint: "draft/cost-center/list", draftId: draftId },
     { id: "selectPersonalAreaName", endpoint: "draft/personnel-area/list", draftId: draftId },
     { id: "selectPersonalSubareaName", endpoint: "draft/personnel-sub-area/list", draftId: draftId },
-    { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId },
-    { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId },
+    { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId, showId: true },
+    { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
     { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId },
     { id: "selectSubSkillGroupMain", endpoint: "draft/sub-skill-group/list", draftId: draftId },
     { id: "selectSkillGroupSecond", endpoint: "draft/skill-group/list", draftId: draftId },
@@ -54,7 +55,7 @@ async function initializeList() {
   return [
     {
       dataId: "selectFunction",
-      data: _function.data.map((item) => ({ id: item.functionCode, text: item.functionName })),
+      data: _function.data.map((item) => ({ id: item.Id, text: item.Name })),
     },
     {
       dataId: "selectAbbrvPosition",
@@ -79,27 +80,25 @@ async function saveAsDraft() {
   const positionId = urlParams.get("unitCode");
   let type = "create";
   if (positionId) type = "edit";
+  hideModal(`modalConfirm`);
   loader(true);
   const save = await saveInputAttribut(type);
-  console.log("save", save);
-  if (save) {
-    hideModal(`modalConfirm`);
+  if (save.status == 200) {
     loader(false);
     swal("Saved", "Save as Draft", "success");
-    // replace & inside string getPosition
-    // .replace(/&/g, '%26')
     const getPosition =
       $("#selectBasket").val() == "Yes" && save.data.jobFormations && save.data.jobFormations.length > 0
         ? save.data.jobFormations[0].unitName
         : $("#inputPositionName").val();
-
-    // Properly encode the position name for URL parameter
     const sanitizedPosition = encodeURIComponent(getPosition);
-    console.log("sanitizedPosition", sanitizedPosition);
     setTimeout(() => {
       window.location.href =
         "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
     }, 2500);
+  } else {
+    const message = save.message || save.title || "Failed to save job .";
+    swal("Error", message, "error");
+    loader(false);
   }
 }
 
@@ -108,6 +107,7 @@ function addSubPosition() {
   let type = "create";
   if (positionId) type = "edit";
   const dataAddSubPos = {};
+
   dataAddSubPos.subPosId = $("#modalInputSubPosId").val() == "" ? 0 : parseInt($("#modalInputSubPosId").val(), 10);
   dataAddSubPos.careerLevelCode = $("#modalSelectCareerLevel").val();
   dataAddSubPos.careerLevelName = $("#modalSelectCareerLevel option:selected").text();
@@ -116,8 +116,8 @@ function addSubPosition() {
   dataAddSubPos.abbrvPositionCode = $("#modalSelectAbbrvPosition").val();
   dataAddSubPos.abbrvPositionName = $("#modalSelectAbbrvPosition option:selected").text();
   dataAddSubPos.modalInputSubPositionName = $("#modalInputSubPositionName").val();
-  dataAddSubPos.modalSelectPrlOrgSubPos = parseInt($("#modalSelectPrlOrgSubPos").val());
-  dataAddSubPos.modalSelectPrlOrgToSubPos = parseInt($("#modalSelectPrlOrgToSubPos").val()) || 0;
+  dataAddSubPos.modalSelectPrlOrgSubPos = parseInt($("#modalSelectPrlOrg").val());
+  dataAddSubPos.modalSelectPrlOrgToSubPos = parseInt($("#modalSelectPrlOrgTo").val()) || 0;
   dataAddSubPos.modalInputFormation = parseInt($("#modalInputFormation").val());
   dataAddSubPos.unitCode = "";
   dataAddSubPos.unitName = $("#inputOrgUnitName").val();
@@ -128,7 +128,30 @@ function addSubPosition() {
   dataAddSubPos.unitParentName = $("#selectOrgUnitParentName option:selected").text();
   let subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
   console.log("dataAddSubPos", dataAddSubPos);
+  //  count how many div with id include subPosDiv
+  dataAddSubPos.formationBasket = [];
+  const countsubPosDiv = $("[id^=subPosDiv]").length;
+  console.log("countsubPosDiv", countsubPosDiv);
+  if (countsubPosDiv >= 1) {
+    let counted;
+    for (let i = 1; i <= countsubPosDiv; i++) {
+      counted = i;
+      if (i == 1) {
+        counted = "";
+      }
+      const prlOrg = $("#modalSelectPrlOrgSubPos" + counted).val() || "";
+      dataAddSubPos.formationBasket.push({
+        prlOrg: prlOrg,
+        positionName: $("#modalInputSubPositionName" + counted).val(),
+      });
+    }
+  }
+  console.log("dataAddSubPos", dataAddSubPos);
   let id;
+  const name =
+    dataAddSubPos.formationBasket.length > 1
+      ? dataAddSubPos.formationBasket.map((item) => item.positionName).join(", ")
+      : dataAddSubPos.modalInputSubPositionName;
   if (dataAddSubPos.subPosId !== 0) {
     id = dataAddSubPos.subPosId;
     const index = subJobPos.findIndex((item) => item.subPosId == dataAddSubPos.subPosId);
@@ -138,7 +161,7 @@ function addSubPosition() {
       unitName: dataAddSubPos.unitName,
       unitParentCode: dataAddSubPos.unitParentCode,
       unitParentName: dataAddSubPos.unitParentName,
-      jobPositionName: dataAddSubPos.modalInputSubPositionName,
+      jobPositionName: name,
       layer: 5,
       prlFrom: dataAddSubPos.modalSelectPrlOrgSubPos,
       prlTo: dataAddSubPos.modalSelectPrlOrgToSubPos,
@@ -158,6 +181,7 @@ function addSubPosition() {
         jobAbbrivationCode: dataAddSubPos.abbrvPositionCode,
         isNew: false,
       },
+      formationBasket: dataAddSubPos.formationBasket,
     };
   } else {
     id = dataAddSubPos.subPosId !== 0 ? dataAddSubPos.subPosId : subJobPos.length + 1;
@@ -167,7 +191,7 @@ function addSubPosition() {
       unitName: dataAddSubPos.unitName,
       unitParentCode: dataAddSubPos.unitParentCode,
       unitParentName: dataAddSubPos.unitParentName,
-      jobPositionName: dataAddSubPos.modalInputSubPositionName,
+      jobPositionName: name,
       layer: 5,
       prlFrom: dataAddSubPos.modalSelectPrlOrgSubPos,
       prlTo: dataAddSubPos.modalSelectPrlOrgToSubPos,
@@ -187,6 +211,7 @@ function addSubPosition() {
         jobAbbrivationCode: dataAddSubPos.abbrvPositionCode,
         isNew: false,
       },
+      formationBasket: dataAddSubPos.formationBasket,
     });
   }
   localStorage.setItem("subJobPos", JSON.stringify(subJobPos));
@@ -196,29 +221,116 @@ function addSubPosition() {
   checkBasketSelected("Yes");
 }
 
-function deleteSubPos(countSubPosDiv) {
-  $("#rowPosDiv" + countSubPosDiv).remove();
-}
+$("#inputPositionName").on("input", function () {
+  const checkBasketSelected = $("#selectBasket").val();
+  if (checkBasketSelected == "Yes") {
+    $("#inputOrgUnitName").val($(this).val());
+  }
+});
 
 function checkBasketSelected(selectBasket) {
   // $("#prlOrgDiv, #prlOrgToDiv").toggleClass("col-md-6 col-md-4");
   $("#subPositionDiv").hide();
   $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").show();
   $("#selectPrlOrgTo").prop("disabled", true);
+  $("#inputOrgUnitName").prop("disabled", false);
   // alert("masuk");
   if (selectBasket == "Yes") {
+    $("#inputOrgUnitName").val($("#inputPositionName").val());
     // alert("masuk 1");
     const subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
     // $("#prlOrgDiv, #prlOrgToDiv").removeClass("col-md-4").addClass("col-md-6");
     $("#subPositionDiv").show();
     $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").hide();
     $("#selectPrlOrgTo").prop("disabled", false);
+    $("#inputOrgUnitName").prop("disabled", true);
     updateDivSubPosition(subJobPos);
+  } else {
+    localStorage.setItem("subJobPos", JSON.stringify([]));
   }
+}
+
+function addSubPos() {
+  // duplicate div with id subPosDiv
+  const newSubPosDiv = $("#subPosDiv").clone();
+  const count = $(".sub-pos-card").length + 1;
+  console.log("count", count);
+  newSubPosDiv.attr("id", "subPosDiv" + count);
+
+  // Remove existing Select2 containers from cloned div
+  newSubPosDiv.find(".select2-container").remove();
+
+  // find class add-sub-pos inside newSubPosDiv and change its class to delete-sub-pos
+  newSubPosDiv.find(".add-sub-pos").removeClass("add-sub-pos").addClass("delete-sub-pos");
+  // find id addSubPos and onClick to call function deleteSubPos
+  newSubPosDiv.find("#addSubPos").attr("onclick", "deleteSubPos(`" + count + "`)");
+
+  // change id to deleteSubPos
+  newSubPosDiv.find("#addSubPos").attr("id", "deleteSubPos" + count);
+  // change button class to btn-danger
+  newSubPosDiv.find("#imageIcon").attr("src", "/assets/images/rasci/trash.svg");
+
+  // find label for and input with id modalInputSubPositionName and change its id to modalInputSubPositionName + count
+  newSubPosDiv.find(".form-label[for='modalInputSubPositionName']").attr("for", "modalInputSubPositionName" + count);
+  newSubPosDiv
+    .find("#modalInputSubPositionName")
+    .attr("id", "modalInputSubPositionName" + count)
+    .val("");
+  // find label for and input with id modalSelectPrlOrgSubPos and change its id to modalSelectPrlOrgSubPos + count
+
+  // remove #modalSelectPrlOrgSubPos and #modalSelectPrlOrgToSubPos
+
+  // Update the first select (PRL Org)
+  const firstSelect = newSubPosDiv.find("select").first();
+  newSubPosDiv
+    .find("label")
+    .first()
+    .attr("for", "modalSelectPrlOrgSubPos" + count);
+  firstSelect.attr("id", "modalSelectPrlOrgSubPos" + count);
+  firstSelect.val(null).trigger("change");
+
+  // Update the second select (PRL Org To)
+  // const secondSelect = newSubPosDiv.find("select").last();
+  // newSubPosDiv
+  //   .find("label")
+  //   .last()
+  //   .attr("for", "modalSelectPrlOrgToSubPos" + count);
+  // secondSelect.attr("id", "modalSelectPrlOrgToSubPos" + count);
+  // secondSelect.val(null).trigger("change");
+
+  // Refresh Select2 for the new selects
+  newSubPosDiv.find("select").each(function () {
+    $(this).select2({
+      dropdownParent: $("#modalAddSubPosition"),
+    });
+  });
+
+  $("#subPosDiv").after(newSubPosDiv);
+  // getDataList([
+  //   // modalSelectPrlOrgSubPos
+  //   {
+  //     dataId: "modalSelectPrlOrgSubPos " + count,
+  //     data: prl.map((item) => ({ id: item, text: item })),
+  //     dropdownParent: $("#modalAddSubPosition"),
+  //   },
+  //   {
+  //     dataId: "modalSelectPrlOrgToSubPos" + count,
+  //     data: prl.map((item) => ({ id: item, text: item })),
+  //     dropdownParent: $("#modalAddSubPosition"),
+  //   },
+  // ]);
+  // find label for and input with id modalSelectPrlOrgToSubPos and change its id to modalSelectPrlOrgToSubPos + count
+}
+
+function deleteSubPos(countSubPosDiv) {
+  console.log("countSubPosDiv", countSubPosDiv);
+  $("#subPosDiv" + countSubPosDiv).remove();
 }
 
 $(document).ready(async function () {
   loader(true);
+  // remove local storage subJobPos
+  localStorage.setItem("subJobPos", JSON.stringify([]));
 
   $("#selectBasket").on("change", function (event) {
     // console.log("basket selected");
@@ -289,12 +401,24 @@ $(document).ready(async function () {
     // Check all form controls with required attribute
     const form = document.querySelectorAll(".form-control[required], .form-select[required]");
     let hasErrors = false;
+    const isBasket = $("#selectBasket").val();
 
     form.forEach((input) => {
       const type = input.type || input.tagName.toLowerCase();
       const value = input.value.trim();
+      if (isBasket === "Yes" && (input.name === "selectCareerLevel" || input.id === "inputFormation")) {
+        // Skip validation for career level and job family if basket is "Yes"
+        return;
+      } else {
+        if (input.name === "prlOrgTo") {
+          return;
+        }
+      }
+
+      // Skip validation for certain fields if basket is "Yes"
 
       if (type === "text" || type === "number" || type === "email") {
+        console.log("masuk sini", value);
         if (!value) {
           input.classList.add("is-invalid");
           hasErrors = true;
@@ -321,7 +445,11 @@ $(document).ready(async function () {
           }
         }
       }
+      console.log("hasErrors", hasErrors);
+      console.log("input", input);
+      console.log("value", value);
     });
+    // console.log errornya dimana
 
     return !hasErrors; // Return true if no errors, false if there are errors
   }

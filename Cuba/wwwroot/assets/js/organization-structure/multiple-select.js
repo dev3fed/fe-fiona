@@ -23,7 +23,7 @@ function getDataListAsync(data) {
             return {
               results: data.data.map((item) => ({
                 id: item.unitCode || item.Id || item.id, // The ID for Select2
-                text: item.unitName || item.Name || item.name, // The text that appears in the dropdown
+                text: item.unitName || item.Name || `${item.name} (${item.id})`, // The text that appears in the dropdown
               })),
               pagination: {
                 more: data.hasMore, // Boolean to indicate if more data is available

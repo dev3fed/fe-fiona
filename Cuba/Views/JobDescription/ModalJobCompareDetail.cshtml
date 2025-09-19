@@ -10,7 +10,7 @@
 </style>
 
 <div class="modal fade" id="modalJobCompareDetail" tabindex="-1" role="dialog" aria-labelledby="modalJobCompareDetailLabel"
-    aria-hidden="true">
+    aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-add-refence" role="document">
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
@@ -21,22 +21,177 @@
                 <div class="row">
                     <div class="col-md-2">
                         <div class="nav flex-column nav-pills nav-primary gap-2" id="v-pills-tab-modal" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link active" id="v-pills-identifikasi-tab" data-bs-toggle="pill" href="#v-pills-identifikasi" role="tab" aria-controls="v-pills-identifikasi" aria-selected="true" style="font-size: smaller;"><span>IDENTIFIKASI JABATAN</span></a>
-                            <a class="nav-link" id="v-pills-fungsi-tab" data-bs-toggle="pill" href="#v-pills-fungsi" role="tab" aria-controls="v-pills-fungsi" aria-selected="false"  style="font-size: 12px;"><span>FUNGSI JABATAN</span></a>
-                            <a class="nav-link" id="v-pills-tugas-ha-tab" data-bs-toggle="pill" href="#v-pills-tugas-ha" role="tab" aria-controls="v-pills-tugas-ha" aria-selected="false"  style="font-size: 12px;"><span> TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span></a>
-                            <a class="nav-link" id="v-pills-koordinasi-internal-tab" data-bs-toggle="pill" href="#v-pills-koordinasi-internal" role="tab" aria-controls="v-pills-koordinasi-internal" aria-selected="false"  style="font-size: 12px;"><span> KOORDINASI INTERNAL</span></a>
-                            <a class="nav-link" id="v-pills-relasi-eksternal-tab" data-bs-toggle="pill" href="#v-pills-relasi-eksternal" role="tab" aria-controls="v-pills-relasi-eksternal" aria-selected="false"  style="font-size: 12px;"><span> RELASI EKSTERNAL</span></a>
-                            <a class="nav-link" id="v-pills-stk-tab" data-bs-toggle="pill" href="#v-pills-stk" role="tab" aria-controls="v-pills-stk" aria-selected="false"  style="font-size: 12px;"><span> SISTEM TATA KERJA</span></a>
+                            <a class="nav-link active" id="v-pills-identifikasiReference-tab" data-bs-toggle="pill" href="#v-pills-identifikasiReference" role="tab" aria-controls="v-pills-identifikasiReference" aria-selected="true" style="font-size: smaller;"><span>IDENTIFIKASI JABATAN</span></a>
+                            <a class="nav-link" id="v-pills-fungsiReference-tab" data-bs-toggle="pill" href="#v-pills-fungsiReference" role="tab" aria-controls="v-pills-fungsiReference" aria-selected="false"  style="font-size: 12px;"><span>FUNGSI JABATAN</span></a>
+                            <a class="nav-link" id="v-pills-tugasHaReference-tab" data-bs-toggle="pill" href="#v-pills-tugasHaReference" role="tab" aria-controls="v-pills-tugasHaReference" aria-selected="false"  style="font-size: 12px;"><span> TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span></a>
+                            <a class="nav-link" id="v-pills-koordinasiInternalReference-tab" data-bs-toggle="pill" href="#v-pills-koordinasiInternalReference" role="tab" aria-controls="v-pills-koordinasiInternalReference" aria-selected="false"  style="font-size: 12px;"><span> KOORDINASI INTERNAL</span></a>
+                            <a class="nav-link" id="v-pills-relasiEksternalReference-tab" data-bs-toggle="pill" href="#v-pills-relasiEksternalReference" role="tab" aria-controls="v-pills-relasiEksternalReference" aria-selected="false"  style="font-size: 12px;"><span> RELASI EKSTERNAL</span></a>
+                            <a class="nav-link" id="v-pills-stkReference-tab" data-bs-toggle="pill" href="#v-pills-stkReference" role="tab" aria-controls="v-pills-stkReference" aria-selected="false"  style="font-size: 12px;"><span> SISTEM TATA KERJA</span></a>
                         </div>
                     </div>
                     <div class="col-md-10">
                         <div class="container vertical-scroll scroll-content">
-                            <div id="identifikasi"></div>
-                            <div id="fungsi"></div>
-                            <div id="tugas-ha"></div>
-                            <div id="koordinasi-internal"></div>
-                            <div id="relasi-eksternal"></div>
-                            <div id="stk"></div>
+                            <div id="identifikasiReference">
+                                <div class="col-md-12 mb-4">
+                                    <span class="section-name mb-2 ">IDENTIFIKASI JABATAN</span>
+                                    <div class="table-responsive ">
+                                        <table class="tableIndentifikasiCompareModal">
+                                        <thead>
+                                            <th></th>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Nama Jabatan</td>
+                                                <td><span id="jobNameReference"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Unit Kerja / Fungsi</td>
+                                                <td><span id="functionReference"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lokasi</td>
+                                                <td><span id="locationReference"></span></td>
+                                            <tr>
+                                                <td>Direktorat</td>
+                                                <td><span id="directoratReference"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Atasan Langsung</td>
+                                                <td><span id="directReportReference"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Surat Keputusan</td>
+                                                <td >
+                                                    <div style="display: flex;justify-content: space-between;">
+                                                        <span id="skReference"></span>
+                                                        <span id="skDateReference"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="fungsiReference">
+                                <div class="col-md-12 mb-4">
+                                    <label class="container-checkbox mt-3"><span class="section-name mb-2 ">FUNGSI JABATAN</span>
+                                        <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_fungsi" class="checkbox_animated checbox-compare" checked>
+                                        <span class="checkmark" style="width:20px;height:20px" ></span>
+                                    </label>
+                                    <span class="content-class" id="fungsiTextReference"></span>
+                                </div>
+                            </div>
+                            <div id="tugasHaReference" class="mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <span class="section-name mb-1 ">TUGAS, TANGGUNG JAWAB DAN HASIL AKHIR</span>
+                                    <span class="text-muted f-12" style="">Merupakan acuan dalam melaksanakan tugasnya. Jika dibutuhkan, dalam situasi tertentu tingkat prioritas dan perubahan tugas dan tanggung jawab dapat disesuaikan dengan kebutuhan perusahaan.</span>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <span class="notifWarning">There are one or more tasks & responsibilities for which references are not available in this position, so it is necessary to seek references from other positions.</span>
+                                </div>
+                                <div class="table-responsive m-t-10">
+                                    <table class="tableMasterData w-100" id="tugasHaTable">
+                                        <thead>
+                                            <tr>
+                                            <th style="width:10%">
+                                                <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                                                    <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugasHaReference" class="checkbox_animated checbox-compare" checked>
+                                                    <span class="checkmark" style="width:20px;height:20px" ></span>
+                                                </label>
+                                            </th>
+                                            <th style="width:30%">Tugas & Tanggung Jawab</th>
+                                            <th style="width:30%">Hasil Akhir Yang Diharapkan</th>
+                                            <th style="width:30%">Leading Indicator</th>
+                                            </tr>
+                                        </thead>
+                                                <table class="tableMasterData w-100" id="tugasHaReferenceTable">
+                                            <tr class="p-20">
+                                                <td colspan="5" class="p-15 text-center">Data Not Found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="koordinasiInternalReference" class="mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <span class="section-name mb-1 ">KOORDINASI INTERNAL</span>
+                                </div>
+                                <div class="table-responsive m-t-10">
+                                    <table class="tableMasterData w-100" id="koordinasiInternalReferenceTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:4%">
+                                                    <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                                                        <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_koordinasiInternalReference" class="checkbox_animated checbox-compare" checked>
+                                                        <span class="checkmark" style="width:20px;height:20px" ></span>
+                                                    </label>
+                                                </th>
+                                                <th style="width:46%">Pihak Internal</th>
+                                                <th style="width:50%">Aktivitas</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="p-20">
+                                                <td colspan="3" class="p-15 text-center">Data Not Found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="relasiEksternalReference" class="mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <span class="section-name mb-1 ">RELASI EKSTERNAL</span>
+                                </div>
+                                <div class="table-responsive m-t-10">
+                                    <table class="tableMasterData w-100" id="relasiEksternalReferenceTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:4%">
+                                                    <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                                                        <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_relasiEksternalReference" class="checkbox_animated checbox-compare" checked>
+                                                        <span class="checkmark" style="width:20px;height:20px" ></span>
+                                                    </label>
+                                                </th>
+                                                <th style="width:46%">Pihak Eksternal</th>
+                                                <th style="width:50%">Aktivitas</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="p-20">
+                                                <td colspan="3" class="p-15 text-center">Data Not Found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="stkReference" class="mb-4">
+                                <div class="col-md-12 mb-3">
+                                    <span class="section-name mb-1 ">STK</span>
+                                </div>
+                                <div class="table-responsive m-t-10">
+                                    <table class="tableMasterData w-100" id="stkReferenceTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:4%">
+                                                    <label class="container-checkbox mt-3"><span class="section-name mb-2 "></span>
+                                                        <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_stkReference" class="checkbox_animated checbox-compare" checked>
+                                                        <span class="checkmark" style="width:20px;height:20px" ></span>
+                                                    </label>
+                                                </th>
+                                                <th style="width:30%">No.STK</th>
+                                                <th style="width:70%">Judul STK</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="p-20">
+                                                <td colspan="3" class="p-15 text-center">Data Not Found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>

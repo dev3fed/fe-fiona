@@ -282,52 +282,52 @@ async function getTableListDraft(params) {
       },
     ],
   });
-  if ($.fn.DataTable.isDataTable("#requestList")) {
-    $("#requestList").DataTable().destroy();
-  }
-  $("#requestList").DataTable({
-    dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-    buttons: [],
-    data: listDraft,
-    sort: false,
-    responsive: true,
-    columns: [
-      {
-        title: "No",
-        data: "id",
-        width: "2%",
-        render: function (data, type, row, meta) {
-          return meta.row + 1;
-        },
-      },
-      {
-        title: "Draft Name",
-        data: "draft-name",
-        width: "30%",
-      },
-      {
-        title: "Created By",
-        data: "created-by",
-        width: "30%",
-      },
-      {
-        title: "Updated By",
-        data: "updated-by",
-        width: "30%",
-      },
-      {
-        title: "Action",
-        data: null,
-        width: "8%",
-        render: function (data) {
-          return `
-          <button class="btn btn-dark" style="padding:4px 12px;font-size:12px;"  onclick="editDraft('${data.id}')">Edit</button>
-          <button class="btn btn-danger" style="padding:4px 12px;font-size:12px;"  onclick="deleteDraft('${data.id}')">Delete</button>
-          `;
-        },
-      },
-    ],
-  });
+  // if ($.fn.DataTable.isDataTable("#requestList")) {
+  //   $("#requestList").DataTable().destroy();
+  // }
+  // $("#requestList").DataTable({
+  //   dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
+  //   buttons: [],
+  //   data: listDraft,
+  //   sort: false,
+  //   responsive: true,
+  //   columns: [
+  //     {
+  //       title: "No",
+  //       data: "id",
+  //       width: "2%",
+  //       render: function (data, type, row, meta) {
+  //         return meta.row + 1;
+  //       },
+  //     },
+  //     {
+  //       title: "Draft Name",
+  //       data: "draft-name",
+  //       width: "30%",
+  //     },
+  //     {
+  //       title: "Created By",
+  //       data: "created-by",
+  //       width: "30%",
+  //     },
+  //     {
+  //       title: "Updated By",
+  //       data: "updated-by",
+  //       width: "30%",
+  //     },
+  //     {
+  //       title: "Action",
+  //       data: null,
+  //       width: "8%",
+  //       render: function (data) {
+  //         return `
+  //         <button class="btn btn-dark" style="padding:4px 12px;font-size:12px;"  onclick="editDraft('${data.id}')">Edit</button>
+  //         <button class="btn btn-danger" style="padding:4px 12px;font-size:12px;"  onclick="deleteDraft('${data.id}')">Delete</button>
+  //         `;
+  //       },
+  //     },
+  //   ],
+  // });
 }
 
 function getTableListApproval(params) {
@@ -407,40 +407,14 @@ function getTableListApproval(params) {
   });
 }
 
-function getTableListDraftDetail(params, lastPath) {
+function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "user" }) {
   if ($.fn.DataTable.isDataTable("#draftListDetail")) {
     $("#draftListDetail").DataTable().destroy();
   }
-  const buttons =
-    lastPath === "draft-detail"
-      ? [
-          {
-            text: '<img src="/assets/images/rasci/plus.svg" alt="" style="margin-top: -1px;margin-right: 2px;"> Add Job Title',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              addJobTitle();
-            },
-          },
-          {
-            text: '<img src="/assets/images/rasci/download.svg" alt="download icon" style="margin-top: -1px;margin-right: 2px;"> Import',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              importDraft();
-            },
-          },
-          {
-            text: '<img src="/assets/images/rasci/upload.svg" alt="upload icon" style="margin-top: -1px;margin-right: 2px;"> Export',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              exportDraft();
-            },
-          },
-        ]
-      : [];
 
   $("#draftListDetail").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-    buttons: buttons,
+    buttons: [],
     autoWidth: false,
     data: params,
     sort: false,
@@ -488,7 +462,12 @@ function getTableListDraftDetail(params, lastPath) {
         width: "25%",
         data: null,
         render: function (data) {
-          return checkButtonTable("positionList", data.unitCode, window.location.pathname.split("/").pop());
+          return checkButtonTable(
+            "positionList",
+            data.unitCode,
+            window.location.pathname.split("/").pop(),
+            getStatusDraft
+          );
         },
       },
     ],

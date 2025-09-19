@@ -1,1123 +1,545 @@
+const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+
+// Debounce function untuk search
+let searchTimeout;
+function debounceSearchJobCompare(event, delay = 800) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    searchJobCompare(event, false);
+  }, delay);
+}
+
 function confirmApply() {
   swal("Success", "Job Description has been applied", "success");
 }
 
-$(document).ready(async function () {
-  const urlParams = new URLSearchParams(window.location.search);
+function refreshDataLocalStorage() {
+  const keys = [
+    "fungsi",
+    "lsAvailable",
+    "tugasHa",
+    "wewenang",
+    "koordinasiInternal",
+    "relasiEksternal",
+    "persyaratanKhusus",
+    "stk",
+  ];
+  keys.forEach((key) => localStorage.removeItem(key));
+}
 
-  // from query string
-  const jobId = urlParams.get("jobId");
-  const prlOrg = urlParams.get("prlOrg");
-  const positionCode = urlParams.get("positionCode");
-  // console.log("positionCode", jobId);
-  // initialize popover
-  async function searchJobCompare(event, isPercentage) {
-    const chkJobList = document.getElementById("chk-job-list");
-    // const jobSelectedList = document.getElementById("job-selected-list");
-    if (isPercentage) {
-      const value = event;
-      const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
-      const params = {
-        draftId: getDraftExisting.draftId,
-        jobId: jobId,
-        prlOrg: prlOrg,
-        percentage: value,
-      };
+async function getAllJobDescData(draftExisting, id, prlOrgParam, prlOrgTarget) {
+  const dataDetailJobDesc = {
+    draftId: draftExisting.draftId,
+    jobId: id,
+    prlRange: prlOrgTarget,
+    prlOrg: prlOrgTarget,
+  };
+  console.log("dataDetailJobDesc", dataDetailJobDesc);
 
-      const result = await getSimilarities(params);
-      console.log("result", result.data);
+  // Helper function to handle errors gracefully
+  const safeApiCall = async (apiCall, fallbackValue = null) => {
+    try {
+      return await apiCall();
+    } catch (error) {
+      console.error(`API call failed:`, error);
+      return fallbackValue;
+    }
+  };
 
-      // dan urutan berdasarkan percentage yang paling tinggi
-      const dataCompare = result?.data
-        .map((item) => ({
-          id: item?.jobIdTarget,
-          name: item?.positionNameTarget,
-          percentage: item?.matchPercentage,
-          jobIdFrom: item?.jobIdSource,
-          prlOrgFrom: item?.prlOrgSource,
-          jobIdTarget: item?.jobIdTarget,
-          prlOrgTo: item?.prlOrgTarget,
-        }))
-        .sort((a, b) => b.percentage - a.percentage);
+  // Execute all API calls in parallel with error handling
+  const [
+    identifikasiJabatan,
+    fungsiJabatan,
+    tugasTanggungJawabUmum,
+    countTugasHa,
+    tugasTanggungJawabAkhir,
+    wewenang,
+    koordinasiInternal,
+    relasiEksternal,
+    persyaratanJabatan,
+    persyaratanKhusus,
+    kompetensiTeknis,
+    kompetensiPerilaku,
+    stk,
+  ] = await Promise.allSettled([
+    safeApiCall(() => getIdentifikasiJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getFungsiJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getTugasTanggungJawabUmum(dataDetailJobDesc)),
+    safeApiCall(() => getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 })),
+    safeApiCall(() => getTugasTanggungJawabAkhir(dataDetailJobDesc)),
+    safeApiCall(() => getWewenang(dataDetailJobDesc)),
+    safeApiCall(() => getKoordinasiInternal(dataDetailJobDesc)),
+    safeApiCall(() => getRelasiEksternal(dataDetailJobDesc)),
+    safeApiCall(() => getPersyaratanJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getPersyaratanKhusus(dataDetailJobDesc)),
+    safeApiCall(() => getKompetensiTeknis(dataDetailJobDesc)),
+    safeApiCall(() => getKompetensiPerilaku(dataDetailJobDesc)),
+    safeApiCall(() => getStk(dataDetailJobDesc)),
+  ]);
 
-      // Fetch all details in parallel instead of sequentially
-      const detailPromises = dataCompare.map((item) =>
-        getAllTanggungJawabJobToJob({
-          draftId: getDraftExisting.draftId,
-          jobIdFrom: jobId,
-          prlOrgFrom: prlOrg,
-          jobIdTo: item.jobIdTarget,
-          prlOrgTo: item.prlOrgTo,
-          page: 1,
-          pageSize: 99,
-        }).then((res) => ({
-          jobIdTo: item.jobIdTarget,
-          data: res.data,
-        }))
-      );
+  // Return the results, extracting values from settled promises
+  return {
+    identifikasiJabatan: identifikasiJabatan.status === "fulfilled" ? identifikasiJabatan.value : null,
+    fungsiJabatan: fungsiJabatan.status === "fulfilled" ? fungsiJabatan.value : null,
+    tugasTanggungJawabUmum: tugasTanggungJawabUmum.status === "fulfilled" ? tugasTanggungJawabUmum.value : null,
+    countTugasHa: countTugasHa.status === "fulfilled" ? countTugasHa.value : null,
+    tugasTanggungJawabAkhir: tugasTanggungJawabAkhir.status === "fulfilled" ? tugasTanggungJawabAkhir.value : null,
+    wewenang: wewenang.status === "fulfilled" ? wewenang.value : null,
+    koordinasiInternal: koordinasiInternal.status === "fulfilled" ? koordinasiInternal.value : null,
+    relasiEksternal: relasiEksternal.status === "fulfilled" ? relasiEksternal.value : null,
+    persyaratanJabatan: persyaratanJabatan.status === "fulfilled" ? persyaratanJabatan.value : null,
+    persyaratanKhusus: persyaratanKhusus.status === "fulfilled" ? persyaratanKhusus.value : null,
+    kompetensiTeknis: kompetensiTeknis.status === "fulfilled" ? kompetensiTeknis.value : null,
+    kompetensiPerilaku: kompetensiPerilaku.status === "fulfilled" ? kompetensiPerilaku.value : null,
+    stk: stk.status === "fulfilled" ? stk.value : null,
+  };
+}
 
-      const details = await Promise.all(detailPromises);
+async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
+  // showChartLoading("chk-job-list-percentage");
+  const getDataJobDesc = await getAllJobDescData(getDraftExisting, id, prlOrgParam, prlOrgTarget);
 
-      for (const item of dataCompare) {
-        let color = "";
-        if (item.percentage >= 90) {
-          color = "background-color: #28a745";
-        } else if (item.percentage >= 80) {
-          color = "background-color: #17a2b8";
-        } else if (item.percentage >= 70) {
-          color = "background-color: #ffc107";
-        } else if (item.percentage >= 60) {
-          color = "background-color: #007bff";
-        } else if (item.percentage >= 50) {
-          color = "background-color: #dc3545";
+  // const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
+  // arrayId.forEach((item) => {
+  //   $(`#${item}`).empty();
+  // });
+  localStorage.setItem("selectedJobDescReference", JSON.stringify(getDataJobDesc));
+  localStorage.setItem("isFullRefer", JSON.stringify(false));
+
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const countNotAvailable = lsAvailable.countNotAvailable;
+  const codeNotAvailable = lsAvailable.codeNotAvailable;
+  const codeAvailable = lsAvailable.codeAvailable;
+
+  const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference"));
+  const tugasHaSelected =
+    selectedJobDescReference.countTugasHa?.data.filter((item) => item.status === "AVAILABLE") || [];
+  const countTugasHaSelected = tugasHaSelected.length;
+  const codeAvailableSelected = tugasHaSelected.map((item) => item.indexNumber);
+  // const codeAvailableSelected = tugasHaSelected.map((item) => item.indexNumber);
+
+  // check if codeAvailableSelected contains all codeNotAvailable
+  // const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
+  const isFullRefer = false;
+  localStorage.setItem("isFullRefer", JSON.stringify(isFullRefer));
+
+  $(".notifWarning").hide();
+  if (!isFullRefer) {
+    $(".notifWarning").show();
+  }
+
+  $("#jobNameReference").text(getDataJobDesc?.identifikasiJabatan?.jobName || DATA_NOT_FOUND);
+  $("#functionReference").text(getDataJobDesc?.identifikasiJabatan?.unitKerjaFungsi || DATA_NOT_FOUND);
+  $("#locationReference").text(getDataJobDesc?.identifikasiJabatan?.lokasiKerja || DATA_NOT_FOUND);
+  $("#directoratReference").text(getDataJobDesc?.identifikasiJabatan?.direktorat || DATA_NOT_FOUND);
+  $("#directReportReference").text(getDataJobDesc?.identifikasiJabatan?.atasanLangsung || DATA_NOT_FOUND);
+  $("#skReference").text(getDataJobDesc?.identifikasiJabatan?.noSuratKeputusan || DATA_NOT_FOUND);
+  $("#skDateReference").text(getDataJobDesc?.identifikasiJabatan?.tanggalSuratKeputusan || DATA_NOT_FOUND);
+
+  $("#fungsiTextReference").text(getDataJobDesc?.fungsiJabatan?.deskripsi || DATA_NOT_FOUND);
+
+  updateTableSelected("tugasHaReference", getDataJobDesc?.tugasTanggungJawabAkhir?.data || [], tabCusJD.tugasHa);
+  updateTableSelected(
+    "koordinasiInternalReference",
+    getDataJobDesc?.koordinasiInternal?.data || [],
+    tabCusJD.koordinasi,
+  );
+  updateTableSelected("relasiEksternalReference", getDataJobDesc?.relasiEksternal?.data || [], tabCusJD.relation);
+  updateTableSelected(
+    "stkReference",
+    getDataJobDesc?.stk?.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined) || [],
+    ["no", ...tabCusJD.stk],
+  );
+  // hideChartLoading("chk-job-list-percentage");
+  return;
+}
+
+async function searchJobCompare(event, isPercentage = false) {
+  console.log("searchJobCompare", event, isPercentage, getDraftExisting);
+  // return;
+
+  const chkJobList = document.getElementById("chk-job-list");
+  // const jobSelectedList = document.getElementById("job-selected-list");
+
+  function callPopover(param, dataDetail) {
+    console.log("callPopover", param, dataDetail);
+    // Generate popoverContent dynamically with if-else for status
+    const popoverContent = (dataDetail?.data || [])
+      .map((item) => {
+        let statusText = "";
+        let statusColor = "";
+        let statusIcon = "";
+        if (item?.status === "AVAILABLE") {
+          statusText = "Available";
+          statusColor = "#06BE00";
+          statusIcon = "available";
+        } else if (item?.status === "NOT AVAILABLE") {
+          statusText = "Not Available";
+          statusColor = "#D02138";
+          statusIcon = "nonavail";
+        } else {
+          statusText = "Unknown";
+          statusColor = "#999";
+          statusIcon = "unknown";
         }
-        item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
-      }
-      const storeId = [];
-      let innerHTML = "";
-      for (let item of dataCompare) {
-        innerHTML += `
-          <div class="row-item">
-        <div class="column-item-name pointer" onClick="applyCompare(${item.id})">
-          <span class="text-primary  text-decoration-none"><u>${item.name}</u></span> 
-          ${item.badge}
-        </div>
-        <i class="pl-1 icon-nm fas fa-info-circle align-self-center"  href="#" tabindex="0" data-toggle="popOver${item.id}"></i>
-          </div>
-        `;
-        storeId.push(item.id);
-      }
-      if (result?.data?.length === 0) {
-        innerHTML = `<div class="text-center">No data found</div>`;
-      }
-      chkJobListPercentage.innerHTML = innerHTML;
-      storeId.forEach((item) => {
-        const dataDetail = details.find((detail) => detail.jobIdTo === item);
-        callPopover(item, dataDetail);
-      });
-
-      // Reinitialize popovers after updating the inner HTML
-
-      // $('[data-toggle="popover"]').popover();
-
-      return;
-    }
-
-    function callPopover(param, dataDetail) {
-      // Generate popoverContent dynamically with if-else for status
-      const popoverContent = (dataDetail?.data || [])
-        .map((item) => {
-          let statusText = "";
-          let statusColor = "";
-          let statusIcon = "";
-          if (item?.status === "AVAILABLE") {
-            statusText = "Available";
-            statusColor = "#06BE00";
-            statusIcon = "available";
-          } else if (item?.status === "NOT AVAILABLE") {
-            statusText = "Not Available";
-            statusColor = "#D02138";
-            statusIcon = "nonavail";
-          } else {
-            statusText = "Unknown";
-            statusColor = "#999";
-            statusIcon = "unknown";
-          }
-          return `
+        return `
+          <tr>
+          <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
+          <td style="place-items:center">
+            <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+            <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
+            </div>
+          </td>
+          <td style="color:${statusColor};text-align:center">
+            <span>${statusText}</span>
+            <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
+          </td>
+          </tr>
+          `;
+      })
+      .join("");
+    $(`[data-toggle="popOver${param}"]`).popover({
+      html: true,
+      sanitize: false,
+      content: `
+        <div style="width: 550px;">
+        <h6 style="margin-bottom:10px">RASCI Similarities Detail</h6>
+        <table class="display tableRasciSimilarities" style="width: 100%">
+        <thead>
             <tr>
-            <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
-            <td style="place-items:center">
-              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
-              <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
-              </div>
-            </td>
-            <td style="color:${statusColor};text-align:center">
-              <span>${statusText}</span>
-              <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
-            </td>
-            </tr>
-            `;
-        })
-        .join("");
-      $(`[data-toggle="popOver${param}"]`).popover({
-        html: true,
-        sanitize: false,
-        content: `
-          <div style="width: 550px;">
-          <h6 style="margin-bottom:10px">RASCI Similarities Detail</h6>
-          <table class="display tableRasciSimilarities" style="width: 100%">
-          <thead>
-              <tr>
-              <th style="width: 55%;">Business Process</th>
-              <th style="width: 15%;">Notation</th>
-              <th style="width: 30%;">Availability of reference</th>
-              <tr>
-          </thead>
-          <tbody>
-          ${popoverContent}
-          </tbody>
-          </table>
-          </div>
-        `,
-        trigger: "focus",
-      });
+            <th style="width: 55%;">Business Process</th>
+            <th style="width: 15%;">Notation</th>
+            <th style="width: 30%;">Availability of reference</th>
+            <tr>
+        </thead>
+        <tbody>
+        ${popoverContent}
+        </tbody>
+        </table>
+        </div>
+      `,
+      trigger: "focus",
+    });
+  }
+
+  if (isPercentage) {
+    console.log("getDraftExisting", getDraftExisting);
+    showChartLoading("chk-job-list-percentage", true, "480px", "100%", "Please wait, fetching data...");
+    const value = event;
+    const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
+    const params = {
+      draftId: getDraftExisting.draftId,
+      jobId: jobId,
+      prlOrg: prlOrg,
+      percentage: value,
+    };
+
+    const result = await getSimilarities(params);
+    // dan urutan berdasarkan percentage yang paling tinggi
+    const dataCompare = result?.data
+      .map((item) => ({
+        id: item?.jobIdTarget,
+        name: item?.positionNameTarget,
+        percentage: item?.matchPercentage,
+        jobIdFrom: item?.jobIdSource,
+        prlOrgFrom: item?.prlOrgSource,
+        jobIdTarget: item?.jobIdTarget,
+        prlOrgTo: item?.prlOrgTarget,
+      }))
+      .sort((a, b) => b.percentage - a.percentage);
+
+    // Fetch all details in parallel instead of sequentially
+    const detailPromises = dataCompare.map((item) =>
+      getAllTanggungJawabJobToJob({
+        draftId: getDraftExisting.draftId,
+        jobIdFrom: jobId,
+        prlOrgFrom: prlOrg,
+        jobIdTo: item.jobIdTarget,
+        prlOrgTo: item.prlOrgTo,
+        page: 1,
+        pageSize: 99,
+      }).then((res) => ({
+        jobIdTo: item.jobIdTarget,
+        data: res.data,
+      })),
+    );
+
+    const details = await Promise.all(detailPromises);
+
+    for (const item of dataCompare) {
+      let color = "";
+      if (item.percentage >= 90) {
+        color = "background-color: #28a745";
+      } else if (item.percentage >= 80) {
+        color = "background-color: #17a2b8";
+      } else if (item.percentage >= 70) {
+        color = "background-color: #ffc107";
+      } else if (item.percentage >= 60) {
+        color = "background-color: #007bff";
+      } else if (item.percentage >= 50) {
+        color = "background-color: #dc3545";
+      }
+      item.badge = `<span class="badge" style="${color}">${item.percentage}% Similarities</span>`;
     }
+    const storeId = [];
+    let innerHTML = "";
+    for (let item of dataCompare) {
+      innerHTML += `
+        <div class="row-item">
+      <div class="column-item-name pointer" onClick="applyCompare(${item.id},${item.prlOrgTo},'${item.prlOrgTo}')">
+        <span class="text-primary  text-decoration-none"><u>${item.name}</u></span> 
+        ${item.badge}
+      </div>
+      <i class="pl-1 icon-nm fas fa-info-circle align-self-center"  href="#" tabindex="0" data-toggle="popOver${item.id}"></i>
+        </div>
+      `;
+      storeId.push(item.id);
+    }
+    if (result?.data?.length === 0) {
+      innerHTML = DATA_NOT_FOUND_HTML;
+    }
+    chkJobListPercentage.innerHTML = innerHTML;
+    storeId.forEach((item) => {
+      const dataDetail = details.find((detail) => detail.jobIdTo === item);
+      callPopover(item, dataDetail);
+    });
 
-    // const data = dataJobDescCompare
-    //   .map((item) => ({
-    //     id: item?.identifikasi?.id,
-    //     name: item?.identifikasi?.jobName,
-    //   }))
-    //   .filter((item) =>
-    //     item.name.toLowerCase().includes(event?.target?.value.toLowerCase())
-    //   );
+    // Hide loading after processing is complete
+    hideChartLoading("animate-chk");
 
-    // chkJobList.innerHTML = data
-    //   .map(
-    //     (item) => `
-    //       <div class="row-item">
-    //         <div class="column-item-name" onClick="applyCompare(${item.id})">
-    //           ${item.name}
-    //         </div>
-    //       </div>
-    //     `
-    //   )
-    //   .join("");
+    // Reinitialize popovers after updating the inner HTML
 
     // $('[data-toggle="popover"]').popover();
-  }
-
-  const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
-
-  function logWewenangFetchSuccess(params, data) {
-    console.log(`get data ${params} berhasil, jika tabel belum muncul cek format data, exp:`, data);
-  }
-  function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
-    // alert(
-    //   `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/${endpoint} tidak valid atau kosong, data yang keluar hanya contoh. cek di console log`
-    // );
-    console.error(
-      `${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. contoh data expected:`,
-      data
-    );
-  }
-
-  const dataDetailJobDesc = {
-    draftId: getDraftExisting.draftId,
-    jobId: jobId,
-    prlRange: prlOrg,
-    prlOrg: prlOrg,
-  };
-
-  const dataBagan = {
-    draftId: getDraftExisting.draftOrganizationId,
-    jobCode: jobId,
-    depth: 5,
-  };
-
-  let identifikasiJabatan = await getIdentifikasiJabatan(dataDetailJobDesc);
-  const identifikasiJabatanData = {
-    jobId: "Data Not Found",
-    jobName: "Data Not Found",
-    prlOrg: "Data Not Found",
-    unitKerjaFungsi: "Data Not Found",
-    lokasiKerja: "Data Not Found",
-    direktorat: "Data Not Found",
-    atasanLangsung: "Data Not Found",
-    noSuratKeputusan: "Data Not Found",
-    tanggalSuratKeputusan: "Data Not Found",
-    jobReference: "Data Not Found",
-    jobReferences: [],
-  };
-  if (!identifikasiJabatan.jobName) {
-    showEndpointErrorAlert("job-description/identifikasi-jabatan/show", identifikasiJabatanData);
-    identifikasiJabatan = identifikasiJabatanData;
-  }
-
-  updateIdentifikasiJob(identifikasiJabatan);
-
-  // get fungsi jabatan = getFungsiJabatan
-  let fungsiJabatan = await getFungsiJabatan(dataDetailJobDesc);
-  const fungsiJabatanData = {
-    deskripsi: "Data Not Found",
-    "...": "...",
-  };
-  if (!fungsiJabatan.deskripsi) {
-    showEndpointErrorAlert("job-description/fungsi-jabatan/show", fungsiJabatanData);
-    fungsiJabatan = fungsiJabatanData;
-  }
-
-  $(".summernote").summernote({
-    height: 300,
-    tabsize: 2,
-    // disable font type button
-    toolbar: [
-      // [groupName, [list of button]]
-      ["style", ["bold", "italic", "underline", "clear"]],
-      ["font", ["strikethrough", "superscript", "subscript"]],
-      ["para", ["ul", "ol", "paragraph"]],
-    ],
-  });
-  $(".summernote").summernote("disable");
-  $(".summernote").summernote("code", fungsiJabatan.deskripsi);
-
-  let tugasTanggungJawabUmum;
-  try {
-    tugasTanggungJawabUmum = await getTugasTanggungJawabUmum(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-umum/show", tugasTanggungJawabUmum.data);
-    updateTable("tugasUmum", tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
-  } catch (error) {
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-umum/show", [], error.message);
-  }
-
-  try {
-    const countTugasHa = await getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 });
-    const countAll = countTugasHa.data.length;
-    const countAvailable = countTugasHa.data.filter((item) => item.status === "AVAILABLE").length;
-    const $label = $("#labelFulfillTugasHa");
-    $label
-      .toggleClass("label-success-custom", countAvailable === countAll)
-      .toggleClass("label-danger-custom", countAvailable !== countAll)
-      .text(`${countAvailable}/${countAll} business processes have been fulfilled.`);
-  } catch (error) {
-    console.error("Error fetching countTugasHa:", error);
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/count", [], error.message);
-  }
-
-  let tugasTanggungJawabAkhir;
-  const tugasTanggungJawabAkhirData = {
-    data: dataJobDescCompare[0].tugasHa.filter((item) => item.responsible.length > 0),
-  };
-  try {
-    tugasTanggungJawabAkhir = await getTugasTanggungJawabAkhir(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
-    updateTable(
-      "tugasHa",
-      tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0),
-      tabCusJD.tugasHa
-    );
-  } catch (error) {
-    console.error("Error fetching tugasTanggungJawabAkhir:", error);
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", tugasTanggungJawabAkhirData);
-  }
-
-  let wewenang;
-  const wewenangData = { data: dataJobDescCompare[0].wewenang };
-  try {
-    wewenang = await getWewenang(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/wewenang/show", wewenangData);
-  } catch (error) {
-    console.error("Error fetching wewenang:", error);
-    showEndpointErrorAlert("job-description/wewenang/show", wewenangData);
-    wewenang = wewenangData;
-  }
-  updateTable("wewenang", wewenang.data, tabCusJD.wewenang);
-
-  let koordinasiInternal;
-  const koordinasiInternalData = {
-    data: dataJobDescCompare[0].koordinasi,
-  };
-  try {
-    koordinasiInternal = await getKoordinasiInternal(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/koordinasi-internal/show", koordinasiInternalData);
-  } catch (error) {
-    console.error("Error fetching koordinasiInternal:", error);
-    showEndpointErrorAlert("job-description/koordinasi-internal/show", dataJobDescCompare[0].koordinasi);
-    koordinasiInternal = koordinasiInternalData;
-  }
-
-  updateTable("koordinasi", koordinasiInternal.data, tabCusJD.koordinasi);
-
-  let relasiEksternal;
-  const relasiEksternalData = { data: dataJobDescCompare[0].relation };
-
-  try {
-    relasiEksternal = await getRelasiEksternal(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/relasi-eksternal/show", relasiEksternalData);
-  } catch (error) {
-    showEndpointErrorAlert("job-description/relasi-eksternal/show", relasiEksternalData);
-    relasiEksternal = relasiEksternalData;
-  }
-  updateTable("relation", relasiEksternal.data, tabCusJD.relation);
-
-  let persyaratanJabatan;
-  const persyaratanJabatanData = { data: dataJobDescCompare[0].relation };
-
-  try {
-    persyaratanJabatan = await getPersyaratanJabatan(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
-
-    persyaratanJabatan.data.map((item) => {
-      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
-    });
-    updateTable("persyaratan", persyaratanJabatan.data, tabCusJD.pj);
-  } catch (error) {
-    console.error("Error fetching persyaratanJabatan:", error);
-    showEndpointErrorAlert("job-description/persyaratan-jabatan/show", persyaratanJabatanData);
-    persyaratanJabatan = persyaratanJabatanData;
-  }
-
-  let persyaratanKhusus;
-  const persyaratanKhususData = { data: dataJobDescCompare[0].relation };
-
-  try {
-    persyaratanKhusus = await getPersyaratanKhusus(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/persyaratan-jabatan/show", persyaratanKhususData);
-
-    persyaratanKhusus.data.map((item) => {
-      item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
-    });
-    // updateTable(
-    //   "persyaratanKhususTable",
-    //   persyaratanKhusus.data,
-    //   tabCusJD.persyaratan
-    // );
-  } catch (error) {
-    console.error("Error fetching persyaratanKhusus:", error);
-    persyaratanKhusus = persyaratanKhususData;
-  }
-
-  const divKompetensiTeknisGeneral = $("#kompetensiGeneral");
-  const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
-  const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
-  // const divKompetensiPerilaku = $("#kompetensiPerilaku");
-
-  let kompetensiTeknis;
-  try {
-    kompetensiTeknis = await getKompetensiTeknis(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/kompetensi-teknis/show", kompetensiTeknis);
-
-    if (Array.isArray(kompetensiTeknis.data.komtekMandatori) && kompetensiTeknis.data.komtekMandatori.length > 0) {
-      const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
-      kompetensiTeknis.data.komtekMandatori.forEach((item) => {
-        $ul.append(
-          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
-        );
-      });
-      divKompetensiTeknisMandatory.empty().append($ul);
-    }
-
-    if (Array.isArray(kompetensiTeknis.data.komtekGeneral) && kompetensiTeknis.data.komtekGeneral.length > 0) {
-      const $ul = $('<ul style=""></ul>');
-      kompetensiTeknis.data.komtekGeneral.forEach((item) => {
-        console.log("ada data komtekGeneral", item);
-        $ul.append(
-          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
-        );
-      });
-      divKompetensiTeknisGeneral.empty().append($ul);
-    }
-
-    if (Array.isArray(kompetensiTeknis.data.komtekSpesifik) && kompetensiTeknis.data.komtekSpesifik.length > 0) {
-      const $ul = $('<ul style=""></ul>');
-      kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
-        console.log("ada data komtekSpesifik", item);
-        $ul.append(
-          `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
-        );
-      });
-      divKompetensiTeknisSpesifik.empty().append($ul);
-    }
-  } catch (error) {
-    console.error("Error fetching persyaratanKhusus:", error);
-    showEndpointErrorAlert("job-description/persyaratan-jabatan/show", []);
-  }
-
-  let kompetensiPerilaku;
-  try {
-    kompetensiPerilaku = await getKompetensiPerilaku(dataDetailJobDesc);
-    logWewenangFetchSuccess("job-description/kompetensi-perilaku/show", kompetensiPerilaku);
-    const divKompetensiPerilaku = $("#kompetensiPerilaku");
-    divKompetensiPerilaku.empty();
-    if (Array.isArray(kompetensiPerilaku.data) && kompetensiPerilaku.data.length > 0) {
-      const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
-      kompetensiPerilaku.data.forEach((item) => {
-        $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
-      });
-      divKompetensiPerilaku.append($ul);
+  } else {
+    const value = event?.target?.value || "";
+    showChartLoading("chk-job-list", true, "480px", "100%", "Please wait, fetching data...");
+    if (value === "") {
+      chkJobList.innerHTML = DATA_NOT_FOUND_HTML;
     } else {
-      divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
+      const result = await draftListJobDesc({
+        draftId: getDraftExisting.draftId,
+        position: value,
+      });
+      console.log("result", result);
+      const data = result?.data
+        .map((item) => ({
+          id: item?.jobId,
+          name: item?.positionName,
+          prlOrg: item?.prlOrg,
+          prlRange: item?.prlRange,
+        }))
+        .filter((item) => item.name.toLowerCase().includes(value.toLowerCase()));
+
+      let innerHTML = "";
+      for (let item of data) {
+        innerHTML += `
+        <div class="row-item">
+          <div class="column-item-name pointer" onClick="applyCompare(${item.id},${item.prlOrg},'${item.prlOrg}')">
+            <span class="text-primary  text-decoration-none"><u>${item.name}</u></span>
+          </div>
+        </div>
+      `;
+      }
+      if (data.length === 0) {
+        innerHTML = DATA_NOT_FOUND_HTML;
+      }
+      chkJobList.innerHTML = innerHTML;
     }
-  } catch (error) {
-    console.error("Error fetching kompetensiPerilaku:", error);
-    showEndpointErrorAlert("job-description/kompetensi-perilaku/show", []);
+    hideChartLoading("animate-chk");
   }
+}
 
-  let stk;
-  try {
-    stk = await getStk(dataDetailJobDesc);
-    // filter stk.data to remove items with empty stkNumber is null or undefined
-    stk.data = stk.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
-    logWewenangFetchSuccess("job-description/tugas-tanggung-jawab-akhir/show", stk.data);
-    updateTable("stk", stk.data, tabCusJD.stk);
-  } catch (error) {
-    console.error("Error fetching stk:", error);
-    showEndpointErrorAlert("job-description/tugas-tanggung-jawab-akhir/show", []);
-  }
-
-  // Store bagan data globally for tab navigation
-  let globalBaganData = null;
-  let globalDataBaganSelf = null;
-
-  chartShow(dataBagan).then((bagan) => {
-    if (bagan && bagan.data) {
-      globalBaganData = bagan.data;
-      globalDataBaganSelf = bagan.data.find((item) => item.id == jobId);
-      focusNode(globalDataBaganSelf, bagan.data);
-    }
-  });
-
-  // const dataBaganku = [
-  //   {
-  //     id_position_atasan_langsung: "10132411",
-  //     bc_3_org_unit_name: "Strategic Planning & Initiatives",
-  //     bc_3_pid: "10132411",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Strategic Planning",
-  //     basket: true,
-  //     bc_2_id_position: "30258748",
-  //     prl: "12-18",
-  //     pid: "10132411",
-  //     bc_1_id_position_atasan_langsung: "10132411",
-  //     bc_2_id: "10132412",
-  //     bc_2_position: "Analyst I-II Strategic Planning & Initiatives",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Strategic Planning & Initiatives",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-III Strategic Planning & Initiatives",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132411",
-  //     bc_1_org_unit_name: "Strategic Planning & Initiatives",
-  //     bc_3_id: "10132412",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30258748",
-  //     position: "Sr Analyst II Strategic Planning & Initiatives",
-  //     id: "10132412",
-  //     assistant: false,
-  //     id_position: "30258748",
-  //     bc_2_org_unit_name: "Strategic Planning & Initiatives",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132411",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258747",
-  //     bc_1_id: "10132412",
-  //     bc_2_position_parent: "Strategic Planning",
-  //     bc_2_pid: "10132411",
-  //     bc_3_jumlah_formasi: "2",
-  //     id_org_unit: "10132412",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132411",
-  //     bc_2_id_org_unit: "10132412",
-  //     org_unit_name: "Strategic Planning & Initiatives",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-18",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10132412",
-  //     position_parent: "Strategic Planning",
-  //     bc_3_id_position: "30258748",
-  //     bc_3_id_org_unit: "10132412",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Strategic Planning",
-  //     hasChildren: false,
-  //     jumlah_formasi: 2,
-  //     bc_1_jumlah_formasi: "2",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L4",
-  //     bc_2_jumlah_formasi: "2",
-  //   },
-  //   {
-  //     id_position_atasan_langsung: "10132411",
-  //     bc_3_org_unit_name: "Budget & Program Planning",
-  //     bc_3_pid: "10132411",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Strategic Planning",
-  //     basket: true,
-  //     bc_2_id_position: "30258750",
-  //     prl: "12-18",
-  //     pid: "10132411",
-  //     bc_1_id_position_atasan_langsung: "10132411",
-  //     bc_2_id: "10132413",
-  //     bc_2_position: "Analyst I-II Budget & Program Planning",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Budget & Program Planning",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-III Budget & Program Planning",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132411",
-  //     bc_1_org_unit_name: "Budget & Program Planning",
-  //     bc_3_id: "10132413",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30258750",
-  //     position: "Analyst II Budget & Program Planning",
-  //     id: "10132413",
-  //     assistant: false,
-  //     id_position: "30258750",
-  //     bc_2_org_unit_name: "Budget & Program Planning",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132411",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258747",
-  //     bc_1_id: "10132413",
-  //     bc_2_position_parent: "Strategic Planning",
-  //     bc_2_pid: "10132411",
-  //     bc_3_jumlah_formasi: "3",
-  //     id_org_unit: "10132413",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132411",
-  //     bc_2_id_org_unit: "10132413",
-  //     org_unit_name: "Budget & Program Planning",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-18",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10132413",
-  //     position_parent: "Strategic Planning",
-  //     bc_3_id_position: "30258750",
-  //     bc_3_id_org_unit: "10132413",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Strategic Planning",
-  //     hasChildren: false,
-  //     jumlah_formasi: 3,
-  //     bc_1_jumlah_formasi: "3",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L4",
-  //     bc_2_jumlah_formasi: "3",
-  //   },
-  //   {
-  //     gl: "GL3",
-  //     org_unit_name: "Strategic Planning & Initiatives",
-  //     id_position_parent: "30258747",
-  //     tags: [],
-  //     id_position_atasan_langsung: "10132411",
-  //     pid: "10132411",
-  //     id_org_unit: "10163365",
-  //     hasChildren: false,
-  //     project: false,
-  //     jumlah_formasi: 1,
-  //     isNeck: false,
-  //     id_position: "30313763",
-  //     assistant: false,
-  //     prl: "16-18",
-  //     coordination: "",
-  //     id: "10163365",
-  //     isMergeFormation: true,
-  //     position_parent: "Strategic Planning",
-  //     position: "Sr Analyst II Strategic Planning & Initiatives",
-  //     basket: false,
-  //     layering: "L4",
-  //   },
-  //   {
-  //     gl: "GL2",
-  //     org_unit_name: "Strategic Planning",
-  //     id_position_parent: "30258746",
-  //     tags: [],
-  //     id_position_atasan_langsung: "10132410",
-  //     pid: "10132410",
-  //     id_org_unit: "10132411",
-  //     hasChildren: true,
-  //     project: false,
-  //     jumlah_formasi: 7,
-  //     isNeck: false,
-  //     id_position: "30258747",
-  //     assistant: false,
-  //     prl: "21",
-  //     coordination: "",
-  //     id: "10132411",
-  //     isMergeFormation: true,
-  //     position_parent: "Business Planning & Investment",
-  //     position: "Manager Strategic Planning",
-  //     basket: false,
-  //     layering: "L3",
-  //   },
-  //   {
-  //     id_position_atasan_langsung: "10132418",
-  //     bc_3_org_unit_name: "Performance Management",
-  //     bc_3_pid: "10132418",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Performance Management",
-  //     basket: true,
-  //     bc_2_id_position: "30258760",
-  //     prl: "12-17",
-  //     pid: "10132418",
-  //     bc_1_id_position_atasan_langsung: "10132418",
-  //     bc_2_id: "10132419",
-  //     bc_2_position: "Analyst I-II Performance Management",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Performance Management",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-II Performance Management",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132418",
-  //     bc_1_org_unit_name: "Performance Management",
-  //     bc_3_id: "10132419",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30258760",
-  //     position: "Jr Analyst II Performance Management",
-  //     id: "10132419",
-  //     assistant: false,
-  //     id_position: "30258760",
-  //     bc_2_org_unit_name: "Performance Management",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132418",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258759",
-  //     bc_1_id: "10132419",
-  //     bc_2_position_parent: "Performance Management",
-  //     bc_2_pid: "10132418",
-  //     bc_3_jumlah_formasi: "3",
-  //     id_org_unit: "10132419",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132418",
-  //     bc_2_id_org_unit: "10132419",
-  //     org_unit_name: "Performance Management",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-17",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10132419",
-  //     position_parent: "Performance Management",
-  //     bc_3_id_position: "30258760",
-  //     bc_3_id_org_unit: "10132419",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Performance Management",
-  //     hasChildren: false,
-  //     jumlah_formasi: 3,
-  //     bc_1_jumlah_formasi: "3",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L4",
-  //     bc_2_jumlah_formasi: "3",
-  //   },
-  //   {
-  //     id_position_atasan_langsung: "10132418",
-  //     bc_3_org_unit_name: "Subsidiary Performance Management",
-  //     bc_3_pid: "10132418",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Performance Management",
-  //     basket: true,
-  //     bc_2_id_position: "30258763",
-  //     prl: "12-17",
-  //     pid: "10132418",
-  //     bc_1_id_position_atasan_langsung: "10132418",
-  //     bc_2_id: "10132420",
-  //     bc_2_position: "Analyst I-II Subsidiary Performance Management",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Subsidiary Performance Management",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-II Subsidiary Performance Management",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132418",
-  //     bc_1_org_unit_name: "Subsidiary Performance Management",
-  //     bc_3_id: "10132420",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30258763",
-  //     position: "Jr Analyst I Subsidiary Performance Management",
-  //     id: "10132420",
-  //     assistant: false,
-  //     id_position: "30258763",
-  //     bc_2_org_unit_name: "Subsidiary Performance Management",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132418",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258759",
-  //     bc_1_id: "10132420",
-  //     bc_2_position_parent: "Performance Management",
-  //     bc_2_pid: "10132418",
-  //     bc_3_jumlah_formasi: "2",
-  //     id_org_unit: "10132420",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132418",
-  //     bc_2_id_org_unit: "10132420",
-  //     org_unit_name: "Subsidiary Performance Management",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-17",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10132420",
-  //     position_parent: "Performance Management",
-  //     bc_3_id_position: "30258763",
-  //     bc_3_id_org_unit: "10132420",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Performance Management",
-  //     hasChildren: false,
-  //     jumlah_formasi: 2,
-  //     bc_1_jumlah_formasi: "2",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L5",
-  //     bc_2_jumlah_formasi: "2",
-  //   },
-  //   {
-  //     gl: "GL2",
-  //     org_unit_name: "Performance Management",
-  //     id_position_parent: "30258746",
-  //     tags: [],
-  //     id_position_atasan_langsung: "10132410",
-  //     pid: "10132410",
-  //     id_org_unit: "10132418",
-  //     hasChildren: true,
-  //     project: false,
-  //     jumlah_formasi: 6,
-  //     isNeck: false,
-  //     id_position: "30258759",
-  //     assistant: false,
-  //     prl: "19",
-  //     coordination: "",
-  //     id: "10132418",
-  //     isMergeFormation: true,
-  //     position_parent: "Business Planning & Investment",
-  //     position: "Manager Performance Management",
-  //     basket: false,
-  //     layering: "L3",
-  //   },
-  //   {
-  //     id_position_atasan_langsung: "10132427",
-  //     bc_3_org_unit_name: "Investment & Risk Evaluation",
-  //     bc_3_pid: "10132427",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Investment Planning & Evaluation",
-  //     basket: true,
-  //     bc_2_id_position: "30258778",
-  //     prl: "12-18",
-  //     pid: "10132427",
-  //     bc_1_id_position_atasan_langsung: "10132427",
-  //     bc_2_id: "10132428",
-  //     bc_2_position: "Analyst I-II Investment & Risk Evaluation",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Investment & Risk Evaluation",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-III Investment & Risk Evaluation",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132427",
-  //     bc_1_org_unit_name: "Investment & Risk Evaluation",
-  //     bc_3_id: "10132428",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30258778",
-  //     position: "Sr Analyst II Investment & Risk Evaluation",
-  //     id: "10132428",
-  //     assistant: false,
-  //     id_position: "30258778",
-  //     bc_2_org_unit_name: "Investment & Risk Evaluation",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132427",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258777",
-  //     bc_1_id: "10132428",
-  //     bc_2_position_parent: "Investment Planning & Evaluation",
-  //     bc_2_pid: "10132427",
-  //     bc_3_jumlah_formasi: "3",
-  //     id_org_unit: "10132428",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132427",
-  //     bc_2_id_org_unit: "10132428",
-  //     org_unit_name: "Investment & Risk Evaluation",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-18",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10132428",
-  //     position_parent: "Investment Planning & Evaluation",
-  //     bc_3_id_position: "30258778",
-  //     bc_3_id_org_unit: "10132428",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Investment Planning & Evaluation",
-  //     hasChildren: false,
-  //     jumlah_formasi: 3,
-  //     bc_1_jumlah_formasi: "3",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L4",
-  //     bc_2_jumlah_formasi: "3",
-  //   },
-  //   {
-  //     id_position_atasan_langsung: "10132427",
-  //     bc_3_org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_3_pid: "10132427",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Investment Planning & Evaluation",
-  //     basket: true,
-  //     bc_2_id_position: "30258781",
-  //     prl: "12-18",
-  //     pid: "10132427",
-  //     bc_1_id_position_atasan_langsung: "10132427",
-  //     bc_2_id: "10132429",
-  //     bc_2_position: "Analyst I-II Monitoring & Post-Mortem Evaluation",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Monitoring & Post-Mortem Evaluation",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-III Monitoring & Post-Mortem Evaluation",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132427",
-  //     bc_1_org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_3_id: "10132429",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30258781",
-  //     position: "Analyst II Monitoring & Post-Mortem Evaluation",
-  //     id: "10132429",
-  //     assistant: false,
-  //     id_position: "30258781",
-  //     bc_2_org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132427",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258777",
-  //     bc_1_id: "10132429",
-  //     bc_2_position_parent: "Investment Planning & Evaluation",
-  //     bc_2_pid: "10132427",
-  //     bc_3_jumlah_formasi: "2",
-  //     id_org_unit: "10132429",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132427",
-  //     bc_2_id_org_unit: "10132429",
-  //     org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-18",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10132429",
-  //     position_parent: "Investment Planning & Evaluation",
-  //     bc_3_id_position: "30258781",
-  //     bc_3_id_org_unit: "10132429",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Investment Planning & Evaluation",
-  //     hasChildren: false,
-  //     jumlah_formasi: 2,
-  //     bc_1_jumlah_formasi: "2",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L4",
-  //     bc_2_jumlah_formasi: "2",
-  //   },
-  //   {
-  //     id_position_atasan_langsung: "10132427",
-  //     bc_3_org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_3_pid: "10132427",
-  //     bc_1_id_position_parent: null,
-  //     bc_3_position_parent: "Investment Planning & Evaluation",
-  //     basket: true,
-  //     bc_2_id_position: "30313764",
-  //     prl: "12-18",
-  //     pid: "10132427",
-  //     bc_1_id_position_atasan_langsung: "10132427",
-  //     bc_2_id: "10163366",
-  //     bc_2_position: "Analyst I-II Monitoring & Post-Mortem Evaluation",
-  //     coordination: "",
-  //     bc_1_layering: "L4",
-  //     bc_2_flagMergeFormation: "A",
-  //     bc_3_position: "Jr Analyst I-II Monitoring & Post-Mortem Evaluation",
-  //     gl: "GL3",
-  //     bc_1_position: "Sr Analyst I-III Monitoring & Post-Mortem Evaluation",
-  //     bc_3_id_position_parent: null,
-  //     bc_2_id_position_parent: null,
-  //     project: false,
-  //     tags: ["basket_3"],
-  //     isMergeFormation: true,
-  //     bc_1_pid: "10132427",
-  //     bc_1_org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_3_id: "10163366",
-  //     bc_3_flagMergeFormation: "A",
-  //     bc_1_id_position: "30313764",
-  //     position: "Sr Analyst II Monitoring & Post-Mortem Evaluation",
-  //     id: "10163366",
-  //     assistant: false,
-  //     id_position: "30313764",
-  //     bc_2_org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_2_prl: "14-15",
-  //     bc_2_id_position_atasan_langsung: "10132427",
-  //     bc_2_layering: "L5",
-  //     bc_3_prl: "12-13",
-  //     bc_1_flagMergeFormation: "A",
-  //     id_position_parent: "30258777",
-  //     bc_1_id: "10163366",
-  //     bc_2_position_parent: "Investment Planning & Evaluation",
-  //     bc_2_pid: "10132427",
-  //     bc_3_jumlah_formasi: "1",
-  //     id_org_unit: "10163366",
-  //     bc_2_gl: "3",
-  //     isNeck: false,
-  //     bc_3_assistant: false,
-  //     bc_3_id_position_atasan_langsung: "10132427",
-  //     bc_2_id_org_unit: "10163366",
-  //     org_unit_name: "Monitoring & Post-Mortem Evaluation",
-  //     bc_2_basket: false,
-  //     bc_1_prl: "16-18",
-  //     bc_1_assistant: false,
-  //     bc_1_id_org_unit: "10163366",
-  //     position_parent: "Investment Planning & Evaluation",
-  //     bc_3_id_position: "30313764",
-  //     bc_3_id_org_unit: "10163366",
-  //     bc_1_gl: "3",
-  //     bc_3_layering: "L6",
-  //     bc_3_gl: "3",
-  //     bc_1_position_parent: "Investment Planning & Evaluation",
-  //     hasChildren: false,
-  //     jumlah_formasi: 1,
-  //     bc_1_jumlah_formasi: "1",
-  //     bc_3_basket: false,
-  //     bc_1_basket: false,
-  //     bc_2_assistant: false,
-  //     layering: "L4",
-  //     bc_2_jumlah_formasi: "1",
-  //   },
-  //   {
-  //     gl: "GL2",
-  //     org_unit_name: "Investment Planning & Evaluation",
-  //     id_position_parent: "30258746",
-  //     tags: [],
-  //     id_position_atasan_langsung: "10132410",
-  //     pid: "10132410",
-  //     id_org_unit: "10132427",
-  //     hasChildren: true,
-  //     project: false,
-  //     jumlah_formasi: 7,
-  //     isNeck: false,
-  //     id_position: "30258777",
-  //     assistant: false,
-  //     prl: "20",
-  //     coordination: "",
-  //     id: "10132427",
-  //     isMergeFormation: true,
-  //     position_parent: "Business Planning & Investment",
-  //     position: "Manager Investment Planning & Evaluation",
-  //     basket: false,
-  //     layering: "L3",
-  //   },
-  //   {
-  //     gl: "GL1",
-  //     org_unit_name: "Business Planning & Investment",
-  //     id_position_parent: "30258744",
-  //     tags: [],
-  //     id_position_atasan_langsung: "10132408",
-  //     pid: "10132408",
-  //     id_org_unit: "10132410",
-  //     hasChildren: true,
-  //     project: false,
-  //     jumlah_formasi: 21,
-  //     isNeck: false,
-  //     id_position: "30258746",
-  //     assistant: false,
-  //     prl: "23",
-  //     coordination: "",
-  //     id: "10132410",
-  //     isMergeFormation: true,
-  //     position_parent: "Perencanaan & Pengembangan Bisnis",
-  //     position: "VP Business Planning & Investment",
-  //     basket: false,
-  //     layering: "L2",
-  //   },
-  // ];
-  // globalBaganData = dataBaganku;
-  // globalDataBaganSelf = dataBaganku.find((item) => item.id == jobId);
-  // focusNode(globalDataBaganSelf, dataBaganku);
-
-  checkLocalStorage();
+function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
+  console.error(`${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. `);
+}
+$(document).ready(async function () {
+  refreshDataLocalStorage();
   let activeTab = "identifikasi";
   if (activeTab) {
     const linkTab = "#v-pills-" + activeTab + "-tab";
     $(linkTab).tab("show");
   }
 
-  const idPos = urlParams.get("id");
-  const isCrete = urlParams.get("create");
-  if (idPos) {
-    if (isCrete) {
-      const findData = dataJobDesc.find((item) => item.identifikasi.id == idPos);
-      $("#selectJobReference").val(findData.identifikasi.id);
-      getJobReference(findData);
-    } else {
-      const findData = await dataJobDescCompare.find((item) => item.identifikasi.id == idPos);
-      $("#selectJobReference").append(
-        `<option value="${findData.identifikasi.id}">${findData.identifikasi.jobName}</option>`
-      );
-      $("#selectJobReference").val(findData.identifikasi.id);
-      let dataFungsi = [{ fungsi: findData.fungsi }];
-      let tugasHa = findData.tugasHa;
-      let koordinasi = findData.koordinasi;
-      let relation = findData.relation;
-      localStorage.setItem("fungsi", JSON.stringify(dataFungsi));
-      localStorage.setItem("tugasHa", JSON.stringify(tugasHa));
-      localStorage.setItem("koordinasi", JSON.stringify(koordinasi));
-      localStorage.setItem("relation", JSON.stringify(relation));
-
-      getJobReference(findData);
-      await getJobReferenceDetail();
+  const getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
+  for (const key in getDataJobDesc) {
+    if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
+      showEndpointErrorAlert(`job-description/${key}/show`, getDataJobDesc[key]);
+      getDataJobDesc[key] = null;
     }
   }
+  if (getDataJobDesc?.identifikasiJabatan) {
+    console.log("getDataJobDesc.identifikasiJabatan", getDataJobDesc.identifikasiJabatan);
+    updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
+  }
+
+  if (getDataJobDesc.fungsiJabatan) {
+    const lsFungsi = [
+      {
+        fungsi: getDataJobDesc?.fungsiJabatan.deskripsi,
+        jobReference: {},
+      },
+    ];
+    localStorage.setItem("fungsi", JSON.stringify(lsFungsi));
+    $(".summernote").summernote({
+      height: 300,
+      tabsize: 2,
+      // disable font type button
+      toolbar: [
+        // [groupName, [list of button]]
+        ["style", ["bold", "italic", "underline", "clear"]],
+        ["font", ["strikethrough", "superscript", "subscript"]],
+        ["para", ["ul", "ol", "paragraph"]],
+      ],
+    });
+    $(".summernote").summernote("enable");
+    let summernoteContent = "";
+    lsFungsi.forEach((item) => {
+      summernoteContent += item.fungsi + "<br><br>";
+      if (item.jobReference.jobName) {
+        const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
+        summernoteContent += textReference + "<br><br>";
+      }
+    });
+    $(".summernote").summernote("code", summernoteContent);
+  }
+
+  if (getDataJobDesc.tugasTanggungJawabUmum) {
+    updateTable("tugasUmum", getDataJobDesc.tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
+  }
+
+  if (getDataJobDesc.countTugasHa) {
+    const countAll = getDataJobDesc.countTugasHa.data.length;
+    const available = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "AVAILABLE");
+    const notAvailable = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "NOT AVAILABLE");
+    const countAvailable = available.length;
+    const countNotAvailable = notAvailable.length;
+    const codeAvailable = available.map((item) => item.indexNumber);
+    const codeNotAvailable = notAvailable.map((item) => item.indexNumber);
+
+    const lsAvailable = {
+      available,
+      notAvailable,
+      countAll,
+      codeAvailable,
+      codeNotAvailable,
+      countAvailable,
+      countNotAvailable,
+    };
+    localStorage.setItem("lsAvailable", JSON.stringify(lsAvailable));
+
+    const isFullFilled = countAvailable === countAll || countNotAvailable === 0;
+    const $label = $("#labelFulfillTugasHa");
+    $label
+      .toggleClass("label-success-custom", isFullFilled)
+      .toggleClass("label-danger-custom", !isFullFilled)
+      .css("cursor", "pointer")
+      .attr("title", "Click to see detail");
+
+    if (!isFullFilled) {
+      $label.html(
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`,
+      );
+    } else {
+      $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
+    }
+  }
+  if (getDataJobDesc.tugasTanggungJawabAkhir) {
+    const cleanObj = getDataJobDesc.tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0);
+    localStorage.setItem("tugasHa", JSON.stringify(cleanObj));
+    updateTable("tugasHa", cleanObj, [...tabCusJD.tugasHa, "action"]);
+  }
+
+  if (getDataJobDesc.wewenang) {
+    updateTable("wewenang", getDataJobDesc.wewenang.data, tabCusJD.wewenang);
+  }
+
+  if (getDataJobDesc.koordinasiInternal) {
+    localStorage.setItem("koordinasiInternal", JSON.stringify(getDataJobDesc.koordinasiInternal.data));
+    updateTable("koordinasi", getDataJobDesc.koordinasiInternal.data, [...tabCusJD.koordinasi, "action"]);
+  }
+
+  if (getDataJobDesc.relasiEksternal) {
+    localStorage.setItem("relasiEksternal", JSON.stringify(getDataJobDesc.relasiEksternal.data));
+    updateTable("relation", getDataJobDesc.relasiEksternal.data, [...tabCusJD.relation, "action"]);
+  }
+  if (getDataJobDesc.persyaratanJabatan) {
+    getDataJobDesc.persyaratanJabatan.data.map((item) => {
+      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
+    });
+    updateTable("persyaratan", getDataJobDesc.persyaratanJabatan.data, tabCusJD.pj);
+  }
+
+  if (getDataJobDesc.persyaratanKhusus) {
+    getDataJobDesc.persyaratanKhusus.data.map((item) => {
+      item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
+    });
+    localStorage.setItem("persyaratanKhusus", JSON.stringify(getDataJobDesc.persyaratanKhusus.data));
+    updateTable("persyaratanKhusus", getDataJobDesc.persyaratanKhusus.data, [...tabCusJD.pk, "action"]);
+  }
+  const divKompetensiTeknisGeneral = $("#kompetensiGeneral");
+  const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
+  const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
+  const divKompetensiPerilaku = $("#kompetensiPerilaku");
+
+  if (
+    Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekMandatori) &&
+    getDataJobDesc.kompetensiTeknis.data.komtekMandatori.length > 0
+  ) {
+    const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
+    getDataJobDesc.kompetensiTeknis.data.komtekMandatori.forEach((item) => {
+      $ul.append(
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`,
+      );
+    });
+    divKompetensiTeknisMandatory.empty().append($ul);
+  }
+
+  if (
+    Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekGeneral) &&
+    getDataJobDesc.kompetensiTeknis.data.komtekGeneral.length > 0
+  ) {
+    const $ul = $('<ul style=""></ul>');
+    getDataJobDesc.kompetensiTeknis.data.komtekGeneral.forEach((item) => {
+      $ul.append(
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`,
+      );
+    });
+    divKompetensiTeknisGeneral.empty().append($ul);
+  }
+
+  if (
+    Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekSpesifik) &&
+    getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.length > 0
+  ) {
+    const $ul = $('<ul style=""></ul>');
+    getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
+      $ul.append(
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`,
+      );
+    });
+    divKompetensiTeknisSpesifik.empty().append($ul);
+  }
+
+  if (Array.isArray(getDataJobDesc.kompetensiPerilaku.data) && getDataJobDesc.kompetensiPerilaku.data.length > 0) {
+    const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
+    getDataJobDesc.kompetensiPerilaku.data.forEach((item) => {
+      $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
+    });
+    divKompetensiPerilaku.append($ul);
+  } else {
+    divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
+  }
+
+  if (getDataJobDesc.stk) {
+    // filter stk.data to remove items with empty stkNumber is null or undefined
+    getDataJobDesc.stk.data = getDataJobDesc.stk.data.filter(
+      (item) => item.stkNumber !== null && item.stkNumber !== undefined,
+    );
+    localStorage.setItem("stk", JSON.stringify(getDataJobDesc.stk.data));
+    updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
+  }
+
+  focusNode(jobId);
 
   // $(".summernote").summernote("disable");
 
@@ -1134,6 +556,10 @@ $(document).ready(async function () {
   // await getJobReferenceDetail();
 
   // multiSelect({ selectID: "JobReference", type: "jobposition" });
+
+  // $("#inputSearchCompare").on("input", function (e) {
+  //   searchJobCompare(e, false, getDraftExisting);
+  // });
 
   // on change selectJobReference
   $("#selectJobReference").on("change", function (e) {
@@ -1181,12 +607,11 @@ $(document).ready(async function () {
   dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
   dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 
-  //  radio button with name debt-amount
-  // ...existing code...
-
-  // Listen for changes on the radio buttons within the form with ID 'debt-amount-form'
-  $("#debt-amount-form input[name='debt-amount']").on("change", function () {
+  // Listen for changes on the radio buttons within the form with ID 'percentage-amount-form'
+  $("#percentage-amount-form input[name='percentage-amount']").on("change", function () {
     const value = $(this).val();
+    console.log("Selected debt amount option:", value);
+    console.log(getDraftExisting, "getDraftExisting");
     searchJobCompare(value, true);
   });
 
@@ -1195,12 +620,7 @@ $(document).ready(async function () {
   // Listen for tab navigation events
   $('#v-pills-tab-modal a[data-bs-toggle="pill"]').on("shown.bs.tab", function (e) {
     const target = $(e.target).attr("href"); // activated tab
-    console.log("target", target);
     activeTab = target.split("#v-pills-")[1];
-    console.log("activeTab", activeTab);
-    if (activeTab === "bagan-primary" && globalDataBaganSelf && globalBaganData) {
-      focusNode(globalDataBaganSelf, globalBaganData);
-    }
     const element = document.getElementById(activeTab);
     if (element) {
       element.scrollIntoView();
@@ -1235,7 +655,7 @@ $(document).ready(async function () {
       "",
       action,
       "50%",
-      1
+      1,
     );
   });
 
@@ -1261,54 +681,45 @@ $(document).ready(async function () {
       "",
       action,
       "30%",
-      1
+      1,
     );
   });
 
-  $("#popUpBispro").on("click", async function () {
+  $("#labelFulfillTugasHa").on("click", function () {
     $("#modalBusinessProcess").modal("show");
+
+    const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+    const countAll = lsAvailable.countAll;
+    const countAvailable = lsAvailable.countAvailable;
+    const countNotAvailable = lsAvailable.countNotAvailable;
+    const isFullFilled = countAvailable === countAll || countNotAvailable === 0;
+    const $label = $("#notifWarningModalBP");
+    $label
+      .toggleClass("label-success-custom", isFullFilled)
+      .toggleClass("label-danger-custom", !isFullFilled)
+      .toggleClass("p-2", true);
+
+    if (!isFullFilled) {
+      $label.html(
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button`,
+      );
+    } else {
+      $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
+    }
+    console.log("lsAvailable", lsAvailable);
     // get modalBusinessProcessBody
     const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
+    const allBusPro = lsAvailable.available.concat(lsAvailable.notAvailable);
+
     modalBusinessProcessBody.innerHTML = "";
-    let dataBispro = [
-      {
-        index: "9.1.2",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.3",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.4",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.5",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-    ];
     let content = `
       <div class="table-responsive" style="overflow-x: auto;">
         <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
           <thead>
             <tr>
-              <th style="width:40%">Business Process</th>
-              <th style="width:10%">Notation</th>
-              <th style="width:35%">Availibity</th>
-              <th style="width:15%">Desc No</th>
+              <th style="width:50%">Business Process</th>
+              <th style="width:20%">Notation</th>
+              <th style="width:30%">Availibity</th>
             </tr>
           </thead>
           <tbody class="tbodBispro">
@@ -1318,260 +729,66 @@ $(document).ready(async function () {
         `;
     modalBusinessProcessBody.innerHTML = content;
     let tbodBispro = document.querySelector(".tbodBispro");
-    for (let item of dataBispro) {
+    for (let item of allBusPro) {
+      const statusIcon = item.status === "AVAILABLE" ? "available" : "nonavail";
+      const statusText = item.status === "AVAILABLE" ? "Available" : "Not Available";
+      const statusColor = item.status === "AVAILABLE" ? "#06BE00" : "#D02138";
       tbodBispro.innerHTML += `
         <tr>
           
           <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.index} - ${item.name}</span>
+            <span class="">${item.indexNumber} - ${item.description}</span>
           </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.notation}</span>
+          <td style="place-items:center">
+            <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+            <span style="font-weight:bold;font-size: 12px;">R</span>
+            </div>
           </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.availability}</span>
-          </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.descriptionNo}</span>
-          </td>
-        </tr>
-      `;
-    }
-  });
-
-  $("#popUpMergeBisPro").on("click", async function () {
-    $("#modalBusinessProcess").modal("show");
-    // get modalBusinessProcessBody
-    const modalBusinessProcessHeader = document.getElementById("modalBusinessProcessHeader");
-    modalBusinessProcessHeader.innerHTML = "Merge With Other Business sentences";
-    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
-    modalBusinessProcessBody.innerHTML = "";
-    let dataBispro = [
-      {
-        index: "9.1.2",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.3",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.4",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-      {
-        index: "9.1.5",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        notation: "r",
-        availability: "Available",
-        descriptionNo: "4",
-      },
-    ];
-    let content = `
-      <div class="table-responsive" style="overflow-x: auto;">
-        <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
-          <thead>
-            <tr>
-              <th style="width:15%"></th>
-              <th style="width:25%">Desc No</th>
-              <th style="width:60%">Related Business Process</th>
-            </tr>
-          </thead>
-          <tbody class="tbodBispro">
-          </tbody>
-        </table>
-      </div>
-        `;
-    modalBusinessProcessBody.innerHTML = content;
-    let tbodBispro = document.querySelector(".tbodBispro");
-    for (let item of dataBispro) {
-      tbodBispro.innerHTML += `
-        <tr>
-        <td class="p-3" style="place-content: flex-start">
-          <span class="">${item.descriptionNo}</span>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <span class="">${item.descriptionNo}</span>
-        </td>
-          <td class="p-3" style="place-content: flex-start">
-            <span class="">${item.index} - ${item.name}</span>
+          <td style="color:${statusColor};text-align:center">
+            <span>${statusText}</span>
+            <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
           </td>
         </tr>
       `;
     }
   });
 
-  $("#otherRec").on("click", async function () {
-    $("#modalRecomendation").modal("show");
-    const dataAll = [
-      {
-        index: "9.1.2",
-        name: "Pengelolaan kebutuhan ICT/digital",
-        tugas_ha_li: [
-          {
-            id: 1,
-            responsible:
-              "Melakukan kegiatan pengelolaan relasi dengan pelanggan terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-            output: [
-              "Pelaksanaan tindak lanjut penanganan saran dan keluhan pelanggan;",
-              "Pelaksanaan tindak lanjut permintaan pelanggan;",
-              "Program pembinaan relasi dengan pelanggan;",
-              "Pelaksanaan kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-            ],
-            lead: [
-              "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-              "Customer satisfaction index;",
-              "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-            ],
-          },
-          {
-            id: 2,
-            responsible:
-              "Melakukan kegiatan pengelolaan relasi dengan pelanggan terkait penjualan produk gas di Fungsi Retail Sales Sumbagsel khususnya di Area Sungai Penuh.",
-            output: [
-              "Pelaksanaan tindak lanjut penanganan saran dan keluhan pelanggan;",
-              "Pelaksanaan tindak lanjut permintaan pelanggan;",
-              "Program pembinaan relasi dengan pelanggan;",
-              "Pelaksanaan kegiatan dan evaluasi pembinaan relasi dengan pelanggan.",
-            ],
-            lead: [
-              "Tingkat kesesuaian dan ketepatan waktu tindak lanjut penyelesaian saran/pertanyaan/keluhan/permintaan pelanggan;",
-              "Customer satisfaction index;",
-              "Tingkat efektivitas pengelolaan kegiatan pembinaan relasi.",
-            ],
-          },
-        ],
-      },
-    ];
+  $("#searchBusinessProcess").on("input", function () {
+    const searchTerm = $(this).val().toLowerCase();
+    $("#tugasHaRecTable tbody tr").each(function () {
+      const rowText = $(this).text().toLowerCase();
+      $(this).toggle(rowText.includes(searchTerm));
+    });
+  });
 
-    // let bodyTugasHa = document.querySelector(".tbodyTugasHa");
-    // for (let j = 0; j < data?.tugasHa.length; j++) {
-    //   const listItemOutput = addList(data?.tugasHa[j].output);
-    //   const listItemLeadingIndicator = addList(data?.tugasHa[j].lead);
-
-    //   bodyTugasHa.innerHTML += `
-    //   <tr>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <label class="container-checkbox m-0"><span style="padding-top: 9px;padding-left: 5px;">${data?.tugasHa[j].id}</span>
-    //         <input onclick="checkboxReference(this)" type="checkbox" id="checkbox_tugas_ha_rec_${data?.tugasHa[j].id}" class="checkbox_animated checbox-compare" checked>
-    //         <span class="checkmark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-    //       </label>
-    //     </td>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <span class="">${data?.tugasHa[j].responsible}</span>
-    //     </td>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <ul class="" style="list-style-type:disc">
-    //         ${listItemOutput}
-    //       </ul>
-    //     </td>
-    //     <td class="p-3" style="place-content: flex-start">
-    //       <ul class="" style="list-style-type:disc">
-    //         ${listItemLeadingIndicator}
-    //       </ul>
-    //     </td>
-    //   </tr>
-    //   `;
-    // }
-
-    // update modalRecomendationBody
-    const modalRecomendationBody = document.getElementById("modalRecomendationBody");
-    let content = "";
-    for (let item of dataAll) {
-      let bodyTugasHa = ``;
-      for (let j = 0; j < item?.tugas_ha_li.length; j++) {
-        const listItemOutput = await addList(item?.tugas_ha_li[j].output);
-        const listItemLeadingIndicator = await addList(item?.tugas_ha_li[j].lead);
-        console.log("listItemOutput", listItemOutput);
-
-        bodyTugasHa += `
-            <tr>
-        <td class="p-3" style="place-content: flex-start">
-          <label class="container-radio m-0"><span style="padding-top: 9px;padding-left: 5px;">${item?.tugas_ha_li[j].id}</span>
-            <input onclick="radioReference(this)" type="radio" name="radio_tugas_ha_rec" id="radio_tugas_ha_rec_${item?.tugas_ha_li[j].id}" class="radio_animated radio-compare">
-            <span class="radiomark" style="top:30%;left:10px;width:17px;height:17px" ></span>
-          </label>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <span class="">${item?.tugas_ha_li[j].responsible}</span>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <ul class="" style="list-style-type:disc">
-            ${listItemOutput}
-          </ul>
-        </td>
-        <td class="p-3" style="place-content: flex-start">
-          <ul class="" style="list-style-type:disc">
-            ${listItemLeadingIndicator}
-          </ul>
-        </td>
-            </tr>
-            `;
-      }
-
-      let tugasHaRow =
-        `
-      <div class="table-responsive" style="overflow-x: auto;">
-        <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
-          <thead>
-            <tr>
-              <th style="width:10%">
-              </th>
-              <th style="width:30%">Tugas & Tanggung Jawab</th>
-              <th style="width:30%">Hasil Akhir Yang Diharapkan</th>
-              <th style="width:30%">Leading Indicator</th>
-            </tr>
-          </thead>
-          <tbody class="tbodyTugasHaRec">
-          ` +
-        bodyTugasHa +
-        `
-          </tbody>
-        </table>
-      </div>
-    `;
-
-      const tugasHaDiv =
-        `
-      <div class="col-md-12 mb-3">
-      ` +
-        tugasHaRow +
-        `
-      </div>
-      `;
-
-      content +=
-        `
-        <div class="card-body">
-          <div class="default-according" id="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">${item.index} - ${item.name}
-                        </button>
-                    </h5>
-                </div>
-                <div class="collapse" id="collapseOne" aria-labelledby="headingOne" data-bs-parent="#accordion">
-                    <div class="card-body">
-        ` +
-        tugasHaDiv +
-        `
+  /* <div id="filterBusinessProcess" class="m-b-3">
+                    <input type="text" id="searchBusinessProcess" placeholder="Search Business Process..." class="form-control mb-2" />
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="availableCheckbox" value="available" checked>
+                        <label class="form-check-label" for="availableCheckbox">Available</label>   
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="notAvailableCheckbox" value="notAvailable">
+                        <label class="form-check-label" for="notAvailableCheckbox">Not Available</label>
                     </div>
                 </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-    modalRecomendationBody.innerHTML = content;
-  });
+                 */
+  function filterBusinessProcessTable() {
+    const availableChecked = $("#availableCheckbox").is(":checked");
+    const notAvailableChecked = $("#notAvailableCheckbox").is(":checked");
+
+    $("#tugasHaRecTable tbody tr").each(function () {
+      const rowText = $(this).text();
+      const isAvailable = rowText.includes("Available") && !rowText.includes("Not Available");
+      const isNotAvailable = rowText.includes("Not Available");
+
+      let shouldShow = false;
+      if (availableChecked && isAvailable) shouldShow = true;
+      if (notAvailableChecked && isNotAvailable) shouldShow = true;
+
+      $(this).toggle(shouldShow);
+    });
+  }
+
+  $("#availableCheckbox, #notAvailableCheckbox").on("change", filterBusinessProcessTable);
 });

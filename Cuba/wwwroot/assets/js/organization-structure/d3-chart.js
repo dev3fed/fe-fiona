@@ -1220,7 +1220,31 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
   let isCompact = true;
   if (focusNodeId) {
     const selfObject = processedDataResult.processedData.find((item) => item.id == focusNodeId);
-    console.log("Self object for focus node:", selfObject);
+
+    // // Safety check: ensure selfObject exists
+    // if (!selfObject) {
+    //   console.warn(`Focus node with ID ${focusNodeId} not found in processed data`);
+    //   return;
+    // }
+
+    // // Add "pointed" tag if not already present (avoid duplicates)
+    // if (!selfObject.tags.includes("pointed")) {
+    //   selfObject.tags.push("pointed");
+    // }
+
+    // // More efficient approach: find index and move to front
+    if (selfObject) {
+      if (!selfObject.tags.includes("pointed")) {
+        selfObject.tags.push("pointed");
+      }
+      const selfIndex = processedDataResult.processedData.findIndex((item) => item.id == focusNodeId);
+      if (selfIndex > 0) {
+        // Remove from current position and insert at beginning
+        processedDataResult.processedData.splice(selfIndex, 1);
+        processedDataResult.processedData.unshift(selfObject);
+      }
+    }
+
     const lengthRelative = processedDataResult.processedData.filter(
       (item) => item.parentId === selfObject.parentId
     ).length;
@@ -1259,18 +1283,31 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
     })
     .nodeContent(function (d) {
       const color = {
-        create: "#2CAAE5",
-        delete: "#FF0000",
+        create: "#03a9f4",
+        delete: "#dc3545",
         black: "black",
       };
+      const background = {
+        create: "#e6f6fe",
+        delete: "#f8d7da",
+        black: "white",
+      };
 
-      let colorSelected;
+      let colorSelected, backgroundSelected;
       if (d.data.tags.includes("create") || d.data.tags.includes("update")) {
         colorSelected = color.create;
+        backgroundSelected = background.create;
       } else if (d.data.tags.includes("delete")) {
         colorSelected = color.delete;
+        backgroundSelected = background.delete;
       } else {
         colorSelected = color.black;
+        backgroundSelected = background.black;
+      }
+
+      if (d.data.tags.includes("pointed")) {
+        // yellowish background
+        backgroundSelected = "#fff3cd";
       }
 
       const borderDot = d.data.project ? "dotted" : "solid";
@@ -1305,7 +1342,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
         }
 
         return `
-                <div id="basket-non-merge-node" style="width:${d.width}px;height:${d.height}px;display:flex;flex-direction:column;${borderStyle};background-color:white;">
+                <div id="basket-non-merge-node" style="width:${d.width}px;height:${d.height}px;display:flex;flex-direction:column;${borderStyle};background-color:${backgroundSelected};">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:2px ${borderDot} ${colorSelected};overflow:hidden;">
                     <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.org_unit_name}</div>
                   </div>
@@ -1360,7 +1397,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
                   tag.includes("basket_")
                 )}" style="width:${d.width}px;height:${
           d.height
-        }px;display:flex;flex-direction:column;${borderStyle};background-color:white;">
+        }px;display:flex;flex-direction:column;${borderStyle};background-color:${backgroundSelected};">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px ${borderDot} ${colorSelected};overflow:hidden;">
                     <div style="font-size:${getBasketMergeHeaderFontSize(
                       d.data.org_unit_name
@@ -1384,7 +1421,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
         const formationFontSize = getFontSize(d.data.jumlah_formasi);
 
         return `
-                <div id="non-basket-node" style="width:${d.width}px;height:${d.height}px;display:flex;${borderStyle};background-color:white;">
+                <div id="non-basket-node" style="width:${d.width}px;height:${d.height}px;display:flex;${borderStyle};background-color:${backgroundSelected};">
                   <div class="node-content" style="flex:2;height:100%;border-right:2px ${borderDot} ${colorSelected};display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <div style="font-size:${positionFontSize};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${d.data.position}</div>
                   </div>

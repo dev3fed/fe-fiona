@@ -4420,13 +4420,6 @@ const customTableHeaderHeader = ["header"];
 
 // const untuk tableCustomJobDescription
 const tabCusJD = {
-  // tjHa: ["no", "index", "responsible", "output", "lead", "action"],
-  // thUm: ["no", "header", "tugas"],
-  // wewenang: ["no", "wewenang"],
-  // koordinasi: ["no", "internal", "aktivitas", "action"],
-  // relation: ["no", "eksternal", "aktivitas", "action"],
-  // persyaratan: ["pj"],
-  // stk:["stkNumber", "stkTitle", "action"]
   tugasHa: ["no", "index", "responsible", "output", "lead"],
   tugasUmum: ["no", "header", "tugas"],
   wewenang: ["no", "wewenang"],
@@ -4435,3 +4428,89 @@ const tabCusJD = {
   pj: ["pj"],
   stk: ["stkNumber", "stkTitle"],
 };
+
+// Chart Loading HTML Template
+const CHART_LOADING_HTML = `
+  <div id="chart-loading-overlay" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgba(248, 249, 250, 0.95);
+    z-index: 2;
+    border-radius: 4px;
+  ">
+    <div style="
+      border: 4px solid #e9ecef;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: chart-spin 1.2s linear infinite;
+    "></div>
+    <p style="
+      margin-top: 20px;
+      color: #495057;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 8px;
+    "
+    id="header-loading-chart"
+    >Loading organization chart...</p>
+    <p style="
+      margin: 0;
+      color: #6c757d;
+      font-size: 14px;
+      text-align: center;
+    ">Please wait while we prepare your data</p>
+  </div>
+  <style>
+    @keyframes chart-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+`;
+
+const DATA_NOT_FOUND_HTML = `
+  <div id="data-not-found-overlay" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgba(248, 249, 250, 0.95);
+    z-index: 2;
+    border-radius: 4px;
+  ">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+      <line x1="11" y1="8" x2="11" y2="14"></line>
+      <line x1="8" y1="11" x2="14" y2="11"></line>
+    </svg>
+    <p style="
+      margin: 0;
+      color: #6c757d;
+      font-size: 14px;
+      text-align: center;
+    ">Data not found</p>
+  </div>
+`;
+
+const defaultNodeId = "10132406";
+const jobId = urlParams.get("jobId");
+const prlOrg = urlParams.get("prlOrg");
+const positionCode = urlParams.get("positionCode");
+
+const DATA_NOT_FOUND = `Data not found`;
