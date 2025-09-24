@@ -23,6 +23,7 @@ function refreshDataLocalStorage() {
     "relasiEksternal",
     "persyaratanKhusus",
     "stk",
+    "arraySelectedBusPro",
   ];
   keys.forEach((key) => localStorage.removeItem(key));
 }
@@ -97,26 +98,43 @@ async function getAllJobDescData(draftExisting, id, prlOrgParam, prlOrgTarget) {
 
 async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   // showChartLoading("chk-job-list-percentage");
+  const onlyShowdata = localStorage.getItem("onlyShowdata") || "";
+  if (onlyShowdata !== "") {
+    $(
+      "#v-pills-stkReference-tab, #v-pills-fungsiReference-tab, #v-pills-tugasHaReference-tab, #v-pills-koordinasiInternalReference-tab, #v-pills-relasiEksternalReference-tab"
+    ).hide();
+    $(
+      "#fungsiReference, #tugasHaReference, #koordinasiInternalReference, #relasiEksternalReference, #stkReference"
+    ).hide();
+    if (onlyShowdata == "stk") {
+      $("#v-pills-stkReference-tab").show();
+      $("#stkReference").show();
+    } else if (onlyShowdata == "fungsi") {
+      $("#v-pills-fungsiReference-tab").show();
+      $("#fungsiReference").show();
+    } else if (onlyShowdata == "tugasHa") {
+      $("#v-pills-tugasHaReference-tab").show();
+      $("#tugasHaReference").show();
+    } else if (onlyShowdata == "koordinasi") {
+      $("#v-pills-koordinasiInternalReference-tab").show();
+      $("#koordinasiInternalReference").show();
+    } else if (onlyShowdata == "relation") {
+      $("#v-pills-relasiEksternalReference-tab").show();
+      $("#relasiEksternalReference").show();
+    } else {
+    }
+    localStorage.setItem("onlyShowdata", onlyShowdata);
+  }
   const getDataJobDesc = await getAllJobDescData(getDraftExisting, id, prlOrgParam, prlOrgTarget);
 
-  // const arrayId = ["identifikasi", "fungsi", "tugas-ha", "koordinasi-internal", "relasi-eksternal", "stk"];
-  // arrayId.forEach((item) => {
-  //   $(`#${item}`).empty();
-  // });
   localStorage.setItem("selectedJobDescReference", JSON.stringify(getDataJobDesc));
   localStorage.setItem("isFullRefer", JSON.stringify(false));
 
   const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
-  const countNotAvailable = lsAvailable.countNotAvailable;
-  const codeNotAvailable = lsAvailable.codeNotAvailable;
-  const codeAvailable = lsAvailable.codeAvailable;
 
   const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference"));
   const tugasHaSelected =
     selectedJobDescReference.countTugasHa?.data.filter((item) => item.status === "AVAILABLE") || [];
-  const countTugasHaSelected = tugasHaSelected.length;
-  const codeAvailableSelected = tugasHaSelected.map((item) => item.indexNumber);
-  // const codeAvailableSelected = tugasHaSelected.map((item) => item.indexNumber);
 
   // check if codeAvailableSelected contains all codeNotAvailable
   // const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
@@ -150,19 +168,18 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
     getDataJobDesc?.stk?.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined) || [],
     ["no", ...tabCusJD.stk]
   );
+
   // hideChartLoading("chk-job-list-percentage");
   return;
 }
 
 async function searchJobCompare(event, isPercentage = false) {
-  console.log("searchJobCompare", event, isPercentage, getDraftExisting);
   // return;
 
   const chkJobList = document.getElementById("chk-job-list");
   // const jobSelectedList = document.getElementById("job-selected-list");
 
   function callPopover(param, dataDetail) {
-    console.log("callPopover", param, dataDetail);
     // Generate popoverContent dynamically with if-else for status
     const popoverContent = (dataDetail?.data || [])
       .map((item) => {
@@ -373,34 +390,41 @@ $(document).ready(async function () {
   }
 
   if (getDataJobDesc.fungsiJabatan) {
-    const lsFungsi = [
-      {
-        fungsi: getDataJobDesc?.fungsiJabatan.deskripsi,
-        jobReference: {},
-      },
-    ];
-    localStorage.setItem("fungsi", JSON.stringify(lsFungsi));
-    $(".summernote").summernote({
-      height: 300,
-      tabsize: 2,
-      // disable font type button
-      toolbar: [
-        // [groupName, [list of button]]
-        ["style", ["bold", "italic", "underline", "clear"]],
-        ["font", ["strikethrough", "superscript", "subscript"]],
-        ["para", ["ul", "ol", "paragraph"]],
-      ],
+    localStorage.setItem("fungsi", JSON.stringify(getDataJobDesc?.fungsiJabatan));
+    // Initialize CKEditor for .summernote elements
+    if (typeof ClassicEditor !== "undefined") {
+      document.querySelectorAll(".summernote").forEach((element) => {
+        ClassicEditor.create(element, {
+          toolbar: TOOLBAR_SHORT,
+          removePlugins: REMOVE_PLUGINS,
+          ui: CKEDITOR_UI_CONFIG,
+        })
+          .then((editor) => {
+            // Store the editor instance to the element for later reference
+            element.ckeditorInstance = editor;
+            editor.setData(getDataJobDesc?.fungsiJabatan?.deskripsi || "");
+            console.log("CKEditor instance created and stored for .summernote element");
+          })
+          .catch((error) => {
+            console.error("CKEditor initialization error:", error);
+          });
+      });
+    } else {
+      document.querySelectorAll(".summernote").forEach((element) => {
+        element.innerHTML = getDataJobDesc?.fungsiJabatan?.deskripsi || "";
+      });
+    }
+    console.log(getDataJobDesc?.fungsiJabatan);
+    getDataJobDesc?.fungsiJabatan.jobReferences.map((item) => {
+      //  const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
+      const textReference = `(Reference from : ${item.jobReference.jobName}) - ${
+        item.jobReference.noSuratKeputusan ? item.jobReference.noSuratKeputusan : "-"
+      }`;
+      $("#fungsiReferenceContainer").append(`<li>${item.fungsiJabatan}</li>`);
+      $("#fungsiReferenceContainer").append(
+        `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
+      );
     });
-    $(".summernote").summernote("enable");
-    let summernoteContent = "";
-    lsFungsi.forEach((item) => {
-      summernoteContent += item.fungsi + "<br><br>";
-      if (item.jobReference.jobName) {
-        const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
-        summernoteContent += textReference + "<br><br>";
-      }
-    });
-    $(".summernote").summernote("code", summernoteContent);
   }
 
   if (getDataJobDesc.tugasTanggungJawabUmum) {
@@ -604,8 +628,8 @@ $(document).ready(async function () {
     }
   });
 
-  dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
-  dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
+  // dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
+  // dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 
   // Listen for changes on the radio buttons within the form with ID 'percentage-amount-form'
   $("#percentage-amount-form input[name='percentage-amount']").on("change", function () {
@@ -686,7 +710,7 @@ $(document).ready(async function () {
   });
 
   $("#labelFulfillTugasHa").on("click", function () {
-    $("#modalBusinessProcess").modal("show");
+    $("#modalRasciAvailability").modal("show");
 
     const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
     const countAll = lsAvailable.countAll;
@@ -707,11 +731,12 @@ $(document).ready(async function () {
       $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
     }
     console.log("lsAvailable", lsAvailable);
-    // get modalBusinessProcessBody
-    const modalBusinessProcessBody = document.getElementById("modalBusinessProcessBody");
+    // get modalRasciAvailabilityBody
+    const modalRasciAvailabilityBody = document.getElementById("modalRasciAvailabilityBody");
     const allBusPro = lsAvailable.available.concat(lsAvailable.notAvailable);
+    console.log("allBusPro", allBusPro);
 
-    modalBusinessProcessBody.innerHTML = "";
+    modalRasciAvailabilityBody.innerHTML = "";
     let content = `
       <div class="table-responsive" style="overflow-x: auto;">
         <table class="tableMasterData" id="tugasHaRecTable" style="width:100%">
@@ -722,18 +747,20 @@ $(document).ready(async function () {
               <th style="width:30%">Availibity</th>
             </tr>
           </thead>
-          <tbody class="tbodBispro">
+          <tbody class="tbodRasciAvailability">
           </tbody>
         </table>
       </div>
         `;
-    modalBusinessProcessBody.innerHTML = content;
-    let tbodBispro = document.querySelector(".tbodBispro");
+    modalRasciAvailabilityBody.innerHTML = content;
+    let tbodRasciAvailability = document.querySelector(".tbodRasciAvailability");
+    console.log("tbodRasciAvailability", tbodRasciAvailability);
+    tbodRasciAvailability.innerHTML = "";
     for (let item of allBusPro) {
       const statusIcon = item.status === "AVAILABLE" ? "available" : "nonavail";
       const statusText = item.status === "AVAILABLE" ? "Available" : "Not Available";
       const statusColor = item.status === "AVAILABLE" ? "#06BE00" : "#D02138";
-      tbodBispro.innerHTML += `
+      tbodRasciAvailability.innerHTML += `
         <tr>
           
           <td class="p-3" style="place-content: flex-start">
@@ -752,43 +779,4 @@ $(document).ready(async function () {
       `;
     }
   });
-
-  $("#searchBusinessProcess").on("input", function () {
-    const searchTerm = $(this).val().toLowerCase();
-    $("#tugasHaRecTable tbody tr").each(function () {
-      const rowText = $(this).text().toLowerCase();
-      $(this).toggle(rowText.includes(searchTerm));
-    });
-  });
-
-  /* <div id="filterBusinessProcess" class="m-b-3">
-                    <input type="text" id="searchBusinessProcess" placeholder="Search Business Process..." class="form-control mb-2" />
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="availableCheckbox" value="available" checked>
-                        <label class="form-check-label" for="availableCheckbox">Available</label>   
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="notAvailableCheckbox" value="notAvailable">
-                        <label class="form-check-label" for="notAvailableCheckbox">Not Available</label>
-                    </div>
-                </div>
-                 */
-  function filterBusinessProcessTable() {
-    const availableChecked = $("#availableCheckbox").is(":checked");
-    const notAvailableChecked = $("#notAvailableCheckbox").is(":checked");
-
-    $("#tugasHaRecTable tbody tr").each(function () {
-      const rowText = $(this).text();
-      const isAvailable = rowText.includes("Available") && !rowText.includes("Not Available");
-      const isNotAvailable = rowText.includes("Not Available");
-
-      let shouldShow = false;
-      if (availableChecked && isAvailable) shouldShow = true;
-      if (notAvailableChecked && isNotAvailable) shouldShow = true;
-
-      $(this).toggle(shouldShow);
-    });
-  }
-
-  $("#availableCheckbox, #notAvailableCheckbox").on("change", filterBusinessProcessTable);
 });

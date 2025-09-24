@@ -32,7 +32,7 @@ async function checkDraftSelected(listDraft) {
   $("#selectJobDescDraft").val(draftId).trigger("change");
 
   // disable selectJobDescDraft if draftId is not empty
-  $("#selectJobDescDraft").prop("disabled", true);
+  // $("#selectJobDescDraft").prop("disabled", true);
 }
 
 $(document).ready(async function () {
@@ -46,10 +46,6 @@ $(document).ready(async function () {
   localStorage.getItem("statusSbm")
     ? localStorage.getItem("statusSbm")
     : localStorage.setItem("statusSbm", "not available");
-
-  let dataList = dataListJobDescription;
-  dataList[0].jobStatus = localStorage.getItem("statusManager");
-  dataList[1].jobStatus = localStorage.getItem("statusSbm");
 
   // get draft list
   const dataListDraft = await draftList();
@@ -68,17 +64,8 @@ $(document).ready(async function () {
   getTableListJobDes();
 
   $("#selectStatusJobDesc").on("change", function () {
-    // const value = $(this).val() ?? "";
-    // const search = $("#searchJobDesc").val() ?? "";
-    // filterListJobDesc(value, search);
     getTableListJobDes();
   });
-
-  // function onSelectType(text) {
-  //   setState("selectedType", text);
-  //   document.getElementById("btnSearchType").innerText = text;
-  //   document.getElementById("inputText").value = "";
-  // }
 
   $(".di").on("click", function () {
     const value = $(this).attr("value");
@@ -88,9 +75,6 @@ $(document).ready(async function () {
 
   // ketika inputan serach selesai ketik
   $("#searchFilter").on("click", function () {
-    // const value = $("#selectStatusJobDesc").val() ?? "";
-    // const search = $(this).val() ?? "";
-    // filterListJobDesc(value, search);
     getTableListJobDes();
   });
 
@@ -107,7 +91,8 @@ $(document).ready(async function () {
   $("#selectJobDescDraft").change(function () {
     const value = $(this).val();
     if (value == "1") {
-      $("#pills-warningtab").attr("style", "display:none !important");
+      $("#pills-warningtab").hide();
+      $("#pills-draft, #pills-request, #pills-log").hide();
     } else {
       $("#pills-warningtab").show();
     }

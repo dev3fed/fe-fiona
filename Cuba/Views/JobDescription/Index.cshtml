@@ -48,7 +48,7 @@
             <div class="col-sm-12">
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
-                        <ul class="nav nav-tabs nav-primary d-none" id="pills-warningtab" role="tablist">
+                        <ul class="nav nav-tabs nav-primary" id="pills-warningtab" role="tablist">
                             <li class="nav-item"><a class="nav-link active" id="pills-jobdesc" data-bs-toggle="pill"
                                     href="#jobdesc" role="tab" aria-controls="pills-matrix"
                                     aria-selected="true">Summary</a></li>
@@ -97,6 +97,7 @@
                                             </div>
                                         </div>
                                         <div class="col-2" style="padding-left: 0;place-self: end;">
+                                        <label for="searchJobDesc">Status</label>
                                             <select class="form-select digits" name="selectStatusJobDesc"
                                                 id="selectStatusJobDesc">
                                                 <option value="all">All Status</option>
@@ -106,7 +107,7 @@
                                                 <option value="waiting approval">Waiting Approval</option>
                                             </select>
                                         </div>
-                                        <div class="col-4 d-flex" style="padding-left: 0;">
+                                        <div class="col-3 d-flex" style="padding-left: 0;">
                                             <button class="btn btn-outline-primary me-2 btn-icon"
                                                 style="height: 42px;place-self: end;width:75px" type="button"
                                                 id="clearFilter">
@@ -117,14 +118,16 @@
                                                 id="searchFilter">
                                                 Search
                                             </button>
-                                            <button class="btn btn-primary me-2 btn-icon dropdown-toggle d-none" id="downloadJobDesc" style="height: 42px;place-self: end;width:100px" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>
+                                        </div>
+                                        <div class="col-1 d-flex" style="padding-left: 0;">
+                                            <button class="btn btn-primary me-2 btn-icon dropdown-toggle" id="downloadJobDesc" style="height: 42px;place-self: end;width:100px" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Option</button>
                                             <div class="dropdown-menu" aria-labelledby="downloadJobDesc">
-                                                <a class="dropdown-item" href="#" style="padding: 12px;">
+                                                @* <a class="dropdown-item" href="#" style="padding: 12px;">
                                                     <img src="~/assets/images/rasci/download-black.svg"
                                                         alt="Filter Icon" class=""
                                                         style="margin-top: -1px;padding-right: 5px;">
                                                     Download
-                                                </a>
+                                                </a> *@
                                                 <a class="dropdown-item" href="#" id="createDraft"
                                                     style="padding: 12px;">
                                                     <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon"
@@ -136,7 +139,7 @@
                                             @* <button class="btn btn-primary me-2 btn-icon"  style="height: 42px;place-self: end;" type="button" id="downloadJobDesc"><img src="~/assets/images/rasci/vector.svg" alt="Filter Icon" style="margin-top: -5px;margin-right: 7px;">Download</button> *@
                                         </div>
                                     </div>
-                                    <div class="row d-none">
+                                    <div class="row">
                                         <div class="col-12 mt-1">
                                             <span class="notifDanger">There are 5 positions with job descriptions not
                                                 available <span><b>[Click here to show]</b></span></span>
