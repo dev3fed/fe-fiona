@@ -1,0 +1,30 @@
+<style>
+    .modal-dialog{
+        max-width:65% !important;
+        width:50% !important;
+        margin: 30px auto;
+    }
+</style>
+
+<link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
+<div class="modal fade" id="modalRelatedBusPro" tabindex="-1" role="dialog" aria-labelledby="modalRelatedBusPro" aria-hidden="true" style="z-index: 2600;">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header" id="modalRelatedBusProHeader">
+                <span class="" id="" style="border-radius:4px">Choose Related Business Process</span>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="filterBusinessProcess" class="m-b-3">
+                    <input type="text" id="searchBusinessProcess" placeholder="Search Business Process..." class="form-control mb-2" />
+                </div>
+                <div id="modalRelatedBusProBody"> </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <div class="text-end " id="modalRelatedBusProFooter">
+                    <button class="btn btn-primary" type="button" id="addSelectedBusProBtn" onclick="addSelectedBusPro()">Add Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
