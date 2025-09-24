@@ -166,6 +166,7 @@ const appState = new Proxy(
     payloadLogHistory: {
       page: 1,
       limit: 5,
+      menu: "rasci",
     },
     logHistoryData: [],
   },

@@ -19,6 +19,15 @@ const appState = new Proxy(
       page: 1,
       pageSize: 10,
     },
+    payloadApproval: {
+      page: 1,
+      pageSize: 10,
+    },
+    payloadLogHistory: {
+      page: 1,
+      limit: 5,
+      menu: "competency",
+    },
     payloadDeleteActivity: {},
     payloadTblBehavior: {},
     payloadTblTechnical: {},

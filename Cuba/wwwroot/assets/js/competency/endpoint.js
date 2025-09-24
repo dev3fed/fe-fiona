@@ -464,6 +464,67 @@ async function fetchEditActivityCompetency(draftId, positionCode) {
   }
 }
 
+async function fetchSubmitDraftCompetency(payload) {
+  const url = `${url_api}/api/ApiApprovalCompetency/submit-draft-competency?draftId=${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+async function fetchApprovalList(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency/approval-list`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+async function fetchLoghistoryList(payload) {
+  const url = `${url_api}/api/log-history/list`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 // END OLD API SERVICE COMPETENCY
 async function fetchData() {
   try {

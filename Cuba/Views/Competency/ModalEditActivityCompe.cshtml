@@ -1,0 +1,46 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-editactivity {
+        max-width: 45% !important;
+        margin: 90px auto;
+    }
+</style>
+
+
+<div class="modal fade" id="modalEditActivityCompe" tabindex="-1" role="dialog"
+    aria-labelledby="modalEditActivityCompeLabel" aria-hidden="true">
+    <div class="modal-dialog custom-editactivity bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditActivityCompeTitle">Edit Competency Proficiency Level</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-activitycompe">
+                <div class="row mb-4" id="form-editactivitycompe">
+
+                </div>
+
+            </div>
+            <div class="modal-footer  ">
+                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                        class="icon-arrow-left"></i>
+                    Back</button>
+                <div>
+                    <button id="btnSubmitActivityCompe" class="btn btn-primary" type="button"
+                        onclick="openModalApprovalActivityCompe()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="spinBtnActivityCompe" role="status"></div>
+                            <span class="btn-text">Save Change</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

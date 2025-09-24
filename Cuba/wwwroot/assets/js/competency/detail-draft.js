@@ -122,8 +122,8 @@ async function renderTableActivity(listData) {
                                   ${
                                     data?.positionName
                                       ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
-                                         title="${data.positionCode} - ${data.positionName}">
-                                         ${data.positionCode} - ${data.positionName}
+                                         title="${data.jobCode} - ${data.positionName}">
+                                         ${data.jobCode} - ${data.positionName}
                                          </div>`
                                       : "-"
                                   }
@@ -542,6 +542,45 @@ async function confirmDeleteDetailcompeDraft() {
         spinBtn.style.display = "none";
         handleBack();
       });
+    }
+  } catch (error) {}
+}
+
+async function openDetailApproval() {
+  const openModal = new bootstrap.Modal(document.getElementById("modalDraftAprroval"));
+  openModal.show();
+}
+
+async function handleSubmitApproval() {
+  try {
+    const dataDraft = getState("dataDetailDraft");
+    const spinBtn = document.getElementById("spinbtnSaveDraft");
+    if (spinBtn) spinBtn.style.display = "inline-block";
+    const result = await fetchSubmitDraftCompetency(dataDraft.draftId);
+    const modalDetailAprroval = document.getElementById("modalDraftAprroval");
+    const modal = bootstrap.Modal.getInstance(modalDetailAprroval);
+    console.log("result", result);
+    if (result.success === true) {
+      if (modal) {
+        modal.hide();
+      }
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${dataDraft.draftName} draft has been submit to approval. You can check in approval tab.</div>`,
+            },
+          },
+        }).then(async () => {
+          spinBtn.style.display = "none";
+          handleBack();
+        });
+      }, 100);
     }
   } catch (error) {}
 }
