@@ -7,6 +7,7 @@ function loader(status) {
 }
 
 function updateIdentifikasiJob(params) {
+  localStorage.setItem("identifikasi", JSON.stringify(params));
   $("#jabatan").text(params.jobName ?? "Data not found");
   $("#function").text(params.unitKerjaFungsi ?? "Data not found");
   $("#location").text(params.lokasiKerja ?? "Data not found");
@@ -37,10 +38,10 @@ function updateTable(params, data, rowHeader) {
   }
 
   data.forEach((item, inc) => {
-    const reference = item.jobReference ? item.jobReference : "";
+    const reference = item.jobReferences !== undefined && item.jobReferences.length > 0 ? item.jobReferences[0] : "";
     const referenceHtml =
       reference !== ""
-        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference.jobName} - ${reference.noSuratKeputusan})</span>`
+        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference.jobName} - ${reference.skNumber})</span>`
         : "";
     row = `<tr>`;
     if (!rowHeader) {
@@ -286,8 +287,7 @@ async function getJobReferenceDetail() {
   }
 
   lsFungsi.jobReferences.map((item) => {
-    //  const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
-    const textReference = `(Reference from : ${item.jobName}) - ${item.noSuratKeputusan ? item.noSuratKeputusan : "-"}`;
+    const textReference = `(Reference from : ${item.jobName}) - ${item.skNumber ? item.skNumber : "-"}`;
     $("#fungsiReferenceContainer").append(
       `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
     );
@@ -476,7 +476,7 @@ async function applyCompare(id, prlOrg, prlOrgTarget) {
 async function addJobReference(showData = "") {
   $("#modalJobCompare").modal("show");
   $("#searchDiv").hide();
-  localStorage.setItem("onlyShowdata", false);
+  localStorage.setItem("onlyShowdata", "");
   if (showData) {
     localStorage.setItem("onlyShowdata", showData);
   }
@@ -610,11 +610,16 @@ async function saveReferenceAttribute() {
     if (isCheckedAll !== undefined) {
       // Process all items
       selectedJobDescReference?.[dataPath]?.data?.forEach((item) => {
-        item.jobReference = {
-          jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
-          jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-          noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-        };
+        item.jobReferences = item.jobReferences ?? [];
+        if (item.jobReferences) {
+          item.jobReferences.push({
+            jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
+            jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
+            skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+            jobId: jobId,
+            prlOrg: prlOrg,
+          });
+        }
       });
       if (localStorageKey === "tugasHa") {
         let arraySelectedBusPro = [];
@@ -635,11 +640,13 @@ async function saveReferenceAttribute() {
         })
         .filter((item) => item)
         .map((item) => {
-          item.jobReference = {
+          item.jobReferences.push({
             jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
             jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-            noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-          };
+            skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+            jobId: jobId,
+            prlOrg: prlOrg,
+          });
           return item;
         });
 
@@ -677,7 +684,9 @@ async function saveReferenceAttribute() {
     localData.jobReferences.push({
       jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
       jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-      noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+      skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+      jobId: jobId,
+      prlOrg: prlOrg,
     });
     localStorage.setItem("fungsi", JSON.stringify(localData));
   }
@@ -1087,12 +1096,9 @@ function mergeData(params, index) {
   tugasHaData.forEach((item, idx) => {
     item.index = idx;
   });
-  console.log("Tugas dan Tanggung Jawab Akhir data for merging:", tugasHaData);
   // get data selected by index
   const getDataSelected = tugasHaData[index];
   const getDataElsewhere = tugasHaData.filter((item, idx) => idx !== index);
-  console.log("Data selected for merge:", getDataSelected);
-  console.log("Other data available for merge:", getDataElsewhere);
 
   const modalBusProMergeBody = document.getElementById("modalBusProMergeBody");
   const uniqueBusPro = getDataSelected.tanggungJawabProses.filter(
@@ -1159,8 +1165,6 @@ async function mergeBusPro() {
   );
   if (!confirm) return;
   const selectedIndexes = checkboxes.map((checkbox) => parseInt(checkbox.value));
-  console.log("Merge index selected:", mergeIndexSelected);
-  console.log("Selected indexes for merging:", selectedIndexes);
   const tugasHaData = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
   const itemToMerge = tugasHaData[mergeIndexSelected];
 

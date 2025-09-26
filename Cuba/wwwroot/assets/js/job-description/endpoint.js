@@ -18,8 +18,8 @@ async function draftList() {
 //       page: 0,
 //       pageSize: 9999,
 //     });
-async function draftListJobDesc(params) {
-  const api = `${url.baseUrl}/${url["job-description"]}/get-list-positions/0/999?position=${params.position}&division=&function=&department=&status=available&draftId=${params.draftId}`;
+async function draftListJobDesc({ draftId = "", position = "", status = "available", pageSize = 999 }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/get-list-positions/0/${pageSize}?position=${position}&division=&function=&department=&status=${status}&draftId=${draftId}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
@@ -238,5 +238,68 @@ async function getAllTanggungJawabJobToJob(params) {
   } catch (error) {
     console.error("Error fetching data from API");
     throw error;
+  }
+}
+
+//
+
+// /api/job-description/draft/detail/{draftId}
+async function draftDetailById(draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/detail/${draftId}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// /api/job-description/draft/rename/{draftId}
+async function draftRenameById({ draftId, draftName, description = "" }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/rename/${draftId}/?draftName=${draftName}&description=${description}`;
+  try {
+    const result = await ajaxRequest(api, "PUT", { draftName: draftName, description: description }); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// /api/job-description/draft/detail/list-detail/{draftId}/{page}/{pageSize}
+async function draftDetailListById({ draftId, page = 1, pageSize = 10 }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/${draftId}/${page}/${pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// draftSubmitToApproval
+// /api/job-description/draft/submit-to-approval/{draftId}
+async function draftSubmitToApproval(draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/submit/${draftId}`;
+  try {
+    const result = await ajaxRequest(api, "POST"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// /api/job-description/detail-draft/save/{draftId}/{jobId}/{prlOrg}
+async function saveDetailDraft({ draftId, jobId, prlOrg, data }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/detail-draft/save/${draftId}/${jobId}/${prlOrg}`;
+  try {
+    const result = await ajaxRequest(api, "POST", data);
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
   }
 }

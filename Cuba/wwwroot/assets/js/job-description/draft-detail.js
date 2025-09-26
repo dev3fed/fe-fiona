@@ -101,8 +101,9 @@ function confirmDelete(id) {
 }
 
 async function confirmSubmit(id) {
-  // const draftId = urlParams.get("draftId");
-  // await draftSubmitToApproval(draftId);
+  const draftId = urlParams.get("draftId");
+  await draftSubmitToApproval(draftId);
+
   // const getDataDraft = await draftDetailById(draftId);
   $("#modalConfirm").modal("hide");
   swal("Success", "Draft has been submitted to approval", "success");
@@ -392,8 +393,13 @@ function editJobDesc() {
 }
 
 $(document).ready(async function () {
-  // let draftId = urlParams.get("draftId");
-  // const getDataDraft = await draftDetailById(draftId);
+  let draftId = urlParams.get("draftId");
+  const getDataDraft = await draftDetailById(draftId);
+  console.log("getDataDraft", getDataDraft);
+  if (getDataDraft.status !== 200) {
+    window.location.href = "/job-description/index";
+  }
+  await initializeDraftDetail(getDataDraft.data);
   // checkDataOrganizationLocalStorage();
   // checkDataOrganization();
   // await initializeDraftDetail(getDataDraft.data);
@@ -460,7 +466,27 @@ $(document).ready(async function () {
   $("#editDraftName").on("click", function () {
     $("#inputDraftName").val($("#draftName").text());
     $("#modalLabelOSDraft").text("Edit Draft Name");
+    $("#createDraftSO").text("Save Changes");
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
+  });
+
+  $("#createDraftSO").on("click", async function () {
+    const draftName = $("#inputDraftName").val().trim();
+    if (draftName === "") {
+      swal("Error", "Draft name cannot be empty", "error");
+      return;
+    }
+    loader(true);
+    const sendDraft = await draftRenameById({ draftId: draftId, draftName: draftName });
+    if (sendDraft.status !== 200) {
+      swal("Error", sendDraft.message, "error");
+      loader(false);
+      return;
+    }
+    loader(false);
+    $("#draftName").text(draftName);
+    swal("Success", "Draft name has been updated", "success");
+    $("#modalCreateDraftSO").modal("hide");
   });
 
   $("#continueButton").on("click", async function () {

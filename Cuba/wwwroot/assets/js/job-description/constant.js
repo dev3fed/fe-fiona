@@ -718,7 +718,6 @@ const tabCusJD = {
   stk: ["stkNumber", "stkTitle"],
 };
 
-
 // Chart Loading HTML Template
 const CHART_LOADING_HTML = `
   <div id="chart-loading-overlay" style="
@@ -831,7 +830,6 @@ const DATA_NOT_FOUND = `Data not found`;
 const TOOLBAR_FULL = ["bold", "italic", "|", "bulletedList", "numberedList", "|", "undo", "redo"];
 const TOOLBAR_SHORT = ["undo", "redo"];
 
-
 const mappingAddUpdate = {
   tugasHa: {
     ls: "tugasHa",
@@ -891,4 +889,94 @@ const mappingAddUpdate = {
       jdJobReferences: [],
     },
   },
+};
+const paramsJobReferences = [
+  {
+    jobId: "",
+    prlOrg: "",
+    jobName: "",
+    skNumber: "",
+  },
+];
+
+const paramsSaveDraft = {
+  identifikasiJabatan: {
+    jobId: "",
+    prlOrg: "",
+    unitKerjaFungsi: "",
+    lokasiKerja: "",
+    direktorat: "",
+    atasanLangsung: "",
+    noSuratKeputusan: "",
+    tanggalSuratKeputusan: "",
+    jobReferences: [],
+  },
+  fungsiJabatan: {
+    jobId: "", //jobId
+    prlOrg: "", //prlOrg
+    deskripsi: "",
+    prosesBisnis: null,
+    jobReferences: [],
+  },
+  tugasTanggungJawabAkhir: [
+    {
+      jobId: "",
+      prlOrg: "",
+      uraian: null, // uraian
+      tanggungJawab: [], // responsible
+      hasilAkhir: [], // output
+      leadingIndikator: [], // lead
+      tanggungJawabProses: [], // tanggungJawabProses
+      hasilAkhirProses: [], // hasilAkhirProses
+      jobReferences: [],
+    },
+  ],
+  tugasTanggungJawabUmum: [
+    {
+      jobId: "",
+      prlOrg: "",
+      tanggungJawab: [], //header
+      hasilAkhir: [], //tugas
+      jobReferences: [],
+    },
+  ],
+  wewenang: [
+    {
+      jobId: "",
+      prlOrg: "",
+      listKewenangan: [], // wewenang
+      jobReferences: [],
+    },
+  ],
+  koordinasiInternal: [
+    {
+      jobId: "",
+      prlOrg: "",
+      pihakInternal: "", //internal
+      aktivitas: "", // aktivitas
+      internalProcess: null,
+      jobReferences: [],
+    },
+  ],
+  relasiEksternal: [
+    {
+      jobId: "",
+      prlOrg: "",
+      pihakEksternal: "", //eksternal
+      aktivitas: "",
+      jobReferences: [],
+    },
+  ],
+  persyaratanJabatan: [], // ambil dari local storage
+  persyaratanKhusus: [], // ambil dari local storage
+  stk: [
+    {
+      jobId: "",
+      prlOrg: "",
+      penanggungJawab: "",
+      stkNumber: "",
+      stkTitle: "",
+      jobReferences: [],
+    },
+  ],
 };

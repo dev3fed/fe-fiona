@@ -141,8 +141,8 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-12 mt-1">
-                                            <span class="notifDanger">There are 5 positions with job descriptions not
-                                                available <span><b>[Click here to show]</b></span></span>
+                                            <span class="notifDanger" id="notifNotAvailable">
+                                                </span>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -172,20 +172,14 @@
                                     <div class="row">
                                         <div class="col-2">
                                             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dt-minimum"
-                                                    data-toggle="datetimepicker"><i data-feather="calendar"
-                                                        style="width: 20px;"></i></div>
-                                                <input class="form-control" type="text" name="datePicker"
-                                                    id="createDate" placeholder="Submitted Date">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i data-feather="calendar"     style="width: 20px;"></i></div>
+                                                <input class="form-control" type="text" name="datePicker" id="createDate" placeholder="Submitted Date">
                                             </div>
                                         </div>
                                         <div class="col-2">
                                             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dt-minimum"
-                                                    data-toggle="datetimepicker"><i data-feather="calendar"
-                                                        style="width: 20px;"></i></div>
-                                                <input class="form-control" type="text" name="datePicker"
-                                                    placeholder="Approved/Reject Date">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i data-feather="calendar"     style="width: 20px;"></i></div>
+                                                <input class="form-control" type="text" name="datePicker" placeholder="Approved/Reject Date">
                                             </div>
                                         </div>
                                         <div class="col-2">
@@ -209,8 +203,7 @@
                                     <div class="row m-t-10">
                                         <div class="col-12">
                                             <div class="table-responsive">
-                                                <table class="tableMasterData table table-hover w-100"
-                                                    id="approvalList">
+                                                <table class="tableMasterData table table-hover w-100" id="approvalList">
                                                 </table>
                                             </div>
                                         </div>

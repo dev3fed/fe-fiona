@@ -1,5 +1,5 @@
 function detailDraft(id) {
-  window.location.href = `/job-description/draft-detail`;
+  window.location.href = `/job-description/draft-detail?draftId=${id}`;
 }
 
 async function checkDraftSelected(listDraft) {
@@ -40,13 +40,6 @@ $(document).ready(async function () {
     window.location.href = "/job-description/detail";
   });
 
-  localStorage.getItem("statusManager")
-    ? localStorage.getItem("statusManager")
-    : localStorage.setItem("statusManager", "not available");
-  localStorage.getItem("statusSbm")
-    ? localStorage.getItem("statusSbm")
-    : localStorage.setItem("statusSbm", "not available");
-
   // get draft list
   const dataListDraft = await draftList();
   getDataList([
@@ -58,7 +51,17 @@ $(document).ready(async function () {
       })),
     },
   ]);
-  checkDraftSelected(dataListDraft.data);
+  await checkDraftSelected(dataListDraft.data);
+  updateNotifNotAvailable();
+
+  await getTableListDraft(dataListDraft.data);
+
+  //
+
+  $("#notifNotAvailable").click(function () {
+    // scroll to table list job description
+    $("#selectStatusJobDesc").val("not available").trigger("change");
+  });
 
   // get data for table job description list
   getTableListJobDes();
@@ -88,7 +91,13 @@ $(document).ready(async function () {
     $("#modalCreateDraftJobDesc").modal("show");
   });
 
+  getTableListApproval();
+  getTableListLog();
+
+  checkDraftSelected(dataListDraft.data);
+
   $("#selectJobDescDraft").change(function () {
+    alert("maok");
     const value = $(this).val();
     if (value == "1") {
       $("#pills-warningtab").hide();
@@ -96,20 +105,31 @@ $(document).ready(async function () {
     } else {
       $("#pills-warningtab").show();
     }
-  });
-
-  getTableListApproval();
-  getTableListLog();
-
-  checkDraftSelected(dataListDraft.data);
-
-  $("#selectJobDescDraft").on("change", function () {
-    const value = $(this).val();
     const data = value.split("|");
     draftExistingJobDesc.draftId = data[2];
     draftExistingJobDesc.draftRasciId = data[1];
     draftExistingJobDesc.draftOrganizationId = data[0];
     draftExistingJobDesc.draftName = $(this).find("option:selected").text();
     localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
+    if (draftExistingJobDesc.draftId != "" && draftExistingJobDesc.draftId != null) {
+      getTableListJobDes();
+      updateNotifNotAvailable();
+    }
   });
+
+  function updateNotifNotAvailable() {
+    console.log("updateNotifNotAvailable");
+    $("#notifNotAvailable").hide();
+    draftListJobDesc({
+      draftId: draftExistingJobDesc.draftId,
+      position: "",
+      status: "not available",
+      pageSize: 10,
+    }).then((result) => {
+      $("#notifNotAvailable").show();
+      $("#notifNotAvailable").text(
+        `There are ${result.count} positions with job descriptions not available. Click here to show.`
+      );
+    });
+  }
 });

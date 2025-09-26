@@ -17,10 +17,14 @@ function refreshDataLocalStorage() {
   const keys = [
     "fungsi",
     "lsAvailable",
+    "tugasUmum",
     "tugasHa",
     "wewenang",
     "koordinasiInternal",
     "relasiEksternal",
+    "persyaratanJabatan",
+    "kompetensiPerilaku",
+    "kompetensiTeknis",
     "persyaratanKhusus",
     "stk",
     "arraySelectedBusPro",
@@ -377,6 +381,9 @@ $(document).ready(async function () {
     $(linkTab).tab("show");
   }
 
+  $("#modalJobCompareDetail").modal("show");
+  await applySelectedData(jobId, prlOrg, prlOrg);
+
   const getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
   for (const key in getDataJobDesc) {
     if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
@@ -416,9 +423,8 @@ $(document).ready(async function () {
     }
     console.log(getDataJobDesc?.fungsiJabatan);
     getDataJobDesc?.fungsiJabatan.jobReferences.map((item) => {
-      //  const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
       const textReference = `(Reference from : ${item.jobReference.jobName}) - ${
-        item.jobReference.noSuratKeputusan ? item.jobReference.noSuratKeputusan : "-"
+        item.jobReference.skNumber ? item.jobReference.skNumber : "-"
       }`;
       $("#fungsiReferenceContainer").append(`<li>${item.fungsiJabatan}</li>`);
       $("#fungsiReferenceContainer").append(
@@ -428,6 +434,7 @@ $(document).ready(async function () {
   }
 
   if (getDataJobDesc.tugasTanggungJawabUmum) {
+    localStorage.setItem("tugasUmum", JSON.stringify(getDataJobDesc.tugasTanggungJawabUmum.data));
     updateTable("tugasUmum", getDataJobDesc.tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
   }
 
@@ -474,6 +481,7 @@ $(document).ready(async function () {
   }
 
   if (getDataJobDesc.wewenang) {
+    localStorage.setItem("wewenang", JSON.stringify(getDataJobDesc.wewenang.data));
     updateTable("wewenang", getDataJobDesc.wewenang.data, tabCusJD.wewenang);
   }
 
@@ -490,20 +498,26 @@ $(document).ready(async function () {
     getDataJobDesc.persyaratanJabatan.data.map((item) => {
       item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
     });
+    localStorage.setItem("persyaratanJabatan", JSON.stringify(getDataJobDesc.persyaratanJabatan.data));
     updateTable("persyaratan", getDataJobDesc.persyaratanJabatan.data, tabCusJD.pj);
   }
 
   if (getDataJobDesc.persyaratanKhusus) {
-    getDataJobDesc.persyaratanKhusus.data.map((item) => {
-      item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
-    });
-    localStorage.setItem("persyaratanKhusus", JSON.stringify(getDataJobDesc.persyaratanKhusus.data));
-    updateTable("persyaratanKhusus", getDataJobDesc.persyaratanKhusus.data, [...tabCusJD.pk, "action"]);
+    // getDataJobDesc.persyaratanKhusus.data.map((item) => {
+    //   item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
+    // });
+    localStorage.setItem("persyaratanKhusus", JSON.stringify([]));
+    // updateTable("persyaratanKhusus", [], [...tabCusJD.pk, "action"]);
+    // localStorage.setItem("persyaratanKhusus", JSON.stringify(getDataJobDesc.persyaratanKhusus.data));
+    // updateTable("persyaratanKhusus", getDataJobDesc.persyaratanKhusus.data, [...tabCusJD.pk, "action"]);
   }
   const divKompetensiTeknisGeneral = $("#kompetensiGeneral");
   const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
   const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
   const divKompetensiPerilaku = $("#kompetensiPerilaku");
+
+  localStorage.setItem("kompetensiTeknis", JSON.stringify(getDataJobDesc.kompetensiTeknis.data));
+  localStorage.setItem("kompetensiPerilaku", JSON.stringify(getDataJobDesc.kompetensiPerilaku.data));
 
   if (
     Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekMandatori) &&
@@ -601,20 +615,200 @@ $(document).ready(async function () {
   });
 
   $("#saveDraft").on("click", async function () {
-    swal({
-      title: "Are you sure?",
-      text: "You will save this job description as draft",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then(async (willSave) => {
-      if (willSave) {
-        swal("Success", "Job Description has been deleted", "success");
-        // const url = "/job-description/index";
-        // window.location.href = url;
-        // localStorage.setItem("statusManager", "on progress");
+    const confirm = await confirmFunction("Are you sure want to save this draft?");
+    if (!confirm) {
+      return;
+    }
+
+    console.log("jobId", jobId);
+    console.log("prlOrg", prlOrg);
+    // get all data from local storage
+    const identifikasi = JSON.parse(localStorage.getItem("identifikasi")) || {};
+    const fungsi = JSON.parse(localStorage.getItem("fungsi")) || {};
+    const tugasUmum = JSON.parse(localStorage.getItem("tugasUmum")) || [];
+    const tugasHa = JSON.parse(localStorage.getItem("tugasHa")) || [];
+    const wewenang = JSON.parse(localStorage.getItem("wewenang")) || [];
+    const koordinasiInternal = JSON.parse(localStorage.getItem("koordinasiInternal")) || [];
+    const relasiEksternal = JSON.parse(localStorage.getItem("relasiEksternal")) || [];
+    const persyaratanJabatan = JSON.parse(localStorage.getItem("persyaratanJabatan")) || [];
+    const persyaratanKhusus = JSON.parse(localStorage.getItem("persyaratanKhusus")) || [];
+    const kompetensiPerilaku = JSON.parse(localStorage.getItem("kompetensiPerilaku")) || [];
+    const kompetensiTeknis = JSON.parse(localStorage.getItem("kompetensiTeknis")) || {};
+    const stk = JSON.parse(localStorage.getItem("stk")) || [];
+
+    const paramJobRef = paramsJobReferences;
+    const params = paramsSaveDraft;
+
+    // identifikasi jabatan
+    params.identifikasiJabatan.jobId = jobId;
+    params.identifikasiJabatan.prlOrg = prlOrg;
+    params.identifikasiJabatan.unitKerjaFungsi = identifikasi.unitKerjaFungsi;
+    params.identifikasiJabatan.lokasiKerja = identifikasi.lokasiKerja;
+    params.identifikasiJabatan.direktorat = identifikasi.direktorat;
+    params.identifikasiJabatan.atasanLangsung = identifikasi.atasanLangsung;
+    params.identifikasiJabatan.noSuratKeputusan = identifikasi.noSuratKeputusan;
+    params.identifikasiJabatan.tanggalSuratKeputusan = identifikasi.tanggalSuratKeputusan;
+    params.identifikasiJabatan.jobReferences = [];
+
+    // fungsi jabatan
+    params.fungsiJabatan.jobId = jobId;
+    params.fungsiJabatan.prlOrg = prlOrg;
+    // $(".summernote").summernote("code") || ""; using ckeditor
+    const summernoteElement = document.querySelector(".summernote");
+    let deskripsiFungsi = "";
+    deskripsiFungsi = summernoteElement.ckeditorInstance.getData();
+    // if (summernoteElement && summernoteElement.ckeditorInstance) {
+    // deskripsiFungsi = summernoteElement.ckeditorInstance.getData();
+    // } else {
+    //   deskripsiFungsi = fungsi.deskripsi || "";
+    // }
+    deskripsiFungsi = deskripsiFungsi.replace(/^<p>|<\/p>$/g, "").trim();
+    params.fungsiJabatan.deskripsi = deskripsiFungsi;
+    params.fungsiJabatan.jobReferences = fungsi.jobReferences;
+
+    // tugas dan tanggung jawab akhir
+    const paramsTugasAkhir = params.tugasTanggungJawabAkhir[0];
+    params.tugasTanggungJawabAkhir = [];
+    tugasHa.forEach((item) => {
+      const objTugasHa = { ...paramsTugasAkhir };
+      objTugasHa.jobId = jobId;
+      objTugasHa.prlOrg = prlOrg;
+      objTugasHa.tanggungJawab = item.responsible || [];
+      objTugasHa.uraian = item.uraian || "";
+      objTugasHa.hasilAkhir = item.output || [];
+      objTugasHa.leadingIndikator = item.lead || [];
+      // filter unique
+      objTugasHa.tanggungJawabProses = item.tanggungJawabProses
+        .map((tr) => tr.code)
+        .filter((v, i, a) => a.indexOf(v) === i);
+      objTugasHa.hasilAkhirProses = item.hasilAkhirProses.map((hr) => hr.code).filter((v, i, a) => a.indexOf(v) === i);
+      objTugasHa.jobReferences = [];
+      if (item.jobReferences && item.jobReferences.length > 0) {
+        objTugasHa.jobReferences = item.jobReferences;
       }
+      params.tugasTanggungJawabAkhir.push(objTugasHa);
     });
+
+    // tugas dan tanggung jawab umum
+    const paramsTugasUmum = params.tugasTanggungJawabUmum[0];
+    params.tugasTanggungJawabUmum = [];
+    tugasUmum.forEach((item) => {
+      const objTugasUmum = { ...paramsTugasUmum };
+      objTugasUmum.jobId = jobId;
+      objTugasUmum.prlOrg = prlOrg;
+      objTugasUmum.tanggungJawab = item.header || [];
+      objTugasUmum.hasilAkhir = item.tugas || [];
+      objTugasUmum.jobReferences = [];
+      if (item.jobReferences && item.jobReferences.length > 0) {
+        objTugasUmum.jobReferences = item.jobReferences;
+      }
+      params.tugasTanggungJawabUmum.push(objTugasUmum);
+    });
+
+    // wewenang
+    const paramsWewenang = params.wewenang[0];
+    params.wewenang = [];
+    wewenang.forEach((item) => {
+      const objWewenang = { ...paramsWewenang };
+      objWewenang.jobId = jobId;
+      objWewenang.prlOrg = prlOrg;
+      objWewenang.listKewenangan = item.wewenang || [];
+      objWewenang.jobReferences = [];
+    });
+
+    // koordinasi internal
+    const paramsKoordinasi = params.koordinasiInternal[0];
+    params.koordinasiInternal = [];
+    koordinasiInternal.forEach((item) => {
+      const objKoordinasi = { ...paramsKoordinasi };
+      objKoordinasi.jobId = jobId;
+      objKoordinasi.prlOrg = prlOrg;
+      objKoordinasi.pihakInternal = item.pihakInternal || "";
+      objKoordinasi.aktivitas = item.aktivitas || "";
+      objKoordinasi.internalProcess = item.internalProcess || null;
+      objKoordinasi.jobReferences = [];
+      if (item.jobReferences && item.jobReferences.length > 0) {
+        objKoordinasi.jobReferences = item.jobReferences;
+      }
+      params.koordinasiInternal.push(objKoordinasi);
+    });
+
+    // relasi eksternal
+    const paramsRelasi = params.relasiEksternal[0];
+    params.relasiEksternal = [];
+    relasiEksternal.forEach((item) => {
+      const objRelasi = { ...paramsRelasi };
+      objRelasi.jobId = jobId;
+      objRelasi.prlOrg = prlOrg;
+      objRelasi.pihakEksternal = item.pihakEksternal || "";
+      objRelasi.aktivitas = item.aktivitas || "";
+      objRelasi.jobReferences = [];
+      if (item.jobReferences && item.jobReferences.length > 0) {
+        objRelasi.jobReferences = item.jobReferences;
+      }
+      params.relasiEksternal.push(objRelasi);
+    });
+
+    // stk
+    const paramsStk = params.stk[0];
+    params.stk = [];
+    stk.forEach((item) => {
+      const obJStk = { ...paramsStk };
+      obJStk.jobId = jobId;
+      obJStk.prlOrg = prlOrg;
+      obJStk.stkNumber = item.stkNumber;
+      obJStk.penanggungJawab = item.penanggungJawab || "";
+      obJStk.stkTitle = item.stkTitle || "";
+      obJStk.jobReferences = [];
+      if (item.jobReferences && item.jobReferences.length > 0) {
+        obJStk.jobReferences = item.jobReferences;
+      }
+      params.stk.push(obJStk);
+    });
+
+    // persyaratan jabatan
+    params.persyaratanJabatan = persyaratanJabatan.map((item) => ({
+      ...item,
+      jobId: jobId,
+      prlOrg: prlOrg,
+      jobReferences: [],
+    }));
+
+    // persyaratan khusus
+    params.persyaratanKhusus = persyaratanKhusus.map((item) => ({
+      ...item,
+      jobId: jobId,
+      prlOrg: prlOrg,
+      jobReferences: [],
+    }));
+
+    // kompetensi perilaku
+    params.kompetensiPerilaku = kompetensiPerilaku.map((item) => ({
+      ...item,
+      jobId: jobId,
+      prlOrg: prlOrg,
+      jobReferences: [],
+    }));
+
+    // kompetensi teknis
+    params.kompetensiTeknis = kompetensiTeknis;
+    console.log("params sebelum saveDraft", params);
+
+    // saveDetailDraft
+    loader(true);
+    // async function saveDetailDraft({ draftId, jobId, prlOrg, data }) {
+    const save = await saveDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
+    if (save.statusCode === 200) {
+      loader(false);
+      swalAlert("Success", "Draft saved successfully", "success");
+      // redirect to job-desc.html
+      setTimeout(() => {
+        window.location.href = `job-desc.html?jobId=${jobId}&prlOrg=${prlOrg}&from=manager`;
+      }, 1500);
+    } else {
+      loader(false);
+      swalAlert("Error", save.message || "Failed to save draft", "error");
+    }
   });
 
   // searchReferenceBy radio button
