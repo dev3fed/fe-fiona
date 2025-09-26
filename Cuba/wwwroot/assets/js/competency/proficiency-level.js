@@ -1,24 +1,23 @@
-const openModalEditDepth = async (jobCode, compCode) => {
+const openModalEditDepth = async (jobCode, compCode, compeType) => {
   const selectedValue = $("#dataSource-competency").val();
   const payload = {
     dataSource: selectedValue,
     positionCode: jobCode,
+    compeType: compeType,
     competencyCode: compCode,
   };
   const queryString = "?" + new URLSearchParams(payload).toString();
   const result = await fetchProficiencyLevel(queryString);
-  setState("detailProficiency", result.data);
+  setState("detailProficiency", { ...result.data, compeType: compeType });
   const competencyLevel = result.data.proficiencyLevel;
-  const compeCategory = result.data.competencyType;
+  const compeCategory = result.data.competencyType || compeType;
   const detailData = result.data;
 
   const btnApproval = document.getElementById("btnSubmitApproval");
   btnApproval.disabled = competencyLevel ? false : true;
 
   if (compeCategory !== "mandatory") {
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalEditDepthLevel"),
-    );
+    const modal = new bootstrap.Modal(document.getElementById("modalEditDepthLevel"));
     modal.show();
 
     const selectedLevel = competencyLevel || "";
@@ -31,8 +30,7 @@ const openModalEditDepth = async (jobCode, compCode) => {
       let radioButtons = levels
         .map((level) => {
           // Kondisi disabled jika compeCategory === "general" dan level < selectedLevel
-          const isDisabled =
-            compeCategory === "general" && level < selectedLevel;
+          const isDisabled = compeCategory === "general" && level < selectedLevel;
 
           return `
             <div class="form-check form-check-inline radio radio-primary">
@@ -102,15 +100,13 @@ const openModalEditDepth = async (jobCode, compCode) => {
         <div class="col-12">
           <div class="row mb-2">
             <div class="col-4" style="display: flex; justify-content: space-between; align-items: center;">
-              <label style="color:#9F9FA5">${
-                category[compeCategory]
-              } Competency</label>
+              <label style="color:#9F9FA5">${category[compeCategory]} Competency</label>
               <label>:</label>
             </div>
             <div class="col-8">
               <h6 style="color:#03A9F4; cursor: pointer" onclick="handleDetailCompetency('${
-                detailData.compCode
-              }')">${detailData.compName}</h6>
+                detailData.competencyType
+              }','${detailData.compCode}')">${detailData.compName}</h6>
             </div>
           </div>
         </div>
@@ -166,26 +162,21 @@ const openModalApprovalDepthLevel = async () => {
   // get value from input radio id radioinlineNone
   try {
     //
-    const selectedValue = document.querySelector(
-      'input[name="radio1"]:checked',
-    ).value;
+    const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
     const draftId = $("#dataSource-competency").val();
     const detailProficiency = getState("detailProficiency");
-    console.log("detailProficiency", detailProficiency);
-    console.log("cek", selectedValue);
     const payload = {
       draftId: draftId,
       positionCode: detailProficiency.positionCode,
       compCode: detailProficiency.compCode,
       proficiencyLevel: selectedValue,
+      compeType: detailProficiency.compeType,
     };
     console.log("payload", payload);
     const result = await fetchSaveProficiencyLevel(payload);
     console.log("result", result);
     if (result.success === true) {
-      const modalEditDepthLevel = document.getElementById(
-        "modalEditDepthLevel",
-      );
+      const modalEditDepthLevel = document.getElementById("modalEditDepthLevel");
       const modal = bootstrap.Modal.getInstance(modalEditDepthLevel);
       if (modal) {
         modal.hide();
@@ -227,17 +218,11 @@ const openModalApprovalDepthLevel = async () => {
 async function saveAsDraft() {
   try {
     const draftName = document.getElementById("draftName").value;
-    const selectedValue = document.querySelector(
-      'input[name="radio1"]:checked',
-    ).value;
+    const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
     const dataEditDraft = getState("dataEditDraft");
     const draftList = getState("draftList");
-    const jobList = getState("jobList").find(
-      (job) => job.id === dataEditDraft.jobId,
-    );
-    const competencyList = getState("competencyList").find(
-      (compe) => compe.id === dataEditDraft.compeId,
-    );
+    const jobList = getState("jobList").find((job) => job.id === dataEditDraft.jobId);
+    const competencyList = getState("competencyList").find((compe) => compe.id === dataEditDraft.compeId);
     const date = new Date();
     const type = "draft";
     const DepthLevelAfter = selectedValue;
@@ -261,9 +246,7 @@ async function saveAsDraft() {
     if (draftListAfter.length > 0) {
       const modalSaveDraft = document.getElementById("modalSaveDraft");
       const modalSave = bootstrap.Modal.getInstance(modalSaveDraft);
-      const modalEditDepthLevel = document.getElementById(
-        "modalEditDepthLevel",
-      );
+      const modalEditDepthLevel = document.getElementById("modalEditDepthLevel");
       const modalEdit = bootstrap.Modal.getInstance(modalEditDepthLevel);
       document.getElementById("draftName").value = "";
       const btnSave = document.getElementById("compeSavedraft");

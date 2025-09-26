@@ -11,10 +11,15 @@ async function draftList() {
   }
 }
 
-// http://localhost:5075/api/job-description/get-list-positions/1/10?search=busin&status=Available&draftId=b6735063-30eb-40f5-aacd-daf67b7b6c96
-// http://localhost:5075/api/job-description/get-list-positions/1/10?position=busin&division=busin&function=busin&department=busin&status=Available&draftId=078f449f-a016-44ee-a09c-71326225aed1
-async function draftListJobDesc(id) {
-  const api = `${url.baseUrl}/${url["job-description"]}/get-list-positions/1/10?search=busin&status=Available&draftId=${id}`;
+// https://7p8ddbts-5095.asse.devtunnels.ms/api/job-description/get-list-positions/0/10?position=&division=&function=&department=&status=all&draftId=cde50163-22cf-48f3-b316-e1f12b545be4&draw=1&start=0&length=10&search=
+// const result = await draftListJobDesc({
+//       draftId: getDraftExisting.draftId,
+//       position: value,
+//       page: 0,
+//       pageSize: 9999,
+//     });
+async function draftListJobDesc(params) {
+  const api = `${url.baseUrl}/${url["job-description"]}/get-list-positions/0/999?position=${params.position}&division=&function=&department=&status=available&draftId=${params.draftId}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;

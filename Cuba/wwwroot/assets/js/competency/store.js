@@ -5,6 +5,7 @@ const appState = new Proxy(
     draftList: [],
     dataEditDraft: {},
     dataDetailDraft: {},
+    dataDetailApproval: {},
     deleteDraftCompetency: "",
     selectedType: "position",
     currentPageY: 1,
@@ -19,6 +20,16 @@ const appState = new Proxy(
       page: 1,
       pageSize: 10,
     },
+    payloadApproval: {
+      page: 1,
+      pageSize: 10,
+    },
+    payloadLogHistory: {
+      page: 1,
+      limit: 5,
+      menu: "competency",
+    },
+    payloadDeleteActivity: {},
     payloadTblBehavior: {},
     payloadTblTechnical: {},
     jobInformation: {},
@@ -40,6 +51,9 @@ const appState = new Proxy(
         target[property] = value;
         if (property === "dataDetailDraft") {
           detailDraft();
+        }
+        if (property === "dataDetailApproval") {
+          detailApproval();
         }
       }
       return true;

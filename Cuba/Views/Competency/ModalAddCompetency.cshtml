@@ -74,6 +74,14 @@
     }
 
     .card-tblspesific {
+        height: 520px;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 5px
+    }
+
+    .card-tablebusinessreference {
         height: 420px;
         border: 1px solid #BFBFC2;
         border-radius: 4px;
@@ -270,13 +278,13 @@
                     <div class="col-12" style="display: none;" id="comperef">
 
                     </div>
-                    <div class="col-6" style="display: none;" id="table-comperef">
+                    <div class="col-12" style="display: none;margin-top:15px" id="table-comperef">
 
                     </div>
                     @* <div class="col-6" style="display: none;" id="selectedBisproref">
 
                     </div> *@
-                    <div class="col-6" style="display: block;" id="specCompe">
+                    <div class="col-6 mb-4" style="display: block;" id="specCompe">
                         <label class="form-label">Core & Specific Competencies</label>
                         <div class="card-tblspesific">
                             <div id="select-speccompe">
@@ -306,9 +314,10 @@
             </div>
             <div class="modal-footer  d-flex justify-content-end">
                 <div>
-                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
-                            class="icon-arrow-left"></i> Back</button>
-                    <button id="btnDraftcompetency" class="btn btn-primary" type="button">
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                        onclick="closeModalCompetency()"><i class="icon-arrow-left"></i> Back</button>
+                    <button id="btnDraftcompetency" class="btn btn-primary" type="button"
+                        onclick="handleSaveDraftCompe()">
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
                                 id="spinBtncompetency" role="status"></div>

@@ -15,6 +15,14 @@
         display: none;
     }
 
+    #header-detail-approval {
+        display: none;
+    }
+
+    #approval-detail {
+        display: none;
+    }
+
     #main-competency {
         display: block;
     }
@@ -112,6 +120,20 @@
                         <li class="breadcrumb-item active">Detail Draft</li>
                     </ol>
                 </div>
+                <div class="col-6" id="header-detail-approval">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="HomePage" asp-action="Index">
+                                <svg class="stroke-icon">
+                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Competency</li>
+                        <li class="breadcrumb-item active">Approval Detail</li>
+                    </ol>
+                </div>
+
                 @* <div class="col-6" id="header-dictionarypage">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
@@ -138,8 +160,16 @@
                 <partial name="~/Views/Competency/ModalDraftDetailCompe.cshtml" />
                 <partial name="~/Views/Competency/ModalEditDraftDepth.cshtml" />
                 <partial name="~/Views/Competency/ModalDraftDeleteNotif.cshtml" />
+                <partial name="~/Views/Competency/ModalDraftApproval.cshtml" />
+                <partial name="~/Views/Competency/ModalNotifdeleteactivity.cshtml" />
+                <partial name="~/Views/Competency/ModalActivityCompe.cshtml" />
+                <partial name="~/Views/Competency/ModalActivityAddcompe.cshtml" />
+                <partial name="~/Views/Competency/ModalEditActivityCompe.cshtml" />
                 <partial name="~/Views/Competency/ModalRenameDraft.cshtml" />
                 <partial name="~/Views/Competency/DetailDraft.cshtml" />
+            </div>
+            <div class="col-12" id="approval-detail">
+                <partial name="~/Views/Competency/DetailApproval.cshtml" />
             </div>
             @* <div class="col-12" id="dictionary-page">
                 <div class="card" style="border-radius:8px">
@@ -253,7 +283,7 @@
                                 aria-labelledby="pills-approval-tab">
                                 <div class="card-body" style="padding:12px 5px 15px 5px !important">
                                     <div class="row">
-                                        <partial name="~/Views/Competency/behaviorPage.cshtml" />
+                                        <partial name="~/Views/Competency/ApprovalPage.cshtml" />
 
                                     </div>
                                 </div>
@@ -262,7 +292,7 @@
                                 aria-labelledby="pills-history-tab">
                                 <div class="card-body" style="padding:12px 5px 15px 5px !important">
                                     <div class="row">
-                                        <partial name="~/Views/Competency/ApprovalPage.cshtml" />
+                                        <partial name="~/Views/Competency/HistoryPage.cshtml" />
                                     </div>
                                 </div>
                             </div>
@@ -278,7 +308,7 @@
     <script>
         const url_api = "@Configuration["AppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                            const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->
@@ -287,6 +317,15 @@
     <script src="../assets/js/slick/slick.js"></script>
     <script src="../assets/js/header-slick.js"></script>
     <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <script src="../assets/js/datepicker/date-picker/datepicker.js"></script>
+    <script src="../assets/js/datepicker/date-picker/datepicker.en.js"></script>
+    <script src="../assets/js/datepicker/date-picker/datepicker.custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/datatable/datatables/datatable.custom.js"></script>
+    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
     <script src="../assets/js/script.js"></script>
@@ -297,6 +336,7 @@
     <script src="../assets/js/competency/summary-list.js"></script>
     <script src="../assets/js/competency/proficiency-level.js"></script>
     <script src="../assets/js/competency/detail-competency.js"></script>
+    <script src="../assets/js/competency/activity-detaildraft.js"></script>
     <script src="../assets/js/competency/scroll-table.js"></script>
     <script src="../assets/js/competency/competency-draft.js"></script>
     <script src="../assets/js/competency/detail-draft.js"></script>
@@ -305,8 +345,9 @@
     <script src="../assets/js/competency/technical-table.js"></script>
     <script src="../assets/js/competency/detail-position.js"></script>
     <script src="../assets/js/competency/add-competency.js"></script>
-
-
+    <script src="../assets/js/competency/table-approval.js"></script>
+    <script src="../assets/js/competency/detail-approval.js"></script>
+    <script src="../assets/js/competency/table-loghistory.js"></script>
 
 
 }

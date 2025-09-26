@@ -5,32 +5,26 @@ const openSpecificCompetency = async () => {
   const jobInformation = getState("jobInformation");
   const closeModal = bootstrap.Modal.getInstance(modalDetailPos);
   const competencyList = getState("payloadAddCompetency");
-  const coreCompe = competencyList.filter(
-    (item) => item.selectedType === "core",
-  );
-  const specificCompe = competencyList.filter(
-    (item) => item.selectedType === "specific",
-  );
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalAddCompetency"),
-  );
+  const mandatoryCompe = competencyList.filter((item) => item.selectedType === "general");
+  const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
+  const modal = new bootstrap.Modal(document.getElementById("modalAddCompetency"));
   closeModal.hide();
 
-  let coreDisabled = "";
-  let coreLabelStyle = "";
+  let mandatoryDisabled = "";
+  let mandatoryLabelStyle = "";
+  let generalDisabled = "";
+  let generalLabelStyle = "";
   let specificDisabled = "";
   let specificLabelStyle = "";
 
-  if (coreCompe.length > 2) {
-    coreDisabled = "disabled";
-    coreLabelStyle =
-      "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
+  if (mandatoryCompe.length > 2) {
+    mandatoryDisabled = "disabled";
+    mandatoryLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
   }
 
   if (specificCompe.length > 8) {
     specificDisabled = "disabled";
-    specificLabelStyle =
-      "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
+    specificLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
   }
 
   const formContent = `
@@ -72,26 +66,25 @@ const openSpecificCompetency = async () => {
 
   const bodyJobRef = `
   <label class="form-label">Position Reference</label>
-    <select class="form-select digits" name="jobIdRef" id="jobIdRef">
+    <select class="form-select digits" name="jobIdRef" id="jobIdRef" onchange="onSelectPositionRefer(event)">
     </select>
-  <hr style="margin-top:25px;margin-bottom:20px" />
   `;
 
   const bodySelectSpecific = `
   <div class="row">
-    <div class="col-12">
-      <label>Skill Group</label>
-      <select class="form-select digits" name="sgId" id="sgId" onchange="onSelectSg(event)"></select>
-    </div>
-    <div class="col-12 mt-3">
-      <label>Sub Skill Group</label>
-      <select class="form-select digits" name="ssgId" id="ssgId" onchange="onSelectSsg(event)"></select>
-    </div>
-    <div class="col-12 mt-3">
+    <div class="col-12 mt-3 mb-3">
       <label>Competency</label>
       <select class="form-select digits" name="competencyId" id="competencyId" onchange="onSelectCompetency(event)"></select>
     </div>
-    <div class="option-row mt-4">
+    <div id="sg-ssg-info" class="col-12" style="display:none;">
+      <label style="color:#03a9f4; cursor:pointer;" 
+             onmouseover="this.style.textDecoration='underline'" 
+             onmouseout="this.style.textDecoration='none'">See dictionary</label>
+      <label id="sg-ssg-label" style="display:block; margin-top:2px;"></label>
+      <hr style="margin-top:20px;margin-bottom:20px"/>
+    </div>
+    
+    <div class="option-row">
       <div>
         <label>Proficiency Level</label>
         <div class="d-flex gap-2">
@@ -112,15 +105,18 @@ const openSpecificCompetency = async () => {
       <div style="margin-left: 30px;">
         <label>Type</label>
         <div class="d-flex gap-2">
-          <input type="radio" class="btn-check" name="optType" id="typeCore" autocomplete="off" value="core" ${coreDisabled}>
-          <label class="oval-option" for="typeCore" style="${coreLabelStyle}">Core</label>
+          <input type="radio" class="btn-check" name="optType" id="typeMandatory" autocomplete="off" value="mandatory" ${mandatoryDisabled}>
+          <label class="oval-option" for="typeMandatory" style="${mandatoryLabelStyle}">Mandatory</label>
+
+          <input type="radio" class="btn-check" name="optType" id="typeGeneral" autocomplete="off" value="general" ${generalDisabled}>
+          <label class="oval-option" for="typeGeneral" style="${generalLabelStyle}">General</label>
 
           <input type="radio" class="btn-check" name="optType" id="typeSpecific" autocomplete="off" value="specific" ${specificDisabled}>
           <label class="oval-option" for="typeSpecific" style="${specificLabelStyle}">Specific</label>
         </div>
       </div>
     </div>
-    <hr/>
+    <hr class="mt-4"/>
   </div>
   `;
 
@@ -143,31 +139,41 @@ const openSpecificCompetency = async () => {
 
 function updateRadioButtonState() {
   const competencyList = getState("payloadAddCompetency") || [];
-  const coreCompe = competencyList.filter(
-    (item) => item.selectedType === "core",
-  );
-  const specificCompe = competencyList.filter(
-    (item) => item.selectedType === "specific",
-  );
+  const mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
+  const generalCompe = competencyList.filter((item) => item.selectedType === "general");
+  const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
 
-  const typeCoreInput = document.getElementById("typeCore");
-  const typeCoreLabel = document.querySelector('label[for="typeCore"]');
+  const typeMandatoryInput = document.getElementById("typeMandatory");
+  const typeMandatoryLabel = document.querySelector('label[for="typeMandatory"]');
+  const typeGeneralInput = document.getElementById("typeGeneral");
+  const typeGeneralLabel = document.querySelector('label[for="typeGeneral"]');
   const typeSpecificInput = document.getElementById("typeSpecific");
   const typeSpecificLabel = document.querySelector('label[for="typeSpecific"]');
 
-  if (typeCoreInput && typeCoreLabel) {
-    if (coreCompe.length > 2) {
-      typeCoreInput.disabled = true;
-      typeCoreLabel.style.backgroundColor = "#E0E0E0";
-      typeCoreLabel.style.color = "#A0A0A0";
-      typeCoreLabel.style.cursor = "not-allowed";
-      typeCoreLabel.style.border = "1px solid #A0A0A0";
+  if (typeMandatoryInput && typeMandatoryLabel) {
+    if (mandatoryCompe.length > 2) {
+      typeMandatoryInput.disabled = true;
+      typeMandatoryLabel.style.backgroundColor = "#E0E0E0";
+      typeMandatoryLabel.style.color = "#A0A0A0";
+      typeMandatoryLabel.style.cursor = "not-allowed";
+      typeMandatoryLabel.style.border = "1px solid #A0A0A0";
     } else {
-      typeCoreInput.disabled = false;
-      typeCoreLabel.style = "";
+      typeMandatoryInput.disabled = false;
+      typeMandatoryLabel.style = "";
     }
   }
-
+  if (typeGeneralInput && typeGeneralLabel) {
+    if (generalCompe.length > 0) {
+      typeGeneralInput.disabled = true;
+      typeGeneralLabel.style.backgroundColor = "#E0E0E0";
+      typeGeneralLabel.style.color = "#A0A0A0";
+      typeGeneralLabel.style.cursor = "not-allowed";
+      typeGeneralLabel.style.border = "1px solid #A0A0A0";
+    } else {
+      typeGeneralInput.disabled = false;
+      typeGeneralLabel.style = "";
+    }
+  }
   if (typeSpecificInput && typeSpecificLabel) {
     if (specificCompe.length > 8) {
       typeSpecificInput.disabled = true;
@@ -181,28 +187,29 @@ function updateRadioButtonState() {
     }
   }
 
-  // Pastikan tombol juga diperbarui setiap kali radio diupdate
   updateButtonStateBySelectsAndCompetency();
 }
 
 async function cardSelectedCompetency(competencyList) {
   try {
-    let coreCompe = [];
+    let mandatoryCompe = [];
+    let generalCompe = [];
     let specificCompe = [];
-    let coreCount = 0;
+    let mandatoryCount = 0;
+    let generalCount = 0;
     let specificCount = 0;
 
     if (competencyList.length > 0) {
-      coreCompe = competencyList.filter((item) => item.selectedType === "core");
-      specificCompe = competencyList.filter(
-        (item) => item.selectedType === "specific",
-      );
-      coreCount = coreCompe.length;
+      mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
+      specificCompe = competencyList.filter((item) => item.selectedType === "specific");
+      generalCompe = competencyList.filter((item) => item.selectedType === "general");
+      generalCount = generalCompe.length;
+      mandatoryCount = mandatoryCompe.length;
       specificCount = specificCompe.length;
     }
 
-    const coreContent =
-      coreCount > 0
+    const mandatoryContent =
+      mandatoryCount > 0
         ? `
         <div class="table-responsive " style="max-height: 200px;">
           <table class="table tbl-border">
@@ -215,7 +222,7 @@ async function cardSelectedCompetency(competencyList) {
               </tr>
             </thead>
             <tbody>
-              ${coreCompe
+              ${mandatoryCompe
                 .map(
                   (item, index) => `
                 <tr>
@@ -241,11 +248,54 @@ async function cardSelectedCompetency(competencyList) {
         <div class="col-12">
           <div class="competency-box">
             <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
-            <span class="desc">Selected core competency will appear here</span>
+            <span class="desc">Selected mandatory competency will appear here</span>
           </div>
         </div>
       `;
-
+    const generalContent =
+      generalCount > 0
+        ? `
+        <div class="table-responsive scrollable-tbl" style="max-height: 150px;">
+          <table class="table tbl-border">
+            <thead style="background-color: #006CA9;">
+              <tr>
+                <th scope="col" style="width: 50px; text-align: center;">No</th>
+                <th scope="col">Competency</th>
+                <th scope="col" style="width: 130px;">Proficiency Level</th>
+                <th scope="col" style="width: 60px;">Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${generalCompe
+                .map(
+                  (item, index) => `
+                <tr>
+                  <td style="text-align: center;">${index + 1}</td>
+                  <td>${item.compeName}</td>
+                  <td style="text-align: center;">${item.selectedLvl}</td>
+                  <td style="text-align: center;">
+                      <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeCompetency('${
+                        item.compeId
+                      }')">
+                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
+                      </button>
+                  </td>
+                </tr>
+              `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      `
+        : `
+        <div class="col-12">
+          <div class="competency-box">
+            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
+            <span class="desc">Selected general competency will appear here</span>
+          </div>
+        </div>
+      `;
     const specificContent =
       specificCount > 0
         ? `
@@ -293,12 +343,20 @@ async function cardSelectedCompetency(competencyList) {
 
     const bodySelectedCompe = `
       <div class="competency-section">
-        <!-- Core -->
+        <!-- Mandatory -->
         <div class="row mb-2">
           <div class="col-12">
-            <label>Core (${coreCount}/3)</label>
+            <label>Mandatory (${mandatoryCount}/3)</label>
           </div>
-          ${coreContent}
+          ${mandatoryContent}
+        </div>
+
+         <!-- Specific -->
+        <div class="row mb-2">
+          <div class="col-12">
+            <label>General (${generalCount}/1)</label>
+          </div>
+          ${generalContent}
         </div>
 
         <!-- Specific -->
@@ -317,32 +375,23 @@ async function cardSelectedCompetency(competencyList) {
   }
 }
 function updateButtonStateBySelectsAndCompetency() {
-  const sgId = $("#sgId").val();
-  const ssgId = $("#ssgId").val();
+  // const sgId = $("#sgId").val();
+  // const ssgId = $("#ssgId").val();
   const competencyId = $("#competencyId").val();
   const selectedLvl = $('input[name="optLvl"]:checked').val();
   const selectedType = $('input[name="optType"]:checked').val();
   const btnSelectedCompe = document.getElementById("btn-selectedCompe");
 
   const competencyList = getState("payloadAddCompetency") || [];
-  const coreCompe = competencyList.filter(
-    (item) => item.selectedType === "core",
-  );
-  const specificCompe = competencyList.filter(
-    (item) => item.selectedType === "specific",
-  );
+  const mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
+  const generalCompe = competencyList.filter((item) => item.selectedType === "general");
+  const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
 
-  const isAllSelectFilled =
-    sgId &&
-    sgId.length > 0 &&
-    ssgId &&
-    ssgId.length > 0 &&
-    competencyId &&
-    competencyId.length > 0;
+  const isAllSelectFilled = competencyId && competencyId.length > 0;
 
   const isRadioFilled = selectedLvl && selectedType;
 
-  const isCompeLimitExceeded = coreCompe.length > 2 && specificCompe.length > 8;
+  const isCompeLimitExceeded = mandatoryCompe.length > 2 && generalCompe.length > 0 && specificCompe.length > 8;
 
   if (btnSelectedCompe) {
     if (isAllSelectFilled && isRadioFilled && !isCompeLimitExceeded) {
@@ -362,7 +411,29 @@ async function onSelectSsg(event) {
   updateButtonStateBySelectsAndCompetency();
 }
 async function onSelectCompetency(event) {
-  updateButtonStateBySelectsAndCompetency();
+  try {
+    const idPosition = event.target.value || null;
+    if (!idPosition) return;
+    const result = await fetchSgandSsg(idPosition);
+
+    if (result && result.data) {
+      const { sgName, ssgName } = result.data;
+      const sgSsgDiv = document.getElementById("sg-ssg-info");
+      const sgSsgLabel = document.getElementById("sg-ssg-label");
+
+      if (sgSsgDiv && sgSsgLabel) {
+        sgSsgDiv.style.display = "block";
+        sgSsgLabel.textContent = `SG: ${sgName}, SSG: ${ssgName}`;
+      }
+    } else {
+      const sgSsgDiv = document.getElementById("sg-ssg-info");
+      if (sgSsgDiv) sgSsgDiv.style.display = "none";
+    }
+
+    updateButtonStateBySelectsAndCompetency();
+  } catch (error) {
+    console.error(error);
+  }
 }
 $(document).on("change", 'input[name="optLvl"]', function () {
   console.log("optLvl changed");
@@ -427,26 +498,17 @@ function selectJobReference() {
 const handleRadioChange = (event) => {
   const value = event.target.value;
   const jobSelect = $("#jobIdRef");
-  const dataChangeNotasi = getState("dataChangeNotasi");
-  const reset = {
-    ...dataChangeNotasi,
-    busProsMapped: [],
-  };
+  setState("payloadAddCompetency", []);
+  cardSelectedCompetency([]);
+  updateRadioButtonState();
   if (value === "reference") {
     $("#comperef").show();
     $("#specCompe, #selectedcompe").hide();
-    // cardSelectedNotasilist(reset);
-    // setState("dataChangeNotasi", reset);
-    // setState("listSelectedProsbisref", []);
-    // cardSelectedProsbisref();
   } else if (value === "nonReference") {
     jobSelect.val(null).trigger("change");
     $("#table-comperef").hide();
     $("#comperef").hide();
     $("#specCompe, #selectedcompe").show();
-    // setState("dataChangeNotasi", reset);
-    // setState("listSelectedProsbisref", []);
-    // cardSelectedProsbisref();
   }
 };
 
@@ -577,38 +639,438 @@ function selectSkillGroup() {
     });
 }
 
+const onSelectPositionRefer = async (event) => {
+  const dataSource = $("#dataSource-competency").val();
+  const idPosition = event.target.value || null;
+  console.log("idPosition", idPosition);
+  try {
+    const payload = {
+      dataSource: dataSource,
+      page: 1,
+      pageSize: 999,
+      jobCode: [idPosition],
+    };
+    const result = await fetchCompetencyReference(payload);
+    const competencyList = result?.data?.level || [];
+    console.log("first", competencyList);
+    if (competencyList.length > 0) {
+      const elementComperef = document.getElementById("table-comperef");
+      elementComperef.style.display = "block";
+      const dataMandatory = competencyList.filter((item) => item.compType.toLowerCase() === "mandatory");
+      const dataGeneral = competencyList.filter((item) => item.compType.toLowerCase() === "general");
+      const dataSpecific = competencyList.filter((item) => item.compType.toLowerCase() === "specific");
+      const bodyTableCompeRef = `
+      <label class="form-label">Specific Competencies of Manager Event Management</label>
+                        <div class="card-tablebusinessreference">
+                            <div class="row">
+                                <div class="col-4">
+                                    <h6 style="font-weight: bold;">Mandatory</h6>
+                                    <table class="mt-2 mb-3 table tbl-border">
+                                        <thead>
+                                         <tr>
+                                         <th scope="col" style="width: 40px;text-align:center">
+                                         <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllMandatory(this)">
+                                         </th>
+                                          <th scope="col" style="width: 40px;text-align:center">No</th>
+                                          <th scope="col" style="width: 200px">Competency</th>
+                                         <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        ${dataMandatory
+                                          .map(
+                                            (item, index) => `
+                                            <tr>
+                                                <td style="text-align:center">
+                                                  <input type="checkbox" class="form-check-input" name="mandatoryCompeRef" value="${
+                                                    item.id || item.compCode
+                                                  }" onclick="singleSelectMandatory(this)">
+                                                </td>
+                                                <td style="text-align:center">${index + 1}</td>
+                                                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
+                                                  item.compName
+                                                }</td>
+                                                <td style="text-align:center">${item.proficiencyLevel}</td>
+                                            </tr>
+                                        `,
+                                          )
+                                          .join("")}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-4">
+                                    <h6 style="font-weight: bold;">General</h6>
+                                    <table class="mt-2 mb-3 table tbl-border">
+                                        <thead>
+                                        <tr>
+                                        <th scope="col" style="width: 40px;text-align:center">
+                                        <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllGeneral(this)">
+                                        </th>
+                                          <th scope="col" style="width: 40px;text-align:center">No</th>
+                                          <th scope="col" style="width: 200px">Competency</th>
+                                          <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        ${dataGeneral
+                                          .map(
+                                            (item, index) => `
+                                            <tr>
+                                                <td style="text-align:center">
+                                                  <input type="checkbox" class="form-check-input" name="generalCompeRef" value="${
+                                                    item.id || item.compCode
+                                                  }" onclick="singleSelectGeneral(this)">
+                                                </td>
+                                                <td style="text-align:center">${index + 1}</td>
+                                                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
+                                                  item.compName
+                                                }</td>
+                                                <td style="text-align:center">${item.proficiencyLevel}</td>
+                                            </tr>
+                                        `,
+                                          )
+                                          .join("")}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-4 ">
+                                    <h6 style="font-weight: bold;">Specific</h6>
+                                    <table class="mt-2 mb-3 table tbl-border">
+                                        <thead>
+                                        <tr>
+                                        <th scope="col" style="width: 40px;text-align:center">
+                                        <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllSpecific(this)">
+                                        </th>
+                                          <th scope="col" style="width: 40px;text-align:center">No</th>
+                                          <th scope="col" style="width: 200px">Competency</th>
+                                          <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        ${dataSpecific
+                                          .map(
+                                            (item, index) => `
+                                            <tr>
+                                                <td style="text-align:center">
+                                                  <input type="checkbox" class="form-check-input" name="specificCompeRef" value="${
+                                                    item.id || item.compCode
+                                                  }" onclick="singleSelectSpecific(this)"> 
+                                                </td>
+                                                <td style="text-align:center">${index + 1}</td>
+                                                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
+                                                  item.compName
+                                                }</td>
+                                                <td style="text-align:center">${item.proficiencyLevel}</td>
+                                            </tr>
+                                        `,
+                                          )
+                                          .join("")}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>`;
+      elementComperef.innerHTML = bodyTableCompeRef;
+    }
+  } catch (error) {
+    console.error("Error fetching competency reference:", error);
+  }
+};
+const toggleSelectAllMandatory = (source) => {
+  const checkboxes = document.getElementsByName("mandatoryCompeRef");
+  const payloadAddCompetency = getState("payloadAddCompetency") || [];
+  const jobInformation = getState("jobInformation");
+
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+
+  if (source.checked) {
+    const newCompe = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => {
+        const row = checkbox.closest("tr");
+        return {
+          compeId: checkbox.value,
+          compeName: row?.children[2]?.textContent || "",
+          selectedLvl: row?.children[3]?.textContent || "",
+          selectedType: "mandatory",
+          unitCode: jobInformation.unitCode,
+          prlOrg: jobInformation.prlOrg,
+        };
+      })
+      .filter(
+        (data) =>
+          !payloadAddCompetency.some((item) => item.compeId === data.compeId && item.selectedType === "mandatory"),
+      );
+
+    const sentData = [...payloadAddCompetency, ...newCompe];
+    console.log("payloadAddCompetency", sentData);
+    setState("payloadAddCompetency", sentData);
+    cardSelectedCompetency(sentData);
+  } else {
+    const filtered = payloadAddCompetency.filter((item) => item.selectedType !== "mandatory");
+    setState("payloadAddCompetency", filtered);
+    cardSelectedCompetency(filtered);
+  }
+  updateRadioButtonState();
+};
+
+const toggleSelectAllGeneral = (source) => {
+  const checkboxes = document.getElementsByName("generalCompeRef");
+  const payloadAddCompetency = getState("payloadAddCompetency") || [];
+  const jobInformation = getState("jobInformation");
+
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+
+  if (source.checked) {
+    const newCompe = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => {
+        const row = checkbox.closest("tr");
+        return {
+          compeId: checkbox.value,
+          compeName: row?.children[2]?.textContent || "",
+          selectedLvl: row?.children[3]?.textContent || "",
+          selectedType: "general",
+          unitCode: jobInformation.unitCode,
+          prlOrg: jobInformation.prlOrg,
+        };
+      })
+      .filter(
+        (data) =>
+          !payloadAddCompetency.some((item) => item.compeId === data.compeId && item.selectedType === "general"),
+      );
+
+    const sentData = [...payloadAddCompetency, ...newCompe];
+    setState("payloadAddCompetency", sentData);
+    cardSelectedCompetency(sentData);
+  } else {
+    const filtered = payloadAddCompetency.filter((item) => item.selectedType !== "general");
+    setState("payloadAddCompetency", filtered);
+    cardSelectedCompetency(filtered);
+  }
+  updateRadioButtonState();
+};
+
+const toggleSelectAllSpecific = (source) => {
+  const checkboxes = document.getElementsByName("specificCompeRef");
+  const payloadAddCompetency = getState("payloadAddCompetency") || [];
+  const jobInformation = getState("jobInformation");
+
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+
+  if (source.checked) {
+    const newCompe = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => {
+        const row = checkbox.closest("tr");
+        return {
+          compeId: checkbox.value,
+          compeName: row?.children[2]?.textContent || "",
+          selectedLvl: row?.children[3]?.textContent || "",
+          selectedType: "specific",
+          unitCode: jobInformation.unitCode,
+          prlOrg: jobInformation.prlOrg,
+        };
+      })
+      .filter(
+        (data) =>
+          !payloadAddCompetency.some((item) => item.compeId === data.compeId && item.selectedType === "specific"),
+      );
+
+    const sentData = [...payloadAddCompetency, ...newCompe];
+    setState("payloadAddCompetency", sentData);
+    cardSelectedCompetency(sentData);
+  } else {
+    const filtered = payloadAddCompetency.filter((item) => item.selectedType !== "specific");
+    setState("payloadAddCompetency", filtered);
+    cardSelectedCompetency(filtered);
+  }
+  updateRadioButtonState();
+};
+
+const singleSelectSpecific = (checkbox) => {
+  const payloadAddCompetency = getState("payloadAddCompetency") || [];
+  const jobInformation = getState("jobInformation");
+  const compeId = checkbox.value;
+  const row = checkbox.closest("tr");
+
+  if (checkbox.checked) {
+    if (!payloadAddCompetency.some((item) => item.compeId === compeId && item.selectedType === "specific")) {
+      const newCompe = {
+        compeId: compeId,
+        compeName: row?.children[2]?.textContent || "",
+        selectedLvl: row?.children[3]?.textContent || "",
+        selectedType: "specific",
+        unitCode: jobInformation.unitCode,
+        prlOrg: jobInformation.prlOrg,
+      };
+      const sentData = [...payloadAddCompetency, newCompe];
+      setState("payloadAddCompetency", sentData);
+      cardSelectedCompetency(sentData);
+    }
+  } else {
+    // Remove only the unchecked one
+    const filtered = payloadAddCompetency.filter(
+      (item) => !(item.compeId === compeId && item.selectedType === "specific"),
+    );
+    setState("payloadAddCompetency", filtered);
+    cardSelectedCompetency(filtered);
+  }
+  updateRadioButtonState();
+};
+const singleSelectMandatory = (checkbox) => {
+  const payloadAddCompetency = getState("payloadAddCompetency") || [];
+  const jobInformation = getState("jobInformation");
+  const compeId = checkbox.value;
+  const row = checkbox.closest("tr");
+
+  if (checkbox.checked) {
+    if (!payloadAddCompetency.some((item) => item.compeId === compeId && item.selectedType === "mandatory")) {
+      const newCompe = {
+        compeId: compeId,
+        compeName: row?.children[2]?.textContent || "",
+        selectedLvl: row?.children[3]?.textContent || "",
+        selectedType: "mandatory",
+        unitCode: jobInformation.unitCode,
+        prlOrg: jobInformation.prlOrg,
+      };
+      const sentData = [...payloadAddCompetency, newCompe];
+      setState("payloadAddCompetency", sentData);
+      cardSelectedCompetency(sentData);
+    }
+  } else {
+    const filtered = payloadAddCompetency.filter(
+      (item) => !(item.compeId === compeId && item.selectedType === "mandatory"),
+    );
+    setState("payloadAddCompetency", filtered);
+    cardSelectedCompetency(filtered);
+  }
+  updateRadioButtonState();
+};
+
+const singleSelectGeneral = (checkbox) => {
+  const payloadAddCompetency = getState("payloadAddCompetency") || [];
+  const jobInformation = getState("jobInformation");
+  const compeId = checkbox.value;
+  const row = checkbox.closest("tr");
+
+  if (checkbox.checked) {
+    if (!payloadAddCompetency.some((item) => item.compeId === compeId && item.selectedType === "general")) {
+      const newCompe = {
+        compeId: compeId,
+        compeName: row?.children[2]?.textContent || "",
+        selectedLvl: row?.children[3]?.textContent || "",
+        selectedType: "general",
+        unitCode: jobInformation.unitCode,
+        prlOrg: jobInformation.prlOrg,
+      };
+      const sentData = [...payloadAddCompetency, newCompe];
+      setState("payloadAddCompetency", sentData);
+      cardSelectedCompetency(sentData);
+    }
+  } else {
+    const filtered = payloadAddCompetency.filter(
+      (item) => !(item.compeId === compeId && item.selectedType === "general"),
+    );
+    setState("payloadAddCompetency", filtered);
+    cardSelectedCompetency(filtered);
+  }
+  updateRadioButtonState();
+};
 async function triggleSelectCompe() {
-  const selectedSg = $("#sgId");
-  const sgId = selectedSg.val();
-  const SgName = selectedSg.find(":selected").text();
-  const selectedSsg = $("#ssgId");
-  const ssgId = selectedSsg.val();
-  const SsgName = selectedSsg.find(":selected").text();
   const selectedCompe = $("#competencyId");
   const compeId = selectedCompe.val();
   const CompeName = selectedCompe.find(":selected").text();
   const selectedLvl = $('input[name="optLvl"]:checked').val();
-  const selectedLvlId = $('input[name="optLvl"]:checked').attr("id");
   const selectedType = $('input[name="optType"]:checked').val();
-  const selectedTypeId = $('input[name="optType"]:checked').attr("id");
   const payloadAddCompetency = getState("payloadAddCompetency");
+  const btnSelectedCompe = document.getElementById("btn-selectedCompe");
+  const jobInformation = getState("jobInformation");
   const dataSelectedCompe = {
-    sgId: sgId,
-    sgName: SgName,
-    ssgId: ssgId,
-    ssgName: SsgName,
     compeId: compeId,
     compeName: CompeName,
     selectedLvl: selectedLvl,
     selectedType: selectedType,
+    unitCode: jobInformation.unitCode,
+    prlOrg: jobInformation.prlOrg,
   };
   const sentData = [...payloadAddCompetency, dataSelectedCompe];
   setState("payloadAddCompetency", sentData);
   cardSelectedCompetency(sentData);
   updateRadioButtonState();
-  $("#sgId").val(null).trigger("change");
-  $("#ssgId").val(null).trigger("change");
   $("#competencyId").val(null).trigger("change");
   $('input[name="optLvl"]').prop("checked", false);
   $('input[name="optType"]').prop("checked", false);
+  btnSelectedCompe.disabled = true;
+  btnSelectedCompe.classList.add("btn-disabled");
 }
+
+function closeModalCompetency() {
+  const jobSelect = $("#jobIdRef");
+  jobSelect.val(null).trigger("change");
+  $("#table-comperef").hide();
+  $("#comperef").hide();
+  $("#specCompe, #selectedcompe").show();
+  setState("payloadAddCompetency", []);
+  cardSelectedCompetency([]);
+  updateRadioButtonState();
+}
+
+const handleSaveDraftCompe = async () => {
+  try {
+    const payloadAddCompetency = getState("payloadAddCompetency");
+    const spinBtn = document.getElementById("spinBtncompetency");
+    const modalAddCompetency = document.getElementById("modalAddCompetency");
+    const modal = bootstrap.Modal.getInstance(modalAddCompetency);
+
+    if (spinBtn) spinBtn.style.display = "inline-block";
+    const payload = {
+      draftId: $("#dataSource-competency").val() || null,
+      data: [
+        {
+          unitCode: payloadAddCompetency[0]?.unitCode || "",
+          prlOrg: payloadAddCompetency[0]?.prlOrg || "",
+          competency: payloadAddCompetency.map((item) => ({
+            compCode: item.compeId,
+            level: item.selectedLvl,
+            compType: item.selectedType,
+          })),
+        },
+      ],
+    };
+    console.log("payload", payload);
+    const result = await fetchAddtechnicalCompetency(payload);
+    console.log("result", result);
+    if (result.success === true) {
+      const draftName = $("#dataSource-competency option:selected").text();
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+          <br>
+          <span>You can check in <b>${draftName}</b> at draft tab.</span>
+          `,
+          },
+        },
+      }).then(async () => {
+        if (modal) modal.hide();
+        spinBtn.style.display = "none";
+      });
+    }
+  } catch (error) {
+    console.error("Error saving draft:", error);
+  }
+};

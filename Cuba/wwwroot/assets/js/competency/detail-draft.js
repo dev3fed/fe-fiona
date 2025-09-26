@@ -1,6 +1,7 @@
 async function detailDraft() {
   try {
     const dataDraft = getState("dataDetailDraft");
+    console.log("dataDraft", dataDraft);
     if (dataDraft) {
       const bodyInfo = `
         <div class="col-3 custom-col">
@@ -18,7 +19,9 @@ async function detailDraft() {
         </div>
         <div class="col-3 custom-col">
           <label style="color:#9F9FA5">Created by</label>
-          <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${
+            dataDraft.draftCreatedBy ? dataDraft.draftCreatedBy : "-"
+          }</label>
           <label style="color:#9F9FA5">${
             dataDraft.draftCreatedDate ? new Date(dataDraft.draftCreatedDate).toLocaleDateString() : "-"
           }</label>
@@ -34,8 +37,9 @@ async function detailDraft() {
         </div>`;
       const draftInfo = document.getElementById("draft-competencyinfo");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
-      if (dataDraft.data.length > 0) {
-        renderTableActivity(dataDraft.data);
+      console.log("dataDraft?.data.length", dataDraft?.data.length);
+      if (dataDraft?.data.length > 0) {
+        renderTableActivity(dataDraft);
       } else {
         const bodyEmpty = `
           <div class="empty-activity-body">
@@ -97,49 +101,42 @@ async function renderTableActivity(listData) {
                   </thead>
                   <tbody id="body-draft">
                       ${
-                        listData.length === 0
+                        listData?.data.length === 0
                           ? `<tr>
                             <td colspan="7" style="text-align: center; color: #9F9FA5;">
                               Data not available
                             </td>
                           </tr>`
-                          : listData.data
+                          : listData?.data
                               .map((data, index) => {
-                                const startIndex = (listData.page - 1) * listData.pageSize;
+                                const startIndex = (listData.currentPage - 1) * listData.pageSize;
                                 return `
                               <tr>
                                 <td style="width: 50px;text-align:center">
                                   ${startIndex + index + 1}
                                 </td>
                                 <td>
-                                  ${data.draftType || "-"}
+                                  ${data.activityType || "-"}
                                 </td>
                                 <td>
                                   ${
-                                    data.jobPosition?.length
+                                    data?.positionName
                                       ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
-                                         title="${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}">
-                                         ${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}
-                                         </div>` +
-                                        (data.jobPosition.length > 1
-                                          ? `<small style="color:#9F9FA5;cursor: pointer">+${
-                                              data.jobPosition.length - 1
-                                            } more</small>`
-                                          : "")
+                                         title="${data.jobCode} - ${data.positionName}">
+                                         ${data.jobCode} - ${data.positionName}
+                                         </div>`
                                       : "-"
                                   }
                                 </td>
                                 <td>
                                   ${
-                                    data.businessProcessName?.length
+                                    data?.competencyName
                                       ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
-                                         title="${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}">
-                                         ${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}
+                                         title=" ${data.competencyName}">
+                                          ${data.competencyName}
                                          </div>` +
-                                        (data.businessProcessName.length > 1
-                                          ? `<small style="color:#9F9FA5;cursor: pointer">+${
-                                              data.businessProcessName.length - 1
-                                            } more</small>`
+                                        (data.totalCompetency > 1
+                                          ? `<small style="color:#9F9FA5;cursor: pointer">+${data.totalCompetency} more</small>`
                                           : "")
                                       : "-"
                                   }
@@ -151,20 +148,19 @@ async function renderTableActivity(listData) {
                                   </small>
                                 </td>
                                 <td>
-                                  ${data.modifiedBy || "-"}<br>
+                                  ${data.updatedBy || "-"}<br>
                                   <small style="color:#9F9FA5">
-                                    ${data.modifiedDate ? "at " + new Date(data.modifiedDate).toLocaleString() : "-"}
+                                    ${data.updatedDate ? "at " + new Date(data.updatedDate).toLocaleString() : "-"}
                                   </small>
                                 </td>
                                 <td style="text-align: center;">
                                   <button class="btn btn-outline-light btn-small-icon" type="button" 
-                                    onclick="triggleDetailActivity('${data.draftListId}', '${data.draftType}')">
+                                    onclick="triggleDetailActivity('${data.positionCode}')">
                                     <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon">
                                   </button>  
-                                  <button class="btn btn-outline-light btn-small-icon" type="button">
-                                    <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
-                                  </button>
-                                  <button class="btn btn-outline-danger btn-small-icon" type="button">
+                                  <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="deleteActivityDraft('${
+                                    data.positionCode
+                                  }')">
                                     <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
                                   </button>
                                 </td>
@@ -187,14 +183,14 @@ async function renderTableActivity(listData) {
         </div>
      `;
 
-    const draftDetail = document.getElementById("detail-competency");
+    const draftDetail = document.getElementById("draftactivity-competency");
     if (draftDetail) {
       draftDetail.innerHTML = bodyDetail;
     }
     const itemsPerPage = listData.pageSize;
-    const totalPages = Math.ceil(listData.total / itemsPerPage);
-    const currentPage = listData.page;
-    const start = (listData.page - 1) * itemsPerPage + 1;
+    const totalPages = Math.ceil(listData.totalPages / itemsPerPage);
+    const currentPage = listData.currentPage;
+    const start = (listData.currentPage - 1) * itemsPerPage + 1;
     renderPaginationDetailDraft(currentPage, totalPages);
     const totalPage = document.getElementById("total-pagedraft");
 
@@ -213,8 +209,10 @@ async function renderTableActivity(listData) {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
-      } of ${listData.total} records</label>
+        listData.totalPages < itemsPerPage * listData.currentPage
+          ? listData.totalPages
+          : itemsPerPage * listData.currentPage
+      } of ${listData.totalPages} records</label>
             </div>
           </div>
         `;
@@ -318,15 +316,18 @@ const handleSubmitRenameDraft = async () => {
   try {
     const draftNameInput = document.getElementById("draftRename").value;
     const dataDraft = getState("dataDetailDraft");
+    const spinner = document.getElementById("loadingRenameDraft");
+    spinner.style.display = "inline-block";
     const payload = {
       draftId: dataDraft.draftId,
       draftCompName: draftNameInput,
     };
-    const queryString = "?" + new URLSearchParams(payload).toString();
-    const result = await fetchRenameDraft(queryString);
+    const result = await fetchRenameDraft(payload);
     const modalRenameDraft = document.getElementById("modalRenameDraft");
     const modal = bootstrap.Modal.getInstance(modalRenameDraft);
     if (modal) modal.hide();
+    console.log("result", result);
+    const draftName = result?.data?.data.draftName;
     if (result.success === true) {
       setTimeout(() => {
         swal({
@@ -337,7 +338,7 @@ const handleSubmitRenameDraft = async () => {
           content: {
             element: "div",
             attributes: {
-              innerHTML: `<div style="text-align: center;">${result?.data.draftName} has been change</div>`,
+              innerHTML: `<div style="text-align: center;">${draftName} has been change</div>`,
             },
           },
           customClass: {
@@ -345,9 +346,10 @@ const handleSubmitRenameDraft = async () => {
           },
         }).then(async () => {
           spinner.style.display = "none";
-          const id = result.data.data.draftId;
-          const dataDraft = await fetchDraftProsbisByid(id);
-          setState("dataDetailDraft", dataDraft.data);
+          const detailResult = await fetchDetailDraft(dataDraft.draftId);
+          if (detailResult.success === true) {
+            setState("dataDetailDraft", detailResult.data);
+          }
         });
       }, 200);
     } else {
@@ -365,136 +367,14 @@ const handleSubmitRenameDraft = async () => {
           },
         }).then(async () => {
           spinner.style.display = "none";
-          const id = result.data.data.draftId;
-          const dataDraft = await fetchDraftProsbisByid(id);
-          setState("dataDetailDraft", dataDraft.data);
+          const detailResult = await fetchDetailDraft(dataDraft.draftId);
+          if (detailResult.success === true) {
+            setState("dataDetailDraft", detailResult.data);
+          }
         });
       }, 200);
     }
   } catch (error) {}
-};
-const handleDraftDetailCompetency = async (id) => {
-  console.log("id", id);
-  const competencyList = getState("competencyList");
-  const dataDetail = await fetchCompetencyDetail(id);
-  const findcompetencyList = competencyList.find((compe) => compe.id === dataDetail.data.idcompetency);
-  console.log("dataDetail", dataDetail);
-  const modal = new bootstrap.Modal(document.getElementById("modalDraftDetailCompe"));
-  modal.show();
-
-  const formContent = `
-    <div class="col-12 scrollable-content" style="min-height: 620px;">
-        <div class="mb-2">
-          <h6>${findcompetencyList.competency_name} </h6>
-        </div>
-               
-        <div class="custom-card-approval">
-            <div class="header-card-approval">
-                Detail
-            </div>
-            <div>
-                <div class=" custom-row-full">
-                    <label>${dataDetail?.data.definition}</label>
-                </div>
-            </div>
-        </div>
-        <div class="custom-card-approval">
-            <div class="header-card-approval">
-                Level 1 (Basic)
-            </div>
-            <div style="padding-top: 10px;">
-                <div class=" custom-row-full">
-                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.level1.map((item) => `<li> ${item}</li>`).join("")}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="custom-card-approval">
-            <div class="header-card-approval">
-              Level 2 (Intermediate)
-            </div>
-            <div style="padding-top: 10px;">
-                <div class=" custom-row-full">
-                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.level2.map((item) => `<li> ${item}</li>`).join("")}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="custom-card-approval">
-            <div class="header-card-approval">
-                Level 3 (Advance)
-            </div>
-            <div style="padding-top: 10px;">
-                <div class=" custom-row-full">
-                   <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.level3.map((item) => `<li> ${item}</li>`).join("")}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="custom-card-approval">
-            <div class="header-card-approval">
-                Level 4 (Mastery)
-            </div>
-            <div style="padding-top: 10px;">
-                <div class=" custom-row-full">
-                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${dataDetail?.data.level4.map((item) => `<li> ${item}</li>`).join("")}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-12">
-  `;
-
-  const modalBodyContent = document.getElementById("body-draftdetailcompe");
-  if (modalBodyContent) {
-    modalBodyContent.innerHTML = formContent;
-  }
-};
-
-const triggleEditCompetency = () => {
-  const dataDraft = getState("dataDetailDraft");
-  console.log("dataDraft", dataDraft);
-  const modal = new bootstrap.Modal(document.getElementById("modalDraftEditdepth"));
-  modal.show();
-
-  const formEditDepth = `
-        <div class="col-6">
-        <label class="form-label">Draft Name</label>
-            <input class="form-control" type="text" id="edit-draftname"  placeholder="Draft Name" >
-        </div>
-        <div class="col-6">
-        <label class="form-label">Draft Type</label>
-            <input class="form-control" type="text" placeholder="Draft Type"  disabled>
-        </div>
-        <div class="col-12 mt-3 mb-2">
-        <h6 class="f-w-600">Job Title & Technical Competency Info</h6>
-        </div>
-        <div class="col-12 mt-2 mb-2">
-        <label class="form-label">Job</label>
-            <input class="form-control" type="text" placeholder="Job"  disabled>
-        </div>
-         <div class="col-12 mt-2 mb-2">
-        <label class="form-label">Skill Group</label>
-            <input class="form-control" type="text" placeholder="Skill Group">
-        </div>
-         <div class="col-12 mt-2 mb-2">
-        <label class="form-label">Sub Skill Group</label>
-            <input class="form-control" type="text" placeholder="Sub Skill Group">
-        </div>
-         <div class="col-12 mt-2">
-        <label class="form-label">Technical Competency</label>
-            <input class="form-control" type="text" placeholder="Technical Competency">
-        </div>
-  `;
-  const bodyContent = document.getElementById("form-content-edit");
-  if (bodyContent) {
-    bodyContent.innerHTML = formEditDepth;
-  }
 };
 
 const deleteDetailDraft = () => {
@@ -506,21 +386,78 @@ const deleteDetailDraft = () => {
 };
 
 async function confirmDeleteDetailcompeDraft() {
-  const dataDraft = getState("dataDetailDraft");
-  const draftList = getState("draftList");
-  // remove from draft list
-  setState(
-    "draftList",
-    draftList.filter((val) => val.id !== dataDraft.id),
-  );
-  const modalDelDraft = document.getElementById("modalDraftDelete");
-  const modal = bootstrap.Modal.getInstance(modalDelDraft);
-  if (modal) {
-    modal.hide();
-  }
-  const draftListAfter = getState("draftList");
-  const IsNotEmpty = draftListAfter.length;
-  handleBack();
-  changeemptyPageDraft(IsNotEmpty);
-  loadTableBodyDraft(draftListAfter);
+  const { draftId } = getState("dataDetailDraft");
+  const spinBtn = document.getElementById("btnspin-deletedetaildraft");
+  if (spinBtn) spinBtn.style.display = "inline-block";
+  try {
+    const deleteResult = await fetchDeleteDraft(draftId);
+    console.log("spinBtn", spinBtn);
+    console.log("deleteResult", deleteResult);
+    if (deleteResult.success === true) {
+      const modalDelDraft = document.getElementById("modalDraftDelete");
+      const modal = bootstrap.Modal.getInstance(modalDelDraft);
+      if (modal) {
+        modal.hide();
+      }
+      fetctDataSourceComp();
+      const listDraft = await fetchDraftList();
+      const IsNotEmpty = listDraft.data.length;
+      changeemptyPageDraft(IsNotEmpty);
+      loadTableBodyDraft(listDraft.data);
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">${deleteResult.data.draftName} draft has been deleted.</div>`,
+          },
+        },
+      }).then(() => {
+        spinBtn.style.display = "none";
+        handleBack();
+      });
+    }
+  } catch (error) {}
+}
+
+async function openDetailApproval() {
+  const openModal = new bootstrap.Modal(document.getElementById("modalDraftAprroval"));
+  openModal.show();
+}
+
+async function handleSubmitApproval() {
+  try {
+    const dataDraft = getState("dataDetailDraft");
+    const spinBtn = document.getElementById("spinbtnSaveDraft");
+    if (spinBtn) spinBtn.style.display = "inline-block";
+    const result = await fetchSubmitDraftCompetency(dataDraft.draftId);
+    const modalDetailAprroval = document.getElementById("modalDraftAprroval");
+    const modal = bootstrap.Modal.getInstance(modalDetailAprroval);
+    console.log("result", result);
+    if (result.success === true) {
+      if (modal) {
+        modal.hide();
+      }
+      setTimeout(() => {
+        swal({
+          title: "SUCCESS",
+          icon: "success",
+          buttons: false,
+          timer: 2000,
+          content: {
+            element: "div",
+            attributes: {
+              innerHTML: `<div style="text-align: center;">${dataDraft.draftName} draft has been submit to approval. You can check in approval tab.</div>`,
+            },
+          },
+        }).then(async () => {
+          spinBtn.style.display = "none";
+          handleBack();
+        });
+      }, 100);
+    }
+  } catch (error) {}
 }

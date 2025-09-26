@@ -1,0 +1,148 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.custom-modal-bp {
+        max-width: 60% !important;
+        margin: 30px auto;
+    }
+
+    .tbl-border-history {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-history th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-history thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-history th,
+    .tbl-border-history td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+    }
+
+    .checkbox_animated {
+        width: 12px;
+        height: 12px;
+        transform: scale(0.8);
+        margin-right: 5px;
+    }
+
+    .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin: 0;
+        text-align: center;
+    }
+
+    .radio_animated {
+        margin-right: 5px;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+
+    .empty-body-history {
+        background-color: #EAEAEB;
+        height: 400px;
+        background-image: url("/assets/images/rasci/empty_history.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-size: 150px;
+    }
+
+    #table-history {
+        display: none;
+    }
+
+    #empty-history {
+        display: block;
+    }
+</style>
+<div class="col-12 " id="empty-history">
+    <div class="empty-body-history">
+
+    </div>
+</div>
+<div class="col-12" id="table-history">
+    <div class="row">
+        <div class="col-3">
+            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                        class="fa fa-calendar"></i></div>
+                <input class="datepicker-here form-control digits" type="text" data-language="en"
+                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Created Date"
+                    id="createdDateInput">
+
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="faq-form">
+                <input class="form-control" type="text" placeholder="Search.." id="searchInput"><i class="search-icon"
+                    data-feather="search"></i>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="table-responsive" style=" max-height: 450px;">
+                <table class="table tbl-border-history">
+                    <thead id="tbl-history-header" style="background-color: #006CA9;">
+                        <tr>
+                            <th scope="col" style="width: 40px;text-align:center">
+                                No
+                            </th>
+                            <th scope="col" style="width: 100px">Date Time</th>
+                            <th scope="col" style="width: 120px">Username</th>
+                            <th scope="col" style="width: 250px">Draft Name</th>
+                            <th scope="col" style="width: 300px">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-9 mt-3">
+            <div id="total-loghistory-page">
+            </div>
+        </div>
+        <div class="col-3 mt-3 d-flex justify-content-end">
+            <div id="list-loghistory-page">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

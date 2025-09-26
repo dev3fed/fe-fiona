@@ -35,13 +35,11 @@ async function deleteActivitydraft() {
       "Add/Edit RASCI": "Add/Edit RASCI activity data has been deleted",
     };
     const information = draftTypeMessages[draftType] || "Are you sure want to delete this activity data?";
-    console.log("draftRasciId", draftRasciId);
-    console.log("id", id);
-    console.log("cek");
     const spinner = document.getElementById("btnDeleteActivitydraft");
     if (spinner) spinner.style.display = "inline-block";
 
     const url = `${id}?draftId=${draftRasciId}`;
+    console.log("url", url);
     const deleteResult = await endpointDeleteDraftActivity(url);
     console.log("deleteResult", deleteResult);
     if (deleteResult.success === true) {
@@ -78,25 +76,47 @@ async function deleteActivitydraft() {
 }
 async function triggleEditActivitybp(id) {
   const draftRasciId = getState("draftRasciId");
-  console.log("first", id);
-  console.log("draftRasciId", draftRasciId);
   const rasciNotation = getState("rasciNotation") || [];
-  const dataProsbis = getState("insertProsbis");
   const draftName = $("#dataSource-rasci option:selected").text();
-  console.log("first", draftName);
+  const selectedOption = $("#dataSource-rasci option:selected");
+  const draftSoId = selectedOption.data("draftso");
+  const url = `${draftRasciId}?draftListId=${id}`;
+  const dataActivity = await fetchDetailDraftActivity(url);
+  const dataHeader = dataActivity?.data.businessProcess;
+  const dataFooter = dataActivity?.data.rasciMapping;
+  const detailActivity = {
+    draftId: draftRasciId,
+    draftType: "Edit Business Notation",
+    draftName,
+    parentId: dataHeader?.parentId,
+    businessProcessName: dataHeader?.businessProcessName,
+    level: dataHeader?.level,
+    draftJobSource: draftSoId,
+    jobMapped: dataFooter.map(({ unitCode, prlOrg, rasciData, positionName }) => ({
+      jobName: positionName,
+      orgUnitCode: unitCode,
+      orgPrl: prlOrg,
+      rasciNotation: rasciData.map(({ notation, comment }) => ({
+        rasciCode: notation,
+        comment,
+        isChecked: Boolean(notation),
+      })),
+    })),
+  };
+  setState("insertProsbis", detailActivity);
   const resultLevel = await fetchSelectLevel(draftRasciId);
   const modal = new bootstrap.Modal(document.getElementById("ModalEditActivitybp"));
   modal.show();
+
   try {
     if (resultLevel.status === 200) {
       const listLevel = resultLevel?.data.result;
-      console.log("first", listLevel);
       const formContent = `
     <div class="col-2">
       <div class="mb-3">
         <label class="form-label">Level</label>
          <select class="form-select digits" disabled>
-          <option value="${draftRasciId}">${draftName}</option>
+          <option value="${dataHeader.level}">${dataHeader.level}</option>
         </select>
       </div>
     </div>
@@ -104,14 +124,14 @@ async function triggleEditActivitybp(id) {
         <div class="mb-3">
           <label class="form-label">Parent</label>
           <select class="form-select digits" disabled>
-          <option value="${draftRasciId}">${draftName}</option>
+          <option value="${dataHeader.parentId}">${dataHeader.parentName}</option>
         </select>
         </div>
     </div>
     <div class="col-12">
       <div>
         <label class="form-label">Business Process Name</label>
-        <textarea class="form-control"></textarea>
+        <textarea class="form-control" id="editBpName">${dataHeader.businessProcessName}</textarea>
       </div>
     </div>`;
       const bodySelectJob = `
@@ -125,7 +145,7 @@ async function triggleEditActivitybp(id) {
           </tr>`;
 
       editTblNotation(rasciNotation);
-      cardSelectedEditJoblist(dataProsbis);
+      cardSelectedEditJoblist(detailActivity);
       document.getElementById("edit-select-job").innerHTML = bodySelectJob;
       document.getElementById("tbl-edit-bp-header").innerHTML = theadContent;
 
@@ -147,7 +167,9 @@ const cardSelectedEditJoblist = (param) => {
               <span style="font-size:13px;font-weight:bold">${value.jobName}</span>
             </div>
             <div class="col-2 d-flex justify-content-end">
-              <button class="btn btn-outline-danger btn-sm " type="button"  style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
+              <button class="btn btn-outline-danger btn-sm " type="button" onclick="deleteActivityJob(${
+                value.orgUnitCode
+              })" style="padding: 0; width: 25px; height: 22px; display: flex; justify-content: center; align-items: center;">
                 <i class="icon-trash" style="font-size: 14px;padding-right:2px"></i>
               </button>
             </div> 
@@ -169,6 +191,14 @@ const cardSelectedEditJoblist = (param) => {
     })
     .join("");
   document.getElementById("selected-edit-job").innerHTML = bodyJoblist;
+};
+
+const deleteActivityJob = (id) => {
+  const dataProsbis = getState("insertProsbis");
+  const removeData = dataProsbis.jobMapped.filter((item) => Number(item.orgUnitCode) !== Number(id));
+  const result = { ...dataProsbis, jobMapped: removeData };
+  setState("insertProsbis", result);
+  cardSelectedEditJoblist(result);
 };
 
 const editTblNotation = (rasciNotation) => {
@@ -203,6 +233,94 @@ const editTblNotation = (rasciNotation) => {
     .join("");
   tdBody = rasciRows;
   document.getElementById("tbl-edit-bp-body").innerHTML = tdBody;
+};
+
+const selectProsbisPosition = () => {
+  const selectedJobId = $("#jobeditId");
+  const selectedValue = selectedJobId.val();
+  const jobName = selectedJobId.find(":selected").text();
+  const dataProsbis = getState("insertProsbis") || {};
+  const rasciNotation = getState("rasciNotation") || [];
+  console.log("first", rasciNotation);
+  const [orgUnitCode, orgPrl] = selectedValue.split(";");
+
+  const payload = {
+    ...dataProsbis,
+    jobMapped: [
+      ...dataProsbis.jobMapped,
+      {
+        jobName,
+        orgUnitCode: orgUnitCode,
+        orgPrl: orgPrl,
+        rasciNotation: rasciNotation,
+      },
+    ],
+  };
+  console.log("first", payload);
+  setState("insertProsbis", payload);
+  setTimeout(() => {
+    selectedJobId.val(null).trigger("change");
+    const updatedRasciNotation = rasciNotation.map((letter) => {
+      return { ...letter, comment: "", isChecked: false };
+    });
+    setState("rasciNotation", updatedRasciNotation);
+    editTblNotation(updatedRasciNotation);
+    cardSelectedEditJoblist(payload);
+  }, 200);
+};
+$(document).on("change", "#jobeditId", function () {
+  const jobId = $("#jobeditId").val();
+  const inputProsbis = $("#editBpName").val();
+  const btn = $("#btnSelectPosition");
+  if (jobId && inputProsbis && inputProsbis.trim().length > 0) {
+    btn.prop("disabled", false);
+  } else {
+    btn.prop("disabled", true);
+  }
+});
+const saveEditBpchange = async () => {
+  try {
+    const dataProsbis = getState("insertProsbis");
+    const draftRasciId = getState("draftRasciId");
+    const spinner = document.getElementById("saveChangeSpinner");
+    const editBpNameValue = document.getElementById("editBpName")?.value;
+    spinner.style.display = "inline-block";
+    const inputValue = {
+      ...dataProsbis,
+      businessProcessName: editBpNameValue,
+    };
+    console.log("dataProsbis", inputValue);
+    const result = await submitDraftProsbis(inputValue);
+    if (result.status === 200) {
+      const ModalEditActivitybp = document.getElementById("ModalEditActivitybp");
+      const modal = bootstrap.Modal.getInstance(ModalEditActivitybp);
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Data change has been saved</span>
+              `,
+          },
+        },
+      }).then(async () => {
+        spinner.style.display = "none";
+        if (modal) modal.hide();
+        const payload = {
+          Page: 1,
+          PageSize: 5,
+        };
+        const queryString = new URLSearchParams(payload).toString();
+        const listData = await fetchDraftListProsbis(draftRasciId, queryString);
+        renderTableActivity(listData);
+      });
+    }
+  } catch (error) {
+    console.error("Error saving draft:", error);
+  }
 };
 function select2EditJob() {
   const draftRasciId = $("#dataSource-rasci").val();
@@ -249,16 +367,18 @@ function select2EditJob() {
 }
 
 async function triggleDetailActivity(id, draftType) {
-  const draftRasciId = getState("draftRasciId");
+  const dataDetailDraft = getState("dataDetailDraft");
+  setState("draftActivityType", draftType);
+  setState("draftActivityId", id);
   try {
     if (draftType === "Add New Business Process") {
-      detailAddprosbis(id, draftRasciId);
+      detailAddprosbis(id, dataDetailDraft.draftId);
     } else if (draftType === "Delete Business Process") {
-      detailDeleteBp(id, draftRasciId);
+      detailDeleteBp(id, dataDetailDraft.draftId);
     } else if (draftType === "Edit Business Process") {
-      detailEditBp(id, draftRasciId);
+      detailEditBp(id, dataDetailDraft.draftId);
     } else if (draftType === "Add/Edit RASCI") {
-      detailAddNotation(id, draftRasciId);
+      detailAddNotation(id, dataDetailDraft.draftId);
     }
   } catch (error) {}
 }
@@ -305,7 +425,6 @@ async function detailAddprosbis(id, draftRasciId) {
         `;
       })
       .join("");
-
     const contentBody = `
     <div class="custom-card-draft">
         <div class="header-card-draft">
@@ -315,7 +434,7 @@ async function detailAddprosbis(id, draftRasciId) {
           <div class="col-7 custom-col" style="text-align: left">
             <label label style="color:#9F9FA5">Business Process Name</label>
             <div style="display: flex;  font-weight: 600; font-size: 14px;">
-              <span>${dataHeader.indexGroup || "0"} - ${dataHeader.businessProcessName}</span>
+              <span>${dataHeader.indexNumber || "0"} - ${dataHeader.businessProcessName}</span>
             </div>
          </div>
           <div class="col-5 custom-col" style="text-align: left; border-right:none">
@@ -403,7 +522,7 @@ async function detailDeleteBp(id, draftRasciId) {
 async function detailEditBp(id, draftRasciId) {
   const url = `${draftRasciId}?draftListId=${id}`;
   const dataActivity = await fetchDetailDraftActivity(url);
-  console.log("dataActivity", dataActivity.data);
+  setState("dataDetailProsbis", dataActivity.data);
   const modal = new bootstrap.Modal(document.getElementById("ModalDetaileditbp"));
   modal.show();
   const dataInfo = dataActivity.data;
@@ -453,22 +572,135 @@ async function detailEditBp(id, draftRasciId) {
   // const dataInfo = dataActivity.data.businessProcess;
 }
 
+async function triggleEditBpActivity() {
+  try {
+    ["saveBpactivity", "cancelEditBp"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.style.display = "inline-block";
+        btn.classList.remove("d-none");
+      }
+    });
+
+    ["editBpactivity", "deleteBpActivity"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.style.display = "none";
+    });
+
+    document.querySelectorAll("textarea.form-control[disabled]").forEach((textarea) => {
+      textarea.removeAttribute("disabled");
+    });
+  } catch (error) {}
+}
+
+async function closeModaleditbp() {
+  try {
+    const modal = bootstrap.Modal.getInstance(document.getElementById("ModalDetaileditbp"));
+    if (modal) modal.hide();
+    changeConditionEdit();
+  } catch (error) {}
+}
+
+async function handleCancelEditbp() {
+  try {
+    changeConditionEdit();
+  } catch (error) {}
+}
+
+async function changeConditionEdit() {
+  try {
+    ["saveBpactivity", "cancelEditBp"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.style.display = "none";
+        btn.classList.add("d-none");
+      }
+    });
+
+    ["editBpactivity", "deleteBpActivity"].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.style.display = "inline-block";
+    });
+
+    document.querySelectorAll("textarea.form-control").forEach((textarea) => {
+      textarea.setAttribute("disabled", "true");
+    });
+  } catch (error) {}
+}
+$(document).on("click", "#deleteBpActivity", async function () {
+  try {
+    const id = getState("draftActivityId");
+    const draftType = getState("draftActivityType");
+    const modalEditBp = bootstrap.Modal.getInstance(document.getElementById("ModalDetaileditbp"));
+    if (modalEditBp) modalEditBp.hide();
+    handleDeleteDraftActivity(id, draftType);
+  } catch (error) {}
+});
+$(document).on("click", "#saveBpactivity", async function () {
+  try {
+    const { draftId, draftName, indexNumber } = getState("dataDetailProsbis");
+    const businessProcessName = $("textarea.form-control").val();
+    const spinner = document.getElementById("loadingBpactivity");
+    spinner.style.display = "inline-block";
+
+    const payload = {
+      draftId,
+      draftType: "Edit Business Process",
+      draftName,
+      parentId: indexNumber,
+      businessProcessName,
+    };
+
+    const result = await submitDraftProsbis(payload);
+    if (result.status === 200) {
+      const modal = bootstrap.Modal.getInstance(document.getElementById("ModalDetaileditbp"));
+      spinner.style.display = "none";
+      modal?.hide();
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2500,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;"><b>SUCCESS</b></span><br><span>Data change has been saved.</span>`,
+          },
+        },
+      }).then(async () => {
+        const queryString = new URLSearchParams({ Page: 1, PageSize: 5 }).toString();
+        const listData = await fetchDraftListProsbis(draftId, queryString);
+        changeConditionEdit();
+        renderTableActivity(listData);
+      });
+    }
+  } catch (error) {
+    swal({
+      title: "Error",
+      text: "An error occurred while saving.",
+      icon: "error",
+      button: "OK",
+    });
+  }
+});
 async function detailAddNotation(id, draftRasciId) {
   console.log("first", id);
-  const url = `${draftRasciId}?draftListId=${id}`;
-  const dataActivity = await fetchDetailDraftActivity(url);
-  console.log("dataActivity", dataActivity);
-  const detailInfo = dataActivity?.data.mappingData;
   const modal = new bootstrap.Modal(document.getElementById("modalActivityEnot"));
   modal.show();
   const modalTitle = document.getElementById("modalActivityEnotTitle");
   if (modalTitle) {
     modalTitle.innerHTML = `Add/Edit RASCI Activity Detail `;
   }
-  // Looping detailInfo.mappingData untuk membuat baris tabel dinamis
-
-  // Generate table body with comment icons for old and new notation
-  const contentBody = `
+  renderTableEditnotActivity(id, draftRasciId);
+}
+const renderTableEditnotActivity = async (id, draftRasciId) => {
+  try {
+    const url = `${draftRasciId}?draftListId=${id}`;
+    const dataActivity = await fetchDetailDraftActivity(url);
+    console.log("dataActivity", dataActivity);
+    setState("dataDetailDraft", dataActivity.data);
+    const detailInfo = dataActivity?.data.mappingData;
+    const contentBody = `
       <div class="row">
         <div class="col-12 ">
             <label>Position: ${detailInfo[0].positionCode} - ${detailInfo[0].positionName}</label>
@@ -479,135 +711,312 @@ async function detailAddNotation(id, draftRasciId) {
            <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;"> Add RASCI
          </button>
         </div>
-        <div class="col-12 ">
-       <div class="card-tblbusiness" style=" max-height: 300px;">
-         <div class="table-responsive scrollable mt-1" style=" max-height: 260px;">
-             <table class="table tbl-border-notation">
-                 <thead>
-                 <tr>
-                      <th scope="col" style="width: 50px">No</th>
-                     <th scope="col" style="width: 50px">Level</th>
-                     <th scope="col" style="width: 80px;text-align:center">Index</th>
-                     <th scope="col" >Business Process</th>
-                     <th scope="col" style="width: 120px;text-align:center">RASCI (Before)</th>
-                     <th scope="col" style="width: 120px;text-align:center">RASCI (After)</th>
-                     <th scope="col" style="width: 100px;text-align:center">Action</th>
-                 </tr>
-                 </thead>
-                 <tbody>
-                  ${
-                    detailInfo.length === 0
-                      ? `<tr><td colspan="7" style="text-align:center">No data</td></tr>`
-                      : detailInfo
-                          .map((item, idx) => {
-                            // OLD COMMENT TOOLTIP
-                            let oldCommentTooltip = "";
-                            if (Array.isArray(item.oldNotation) && item.oldComment && item.oldComment.length > 0) {
-                              oldCommentTooltip = item.oldComment
-                                .map((c, i) => {
-                                  const code = item.oldNotation[i]?.value || "";
-                                  return code && c.value ? `${code} : ${c.value}` : "";
-                                })
-                                .filter(Boolean)
-                                .join("<br>");
-                            }
-                            // If oldComment is empty, try to fallback to empty string
-                            // NEW COMMENT TOOLTIP
-                            let newCommentTooltip = "";
-                            if (
-                              item.newNotation &&
-                              item.newNotation.value &&
-                              item.newComment &&
-                              item.newComment.value
-                            ) {
-                              newCommentTooltip = `${item.newNotation.value} : ${item.newComment.value}`;
-                            }
+         <div class="col-12 ">
+      <div class="card-tblbusiness" style="max-height: 300px;">
+        <div class="table-responsive scrollable mt-1" style="max-height: 260px;">
+        <table class="table tbl-border-notation">
+          <thead>
+          <tr>
+            <th scope="col" style="width: 50px">No</th>
+            <th scope="col" style="width: 50px">Level</th>
+            <th scope="col" style="width: 80px;text-align:center">Index</th>
+            <th scope="col">Business Process</th>
+            <th scope="col" style="width: 120px;text-align:center">RASCI (Before)</th>
+            <th scope="col" style="width: 120px;text-align:center">RASCI (After)</th>
+            <th scope="col" style="width: 100px;text-align:center">Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          ${detailInfo
+            .map((item, idx) => {
+              let oldCommentTooltip = "";
+              if (Array.isArray(item.oldNotation)) {
+                oldCommentTooltip = item.oldNotation
+                  .filter((n) => n.comment)
+                  .map((n) => `${n.value} : ${n.comment}`)
+                  .join("<br>");
+              }
 
-                            return `
-                          <tr>
-                          <td>${idx + 1}</td>
-                          <td>${item.level || "-"}</td>
-                          <td style="text-align:center">${item.indexNo || "-"}</td>
-                          <td>
-                            ${item.businessProcessName || "-"}
-                            ${
-                              item.businessProcessReference
-                                ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
-                                : ""
-                            }
-                          </td>
-                          <td style="text-align:center">
-                            ${
-                              Array.isArray(item.oldNotation)
-                                ? item.oldNotation
-                                    .map(
-                                      (n, i) =>
-                                        `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
-                                          n.value
-                                        } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
-                                    )
-                                    .join("")
-                                : "-"
-                            }
-                            ${
-                              oldCommentTooltip
-                                ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
-                                : ""
-                            }
-                          </td>
-                          <td style="text-align:center">
-                            ${
-                              item.newNotation && item.newNotation.value
-                                ? `<img src="/assets/images/rasci/${item.newNotation.value.toLowerCase()}.svg" alt="${
-                                    item.newNotation.value
-                                  } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`
-                                : "-"
-                            }
-                            ${
-                              newCommentTooltip && item.newComment.value
-                                ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${newCommentTooltip}">`
-                                : ""
-                            }
-                          </td>
-                          <td style="text-align:center">
-                            <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditNotation()">
-                            <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
-                            </button>
-                          </td>
-                          </tr>
-                        `;
-                          })
-                          .join("")
-                  }
-               </tbody>
-             </table>
-            </div>
-          </div>
+              let newCommentTooltip = "";
+              if (Array.isArray(item.newNotation)) {
+                newCommentTooltip = item.newNotation
+                  .filter((n) => n.comment)
+                  .map((n) => `${n.value} : ${n.comment}`)
+                  .join("<br>");
+              }
+
+              const rasciOrder = ["R", "A", "S", "C", "I"];
+              const sortByRasci = (arr) =>
+                Array.isArray(arr)
+                  ? arr.slice().sort((a, b) => rasciOrder.indexOf(a.value) - rasciOrder.indexOf(b.value))
+                  : [];
+
+              const sortedOldNotation = sortByRasci(item.oldNotation);
+              const sortedNewNotation = sortByRasci(item.newNotation);
+
+              return `
+                <tr>
+                <td>${idx + 1}</td>
+                <td>${item.level || "-"}</td>
+                <td style="text-align:center">${item.indexNo || "-"}</td>
+                <td>
+                ${item.businessProcess || "-"}
+                ${
+                  item.businessProcessReference
+                    ? `<br><small style="color:#9F9FA5">(${item.businessProcessReference})</small>`
+                    : ""
+                }
+                </td>
+                <td style="text-align:center">
+                ${
+                  sortedOldNotation.length > 0
+                    ? sortedOldNotation
+                        .map(
+                          (n) =>
+                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                              n.value
+                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                        )
+                        .join("")
+                    : "-"
+                }
+                ${
+                  oldCommentTooltip
+                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${oldCommentTooltip}">`
+                    : ""
+                }
+                </td>
+                <td style="text-align:center">
+                ${
+                  sortedNewNotation.length > 0
+                    ? sortedNewNotation
+                        .map(
+                          (n) =>
+                            `<img src="/assets/images/rasci/${n.value.toLowerCase()}.svg" alt="${
+                              n.value
+                            } Icon" style="height: 16px; width: 16px; margin-left: 6px;">`,
+                        )
+                        .join("")
+                    : "-"
+                }
+                ${
+                  newCommentTooltip
+                    ? `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${newCommentTooltip}">`
+                    : ""
+                }
+                </td>
+                <td style="text-align:center">
+                <button class="btn btn-outline-light btn-small-icon" type="button" onclick='handleEditNotation(JSON.parse(this.getAttribute("data-detail")), "${
+                  item.businessProcess || ""
+                }","${item.indexNo || ""}")' data-detail='${JSON.stringify(item)}'>
+                <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
+                </button>
+                </td>
+                </tr>
+              `;
+            })
+            .join("")}
+          </tbody>
+        </table>
         </div>
       </div>
+      </div>
+      </div>
   `;
-
-  const contentDetailDraftEditnotComponent = document.getElementById("contentdetailEditnitation");
-  if (contentDetailDraftEditnotComponent) {
-    contentDetailDraftEditnotComponent.innerHTML = contentBody;
-  }
-  // const url = `${draftRasciId}?draftListId=${id}`;
-  // const dataActivity = await fetchDetailDraftActivity(url);
-  // console.log("dataActivity", dataActivity);
+    const contentDetailDraftEditnotComponent = document.getElementById("contentdetailEditnitation");
+    if (contentDetailDraftEditnotComponent) {
+      contentDetailDraftEditnotComponent.innerHTML = contentBody;
+    }
+    feather.replace();
+    initializeTooltips();
+  } catch (error) {}
+};
+function tblChangeNotationActivity(rasciNotation) {
+  const rasciRows = rasciNotation
+    .map(
+      (letter) => `
+    <tr>
+      <th scope="row">
+        <label class="radio-label" for="checked-body-bp">
+          <input class="checkbox_animated" 
+                 id="checked-${letter.rasciCode.toLowerCase()}" 
+                 type="checkbox" 
+                 data-rasci="${letter.rasciCode}" 
+                 ${letter.isChecked ? "checked" : ""} 
+                 onclick="onCheck(event, '${letter.rasciCode}')">
+        </label>
+      </th>
+      <td style="text-align:center">
+        <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
+        letter.rasciCode
+      } Icon" style="padding-right:2px">
+      </td>
+      <td>
+        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
+          value="${letter.comment || ""}"
+          ${!letter.isChecked ? "disabled" : ""}
+          oninput="updateComment('${letter.rasciCode}', this.value)">
+      </td>
+    </tr>
+  `,
+    )
+    .join("");
+  let tdBody = rasciRows;
+  document.getElementById("tbl-activityeditnot-body").innerHTML = tdBody;
 }
 
-const handleEditNotation = () => {
-  console.log("first");
-  const modal = new bootstrap.Modal(document.getElementById("modalActivityEditnot"));
-  modal.show();
+const handleEditNotation = (detail, prosbisName, indexNumber) => {
+  console.log("first", detail);
+  console.log("first", prosbisName);
+  const dataDetailDraft = getState("dataDetailDraft");
   // console.log("data", data);
   // console.log("dataChangeNotasi", dataChangeNotasi);
   // const dataChangeNotasi = getState("dataChangeNotasi");
   // setState("editRasciNotation", data);
   // openModalEditRascinotation(dataChangeNotasi, data);
-};
 
-const openModalActivityAddnot = () => {
-  const modal = new bootstrap.Modal(document.getElementById("modalActivityAddnot"));
-  modal.show();
+  try {
+    const selectedValue = $("#dataSource-rasci").val();
+    const draftName = $("#dataSource-rasci option:selected").text();
+    const rasciNotation = getState("rasciNotation") || [];
+    const dataDetailProsbis = getState("dataDetailProsbis");
+    console.log("dataDetailProsbis", dataDetailProsbis);
+    const notation = detail.newNotation.map((item) => {
+      return {
+        rasciCode: item.value,
+        comment: item.comment,
+        isChecked: item.isChecked,
+      };
+    });
+    console.log("notation", notation);
+    const modal = new bootstrap.Modal(document.getElementById("modalActivityEditnot"));
+    modal.show();
+    const formContent = `
+        <div class="col-12">
+          <div >
+            <label class="form-label" style="width:19%">RASCI Matrix Draft</label>
+            <label> : </label>
+          <b class="form-label">${dataDetailDraft.draftName}</b>
+          <input type="hidden" id="activityIndexno" value="${detail.indexNo}" />
+          </div>
+        </div>
+        <div class="col-12">
+          <div >
+              <label class="form-label" style="width:19%">Position</label>
+               <label> : </label>
+          <b class="form-label">${detail.positionName}</b>
+          </div>
+        </div>
+        <div class="col-12">
+          <div >
+              <label class="form-label" style="width:19%">Business Process</label>
+               <label> : </label>
+          <b class="form-label">${indexNumber} - ${prosbisName}</b>
+          </div>
+        </div>
+      `;
+
+    theadContent = `<tr>
+          <th scope="col" style="width: 50px">Check</th>
+          <th scope="col" style="width: 150px;text-align:center">RASCI Notation</th>
+          <th scope="col">Comment (Optional)</th>
+          </tr>`;
+    const output = mergeRasciData(notation, rasciNotation);
+    setState("rasciNotation", output);
+    tblChangeNotationActivity(output);
+    document.getElementById("tbl-activityeditnot-header").innerHTML = theadContent;
+
+    const bodyContent = document.getElementById("form-activityeditnot");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+  } catch (error) {}
+};
+const editNotActivity = async () => {
+  try {
+    const rasciNotation = getState("rasciNotation");
+    const detail = getState("dataDetailDraft");
+    const draftActivityId = getState("draftActivityId");
+    const activityIndexno = document.getElementById("activityIndexno")?.value;
+    const spinner = document.getElementById("loadingEditActivity");
+
+    if (spinner) spinner.style.display = "inline-block";
+
+    const mappingItem = Array.isArray(detail.mappingData)
+      ? detail.mappingData.find((item) => String(item.indexNo) === String(activityIndexno))
+      : null;
+
+    if (!mappingItem) {
+      if (spinner) spinner.style.display = "none";
+      swal({
+        title: "Error",
+        text: "Mapping item not found.",
+        icon: "error",
+        button: "OK",
+      });
+      return;
+    }
+
+    mappingItem.newNotation = rasciNotation;
+
+    const payload = {
+      draftId: detail.draftId,
+      draftListId: draftActivityId,
+      draftType: "Add/Edit RASCI",
+      draftJobSource: null,
+      orgUnitCode: detail.unitCodeOrg,
+      orgPrl: detail.prlOrg,
+      busProsMapped: [
+        {
+          parentId: mappingItem.indexNo,
+          rasciNotation: mappingItem.newNotation,
+        },
+      ],
+    };
+
+    const result = await submitDraftProsbis(payload);
+
+    if (result.status === 200) {
+      const modalEl = document.getElementById("modalActivityEditnot");
+      const modal = bootstrap.Modal.getInstance(modalEl);
+
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Your activity has been saved as draft.</span>
+              <br>
+              <span>You can check in <b>${result?.data.draftName}</b> at draft tab.</span>`,
+          },
+        },
+      }).then(async () => {
+        if (spinner) spinner.style.display = "none";
+        if (modal) modal.hide();
+        backChangeNotationRow();
+        await renderTableEditnotActivity(draftActivityId, detail.draftId);
+      });
+    } else {
+      if (spinner) spinner.style.display = "none";
+      swal({
+        title: "Error",
+        text: "Failed to save draft.",
+        icon: "error",
+        button: "OK",
+      });
+    }
+  } catch (error) {
+    const spinner = document.getElementById("loadingEditActivity");
+    if (spinner) spinner.style.display = "none";
+    swal({
+      title: "Error",
+      text: "An error occurred while saving.",
+      icon: "error",
+      button: "OK",
+    });
+    console.error("editNotActivity error:", error);
+  }
 };

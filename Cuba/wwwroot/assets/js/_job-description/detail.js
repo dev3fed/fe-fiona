@@ -246,11 +246,11 @@ $(document).ready(async function () {
   dataListJobDescription[0].jobStatus = localStorage.getItem("statusManager");
   dataListJobDescription[1].jobStatus = localStorage.getItem("statusSbm");
 
-  //  radio button with name debt-amount
+  //  radio button with name percentage-amount
   // ...existing code...
 
-  // Listen for changes on the radio buttons within the form with ID 'debt-amount-form'
-  $("#debt-amount-form input[name='debt-amount']").on("change", function () {
+  // Listen for changes on the radio buttons within the form with ID 'percentage-amount-form'
+  $("#percentage-amount-form input[name='percentage-amount']").on("change", function () {
     const value = $(this).val();
     searchJobCompare(value, true);
   });

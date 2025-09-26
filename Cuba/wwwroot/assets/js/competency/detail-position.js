@@ -1,4 +1,4 @@
-const modalInfoPosition = async (code) => {
+const modalInfoPosition = async (code, prl) => {
   try {
     const dataSource = $("#dataSource-competency").val();
     const payload = {
@@ -6,7 +6,8 @@ const modalInfoPosition = async (code) => {
       page: 1,
       pageSize: 10,
     };
-    const queryString = `${code}?` + new URLSearchParams(payload).toString();
+    const queryString = `${code}/${prl}?` + new URLSearchParams(payload).toString();
+    console.log("queryString", queryString);
     const result = await fetchDetailPositionInfo(queryString);
     if (result.success === true) {
       const detailInformation = result?.data.jobDetail[0];
@@ -240,9 +241,9 @@ const modalInfoPosition = async (code) => {
   } catch (error) {}
 };
 
-const cardTblMandatory = async (code) => {
+const cardTblMandatory = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
-  const payload = `${dataSource}/${code}`;
+  const payload = `${dataSource}/${code}/${prl}`;
 
   try {
     const result = await fetchDetailPositionMandatory(payload);
@@ -281,9 +282,9 @@ const cardTblMandatory = async (code) => {
   }
 };
 
-const cardTblGeneral = async (code) => {
+const cardTblGeneral = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
-  const payload = `${dataSource}/${code}`;
+  const payload = `${dataSource}/${code}/${prl}`;
 
   try {
     const result = await fetchDetailPositionTechnical(payload);
@@ -327,9 +328,9 @@ const cardTblGeneral = async (code) => {
   }
 };
 
-const cardTblSpecific = async (code) => {
+const cardTblSpecific = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
-  const payload = `${dataSource}/${code}`;
+  const payload = `${dataSource}/${code}/${prl}`;
 
   try {
     const result = await fetchDetailPositionTechnical(payload);
@@ -369,18 +370,19 @@ const cardTblSpecific = async (code) => {
     console.error(error);
   }
 };
-const cardTblBehavior = async (code) => {
+const cardTblBehavior = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
   const payload = {
     dataSource: dataSource,
-    positionCode: code,
+    unitCode: code,
+    prlOrg: prl,
   };
-  const queryString = "?" + new URLSearchParams(payload).toString();
+  const queryString = "/unitprl?" + new URLSearchParams(payload).toString();
 
   try {
     const result = await fetchDetailPositionBehavior(queryString);
     if (result.success === true) {
-      const listBehavior = result?.data.behaviourList[0].behaviouralDictionary || [];
+      const listBehavior = result?.data.behaviourList[0]?.behaviouralDictionary || [];
       const theadMandatory = `
           <tr>
             <th scope="col" style="width: 40px;text-align:center">No</th>

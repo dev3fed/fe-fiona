@@ -112,21 +112,19 @@ async function backToOrg(params) {
 }
 
 async function confirmDeleteDraft(id) {
-  // alert("confirmDeleteDraft" + id);
-  // lsListDraft = lsListDraft.filter((x) => x.draftId != id);
-  // lsListDetailDraft = lsListDetailDraft.filter((x) => x.draftId != id);
-  // lsListPosition = lsListPosition.filter((x) => x.draftId != id);
-  // lsListOrgNode = lsListOrgNode.filter((x) => x.draftId != id);
-  // localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
-  // localStorage.setItem("listDetailDraft", JSON.stringify(lsListDetailDraft));
-  // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-  // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  // changeOrganization(0, "Master Data SO");
-  let rollback = await rollback(id);
+  console.log("confirmDeleteDraft", id);
+  let rollback = await rollbackDraftSO(id);
   if (rollback) {
     swal("Success", "Draft has been deleted", "success");
-    window.location.href = "/organization/index";
+    // wait 2s
+    // setTimeout(() => {
+    //   window.location.href = "/organization/index";
+    // }, 3000);
   }
+  // wait 2s then redirect to organization index
+  setTimeout(() => {
+    window.location.href = "/organization/index";
+  }, 2000);
 }
 
 function deleteDraft() {
@@ -174,29 +172,33 @@ async function confirmSubmit(id) {
 }
 
 async function confirmSubmitApproval(id) {
+  loader(true);
   const draftId = urlParams.get("draftId");
   await draftApprove(draftId);
   const getDataDraft = await draftDetailById(draftId);
   checkButtonDraftDetail(getDataDraft.data);
   $("#modalConfirm").modal("hide");
   swal("Approved", "draft has been approved.", "success");
+  loader(false);
 }
 async function confirmRejectApproval(id) {
+  loader(true);
   const draftId = urlParams.get("draftId");
   await draftReject(draftId, rejectReason);
   const getDataDraft = await draftDetailById(draftId);
   checkButtonDraftDetail(getDataDraft.data);
   $("#modalConfirm").modal("hide");
   swal("Rejected", "draft has been rejected.", "success");
+  loader(false);
 }
 
 async function previewDesignCost() {
-  await changeDataSourceFilter($("#selectDraftFilterByDataSource").val());
+  await changeDataDesignCostFilter($("#selectDraftFilterByDataSource").val());
   $("#modalPreviewDesignCost").modal("show");
 }
 
 $("#selectDraftFilterByDataSource").on("change", async function () {
-  await changeDataSourceFilter($(this).val());
+  await changeDataDesignCostFilter($(this).val());
 });
 
 async function previewOrgChart() {
@@ -209,25 +211,36 @@ async function previewOrgChart() {
     },
   ]);
   $("#modalPreviewOrgChart").modal("show");
-  const dataChart = await chartShow({
-    draftId: organizationAttribute.orgUnitId,
-    jobCode: "10132405",
-    depth: 3,
-  });
-
-  if (!dataChart.data) {
-    swal("Warning", "Data not found", "warning");
-    return;
+  showChartLoading("chart-container-custom");
+  try {
+    const dataChart = await chartShow({
+      draftId: organizationAttribute.orgUnitId,
+      jobCode: defaultNodeId,
+      depth: 5,
+    });
+    renderOrgChart(dataChart.data, defaultNodeId, false);
+    setTimeout(() => {
+      if (typeof hideChartLoading === "function") {
+        hideChartLoading("chart-container-custom");
+      }
+      console.log("Chart initialization and loading completed");
+    }, 1500); // Wait 1.5 seconds for chart to fully render
+  } catch (error) {
+    console.error("Error in initializeHelper:", error);
+    // Hide loading and show error message on failure
+    if (typeof hideChartLoading === "function") {
+      hideChartLoading("chart-container-custom");
+    }
+    // Show error message in chart container
+    const container = document.querySelector(".chart-container-custom") || document.getElementById("osContainer");
+    if (container) {
+      container.innerHTML =
+        '<div style="text-align: center; padding: 20px; color: #999;">Chart loading failed. Please try again.</div>';
+    }
   }
-  dataChart.data.forEach((item) => {
-    item.id = item.id_org_unit;
-  });
-  helperOrgChart(true, "os-container", dataChart.data, true);
-
-  $("#modalPreviewOrgChart").modal("show");
 }
 
-$("#searchOrgNodeButton").on("click", function () {
+$("#searchOrgNode").on("change", function () {
   const searchValue = $("#searchOrgNode").val();
   focusNode(searchValue);
 });
@@ -269,7 +282,7 @@ function editPositionDraft(id) {
   window.location.href = "/organization/form-position?unitCode=" + id;
 }
 
-async function detailPositionDraft(id) {
+async function detailPositionDraftOld(id) {
   let findPosition = await chartJobDetail({
     draftId: organizationAttribute.orgUnitId,
     jobCode: id,
@@ -278,9 +291,7 @@ async function detailPositionDraft(id) {
   if (findPosition == undefined) {
     alert("Data not found");
     return;
-    // data = lsListPosition.find((item) => item.positionId == dataDefault);
   }
-  // const findPosition = lsListDetailDraft.find((x) => x.positionId == id);
   console.log("findPosition", findPosition);
   $("#jobName").text(
     findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
@@ -339,6 +350,14 @@ async function detailPositionDraft(id) {
   $("#modalDetailJobDraft").modal("show");
 }
 
+async function detailPositionDraft(id) {
+  await modalJobPopup(id);
+}
+
+async function detailapproval(id) {
+  await modalJobPopup(id);
+}
+
 async function confirmRollback(unitCode) {
   // alert("confirmRollback" + unitCode);
   const rollback = await deleteJobAndSubordinates({
@@ -382,12 +401,6 @@ function deletePositionDraft(positionId) {
   );
 }
 
-$(".tab-custom").on("click", function () {
-  $(this).attr("id");
-  $(".tab-custom").removeClass("active");
-  $(this).addClass("active");
-});
-
 function acceptApproval() {
   const action = [
     actionBack,
@@ -429,6 +442,9 @@ function rejectApproval() {
 }
 
 function checkButtonDraftDetail(data) {
+  const urlParts = window.location.pathname.split("/");
+  const lastPath = urlParts.pop() || urlParts.pop();
+  console.log("lastPath", lastPath);
   // hideModal(`modalConfirm`);
   // console.log("getDataDraft.data", data);
   const submitApprovalButton = $("#submitApproval");
@@ -446,19 +462,25 @@ function checkButtonDraftDetail(data) {
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
   finalizeConfirm.hide();
-  if (data.isSubmitted) {
+  // data.isRejected = true;
+  let step = 0;
+  let userRole = "admin";
+  if (data?.isSubmitted) {
+    step = 1;
     submitApprovalButton.hide();
     acceptApprovalButton.show();
     rejectApprovalButton.show();
   }
 
-  if (data.isRejected) {
+  if (data?.isRejected) {
+    step = 2;
     submitApprovalButton.show();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
   }
 
-  if (data.isApproved) {
+  if (data?.isApproved) {
+    step = 3;
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
@@ -466,7 +488,8 @@ function checkButtonDraftDetail(data) {
     deleteDraft.hide();
   }
 
-  if (data.isFinalized) {
+  if (data?.isFinalized) {
+    step = 4;
     submitApprovalButton.hide();
     finalizeConfirm.hide();
     deleteDraft.hide();
@@ -477,15 +500,27 @@ function checkButtonDraftDetail(data) {
   } else {
     finalizeConfirm.hide();
   }
+
+  if (lastPath === "approval-detail") {
+    $("#editDraftName,#submitApproval,#downloadTemplate, #exportDataDraft, #importDataDraft").hide();
+  }
+
+  return { step, userRole };
 }
 
 $("#finalizeConfirm").on("click", async function () {
   // alert('masok')
+  loader(true);
   const file = $("#file-input")[0].files[0];
   const sendFinalize = await draftFinalize(organizationAttribute.orgUnitId, file);
-  if (sendFinalize) {
+  if (sendFinalize.status == 200) {
     hideModal(`modalUploadFinalized`);
+    loader(false);
     swal("Success", "Draft has been finalized", "success");
+  } else {
+    const message = sendFinalize?.message ?? "Failed to finalize draft";
+    swal("Failed", message, "error");
+    loader(false);
   }
 });
 
@@ -505,10 +540,26 @@ $(document).ready(async function () {
   checkDataOrganization();
   await initializeDraftDetail(getDataDraft.data);
 
-  checkButtonDraftDetail(getDataDraft.data);
+  const getStatusDraft = checkButtonDraftDetail(getDataDraft.data);
+  console.log("getStatusDraft", getStatusDraft);
   // checkPage();
-  getTableListDraftDetail(getDataListDraft.data);
+  getTableListDraftDetail(getDataListDraft.data, getStatusDraft);
   uploadFinalizeHandler();
+
+  $(".tab-custom").on("click", function () {
+    $(this).attr("id");
+    $(".tab-custom").removeClass("active");
+    $(this).addClass("active");
+
+    const value = $(this).attr("id");
+    if (value == "all") {
+      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.draftId == draftId));
+    } else {
+      console.log("value", value);
+      console.log("getDataListDraft.data", getDataListDraft.data);
+      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.draftId == draftId && x.actionType == value));
+    }
+  });
 
   // // tab-custom class on change
   // $(".tab-custom").on("click", function () {
@@ -565,11 +616,16 @@ $(document).ready(async function () {
   $("#editDraftName").on("click", function () {
     $("#inputDraftName").val($("#draftName").text());
     $("#modalLabelOSDraft").text("Edit Draft Name");
+    $("#createDraftSO").text("Update Draft Name");
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
   });
 
-  $("#continueButton").on("click", async function () {
+  $("#createDraftSO").on("click", async function () {
     const draftName = $("#inputDraftName").val();
+    if (!draftName) {
+      swal("Failed", "Draft name is required", "error");
+      return;
+    }
     const draftId = urlParams.get("draftId");
     $("#draftName").text(draftName);
     $("#modalCreateDraftSO").modal("hide");
@@ -583,5 +639,8 @@ $(document).ready(async function () {
     });
     localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
     changeOrganization();
+    $("#modalLabelOSDraft").text("Create Draft SO");
+    $("#inputDraftName").val("");
+    $("#createDraftSO").text("Create Draft");
   });
 });

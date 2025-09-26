@@ -230,7 +230,7 @@ function loadTableBody(jobList) {
           <div class="joblist-cell-wrapper">
             <div class="flex-fill joblist-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
               title="${val.positionName}"
-              onclick="handleClickPosition('${val.positionCode}', ${valString})">
+              onclick="handleClickPosition('${val.unitCode}', '${val.prlOrg}')">
               ${val.positionName}
             </div>
             <div class="ellipsis-menu joblist-row-ellipsis">
@@ -240,7 +240,7 @@ function loadTableBody(jobList) {
                   <i class="fas fa-ellipsis-v"></i>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <li onclick="handleClickPosition('${val.positionCode}')">
+                  <li onclick="handleClickPosition('${val.unitCode}','${val.prlOrg}')">
                     <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Icon">Detail</a>
                   </li>
                 </ul>
@@ -257,15 +257,14 @@ function loadTableBody(jobList) {
   initializeTooltips();
 }
 
-function handleClickPosition(positionCode) {
+function handleClickPosition(unitCode, prlOrg) {
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
   modal.show();
-  modalInfoPosition(positionCode);
-  cardTblMandatory(positionCode);
-  cardTblGeneral(positionCode);
-  cardTblSpecific(positionCode);
-  cardTblBehavior(positionCode);
-  // modalTabBehavior(positionCode);
+  modalInfoPosition(unitCode, prlOrg);
+  cardTblMandatory(unitCode, prlOrg);
+  cardTblGeneral(unitCode, prlOrg);
+  cardTblSpecific(unitCode, prlOrg);
+  cardTblBehavior(unitCode, prlOrg);
 }
 // Initialize tooltips after rendering
 function initializeTooltips() {
@@ -286,7 +285,9 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
     const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");
     listCompetency.forEach((comp) => {
-      const compItem = competencyMapping.find((item) => item.uniqueKey === jobCode && item.compCode === comp.compCode);
+      const compItem = competencyMapping.find(
+        (item) => item.uniqueKey === jobCode && item.compCode === comp.compCode && item.compType === comp.compType,
+      );
       const level = compItem?.level || "";
       const compTd = `
         <td data-index="${jobCode}-${comp.compCode}">
@@ -297,7 +298,7 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
             <img style="display: ${
               isMaster ? "none" : "flex"
             }" src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" 
-              onclick="openModalEditDepth('${jobCode}', '${comp.compCode}')">
+              onclick="openModalEditDepth('${jobCode}', '${comp.compCode}','${comp.compType}')">
           </div>
         </td>
       `;

@@ -353,6 +353,7 @@ const showRasciMatrixBybp = async () => {
         setState("isSearchMatrix", true);
         setState("payloadProsbis", payloadByBusiness);
         setState("payloadPosition", payloadJob);
+        setState("actionExport", "searchByBusiness");
         setState("resultProsbis", resultMatrix.data);
         setState("resultJabatan", resultPosition.data);
         setState("totalProsbis", resultMatrix.totalResult);

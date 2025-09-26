@@ -1,41 +1,56 @@
+const url = {
+  baseUrl: url_api,
+  dashboard: "api/dashboard",
+  "organization-structure": "/organization-structure",
+  "rasci-matrix": "/rasci-matrix",
+  competency: "/competency",
+};
+
+const mappingLevelName = {
+  director: "Director",
+  vp: "VP/EGM/SMOM",
+  manager: "Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara",
+  "ass-manager": "Asst. Manager/Sr. Analyst/Setara",
+  "sr-supervisor": "Sr. Supervisor/Analyst/Setara",
+  supervisor: "Supervisor/Jr. Analyst/Setara",
+  "jr-supervisor": "Jr. Supervisor/Jr. Assistant/Setara",
+  "jr-operator": "Jr. Operator/Jr. Technician/Administrator/Setara",
+};
+
+// "L1 (Category)", "L2 (Process Group)", "L3 (Process)", "L4 (Activity)", "L5 (Task)", "L6 (Sub Task)"
+const businessProcessLevels = [
+  "L1 (Category)",
+  "L2 (Process Group)",
+  "L3 (Process)",
+  "L4 (Activity)",
+  "L5 (Task)",
+  "L6 (Sub Task)",
+];
+
+const colorsRasci = {
+  A: "#4E9ECA",
+  R: "#45C6C1",
+  S: "#8DC2B5",
+  C: "#EF9D91",
+  I: "#FFDF6F",
+};
+
+const mappingRasciName = {
+  A: "Accountable",
+  R: "Responsible",
+  S: "Support",
+  C: "Consulted",
+  I: "Informed",
+};
+
+const rasciNotations = ["A", "R", "S", "C", "I"];
+
+const COLOR = ["#E87777", "#9999FC", "#7EC67E", "#7BE5D1", "#FDC47E", "#76BFFF", "#FFA5C3", "#B7B7B7"];
+const BAR_PERCENTAGE = 0.8;
+const CATEGORY_PERCENTAGE = 0.8;
+
 const dataDesinCost = {
   dataFunction: [
-    // {
-    //   functionName: "",
-    //   formationProposed: 157,
-    //   costMonthProposed: 2578945819,
-    //   costYearProposed: 2578945819,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 157,
-    //   costMonthAdjustment: 2578945819,
-    //   costYearAdjustment: 2578945819,
-    // },
-    // {
-    //   functionName: "Perencanaan & Pengembangan Bisnis",
-    //   formationProposed: 81,
-    //   costMonthProposed: 1748396206,
-    //   costYearProposed: 1748396206,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 81,
-    //   costMonthAdjustment: 1748396206,
-    //   costYearAdjustment: 1748396206,
-    // },
-    // {
-    //   functionName: "Pemasaran Pusat & Niaga",
-    //   formationProposed: 216,
-    //   costMonthProposed: 3724734488,
-    //   costYearProposed: 3724734488,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 216,
-    //   costMonthAdjustment: 3724734488,
-    //   costYearAdjustment: 3724734488,
-    // },
     {
       functionName: "Pemasaran Regional",
       formationProposed: 1218,
@@ -48,54 +63,6 @@ const dataDesinCost = {
       costMonthAdjustment: 16086711529,
       costYearAdjustment: 16086711529,
     },
-    // {
-    //   functionName: "Rekayasa & Infrastruktur Darat",
-    //   formationProposed: 3023,
-    //   costMonthProposed: 26902616274,
-    //   costYearProposed: 26902616274,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 3023,
-    //   costMonthAdjustment: 26902616274,
-    //   costYearAdjustment: 26902616274,
-    // },
-    // {
-    //   functionName: "Keuangan",
-    //   formationProposed: 110,
-    //   costMonthProposed: 1693218180,
-    //   costYearProposed: 1693218180,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 110,
-    //   costMonthAdjustment: 1693218180,
-    //   costYearAdjustment: 1693218180,
-    // },
-    // {
-    //   functionName: "SDM & Penunjang Bisnis",
-    //   formationProposed: 179,
-    //   costMonthProposed: 3279906408,
-    //   costYearProposed: 3279906408,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 179,
-    //   costMonthAdjustment: 3279906408,
-    //   costYearAdjustment: 3279906408,
-    // },
-    // {
-    //   functionName: "Manajemen Risiko",
-    //   formationProposed: 31,
-    //   costMonthProposed: 400475787,
-    //   costYearProposed: 400475787,
-    //   formationExisting: 0,
-    //   costMonthExisting: 0,
-    //   costYearExisting: 0,
-    //   formationAdjustment: 31,
-    //   costMonthAdjustment: 400475787,
-    //   costYearAdjustment: 400475787,
-    // },
   ],
   dataDivision: [
     {

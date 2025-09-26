@@ -171,16 +171,16 @@
 
                         </div>
                     </div>
-                    <div class="col-12" style="display: none;" id="activityposref">
+                    @* <div class="col-12" style="display: none;" id="activityposref">
 
                     </div>
                     <div class="col-6" style="display: none;" id="table-activityprosbisref">
                     </div>
                     <div class="col-6" style="display: none;" id="selectedActivityBisproref">
 
-                    </div>
+                    </div> *@
 
-                    <div class="col-6" style="display: block;" id="bispro">
+                    <div class="col-6 mt-2" style="display: block;" id="activity-bispro">
                         <label class="form-label">Business Process</label>
                         <div class="card-tblbusiness">
                             <div id="select-activitybusiness">
@@ -195,12 +195,12 @@
                             </div>
                             <div class="d-flex mt-2 justify-content-end">
                                 <button class="btn btn btn-primary" type="button" id="btn-activityselectedbusiness"
-                                    onclick="triggleSelectBusiness()" disabled>
+                                    onclick="triggleSelectActivitybp()" disabled>
                                     Select Business Process</button>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6" style="display: block;" id="selectedBispro">
+                    <div class="col-6 mt-2" style="display: block;" id="selected-activitybispro">
                         <label class="form-label">Selected Business Process</label>
                         <div class="card-tblbusiness scrollable-cardbusiness" id="selected-activitybusiness">
 
@@ -211,9 +211,9 @@
             <div class="modal-footer  d-flex justify-content-end">
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
-                        onclick="backChangeNotation()"><i class="icon-arrow-left"></i> Back</button>
+                        onclick="backChangeActivityNotation()"><i class="icon-arrow-left"></i> Back</button>
                     <button id="btnDraftActivitynotation" class="btn btn-primary" type="button"
-                        onclick="saveDraftnotation()">
+                        onclick="saveNewActivityNotation()">
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
                                 id="spinBtnNotation" role="status"></div>

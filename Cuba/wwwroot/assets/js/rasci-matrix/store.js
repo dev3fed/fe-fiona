@@ -57,6 +57,7 @@ const appState = new Proxy(
       "20",
     ],
     actionType: "BP_THEN_JOB",
+    actionExport: "",
     totalProsbis: 0,
     totalJob: 0,
     expandNumber: [],
@@ -150,17 +151,22 @@ const appState = new Proxy(
       parentId: null,
       jobMapped: [],
     },
-    approvalData: [
-      {
-        requestId: "Req/RM/01122024/001",
-        draftName: "Usulan Perubahan Fungsi Marketing",
-        organizationSource: "Usulan Perubahan Fungsi Marketing",
-        status: "On Review",
-      },
-    ],
+    payloadApproval: {
+      Page: 1,
+      PageSize: 5,
+    },
+    // approvalData: [
+    //   {
+    //     requestId: "Req/RM/01122024/001",
+    //     draftName: "Usulan Perubahan Fungsi Marketing",
+    //     organizationSource: "Usulan Perubahan Fungsi Marketing",
+    //     status: "On Review",
+    //   },
+    // ],
     payloadLogHistory: {
       page: 1,
       limit: 5,
+      menu: "rasci",
     },
     logHistoryData: [],
   },
@@ -170,11 +176,15 @@ const appState = new Proxy(
         // Set the new value
         target[property] = value;
         updateSelect2ByProsbis();
+        select2Activityprosbis();
+        updateSelect2ByNotation();
         updateSelect2ByJob();
         formValidation();
         formValidationNotation();
         if (property === "dataDetailDraft") {
           detailDraft();
+        } else if (property === "dataDetailAproval") {
+          detailApproval();
         } else if (property === "editDrafProsbis") {
           updateSelectEditProsbis();
         } else if (property === "checkedParentId") {

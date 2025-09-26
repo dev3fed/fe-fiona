@@ -128,7 +128,7 @@ async function fetchDetailDraft(id) {
 }
 
 async function fetchRenameDraft(payload) {
-  const url = `${url_api}/api/TechnicalCompetency/rename-draft-competency${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/rename-draft-competency`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
     if (result.status === 400) {
@@ -372,6 +372,159 @@ async function fetchCompeBehaviorDetail(payload) {
   }
 }
 
+async function fetchSgandSsg(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/sg-ssg-by-comp-code?compCode=${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
+  }
+}
+
+async function fetchCompetencyReference(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/list-competency/position-code`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchAddtechnicalCompetency(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/draft/add-technical-competency`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchDeleteActivityDraft(id, positionCode) {
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency/delete-action?draftId=${id}&positionCode=${positionCode}`;
+  try {
+    const result = await ajaxRequest(url, "DELETE");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+async function fetchEditActivityCompetency(draftId, positionCode) {
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency/detail-action/${draftId}/${positionCode}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchSubmitDraftCompetency(payload) {
+  const url = `${url_api}/api/ApiApprovalCompetency/submit-draft-competency?draftId=${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+async function fetchApprovalList(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency/approval-list`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+async function fetchLoghistoryList(payload) {
+  const url = `${url_api}/api/log-history/list`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 // END OLD API SERVICE COMPETENCY
 async function fetchData() {
   try {

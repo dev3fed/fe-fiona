@@ -1,0 +1,124 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.modal-activitydetail {
+        max-width: 68%;
+        margin: 60px auto;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-outline-light .icon-arrow-left {
+        font-size: 12px;
+        margin-right: 8px;
+    }
+
+    .reset-label-compare {
+        color: #9F9FA5;
+    }
+
+    .custom-card {
+        height: 300px;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px
+    }
+
+    .custom-card-Bottom {
+        height: 45px;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px
+    }
+
+    .tooltip-inner {
+        background-color: #ffffff !important;
+        color: #000000;
+        border: 1px solid #cccccc;
+    }
+
+    .row-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .column-checkbox {
+        flex: 0 0 10px;
+        margin-right: 10px;
+    }
+
+    .column-item-name {
+        flex: 1;
+        word-wrap: break-word;
+    }
+
+    .remove-item {
+        cursor: pointer;
+        transition: color 0.3s ease;
+        color: red;
+        margin-top: 5px;
+    }
+
+    /* Custom scrollbar styles */
+    .scrollable-detailDraft::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-detailDraft::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-detailDraft::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-detailDraft::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+
+    .scrollable-detailDraft {
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-right: 1px;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="modal fade" id="modalActivityCompe" tabindex="-1" role="dialog" aria-labelledby="modalActivityCompeLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-activitydetail bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalActivityCompeTitle"></h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="contentActivityCompe">
+
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                        <i class="icon-arrow-left"></i> Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

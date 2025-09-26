@@ -338,6 +338,7 @@ const applyFilterRasci = async () => {
       setState("payloadPosition", payloadJob);
       setState("payloadProsbis", payload);
       setState("actionType", "POS_THEN_BP");
+      setState("actionExport", "filterRasci");
       setState("resultProsbis", resultMatrix.data);
       setState("resultJabatan", resultPosition.data);
       setState("totalProsbis", resultMatrix.totalResult);

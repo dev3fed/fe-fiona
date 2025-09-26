@@ -50,7 +50,7 @@ async function onModalAddNotation() {
       <div class="row">
         <div class="col-3">
           <select class="form-select digits" onchange="onSelectLevel(event)" name="levelId" id="levelId">
-           <option value="" disabled selected>Level</option>
+           <option>Choose</option>
               ${listLevel.map((opt) => `<option value="${opt.id}">${opt.text}</option>`)}
           </select>
         </div>
@@ -78,7 +78,7 @@ async function onModalAddNotation() {
 
     // Initialize Bootstrap Select
     $(".selectpicker").selectpicker();
-    updateSelectProsbis();
+    updateSelect2ByNotation();
     selectJobPosition();
     selectJobReference();
     initializeTooltips();
@@ -128,7 +128,7 @@ const deleteBusinesslist = (id) => {
   cardSelectedNotasilist(result);
 };
 
-function updateSelectProsbis() {
+function updateSelect2ByNotation() {
   const draftidRasci = $("#dataSource-rasci").val();
   const levelId = $("#levelId").val();
   const selectedOption = $("#dataSource-rasci option:selected");
@@ -681,6 +681,7 @@ function backChangeNotationRow() {
   const updatedRasciNotation = rasciNotation.map((letter) => {
     return { ...letter, comment: "", isChecked: false };
   });
+  console.log("rasciNotation", rasciNotation);
   setState("dataDetailProsbis", {});
   setState("rasciNotation", updatedRasciNotation);
 }

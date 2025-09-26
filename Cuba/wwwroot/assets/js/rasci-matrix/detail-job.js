@@ -301,6 +301,7 @@ async function handleShowRasci() {
       setState("payloadProsbis", payload);
       setState("payloadPosition", payloadJob);
       setState("actionType", "POS_THEN_BP");
+      setState("actionExport", "searchByPosition");
       setState("resultProsbis", resultMatrix.data);
       setState("resultJabatan", resultPosition.data);
       setState("totalProsbis", resultMatrix.totalResult);
