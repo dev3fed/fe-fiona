@@ -303,3 +303,16 @@ async function saveDetailDraft({ draftId, jobId, prlOrg, data }) {
     return error;
   }
 }
+
+// update
+// /api/job-description/detail-draft/update/{draftId}/{jobId}/{prlOrg}
+async function updateDetailDraft({ draftId, jobId, prlOrg, data }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/detail-draft/update/${draftId}/${jobId}/${prlOrg}`;
+  try {
+    const result = await ajaxRequest(api, "PUT", data);
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}

@@ -797,7 +797,7 @@ $(document).ready(async function () {
     // saveDetailDraft
     loader(true);
     // async function saveDetailDraft({ draftId, jobId, prlOrg, data }) {
-    const save = await saveDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
+    const save = await updateDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
     if (save.statusCode === 200) {
       loader(false);
       swalAlert("Success", "Draft saved successfully", "success");
