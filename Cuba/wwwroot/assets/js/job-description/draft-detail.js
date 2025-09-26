@@ -313,45 +313,70 @@ function rejectApproval() {
 }
 
 function checkButtonDraftDetail(data) {
+  const urlParts = window.location.pathname.split("/");
+  const lastPath = urlParts.pop() || urlParts.pop();
+  console.log("lastPath", lastPath);
   // hideModal(`modalConfirm`);
-  console.log("getDataDraft.data", data);
+  // console.log("getDataDraft.data", data);
   const submitApprovalButton = $("#submitApproval");
   const acceptApprovalButton = $("#acceptApproval");
   const rejectApprovalButton = $("#rejectApproval");
-  const finalizeButton = $("#finalize");
+  const finalizeConfirm = $("#finalize");
+  const deleteDraft = $("#deleteDraft");
 
   // submitApprovalButton.toggle(!data.isSubmitted && !data.isApproved && !data.isFinalized);
   // acceptApprovalButton.toggle(data.isSubmitted && !data.isApproved);
   // rejectApprovalButton.toggle(data.isSubmitted && !data.isApproved);
-  // finalizeButton.toggle(data.isApproved || data.isFinalized);
+  // finalizeConfirm.toggle(data.isApproved || data.isFinalized);
 
   submitApprovalButton.show();
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
-  finalizeButton.hide();
-  if (data.isSubmitted) {
+  finalizeConfirm.hide();
+  // data.isRejected = true;
+  let step = 0;
+  let userRole = "admin";
+  if (data?.isSubmitted) {
+    step = 1;
     submitApprovalButton.hide();
     acceptApprovalButton.show();
     rejectApprovalButton.show();
   }
 
-  if (data.isRejected) {
+  if (data?.isRejected) {
+    step = 2;
     submitApprovalButton.show();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
   }
 
-  if (data.isApproved) {
+  if (data?.isApproved) {
+    step = 3;
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
-    finalizeButton.show();
+    finalizeConfirm.show();
+    deleteDraft.hide();
   }
 
-  if (data.isFinalized) {
+  if (data?.isFinalized) {
+    step = 4;
     submitApprovalButton.hide();
-    finalizeButton.show();
+    finalizeConfirm.hide();
+    deleteDraft.hide();
   }
+  if (lastPath === "draft-detail") {
+    acceptApprovalButton.hide();
+    rejectApprovalButton.hide();
+  } else {
+    finalizeConfirm.hide();
+  }
+
+  if (lastPath === "approval-detail") {
+    $("#editDraftName,#submitApproval,#downloadTemplate, #exportDataDraft, #importDataDraft").hide();
+  }
+
+  return { step, userRole };
 }
 
 function confirmDeleteJobDesc(id) {
@@ -403,7 +428,7 @@ $(document).ready(async function () {
   // checkDataOrganizationLocalStorage();
   // checkDataOrganization();
   // await initializeDraftDetail(getDataDraft.data);
-  // checkButtonDraftDetail(getDataDraft.data);
+  checkButtonDraftDetail(getDataDraft.data);
 
   getTableListDraftDetail();
 

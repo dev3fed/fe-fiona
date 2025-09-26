@@ -792,7 +792,7 @@ $(document).ready(async function () {
 
     // kompetensi teknis
     params.kompetensiTeknis = kompetensiTeknis;
-    console.log("params sebelum saveDraft", params);
+    // console.log("params sebelum saveDraft", params);
 
     // saveDetailDraft
     loader(true);
