@@ -381,8 +381,8 @@ $(document).ready(async function () {
     $(linkTab).tab("show");
   }
 
-  $("#modalJobCompareDetail").modal("show");
-  await applySelectedData(jobId, prlOrg, prlOrg);
+  // $("#modalJobCompareDetail").modal("show");
+  // await applySelectedData(jobId, prlOrg, prlOrg);
 
   const getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
   for (const key in getDataJobDesc) {
@@ -803,7 +803,7 @@ $(document).ready(async function () {
       swalAlert("Success", "Draft saved successfully", "success");
       // redirect to job-desc.html
       setTimeout(() => {
-        window.location.href = `job-desc.html?jobId=${jobId}&prlOrg=${prlOrg}&from=manager`;
+        window.location.href = "/job-description/index";
       }, 1500);
     } else {
       loader(false);
