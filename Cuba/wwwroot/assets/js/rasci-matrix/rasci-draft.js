@@ -329,25 +329,33 @@ function handleChangeItemsPerPage(event) {
 }
 
 function handleBack() {
-  // const draftDetail = document.getElementById("draft-detail");
-  // const mainMatrix = document.getElementById("main-matrix");
-  // const headerMatrix = document.getElementById("header-matrix");
-  // const headerDetail = document.getElementById("header-detail-draft");
-  // if (draftDetail) {
-  //   draftDetail.style.display = "none";
-  // }
-  // if (mainMatrix) {
-  //   mainMatrix.style.display = "block";
-  // }
-  // if (headerDetail) {
-  //   headerDetail.style.display = "none";
-  // }
-  // if (headerMatrix) {
-  //   headerMatrix.style.display = "block";
-  // }
+  const draftDetail = document.getElementById("draft-detail");
+  const mainMatrix = document.getElementById("main-matrix");
+  const headerMatrix = document.getElementById("header-matrix");
+  const headerDetail = document.getElementById("header-detail-draft");
+  setState("dataDetailDraft", {});
+  const draftInfo = document.getElementById("draft-info");
+  if (draftInfo) draftInfo.innerHTML = "";
+  const emptyActivity = document.getElementById("empty-activity");
+  if (emptyActivity) emptyActivity.innerHTML = "";
+  const tblActivity = document.getElementById("detail-prosbis");
+  if (tblActivity) tblActivity.innerHTML = "";
+  if (draftDetail) {
+    draftDetail.style.display = "none";
+  }
+  if (mainMatrix) {
+    mainMatrix.style.display = "block";
+  }
+  if (headerDetail) {
+    headerDetail.style.display = "none";
+  }
+  if (headerMatrix) {
+    headerMatrix.style.display = "block";
+  }
   // set window reload
-  window.location.reload();
+  // window.location.reload();
 }
+
 async function handleOpenDetail(id) {
   const draftDetail = document.getElementById("draft-detail");
   const mainMatrix = document.getElementById("main-matrix");

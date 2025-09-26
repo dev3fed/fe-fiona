@@ -146,7 +146,7 @@ const renderTableApproval = async (approvalData) => {
           <td>${formatDate(data.modifiedDate)}</td>
           <td>${data.statusText}</td>
           <td style="width: 100px;text-align:center">
-        <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval()">
+        <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
           <i class="icon-eye"></i> 
         </button>
           </td>
@@ -290,3 +290,57 @@ async function changePageApproval(pageNumber) {
   renderTableApproval(result.data);
   setState("payloadApproval", payload);
 }
+
+function handleApprovalBack() {
+  const approvalDetail = document.getElementById("approval-detail");
+  const mainCompetency = document.getElementById("main-competency");
+  const headerCompetency = document.getElementById("header-competency");
+  const headerDetail = document.getElementById("header-detail-approval");
+  const approvalInfo = document.getElementById("info-approval");
+  setState("detailApproval", {});
+  if (approvalInfo) approvalInfo.innerHTML = "";
+  const emptyActivity = document.getElementById("empty-activityapproval");
+  if (emptyActivity) emptyActivity.innerHTML = "";
+  const tblActivity = document.getElementById("detail-activityapproval");
+  if (tblActivity) tblActivity.innerHTML = "";
+
+  if (approvalDetail) {
+    approvalDetail.style.display = "none";
+  }
+  if (mainCompetency) {
+    mainCompetency.style.display = "block";
+  }
+  if (headerDetail) {
+    headerDetail.style.display = "none";
+  }
+  if (headerCompetency) {
+    headerCompetency.style.display = "block";
+  }
+}
+const handleDetailApproval = async (id) => {
+  console.log("cek");
+  console.log("first", id);
+  try {
+    const approvalDetail = document.getElementById("approval-detail");
+    const mainCompetency = document.getElementById("main-competency");
+    const headerCompetency = document.getElementById("header-competency");
+    const headerDetail = document.getElementById("header-detail-approval");
+    if (approvalDetail) {
+      approvalDetail.style.display = "block";
+    }
+    if (mainCompetency) {
+      mainCompetency.style.display = "none";
+    }
+    if (headerDetail) {
+      headerDetail.style.display = "block";
+    }
+    if (headerCompetency) {
+      headerCompetency.style.display = "none";
+    }
+    const detailResult = await fetchDetailDraft(id);
+    console.log("detailResult", detailResult);
+    if (detailResult.success === true) {
+      setState("dataDetailApproval", detailResult.data);
+    }
+  } catch (error) {}
+};

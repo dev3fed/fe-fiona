@@ -153,7 +153,7 @@ const renderTableApproval = async (approvalData) => {
           <td>${formatDate(data.modifiedDate)}</td>
           <td>${statusText}</td>
           <td style="width: 100px;text-align:center">
-        <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval()">
+        <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
           <i class="icon-eye"></i> 
         </button>
           </td>
@@ -296,4 +296,43 @@ async function changePageApproval(pageNumber) {
   const result = await fetchApprovalList(queryString);
   renderTableApproval(result.data);
   setState("payloadApproval", payload);
+}
+
+function handleApprovalBack() {
+  const approvalDetail = document.getElementById("approval-detail");
+  const mainMatrix = document.getElementById("main-matrix");
+  const headerMatrix = document.getElementById("header-matrix");
+  const headerDetail = document.getElementById("header-detail-approval");
+  if (approvalDetail) {
+    approvalDetail.style.display = "none";
+  }
+  if (mainMatrix) {
+    mainMatrix.style.display = "block";
+  }
+  if (headerDetail) {
+    headerDetail.style.display = "none";
+  }
+  if (headerMatrix) {
+    headerMatrix.style.display = "block";
+  }
+}
+function handleDetailApproval(draftId) {
+  const approvalDetail = document.getElementById("approval-detail");
+  const mainMatrix = document.getElementById("main-matrix");
+  const headerMatrix = document.getElementById("header-matrix");
+  const headerDetail = document.getElementById("header-detail-approval");
+  console.log("first", draftId);
+  if (approvalDetail) {
+    approvalDetail.style.display = "block";
+  }
+  if (mainMatrix) {
+    mainMatrix.style.display = "none";
+  }
+  if (headerDetail) {
+    headerDetail.style.display = "block";
+  }
+  if (headerMatrix) {
+    headerMatrix.style.display = "none";
+  }
+  setState("dataDetailAproval", {});
 }

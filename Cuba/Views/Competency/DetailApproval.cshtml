@@ -1,0 +1,129 @@
+<style>
+    .custom-card-approval {
+        height: auto;
+        border: 1px solid #BFBFC2;
+        border-radius: 4px;
+        padding: 20px 10px 10px 15px;
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .header-card-approval {
+        background-color: #F5F5F5;
+        height: 35px;
+        padding-left: 15px;
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        position: absolute;
+        top: -5px;
+        left: 0;
+        right: 0;
+        border-radius: 4px 4px 0 0;
+        border: 1px solid #BFBFC2;
+        border-bottom: none;
+        width: calc(100% + 2px);
+        font-size: 14px;
+        margin-left: -1px;
+    }
+
+
+    .custom-col {
+        border-right: 1px solid #BFBFC2;
+        padding-right: 10px;
+        text-align: center;
+    }
+
+    .custom-col:last-child {
+        border-right: none;
+    }
+
+    .custom-col label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .custom-row-full:first-child {
+        border-top: none;
+    }
+
+    .custom-row-full {
+        border-top: 1px solid #BFBFC2;
+        padding-right: 10px;
+        padding-top: 10px;
+        text-align: left;
+
+    }
+
+    .custom-row-full label {
+        display: block;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .btn-outline-light:hover img {
+        filter: brightness(0) invert(1);
+    }
+
+    .empty-activity-body {
+        background-color: #EAEAEB;
+        height: 300px;
+        background-image: url("/assets/images/competency/empty_draftkkj.svg");
+        background-position: center 60px;
+        background-repeat: no-repeat;
+        background-size: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 200px;
+        margin-top: 25px;
+        border-radius: 7px;
+    }
+</style>
+
+<div class="card" style="border-radius:8px">
+    <div style="padding:15px">
+        <h6 class="f-w-600">Approval Detail</h6>
+        <!-- Card info start-->
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Info
+            </div>
+            <div class="row" style="padding-top: 20px;" id="info-approval">
+
+            </div>
+        </div>
+        <!-- Card info end-->
+
+        <!-- Card detail start-->
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Detail
+            </div>
+            <div id="empty-activityapproval">
+
+            </div>
+            <div class="row" style="padding-top: 20px;" id="detail-activityapproval">
+            </div>
+        </div>
+
+        <!-- card footer start-->
+        <div class="text-end mt-4 mb-2">
+            <button class="btn btn-outline-light" type="button" onclick="handleApprovalBack()">
+                <i class="icon-arrow-left"></i> Back
+            </button>
+            <button class="btn btn-outline-light" type="button">
+                <i class="icon-close" style="font-size: 0.8em;margin-right: 5px;"></i>Reject
+            </button>
+            <button class="btn btn-primary" type="button">Approve<i class="icon-arrow-right"
+                    style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+        </div>
+        <!-- card footer end-->
+
+    </div>
+    <!-- Card detail end-->
+
+
+</div>

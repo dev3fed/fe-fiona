@@ -183,6 +183,8 @@ const appState = new Proxy(
         formValidationNotation();
         if (property === "dataDetailDraft") {
           detailDraft();
+        } else if (property === "dataDetailAproval") {
+          detailApproval();
         } else if (property === "editDrafProsbis") {
           updateSelectEditProsbis();
         } else if (property === "checkedParentId") {

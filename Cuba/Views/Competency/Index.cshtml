@@ -15,6 +15,14 @@
         display: none;
     }
 
+    #header-detail-approval {
+        display: none;
+    }
+
+    #approval-detail {
+        display: none;
+    }
+
     #main-competency {
         display: block;
     }
@@ -112,6 +120,20 @@
                         <li class="breadcrumb-item active">Detail Draft</li>
                     </ol>
                 </div>
+                <div class="col-6" id="header-detail-approval">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="HomePage" asp-action="Index">
+                                <svg class="stroke-icon">
+                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">Competency</li>
+                        <li class="breadcrumb-item active">Approval Detail</li>
+                    </ol>
+                </div>
+
                 @* <div class="col-6" id="header-dictionarypage">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
@@ -145,6 +167,9 @@
                 <partial name="~/Views/Competency/ModalEditActivityCompe.cshtml" />
                 <partial name="~/Views/Competency/ModalRenameDraft.cshtml" />
                 <partial name="~/Views/Competency/DetailDraft.cshtml" />
+            </div>
+            <div class="col-12" id="approval-detail">
+                <partial name="~/Views/Competency/DetailApproval.cshtml" />
             </div>
             @* <div class="col-12" id="dictionary-page">
                 <div class="card" style="border-radius:8px">
@@ -283,7 +308,7 @@
     <script>
         const url_api = "@Configuration["AppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                            const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->
@@ -321,6 +346,8 @@
     <script src="../assets/js/competency/detail-position.js"></script>
     <script src="../assets/js/competency/add-competency.js"></script>
     <script src="../assets/js/competency/table-approval.js"></script>
+    <script src="../assets/js/competency/detail-approval.js"></script>
     <script src="../assets/js/competency/table-loghistory.js"></script>
+
 
 }

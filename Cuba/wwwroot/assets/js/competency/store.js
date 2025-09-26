@@ -5,6 +5,7 @@ const appState = new Proxy(
     draftList: [],
     dataEditDraft: {},
     dataDetailDraft: {},
+    dataDetailApproval: {},
     deleteDraftCompetency: "",
     selectedType: "position",
     currentPageY: 1,
@@ -50,6 +51,9 @@ const appState = new Proxy(
         target[property] = value;
         if (property === "dataDetailDraft") {
           detailDraft();
+        }
+        if (property === "dataDetailApproval") {
+          detailApproval();
         }
       }
       return true;
