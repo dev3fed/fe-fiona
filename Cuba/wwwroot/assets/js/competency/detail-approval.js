@@ -328,15 +328,192 @@ const triggleDetailActivityApproval = async (positionCode) => {
     console.log("positionCode", positionCode);
     const dataApproval = getState("dataDetailApproval");
     const result = await fetchEditActivityCompetency(dataApproval.draftId, positionCode);
-    // const modal = new bootstrap.Modal(document.getElementById("modalActivityCompe"));
-    // modal.show();
-    // const modalTitle = document.getElementById("modalActivityCompeTitle");
-    // if (modalTitle) {
-    //   modalTitle.innerHTML = `Activity Detail Add/Edit Competency to Position `;
-    // }
+    console.log("result", result);
+    const modal = new bootstrap.Modal(document.getElementById("modalActivityApproval"));
+    modal.show();
+    const modalTitle = document.getElementById("modalActivityApprovalTitle");
+    if (modalTitle) {
+      modalTitle.innerHTML = `Activity Detail Add/Edit Competency to Position `;
+    }
 
-    // renderTableEditActivity(result.data);
+    renderTabledetailActivity(result.data);
   } catch (error) {
     console.error("Error fetching activity competency:", error);
   }
+};
+const renderTabledetailActivity = async (listData) => {
+  try {
+    // setState("dataDetailDraft", dataActivity.data);
+    const detailInfo = listData;
+    console.log("detailInfo", detailInfo);
+    const contentBody = `
+      <div class="row">
+        <div class="col-12 ">
+            <label>Position: ${detailInfo[0].jobCode} - ${detailInfo[0].positionName}</label>
+            <hr style="margin-top: 0;" />
+        </div>
+         <div class="col-12 ">
+      <div class="card-tblbusiness" style="max-height: 300px;">
+        <div class="table-responsive scrollable-posdetail mt-1" style="max-height: 260px;">
+        <table class="table tbl-border">
+          <thead>
+          <tr>
+            <th scope="col" style="width: 40px;text-align:center">No</th>
+            <th scope="col" style="width: 200px">Competency</th>
+            <th scope="col" style="width: 100px;text-align:center">Type</th>
+            <th scope="col" style="width: 80px;text-align:center">Level (Before)</th>
+            <th scope="col" style="width: 80px;text-align:center">Level (After)</th>
+          </tr>
+          </thead>
+          <tbody>
+          ${detailInfo
+            .map((item, idx) => {
+              return `
+                <tr>
+                <td style="text-align:center">${idx + 1}</td>
+                <td>
+                ${item.competencyName || "-"}
+                ${
+                  item.competencyReference
+                    ? `<br><small style="color:#9F9FA5">(${item.competencyReference})</small>`
+                    : ""
+                }
+                </td>
+                <td style="text-align:center">
+                   ${item.competencyType || "-"}
+                </td>
+                <td style="text-align:center">
+                  ${item.levelBefore || "-"}
+                </td>
+                <td style="text-align:center">
+                  ${item.levelAfter || "-"}
+                </td>
+                </tr>
+              `;
+            })
+            .join("")}
+          </tbody>
+        </table>
+        </div>
+      </div>
+      </div>
+      </div>
+  `;
+    const contentActivityCompe = document.getElementById("contentActivityApproval");
+    if (contentActivityCompe) {
+      contentActivityCompe.innerHTML = contentBody;
+    }
+    feather.replace();
+    initializeTooltips();
+  } catch (error) {}
+};
+
+const handleOpenApprovalModal = async () => {
+  try {
+    const detailApproval = getState("dataDetailApproval");
+    const modal = new bootstrap.Modal(document.getElementById("modalApproval"));
+    modal.show();
+    const modalTitle = document.getElementById("modalApprovalLabel");
+    if (modalTitle) {
+      modalTitle.innerHTML = `Are you sure want to approve this <b>${detailApproval.draftName}</b> draft?`;
+    }
+  } catch (error) {
+    console.error("Error approving:", error);
+  }
+};
+
+const handleApprove = async () => {
+  try {
+    const detailApproval = getState("dataDetailApproval");
+    console.log("detailApproval", detailApproval);
+    const spinBtn = document.getElementById("spinbtnApprove");
+    if (spinBtn) spinBtn.style.display = "inline-block";
+    const payload = {
+      draftId: detailApproval.draftId,
+      IsApproved: true,
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    console.log("queryString", queryString);
+    const result = await fetchIsApproved(queryString);
+    console.log("first", result);
+
+    if (result.success === true) {
+      const modalElement = document.getElementById("modalApproval");
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) modal.hide();
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">APPROVED</span>
+          <br>
+          <span>You can check in <b>${detailApproval.draftName}</b> draft has been approved.</span>
+          `,
+          },
+        },
+      }).then(async () => {
+        spinBtn.style.display = "none";
+        const detailResult = await fetchDetailDraft(detailApproval.draftId);
+        console.log("detailResult", detailResult);
+        if (detailResult.success === true) {
+          setState("dataDetailApproval", detailResult.data);
+        }
+      });
+    }
+  } catch (error) {}
+};
+const handleOpenRejectModal = async () => {
+  try {
+    const modal = new bootstrap.Modal(document.getElementById("ModalReject"));
+    modal.show();
+  } catch (error) {
+    console.error("Error rejecting approval:", error);
+  }
+};
+
+const handleReject = async () => {
+  try {
+    const detailApproval = getState("dataDetailApproval");
+    const rejectComment = document.getElementById("rejectComment")?.value || "";
+    const spinBtn = document.getElementById("spinbtnReject");
+    if (spinBtn) spinBtn.style.display = "inline-block";
+    const payload = {
+      draftId: detailApproval.draftId,
+      comment: rejectComment,
+      IsApproved: false,
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const result = await fetchIsApproved(queryString);
+
+    if (result.success === true) {
+      const modalElement = document.getElementById("ModalReject");
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) modal.hide();
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">APPROVED</span>
+          <br>
+          <span>You can check in <b>${detailApproval.draftName}</b> draft has been approved.</span>
+          `,
+          },
+        },
+      }).then(async () => {
+        spinBtn.style.display = "none";
+        const detailResult = await fetchDetailDraft(detailApproval.draftId);
+        if (detailResult.success === true) {
+          setState("dataDetailApproval", detailResult.data);
+        }
+      });
+    }
+  } catch (error) {}
 };

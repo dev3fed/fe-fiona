@@ -316,7 +316,7 @@ function handleApprovalBack() {
     headerMatrix.style.display = "block";
   }
 }
-function handleDetailApproval(draftId) {
+const handleDetailApproval = async (draftId) => {
   const approvalDetail = document.getElementById("approval-detail");
   const mainMatrix = document.getElementById("main-matrix");
   const headerMatrix = document.getElementById("header-matrix");
@@ -334,5 +334,9 @@ function handleDetailApproval(draftId) {
   if (headerMatrix) {
     headerMatrix.style.display = "none";
   }
-  setState("dataDetailAproval", {});
-}
+  const dataApproval = await fetchDraftProsbisByid(draftId);
+  console.log(dataApproval);
+  if (dataApproval.status === 200) {
+    setState("dataDetailAproval", dataApproval.data);
+  }
+};

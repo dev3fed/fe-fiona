@@ -510,6 +510,31 @@ async function fetchApprovalList(payload) {
     };
   }
 }
+
+async function fetchIsApproved(payload) {
+  const url = `${url_api}/api/ApiApprovalCompetency/approve-draft-competency${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchLoghistoryList(payload) {
   const url = `${url_api}/api/log-history/list`;
   try {

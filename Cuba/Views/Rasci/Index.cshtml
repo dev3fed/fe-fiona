@@ -121,6 +121,8 @@
                 <partial name="DetailDraft" />
             </div>
             <div class="col-12" id="approval-detail">
+                <partial name="ModalApproved" />
+                <partial name="ModalReject" />
                 <partial name="DetailApproval" />
             </div>
             <div class="col-12" id="main-matrix">
@@ -134,6 +136,10 @@
                             <li class="nav-item"><a class="nav-link " id="pills-matrix-tab" data-bs-toggle="pill"
                                     href="#pills-matrix" role="tab" aria-controls="pills-matrix"
                                     aria-selected="false">RASCI Matrix</a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-summary-tab" data-bs-toggle="pill"
+                                    href="#pills-summary" role="tab" aria-controls="pills-summary"
+                                    aria-selected="false">Summary
+                                </a></li>
                             <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
                                     href="#pills-draft" role="tab" aria-controls="pills-draft"
                                     aria-selected="false">Draft
@@ -359,6 +365,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane fade " id="pills-summary" role="tabpanel"
+                                aria-labelledby="pills-summary-tab">
+                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                    <div class="row">
+                                        <partial name="SummaryPage" />
+                                    </div>
+                                </div>
+                            </div>
                             <div class="tab-pane fade" id="pills-draft" role="tabpanel"
                                 aria-labelledby="pills-draft-tab">
                                 <div class="card-body" style="padding:15px 5px 15px 5px !important">
@@ -438,6 +452,7 @@
     <script src="../assets/js/rasci-matrix/table-list.js"></script>
     <script src="../assets/js/rasci-matrix/event-scroll.js"></script>
     <script src="../assets/js/rasci-matrix/table-matrix.js"></script>
+    <script src="../assets/js/rasci-matrix/summary-list.js"></script>
     <script src="../assets/js/rasci-matrix/job-compare.js"></script>
     <script src="../assets/js/rasci-matrix/detail-prosbis.js"></script>
     <script src="../assets/js/rasci-matrix/add-prosbis.js"></script>
@@ -456,6 +471,8 @@
     <script src="../assets/js/rasci-matrix/table-approval.js"></script>
     <script src="../assets/js/rasci-matrix/detail-approval.js"></script>
     <script src="../assets/js/rasci-matrix/scroll-jobcard.js"></script>
+    <script src="../assets/js/rasci-matrix/value-chain.js"></script>
+
 
 
 }

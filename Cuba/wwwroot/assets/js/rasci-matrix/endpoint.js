@@ -359,6 +359,71 @@ async function fetchExportRasciMatrix(payload) {
     };
   }
 }
+async function fetchApproved(payload) {
+  const url = `${url_api}/api/rasci-matrix/draft/approve/${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+async function fetchReject(payload) {
+  const url = `${url_api}/api/rasci-matrix/draft/reject/${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
+async function fetchAllValueChain(payload) {
+  let url = `${url_api}/api/value-chain/business-process/all`;
+  if (payload !== "master") {
+    url += `?draftSource=${payload}`;
+  }
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 
 async function fetchApprovalList(payload) {
   const url = `${url_api}/api/rasci-matrix/draft/list/approval?${payload}`;
@@ -375,6 +440,32 @@ async function fetchApprovalList(payload) {
     };
   }
 }
+
+async function fetchSummalyList(payload) {
+  console.log("payload", payload);
+  const url = `${url_api}/api/rasci-matrix/draft/summary-rasci-mapping`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchData() {
   try {
     const payload = {

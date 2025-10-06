@@ -217,7 +217,8 @@ async function renderTableActivity(listData) {
     const totalPages = Math.ceil(listData.total / itemsPerPage);
     const currentPage = listData.page;
     const start = (listData.page - 1) * itemsPerPage + 1;
-    renderPaginationDetailDraft(currentPage, totalPages);
+    console.log("currentPage", currentPage);
+    renderDetailDraftPagination(currentPage, totalPages);
     const totalPage = document.getElementById("total-pagedraft");
 
     if (totalPage) {
@@ -249,9 +250,10 @@ async function renderTableActivity(listData) {
     feather.replace();
   } catch (error) {}
 }
-function renderPaginationDetailDraft(currentPage, totalPages) {
+function renderDetailDraftPagination(currentPage, totalPages) {
   const paginationContainer = document.getElementById("list-pagedraft");
-  if (!paginationContainer) return;
+  console.log("paginationContainer", paginationContainer);
+  // if (!paginationContainer) return;
 
   let pagesToShow = 3;
   let startPage = Math.max(currentPage - Math.floor(pagesToShow / 2), 1);

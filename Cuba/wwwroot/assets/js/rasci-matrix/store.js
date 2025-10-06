@@ -182,7 +182,9 @@ const appState = new Proxy(
         formValidation();
         formValidationNotation();
         if (property === "dataDetailDraft") {
-          detailDraft();
+          if (value && Object.keys(value).length > 0) {
+            detailDraft();
+          }
         } else if (property === "dataDetailAproval") {
           detailApproval();
         } else if (property === "editDrafProsbis") {

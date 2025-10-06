@@ -1,0 +1,125 @@
+<style>
+    .tbl-border-summary {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-summary th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-summary thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-summary th,
+    .tbl-border-summary td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+</style>
+<div class="col-12">
+    <div class="row">
+        <div class="col-4">
+            <span class="mt-2 mb-2" style="min-width: 130px;">RASCI Matrix Data Source</span>
+            <div class="faq-form">
+                <select class="form-select digits" id="dataSource-summary">
+                    <option value="master">Master data RASCI</option>
+
+                </select>
+            </div>
+        </div>
+        <div class="col-4">
+            <span class="mt-2 mb-2" style="min-width: 130px;">Search</span>
+            <div class="faq-form">
+                <div class="btn-group w-100" role="group" aria-label="Button group with nested dropdown">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">Position</button>
+                        <div class="dropdown-menu" aria-labelledby="btnSearchType">
+                            <a class="dropdown-item" onclick="onSelectType('Position')" value="position">Position</a>
+                            <a class="dropdown-item" onclick="onSelectType('Function')" value="function">Function</a>
+                            <a class="dropdown-item" onclick="onSelectType('Division')" value="Division">Division</a>
+                            <a class="dropdown-item" onclick="onSelectType('Department')"
+                                value="Department">Department</a>
+                        </div>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search"
+                        style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <span class="mt-2 mb-2" style="min-width: 130px;">Status</span>
+            <div class="faq-form">
+                <select class="form-select" aria-label="Default select example" id="status-summary">
+                    <option value="available">Available</option>
+                    <option value="all">All Status</option>
+                    <option value="not-available">Not available</option>
+                    <option value="waiting-approval">Waiting approval</option>
+                    <option value="on-progress">On progress</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-2" style="padding-left: 0;margin-top:15px">
+            <div class="faq-form">
+                <span class="mt-2 mb-2" style="min-width: 130px;"></span>
+                <button id="btnSearchCompe" class="btn btn-primary" type="button">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                            id="loadingSearch" role="status"></div>
+                        <span class="btn-text">Search</span>
+                    </div>
+                </button>
+                <button class="btn btn-outline-primary" type="button" id="clearButton">Clear</button>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="table-responsive" style=" max-height: 450px;">
+                <table class="table tbl-border-summary">
+                    <thead id="tbl-summary-header" style="background-color: #006CA9;">
+                        <tr>
+                            <th scope="col" style="width: 50px;text-align:center">
+                                No
+                            </th>
+                            <th scope="col" style="width: 280px;">Position</th>
+                            <th scope="col" style="width: 280px;">Function</th>
+                            <th scope="col" style="width: 280px;">Division</th>
+                            <th scope="col" style="width: 100px;text-align:center">Status</th>
+                            <th scope="col" style="text-align: center;width: 100px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-summary">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-10 mt-3">
+            <div id="total-summary-page">
+            </div>
+        </div>
+        <div class="col-2 mt-3">
+            <div id="list-summary-page">
+            </div>
+        </div>
+    </div>
+</div>

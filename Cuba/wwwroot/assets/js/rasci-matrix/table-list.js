@@ -29,16 +29,19 @@ document.addEventListener("dataLoaded", async function () {
 
 document.addEventListener("DOMContentLoaded", async function () {
   let selectElement = document.querySelector("#dataSource-rasci");
-
+  infoValueChain(selectElement.value);
   if (selectElement.value === "master" || selectElement.value === "" || selectElement.value === null) {
     // document.getElementById("pills-warningtab").style.display = "none";
     document.getElementById("pills-draft-tab").style.display = "none";
     document.getElementById("pills-approval-tab").style.display = "none";
     document.getElementById("pills-log-history-tab").style.display = "none";
+    document.getElementById("pills-summary-tab").style.display = "none";
+
     document.getElementById("btnAddBp").style.display = "none";
     document.getElementById("btnAddNotation").style.display = "none";
     document.getElementById("btnDeleteDetail").style.display = "none";
     document.getElementById("btnEditDetail").style.display = "none";
+
     // document.getElementById("btnFormdraft").style.display = "flex";
   }
   showLoading();
@@ -88,6 +91,7 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
     ];
     setState("filterJobList", combinedData);
     ChangeSourceDraft();
+    infoValueChain(selectedValue);
     changeDataSource(selectedValue, selectedDraftSo);
   } catch (error) {}
 });
@@ -135,22 +139,28 @@ function fetchDatasource(draftId = null) {
 async function changeDataSource(dataSource, draftSo) {
   try {
     const defaultIndexNumber = getState("defaultIndexNumber");
+    $("#dataSource-summary").val(dataSource).trigger("change");
+    console.log("dataSource", dataSource);
+    document.getElementById("dataSource-summary").disabled = true;
     if (dataSource !== "master" && dataSource !== "" && dataSource !== null) {
       // document.getElementById("pills-warningtab").style.display = "flex";
 
       document.getElementById("pills-draft-tab").style.display = "flex";
       document.getElementById("pills-approval-tab").style.display = "flex";
       document.getElementById("pills-log-history-tab").style.display = "flex";
+      document.getElementById("pills-summary-tab").style.display = "flex";
       document.getElementById("btnAddBp").style.display = "flex";
       document.getElementById("btnAddNotation").style.display = "flex";
       document.getElementById("btnDeleteDetail").style.display = "inline-block";
       document.getElementById("btnEditDetail").style.display = "inline-block";
+      getSummaryList(dataSource);
       // document.getElementById("btnFormdraft").style.display = "none";
     } else {
       // document.getElementById("pills-warningtab").style.display = "none";
       document.getElementById("pills-draft-tab").style.display = "none";
       document.getElementById("pills-approval-tab").style.display = "none";
       document.getElementById("pills-log-history-tab").style.display = "none";
+      document.getElementById("pills-summary-tab").style.display = "none";
       document.getElementById("btnAddBp").style.display = "none";
       document.getElementById("btnAddNotation").style.display = "none";
       document.getElementById("btnDeleteDetail").style.display = "none";

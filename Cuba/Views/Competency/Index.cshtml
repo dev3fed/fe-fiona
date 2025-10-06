@@ -169,6 +169,9 @@
                 <partial name="~/Views/Competency/DetailDraft.cshtml" />
             </div>
             <div class="col-12" id="approval-detail">
+                <partial name="~/Views/Competency/ModalReject.cshtml" />
+                <partial name="~/Views/Competency/ModalActivityApproval.cshtml" />
+                <partial name="~/Views/Competency/ModalApproval.cshtml" />
                 <partial name="~/Views/Competency/DetailApproval.cshtml" />
             </div>
             @* <div class="col-12" id="dictionary-page">
@@ -308,7 +311,7 @@
     <script>
         const url_api = "@Configuration["AppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                                                            const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                                            const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->

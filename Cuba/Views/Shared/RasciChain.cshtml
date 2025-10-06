@@ -1,10 +1,152 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+    }
 
+    .main-container {
+        margin: auto;
+        text-align: center;
+    }
+
+    /* Top big box */
+    .top-box {
+        background: #0b74c7;
+        color: #fff;
+        padding: 15px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 18px;
+        width: 100%;
+    }
+
+    .label {
+        background: #fff;
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 4px;
+        margin: 8px 0;
+        font-size: 13px;
+    }
+
+    .big-frame {
+        background: #BFBFC2;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    /* Section titles */
+    .section {
+        margin-bottom: 25px;
+    }
+
+    .section h3 {
+        font-size: 15px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Core Process */
+    .core-process .box {
+        background: #1989e0;
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    /* Critical Process */
+    .critical-process .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .critical-process .box {
+        background: #2c9e6f;
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    /* Supporting Process */
+    .supporting-process .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .supporting-process .box {
+        background: #74747C;
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+    }
+</style>
 
 <div class="col-12">
-    <div class="row">
-        <img src="~/assets/images/chain_page.png" alt="Chain Page" class="img-fluid" />
+    <div class="main-container">
+        <!-- Top -->
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center;" id="leader-chain">
+
+        </div>
+
+        <!-- Big Frame -->
+        <div class="big-frame">
+
+            <!-- Core -->
+            <div style="background-color:#E6F0F6;height:auto;padding:10px;border-radius:6px;margin-bottom:20px"
+                id="core-chain">
+
+            </div>
+
+            <div
+                style="position: relative; display: flex; flex-direction: column; align-items: center;margin-top: -16px">
+                <div
+                    style="width: 120px; height: 0; border-left: 85px solid transparent; border-right: 85px solid transparent; border-bottom: 45px solid #E6F6FE; margin-top: -1px; z-index: 1;">
+                </div>
+                <div style="width: 60px; height: 15px; background: #E6F6FE; margin-top: -2px; z-index: 1;"></div>
+                <div class="label"
+                    style="color: #000; position: absolute; top: 50px; left: 50%; transform: translate(-50%, 0);  min-width: 55px; min-height: 40px; width: 130px; height: 40px; font-size: 22px; font-weight: bold; border: 2px solid #888; display: flex; align-items: center; justify-content: center;">
+                    Support
+                </div>
+                <div style="width: 60px; height: 15px; background: #E6F6FE; margin-top: 41px; z-index: 1;"></div>
+            </div>
+            <div style="background-color:#E6F0F6; height:auto; padding:18px 10px 24px 10px; border-radius:6px; margin-bottom:20px;"
+                id="critical-chain">
+                <!-- Critical -->
+            </div>
+
+
+            <div
+                style="position: relative; display: flex; flex-direction: column; align-items: center;margin-top: -16px">
+                <div
+                    style="width: 120px; height: 0; border-left: 85px solid transparent; border-right: 85px solid transparent; border-bottom: 45px solid #E6F6FE; margin-top: -1px; z-index: 1;">
+                </div>
+                <div style="width: 60px; height: 15px; background: #E6F6FE; margin-top: -2px; z-index: 1;"></div>
+                <div class="label"
+                    style="color: #000; position: absolute; top: 50px; left: 50%; transform: translate(-50%, 0);  min-width: 55px; min-height: 40px; width: 130px; height: 40px; font-size: 22px; font-weight: bold; border: 2px solid #888; display: flex; align-items: center; justify-content: center;">
+                    Support
+                </div>
+                <div style="width: 60px; height: 15px; background: #E6F6FE; margin-top: 41px; z-index: 1;"></div>
+            </div>
+
+            <!-- Supporting -->
+            <div style="background-color:#E6F6FE; height:auto; padding:18px 10px 24px 10px; border-radius:6px; margin-bottom:20px;"
+                id="supporting-process">
+
+            </div>
+        </div>
     </div>
 </div>
 <!-- Bootstrap JS and Popper.js -->
