@@ -7,6 +7,7 @@ function loader(status) {
 }
 
 function updateIdentifikasiJob(params) {
+  localStorage.setItem("identifikasi", JSON.stringify(params));
   $("#jabatan").text(params.jobName ?? "Data not found");
   $("#function").text(params.unitKerjaFungsi ?? "Data not found");
   $("#location").text(params.lokasiKerja ?? "Data not found");
@@ -37,10 +38,10 @@ function updateTable(params, data, rowHeader) {
   }
 
   data.forEach((item, inc) => {
-    const reference = item.jobReference ? item.jobReference : "";
+    const reference = item.jobReferences !== undefined && item.jobReferences.length > 0 ? item.jobReferences[0] : "";
     const referenceHtml =
       reference !== ""
-        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference.jobName} - ${reference.noSuratKeputusan})</span>`
+        ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference.jobName} - ${reference.skNumber})</span>`
         : "";
     row = `<tr>`;
     if (!rowHeader) {
@@ -111,9 +112,15 @@ function updateTable(params, data, rowHeader) {
         return;
       }
       if (header === "action") {
-        row += `<td class="p-3">
-          <button type="button" class="btn btn-primary" id="editData${idx}" onclick="editData(${idx})"> <i class="fas fa-edit"></i></button>
-          <button type="button" class="btn btn-danger" id="deleteData${idx}" onclick="deleteData(${idx})"> <i class="fas fa-trash"></i></button>
+        const mergeButton = `<button type="button" alt="Merge With" title="Merge With" class="btn btn-info" id="mergeData('${params}',${inc})" onclick="mergeData('${params}',${inc})"> <i class="fas fa-spin fa-sync-alt"></i></button>`;
+        const isMergeButton = params === "tugasHa" ? mergeButton : "";
+        row +=
+          `<td class="p-3">
+        ` +
+          isMergeButton +
+          `
+          <button type="button" class="btn btn-primary" id="editData('${params}',${inc})" onclick="editData('${params}',${inc})"> <i class="fas fa-edit"></i></button>
+          <button type="button" class="btn btn-danger" id="deleteData('${params}',${inc})" onclick="deleteData('${params}',${inc})"> <i class="fas fa-trash"></i></button>
         </td>`;
         return;
       }
@@ -261,24 +268,45 @@ async function getJobReferenceDetail() {
     localStorage.getItem("relasiEksternal") !== "" ? JSON.parse(localStorage.getItem("relasiEksternal")) : [];
   const lsStk = localStorage.getItem("stk") !== "" ? JSON.parse(localStorage.getItem("stk")) : [];
 
-  let summernoteContent = "";
-  lsFungsi.forEach((item) => {
-    summernoteContent += item.fungsi + "<br><br>";
-    if (item.jobReference.jobName) {
-      const textReference = `(Reference from : ${item.jobReference.jobName} - ${item.jobReference.noSuratKeputusan})`;
-      summernoteContent += textReference + "<br><br>";
-    }
+  // Initialize CKEditor for .summernote elements
+  if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
+    document.querySelectorAll(".summernote").forEach((element) => {
+      // Check if CKEditor instance already exists
+      if (element.ckeditorInstance) {
+        // Just replace the content in existing editor
+        element.ckeditorInstance.setData(lsFungsi.deskripsi || "");
+      } else {
+        // Don't create new instances to prevent adding new textareas
+        // The CKEditor should already be initialized elsewhere
+      }
+    });
+  } else {
+    document.querySelectorAll(".summernote").forEach((element) => {
+      element.innerHTML = lsFungsi.deskripsi || "";
+    });
+  }
+
+  lsFungsi.jobReferences.map((item) => {
+    const textReference = `(Reference from : ${item.jobName}) - ${item.skNumber ? item.skNumber : "-"}`;
+    $("#fungsiReferenceContainer").append(
+      `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
+    );
   });
-  $(".summernote").summernote("code", summernoteContent);
 
   // Filter data arrays properly
-  const filteredTugasHa = lsTugasHa.filter((item) => item.responsible && item.responsible.length > 0);
-  const filteredStk = lsStk.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
+  const filteredTugasHa =
+    lsTugasHa.length > 0 && Array.isArray(lsTugasHa)
+      ? lsTugasHa.filter((item) => item.responsible && item.responsible.length > 0)
+      : [];
+  const filteredStk =
+    lsStk.length > 0 && Array.isArray(lsStk)
+      ? lsStk.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined)
+      : [];
 
-  updateTable("tugasHa", filteredTugasHa, tabCusJD.tugasHa);
-  updateTable("koordinasi", lsKoordinasiInternal, tabCusJD.koordinasi);
-  updateTable("relation", lsRelasiEksternal, tabCusJD.relation);
-  updateTable("stk", filteredStk, tabCusJD.stk);
+  updateTable("tugasHa", filteredTugasHa, [...tabCusJD.tugasHa, "action"]);
+  updateTable("koordinasi", lsKoordinasiInternal, [...tabCusJD.koordinasi, "action"]);
+  updateTable("relation", lsRelasiEksternal, [...tabCusJD.relation, "action"]);
+  updateTable("stk", filteredStk, [...tabCusJD.stk, "action"]);
 }
 
 async function addList(data) {
@@ -451,12 +479,16 @@ async function applyCompare(id, prlOrg, prlOrgTarget) {
   await applySelectedData(id, prlOrg, prlOrgTarget);
 }
 
-async function addJobReference() {
+async function addJobReference(showData = "") {
+  // $("#modalJobCompareDetail").modal("show");
+  // await applySelectedData(jobId, prlOrg, prlOrg);
+  // return;
   $("#modalJobCompare").modal("show");
   $("#searchDiv").hide();
-  // $("#detailJob").show();
-
-  // searchJobCompare();
+  localStorage.setItem("onlyShowdata", "");
+  if (showData) {
+    localStorage.setItem("onlyShowdata", showData);
+  }
 }
 
 function filterListJobDesc(value, search) {
@@ -513,7 +545,21 @@ function confirmFunction(title, text) {
   });
 }
 
-function callOtherRecommendations(data) {
+async function callOtherRecommendations() {
+  const getDataJobDesc = JSON.parse(localStorage.getItem("selectedJobDescReference"));
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const notAvailable = lsAvailable?.notAvailable || [];
+  const getUniqueCode = notAvailable.map((item) => item.code);
+  const codeNotAvailable = [...new Set(getUniqueCode)];
+  console.log("codeNotAvailable", codeNotAvailable);
+  console.log("notAvailable", notAvailable);
+  const getRecommendationBusPro = await getAllRecommendationTaskAndResponsibilities({
+    draftId: getDraftExisting.draftId,
+    jobId,
+    prlOrg,
+    businessProcessCode: codeNotAvailable,
+  });
+  console.log("getRecommendationBusPro", getRecommendationBusPro);
   $("#modalRecomendation").modal("show");
 }
 
@@ -539,7 +585,7 @@ function callConfirmReference() {
       className: "btn-primary",
       callback: function () {
         hideModal(`modalConfirm`);
-        callOtherRecommendations("asikin aja");
+        callOtherRecommendations();
       },
     },
   ];
@@ -556,16 +602,25 @@ function callConfirmReference() {
 
 async function saveReferenceAttribute() {
   loader(true);
-
+  const onlyShowdata = localStorage.getItem("onlyShowdata") == "" ? false : localStorage.getItem("onlyShowdata");
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
     (item) => !item.id.includes("all") && item.checked,
   );
   const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) ?? "[]";
-  const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
-  const checboxTugasHa = checkboxList.filter((item) => item.id.includes("checkbox_tugasHaReference"));
-  const checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_koordinasiInternalReference"));
-  const checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_relasiEksternalReference"));
-  const checkboxStk = checkboxList.filter((item) => item.id.includes("checkbox_stkReference"));
+  let checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
+  let checboxTugasHa = checkboxList.filter((item) => item.id.includes("checkbox_tugasHaReference"));
+  let checboxInternal = checkboxList.filter((item) => item.id.includes("checkbox_koordinasiInternalReference"));
+  let checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_relasiEksternalReference"));
+  let checkboxStk = checkboxList.filter((item) => item.id.includes("checkbox_stkReference"));
+
+  // Reset other checkboxes based on onlyShowdata filter
+  if (onlyShowdata) {
+    if (onlyShowdata !== "stk") checkboxStk = [];
+    if (onlyShowdata !== "relation") checboxEksternal = [];
+    if (onlyShowdata !== "koordinasi") checboxInternal = [];
+    if (onlyShowdata !== "tugasHa") checboxTugasHa = [];
+    if (onlyShowdata !== "fungsi") checboxFungsi = undefined;
+  }
 
   // Dynamic function to process checkbox references
   const processCheckboxReference = (checkboxes, config) => {
@@ -574,52 +629,85 @@ async function saveReferenceAttribute() {
     const { checkAllId, dataPath, localStorageKey, checkboxPrefix } = config;
     const isCheckedAll = checkboxes.find((item) => item.id === checkAllId);
 
-    if (isCheckedAll !== undefined) {
-      // Process all items
-      selectedJobDescReference?.[dataPath]?.data?.forEach((item) => {
-        item.jobReference = {
+    const selectedItems = checkboxes
+      .map((item) => {
+        const id = item.id.split(`${checkboxPrefix}_`)[1];
+        return selectedJobDescReference?.[dataPath]?.data?.[id];
+      })
+      .filter((item) => item)
+      .map((item) => {
+        // Ensure jobReferences is always an array
+        if (!Array.isArray(item.jobReferences)) {
+          item.jobReferences = [];
+        }
+
+        item.jobReferences.push({
           jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
           jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-          noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-        };
-      });
-    } else {
-      // Process selected items only
-      const selectedItems = checkboxes
-        .map((item) => {
-          const id = item.id.split(`${checkboxPrefix}_`)[1];
-          return selectedJobDescReference?.[dataPath]?.data?.[id];
-        })
-        .filter((item) => item)
-        .map((item) => {
-          item.jobReference = {
-            jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
-            jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-            noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-          };
-          return item;
+          skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+          jobId: jobId,
+          prlOrg: prlOrg,
         });
 
-      selectedJobDescReference[dataPath].data = selectedItems;
+        return item;
+      });
+
+    selectedJobDescReference[dataPath].data = selectedItems;
+    if (localStorageKey === "tugasHa") {
+      let arraySelectedBusPro = [];
+      selectedItems.forEach((item) => {
+        arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
+      });
+      const uniqueSelectedBusPro = arraySelectedBusPro.filter(
+        (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+      );
+      updateCalculateLsAvailable(uniqueSelectedBusPro);
     }
+    // }
 
     // Update localStorage
-    const localData =
-      localStorage.getItem(localStorageKey) !== "" ? JSON.parse(localStorage.getItem(localStorageKey)) : [];
+    // check selectedJobDescReference[dataPath]?.data is array
+    if (!Array.isArray(selectedJobDescReference?.[dataPath]?.data)) {
+      console.warn(`${dataPath} is not an array, skipping localStorage update`);
+      return;
+    }
+
+    let localData = [];
+    try {
+      const storedData = localStorage.getItem(localStorageKey);
+      if (storedData && storedData !== "") {
+        localData = JSON.parse(storedData);
+      }
+      // Ensure localData is an array
+      if (!Array.isArray(localData)) {
+        localData = [];
+      }
+    } catch (error) {
+      console.warn(`Error parsing localStorage for ${localStorageKey}:`, error);
+      localData = [];
+    }
+
     localData.push(...(selectedJobDescReference?.[dataPath]?.data ?? []));
     localStorage.setItem(localStorageKey, JSON.stringify(localData));
   };
 
   if (checboxFungsi != undefined) {
     const localData = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
-    const dataFungsi = $("#fungsiTextReference").summernote("code");
-    localData.push({
-      jobReference: {
-        jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
-        jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-        noSuratKeputusan: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-      },
-      fungsi: dataFungsi,
+    let dataFungsi = "";
+    const fungsiElement = document.querySelector("#fungsiTextReference");
+    if (fungsiElement && fungsiElement.ckeditorInstance) {
+      dataFungsi = fungsiElement.ckeditorInstance.getData();
+    } else if (fungsiElement) {
+      dataFungsi = fungsiElement.innerHTML || fungsiElement.value;
+    }
+    const getFungsiText = localData.deskripsi + " " + dataFungsi;
+    localData.deskripsi = getFungsiText;
+    localData.jobReferences.push({
+      jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
+      jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
+      skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+      jobId: jobId,
+      prlOrg: prlOrg,
     });
     localStorage.setItem("fungsi", JSON.stringify(localData));
   }
@@ -656,6 +744,8 @@ async function saveReferenceAttribute() {
     checkboxPrefix: "checkbox_stkReference",
   });
 
+  saveTugasHa();
+
   await getJobReferenceDetail();
   $("#modalJobCompare").modal("hide");
   $("#modalJobCompareDetail").modal("hide");
@@ -663,10 +753,44 @@ async function saveReferenceAttribute() {
   swal("Success!", "Reference saved to your job description", "success");
 }
 
+async function saveTugasHa() {
+  const tugasHa = JSON.parse(localStorage.getItem("tugasHa")) || [];
+  // tugas dan tanggung jawab akhir
+  const params = paramsSaveDraft;
+  const paramsTugasAkhir = params.tugasTanggungJawabAkhir[0];
+  params.tugasTanggungJawabAkhir = [];
+  tugasHa.forEach((item) => {
+    const objTugasHa = { ...paramsTugasAkhir };
+    objTugasHa.jobId = jobId;
+    objTugasHa.prlOrg = prlOrg;
+    objTugasHa.tanggungJawab = item.responsible || [];
+    objTugasHa.uraian = item.uraian || "";
+    objTugasHa.hasilAkhir = item.output || [];
+    objTugasHa.leadingIndikator = item.lead || [];
+    // filter unique
+    objTugasHa.tanggungJawabProses = item.tanggungJawabProses
+      .map((tr) => tr.code)
+      .filter((v, i, a) => a.indexOf(v) === i);
+    objTugasHa.hasilAkhirProses = item.hasilAkhirProses.map((hr) => hr.code).filter((v, i, a) => a.indexOf(v) === i);
+    objTugasHa.jobReferences = [];
+    if (item.jobReferences && item.jobReferences.length > 0) {
+      objTugasHa.jobReferences = item.jobReferences;
+    }
+    params.tugasTanggungJawabAkhir.push(objTugasHa);
+  });
+  console.log("params.tugasTanggungJawabAkhir", params.tugasTanggungJawabAkhir);
+}
+
 async function saveReference() {
+  const onlyShowdata = localStorage.getItem("onlyShowdata") ?? false;
   const isFullRefer = JSON.parse(localStorage.getItem("isFullRefer")) ?? false;
+  console.log("onlyShowdata", onlyShowdata);
   console.log("isFullRefer", isFullRefer);
-  if (!isFullRefer) {
+  console.log("isFullRefer", isFullRefer);
+  console.log("isFullRefer", isFullRefer);
+
+  // if not full reference or onlyShowdata is tugasHa, call confirm reference
+  if (!isFullRefer && (onlyShowdata == "tugasHa" || onlyShowdata === false || onlyShowdata === "")) {
     callConfirmReference();
     return;
   }
@@ -833,7 +957,6 @@ async function focusNode(nodeId) {
       if (typeof hideChartLoading === "function") {
         hideChartLoading("chart-container-custom");
       }
-      console.log("Chart focus completed successfully");
     }, 1500); // Wait 1.5 seconds for chart to fully render
   } catch (error) {
     console.error("Error in focusNode:", error);
@@ -862,7 +985,6 @@ function showChartLoading(
 ) {
   let container = document.querySelector(`.${containerClass}`);
   container.innerHTML = CHART_LOADING_HTML;
-  console.log({ containerClass, isCustom, height, width, text });
 
   // Ensure container has proper positioning for loading overlay
   const containerStyle = window.getComputedStyle(container);
@@ -909,4 +1031,867 @@ function hideChartLoading(containerClass) {
   if (loadingStyle) {
     loadingStyle.remove();
   }
+}
+
+// Action button functions for table rows
+function editData(params, index) {
+  // Get data from localStorage based on the params
+  if (params == "koordinasi") params = "koordinasiInternal";
+  if (params == "relation") params = "relasiEksternal";
+  if (params == "tugasHa") params = "tugasHa";
+  if (params == "stk") params = "stk";
+  if (params == "pk") params = "persyaratanKhusus";
+  let data = [];
+  try {
+    const storageData = localStorage.getItem(params);
+    data = storageData ? JSON.parse(storageData) : [];
+  } catch (error) {
+    swal("Error", "Failed to load data for editing", "error");
+    return;
+  }
+
+  // Check if index is valid
+  if (index < 0 || index >= data.length) {
+    swal("Error", "Invalid data index", "error");
+    return;
+  }
+
+  const itemToEdit = data[index];
+
+  // Show confirmation before editing
+  swal({
+    title: "Edit Item",
+    text: "Do you want to edit this item?",
+    icon: "info",
+    buttons: {
+      cancel: "Cancel",
+      confirm: "Edit",
+    },
+  }).then((willEdit) => {
+    if (willEdit) {
+      params == "relasiEksternal" ? (params = "relation") : params;
+      params == "koordinasiInternal" ? (params = "koordinasi") : params;
+      updateJobDescItem(params, index, false);
+    }
+  });
+}
+
+function deleteData(params, index) {
+  let paramsLs;
+  if (params == "koordinasi") paramsLs = "koordinasiInternal";
+  if (params == "relation") paramsLs = "relasiEksternal";
+  if (params == "tugasHa") paramsLs = "tugasHa";
+  if (params == "stk") paramsLs = "stk";
+  if (params == "pk") paramsLs = "persyaratanKhusus";
+
+  // Get data from localStorage based on the params
+  let data = [];
+  try {
+    const storageData = localStorage.getItem(paramsLs);
+    let arrayDeleted = [];
+    if (paramsLs === "tugasHa") {
+      const findDeleted = JSON.parse(storageData).find((item, idx) => idx === index);
+      findDeleted.tanggungJawabProses.forEach((element) => {
+        arrayDeleted.push(element);
+      });
+      updateCalculateLsAvailable([], arrayDeleted);
+    }
+    data = storageData ? JSON.parse(storageData) : [];
+  } catch (error) {
+    console.error("Error parsing localStorage data:", error);
+    swal("Error", "Failed to load data for deletion", "error");
+    return;
+  }
+
+  // Check if index is valid
+  if (index < 0 || index >= data.length) {
+    swal("Error", "Invalid data index", "error");
+    return;
+  }
+
+  const itemToDelete = data[index];
+  // Show confirmation before deleting
+  swal({
+    title: "Are you sure?",
+    text: "This action cannot be undone. Do you want to delete this item?",
+    icon: "warning",
+    buttons: {
+      cancel: "Cancel",
+      confirm: {
+        text: "Delete",
+        value: true,
+        className: "btn-danger",
+      },
+    },
+    dangerMode: true,
+  }).then((willDelete) => {
+    if (willDelete) {
+      // Remove item from array
+      data.splice(index, 1);
+
+      // Update localStorage using the correct localStorage key
+      localStorage.setItem(paramsLs, JSON.stringify(data));
+
+      // Refresh the table display using the original params for table name
+      refreshTableDisplay(params, data);
+
+      swal("Deleted!", "The item has been deleted successfully.", "success");
+    }
+  });
+}
+
+function mergeData(params, index) {
+  $("#modalBusProMerge").modal("show");
+  const tugasHaData = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
+  if (tugasHaData.length === 0) {
+    swal("Info", "No Tugas dan Tanggung Jawab Akhir data available to merge.", "info");
+    return;
+  }
+  // give index number to each item in tugasHaData
+  tugasHaData.forEach((item, idx) => {
+    item.index = idx;
+  });
+  // get data selected by index
+  const getDataSelected = tugasHaData[index];
+  const getDataElsewhere = tugasHaData.filter((item, idx) => idx !== index);
+
+  const modalBusProMergeBody = document.getElementById("modalBusProMergeBody");
+  const uniqueBusPro = getDataSelected.tanggungJawabProses.filter(
+    (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+  );
+  const textUniqueBusPro = uniqueBusPro.map((process) => process.indexNumber + " - " + process.description);
+  modalBusProMergeBody.innerHTML = "";
+  let content = `
+    <div class="mb-3">
+        <input type="hidden" id="mergeIndexSelected" value="${getDataSelected.index}" />
+        <h6 class="modal-title" id="">Description No. ${getDataSelected.index + 1}</h6> 
+        <h6 class="modal-title" id="modalBusProMergeLabel">${textUniqueBusPro.join(", ")}</h6> 
+    </div>
+      <div class="table-responsive" style="overflow-x: auto;">
+        <table class="tableMasterData" id="relatedBusProTable" style="width:100%">
+          <thead>
+            <tr>
+              <th style="width:10%">
+                <input type="checkbox" id="selectAllBusPro" onclick="toggleSelectAllBusPro(this)" />
+              </th>
+              <th style="width:15%">Description No.</th>
+              <th style="width:75%">Related Business Process</th>
+            </tr>
+          </thead>
+          <tbody class="tbodBisproMerge">
+          </tbody>
+        </table>
+      </div>
+        `;
+  modalBusProMergeBody.innerHTML = content;
+  let tbodBisproMerge = document.querySelector(".tbodBisproMerge");
+  for (let [idx, item] of getDataElsewhere.entries()) {
+    // unique indexNumber from item.tanggungJawabProses
+    const uniqueIndex = item.tanggungJawabProses.filter(
+      (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+    );
+    let textIndexDescription = uniqueIndex.map((process) => process.indexNumber + " - " + process.description);
+    tbodBisproMerge.innerHTML += `
+        <tr>
+          <td class="p-3" style="place-content: center">
+            <input type="checkbox" class="checkboxBusPro" value="${item.index}" />
+          </td>
+          <td class="p-3" style="place-content: center">
+            <span class="">${item.index + 1}</span>
+          </td>
+          <td class="p-3" style="place-content: flex-start">
+            <span class="">${textIndexDescription.join(", ")}</span>
+          </td>
+        </tr>
+      `;
+  }
+}
+
+async function mergeBusPro() {
+  const mergeIndexSelected = document.getElementById("mergeIndexSelected").value;
+  const checkboxes = Array.from(document.querySelectorAll(".checkboxBusPro:checked"));
+  if (checkboxes.length === 0) {
+    swal("Info", "Please select at least one item to merge.", "info");
+    return;
+  }
+  const confirm = await confirmFunction(
+    "Merge Business Processes",
+    "Are you sure you want to merge the selected business processes?"
+  );
+  if (!confirm) return;
+  const selectedIndexes = checkboxes.map((checkbox) => parseInt(checkbox.value));
+  const tugasHaData = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
+  const itemToMerge = tugasHaData[mergeIndexSelected];
+
+  // Merge tanggungJawabProses from selected items into itemToMerge, avoiding duplicates, and merge lead, output, responsible ass well
+  selectedIndexes.forEach((idx) => {
+    const item = tugasHaData[idx];
+    item.tanggungJawabProses.forEach((process) => {
+      // Check for duplicates before adding
+      if (!itemToMerge.tanggungJawabProses.some((p) => p.indexNumber === process.indexNumber)) {
+        itemToMerge.tanggungJawabProses.push(process);
+      }
+    });
+
+    // Merge lead, output, responsible is array. if data exists, push to array
+    if (item.lead && !itemToMerge.lead) {
+      itemToMerge.lead = [];
+    }
+    if (item.output && !itemToMerge.output) {
+      itemToMerge.output = [];
+    }
+    if (item.responsible && !itemToMerge.responsible) {
+      itemToMerge.responsible = [];
+    }
+
+    if (item.lead && Array.isArray(item.lead)) {
+      item.lead.forEach((leadItem) => {
+        if (!itemToMerge.lead.some((existing) => JSON.stringify(existing) === JSON.stringify(leadItem))) {
+          itemToMerge.lead.push(leadItem);
+        }
+      });
+    }
+    if (item.output && Array.isArray(item.output)) {
+      item.output.forEach((outputItem) => {
+        if (!itemToMerge.output.some((existing) => JSON.stringify(existing) === JSON.stringify(outputItem))) {
+          itemToMerge.output.push(outputItem);
+        }
+      });
+    }
+    if (item.responsible && Array.isArray(item.responsible)) {
+      item.responsible.forEach((responsibleItem) => {
+        if (!itemToMerge.responsible.some((existing) => JSON.stringify(existing) === JSON.stringify(responsibleItem))) {
+          itemToMerge.responsible.push(responsibleItem);
+        }
+      });
+    }
+  });
+
+  // Calculate how many items before mergeIndexSelected will be removed
+  const itemsRemovedBefore = selectedIndexes.filter((idx) => idx < mergeIndexSelected).length;
+  const newMergeIndex = mergeIndexSelected - itemsRemovedBefore;
+
+  // Remove merged items from tugasHaData (sort indexes descending to avoid shifting issues)
+  const sortedIndexes = selectedIndexes.sort((a, b) => b - a);
+  sortedIndexes.forEach((idx) => {
+    tugasHaData.splice(idx, 1);
+  });
+
+  // Update the merged item at the correct position after removals
+  tugasHaData[newMergeIndex] = itemToMerge;
+
+  // Update localStorage
+  localStorage.setItem("tugasHa", JSON.stringify(tugasHaData));
+  // Refresh table display
+  refreshTableDisplay("tugasHa", tugasHaData);
+  $("#modalBusProMerge").modal("hide");
+  swal("Success", "Business processes merged successfully.", "success");
+}
+
+// Helper function to refresh table display after deletion
+function refreshTableDisplay(params, data) {
+  try {
+    // Determine the appropriate table headers based on params
+    let tableHeaders = [];
+    switch (params) {
+      case "tugasHa":
+        tableHeaders = [...tabCusJD.tugasHa, "action"];
+        break;
+      case "koordinasi":
+        tableHeaders = [...tabCusJD.koordinasi, "action"];
+        break;
+      case "relation":
+        tableHeaders = [...tabCusJD.relation, "action"];
+        break;
+      case "stk":
+        tableHeaders = [...tabCusJD.stk, "action"];
+        break;
+      case "persyaratanKhusus":
+        tableHeaders = [...tabCusJD.pk, "action"];
+        break;
+      default:
+        console.warn("Unknown params for table refresh:", params);
+        return;
+    }
+
+    // Update the table using existing updateTable function
+    updateTable(params, data, tableHeaders);
+  } catch (error) {
+    console.error("Error refreshing table display:", error);
+  }
+}
+
+async function saveJobDescItem(type, id, isAdd = true) {
+  const ls = mappingAddUpdate[type];
+
+  if (!ls) {
+    swal("Error", "Unsupported item type for saving", "error");
+    return;
+  }
+  const confirm = await confirmFunction("Save Item", `Are you sure you want to ${isAdd ? "add" : "update"} this item?`);
+  if (!confirm) return;
+  if (isAdd) {
+    const lsData = localStorage.getItem(ls.ls) !== "" ? JSON.parse(localStorage.getItem(ls.ls)) : [];
+    const newItem = { ...ls.defaultData };
+    // get data from ckeditor instance or fallback to element content
+    ls.ids.forEach((itemId) => {
+      const element = document.querySelector(`#${itemId}`);
+      if (element && element.ckeditorInstance) {
+        let data = element.ckeditorInstance.getData();
+        // Remove wrapping p tags from CKEditor data
+        data = data.replace(/^<p>|<\/p>$/g, "").trim();
+        if (data.includes("<ul>") && data.includes("<li>")) {
+          // Extract list items and convert to array
+          const listItems = data.match(/<li>(.*?)<\/li>/g);
+          if (listItems) {
+            const arrayData = listItems.map((item) => item.replace(/<\/?li>/g, "").trim());
+            newItem[itemId] = arrayData;
+          } else {
+            newItem[itemId] = data;
+          }
+        } else {
+          newItem[itemId] = data;
+        }
+      } else if (element) {
+        newItem[itemId] = element.value || element.innerHTML;
+      }
+    });
+    if (type === "tugasHa") {
+      const arraySelectedBusPro = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
+      const arrayRemovedBusPro = JSON.parse(localStorage.getItem("arrayRemovedBusPro")) || [];
+      if (arraySelectedBusPro.length > 0) {
+        newItem.tanggungJawabProses = arraySelectedBusPro;
+      } else {
+        newItem.tanggungJawabProses = [];
+        swal("Warning", "Please select at least one Business Process for Tugas dan Tanggung Jawab Akhir", "warning");
+        return;
+      }
+      updateCalculateLsAvailable(arraySelectedBusPro, arrayRemovedBusPro);
+    }
+    lsData.push(newItem);
+    localStorage.setItem(ls.ls, JSON.stringify(lsData));
+    updateTable(type, lsData, [...tabCusJD[type], "action"]);
+    $("#modalAddJobDescItem").modal("hide");
+    swal("Success", `${type.toUpperCase()} item added successfully`, "success");
+    return;
+  } else {
+    const lsData = localStorage.getItem(ls.ls) !== "" ? JSON.parse(localStorage.getItem(ls.ls)) : [];
+    if (id === undefined || !lsData[id]) {
+      swal("Error", "Invalid item ID for update", "error");
+      return;
+    }
+    // Update existing item
+    ls.ids.forEach((itemId) => {
+      const element = document.querySelector(`#${itemId}`);
+      if (element && element.ckeditorInstance) {
+        let data = element.ckeditorInstance.getData();
+        // Remove wrapping p tags from CKEditor data
+        data = data.replace(/^<p>|<\/p>$/g, "").trim();
+
+        // Check if data contains bulleted list and convert to array
+        if (data.includes("<ul>") && data.includes("<li>")) {
+          // Extract list items and convert to array
+          const listItems = data.match(/<li>(.*?)<\/li>/g);
+          if (listItems) {
+            const arrayData = listItems.map((item) => item.replace(/<\/?li>/g, "").trim());
+            lsData[id][itemId] = arrayData;
+          } else {
+            lsData[id][itemId] = data;
+          }
+        } else {
+          lsData[id][itemId] = data;
+        }
+      } else if (element) {
+        lsData[id][itemId] = element.value || element.innerHTML;
+      }
+    });
+
+    if (type === "tugasHa") {
+      const arraySelectedBusPro = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
+      if (arraySelectedBusPro.length > 0) {
+        lsData[id].tanggungJawabProses = arraySelectedBusPro;
+      } else {
+        lsData[id].tanggungJawabProses = [];
+        swal("Warning", "Please select at least one Business Process for Tugas dan Tanggung Jawab Akhir", "warning");
+        return;
+      }
+      const arrayRemovedBusPro = JSON.parse(localStorage.getItem("arrayRemovedBusPro")) || [];
+      // update localStorage arraySelectedBusPro to empty array and lsAvailable notAvailable to full data
+      updateCalculateLsAvailable(arraySelectedBusPro, arrayRemovedBusPro);
+    }
+    localStorage.setItem(ls.ls, JSON.stringify(lsData));
+    updateTable(type, lsData, [...tabCusJD[type], "action"]);
+    $("#modalAddJobDescItem").modal("hide");
+    swal("Success", `${type.toUpperCase()} item updated successfully`, "success");
+    return;
+  }
+}
+
+function updateCalculateLsAvailable(arraySelectedBusPro = [], arrayRemovedBusPro = []) {
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable")) || {};
+  let notAvailable = lsAvailable.notAvailable || [];
+  let available = lsAvailable.available || [];
+  let countAll = lsAvailable.countAll || 0;
+  let codeAvailable = lsAvailable.codeAvailable || [];
+  let codeNotAvailable = lsAvailable.codeNotAvailable || [];
+  let countAvailable = lsAvailable.countAvailable || 0;
+  let countNotAvailable = lsAvailable.countNotAvailable || 0;
+
+  if (arraySelectedBusPro.length > 0) {
+    // ada pergerakan
+    // takeout arraySelectedBusPro from notAvailable and push to available
+    arraySelectedBusPro.forEach((item) => {
+      const index = notAvailable.findIndex((i) => i.indexNumber === item.indexNumber);
+      if (index !== -1) {
+        available.push(notAvailable[index]);
+        notAvailable.splice(index, 1);
+      }
+    });
+  }
+  if (arrayRemovedBusPro.length > 0) {
+    // ada pergerakan
+    // takeout arrayRemovedBusPro from available and push to notAvailable
+    arrayRemovedBusPro.forEach((item) => {
+      const index = available.findIndex((i) => i.indexNumber === item.indexNumber);
+      if (index !== -1) {
+        notAvailable.push(available[index]);
+        available.splice(index, 1);
+      }
+    });
+  }
+
+  countAll = available.length + notAvailable.length;
+  countAvailable = available.length;
+  countNotAvailable = notAvailable.length;
+  codeAvailable = [...new Set(available.map((item) => item.indexNumber))];
+  codeNotAvailable = [...new Set(notAvailable.map((item) => item.indexNumber))];
+
+  localStorage.setItem(
+    "lsAvailable",
+    JSON.stringify({
+      available,
+      notAvailable,
+      countAll,
+      codeAvailable,
+      codeNotAvailable,
+      countAvailable,
+      countNotAvailable,
+    })
+  );
+  localStorage.setItem("arraySelectedBusPro", JSON.stringify([]));
+  const isFullFilled = countAvailable === countAll || countNotAvailable === 0;
+  const $label = $("#labelFulfillTugasHa");
+  $label
+    .toggleClass("label-success-custom", isFullFilled)
+    .toggleClass("label-danger-custom", !isFullFilled)
+    .css("cursor", "pointer")
+    .attr("title", "Click to see detail");
+
+  if (!isFullFilled) {
+    $label.html(
+      `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`
+    );
+  } else {
+    $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
+  }
+}
+
+function relatedBusPro() {
+  // $("#modalAddJobDescItem").modal("hide");
+  $("#modalRelatedBusPro").modal("show");
+  const modalRelatedBusPro = document.getElementById("modalRelatedBusProBody");
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const notAvailable = lsAvailable.notAvailable;
+  modalRelatedBusPro.innerHTML = "";
+  let content = `
+      <div class="table-responsive" style="overflow-x: auto;">
+        <table class="tableMasterData" id="relatedBusProTable" style="width:100%">
+          <thead>
+            <tr>
+              <th style="width:20%">
+                <input type="checkbox" id="selectAllBusPro" onclick="toggleSelectAllBusPro(this)" />
+              </th>
+              <th style="width:80%">Business Process</th>
+            </tr>
+          </thead>
+          <tbody class="tbodBispro">
+          </tbody>
+        </table>
+      </div>
+        `;
+  modalRelatedBusPro.innerHTML = content;
+  let tbodBispro = document.querySelector(".tbodBispro");
+  for (let item of notAvailable) {
+    tbodBispro.innerHTML += `
+        <tr>
+          <td class="p-3" style="place-content: center">
+            <input type="checkbox" class="checkboxBusPro" value="${item.indexNumber}" />
+          </td>
+          <td class="p-3" style="place-content: flex-start">
+            <span class="">${item.indexNumber} - ${item.description}</span>
+          </td>
+        </tr>
+      `;
+  }
+  if (notAvailable.length === 0) {
+    tbodBispro.innerHTML = `
+        <tr class="no-data-row">
+          <td colspan="2" class="text-center p-3">
+            No business processes available to add.
+          </td>
+        </tr>
+      `;
+    $("#addSelectedBusProBtn").prop("disabled", true);
+  }
+}
+
+function toggleSelectAllBusPro(source) {
+  const checkboxes = document.querySelectorAll(".checkboxBusPro");
+  const searchTerm = document.getElementById("searchBusinessProcess").value.toLowerCase();
+  const visibleCheckboxes = Array.from(checkboxes).filter((checkbox) => {
+    const row = checkbox.closest("tr");
+    return row && row.style.display !== "none";
+  });
+  const checkboxesToToggle = searchTerm ? visibleCheckboxes : checkboxes;
+  checkboxesToToggle.forEach((checkbox) => {
+    checkbox.checked = source.checked;
+  });
+}
+
+async function addSelectedBusPro() {
+  const selectedCheckboxes = Array.from(document.querySelectorAll(".checkboxBusPro:checked"));
+  if (selectedCheckboxes.length === 0) {
+    swal("Warning", "Please select at least one business process", "warning");
+    return;
+  }
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const notAvailable = lsAvailable.notAvailable;
+  const selectedValues = selectedCheckboxes
+    .map((checkbox) => checkbox.value)
+    .map((value) => {
+      const matchedItem = notAvailable.find((item) => item.indexNumber === value);
+      return {
+        indexNumber: matchedItem ? matchedItem.indexNumber : null,
+        description: matchedItem ? matchedItem.description : null,
+        code: matchedItem ? matchedItem.code : null,
+      };
+    })
+    .filter((item) => item.indexNumber !== null);
+
+  const confirm = await confirmFunction(
+    "Add Business Processes",
+    `Are you sure you want to add the selected business processes?`
+  );
+  if (!confirm) return;
+  const existingSelected = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
+  const combinedSelected = Array.from(new Set([...existingSelected, ...selectedValues]));
+  selectedValues.length = 0;
+  localStorage.setItem("arraySelectedBusPro", JSON.stringify(combinedSelected));
+
+  const selectedBusProContainer = document.getElementById("selectedBusProContainer");
+  selectedBusProContainer.innerHTML = "";
+  const arraySelectedBusPro = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
+  arraySelectedBusPro.forEach((val) => {
+    selectedBusProContainer.innerHTML += `
+      <div class="badge bg-primary m-1 p-2" style="font-size: 0.9rem;">
+        ${val.indexNumber} - ${val.description}
+        <span class="icon-delete" onclick="removeSelectedBusPro('${val.indexNumber}')">&times;</span>
+      </div>
+    `;
+  });
+  // uncheck all checkboxes in modalRelatedBusPro
+  document.getElementById("selectAllBusPro").checked = false;
+  const checkboxes = document.querySelectorAll(".checkboxBusPro");
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+  // close modal
+
+  swal("Success", "Selected business processes added", "success");
+  $("#modalRelatedBusPro").modal("hide");
+}
+
+async function removeSelectedBusPro(value) {
+  const confirm = await confirmFunction(
+    "Remove Business Process",
+    `Are you sure you want to remove the business process ${value}?`
+  );
+  if (!confirm) return;
+
+  let selectedValues = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
+  const removedValue = selectedValues.find((item) => item.indexNumber === value);
+  selectedValues = selectedValues.filter((item) => item.indexNumber !== value);
+  localStorage.setItem("arraySelectedBusPro", JSON.stringify(selectedValues));
+  const selectedBusProContainer = document.getElementById("selectedBusProContainer");
+  selectedBusProContainer.innerHTML = "";
+  const arraySelectedBusPro = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
+  arraySelectedBusPro.forEach((val) => {
+    selectedBusProContainer.innerHTML += `
+      <div class="badge bg-primary m-1 p-2" style="font-size: 0.9rem;">
+        ${val.indexNumber} - ${val.description}
+        <span class="icon-delete" onclick="removeSelectedBusPro('${val.indexNumber}')">&times;</span>
+      </div>
+    `;
+  });
+
+  // add value back to notAvailable in lsAvailable
+  const removeSelected = JSON.parse(localStorage.getItem("arrayRemovedBusPro")) || [];
+  removeSelected.push(removedValue);
+  localStorage.setItem("arrayRemovedBusPro", JSON.stringify(removeSelected));
+
+  // uncheck checkbox in modalRelatedBusPro
+  swal("Success", "Selected business processes removed", "success");
+  $("#modalRelatedBusPro").modal("hide");
+}
+
+$("#searchBusinessProcess").on("input", function () {
+  // filterBusinessProcessTable();
+  const searchTerm = $(this).val().toLowerCase();
+  $("#relatedBusProTable tbody tr").each(function () {
+    const rowText = $(this).text().toLowerCase();
+    $(this).toggle(rowText.includes(searchTerm));
+  });
+});
+
+$("#searchRasciAvailability").on("input", function () {
+  filterRasciAvailability();
+});
+$("#availableCheckbox, #notAvailableCheckbox").on("change", filterRasciAvailability);
+
+function filterRasciAvailability() {
+  const availableChecked = $("#availableCheckbox").is(":checked");
+  const notAvailableChecked = $("#notAvailableCheckbox").is(":checked");
+  const searchTerm = $("#searchRasciAvailability").val().toLowerCase();
+  let visibleRowCount = 0;
+
+  $("#tugasHaRecTable tbody tr").each(function () {
+    // Skip the "no data" row if it exists
+    if ($(this).hasClass("no-data-row")) {
+      return;
+    }
+
+    const rowText = $(this).text();
+    const rowTextLower = rowText.toLowerCase();
+    const isAvailable = rowText.includes("Available") && !rowText.includes("Not Available");
+    const isNotAvailable = rowText.includes("Not Available");
+
+    // Check if row matches search term
+    const matchesSearch = searchTerm === "" || rowTextLower.includes(searchTerm);
+
+    // Check if row matches availability filter
+    let matchesAvailabilityFilter = false;
+    if (availableChecked && isAvailable) matchesAvailabilityFilter = true;
+    if (notAvailableChecked && isNotAvailable) matchesAvailabilityFilter = true;
+
+    // Show row only if it matches both search and availability filters
+    const shouldShow = matchesSearch && matchesAvailabilityFilter;
+    $(this).toggle(shouldShow);
+
+    if (shouldShow) {
+      visibleRowCount++;
+    }
+  });
+
+  // Remove existing "no data" row
+  $("#tugasHaRecTable tbody .no-data-row").remove();
+
+  // Add "no data" row if no rows are visible
+  if (visibleRowCount === 0) {
+    const noDataRow = `
+        <tr class="no-data-row">
+          <td colspan="3" class="text-center p-4" style="color: #666;">
+            <i class="fas fa-info-circle mb-2"></i><br>
+            No business processes match the current filters
+          </td>
+        </tr>
+      `;
+    $("#tugasHaRecTable tbody").append(noDataRow);
+  }
+}
+function updateJobDescItem(type, id, isAdd = true) {
+  localStorage.setItem("arrayRemovedBusPro", JSON.stringify([]));
+  localStorage.setItem("arraySelectedBusPro", JSON.stringify([]));
+  // Implement edit logic based on type and id
+  const mapping = mappingAddUpdate[type];
+  if (!mapping) {
+    swal("Error", "Unsupported item type for editing", "error");
+    return;
+  }
+  $("#modalAddJobDescItemTitle").text(isAdd ? "Add New Item" : "Edit Item");
+  $("#modalAddJobDescItemBody").html(""); // Clear previous content
+  const ls = localStorage.getItem(mapping.ls) !== "" ? JSON.parse(localStorage.getItem(mapping.ls)) : [];
+  if (type === "tugasHa") {
+    // add button choose related business process
+    $("#modalAddJobDescItemBody").append(`
+      <div class="form-group mb-3">
+        <button class="btn btn-primary btn-sm" id="relatedBusPro" onclick="relatedBusPro()">Choose Related Business Process</button>
+      </div>
+      <div class="mb-3" id="selectedBusProContainer">
+      </div>
+    `);
+  }
+  if (isAdd) {
+    id = undefined;
+    // create text area by looping mapping.ids
+    mapping.ids.forEach((itemId) => {
+      $("#modalAddJobDescItemBody").append(`
+          <div class="form-group mb-3">
+            <label style="font-weight: bold;font-size: 1rem;" for="${itemId}">${itemId
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase())}</label>
+            <textarea id="${itemId}" class="form-control" rows="4"></textarea>
+          </div>
+        `);
+    });
+    // Initialize CKEditor 4.8.0 for textareas
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR && mapping.toolbar) {
+      mapping.ids.forEach((itemId) => {
+        const editor = CKEDITOR.replace(itemId, {
+          toolbar: [
+            { name: "editing", items: ["Undo", "Redo"] },
+            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+          ],
+          removePlugins: "elementspath",
+          resize_enabled: false,
+          height: 180,
+          uiColor: "#ffffff",
+          enterMode: CKEDITOR.ENTER_P,
+          shiftEnterMode: CKEDITOR.ENTER_BR,
+          allowedContent: true,
+          fillEmptyBlocks: false,
+          autoParagraph: false,
+          startupFocus: false,
+          entities: false,
+          basicEntities: false,
+          forceEnterMode: true,
+        });
+
+        // Store the editor instance for compatibility
+        document.querySelector(`#${itemId}`).ckeditorInstance = {
+          getData: () => editor.getData(),
+          setData: (data) => editor.setData(data),
+          _editor: editor,
+        };
+
+        editor.on("instanceReady", function () {
+          editor.setData("");
+          console.log(`✅ CKEditor 4.8.0 initialized for ${itemId}`);
+        });
+
+        editor.on("error", function (evt) {
+          console.error(`❌ CKEditor 4.8.0 error for ${itemId}:`, evt.data);
+        });
+      });
+    }
+  } else {
+    if (id === undefined || !ls[id]) {
+      swal("Error", "Invalid item ID for editing", "error");
+      return;
+    }
+    const itemData = ls[id];
+    if (type === "tugasHa") {
+      // load selected business process from itemData.tanggungJawabProses uniquely
+      const selectedBusPro = itemData.tanggungJawabProses.filter((item, index, self) => {
+        return index === self.findIndex((t) => t.indexNumber === item.indexNumber);
+      });
+      const selectedBusProContainer = document.getElementById("selectedBusProContainer");
+      let arraySelectedBusPro = [];
+      selectedBusPro.forEach((item) => {
+        arraySelectedBusPro.push({
+          code: item.code,
+          indexNumber: item.indexNumber,
+          description: item.description,
+        });
+      });
+      localStorage.setItem("arraySelectedBusPro", JSON.stringify(arraySelectedBusPro));
+      selectedBusProContainer.innerHTML = "";
+      selectedBusPro.forEach((item) => {
+        selectedBusProContainer.innerHTML += `
+        <div class="badge bg-primary m-1 p-2" style="font-size: 0.9rem;">
+          ${item.indexNumber} - ${item.description}
+          <span class="icon-delete" onclick="removeSelectedBusPro('${item.indexNumber}')">&times;</span>
+        </div>
+    `;
+      });
+    }
+
+    // create text area by looping mapping.ids and fill with data from ls[id]
+    mapping.ids.forEach((itemId) => {
+      const isList = mapping.listIds && mapping.listIds.includes(itemId);
+      let value = "";
+      if (isList && Array.isArray(itemData[itemId])) {
+        // Convert array to HTML ul/li format
+        const listItems = itemData[itemId].map((item) => `<li>${item}</li>`).join("");
+        value = listItems ? `<ul>${listItems}</ul>` : "";
+      } else {
+        value = itemData[itemId] || "";
+      }
+      $("#modalAddJobDescItemBody").append(`
+          <div class="form-group mb-3">
+            <label style="font-weight: bold;font-size: 1rem;" for="${itemId}">${itemId
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase())}</label>
+            <textarea id="${itemId}" class="form-control" rows="4">${value || ""}</textarea>
+          </div>
+        `);
+    });
+    // Initialize CKEditor 4.8.0 for textareas with existing data
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR && mapping.toolbar) {
+      mapping.ids.forEach((itemId) => {
+        const isList = mapping.listIds && mapping.listIds.includes(itemId);
+        let value = "";
+        if (isList && Array.isArray(itemData[itemId])) {
+          // Convert array to HTML ul/li format
+          const listItems = itemData[itemId].map((item) => `<li>${item}</li>`).join("");
+          value = listItems ? `<ul>${listItems}</ul>` : "";
+        } else {
+          value = itemData[itemId] || "";
+        }
+
+        const editor = CKEDITOR.replace(itemId, {
+          toolbar: [
+            { name: "editing", items: ["Undo", "Redo"] },
+            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+          ],
+          removePlugins: "elementspath",
+          resize_enabled: false,
+          height: 180,
+          uiColor: "#ffffff",
+          enterMode: CKEDITOR.ENTER_P,
+          shiftEnterMode: CKEDITOR.ENTER_BR,
+          allowedContent: true,
+          fillEmptyBlocks: false,
+          autoParagraph: false,
+          startupFocus: false,
+          entities: false,
+          basicEntities: false,
+          forceEnterMode: true,
+        });
+
+        // Store the editor instance for compatibility
+        document.querySelector(`#${itemId}`).ckeditorInstance = {
+          getData: () => editor.getData(),
+          setData: (data) => editor.setData(data),
+          _editor: editor,
+        };
+
+        editor.on("instanceReady", function () {
+          editor.setData(value || "");
+          console.log(`✅ CKEditor 4.8.0 initialized for ${itemId} with data`);
+        });
+
+        editor.on("error", function (evt) {
+          console.error(`❌ CKEditor 4.8.0 error for ${itemId}:`, evt.data);
+        });
+      });
+    }
+  }
+  // create button inside div
+  $("#modalAddJobDescItemFooter").html(`
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-primary" onclick="saveJobDescItem('${type}', ${id}, ${isAdd})">Save</button>
+  `);
+  $("#modalAddJobDescItem").modal("show");
 }

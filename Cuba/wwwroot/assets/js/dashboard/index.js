@@ -289,23 +289,29 @@ $(document).ready(async function () {
         item.directorateName.includes("Direktorat") ? item.directorateName : `Direktorat ${item.directorateName}`
       )
       .filter((value, index, self) => self.indexOf(value) === index); // unique value
-
-    // looping object mappingLevelName keys
     dataChart.dataPositionLevelByDirectorate.datasets = [];
     Object.keys(mappingLevelName).forEach((level, idx) => {
-      const filterObject = dataAll.totalPositionsByDirectorate.data.filter(
-        (item) => item.jobLevelName === mappingLevelName[level]
-      );
+      const arrayObject = [];
+      dataChart.dataPositionLevelByDirectorate.label.forEach((positionName, idx) => {
+        const name = positionName !== "Direktorat Utama" ? positionName.replace("Direktorat ", "") : positionName;
+        const findObject = dataAll.totalPositionsByDirectorate.data.find(
+          (item) => item.jobLevelName === mappingLevelName[level] && item.directorateName === name
+        );
+        if (findObject) {
+          arrayObject.push(findObject.totalPositions);
+        } else {
+          arrayObject.push(0);
+        }
+      });
       dataChart.dataPositionLevelByDirectorate.datasets.push({
         label: mappingLevelName[level],
-        data: filterObject.map((item) => item.totalPositions),
+        data: arrayObject,
         backgroundColor: COLOR[idx] || "#9999FC",
         barPercentage: BAR_PERCENTAGE, // Adjust bar width to create space
         categoryPercentage: CATEGORY_PERCENTAGE, // Adjust category width to create space
       });
-      // console.log("idx", idx);
-      // console.log("filterObject", filterObject);
     });
+    console.log("dataChart.dataPositionLevelByDirectorate", dataChart.dataPositionLevelByDirectorate);
 
     new Chart(chartOsPositionLevel, {
       type: "bar",

@@ -1,5 +1,12 @@
 function detailDraft(id) {
-  window.location.href = `/job-description/draft-detail`;
+  const data = id.split("|");
+  draftExistingJobDesc.draftId = data[2];
+  draftExistingJobDesc.draftRasciId = data[1];
+  draftExistingJobDesc.draftOrganizationId = data[0];
+  draftExistingJobDesc.draftName = data[3];
+  localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
+
+  window.location.href = `/job-description/draft-detail?draftId=${draftExistingJobDesc.draftId}`;
 }
 
 async function checkDraftSelected(listDraft) {
@@ -32,7 +39,7 @@ async function checkDraftSelected(listDraft) {
   $("#selectJobDescDraft").val(draftId).trigger("change");
 
   // disable selectJobDescDraft if draftId is not empty
-  $("#selectJobDescDraft").prop("disabled", true);
+  // $("#selectJobDescDraft").prop("disabled", true);
 }
 
 $(document).ready(async function () {
@@ -40,19 +47,35 @@ $(document).ready(async function () {
     window.location.href = "/job-description/detail";
   });
 
-  localStorage.getItem("statusManager")
-    ? localStorage.getItem("statusManager")
-    : localStorage.setItem("statusManager", "not available");
-  localStorage.getItem("statusSbm")
-    ? localStorage.getItem("statusSbm")
-    : localStorage.setItem("statusSbm", "not available");
-
-  let dataList = dataListJobDescription;
-  dataList[0].jobStatus = localStorage.getItem("statusManager");
-  dataList[1].jobStatus = localStorage.getItem("statusSbm");
+  $("#saveDraft").click(async function () {
+    // Save draft logic here
+    // both inputDraftName and selectDraftRacsi must be filled
+    const inputDraftName = $("#inputDraftName").val();
+    const selectDraftRacsi = $("#selectDraftRacsi").val();
+    if (inputDraftName == "" || selectDraftRacsi == null) {
+      swal("Please fill in all required fields");
+      return;
+    }
+    const confirmSave = await confirmFunction("Are you sure you want to save the draft?");
+    if (!confirmSave) return;
+    const saveData = await createDraft({
+      draftName: inputDraftName,
+      draftRasciId: selectDraftRacsi.split("|")[0],
+      draftOrganizationId: selectDraftRacsi.split("|")[1],
+    });
+    if (saveData.status == 200) {
+      swal("Draft saved successfully", { icon: "success" }).then(() => {
+        location.reload();
+      });
+    } else {
+      swal("Failed to save draft", { icon: "error" });
+    }
+  });
 
   // get draft list
   const dataListDraft = await draftList();
+  const rasciList = await getRasciList();
+  console.log("rasciList", rasciList);
   getDataList([
     {
       dataId: "selectJobDescDraft",
@@ -61,24 +84,32 @@ $(document).ready(async function () {
         text: item.draftName,
       })),
     },
+    {
+      dataId: "selectDraftRacsi",
+      data: rasciList.data.result.map((item) => ({
+        id: item.id + "|" + item.draftSo,
+        text: item.text,
+      })),
+    },
   ]);
-  checkDraftSelected(dataListDraft.data);
+  await checkDraftSelected(dataListDraft.data);
+  updateNotifNotAvailable();
+
+  await getTableListDraft(dataListDraft.data);
+
+  //
+
+  $("#notifNotAvailable").click(function () {
+    // scroll to table list job description
+    $("#selectStatusJobDesc").val("not available").trigger("change");
+  });
 
   // get data for table job description list
   getTableListJobDes();
 
   $("#selectStatusJobDesc").on("change", function () {
-    // const value = $(this).val() ?? "";
-    // const search = $("#searchJobDesc").val() ?? "";
-    // filterListJobDesc(value, search);
     getTableListJobDes();
   });
-
-  // function onSelectType(text) {
-  //   setState("selectedType", text);
-  //   document.getElementById("btnSearchType").innerText = text;
-  //   document.getElementById("inputText").value = "";
-  // }
 
   $(".di").on("click", function () {
     const value = $(this).attr("value");
@@ -88,9 +119,6 @@ $(document).ready(async function () {
 
   // ketika inputan serach selesai ketik
   $("#searchFilter").on("click", function () {
-    // const value = $("#selectStatusJobDesc").val() ?? "";
-    // const search = $(this).val() ?? "";
-    // filterListJobDesc(value, search);
     getTableListJobDes();
   });
 
@@ -104,27 +132,45 @@ $(document).ready(async function () {
     $("#modalCreateDraftJobDesc").modal("show");
   });
 
-  $("#selectJobDescDraft").change(function () {
-    const value = $(this).val();
-    if (value == "1") {
-      $("#pills-warningtab").attr("style", "display:none !important");
-    } else {
-      $("#pills-warningtab").show();
-    }
-  });
-
   getTableListApproval();
   getTableListLog();
 
   checkDraftSelected(dataListDraft.data);
 
-  $("#selectJobDescDraft").on("change", function () {
+  $("#selectJobDescDraft").change(function () {
     const value = $(this).val();
+    console.log("Selected draft:", value);
+    if (value == "1") {
+      $("#pills-warningtab").hide();
+      $("#pills-draft, #pills-request, #pills-log").hide();
+    } else {
+      $("#pills-warningtab").show();
+    }
     const data = value.split("|");
     draftExistingJobDesc.draftId = data[2];
     draftExistingJobDesc.draftRasciId = data[1];
     draftExistingJobDesc.draftOrganizationId = data[0];
     draftExistingJobDesc.draftName = $(this).find("option:selected").text();
     localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
+    if (draftExistingJobDesc.draftId != "" && draftExistingJobDesc.draftId != null) {
+      getTableListJobDes();
+      updateNotifNotAvailable();
+    }
   });
+
+  function updateNotifNotAvailable() {
+    console.log("updateNotifNotAvailable");
+    $("#notifNotAvailable").hide();
+    draftListJobDesc({
+      draftId: draftExistingJobDesc.draftId,
+      position: "",
+      status: "not available",
+      pageSize: 10,
+    }).then((result) => {
+      $("#notifNotAvailable").show();
+      $("#notifNotAvailable").text(
+        `There are ${result.count} positions with job descriptions not available. Click here to show.`
+      );
+    });
+  }
 });

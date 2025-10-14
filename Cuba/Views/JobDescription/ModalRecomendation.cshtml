@@ -1,5 +1,5 @@
 <link rel="stylesheet" type="text/css" href="~/assets/css/organization-structure.css">
-<div class="modal fade" id="modalRecomendation" tabindex="-1" role="dialog" aria-labelledby="modalRecomendation" aria-hidden="true" style="z-index: 2200;" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="modalRecomendation" tabindex="-1" role="dialog" aria-labelledby="modalRecomendation" aria-hidden="true" style="z-index: 3200;" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,8 +9,12 @@
             <div class="modal-body">
                 <div id="modalRecomendationBody"> </div>
             </div>
-            <div class="modal-footer" >
-                <div class="text-end " id="modalRecomendationFooter">
+                <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">Back</button>
+                    <button class="btn btn-primary" type="button" onclick="saveRecommendation()">
+                        Save
+                    </button>
                 </div>
             </div>
         </div>

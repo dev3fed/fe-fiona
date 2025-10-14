@@ -94,7 +94,8 @@ async function confirmDuplicate(id) {
   loader(false);
 }
 
-async function duplicateJob(draftId, positionId) {
+async function duplicateJob() {
+  const positionName = $("#jobName").text();
   $("#modalDetailJob").modal("hide");
   const action = [
     actionBack,
@@ -107,7 +108,7 @@ async function duplicateJob(draftId, positionId) {
   modalConfrimHelper(
     "confirm",
     "Duplicate Position",
-    "<span>Are you sure want to duplicate <b>Manager Strategic Planning</b> position?</span>",
+    `<span>Are you sure want to duplicate <b>${positionName}</b> position?</span>`,
     "",
     action,
     "40%",
@@ -184,7 +185,7 @@ function confirmDeleteOption(value) {
 // modal confirm delete job
 async function confirmDeleteJob(unitCode) {
   const positionId = $("#inputOUCode").val();
-  const positionName = $("#jobName").val();
+  const positionName = $("#jobName").text();
   const deleteOption = $("input[name='deleteOption']:checked").val();
   const tableVarious = $("#editMoveVariousTable");
   const data = tableVarious.DataTable().rows().data().toArray();
@@ -359,6 +360,7 @@ async function handleEditJob() {
 
 // handle delete job
 async function handleDeleteJob() {
+  const positionName = $("#jobName").text();
   const getDataSub = await draftJobSubordinate({
     draftId: organizationAttribute.orgUnitId,
     jobCode: $("#inputOUCode").val(),
@@ -392,7 +394,7 @@ async function handleDeleteJob() {
   table += `</table>`;
 
   // handleEditJob
-  const divDeleteSpesific = `<span>Are you sure want to delete <b>Manager Strategic Planning</b> position?</span>
+  const divDeleteSpesific = `<span>Are you sure want to delete <b>${positionName}</b> position?</span>
     <br/>
     <div class="col">
         <div class="mb-3 m-t-15 custom-radio-ml">

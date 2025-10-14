@@ -101,8 +101,9 @@ function confirmDelete(id) {
 }
 
 async function confirmSubmit(id) {
-  // const draftId = urlParams.get("draftId");
-  // await draftSubmitToApproval(draftId);
+  const draftId = urlParams.get("draftId");
+  await draftSubmitToApproval(draftId);
+
   // const getDataDraft = await draftDetailById(draftId);
   $("#modalConfirm").modal("hide");
   swal("Success", "Draft has been submitted to approval", "success");
@@ -110,19 +111,20 @@ async function confirmSubmit(id) {
 }
 
 async function confirmSubmitApproval(id) {
-  // const draftId = urlParams.get("draftId");
-  // await draftApprove(draftId);
-  // const getDataDraft = await draftDetailById(draftId);
-  // checkButtonDraftDetail(getDataDraft.data);
-  // $("#modalConfirm").modal("hide");
+  const draftId = urlParams.get("draftId");
+  await draftApprove(draftId);
+  const getDataDraft = await draftDetailById(draftId);
+  checkButtonDraftDetail(getDataDraft.data);
+  $("#modalConfirm").modal("hide");
   swal("Approved", "draft has been approved.", "success");
 }
 async function confirmRejectApproval(id) {
-  // const draftId = urlParams.get("draftId");
-  // await draftReject(draftId, rejectReason);
-  // const getDataDraft = await draftDetailById(draftId);
-  // checkButtonDraftDetail(getDataDraft.data);
-  // $("#modalConfirm").modal("hide");
+  const draftId = urlParams.get("draftId");
+  const rejectReason = $("#rejectReason").val();
+  await draftReject(draftId, rejectReason);
+  const getDataDraft = await draftDetailById(draftId);
+  checkButtonDraftDetail(getDataDraft.data);
+  $("#modalConfirm").modal("hide");
   swal("Rejected", "draft has been rejected.", "success");
 }
 
@@ -312,45 +314,70 @@ function rejectApproval() {
 }
 
 function checkButtonDraftDetail(data) {
+  const urlParts = window.location.pathname.split("/");
+  const lastPath = urlParts.pop() || urlParts.pop();
+  console.log("lastPath", lastPath);
   // hideModal(`modalConfirm`);
-  console.log("getDataDraft.data", data);
+  // console.log("getDataDraft.data", data);
   const submitApprovalButton = $("#submitApproval");
   const acceptApprovalButton = $("#acceptApproval");
   const rejectApprovalButton = $("#rejectApproval");
-  const finalizeButton = $("#finalize");
+  const finalizeConfirm = $("#finalize");
+  const deleteDraft = $("#deleteDraft");
 
   // submitApprovalButton.toggle(!data.isSubmitted && !data.isApproved && !data.isFinalized);
   // acceptApprovalButton.toggle(data.isSubmitted && !data.isApproved);
   // rejectApprovalButton.toggle(data.isSubmitted && !data.isApproved);
-  // finalizeButton.toggle(data.isApproved || data.isFinalized);
+  // finalizeConfirm.toggle(data.isApproved || data.isFinalized);
 
   submitApprovalButton.show();
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
-  finalizeButton.hide();
-  if (data.isSubmitted) {
+  finalizeConfirm.hide();
+  // data.isRejected = true;
+  let step = 0;
+  let userRole = "admin";
+  if (data?.isSubmitted) {
+    step = 1;
     submitApprovalButton.hide();
     acceptApprovalButton.show();
     rejectApprovalButton.show();
   }
 
-  if (data.isRejected) {
+  if (data?.isRejected) {
+    step = 2;
     submitApprovalButton.show();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
   }
 
-  if (data.isApproved) {
+  if (data?.isApproved) {
+    step = 3;
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
-    finalizeButton.show();
+    finalizeConfirm.show();
+    deleteDraft.hide();
   }
 
-  if (data.isFinalized) {
+  if (data?.isFinalized) {
+    step = 4;
     submitApprovalButton.hide();
-    finalizeButton.show();
+    finalizeConfirm.hide();
+    deleteDraft.hide();
   }
+  if (lastPath === "draft-detail") {
+    acceptApprovalButton.hide();
+    rejectApprovalButton.hide();
+  } else {
+    finalizeConfirm.hide();
+  }
+
+  if (lastPath === "approval-detail") {
+    $("#editDraftName,#submitApproval,#downloadTemplate, #exportDataDraft, #importDataDraft").hide();
+  }
+
+  return { step, userRole };
 }
 
 function confirmDeleteJobDesc(id) {
@@ -392,12 +419,17 @@ function editJobDesc() {
 }
 
 $(document).ready(async function () {
-  // let draftId = urlParams.get("draftId");
-  // const getDataDraft = await draftDetailById(draftId);
+  let draftId = urlParams.get("draftId");
+  const getDataDraft = await draftDetailById(draftId);
+  console.log("getDataDraft", getDataDraft);
+  if (getDataDraft.status !== 200) {
+    window.location.href = "/job-description/index";
+  }
+  await initializeDraftDetail(getDataDraft.data);
   // checkDataOrganizationLocalStorage();
   // checkDataOrganization();
   // await initializeDraftDetail(getDataDraft.data);
-  // checkButtonDraftDetail(getDataDraft.data);
+  checkButtonDraftDetail(getDataDraft.data);
 
   getTableListDraftDetail();
 
@@ -460,7 +492,27 @@ $(document).ready(async function () {
   $("#editDraftName").on("click", function () {
     $("#inputDraftName").val($("#draftName").text());
     $("#modalLabelOSDraft").text("Edit Draft Name");
+    $("#createDraftSO").text("Save Changes");
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
+  });
+
+  $("#createDraftSO").on("click", async function () {
+    const draftName = $("#inputDraftName").val().trim();
+    if (draftName === "") {
+      swal("Error", "Draft name cannot be empty", "error");
+      return;
+    }
+    loader(true);
+    const sendDraft = await draftRenameById({ draftId: draftId, draftName: draftName });
+    if (sendDraft.status !== 200) {
+      swal("Error", sendDraft.message, "error");
+      loader(false);
+      return;
+    }
+    loader(false);
+    $("#draftName").text(draftName);
+    swal("Success", "Draft name has been updated", "success");
+    $("#modalCreateDraftSO").modal("hide");
   });
 
   $("#continueButton").on("click", async function () {

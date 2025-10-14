@@ -1,4 +1,4 @@
-function getTableListJobDes(dataList) {
+function getTableListJobDes() {
   if ($.fn.DataTable.isDataTable("#jobdescList")) {
     $("#jobdescList").DataTable().destroy();
   }
@@ -123,26 +123,7 @@ function getTableListJobDes(dataList) {
 }
 
 async function getTableListDraft(params) {
-  params = [
-    {
-      id: 1,
-      draftName: "Draft 1",
-      rasciDataSource: "RASCI",
-      createdBy: "Admin",
-      createdDate: "2021-09-02",
-      modifiedBy: "Admin",
-      modifiedDate: "2021-09-02",
-    },
-    {
-      id: 2,
-      draftName: "Draft 2",
-      rasciDataSource: "RASCI",
-      createdBy: "Admin",
-      createdDate: "2021-09-02",
-      modifiedBy: "Admin",
-      modifiedDate: "2021-09-02",
-    },
-  ];
+  console.log("params", params);
   if ($.fn.DataTable.isDataTable("#draftList")) {
     $("#draftList").DataTable().destroy();
   }
@@ -176,7 +157,7 @@ async function getTableListDraft(params) {
       },
       {
         title: "RASCI MATRIX Data Source",
-        data: "rasciDataSource",
+        data: "draftName",
         width: "25%",
       },
       {
@@ -209,7 +190,10 @@ async function getTableListDraft(params) {
         data: null,
         render: function (data) {
           // return "asik";
-          return checkButtonTable("draftList", data.draftId, "draft-detail");
+          console.log("data", data);
+          const draftId =
+            data.draftOrganizationId + "|" + data.draftRasciId + "|" + data.draftId + "|" + data.draftName;
+          return checkButtonTable("draftList", draftId, "draft-detail");
         },
       },
     ],
@@ -262,67 +246,49 @@ async function getTableListDraft(params) {
   // });
 }
 
-async function getTableListDraftDetail(params, lastPath) {
+async function getTableListDraftDetail() {
   if ($.fn.DataTable.isDataTable("#draftListDetail")) {
     $("#draftListDetail").DataTable().destroy();
   }
-  lastPath = "draft-detail";
-  params = [
-    {
-      id: 1,
-      type: "create new position",
-      orgUnitId: "B0001",
-      positionId: "Q0001",
-      positionName: "VP Human Capital",
-      createdDate: "2021-09-02",
-      createdBy: "Admin",
-      updatedBy: "Admin",
-      updatedDate: "2021-09-02",
-    },
-    {
-      id: 2,
-      type: "create new position",
-      orgUnitId: "B0001",
-      positionId: "Q0001",
-      positionName: "VP Human Capital",
-      createdDate: "2021-09-02",
-      updatedBy: "Admin",
-      updatedDate: "2021-09-02",
-      createdBy: "Admin",
-    },
-  ];
-  const buttons =
-    lastPath === "draft-detail"
-      ? [
-          {
-            text: '<img src="/assets/images/rasci/plus.svg" alt="" style="margin-top: -1px;margin-right: 2px;"> Add Job Title',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              addJobTitle();
-            },
-          },
-          {
-            text: '<img src="/assets/images/rasci/download.svg" alt="download icon" style="margin-top: -1px;margin-right: 2px;"> Import',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              importDraft();
-            },
-          },
-          {
-            text: '<img src="/assets/images/rasci/upload.svg" alt="upload icon" style="margin-top: -1px;margin-right: 2px;"> Export',
-            className: "btn btn-primary tet-white asik dt-custom-btn",
-            action: function (e, dt, node, config) {
-              exportDraft();
-            },
-          },
-        ]
-      : [];
 
   $("#draftListDetail").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-    buttons: buttons,
+    buttons: [],
     autoWidth: false,
-    data: params,
+    ajax: function (data, callback, settings) {
+      //  `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/${draftId}/${page}/${pageSize}`;
+      $.ajax({
+        url: `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/fe817219-f352-4a0d-8720-60cfeee1a1ad/${
+          data.start || 0
+        }/${data.length || 9999}`,
+        // url: `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/${draftExistingJobDesc.draftId}/${data.start}/${data.length}`,
+        type: "GET",
+        data: {
+          draw: data.draw,
+          start: data.start,
+          length: data.length,
+          search: data.search,
+          order: data.order,
+        },
+        success: function (res) {
+          console.log("res", res);
+          callback({
+            draw: data.draw,
+            recordsTotal: res.count || 0,
+            recordsFiltered: res.count || 0,
+            data: res.data || [],
+          });
+        },
+        error: function () {
+          callback({
+            draw: data.draw,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: [],
+          });
+        },
+      });
+    },
     sort: false,
     columns: [
       {
@@ -335,28 +301,28 @@ async function getTableListDraftDetail(params, lastPath) {
       },
       {
         title: "Activity Type",
-        data: "type",
+        data: "actionType",
         width: "15%",
       },
       {
-        title: "ID Pos",
-        data: "positionId",
+        title: "ID Position",
+        data: "jobId",
         width: "10%",
       },
       {
-        title: "Job Title",
-        data: "positionName",
+        title: "Position Name",
+        data: "jobName",
         width: "20%",
       },
 
       {
         title: "Created By",
-        data: "createdDate",
+        data: "createdBy",
         width: "15%",
       },
       {
         title: "Updated By",
-        data: "createdDate",
+        data: "modifiedBy",
         width: "15%",
       },
       {

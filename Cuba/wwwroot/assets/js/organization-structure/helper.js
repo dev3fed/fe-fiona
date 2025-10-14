@@ -1148,7 +1148,7 @@ async function modalSubPosition() {
     },
     {
       dataId: "modalSelectAbbrvPosition",
-      data: _abbrv.data.map((item) => ({ id: item.id, text: item.name })),
+      data: _abbrv.data.map((item) => ({ id: item.id, text: item.abbreviation })),
       dropdownParent: $("#modalAddSubPosition"),
     },
   ]);

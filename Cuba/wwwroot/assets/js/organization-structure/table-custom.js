@@ -438,12 +438,14 @@ function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "
         width: "10%",
       },
       {
-        title: "ID Pos",
+        // title: "ID Pos",
+        title: "ID Position",
         data: "positionCode",
         width: "10%",
       },
       {
-        title: "Job Title",
+        title: "Position Name",
+        // title: "Job Title",
         data: "positionName",
         width: "20%",
       },

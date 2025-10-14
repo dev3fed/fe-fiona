@@ -575,6 +575,117 @@ $(document).ready(async function () {
   //   // $(this).addClass("active");
   // });
 
+  $("#exportTemplate").click(async function () {
+    try {
+      // Check if ExcelJS is available
+      if (typeof ExcelJS === "undefined") {
+        alert("ExcelJS library not loaded. Please refresh the page and try again.");
+        return;
+      }
+
+      // Create new workbook and worksheet
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Organization Template");
+
+      // Add headers
+      const headers = [
+        "Position Name",
+        "Abbreviation",
+        "Org Unit",
+        "PRL Org",
+        "Formation",
+        "Career Type",
+        "Career Level",
+        "Direct Report",
+        "Neck Function",
+        "Is Project",
+        "Coordination",
+        "Coordination With",
+      ];
+
+      // Add header row
+      const headerRow = worksheet.addRow(headers);
+
+      // Style the Position Name header cell (A1) with yellow background
+      const positionNameCell = headerRow.getCell(1);
+      positionNameCell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFFFFF00" }, // Yellow background
+      };
+      positionNameCell.font = {
+        bold: true,
+        color: { argb: "FF000000" }, // Black text
+      };
+      positionNameCell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+      };
+
+      // Style all header cells
+      headerRow.eachCell((cell, colNumber) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+        cell.font = cell.font || {};
+        cell.font.bold = true;
+        cell.alignment = cell.alignment || {};
+        cell.alignment.horizontal = "center";
+        cell.alignment.vertical = "middle";
+      });
+
+      // Set column widths
+      worksheet.columns = [
+        { width: 20 }, // Position Name
+        { width: 15 }, // Abbreviation
+        { width: 20 }, // Org Unit
+        { width: 12 }, // PRL Org
+        { width: 12 }, // Formation
+        { width: 15 }, // Career Type
+        { width: 15 }, // Career Level
+        { width: 20 }, // Direct Report
+        { width: 15 }, // Neck Function
+        { width: 12 }, // Is Project
+        { width: 15 }, // Coordination
+        { width: 20 }, // Coordination With
+      ];
+
+      // Add empty rows for data entry
+      for (let i = 0; i < 3; i++) {
+        worksheet.addRow(["", "", "", "", "", "", "", "", "", "", "", ""]);
+      }
+
+      // Generate Excel file buffer
+      const buffer = await workbook.xlsx.writeBuffer();
+
+      // Create blob and download
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "organization-template.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error creating Excel file:", error);
+      alert("Error creating Excel file: " + error.message);
+    }
+  });
+
+  $("#exportDataDraft").click(function () {
+    alert("Export Data Draft feature is coming soon!");
+
+    // window.location.href = "/organization/import-template";
+  });
+
   $("#importDataDraft").on("click", function () {
     $("#fileImportDraft").click();
   });
