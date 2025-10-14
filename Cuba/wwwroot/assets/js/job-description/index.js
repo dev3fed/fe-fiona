@@ -1,5 +1,12 @@
 function detailDraft(id) {
-  window.location.href = `/job-description/draft-detail?draftId=${id}`;
+  const data = id.split("|");
+  draftExistingJobDesc.draftId = data[2];
+  draftExistingJobDesc.draftRasciId = data[1];
+  draftExistingJobDesc.draftOrganizationId = data[0];
+  draftExistingJobDesc.draftName = data[3];
+  localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
+
+  window.location.href = `/job-description/draft-detail?draftId=${draftExistingJobDesc.draftId}`;
 }
 
 async function checkDraftSelected(listDraft) {
@@ -40,14 +47,48 @@ $(document).ready(async function () {
     window.location.href = "/job-description/detail";
   });
 
+  $("#saveDraft").click(async function () {
+    // Save draft logic here
+    // both inputDraftName and selectDraftRacsi must be filled
+    const inputDraftName = $("#inputDraftName").val();
+    const selectDraftRacsi = $("#selectDraftRacsi").val();
+    if (inputDraftName == "" || selectDraftRacsi == null) {
+      swal("Please fill in all required fields");
+      return;
+    }
+    const confirmSave = await confirmFunction("Are you sure you want to save the draft?");
+    if (!confirmSave) return;
+    const saveData = await createDraft({
+      draftName: inputDraftName,
+      draftRasciId: selectDraftRacsi.split("|")[0],
+      draftOrganizationId: selectDraftRacsi.split("|")[1],
+    });
+    if (saveData.status == 200) {
+      swal("Draft saved successfully", { icon: "success" }).then(() => {
+        location.reload();
+      });
+    } else {
+      swal("Failed to save draft", { icon: "error" });
+    }
+  });
+
   // get draft list
   const dataListDraft = await draftList();
+  const rasciList = await getRasciList();
+  console.log("rasciList", rasciList);
   getDataList([
     {
       dataId: "selectJobDescDraft",
       data: dataListDraft.data.map((item) => ({
         id: item.draftOrganizationId + "|" + item.draftRasciId + "|" + item.draftId,
         text: item.draftName,
+      })),
+    },
+    {
+      dataId: "selectDraftRacsi",
+      data: rasciList.data.result.map((item) => ({
+        id: item.id + "|" + item.draftSo,
+        text: item.text,
       })),
     },
   ]);
@@ -97,8 +138,8 @@ $(document).ready(async function () {
   checkDraftSelected(dataListDraft.data);
 
   $("#selectJobDescDraft").change(function () {
-    alert("maok");
     const value = $(this).val();
+    console.log("Selected draft:", value);
     if (value == "1") {
       $("#pills-warningtab").hide();
       $("#pills-draft, #pills-request, #pills-log").hide();

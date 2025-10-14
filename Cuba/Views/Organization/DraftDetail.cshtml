@@ -166,7 +166,7 @@
                         <div class="col-md-5 offset-1 d-flex gap-2" id="divButton" style="justify-content: end;padding: 10px;">
                             <div class="" id="importButton">
                                 <input type="file" id="fileImportDraft" style="display: none;" />
-                                <button class="btn btn-primary" type="button" id="downloadTemplate">
+                                <button class="btn btn-primary" type="button" id="exportTemplate">
                                     Expoort Template
                                     <img src="~/assets/images/rasci/download.svg" alt="Download Icon" class="p-l-5" style="margin-top: -1px;">
                                 </button>
@@ -264,6 +264,7 @@
     @* datatable *@
     <script src="@Url.Content("~/assets/js/datatable/datatables/jquery.dataTables.min.js")"></script>
     <script src="@Url.Content("~/assets/js/datatable/datatable-extension/dataTables.buttons.min.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 
     @* custom js *@
     <script src="@Url.Content("~/assets/js/organization-structure/multiple-select.js")"></script>

@@ -111,19 +111,20 @@ async function confirmSubmit(id) {
 }
 
 async function confirmSubmitApproval(id) {
-  // const draftId = urlParams.get("draftId");
-  // await draftApprove(draftId);
-  // const getDataDraft = await draftDetailById(draftId);
-  // checkButtonDraftDetail(getDataDraft.data);
-  // $("#modalConfirm").modal("hide");
+  const draftId = urlParams.get("draftId");
+  await draftApprove(draftId);
+  const getDataDraft = await draftDetailById(draftId);
+  checkButtonDraftDetail(getDataDraft.data);
+  $("#modalConfirm").modal("hide");
   swal("Approved", "draft has been approved.", "success");
 }
 async function confirmRejectApproval(id) {
-  // const draftId = urlParams.get("draftId");
-  // await draftReject(draftId, rejectReason);
-  // const getDataDraft = await draftDetailById(draftId);
-  // checkButtonDraftDetail(getDataDraft.data);
-  // $("#modalConfirm").modal("hide");
+  const draftId = urlParams.get("draftId");
+  const rejectReason = $("#rejectReason").val();
+  await draftReject(draftId, rejectReason);
+  const getDataDraft = await draftDetailById(draftId);
+  checkButtonDraftDetail(getDataDraft.data);
+  $("#modalConfirm").modal("hide");
   swal("Rejected", "draft has been rejected.", "success");
 }
 

@@ -24,7 +24,8 @@ async function draftListJobDesc({ draftId = "", position = "", status = "availab
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    alert(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/get-list-positions/ error: ${error.statusText}`);
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
   }
 }
 
@@ -35,9 +36,8 @@ async function getIdentifikasiJabatan(params) {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
-    alert(
-      `Data dari endpoint ${url.baseUrl}/${url["job-description"]}/identifikasi-jabatan/show/ error: ${error.statusText}`
-    );
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
   }
 }
 
@@ -47,12 +47,12 @@ async function getDetailByPosition(id) {
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     if (result?.data?.length == 0 || result?.data == null) {
-      alert(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/show-detail-by-position/ tidak ada`);
+      console.error(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/show-detail-by-position/ tidak ada`);
       return [];
     }
     return result;
   } catch (error) {
-    alert("Error fetching data from API from" + api + "with error: " + error);
+    console.error("Error fetching data from API from" + api + "with error: " + error);
     throw error;
   }
 }
@@ -63,11 +63,12 @@ async function getFungsiJabatan(params) {
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     if (result?.data?.length == 0) {
-      alert(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/fungsi-jabatan/show/ tidak ada`);
+      console.error(`Data dari endpoint ${url.baseUrl}/${url["job-description"]}/fungsi-jabatan/show/ tidak ada`);
       return [];
     }
     return result;
   } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
     return error;
   }
 }
@@ -314,5 +315,131 @@ async function updateDetailDraft({ draftId, jobId, prlOrg, data }) {
   } catch (error) {
     // Do not throw error, just return null or empty result
     return error;
+  }
+}
+
+// /api/job-description/draft/approve/{draftId}
+async function draftApprove(draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/approve/${draftId}`;
+  try {
+    const result = await ajaxRequest(api, "POST"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// /api/job-description/draft/reject/{draftId}
+async function draftReject(draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/reject/${draftId}`;
+  try {
+    const result = await ajaxRequest(api, "POST"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// /api/job-description/draft/delete/{draftId}
+async function draftDelete(draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/delete/${draftId}`;
+  try {
+    const result = await ajaxRequest(api, "DELETE"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// curl -X 'POST' \
+//   'https://7p8ddbts-5095.asse.devtunnels.ms/api/job-description/get-all-recommendation-task-and-responsibilities/fe817219-f352-4a0d-8720-60cfeee1a1ad/10135617/18?page=1&pageSize=10' \
+//   -H 'accept: */*' \
+//   -H 'Content-Type: application/json' \
+//   -d '{
+//   "businessProcessCode": [
+//     "MER-10",
+//     "MER-100",
+//     "BP002"
+//   ]
+// }'
+async function getAllRecommendationTaskAndResponsibilities({
+  draftId,
+  jobId,
+  prlOrg,
+  businessProcessCode = [],
+  page = 1,
+  pageSize = 10,
+}) {
+  const api = `${url.baseUrl}/${url["job-description"]}/get-all-recommendation-task-and-responsibilities/${draftId}/${jobId}/${prlOrg}?page=${page}&pageSize=${pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "POST", { businessProcessCode: businessProcessCode });
+    return result;
+  } catch (error) {
+    // Do not throw error, just return null or empty result
+    return error;
+  }
+}
+
+// /api/job-description/generate-tanggung-jawab-umum/{draftId}/{jobId}/{prlOrg}
+async function generateTanggungJawabUmum({ draftId, jobId, prlOrg }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/generate-tanggung-jawab-umum/${draftId}/${jobId}/${prlOrg}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
+  }
+}
+
+// /api/job-description/generate-wewenang/{draftId}/{jobId}/{prlOrg}
+async function generateWewenang({ draftId, jobId, prlOrg }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/generate-wewenang/${draftId}/${jobId}/${prlOrg}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
+  }
+}
+
+// /api/job-description/generate-persyaratan-jabatan/{draftId}/{jobId}/{prlOrg}
+async function generatePersyaratanJabatan({ draftId, jobId, prlOrg }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/generate-persyaratan-jabatan/${draftId}/${jobId}/${prlOrg}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
+  }
+}
+
+// https://7p8ddbts-5095.asse.devtunnels.ms/api/Utilities/selection?Page=1&Type=draft-rasci
+async function getRasciList(func, jobId, prlOrgFrom, prlOrgTo) {
+  const api = `${url.baseUrl}/api/Utilities/selection?Page=1&Type=draft-rasci`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
+  }
+}
+
+// https://7p8ddbts-5095.asse.devtunnels.ms/api/job-description/draft/create/draftSoId?draftRasciId=draftRasciId&draftName=draftJobdescName&description=asd
+
+async function createDraft({ draftRasciId, draftName, draftOrganizationId, description = "" }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/create/${draftOrganizationId}?draftRasciId=${draftRasciId}&draftName=${draftName}&description=${description}`;
+  try {
+    const result = await ajaxRequest(api, "POST");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
+    throw error;
   }
 }

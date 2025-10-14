@@ -552,9 +552,8 @@
     <script>
         const url_api = "@Configuration["AppSettings:ApiUrl"]";
     </script>
-    <!-- CKEditor 5 Classic Build -->
-    @* <script src="https://cdn.ckeditor.com/ckeditor5/39.0.2/classic/ckeditor.js"></script> *@
-    <script src="@Url.Content("~/assets/js/ckeditor/ckeditor.custom.js")"></script>
+    <!-- CKEditor 4 - Local Build Only -->
+    <script src="@Url.Content(contentPath: "~/assets/js/ckeditor/ckeditor.js")" onerror="console.log('Local CKEditor failed to load')"></script>
 
     <!-- Plugins JS start-->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>

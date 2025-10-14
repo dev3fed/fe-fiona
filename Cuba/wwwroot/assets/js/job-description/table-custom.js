@@ -189,7 +189,10 @@ async function getTableListDraft(params) {
         data: null,
         render: function (data) {
           // return "asik";
-          return checkButtonTable("draftList", data.draftId, "draft-detail");
+          console.log("data", data);
+          const draftId =
+            data.draftOrganizationId + "|" + data.draftRasciId + "|" + data.draftId + "|" + data.draftName;
+          return checkButtonTable("draftList", draftId, "draft-detail");
         },
       },
     ],
@@ -301,12 +304,12 @@ async function getTableListDraftDetail() {
         width: "15%",
       },
       {
-        title: "ID Pos",
+        title: "ID Position",
         data: "jobId",
         width: "10%",
       },
       {
-        title: "Job Title",
+        title: "Position Name",
         data: "jobName",
         width: "20%",
       },

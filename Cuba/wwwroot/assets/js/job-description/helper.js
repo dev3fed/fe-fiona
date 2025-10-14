@@ -269,7 +269,7 @@ async function getJobReferenceDetail() {
   const lsStk = localStorage.getItem("stk") !== "" ? JSON.parse(localStorage.getItem("stk")) : [];
 
   // Initialize CKEditor for .summernote elements
-  if (typeof ClassicEditor !== "undefined") {
+  if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
     document.querySelectorAll(".summernote").forEach((element) => {
       // Check if CKEditor instance already exists
       if (element.ckeditorInstance) {
@@ -294,8 +294,14 @@ async function getJobReferenceDetail() {
   });
 
   // Filter data arrays properly
-  const filteredTugasHa = lsTugasHa.filter((item) => item.responsible && item.responsible.length > 0);
-  const filteredStk = lsStk.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined);
+  const filteredTugasHa =
+    lsTugasHa.length > 0 && Array.isArray(lsTugasHa)
+      ? lsTugasHa.filter((item) => item.responsible && item.responsible.length > 0)
+      : [];
+  const filteredStk =
+    lsStk.length > 0 && Array.isArray(lsStk)
+      ? lsStk.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined)
+      : [];
 
   updateTable("tugasHa", filteredTugasHa, [...tabCusJD.tugasHa, "action"]);
   updateTable("koordinasi", lsKoordinasiInternal, [...tabCusJD.koordinasi, "action"]);
@@ -474,6 +480,9 @@ async function applyCompare(id, prlOrg, prlOrgTarget) {
 }
 
 async function addJobReference(showData = "") {
+  // $("#modalJobCompareDetail").modal("show");
+  // await applySelectedData(jobId, prlOrg, prlOrg);
+  // return;
   $("#modalJobCompare").modal("show");
   $("#searchDiv").hide();
   localStorage.setItem("onlyShowdata", "");
@@ -536,7 +545,21 @@ function confirmFunction(title, text) {
   });
 }
 
-function callOtherRecommendations(data) {
+async function callOtherRecommendations() {
+  const getDataJobDesc = JSON.parse(localStorage.getItem("selectedJobDescReference"));
+  const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const notAvailable = lsAvailable?.notAvailable || [];
+  const getUniqueCode = notAvailable.map((item) => item.code);
+  const codeNotAvailable = [...new Set(getUniqueCode)];
+  console.log("codeNotAvailable", codeNotAvailable);
+  console.log("notAvailable", notAvailable);
+  const getRecommendationBusPro = await getAllRecommendationTaskAndResponsibilities({
+    draftId: getDraftExisting.draftId,
+    jobId,
+    prlOrg,
+    businessProcessCode: codeNotAvailable,
+  });
+  console.log("getRecommendationBusPro", getRecommendationBusPro);
   $("#modalRecomendation").modal("show");
 }
 
@@ -562,7 +585,7 @@ function callConfirmReference() {
       className: "btn-primary",
       callback: function () {
         hideModal(`modalConfirm`);
-        callOtherRecommendations("asikin aja");
+        callOtherRecommendations();
       },
     },
   ];
@@ -579,7 +602,6 @@ function callConfirmReference() {
 
 async function saveReferenceAttribute() {
   loader(true);
-
   const onlyShowdata = localStorage.getItem("onlyShowdata") == "" ? false : localStorage.getItem("onlyShowdata");
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
     (item) => !item.id.includes("all") && item.checked
@@ -607,65 +629,64 @@ async function saveReferenceAttribute() {
     const { checkAllId, dataPath, localStorageKey, checkboxPrefix } = config;
     const isCheckedAll = checkboxes.find((item) => item.id === checkAllId);
 
-    if (isCheckedAll !== undefined) {
-      // Process all items
-      selectedJobDescReference?.[dataPath]?.data?.forEach((item) => {
-        item.jobReferences = item.jobReferences ?? [];
-        if (item.jobReferences) {
-          item.jobReferences.push({
-            jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
-            jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-            skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-            jobId: jobId,
-            prlOrg: prlOrg,
-          });
+    const selectedItems = checkboxes
+      .map((item) => {
+        const id = item.id.split(`${checkboxPrefix}_`)[1];
+        return selectedJobDescReference?.[dataPath]?.data?.[id];
+      })
+      .filter((item) => item)
+      .map((item) => {
+        // Ensure jobReferences is always an array
+        if (!Array.isArray(item.jobReferences)) {
+          item.jobReferences = [];
         }
-      });
-      if (localStorageKey === "tugasHa") {
-        let arraySelectedBusPro = [];
-        selectedJobDescReference?.[dataPath]?.data?.forEach((item) => {
-          arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
-        });
-        const uniqueSelectedBusPro = arraySelectedBusPro.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
-        );
-        updateCalculateLsAvailable(uniqueSelectedBusPro);
-      }
-    } else {
-      // Process selected items only
-      const selectedItems = checkboxes
-        .map((item) => {
-          const id = item.id.split(`${checkboxPrefix}_`)[1];
-          return selectedJobDescReference?.[dataPath]?.data?.[id];
-        })
-        .filter((item) => item)
-        .map((item) => {
-          item.jobReferences.push({
-            jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
-            jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
-            skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
-            jobId: jobId,
-            prlOrg: prlOrg,
-          });
-          return item;
+
+        item.jobReferences.push({
+          jobId: selectedJobDescReference?.identifikasiJabatan?.jobId,
+          jobName: selectedJobDescReference?.identifikasiJabatan?.jobName,
+          skNumber: selectedJobDescReference?.identifikasiJabatan?.noSuratKeputusan,
+          jobId: jobId,
+          prlOrg: prlOrg,
         });
 
-      selectedJobDescReference[dataPath].data = selectedItems;
-      if (localStorageKey === "tugasHa") {
-        let arraySelectedBusPro = [];
-        selectedItems.forEach((item) => {
-          arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
-        });
-        const uniqueSelectedBusPro = arraySelectedBusPro.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
-        );
-        updateCalculateLsAvailable(uniqueSelectedBusPro);
-      }
+        return item;
+      });
+
+    selectedJobDescReference[dataPath].data = selectedItems;
+    if (localStorageKey === "tugasHa") {
+      let arraySelectedBusPro = [];
+      selectedItems.forEach((item) => {
+        arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
+      });
+      const uniqueSelectedBusPro = arraySelectedBusPro.filter(
+        (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+      );
+      updateCalculateLsAvailable(uniqueSelectedBusPro);
     }
+    // }
 
     // Update localStorage
-    const localData =
-      localStorage.getItem(localStorageKey) !== "" ? JSON.parse(localStorage.getItem(localStorageKey)) : [];
+    // check selectedJobDescReference[dataPath]?.data is array
+    if (!Array.isArray(selectedJobDescReference?.[dataPath]?.data)) {
+      console.warn(`${dataPath} is not an array, skipping localStorage update`);
+      return;
+    }
+
+    let localData = [];
+    try {
+      const storedData = localStorage.getItem(localStorageKey);
+      if (storedData && storedData !== "") {
+        localData = JSON.parse(storedData);
+      }
+      // Ensure localData is an array
+      if (!Array.isArray(localData)) {
+        localData = [];
+      }
+    } catch (error) {
+      console.warn(`Error parsing localStorage for ${localStorageKey}:`, error);
+      localData = [];
+    }
+
     localData.push(...(selectedJobDescReference?.[dataPath]?.data ?? []));
     localStorage.setItem(localStorageKey, JSON.stringify(localData));
   };
@@ -723,6 +744,8 @@ async function saveReferenceAttribute() {
     checkboxPrefix: "checkbox_stkReference",
   });
 
+  saveTugasHa();
+
   await getJobReferenceDetail();
   $("#modalJobCompare").modal("hide");
   $("#modalJobCompareDetail").modal("hide");
@@ -730,12 +753,44 @@ async function saveReferenceAttribute() {
   swal("Success!", "Reference saved to your job description", "success");
 }
 
+async function saveTugasHa() {
+  const tugasHa = JSON.parse(localStorage.getItem("tugasHa")) || [];
+  // tugas dan tanggung jawab akhir
+  const params = paramsSaveDraft;
+  const paramsTugasAkhir = params.tugasTanggungJawabAkhir[0];
+  params.tugasTanggungJawabAkhir = [];
+  tugasHa.forEach((item) => {
+    const objTugasHa = { ...paramsTugasAkhir };
+    objTugasHa.jobId = jobId;
+    objTugasHa.prlOrg = prlOrg;
+    objTugasHa.tanggungJawab = item.responsible || [];
+    objTugasHa.uraian = item.uraian || "";
+    objTugasHa.hasilAkhir = item.output || [];
+    objTugasHa.leadingIndikator = item.lead || [];
+    // filter unique
+    objTugasHa.tanggungJawabProses = item.tanggungJawabProses
+      .map((tr) => tr.code)
+      .filter((v, i, a) => a.indexOf(v) === i);
+    objTugasHa.hasilAkhirProses = item.hasilAkhirProses.map((hr) => hr.code).filter((v, i, a) => a.indexOf(v) === i);
+    objTugasHa.jobReferences = [];
+    if (item.jobReferences && item.jobReferences.length > 0) {
+      objTugasHa.jobReferences = item.jobReferences;
+    }
+    params.tugasTanggungJawabAkhir.push(objTugasHa);
+  });
+  console.log("params.tugasTanggungJawabAkhir", params.tugasTanggungJawabAkhir);
+}
+
 async function saveReference() {
   const onlyShowdata = localStorage.getItem("onlyShowdata") ?? false;
   const isFullRefer = JSON.parse(localStorage.getItem("isFullRefer")) ?? false;
+  console.log("onlyShowdata", onlyShowdata);
+  console.log("isFullRefer", isFullRefer);
+  console.log("isFullRefer", isFullRefer);
+  console.log("isFullRefer", isFullRefer);
 
   // if not full reference or onlyShowdata is tugasHa, call confirm reference
-  if (!isFullRefer && (onlyShowdata == "tugasHa" || onlyShowdata === false)) {
+  if (!isFullRefer && (onlyShowdata == "tugasHa" || onlyShowdata === false || onlyShowdata === "")) {
     callConfirmReference();
     return;
   }
@@ -1688,21 +1743,45 @@ function updateJobDescItem(type, id, isAdd = true) {
           </div>
         `);
     });
-    // Initialize CKEditor for textareas
-    if (typeof ClassicEditor !== "undefined" && mapping.toolbar) {
+    // Initialize CKEditor 4.8.0 for textareas
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR && mapping.toolbar) {
       mapping.ids.forEach((itemId) => {
-        ClassicEditor.create(document.querySelector(`#${itemId}`), {
-          toolbar: mapping.toolbarType === TOOLBAR_FULL ? TOOLBAR_FULL : TOOLBAR_SHORT,
-          removePlugins: REMOVE_PLUGINS,
-          ui: CKEDITOR_UI_CONFIG,
-        })
-          .then((editor) => {
-            document.querySelector(`#${itemId}`).ckeditorInstance = editor;
-            editor.setData("");
-          })
-          .catch((error) => {
-            console.error(`CKEditor ${itemId} initialization error:`, error);
-          });
+        const editor = CKEDITOR.replace(itemId, {
+          toolbar: [
+            { name: "editing", items: ["Undo", "Redo"] },
+            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+          ],
+          removePlugins: "elementspath",
+          resize_enabled: false,
+          height: 180,
+          uiColor: "#ffffff",
+          enterMode: CKEDITOR.ENTER_P,
+          shiftEnterMode: CKEDITOR.ENTER_BR,
+          allowedContent: true,
+          fillEmptyBlocks: false,
+          autoParagraph: false,
+          startupFocus: false,
+          entities: false,
+          basicEntities: false,
+          forceEnterMode: true,
+        });
+
+        // Store the editor instance for compatibility
+        document.querySelector(`#${itemId}`).ckeditorInstance = {
+          getData: () => editor.getData(),
+          setData: (data) => editor.setData(data),
+          _editor: editor,
+        };
+
+        editor.on("instanceReady", function () {
+          editor.setData("");
+          console.log(`✅ CKEditor 4.8.0 initialized for ${itemId}`);
+        });
+
+        editor.on("error", function (evt) {
+          console.error(`❌ CKEditor 4.8.0 error for ${itemId}:`, evt.data);
+        });
       });
     }
   } else {
@@ -1757,8 +1836,8 @@ function updateJobDescItem(type, id, isAdd = true) {
           </div>
         `);
     });
-    // Initialize CKEditor for textareas with existing data
-    if (typeof ClassicEditor !== "undefined" && mapping.toolbar) {
+    // Initialize CKEditor 4.8.0 for textareas with existing data
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR && mapping.toolbar) {
       mapping.ids.forEach((itemId) => {
         const isList = mapping.listIds && mapping.listIds.includes(itemId);
         let value = "";
@@ -1770,18 +1849,42 @@ function updateJobDescItem(type, id, isAdd = true) {
           value = itemData[itemId] || "";
         }
 
-        ClassicEditor.create(document.querySelector(`#${itemId}`), {
-          toolbar: mapping.toolbarType === TOOLBAR_FULL ? TOOLBAR_FULL : TOOLBAR_SHORT,
-          removePlugins: REMOVE_PLUGINS,
-          ui: CKEDITOR_UI_CONFIG,
-        })
-          .then((editor) => {
-            document.querySelector(`#${itemId}`).ckeditorInstance = editor;
-            editor.setData(value || "");
-          })
-          .catch((error) => {
-            console.error(`CKEditor ${itemId} initialization error:`, error);
-          });
+        const editor = CKEDITOR.replace(itemId, {
+          toolbar: [
+            { name: "editing", items: ["Undo", "Redo"] },
+            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+          ],
+          removePlugins: "elementspath",
+          resize_enabled: false,
+          height: 180,
+          uiColor: "#ffffff",
+          enterMode: CKEDITOR.ENTER_P,
+          shiftEnterMode: CKEDITOR.ENTER_BR,
+          allowedContent: true,
+          fillEmptyBlocks: false,
+          autoParagraph: false,
+          startupFocus: false,
+          entities: false,
+          basicEntities: false,
+          forceEnterMode: true,
+        });
+
+        // Store the editor instance for compatibility
+        document.querySelector(`#${itemId}`).ckeditorInstance = {
+          getData: () => editor.getData(),
+          setData: (data) => editor.setData(data),
+          _editor: editor,
+        };
+
+        editor.on("instanceReady", function () {
+          editor.setData(value || "");
+          console.log(`✅ CKEditor 4.8.0 initialized for ${itemId} with data`);
+        });
+
+        editor.on("error", function (evt) {
+          console.error(`❌ CKEditor 4.8.0 error for ${itemId}:`, evt.data);
+        });
       });
     }
   }

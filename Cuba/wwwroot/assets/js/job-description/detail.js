@@ -28,8 +28,47 @@ function refreshDataLocalStorage() {
     "persyaratanKhusus",
     "stk",
     "arraySelectedBusPro",
+    "onlyShowdata",
   ];
   keys.forEach((key) => localStorage.removeItem(key));
+}
+
+// Helper function to handle errors gracefully
+const safeApiCall = async (apiCall, fallbackValue = null) => {
+  try {
+    return await apiCall();
+  } catch (error) {
+    console.error(`API call failed:`, error);
+    return fallbackValue;
+  }
+};
+
+async function generateJobDescDataNonEditable(draftExisting, id, prlOrgParam, prlOrgTarget) {
+  // check prlOrgTarget includes - ,  prlOrgTarget.includes(",")
+  const prlOrg = prlOrgTarget.includes("-") ? prlOrgTarget.split("-")[1] : prlOrgTarget;
+  const dataDetailJobDesc = {
+    draftId: draftExisting.draftId,
+    jobId: id,
+    prlRange: prlOrg,
+    prlOrg: prlOrg,
+    // jobId: 10135617,
+    // prlRange: 18,
+    // prlOrg: 18,
+  };
+
+  // Execute all API calls in parallel with error handling
+  const [tugasTanggungJawabUmum, wewenang, persyaratanJabatan] = await Promise.allSettled([
+    safeApiCall(() => generateTanggungJawabUmum(dataDetailJobDesc)),
+    safeApiCall(() => generateWewenang(dataDetailJobDesc)),
+    safeApiCall(() => generatePersyaratanJabatan(dataDetailJobDesc)),
+  ]);
+
+  // Return the results, extracting values from settled promises
+  return {
+    tugasTanggungJawabUmum: tugasTanggungJawabUmum.status === "fulfilled" ? tugasTanggungJawabUmum.value : null,
+    wewenang: wewenang.status === "fulfilled" ? wewenang.value : null,
+    persyaratanJabatan: persyaratanJabatan.status === "fulfilled" ? persyaratanJabatan.value : null,
+  };
 }
 
 async function getAllJobDescData(draftExisting, id, prlOrgParam, prlOrgTarget) {
@@ -39,17 +78,16 @@ async function getAllJobDescData(draftExisting, id, prlOrgParam, prlOrgTarget) {
     prlRange: prlOrgTarget,
     prlOrg: prlOrgTarget,
   };
-  console.log("dataDetailJobDesc", dataDetailJobDesc);
 
   // Helper function to handle errors gracefully
-  const safeApiCall = async (apiCall, fallbackValue = null) => {
-    try {
-      return await apiCall();
-    } catch (error) {
-      console.error(`API call failed:`, error);
-      return fallbackValue;
-    }
-  };
+  // const safeApiCall = async (apiCall, fallbackValue = null) => {
+  //   try {
+  //     return await apiCall();
+  //   } catch (error) {
+  //     console.error(`API call failed:`, error);
+  //     return fallbackValue;
+  //   }
+  // };
 
   // Execute all API calls in parallel with error handling
   const [
@@ -125,7 +163,6 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
     } else if (onlyShowdata == "relation") {
       $("#v-pills-relasiEksternalReference-tab").show();
       $("#relasiEksternalReference").show();
-    } else {
     }
     localStorage.setItem("onlyShowdata", onlyShowdata);
   }
@@ -135,14 +172,45 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   localStorage.setItem("isFullRefer", JSON.stringify(false));
 
   const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
+  const codeNotAvailable = lsAvailable?.codeNotAvailable || [];
 
-  const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference"));
-  const tugasHaSelected =
-    selectedJobDescReference.countTugasHa?.data.filter((item) => item.status === "AVAILABLE") || [];
+  const codeAvailableSelectedArray =
+    getDataJobDesc?.tugasTanggungJawabAkhir?.data?.flatMap(
+      (item) => item.tanggungJawabProses?.map((proses) => proses.indexNumber) || []
+    ) || [];
 
-  // check if codeAvailableSelected contains all codeNotAvailable
-  // const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
-  const isFullRefer = false;
+  const codeAvailableSelected = codeAvailableSelectedArray.filter((v, i, a) => a.indexOf(v) === i);
+
+  // compare codeAvailableSelected with codeNotAvailable
+
+  let arraytugasTanggungJawabAkhir = [];
+
+  getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
+    const uniqueProses = [];
+    const map = new Map();
+    item.tanggungJawabProses?.forEach((proses) => {
+      if (!map.has(proses.indexNumber)) {
+        console.log("proses.indexNumber", proses.indexNumber);
+        map.set(proses.indexNumber, true); // set any value to Map
+        uniqueProses.push(proses);
+      }
+    });
+    item.tanggungJawabProses = uniqueProses;
+  });
+
+  getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
+    item.tanggungJawabProses?.forEach((proses) => {
+      console.log("proses.indexNumber", proses.indexNumber);
+      if (codeNotAvailable.includes(proses.indexNumber) && codeAvailableSelected.includes(proses.indexNumber)) {
+        // Do something if both conditions are met
+        arraytugasTanggungJawabAkhir.push(proses);
+      }
+    });
+  });
+
+  const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
+  console.log("isFullRefer", isFullRefer);
+  console.log("arraytugasTanggungJawabAkhir", arraytugasTanggungJawabAkhir);
   localStorage.setItem("isFullRefer", JSON.stringify(isFullRefer));
 
   $(".notifWarning").hide();
@@ -160,7 +228,7 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 
   $("#fungsiTextReference").text(getDataJobDesc?.fungsiJabatan?.deskripsi || DATA_NOT_FOUND);
 
-  updateTableSelected("tugasHaReference", getDataJobDesc?.tugasTanggungJawabAkhir?.data || [], tabCusJD.tugasHa);
+  updateTableSelected("tugasHaReference", arraytugasTanggungJawabAkhir || [], tabCusJD.tugasHa);
   updateTableSelected(
     "koordinasiInternalReference",
     getDataJobDesc?.koordinasiInternal?.data || [],
@@ -384,7 +452,7 @@ $(document).ready(async function () {
   // $("#modalJobCompareDetail").modal("show");
   // await applySelectedData(jobId, prlOrg, prlOrg);
 
-  const getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
+  let getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
   for (const key in getDataJobDesc) {
     if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
       showEndpointErrorAlert(`job-description/${key}/show`, getDataJobDesc[key]);
@@ -392,35 +460,128 @@ $(document).ready(async function () {
     }
   }
   if (getDataJobDesc?.identifikasiJabatan) {
-    console.log("getDataJobDesc.identifikasiJabatan", getDataJobDesc.identifikasiJabatan);
+    console.log("identifikasiJabatan", getDataJobDesc.identifikasiJabatan);
+
     updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
+  } else {
+    console.error("Identifikasi Jabatan data is null or undefined");
+    console.log("call generate new");
+    getDataJobDesc = await generateJobDescDataNonEditable(getDraftExisting, jobId, prlOrg, prlOrg);
+    console.log("getDataJobDesc", getDataJobDesc);
   }
+
+  console.log("getDataJobDesc", getDataJobDesc);
 
   if (getDataJobDesc.fungsiJabatan) {
     localStorage.setItem("fungsi", JSON.stringify(getDataJobDesc?.fungsiJabatan));
-    // Initialize CKEditor for .summernote elements
-    if (typeof ClassicEditor !== "undefined") {
-      document.querySelectorAll(".summernote").forEach((element) => {
-        ClassicEditor.create(element, {
-          toolbar: TOOLBAR_SHORT,
-          removePlugins: REMOVE_PLUGINS,
-          ui: CKEDITOR_UI_CONFIG,
-        })
-          .then((editor) => {
-            // Store the editor instance to the element for later reference
-            element.ckeditorInstance = editor;
-            editor.setData(getDataJobDesc?.fungsiJabatan?.deskripsi || "");
-            console.log("CKEditor instance created and stored for .summernote element");
-          })
-          .catch((error) => {
-            console.error("CKEditor initialization error:", error);
+
+    // Debug CKEditor availability
+    console.log("Checking CKEditor availability...");
+    console.log("typeof CKEDITOR:", typeof CKEDITOR);
+    console.log("window.CKEDITOR:", window.CKEDITOR);
+
+    // Initialize CKEditor 4 with better detection and fallback
+    const initializeEditor = () => {
+      if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
+        console.log("CKEditor 4.8.0 is available, initializing...");
+
+        document.querySelectorAll(".summernote").forEach((element) => {
+          // Ensure element has an ID for CKEditor 4
+          if (!element.id) {
+            element.id = "ckeditor-" + Math.random().toString(36).substr(2, 9);
+          }
+
+          // CKEditor 4.8.0 optimized configuration
+          const editor = CKEDITOR.replace(element.id, {
+            toolbar: [
+              { name: "editing", items: ["Undo", "Redo"] },
+              { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+              { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+            ],
+            removePlugins: "elementspath", // Remove bottom path bar
+            resize_enabled: false,
+            height: 220,
+            uiColor: "#ffffff",
+            enterMode: CKEDITOR.ENTER_P, // Use <p> tags for Enter
+            shiftEnterMode: CKEDITOR.ENTER_BR, // Use <br> for Shift+Enter
+            allowedContent: true, // Allow all content - important for v4.8.0
+            fillEmptyBlocks: false, // Don't fill empty blocks with &nbsp;
+            autoParagraph: false, // Don't auto-wrap content in <p> tags
+            startupFocus: false, // Don't auto-focus editor on load
+            // Specific settings for CKEditor 4.8.0
+            entities: false, // Don't convert characters to HTML entities
+            basicEntities: false, // Don't convert basic entities
+            forceEnterMode: true, // Force the enter mode setting
           });
-      });
-    } else {
-      document.querySelectorAll(".summernote").forEach((element) => {
-        element.innerHTML = getDataJobDesc?.fungsiJabatan?.deskripsi || "";
-      });
+
+          // Store the editor instance for compatibility
+          element.ckeditorInstance = {
+            getData: () => editor.getData(),
+            setData: (data) => editor.setData(data),
+            _editor: editor, // Store reference to actual CKEditor instance
+          };
+
+          // Set initial data when editor is ready
+          editor.on("instanceReady", function () {
+            editor.setData(getDataJobDesc?.fungsiJabatan?.deskripsi || "");
+            console.log("✅ CKEditor 4.8.0 successfully initialized for element:", element.id);
+
+            // Ensure proper focus behavior for text input
+            editor.focus();
+          });
+
+          // Handle editor errors
+          editor.on("error", function (evt) {
+            console.error("❌ CKEditor 4.8.0 error:", evt.data);
+            setupContentEditable(element);
+          });
+
+          // Additional event for better text editing experience
+          editor.on("key", function (evt) {
+            // Ensure spacebar works properly
+            if (evt.data.keyCode === 32) {
+              // Spacebar
+              return true; // Allow the space
+            }
+          });
+        });
+      } else {
+        console.log("CKEditor 4.8.0 not available, using contenteditable fallback");
+        document.querySelectorAll(".summernote").forEach((element) => {
+          setupContentEditable(element);
+        });
+      }
+    };
+
+    // Helper function for contenteditable fallback
+    function setupContentEditable(element) {
+      element.contentEditable = true;
+      element.innerHTML = getDataJobDesc?.fungsiJabatan?.deskripsi || "";
+      element.style.border = "1px solid #ddd";
+      element.style.padding = "12px";
+      element.style.minHeight = "120px";
+      element.style.outline = "none";
+      element.style.borderRadius = "4px";
+      element.style.fontSize = "14px";
+      element.style.lineHeight = "1.5";
+      element.style.backgroundColor = "#ffffff";
+
+      element.ckeditorInstance = {
+        getData: () => element.innerHTML,
+        setData: (data) => (element.innerHTML = data),
+      };
+
+      console.log("📝 Contenteditable fallback initialized for .summernote element");
     }
+
+    // Try to initialize immediately, or wait a bit if scripts are still loading
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
+      initializeEditor();
+    } else {
+      console.log("CKEditor 4.8.0 not ready yet, waiting 500ms...");
+      setTimeout(initializeEditor, 500);
+    }
+
     console.log(getDataJobDesc?.fungsiJabatan);
     getDataJobDesc?.fungsiJabatan.jobReferences.map((item) => {
       const textReference = `(Reference from : ${item.jobReference.jobName}) - ${
@@ -516,8 +677,8 @@ $(document).ready(async function () {
   const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
   const divKompetensiPerilaku = $("#kompetensiPerilaku");
 
-  localStorage.setItem("kompetensiTeknis", JSON.stringify(getDataJobDesc.kompetensiTeknis.data));
-  localStorage.setItem("kompetensiPerilaku", JSON.stringify(getDataJobDesc.kompetensiPerilaku.data));
+  localStorage.setItem("kompetensiTeknis", JSON.stringify(getDataJobDesc.kompetensiTeknis.data || {}));
+  localStorage.setItem("kompetensiPerilaku", JSON.stringify(getDataJobDesc.kompetensiPerilaku.data || []));
 
   if (
     Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekMandatori) &&
