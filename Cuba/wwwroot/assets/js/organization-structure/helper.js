@@ -1456,7 +1456,7 @@ async function modalJobPopup(params) {
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
-      if (item?.personCode == 0 || item?.personCode == "0") {
+      if (item?.personCode == 0) {
         item.personCode = "-";
         item.personName = "Vacant";
         item.prlPlan = "-";
@@ -1586,14 +1586,14 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-        ? '<i class="fas fa-check-circle text-success"></i>'
-        : '<i class="fas fa-exclamation-circle text-warning"></i>';
+      ? '<i class="fas fa-check-circle text-success"></i>'
+      : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
-    message +
-    `
+      message +
+      `
     </div>`
   );
 
@@ -1601,8 +1601,8 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     $("#modalConfirmBody").append(
       `<div class="alert alert-danger-custom m-t-10" role="alert">
         <strong>Note:</strong> ` +
-      note +
-      `
+        note +
+        `
       </div>`
     );
   }
@@ -1612,21 +1612,21 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
       if (item.callback) {
         $("#modalConfirmFooter").append(
           `<button type="button" class="btn ` +
-          item.className +
-          ` m-r-5" onclick="(` +
-          item.callback +
-          `)()">` +
-          item.button +
-          `</button>`
+            item.className +
+            ` m-r-5" onclick="(` +
+            item.callback +
+            `)()">` +
+            item.button +
+            `</button>`
         );
         return;
       }
       $("#modalConfirmFooter").append(
         `<button type="button" class="btn ` +
-        item.className +
-        ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
-        item.button +
-        `</button>`
+          item.className +
+          ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
+          item.button +
+          `</button>`
       );
     });
   }
@@ -1928,12 +1928,12 @@ async function changeDataDesignCostFilter(value) {
   const result = await (value === "function"
     ? designCostByFunction
     : value === "division"
-      ? designCostByDivision
-      : designCostByLevel)({
-        draftId: organizationAttribute.orgUnitId,
-        page: 1,
-        pageSize: 10,
-      });
+    ? designCostByDivision
+    : designCostByLevel)({
+    draftId: organizationAttribute.orgUnitId,
+    page: 1,
+    pageSize: 10,
+  });
 
   result.data.forEach((item, idx) => {
     let name = item.functionName || item.divisionName || item.jobLevel;

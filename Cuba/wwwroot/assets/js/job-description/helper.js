@@ -58,7 +58,7 @@ function updateTable(params, data, rowHeader) {
 
       if (header === "index") {
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
         );
         if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
           // Single item - display as span with tooltip
@@ -72,7 +72,7 @@ function updateTable(params, data, rowHeader) {
           const listItems = uniqueTanggungJawab
             .map(
               (process) =>
-                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`,
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
             )
             .join("");
           row += `<td class="tdClass">
@@ -180,7 +180,7 @@ function updateTableSelected(params, data, rowHeader, refer) {
 
       if (header === "index") {
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
         );
         if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
           // Single item - display as span with tooltip
@@ -194,7 +194,7 @@ function updateTableSelected(params, data, rowHeader, refer) {
           const listItems = uniqueTanggungJawab
             .map(
               (process) =>
-                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`,
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
             )
             .join("");
           row += `<td class="tdClass" style="padding-left:10px !important">
@@ -596,7 +596,7 @@ function callConfirmReference() {
     "",
     action,
     "50%",
-    1,
+    1
   );
 }
 
@@ -604,7 +604,7 @@ async function saveReferenceAttribute() {
   loader(true);
   const onlyShowdata = localStorage.getItem("onlyShowdata") == "" ? false : localStorage.getItem("onlyShowdata");
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
-    (item) => !item.id.includes("all") && item.checked,
+    (item) => !item.id.includes("all") && item.checked
   );
   const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) ?? "[]";
   let checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
@@ -878,7 +878,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     `<div class="f-14" role="alert">` +
       message +
       `
-    </div>`,
+    </div>`
   );
 
   if (note) {
@@ -887,7 +887,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
         <strong>Note:</strong> ` +
         note +
         `
-      </div>`,
+      </div>`
     );
   }
 
@@ -903,7 +903,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
             item.className +
             ` m-r-5" onclick="window.${callbackId}()">` +
             item.button +
-            `</button>`,
+            `</button>`
         );
         return;
       }
@@ -912,7 +912,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           item.className +
           ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
           item.button +
-          `</button>`,
+          `</button>`
       );
     });
   }
@@ -981,7 +981,7 @@ function showChartLoading(
   isCustom = false,
   height = "480px",
   width = "100%",
-  text = "Loading Chart...",
+  text = "Loading Chart..."
 ) {
   let container = document.querySelector(`.${containerClass}`);
   container.innerHTML = CHART_LOADING_HTML;

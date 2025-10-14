@@ -55,6 +55,7 @@ $(".chart-container-custom").on("click", "foreignObject", async function (e) {
     await modalJobPopup(data.id);
   }
 });
+
 function changeOrganization(value, text) {
   organizationAttribute.orgUnitId = value;
   organizationAttribute.orgUnitName = text;
