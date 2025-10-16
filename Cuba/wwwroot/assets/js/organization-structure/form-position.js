@@ -84,17 +84,17 @@ async function saveAsDraft() {
   loader(true);
   const save = await saveInputAttribut(type);
   if (save.status == 200) {
-    loader(false);
-    swal("Saved", "Save as Draft", "success");
     const getPosition =
       $("#selectBasket").val() == "Yes" && save.data.jobFormations && save.data.jobFormations.length > 0
         ? save.data.jobFormations[0].unitName
         : $("#inputPositionName").val();
     const sanitizedPosition = encodeURIComponent(getPosition);
+    swal("Saved", "Save as Draft", "success");
     setTimeout(() => {
+      loader(false);
       window.location.href =
         "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
-    }, 2500);
+    }, 7500);
   } else {
     const message = save.message || save.title || "Failed to save job .";
     swal("Error", message, "error");

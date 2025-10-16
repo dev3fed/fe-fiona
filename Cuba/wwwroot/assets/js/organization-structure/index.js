@@ -4,8 +4,9 @@ async function initializeHelper() {
     const dataChart = await chartShow({
       draftId: organizationAttribute.orgUnitId,
       jobCode: defaultNodeId,
-      depth: 5,
+      depth: 3,
     });
+    console.log("Data chart fetched:", dataChart);
     helperOrgTree(dataChart.data);
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
@@ -32,6 +33,7 @@ async function initializeHelper() {
 
 $("#searchOrgNode").on("change", function () {
   let searchValue = $("#searchOrgNode").val();
+  if (!searchValue) return;
   focusNode(searchValue);
 });
 
@@ -204,7 +206,7 @@ async function confirmDeleteJob(unitCode) {
       return; // User cancelled, exit function
     }
     loader(true);
-    const deleteData = await draftJobDelete({
+    const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: positionId,
       prlOrg: "8-9",
@@ -236,7 +238,7 @@ async function confirmDeleteJob(unitCode) {
     }));
     loader(true);
     await moveJob(movePosition);
-    const deleteData = await draftJobDelete({
+    const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: unitCode,
       prlOrg: "8-9",
@@ -266,7 +268,7 @@ async function confirmDeleteJob(unitCode) {
     }
     loader(true);
     await moveJob(dataSelectFiltered);
-    const deleteData = await draftJobDelete({
+    const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: unitCode,
       prlOrg: "8-9",
@@ -362,6 +364,8 @@ async function handleEditJob() {
 // handle delete job
 async function handleDeleteJob() {
   const positionName = $("#jobName").text();
+  const positionId = $("#inputOUCode").val();
+  const parentId = $("#modalDirectReportOrgUnitId").text();
   const getDataSub = await draftJobSubordinate({
     draftId: organizationAttribute.orgUnitId,
     jobCode: $("#inputOUCode").val(),
@@ -372,6 +376,33 @@ async function handleDeleteJob() {
       unitCode: item.unitCode,
       unitName: item.unitName,
     })) ?? [];
+
+  if (!dataSub.length) {
+    const willProceed = await confirmFunction(
+      "Confirm Delete",
+      "Are you sure you want to delete " + positionName + " ?"
+    );
+    if (!willProceed) {
+      return; // User cancelled, exit function
+    }
+    $("#modalDetailJob").modal("hide");
+    loader(true);
+    const deleteData = await deleteJobAndSubordinates({
+      draftId: organizationAttribute.orgUnitId,
+      unitCode: positionId,
+      prlOrg: "8-9",
+      userId: "system",
+    });
+    if (deleteData) {
+      swal("Success", "Job has been deleted", "success");
+      // hide modal
+      $("#modalConfirm").modal("hide");
+    }
+    loader(false);
+    changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
+    focusNode(parentId);
+    return;
+  }
   let table = ` <table class="tableMasterData table table-hover w-100" id="editMoveVariousTable">`;
   table += `<thead>
       <tr>

@@ -948,6 +948,7 @@ async function focusNode(nodeId) {
       jobCode: nodeId,
       depth: 5,
     });
+    console.log("dataChart for focusNode:", dataChart);
 
     // Update chart data (assuming this function handles chart rendering)
     renderOrgChart(dataChart.data, nodeId, true);

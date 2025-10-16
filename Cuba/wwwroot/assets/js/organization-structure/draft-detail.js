@@ -242,6 +242,7 @@ async function previewOrgChart() {
 
 $("#searchOrgNode").on("change", function () {
   const searchValue = $("#searchOrgNode").val();
+  if (!searchValue) return;
   focusNode(searchValue);
 });
 

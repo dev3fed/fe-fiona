@@ -1524,6 +1524,9 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   }
   dataChart.forEach((item) => (item.id = item.id_org_unit));
 
+  // remove id duplicate
+  dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+
   const self = dataChart.find((item) => item.id == focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
   if (parent) {
