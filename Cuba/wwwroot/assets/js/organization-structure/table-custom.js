@@ -435,6 +435,17 @@ function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "
         title: "Activity Type",
         data: "actionType",
         width: "15%",
+        data: null,
+        render: function (data) {
+          console.log("data", data);
+          let text = "Created New Job";
+          if (data.actionType === "Update") {
+            text = "Edit Job";
+          } else if (data.actionType === "Delete") {
+            text = "Delete Job";
+          }
+          return text;
+        },
       },
       {
         title: "ID Org Unit",

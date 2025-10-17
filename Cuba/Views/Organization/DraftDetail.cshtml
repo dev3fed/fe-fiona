@@ -102,7 +102,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Draft Detail</h3>
+                    <h3 id="detailTitle">Draft Detail</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -115,7 +115,7 @@
                         </li>
                         <li class="breadcrumb-item ">Organization Structure</li>
                         <li class="breadcrumb-item"></li>
-                        <li class="breadcrumb active">Draft Detail</li>
+                        <li class="breadcrumb active" id="draftDetailBreadcrumb">Draft Detail</li>
                     </ol>
                 </div>
             </div>
@@ -130,24 +130,48 @@
                     <div class="header-card-draft">
                         Info
                     </div>
-                    <div class="row" style="margin-top: 20px;">
+                    <div class="row" style="margin-top: 20px;" id="infoDraft">
                         <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                                <label id="" class="text-black-50" style="font-size: 14px;">Draft Name</label>
+                                <span id="" class="text-black-50" style="font-size: 14px;">Draft Name</span>
                             <div>
-                                <span id="draftName" class="f-w-600" style="font-size: 16px;"></span>
+                                <span id="draftName" class="f-w-600" style="font-size: 18px;"></span>
                                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" class="p-l-5" style="margin-top: -1px;" id="editDraftName">
                             </div>
-                            <label id="requestId" class="f-w-200" style="font-size: 14px;"></label>
+                            <span id="requestId" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                         <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                            <label id="" class="text-black-50" style="font-size: 14px;">Created by</label>
+                            <span id="" class="text-black-50" style="font-size: 14px;">Created by</span>
+                            <span id="createdDate" class="f-w-200" style="font-size: 14px;"></span>
                             <span id="createdBy" class="f-w-600" style="font-size: 16px;"></span>
-                            <label id="createdDate" class="f-w-200" style="font-size: 14px;"></label>
                         </div>
                         <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
-                            <label id="" class="text-black-50" style="font-size: 14px;">Updated by</label>
+                            <span id="" class="text-black-50" style="font-size: 14px;">Updated by</span>
+                            <span id="updatedDate" class="f-w-200" style="font-size: 14px;"></span>
                             <span id="updatedBy" class="f-w-600" style="font-size: 16px;"></span>
-                            <label id="updatedDate" class="f-w-200" style="font-size: 14px;"></label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;" id="infoApproval">
+                        <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                                <span id="" class="text-black-50" style="font-size: 14px;">Draft Name</span>
+                            <div>
+                                <span id="draftNameApproval" class="f-w-600" style="font-size: 18px;"></span>
+                                <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" class="p-l-5" style="margin-top: -1px;" id="editDraftName">
+                            </div>
+                            <span id="requestIdApproval" class="f-w-200" style="font-size: 14px;"></span>
+                        </div>
+                        <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <span id="" class="text-black-50" style="font-size: 14px;">Submitted Date</span>
+                            <span id="submittedDate" class="f-w-200" style="font-size: 14px;"></span>
+                            <span id="submittedBy" class="f-w-600" style="font-size: 16px;"></span>
+                        </div>
+                        <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <span id="" class="text-black-50" style="font-size: 14px;">Approved/Reject Date</span>
+                            <span id="approvedRejectDate" class="f-w-200" style="font-size: 14px;"></span>
+                            <span id="approvedRejectBy" class="f-w-600" style="font-size: 16px;"></span>
+                        </div>
+                        <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
+                            <span id="" class="text-black-50" style="font-size: 14px;">Status</span>
+                            <span id="statusApproval" class="f-w-600" style="font-size: 16px;"></span>
                         </div>
                     </div>
                 </div>
@@ -219,9 +243,9 @@
                     </button> *@
                     <button class="btn btn-success" type="button" id="finalize" onclick="finalizeApproval()"> Finalize
                     </button>
-                    <button class="btn btn-success" type="button" id="acceptApproval" onclick="acceptApproval()"> Approve
-                    </button>
                     <button class="btn btn-danger" type="button" id="rejectApproval" onclick="rejectApproval()"> Reject
+                    </button>
+                    <button class="btn btn-success" type="button" id="acceptApproval" onclick="acceptApproval()"> Approve
                     </button>
                 </div>
                 <!-- card footer end-->

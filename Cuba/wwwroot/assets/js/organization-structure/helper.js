@@ -1674,7 +1674,7 @@ function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0,
         const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailPositionDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
-        if (status >= 2) {
+        if (status >= 1) {
           return `${detailPositionDraft}`;
         }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;

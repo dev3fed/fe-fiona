@@ -56,6 +56,7 @@
 
 async function checkPage() {
   // cons
+  alert("masok");
   const status = 3;
   const user = JSON.parse(localStorage.getItem("user")) === "admin" ? "superadmin" : "superadmin";
   $("#statusApproval").html(
@@ -71,6 +72,9 @@ async function checkPage() {
     $("#statusApproval, #acceptApproval, #rejectApproval").hide();
     $("#deleteDraft, #submitApproval").show();
   } else {
+    alert("maok");
+    $("#detailTitle").text("Approval Detail");
+    $("#draftDetailBreadcrumb").text("Approval Detail");
     $("#statusApproval, #acceptApproval, #rejectApproval").show();
   }
 
@@ -86,11 +90,53 @@ async function checkPage() {
 }
 
 async function initializeDraftDetail(getDraft) {
+  const createdDate = new Date(getDraft?.createdDate);
+  const updatedDate = getDraft?.modifiedDate ? new Date(getDraft?.modifiedDate) : null;
+  const submittedDate = getDraft?.submittedDate ? new Date(getDraft?.submittedDate) : null;
+  const rejectedDate = getDraft?.rejectedDate ? new Date(getDraft?.rejectedDate) : null;
+  const approvedDate = getDraft?.approvedDate ? new Date(getDraft?.approvedDate) : null;
+  const rejectApproved = approvedDate ? approvedDate : rejectedDate;
+  console.log("getDraft", getDraft);
+  console.log("createdDate", createdDate);
+  console.log("updatedDate", updatedDate);
+  console.log("submittedDate", submittedDate);
+  console.log("rejectApproved", rejectApproved);
+
   $("#draftName").text(getDraft?.draftName);
+  $("#draftNameApproval").text(getDraft?.draftName);
+  $("#requestId").text(getDraft?.draftId);
+  $("#requestIdApproval").text(getDraft?.draftId);
   $("#createdBy").text(getDraft?.createdBy);
-  $("#createdDate").text(getDraft?.createdDate);
+  $("#createdDate").text(createdDate.toLocaleDateString() + " " + createdDate.toLocaleTimeString());
   $("#updatedBy").text(getDraft?.modifiedBy);
-  $("#updatedDate").text(getDraft?.modifiedDate);
+  $("#updatedDate").text(updatedDate ? updatedDate.toLocaleDateString() + " " + updatedDate.toLocaleTimeString() : "");
+  $("#submittedBy").text(getDraft?.submittedBy ?? "System");
+  $("#submittedDate").text(
+    submittedDate ? submittedDate.toLocaleDateString() + " " + submittedDate.toLocaleTimeString() : "-"
+  );
+  $("#approvedRejectBy").text("System");
+  $("#approvedRejectDate").text(
+    rejectApproved ? rejectApproved.toLocaleDateString() + " " + rejectApproved.toLocaleTimeString() : "-"
+  );
+  let statusText = "Draft";
+  let statusClass = "bg-secondary";
+  if (getDraft.isSubmitted) {
+    statusText = "On Review";
+    statusClass = "label-info-custom";
+  }
+  if (getDraft.isRejected) {
+    statusText = "Rejected";
+    statusClass = "label-danger-custom";
+  }
+  if (getDraft.isApproved) {
+    statusText = "Approved";
+    statusClass = "label-success-custom";
+  }
+  if (getDraft.isFinalized) {
+    statusText = "Finalized";
+    statusClass = "label-primary-custom";
+  }
+  $(`#statusApproval`).html(`<span class="p-2 b-r-8 ${statusClass}">${statusText}</span>`);
 }
 
 //  =================
@@ -366,6 +412,7 @@ async function detailPositionDraft(id) {
 }
 
 async function detailapproval(id) {
+  $("#deleteJob, #editJob, #handleExport, #duplicateJob, #showJobdesc, #showRasciMatrix").hide();
   await modalJobPopup(id);
 }
 
@@ -413,10 +460,11 @@ function deletePositionDraft(positionId) {
 }
 
 function acceptApproval() {
+  const draftName = $("#draftName").text();
   const action = [
     actionBack,
     {
-      button: "Yes, Approve",
+      button: "Confirm Approve",
       className: "btn-primary",
       callback: function () {
         confirmSubmitApproval(1);
@@ -426,7 +474,7 @@ function acceptApproval() {
   modalConfrimHelper(
     "confirm",
     "Approve Request",
-    "Are you sure want to approve this Evaluasi Struktur Organisasi 2025 draft?",
+    `Are you sure want to approve this <b>${draftName}</b> draft?`,
     "",
     action
   );
@@ -455,7 +503,6 @@ function rejectApproval() {
 function checkButtonDraftDetail(data) {
   const urlParts = window.location.pathname.split("/");
   const lastPath = urlParts.pop() || urlParts.pop();
-  console.log("lastPath", lastPath);
   // hideModal(`modalConfirm`);
   // console.log("getDataDraft.data", data);
   const submitApprovalButton = $("#submitApproval");
@@ -473,10 +520,12 @@ function checkButtonDraftDetail(data) {
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
   finalizeConfirm.hide();
+  console.log("data", data);
   // data.isApproved = true;
   let step = 0;
   let userRole = "admin";
   if (data?.isSubmitted) {
+    $("#deleteDraft").hide();
     step = 1;
     submitApprovalButton.hide();
     acceptApprovalButton.show();
@@ -484,6 +533,7 @@ function checkButtonDraftDetail(data) {
   }
 
   if (data?.isRejected) {
+    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft, #deleteDraft").hide();
     step = 2;
     submitApprovalButton.show();
     acceptApprovalButton.hide();
@@ -492,7 +542,7 @@ function checkButtonDraftDetail(data) {
 
   if (data?.isApproved) {
     // image in id editDraftName hide
-    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft").hide();
+    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft, #deleteDraft").hide();
     $("#editDraftName").hide();
     step = 3;
     submitApprovalButton.hide();
@@ -503,7 +553,7 @@ function checkButtonDraftDetail(data) {
   }
 
   if (data?.isFinalized) {
-    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft").hide();
+    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft, #deleteDraft").hide();
     $("#editDraftName").hide();
     step = 4;
     submitApprovalButton.hide();
@@ -513,9 +563,15 @@ function checkButtonDraftDetail(data) {
   if (lastPath === "draft-detail") {
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
+    $("#infoApproval").hide();
   } else {
+    // $("#draftNameApproval").text(data?.draftName);
+    $("#detailTitle").text("Approval Detail");
+    $("#draftDetailBreadcrumb").text("Approval Detail");
+    $("#infoDraft").hide();
     finalizeConfirm.hide();
   }
+  console.log("step", step);
 
   if (lastPath === "approval-detail") {
     $("#editDraftName,#submitApproval,#downloadTemplate, #exportDataDraft, #importDataDraft").hide();
