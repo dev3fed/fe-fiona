@@ -965,6 +965,14 @@ function chartFit() {
   applyStaticChartPositioning();
 }
 
+function chartZoomOut() {
+  chart.zoomOut();
+}
+
+function chartZoomIn() {
+  chart.zoomIn();
+}
+
 function chartExportSVG() {
   const data = getChartExportData();
   console.log("Exporting chart as SVG:", data);
