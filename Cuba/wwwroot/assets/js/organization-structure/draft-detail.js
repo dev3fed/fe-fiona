@@ -108,9 +108,15 @@ function exportDraft() {
   alert("exportDraft");
 }
 async function backToOrg(params) {
-  window.location.href = "/organization/index";
+  const urlParts = window.location.pathname.split("/");
+  const lastPath = urlParts.pop() || urlParts.pop();
+  console.log("lastPath", lastPath);
+  if (lastPath === "approval-detail") {
+    window.location.href = "/organization/index?activeTab=request";
+  } else {
+    window.location.href = "/organization/index?activeTab=draft";
+  }
 }
-
 async function confirmDeleteDraft(id) {
   console.log("confirmDeleteDraft", id);
   let rollback = await rollbackDraftSO(id);
@@ -164,11 +170,15 @@ function confirmDelete(id) {
 
 async function confirmSubmit(id) {
   const draftId = urlParams.get("draftId");
+  loader(true);
   await draftSubmitToApproval(draftId);
   const getDataDraft = await draftDetailById(draftId);
+  loader(false);
   $("#modalConfirm").modal("hide");
   swal("Success", "Draft has been submitted to approval", "success");
   checkButtonDraftDetail(getDataDraft.data);
+  // move to organization index
+  window.location.href = "/organization/index?activeTab=request";
 }
 
 async function confirmSubmitApproval(id) {
@@ -463,7 +473,7 @@ function checkButtonDraftDetail(data) {
   acceptApprovalButton.hide();
   rejectApprovalButton.hide();
   finalizeConfirm.hide();
-  // data.isRejected = true;
+  // data.isApproved = true;
   let step = 0;
   let userRole = "admin";
   if (data?.isSubmitted) {
@@ -481,6 +491,9 @@ function checkButtonDraftDetail(data) {
   }
 
   if (data?.isApproved) {
+    // image in id editDraftName hide
+    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft").hide();
+    $("#editDraftName").hide();
     step = 3;
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
@@ -490,6 +503,8 @@ function checkButtonDraftDetail(data) {
   }
 
   if (data?.isFinalized) {
+    $("#exportTemplate, #importDataDraft, #downloadTemplate, #exportDataDraft").hide();
+    $("#editDraftName").hide();
     step = 4;
     submitApprovalButton.hide();
     finalizeConfirm.hide();
@@ -588,40 +603,121 @@ $(document).ready(async function () {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Organization Template");
 
+      // Direktorat	Direktorat Teknis	Fungsi	Divisi	Sub Division	Departemen	Section	cek	ID Org Unit	KBO (Org Unit Abbr)	Org Unit Name	ID Position	PJ	Position	cek2	Stack	Coordination	Coordination to	Jabatan fungsi leher	Position Abbreviation	IS dummy position?	Dummy Description	Person Id	Pers.No.	Name	PRL Plan Comp	ID Job	Job Name	Garis Lapor	Layering	PRL Organisasi	8-9	10-11	12-13	14-15	16-18	19-21	22-24	Career Type	Career Level	Main Skill Group	Main Subskill Group	Second Skill Group	Second Subskill Group	Third Skill Group	Third Subskill Group	Company Code	Company Name	Perusahaan	Personnel Area	Personnel Area Name	Personnel Subarea	Personnel Subarea Name	Group	Personnel Admin	Payscale Area Posisi	Desc. Payscale Area Posisi	Payscale Type Posisi	Desc. Payscale Type Posisi	Cost Center Posisi	Cost Center Description	ID Position Atasan Langsung	Position Atasan Langsung	ID Position Chief	Position Chief	Resource	No SK	PJS Position	helper idou x prl	lookup ke zhroom fadil
       // Add headers
       const headers = [
-        "Position Name",
-        "Abbreviation",
-        "Org Unit",
-        "PRL Org",
-        "Formation",
+        "Direktorat",
+        "Direktorat Teknis",
+        "Fungsi",
+        "Divisi",
+        "Sub Division",
+        "Departemen",
+        "Section",
+        "cek",
+        "ID Org Unit",
+        "KBO (Org Unit Abbr)",
+        "Org Unit Name",
+        "ID Position",
+        "PJ",
+        "Position",
+        "cek2",
+        "Stack",
+        "Coordination",
+        "Coordination to",
+        "Jabatan fungsi leher",
+        "Position Abbreviation",
+        "IS dummy position?",
+        "Dummy Description",
+        "Person Id",
+        "Pers.No.",
+        "Name",
+        "PRL Plan Comp",
+        "ID Job",
+        "Job Name",
+        "Garis Lapor",
+        "Layering",
+        "PRL Organisasi",
+        "8-9",
+        "10-11",
+        "12-13",
+        "14-15",
+        "16-18",
+        "19-21",
+        "22-24",
         "Career Type",
         "Career Level",
-        "Direct Report",
-        "Neck Function",
-        "Is Project",
-        "Coordination",
-        "Coordination With",
+        "Main Skill Group",
+        "Main Subskill Group",
+        "Second Skill Group",
+        "Second Subskill Group",
+        "Third Skill Group",
+        "Third Subskill Group",
+        "Company Code",
+        "Company Name",
+        "Perusahaan",
+        "Personnel Area",
+        "Personnel Area Name",
+        "Personnel Subarea",
+        "Personnel Subarea Name",
+        "Group",
+        "Personnel Admin",
+        "Payscale Area Posisi",
+        "Desc. Payscale Area Posisi",
+        "Payscale Type Posisi",
+        "Desc. Payscale Type Posisi",
+        "Cost Center Posisi",
+        "Cost Center Description",
+        "ID Position Atasan Langsung",
+        "Position Atasan Langsung",
+        "ID Position Chief",
+        "Position Chief",
+        "Resource",
+        "No SK",
+        "PJS Position",
+        "helper idou x prl",
+        "lookup ke zhroom fadil",
       ];
 
       // Add header row
       const headerRow = worksheet.addRow(headers);
 
-      // Style the Position Name header cell (A1) with yellow background
-      const positionNameCell = headerRow.getCell(1);
-      positionNameCell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FFFFFF00" }, // Yellow background
-      };
-      positionNameCell.font = {
-        bold: true,
-        color: { argb: "FF000000" }, // Black text
-      };
-      positionNameCell.alignment = {
-        horizontal: "center",
-        vertical: "middle",
-      };
+      // Style columns "Stack" to "Jabatan fungsi leher" with yellow background
+      // Stack = kolom 16, Coordination = 17, Coordination to = 18, Jabatan fungsi leher = 19
+      for (let colIndex = 16; colIndex <= 19; colIndex++) {
+        const cell = headerRow.getCell(colIndex);
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFFFF00" }, // Yellow background
+        };
+        cell.font = {
+          bold: true,
+          color: { argb: "FF000000" }, // Black text
+        };
+        cell.alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+      }
+
+      // Style columns "8-9" to "22-24" with yellow background
+      // "8-9" = kolom 32, "10-11" = 33, "12-13" = 34, "14-15" = 35, "16-18" = 36, "19-21" = 37, "22-24" = 38
+      for (let colIndex = 32; colIndex <= 38; colIndex++) {
+        const cell = headerRow.getCell(colIndex);
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFFFF00" }, // Yellow background
+        };
+        cell.font = {
+          bold: true,
+          color: { argb: "FF000000" }, // Black text
+        };
+        cell.alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+      }
 
       // Style all header cells
       headerRow.eachCell((cell, colNumber) => {
@@ -681,14 +777,44 @@ $(document).ready(async function () {
     }
   });
 
-  $("#exportDataDraft").click(function () {
-    alert("Export Data Draft feature is coming soon!");
+  $("#exportDataDraft").click(async function () {
+    // alert("Export Data Draft feature is coming soon!");
+    const draftId = urlParams.get("draftId");
+    const exportData = await exportZhroomToExcel({ draftId });
+    if (exportData) {
+      const url = window.URL.createObjectURL(new Blob([exportData.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `export-draft-${draftId}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } else {
+      const message = exportData?.message ?? "Failed to export data";
+      swal("Failed", message, "error");
+    }
 
     // window.location.href = "/organization/import-template";
   });
 
-  $("#importDataDraft").on("click", function () {
-    $("#fileImportDraft").click();
+  $("#importDataDraft").on("click", async function () {
+    // $("#fileImportDraft").val("");
+    const draftId = urlParams.get("draftId");
+    const importData = await exportDraftToExcel({ draftId });
+    if (importData) {
+      const url = window.URL.createObjectURL(new Blob([importData.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `import-draft-${draftId}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } else {
+      const message = importData?.message ?? "Failed to download template";
+      swal("Failed", message, "error");
+    }
   });
 
   $("#fileImportDraft").on("change", function () {

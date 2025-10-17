@@ -375,22 +375,26 @@ function getTableListApproval(params) {
         data: null,
         width: "15%",
         render: function (data) {
+          let statusText = "Draft";
+          let statusClass = "bg-secondary";
+
           if (data.isSubmitted) {
-            data.status = 1;
+            statusText = "On Review";
+            statusClass = "label-info-custom";
           }
-
           if (data.isRejected) {
-            data.status = 2;
+            statusText = "Rejected";
+            statusClass = "label-danger-custom";
           }
-
           if (data.isApproved) {
-            data.status = 3;
+            statusText = "Approved";
+            statusClass = "label-success-custom";
           }
-
           if (data.isFinalized) {
-            data.status = 4;
+            statusText = "Finalized";
+            statusClass = "label-primary-custom";
           }
-          return `<span class="p-2 b-r-8 ${statusApprovalClass[data.status]}">${statusApproval[data.status]}</span>`;
+          return `<span class="p-2 b-r-8 ${statusClass}">${statusText}</span>`;
         },
       },
       {

@@ -210,12 +210,13 @@
                                             <button class="btn btn-primary btn-sm" onclick="chartExportSVG()">Export SVG</button>
                                             <button class="btn btn-primary btn-sm" onclick="chartExportPDF()">Export PDF</button>
                                             @* <button class="btn btn-primary btn-sm" onclick="chartExportPDFTest()">Export Test</button> *@
-                                            <button class="btn btn-primary btn-sm" onclick="chart.fit();">Fit to the screen</button>
+                                            @* <button class="btn btn-primary btn-sm" onclick="chart.fit();">Fit to the screen</button> *@
+                                            <button class="btn btn-primary btn-sm" onclick="chartFit();">Fit to the screen</button>
                                             @* zoom in zoom out *@
-                                            <button onclick="chart.zoomIn().render().fit();" class="btn btn-primary btn-sm">
+                                            <button onclick="chart.zoomIn();" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-search-plus"></i> zoom in
                                             </button>
-                                            <button onclick="chart.zoomOut().render().fit();" class="btn btn-primary btn-sm">
+                                            <button onclick="chart.zoomOut();" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-search-minus"></i> zoom out
                                             </button>
                                             <button onclick="chartCompact()" class="btn btn-primary btn-sm">

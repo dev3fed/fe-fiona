@@ -6,7 +6,9 @@ async function initializeHelper() {
       jobCode: defaultNodeId,
       depth: 3,
     });
-    console.log("Data chart fetched:", dataChart);
+    // const dataChart = test1;
+    // renderOrgChart(dataChart, "10135490", false);
+    console.log("Data chart fetched ==>:", dataChart);
     helperOrgTree(dataChart.data);
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
@@ -33,7 +35,9 @@ async function initializeHelper() {
 
 $("#searchOrgNode").on("change", function () {
   let searchValue = $("#searchOrgNode").val();
+  console.log("Search value:", searchValue);
   if (!searchValue) return;
+  if (searchValue == "10132405") searchValue = "10132406"; // temporary fix for id position yang salah
   focusNode(searchValue);
 });
 
@@ -81,10 +85,11 @@ function changeOrganization(value, text) {
 
 async function confirmDuplicate(id) {
   loader(true);
+  const positionId = $("#inputOUCode").val();
   const duplicate = await draftJobDuplicate({
     draftId: organizationAttribute.orgUnitId,
     userId: "system",
-    unitCodeReference: $("#inputOUCode").val(),
+    unitCodeReference: positionId,
   });
 
   if (duplicate?.status !== 200) {
@@ -93,6 +98,7 @@ async function confirmDuplicate(id) {
     return;
   }
   $("#modalConfirm").modal("hide");
+  focusNode(positionId);
   swal("Success", "Position has been duplicated", "success");
   loader(false);
 }
@@ -103,7 +109,7 @@ async function duplicateJob() {
   const action = [
     actionBack,
     {
-      button: "Edit",
+      button: "Duplicate",
       className: "btn-primary",
       callbackFunction: "confirmDuplicate",
     },
@@ -784,7 +790,7 @@ $("#createDraftSO").click(async function () {
     swal("Failed", saveDraft.error, "error");
     return;
   }
-  const getDataDraft = await chartDraftList();
+  const getDataDraft = await chartDraftList(1, 99);
   storeData.listDraft = getDataDraft.data;
   $("#modalCreateDraftSO").modal("hide");
   getDataList([
@@ -796,6 +802,8 @@ $("#createDraftSO").click(async function () {
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
   changeOrganization(saveDraft.data.draftId, saveDraft.data.draftName);
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+  // initializeHelper
+  initializeHelper();
   loader(false);
   swal("Success", `Draft ${draftName} has been created`, "success");
 });
@@ -837,7 +845,7 @@ $("#selectDraftOrganization").change(async function () {
 });
 
 $(document).ready(async function () {
-  const getDataDraft = await chartDraftList();
+  const getDataDraft = await chartDraftList(1, 99);
   const getDataApproval = await approvedList();
   storeData.listDraft = getDataDraft.data;
   // initialize table

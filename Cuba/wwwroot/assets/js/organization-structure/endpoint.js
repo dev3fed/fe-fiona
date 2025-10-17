@@ -30,8 +30,8 @@ async function ajaxRequestFile(url, method, data = null, file = null) {
   }
 }
 
-async function chartDraftList() {
-  const api = `${url.baseUrl}/${url["api-organization"]}/draft/list`;
+async function chartDraftList(page = 1, pageSize = 10) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/list?page=${page}&pageSize=${pageSize}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
@@ -629,6 +629,32 @@ async function designCostByLevel(params) {
 // 'http://localhost:5095/api/organization-structure/draft/jobs/list-detail-jobs?draftId=d2e69277-3791-4f14-9f50-b55e1fca77f1&page=2&pageSize=10' \
 async function listDetailJobs(params) {
   const api = `${url.baseUrl}/${url["api-organization"]}/draft/jobs/list-detail-jobs?draftId=${params.draftId}&page=${params.page}&pageSize=${params.pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// 'https://cnt-be-dev2.devserver.fed-insight.com/api/ExportOrganization/export-zhroom-to-excel?draftId=e02be91d-8f09-4030-b33c-a7920efb961a' \
+async function exportZhroomToExcel(params) {
+  const api = `${url.baseUrl}/${url["api-export-organization"]}/export-zhroom-to-excel?draftId=${params.draftId}`;
+  try {
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/ExportOrganization/export-draft-to-excel
+async function exportDraftToExcel(params) {
+  const api = `${url.baseUrl}/${url["api-export-organization"]}/export-draft-to-excel?draftId=${params.draftId}`;
   try {
     const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
     return result;

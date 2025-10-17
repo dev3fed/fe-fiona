@@ -961,6 +961,10 @@ function getChartExportData() {
   };
 }
 
+function chartFit() {
+  applyStaticChartPositioning();
+}
+
 function chartExportSVG() {
   const data = getChartExportData();
   console.log("Exporting chart as SVG:", data);
@@ -1293,7 +1297,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
         black: "white",
       };
 
-      let colorSelected, backgroundSelected;
+      let colorSelected, backgroundSelected, borderWidth;
       if (d.data.tags.includes("create") || d.data.tags.includes("update")) {
         colorSelected = color.create;
         backgroundSelected = background.create;
@@ -1305,13 +1309,16 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
         backgroundSelected = background.black;
       }
 
+      borderWidth = "2px";
       if (d.data.tags.includes("pointed")) {
         // yellowish background
-        backgroundSelected = "#fff3cd";
+        // backgroundSelected = "#fff3cd";
+        borderWidth = "4px";
+        colorSelected = color.create;
       }
 
       const borderDot = d.data.project ? "dotted" : "solid";
-      const borderStyle = `border:2px ${borderDot} ${colorSelected}`;
+      const borderStyle = `border:${borderWidth} ${borderDot} ${colorSelected}`;
 
       const positionFontSize = getFontSize(d.data.position, true);
       const isBasket = d.data.tags.some((tag) => tag.includes("basket_"));
