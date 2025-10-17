@@ -36,6 +36,7 @@ async function initializeHelper() {
 $("#searchOrgNode").on("change", function () {
   let searchValue = $("#searchOrgNode").val();
   console.log("Search value:", searchValue);
+  console.log("Search value:", searchValue);
   if (!searchValue) return;
   if (searchValue == "10132405") searchValue = "10132406"; // temporary fix for id position yang salah
   focusNode(searchValue);
