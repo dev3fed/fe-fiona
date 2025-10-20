@@ -1795,11 +1795,7 @@ function helperDatePicker() {
 // helper orgTree
 // ======================
 function createHierarchy(data, parentId = null) {
-  console.log(
-    "createHierarchy called data:",
-    parentId,
-    data.filter((item) => item.pid === parentId)
-  );
+  console.log("createHierarchy called data:", parentId);
   return data
     .filter((item) => item.pid === parentId)
     .map((item) => ({
@@ -1814,8 +1810,12 @@ function createHierarchy(data, parentId = null) {
 async function helperOrgTree(params) {
   // di cblock dulu karena bikin error kalo pakai draft datanya jadi belasan ribu
   // console.log("helperOrgTree called with params:", params);
-  // return;
+  return;
   params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+  console.log("helperOrgTree processed params:", params);
+  //  remove duplicate id in params
+  params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+  console.log("helperOrgTree unique params:", params);
 
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({

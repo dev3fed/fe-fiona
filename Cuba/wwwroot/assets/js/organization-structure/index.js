@@ -9,7 +9,6 @@ async function initializeHelper() {
     // const dataChart = test1;
     // renderOrgChart(dataChart, "10135490", false);
     console.log("Data chart fetched ==>:", dataChart);
-    helperOrgTree(dataChart.data);
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
       if (typeof hideChartLoading === "function") {
@@ -17,6 +16,7 @@ async function initializeHelper() {
       }
       console.log("Chart initialization and loading completed");
     }, 1500); // Wait 1.5 seconds for chart to fully render
+    helperOrgTree(dataChart.data);
   } catch (error) {
     console.error("Error in initializeHelper:", error);
     // Hide loading and show error message on failure
@@ -38,7 +38,6 @@ $("#searchOrgNode").on("change", function () {
   console.log("Search value:", searchValue);
   console.log("Search value:", searchValue);
   if (!searchValue) return;
-  if (searchValue == "10132405") searchValue = "10132406"; // temporary fix for id position yang salah
   focusNode(searchValue);
 });
 

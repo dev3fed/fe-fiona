@@ -1265,6 +1265,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
       isCompact = false;
     }
   }
+
   if (forceCompact) {
     isCompact = true;
   }
@@ -1544,6 +1545,12 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
 
   const self = dataChart.find((item) => item.id == focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
+  console.log("Self node: ==>", self.id);
+  let forceCompact = false;
+  if (self.id == "10132405") {
+    forceCompact = true;
+    console.log("Special node 10132405 detected!");
+  }
   if (parent) {
     parent.pid = null;
     dataChart = dataChart.filter((item) => item.id != parent.id);
@@ -1557,6 +1564,6 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   localStorage.setItem("focusNodeId", JSON.stringify(focusNodeId));
   localStorage.setItem("orgChartData", JSON.stringify(processed));
   localStorage.setItem("isAutoExpand", JSON.stringify(isAutoExpand));
-  initializeChart(processed, isAutoExpand ? focusNodeId : null);
+  initializeChart(processed, isAutoExpand ? focusNodeId : null, forceCompact);
   if (chart) chart.fit();
 }
