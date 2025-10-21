@@ -41,7 +41,6 @@ async function detailDraft() {
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
     if (listData.data.length > 0) {
-      console.log("first", listData.data);
       renderTableActivity(listData);
     } else {
       const bodyEmpty = `
@@ -123,8 +122,6 @@ async function renderTableActivity(listData) {
                                 const jobList = Array.isArray(data.businessProcess)
                                   ? data.businessProcess.flatMap((bp) => bp.jobPosition || [])
                                   : data.businessProcess?.jobPosition || [];
-
-                                console.log("jobList", jobList);
                                 return `
                                   <tr>
                                     <td style="width: 50px;text-align:center">
@@ -222,7 +219,6 @@ async function renderTableActivity(listData) {
     const totalPages = Math.ceil(listData.total / itemsPerPage);
     const currentPage = listData.page;
     const start = (listData.page - 1) * itemsPerPage + 1;
-    console.log("currentPage", currentPage);
     renderDetailDraftPagination(currentPage, totalPages);
     const totalPage = document.getElementById("total-pagedraft");
 
@@ -257,8 +253,6 @@ async function renderTableActivity(listData) {
 }
 function renderDetailDraftPagination(currentPage, totalPages) {
   const paginationContainer = document.getElementById("list-pagedraft");
-  console.log("paginationContainer", paginationContainer);
-  // if (!paginationContainer) return;
 
   let pagesToShow = 3;
   let startPage = Math.max(currentPage - Math.floor(pagesToShow / 2), 1);
@@ -721,7 +715,6 @@ async function openDetailApproval() {
 }
 async function handleSubmitApproval() {
   const dataDraft = getState("dataDetailDraft");
-  console.log("dataDraft", dataDraft);
   try {
     const result = await draftSubmittoApproval(dataDraft.draftId);
     const modalDetailAprroval = document.getElementById("modalDraftAprroval");

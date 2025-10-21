@@ -14,6 +14,11 @@ const detailApproval = async () => {
     };
     const queryString = new URLSearchParams(payload).toString();
     const listData = await fetchDraftListProsbis(detailApproval.draftId, queryString);
+    const btnReject = document.getElementById("btn-reject");
+    const btnApprove = document.getElementById("btn-approve");
+    const isHidden = detailApproval && [1, 2].includes(Number(detailApproval.isStatus));
+    if (btnReject) btnReject.style.display = isHidden ? "none" : "inline-block";
+    if (btnApprove) btnApprove.style.display = isHidden ? "none" : "inline-block";
     if (detailApproval) {
       const infoBody = `
      <div class="col-2 custom-col">
@@ -116,6 +121,9 @@ const renderTableActivityApproval = (listData) => {
                           : listData.data
                               .map((data, index) => {
                                 const startIndex = (listData.page - 1) * listData.pageSize;
+                                const jobList = Array.isArray(data.businessProcess)
+                                  ? data.businessProcess.flatMap((bp) => bp.jobPosition || [])
+                                  : data.businessProcess?.jobPosition || [];
                                 return `
                                   <tr>
                                     <td style="width: 50px;text-align:center">
@@ -126,14 +134,14 @@ const renderTableActivityApproval = (listData) => {
                                     </td>
                                     <td>
                                       ${
-                                        data.jobPosition?.length
+                                        jobList?.length
                                           ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
-                                             title="${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}">
-                                             ${data.jobPosition[0].jobCode} - ${data.jobPosition[0].jobName}
+                                             title="${jobList[0].unitCode} - ${jobList[0].positionName}">
+                                             ${jobList[0].unitCode} - ${jobList[0].positionName}
                                              </div>` +
-                                            (data.jobPosition.length > 1
+                                            (jobList.length > 1
                                               ? `<small style="color:#9F9FA5;cursor: pointer">+${
-                                                  data.jobPosition.length - 1
+                                                  jobList.length - 1
                                                 } more</small>`
                                               : "")
                                           : "-"
@@ -141,14 +149,14 @@ const renderTableActivityApproval = (listData) => {
                                     </td>
                                     <td>
                                       ${
-                                        data.businessProcessName?.length
+                                        data.businessProcess?.length
                                           ? `<div class="long-text" data-bs-toggle="tooltip" data-bs-placement="bottom" 
-                                             title="${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}">
-                                             ${data.businessProcessName[0].indexGroup} - ${data.businessProcessName[0].description}
+                                             title="${data.businessProcess[0].indexGroup} - ${data.businessProcess[0].description}">
+                                             ${data.businessProcess[0].indexGroup} - ${data.businessProcess[0].description}
                                              </div>` +
-                                            (data.businessProcessName.length > 1
+                                            (data.businessProcess.length > 1
                                               ? `<small style="color:#9F9FA5;cursor: pointer">+${
-                                                  data.businessProcessName.length - 1
+                                                  data.businessProcess.length - 1
                                                 } more</small>`
                                               : "")
                                           : "-"

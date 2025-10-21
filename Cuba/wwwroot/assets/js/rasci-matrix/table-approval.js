@@ -303,6 +303,13 @@ function handleApprovalBack() {
   const mainMatrix = document.getElementById("main-matrix");
   const headerMatrix = document.getElementById("header-matrix");
   const headerDetail = document.getElementById("header-detail-approval");
+  const draftInfo = document.getElementById("info-approval");
+  setState("dataDetailAproval", {});
+  if (draftInfo) draftInfo.innerHTML = "";
+  const emptyActivity = document.getElementById("empty-activityapproval");
+  if (emptyActivity) emptyActivity.innerHTML = "";
+  const tblActivity = document.getElementById("detail-activityapproval");
+  if (tblActivity) tblActivity.innerHTML = "";
   if (approvalDetail) {
     approvalDetail.style.display = "none";
   }
@@ -321,7 +328,6 @@ const handleDetailApproval = async (draftId) => {
   const mainMatrix = document.getElementById("main-matrix");
   const headerMatrix = document.getElementById("header-matrix");
   const headerDetail = document.getElementById("header-detail-approval");
-  console.log("first", draftId);
   if (approvalDetail) {
     approvalDetail.style.display = "block";
   }
@@ -335,7 +341,6 @@ const handleDetailApproval = async (draftId) => {
     headerMatrix.style.display = "none";
   }
   const dataApproval = await fetchDraftProsbisByid(draftId);
-  console.log(dataApproval);
   if (dataApproval.status === 200) {
     setState("dataDetailAproval", dataApproval.data);
   }

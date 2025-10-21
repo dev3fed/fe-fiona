@@ -190,7 +190,9 @@ const appState = new Proxy(
             detailDraft();
           }
         } else if (property === "dataDetailAproval") {
-          detailApproval();
+          if (value && Object.keys(value).length > 0) {
+            detailApproval();
+          }
         } else if (property === "editDrafProsbis") {
           updateSelectEditProsbis();
         } else if (property === "checkedParentId") {
