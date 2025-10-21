@@ -97,95 +97,12 @@ $(document).ready(async function () {
   });
 
   const chartOsPositionLevel = document.getElementById("chart-os-position-level").getContext("2d");
-<<<<<<< HEAD
-  const chartOsJobGrade = document.getElementById("chart-os-job-grade").getContext("2d");
-  const chartOsPersonGrade = document.getElementById("chart-os-person-grade").getContext("2d");
-=======
->>>>>>> e74399481b1764dd27736a160520eeeee58124dd
   const chartRasciBusPro = document.getElementById("chart-rasci-buspro-level").getContext("2d");
   const chartRasciPosition = document.getElementById("chart-rasci-position-level").getContext("2d");
   const chartRasciNotationsFormation = document.getElementById("chart-rasci-notaions-formation").getContext("2d");
   const chartCompetencySpesific = document.getElementById("chart-competency-spesific").getContext("2d");
   const customTicks = [1, 5, 10, 50, 100, 1000, 10000];
 
-<<<<<<< HEAD
-  new Chart(chartOsPositionLevel, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: [
-        "Direktorat Utama",
-        "Direktorat Perencanaan & Pengembangan Bisnis",
-        "Direktorat Pemasaran Pusat & Niaga",
-        "Direktorat Pemasaran Regional",
-        "Direktorat Rekayasa & Infrastruktur Darat",
-        "Direktorat Keuangan",
-        "Direktorat SDM & Penunjang Bisnis",
-        "Direktorat Manajemen Risiko",
-      ],
-      datasets: [
-        {
-          label: "VP/EGM/GHO",
-          data: [4, 3, 5, 3, 6, 2, 3, 3],
-          backgroundColor: "#9999FC",
-          barPercentage: 0.8, // Adjust bar width to create space
-          categoryPercentage: 0.8, // Adjust category width to create space
-        },
-        {
-          label: "Manager/Region Manager/Area Manager/Sales Area Manager/Setara",
-          data: [25, 11, 24, 11, 49, 12, 15, 6],
-          backgroundColor: "#7EC67E",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Asst. Manager/Sr. Analyst/Setara",
-          data: [56, 16, 52, 16, 248, 16, 43, 8],
-          backgroundColor: "#7BE5D1",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Sr. Supervisor/Analyst/Setara",
-          data: [23, 2, 49, 2, 491, 55, 6, 0],
-          backgroundColor: "#FDC47E",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Supervisor/Jr. Analyst/Setara",
-          data: [51, 51, 71, 51, 853, 10, 105, 13],
-          backgroundColor: "#76BFFF",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Jr. Supervisor/Jr. Assistant/Setara",
-          data: [0, 1, 14, 1, 705, 0, 7, 1],
-          backgroundColor: "#FFA5C3",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Jr. Operator/Jr. Technician/Administrator/Setara",
-          data: [0, 0, 0, 0, 651, 0, 0, 7, 1],
-          backgroundColor: "#B7B7B7",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
-      plugins: {
-        datalabels: {
-          color: "#000", // Changed to black
-          anchor: "end", // Position at the top of the chart
-          align: "top", // Align at the top
-          font: {
-            weight: "bold",
-=======
   const dataChart = {
     dataPositionLevelByDirectorate: {},
     dataOsJobGrade: {},
@@ -248,7 +165,6 @@ $(document).ready(async function () {
               },
               color: "black",
             },
->>>>>>> e74399481b1764dd27736a160520eeeee58124dd
           },
         ],
       },
@@ -268,15 +184,6 @@ $(document).ready(async function () {
           },
         },
       },
-<<<<<<< HEAD
-      scales: {
-        x: {
-          stacked: false, // Disable stacking
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Directorate",
-=======
       plugins: [ChartDataLabels],
     });
 
@@ -379,7 +286,6 @@ $(document).ready(async function () {
             color: "#000", // Changed to black
             anchor: "end", // Position at the top of the chart
             align: "top", // Align at the top
->>>>>>> e74399481b1764dd27736a160520eeeee58124dd
             font: {
               weight: "bold",
             },
@@ -583,196 +489,6 @@ $(document).ready(async function () {
             font: {
               weight: "bold",
             },
-<<<<<<< HEAD
-          },
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y",
-      layout: {
-        padding: {
-          // add more space at the bottom for the hierarchy
-          left: 30,
-        },
-      },
-      scales: {
-        y: {
-          display: true,
-          padding: 25,
-          levelPercentage: 1,
-        },
-        x: {
-          display: false,
-        },
-      },
-    },
-    plugins: [ChartDataLabels],
-  });
-
-  const dataPersonGradeAllPrl = dataPersonGradeAll.map((item) => {
-    return item.prl;
-  });
-  const dataPersonGradeAllFormation = dataPersonGradeAll.map((item) => {
-    return item.formasi;
-  });
-  // const label = [
-  //   "24",
-  //   "23",
-  //   "22",
-  //   "21",
-  //   "20",
-  //   "19",
-  //   "18",
-  //   "17",
-  //   "16",
-  //   "15",
-  //   "14",
-  //   "13",
-  //   "12",
-  //   "11",
-  //   "10",
-  //   "9",
-  //   "8",
-  // ];
-
-  // const dataSets = [
-  //   9, 15, 15, 44, 72, 72, 170, 252, 278, 521, 676, 686, 807, 416, 287, 29, 82,
-  // ];
-
-  new Chart(chartOsPersonGrade, {
-    type: "funnel",
-    data: {
-      labels: dataPersonGradeAllPrl,
-      datasets: [
-        {
-          data: dataPersonGradeAllFormation,
-          backgroundColor: "#549DC5",
-          shrinkAnchor: "none",
-          barPercentage: 0.8, // Adjust bar width to create space
-          categoryPercentage: 0.8, // Adjust category width to create space
-          datalabels: {
-            formatter: (v) => v.toLocaleString(),
-            font: {
-              size: 14,
-            },
-          },
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y",
-      layout: {
-        padding: {
-          // add more space at the bottom for the hierarchy
-          left: 30,
-        },
-      },
-      scales: {
-        y: {
-          display: true,
-          padding: 25,
-          levelPercentage: 1,
-        },
-        x: {
-          display: false,
-        },
-      },
-    },
-    plugins: [ChartDataLabels],
-  });
-
-  new Chart(chartRasciBusPro, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: ["L1 (Category)", "L2 (Process Group)", "L3 (Process)", "L4 (Activity)", "L5 (Task)", "L6 (Sub Task)"],
-      datasets: [
-        {
-          label: "A (Accountable)",
-          data: [13, 144, 1747, 7088, 32711, 66],
-          backgroundColor: "#4E9ECA",
-        },
-        {
-          label: "R (Responsible)",
-          data: [63, 683, 3273, 20126, 174484, 48723],
-          backgroundColor: "#45C6C1",
-        },
-        {
-          label: "S (Support)",
-          data: [0, 0, 39, 572, 20, 0],
-          backgroundColor: "#8DC2B5",
-        },
-        {
-          label: "C (Consulted)",
-          data: [0, 0, 1, 170, 4, 0],
-          backgroundColor: "#EF9D91",
-        },
-        {
-          label: "I (Informed)",
-          data: [0, 0, 13, 234, 10, 37],
-          backgroundColor: "#FFDF6F",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
-      plugins: {
-        datalabels: {
-          color: "#000", // Changed to black
-          anchor: "end", // Position at the top of the chart
-          align: "top", // Align at the top
-          font: {
-            weight: "bold",
-          },
-          formatter: function (value) {
-            // pasang format ribuan
-            thaousandFormatter = new Intl.NumberFormat("en-US", {
-              notation: "compact",
-              compactDisplay: "short",
-              maximumFractionDigits: 1,
-            });
-            return thaousandFormatter.format(value);
-          },
-        },
-        legend: {
-          labels: {
-            font: {
-              size: 13,
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          stacked: false, // Disable stacking
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Business Process Level",
-            font: {
-              size: 22,
-              weight: "400",
-            },
-            padding: {
-              top: 20,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            },
-
-            color: "#9F9FA5", // Text color
-          },
-        },
-        y: {
-          stacked: false, // Disable stacking
-          type: "logarithmic",
-          min: 1,
-          max: 300000,
-          ticks: {
-=======
->>>>>>> e74399481b1764dd27736a160520eeeee58124dd
             formatter: function (value) {
               // pasang format ribuan
               thaousandFormatter = new Intl.NumberFormat("en-US", {
@@ -783,80 +499,12 @@ $(document).ready(async function () {
               return thaousandFormatter.format(value);
             },
           },
-<<<<<<< HEAD
-        },
-      },
-    },
-  });
-  new Chart(chartRasciPosition, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: [
-        "Director",
-        "VP/EGM/GHO",
-        "Manager / Region Manager / Area manager / Sales Area Manager / Setara",
-        "Asst. Manager / Sr. Analyst / Setara",
-        "Sr. Supervisor / Analyst / Setara",
-        "Supervisor/Jr. Analyst/Setara",
-        "Jr. Supervisor / Jr. Assistant / Setara",
-        "Jr. Operator / Jr. Technician / Administrator / Setara",
-      ],
-      datasets: [
-        {
-          label: "A (Accountable)",
-          data: [80, 144, 1300, 970, 2800, 1800, 5500, 1800],
-          backgroundColor: "#4E9ECA",
-        },
-        {
-          label: "R (Responsible)",
-          data: [40, 683, 800, 2000, 4000, 2000, 7000, 800],
-          backgroundColor: "#45C6C1",
-        },
-        {
-          label: "S (Support)",
-          data: [0, 20, 50, 15, 15, 8, 56, 65],
-          backgroundColor: "#8DC2B5",
-        },
-        {
-          label: "C (Consulted)",
-          data: [0, 10, 40, 8, 8, 5, 23, 40],
-          backgroundColor: "#EF9D91",
-        },
-        {
-          label: "I (Informed)",
-          data: [0, 5, 10, 5, 5, 3, 51, 5],
-          backgroundColor: "#FFDF6F",
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // ⬅️ WAJIB agar bisa fleksibel
-      plugins: {
-        datalabels: {
-          color: "#000", // Changed to black
-          anchor: "end", // Position at the top of the chart
-          align: "top", // Align at the top
-          font: {
-            weight: "bold",
-          },
-          formatter: function (value) {
-            // pasang format ribuan
-            thaousandFormatter = new Intl.NumberFormat("en-US", {
-              notation: "compact",
-              compactDisplay: "short",
-              maximumFractionDigits: 1,
-            });
-            return thaousandFormatter.format(value);
-=======
           legend: {
             labels: {
               font: {
                 size: 13,
               },
             },
->>>>>>> e74399481b1764dd27736a160520eeeee58124dd
           },
         },
         scales: {
@@ -1072,7 +720,7 @@ $(document).ready(async function () {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Directorate",
+            text: "Position Level",
             font: {
               size: 22,
               weight: "400",
@@ -1134,220 +782,6 @@ $(document).ready(async function () {
     },
   });
 
-<<<<<<< HEAD
-  const dataCompetencySpecific = [
-    {
-      label: "Domestic Supply Management",
-      "VP/EGM/GHO": 0,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 19,
-      "Asst. Manager/Sr. Analyst/Setara": 3,
-      "Sr. Supervisor/Analyst/Setara": 5,
-      "Supervisor/Jr. Analyst/Setara": 2,
-      "Jr. Supervisor/Jr. Assistant/Setara": 3,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 4,
-      total: 36,
-    },
-    {
-      label: "Sales and Account Management",
-      "VP/EGM/GHO": 5,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 10,
-      "Asst. Manager/Sr. Analyst/Setara": 2,
-      "Sr. Supervisor/Analyst/Setara": 3,
-      "Supervisor/Jr. Analyst/Setara": 4,
-      "Jr. Supervisor/Jr. Assistant/Setara": 1,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 25,
-    },
-    {
-      label: "Promotion and Campaign Management",
-      "VP/EGM/GHO": 3,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 2,
-      "Asst. Manager/Sr. Analyst/Setara": 20,
-      "Sr. Supervisor/Analyst/Setara": 5,
-      "Supervisor/Jr. Analyst/Setara": 1,
-      "Jr. Supervisor/Jr. Assistant/Setara": 4,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 35,
-    },
-    {
-      label: "Channel Management",
-      "VP/EGM/GHO": 5,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 3,
-      "Asst. Manager/Sr. Analyst/Setara": 5,
-      "Sr. Supervisor/Analyst/Setara": 15,
-      "Supervisor/Jr. Analyst/Setara": 22,
-      "Jr. Supervisor/Jr. Assistant/Setara": 30,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 80,
-    },
-    {
-      label: "Handling Customer Complaint",
-      "VP/EGM/GHO": 2,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 4,
-      "Asst. Manager/Sr. Analyst/Setara": 1,
-      "Sr. Supervisor/Analyst/Setara": 22,
-      "Supervisor/Jr. Analyst/Setara": 30,
-      "Jr. Supervisor/Jr. Assistant/Setara": 15,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 8,
-      total: 82,
-    },
-    {
-      label: "Pipeline Transport Operations & Maintenance",
-      "VP/EGM/GHO": 3,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 1,
-      "Asst. Manager/Sr. Analyst/Setara": 4,
-      "Sr. Supervisor/Analyst/Setara": 30,
-      "Supervisor/Jr. Analyst/Setara": 45,
-      "Jr. Supervisor/Jr. Assistant/Setara": 25,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 12,
-      total: 120,
-    },
-    {
-      label: "Distribution Management",
-      "VP/EGM/GHO": 4,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
-      "Asst. Manager/Sr. Analyst/Setara": 0,
-      "Sr. Supervisor/Analyst/Setara": 0,
-      "Supervisor/Jr. Analyst/Setara": 0,
-      "Jr. Supervisor/Jr. Assistant/Setara": 0,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 4,
-    },
-    {
-      label: "Stakeholder Management",
-      "VP/EGM/GHO": 1,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
-      "Asst. Manager/Sr. Analyst/Setara": 0,
-      "Sr. Supervisor/Analyst/Setara": 0,
-      "Supervisor/Jr. Analyst/Setara": 0,
-      "Jr. Supervisor/Jr. Assistant/Setara": 0,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 1,
-    },
-    {
-      label: "Supply Planning & Scheduling",
-      "VP/EGM/GHO": 2,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
-      "Asst. Manager/Sr. Analyst/Setara": 0,
-      "Sr. Supervisor/Analyst/Setara": 0,
-      "Supervisor/Jr. Analyst/Setara": 0,
-      "Jr. Supervisor/Jr. Assistant/Setara": 0,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 2,
-    },
-    {
-      label: "Product/Service Development",
-      "VP/EGM/GHO": 3,
-      "Manager/Region Manager/Area Manager/Sales Area Manager/Setara": 0,
-      "Asst. Manager/Sr. Analyst/Setara": 0,
-      "Sr. Supervisor/Analyst/Setara": 0,
-      "Supervisor/Jr. Analyst/Setara": 0,
-      "Jr. Supervisor/Jr. Assistant/Setara": 0,
-      "Jr. Operator/Jr. Technician/Administrator/Setara": 0,
-      total: 3,
-    },
-  ];
-
-  // Sort dataCompetencySpecific by total (descending order)
-  const sortedCompetencyData = [...dataCompetencySpecific].sort((a, b) => b.total - a.total);
-
-  // Extract sorted labels and data for each position level
-  const sortedLabels = sortedCompetencyData.map((item) => item.label);
-  const vpData = sortedCompetencyData.map((item) => item["VP/EGM/GHO"]);
-  const managerData = sortedCompetencyData.map(
-    (item) => item["Manager/Region Manager/Area Manager/Sales Area Manager/Setara"]
-  );
-  const asstManagerData = sortedCompetencyData.map((item) => item["Asst. Manager/Sr. Analyst/Setara"]);
-  const srSupervisorData = sortedCompetencyData.map((item) => item["Sr. Supervisor/Analyst/Setara"]);
-  const supervisorData = sortedCompetencyData.map((item) => item["Supervisor/Jr. Analyst/Setara"]);
-  const jrSupervisorData = sortedCompetencyData.map((item) => item["Jr. Supervisor/Jr. Assistant/Setara"]);
-  const jrOperatorData = sortedCompetencyData.map((item) => item["Jr. Operator/Jr. Technician/Administrator/Setara"]);
-
-  new Chart(chartCompetencySpesific, {
-    type: "bar",
-    plugins: [ChartDataLabels],
-    data: {
-      labels: sortedLabels,
-      datasets: [
-        {
-          label: "VP/EGM/GHO",
-          data: vpData,
-          backgroundColor: "#9999FC",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Manager/ Region...",
-          data: managerData,
-          backgroundColor: "#7EC67E",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Asst. Manager/Sr. Anal...",
-          data: asstManagerData,
-          backgroundColor: "#7BE5D1",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Sr. Supervisor/Analyst...",
-          data: srSupervisorData,
-          backgroundColor: "#FDC47E",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Supervisor/Jr. Analyst...",
-          data: supervisorData,
-          backgroundColor: "#76BFFF",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Jr. Supervisor/Jr...",
-          data: jrSupervisorData,
-          backgroundColor: "#FFA5C3",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Jr. Operator/Jr. Techn...",
-          data: jrOperatorData,
-          backgroundColor: "#B7B7B7",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: "y",
-      plugins: {
-        datalabels: {
-          color: "#fff",
-          anchor: "center",
-          align: "center",
-          font: {
-            weight: "bold",
-          },
-          formatter: function (value) {
-            return value;
-          },
-        },
-        legend: {
-          display: false,
-        },
-      },
-      scales: {
-        x: {
-          stacked: true,
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Position Total",
-=======
   if (dataAll.top10SpecificCompetencies) {
     dataChart.dataCompetencySpesific.data = dataAll.top10SpecificCompetencies.data;
     // unique label only
@@ -1391,7 +825,6 @@ $(document).ready(async function () {
             color: "black",
             anchor: "center",
             align: "center",
->>>>>>> e74399481b1764dd27736a160520eeeee58124dd
             font: {
               weight: "bold",
             },

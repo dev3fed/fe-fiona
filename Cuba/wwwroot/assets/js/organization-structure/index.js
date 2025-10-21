@@ -4,9 +4,11 @@ async function initializeHelper() {
     const dataChart = await chartShow({
       draftId: organizationAttribute.orgUnitId,
       jobCode: defaultNodeId,
-      depth: 5,
+      depth: 3,
     });
-    helperOrgTree(dataChart.data);
+    // const dataChart = test1;
+    // renderOrgChart(dataChart, "10135490", false);
+    console.log("Data chart fetched ==>:", dataChart);
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
       if (typeof hideChartLoading === "function") {
@@ -14,6 +16,7 @@ async function initializeHelper() {
       }
       console.log("Chart initialization and loading completed");
     }, 1500); // Wait 1.5 seconds for chart to fully render
+    helperOrgTree(dataChart.data);
   } catch (error) {
     console.error("Error in initializeHelper:", error);
     // Hide loading and show error message on failure
@@ -32,6 +35,9 @@ async function initializeHelper() {
 
 $("#searchOrgNode").on("change", function () {
   let searchValue = $("#searchOrgNode").val();
+  console.log("Search value:", searchValue);
+  console.log("Search value:", searchValue);
+  if (!searchValue) return;
   focusNode(searchValue);
 });
 
@@ -55,6 +61,7 @@ $(".chart-container-custom").on("click", "foreignObject", async function (e) {
     await modalJobPopup(data.id);
   }
 });
+
 function changeOrganization(value, text) {
   organizationAttribute.orgUnitId = value;
   organizationAttribute.orgUnitName = text;
@@ -78,10 +85,11 @@ function changeOrganization(value, text) {
 
 async function confirmDuplicate(id) {
   loader(true);
+  const positionId = $("#inputOUCode").val();
   const duplicate = await draftJobDuplicate({
     draftId: organizationAttribute.orgUnitId,
     userId: "system",
-    unitCodeReference: $("#inputOUCode").val(),
+    unitCodeReference: positionId,
   });
 
   if (duplicate?.status !== 200) {
@@ -90,6 +98,7 @@ async function confirmDuplicate(id) {
     return;
   }
   $("#modalConfirm").modal("hide");
+  focusNode(positionId);
   swal("Success", "Position has been duplicated", "success");
   loader(false);
 }
@@ -100,7 +109,7 @@ async function duplicateJob() {
   const action = [
     actionBack,
     {
-      button: "Edit",
+      button: "Duplicate",
       className: "btn-primary",
       callbackFunction: "confirmDuplicate",
     },
@@ -203,7 +212,7 @@ async function confirmDeleteJob(unitCode) {
       return; // User cancelled, exit function
     }
     loader(true);
-    const deleteData = await draftJobDelete({
+    const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: positionId,
       prlOrg: "8-9",
@@ -235,7 +244,7 @@ async function confirmDeleteJob(unitCode) {
     }));
     loader(true);
     await moveJob(movePosition);
-    const deleteData = await draftJobDelete({
+    const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: unitCode,
       prlOrg: "8-9",
@@ -265,7 +274,7 @@ async function confirmDeleteJob(unitCode) {
     }
     loader(true);
     await moveJob(dataSelectFiltered);
-    const deleteData = await draftJobDelete({
+    const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: unitCode,
       prlOrg: "8-9",
@@ -361,6 +370,8 @@ async function handleEditJob() {
 // handle delete job
 async function handleDeleteJob() {
   const positionName = $("#jobName").text();
+  const positionId = $("#inputOUCode").val();
+  const parentId = $("#modalDirectReportOrgUnitId").text();
   const getDataSub = await draftJobSubordinate({
     draftId: organizationAttribute.orgUnitId,
     jobCode: $("#inputOUCode").val(),
@@ -371,6 +382,33 @@ async function handleDeleteJob() {
       unitCode: item.unitCode,
       unitName: item.unitName,
     })) ?? [];
+
+  if (!dataSub.length) {
+    const willProceed = await confirmFunction(
+      "Confirm Delete",
+      "Are you sure you want to delete " + positionName + " ?"
+    );
+    if (!willProceed) {
+      return; // User cancelled, exit function
+    }
+    $("#modalDetailJob").modal("hide");
+    loader(true);
+    const deleteData = await deleteJobAndSubordinates({
+      draftId: organizationAttribute.orgUnitId,
+      unitCode: positionId,
+      prlOrg: "8-9",
+      userId: "system",
+    });
+    if (deleteData) {
+      swal("Success", "Job has been deleted", "success");
+      // hide modal
+      $("#modalConfirm").modal("hide");
+    }
+    loader(false);
+    changeOrganization(organizationAttribute.orgUnitId, organizationAttribute.orgUnitName);
+    focusNode(parentId);
+    return;
+  }
   let table = ` <table class="tableMasterData table table-hover w-100" id="editMoveVariousTable">`;
   table += `<thead>
       <tr>
@@ -752,7 +790,7 @@ $("#createDraftSO").click(async function () {
     swal("Failed", saveDraft.error, "error");
     return;
   }
-  const getDataDraft = await chartDraftList();
+  const getDataDraft = await chartDraftList(1, 99);
   storeData.listDraft = getDataDraft.data;
   $("#modalCreateDraftSO").modal("hide");
   getDataList([
@@ -764,6 +802,8 @@ $("#createDraftSO").click(async function () {
   getTableListDraft(storeData.listDraft.filter((x) => x.draftName != "Master Data SO"));
   changeOrganization(saveDraft.data.draftId, saveDraft.data.draftName);
   $("#selectDraftOrganization").val(organizationAttribute.orgUnitId).trigger("change");
+  // initializeHelper
+  initializeHelper();
   loader(false);
   swal("Success", `Draft ${draftName} has been created`, "success");
 });
@@ -805,7 +845,7 @@ $("#selectDraftOrganization").change(async function () {
 });
 
 $(document).ready(async function () {
-  const getDataDraft = await chartDraftList();
+  const getDataDraft = await chartDraftList(1, 99);
   const getDataApproval = await approvedList();
   storeData.listDraft = getDataDraft.data;
   // initialize table

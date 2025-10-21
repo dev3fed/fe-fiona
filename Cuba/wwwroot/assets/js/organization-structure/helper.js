@@ -1121,6 +1121,7 @@ async function modalSubPosition() {
       endpoint: "draft/career-level/list",
       draftId: draftId,
       dropdownParent: $("#modalAddSubPosition"),
+      showId: false,
     },
   ]);
 
@@ -1456,7 +1457,7 @@ async function modalJobPopup(params) {
 
     const $basketBody = $("#tableBasketIncumbent tbody").empty();
     (data?.incumbents || []).forEach((item, i) => {
-      if (item?.personCode == 0 || item?.personCode == "0") {
+      if (item?.personCode == 0) {
         item.personCode = "-";
         item.personName = "Vacant";
         item.prlPlan = "-";
@@ -1586,14 +1587,14 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-        ? '<i class="fas fa-check-circle text-success"></i>'
-        : '<i class="fas fa-exclamation-circle text-warning"></i>';
+      ? '<i class="fas fa-check-circle text-success"></i>'
+      : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
-    message +
-    `
+      message +
+      `
     </div>`
   );
 
@@ -1601,8 +1602,8 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     $("#modalConfirmBody").append(
       `<div class="alert alert-danger-custom m-t-10" role="alert">
         <strong>Note:</strong> ` +
-      note +
-      `
+        note +
+        `
       </div>`
     );
   }
@@ -1612,21 +1613,21 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
       if (item.callback) {
         $("#modalConfirmFooter").append(
           `<button type="button" class="btn ` +
-          item.className +
-          ` m-r-5" onclick="(` +
-          item.callback +
-          `)()">` +
-          item.button +
-          `</button>`
+            item.className +
+            ` m-r-5" onclick="(` +
+            item.callback +
+            `)()">` +
+            item.button +
+            `</button>`
         );
         return;
       }
       $("#modalConfirmFooter").append(
         `<button type="button" class="btn ` +
-        item.className +
-        ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
-        item.button +
-        `</button>`
+          item.className +
+          ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
+          item.button +
+          `</button>`
       );
     });
   }
@@ -1673,7 +1674,7 @@ function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0,
         const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailPositionDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
-        if (status >= 3) {
+        if (status >= 1) {
           return `${detailPositionDraft}`;
         }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
@@ -1794,7 +1795,7 @@ function helperDatePicker() {
 // helper orgTree
 // ======================
 function createHierarchy(data, parentId = null) {
-  console.log("createHierarchy called data:", data);
+  console.log("createHierarchy called data:", parentId);
   return data
     .filter((item) => item.pid === parentId)
     .map((item) => ({
@@ -1807,6 +1808,15 @@ function createHierarchy(data, parentId = null) {
 }
 
 async function helperOrgTree(params) {
+  // di cblock dulu karena bikin error kalo pakai draft datanya jadi belasan ribu
+  // console.log("helperOrgTree called with params:", params);
+  return;
+  params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+  console.log("helperOrgTree processed params:", params);
+  //  remove duplicate id in params
+  params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+  console.log("helperOrgTree unique params:", params);
+
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
     core: {
@@ -1928,12 +1938,12 @@ async function changeDataDesignCostFilter(value) {
   const result = await (value === "function"
     ? designCostByFunction
     : value === "division"
-      ? designCostByDivision
-      : designCostByLevel)({
-        draftId: organizationAttribute.orgUnitId,
-        page: 1,
-        pageSize: 10,
-      });
+    ? designCostByDivision
+    : designCostByLevel)({
+    draftId: organizationAttribute.orgUnitId,
+    page: 1,
+    pageSize: 10,
+  });
 
   result.data.forEach((item, idx) => {
     let name = item.functionName || item.divisionName || item.jobLevel;

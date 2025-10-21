@@ -961,6 +961,18 @@ function getChartExportData() {
   };
 }
 
+function chartFit() {
+  applyStaticChartPositioning();
+}
+
+function chartZoomOut() {
+  chart.zoomOut();
+}
+
+function chartZoomIn() {
+  chart.zoomIn();
+}
+
 function chartExportSVG() {
   const data = getChartExportData();
   console.log("Exporting chart as SVG:", data);
@@ -1253,6 +1265,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
       isCompact = false;
     }
   }
+
   if (forceCompact) {
     isCompact = true;
   }
@@ -1293,7 +1306,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
         black: "white",
       };
 
-      let colorSelected, backgroundSelected;
+      let colorSelected, backgroundSelected, borderWidth;
       if (d.data.tags.includes("create") || d.data.tags.includes("update")) {
         colorSelected = color.create;
         backgroundSelected = background.create;
@@ -1305,13 +1318,16 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
         backgroundSelected = background.black;
       }
 
+      borderWidth = "2px";
       if (d.data.tags.includes("pointed")) {
         // yellowish background
-        backgroundSelected = "#fff3cd";
+        // backgroundSelected = "#fff3cd";
+        borderWidth = "4px";
+        colorSelected = color.create;
       }
 
       const borderDot = d.data.project ? "dotted" : "solid";
-      const borderStyle = `border:2px ${borderDot} ${colorSelected}`;
+      const borderStyle = `border:${borderWidth} ${borderDot} ${colorSelected}`;
 
       const positionFontSize = getFontSize(d.data.position, true);
       const isBasket = d.data.tags.some((tag) => tag.includes("basket_"));
@@ -1524,8 +1540,17 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   }
   dataChart.forEach((item) => (item.id = item.id_org_unit));
 
+  // remove id duplicate
+  dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+
   const self = dataChart.find((item) => item.id == focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
+  console.log("Self node: ==>", self.id);
+  let forceCompact = false;
+  if (self.id == "10132405") {
+    forceCompact = true;
+    console.log("Special node 10132405 detected!");
+  }
   if (parent) {
     parent.pid = null;
     dataChart = dataChart.filter((item) => item.id != parent.id);
@@ -1539,6 +1564,6 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   localStorage.setItem("focusNodeId", JSON.stringify(focusNodeId));
   localStorage.setItem("orgChartData", JSON.stringify(processed));
   localStorage.setItem("isAutoExpand", JSON.stringify(isAutoExpand));
-  initializeChart(processed, isAutoExpand ? focusNodeId : null);
+  initializeChart(processed, isAutoExpand ? focusNodeId : null, forceCompact);
   if (chart) chart.fit();
 }

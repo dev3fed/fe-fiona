@@ -17,13 +17,21 @@ function getDataListAsync(data) {
               pageSize: 10,
             };
           },
+          // item bisa diakses melalui closure
           processResults: function (data, params) {
             params.page = params.page || 1;
-
+            console.log(data, params, item); // item tersedia di sini
             return {
-              results: data.data.map((item) => ({
-                id: item.unitCode || item.Id || item.id, // The ID for Select2
-                text: item.unitName || item.Name || `${item.name} (${item.id})`, // The text that appears in the dropdown
+              results: data.data.map((dataItem) => ({
+                id: dataItem.unitCode || dataItem.Id || dataItem.id, // The ID for Select2
+                text:
+                  item.showId === false
+                    ? `${dataItem.name}`
+                    : dataItem.unitName || dataItem.Name || `${dataItem.name} (${dataItem.id})`, // The text that appears in the dropdown
+                // text: textProperty
+                //   ? dataItem[textProperty]
+                //   : `${dataItem.unitName} (${dataItem.id})`,
+                // text: dataItem.unitName || dataItem.Name || `${dataItem.name} (${dataItem.id})`, // The text that appears in the dropdown
               })),
               pagination: {
                 more: data.hasMore, // Boolean to indicate if more data is available
@@ -35,6 +43,22 @@ function getDataListAsync(data) {
       })
       .on("select2:open", function () {
         page = 1;
+        // Auto focus pada search input ketika dropdown dibuka
+        const elementId = $(this).attr("id");
+        setTimeout(function () {
+          // Cari search field berdasarkan aria-controls yang terkait dengan element ID
+          const searchField = $(`.select2-search__field[aria-controls*="${elementId}"]`);
+          if (searchField.length > 0) {
+            searchField[0].focus();
+          } else {
+            // Fallback: cari dropdown yang terakhir dibuka
+            const lastDropdown = $(".select2-dropdown:last");
+            const fallbackSearchField = lastDropdown.find(".select2-search__field");
+            if (fallbackSearchField.length > 0) {
+              fallbackSearchField[0].focus();
+            }
+          }
+        }, 100);
       });
   });
 }
@@ -45,12 +69,45 @@ function getDataList(data) {
     if (item.data && item.data.length > 0) {
       let dropdownParent = item.dropdownParent ?? null;
       $(`#${item.dataId}`).empty();
-      $(`#${item.dataId}`).select2({
-        allowClear: true,
-        placeholder: item.placeholder || "Select an option",
-        data: item.data,
-        dropdownParent: dropdownParent,
-      });
+      $(`#${item.dataId}`)
+        .select2({
+          allowClear: true,
+          placeholder: item.placeholder || "Select an option",
+          data: item.data,
+          dropdownParent: dropdownParent,
+          minimumInputLength: 0,
+          closeOnSelect: true,
+          escapeMarkup: function (markup) {
+            return markup;
+          },
+          templateResult: function (option) {
+            if (!option.id) {
+              return option.text;
+            }
+            return option.text;
+          },
+          templateSelection: function (option) {
+            return option.text;
+          },
+        })
+        .on("select2:open", function (e) {
+          // Auto focus pada search input ketika dropdown dibuka
+          const elementId = $(this).attr("id");
+          setTimeout(function () {
+            // Cari search field berdasarkan aria-controls yang terkait dengan element ID
+            const searchField = $(`.select2-search__field[aria-controls*="${elementId}"]`);
+            if (searchField.length > 0) {
+              searchField[0].focus();
+            } else {
+              // Fallback: cari dropdown yang terakhir dibuka
+              const lastDropdown = $(".select2-dropdown:last");
+              const fallbackSearchField = lastDropdown.find(".select2-search__field");
+              if (fallbackSearchField.length > 0) {
+                fallbackSearchField[0].focus();
+              }
+            }
+          }, 100);
+        });
     }
     if (item.isHide) {
       $(`#${item.dataId}`).next(".select2-container").css("display", "none");

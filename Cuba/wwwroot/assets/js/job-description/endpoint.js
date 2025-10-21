@@ -318,6 +318,31 @@ async function updateDetailDraft({ draftId, jobId, prlOrg, data }) {
   }
 }
 
+// download word
+async function downloadWord(data) {
+  const api = `${url.baseUrl}/${url["job-description"]}/detail-draft/download-word`;
+  try {
+    const result = await ajaxRequest(api, "POST", data, "blob");
+    return {
+      statusCode: 200,
+      success: true,
+      data: {
+        blob: result,
+        fileUrl: URL.createObjectURL(result),
+      },
+    };
+  } catch (error) {
+    console.error("Error in downloadWord API:", error);
+    // Return a properly structured error response instead of the raw error
+    return {
+      statusCode: 500,
+      success: false,
+      message: error.message || "Failed to download word document",
+      data: null,
+    };
+  }
+}
+
 // /api/job-description/draft/approve/{draftId}
 async function draftApprove(draftId) {
   const api = `${url.baseUrl}/${url["job-description"]}/draft/approve/${draftId}`;

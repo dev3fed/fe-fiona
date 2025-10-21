@@ -36,8 +36,8 @@ async function initializeList() {
       addedParams: "",
       draftId: draftId,
     },
-    { id: "selectCareerType", endpoint: "draft/career-type/list", draftId: draftId },
-    { id: "selectCareerLevel", endpoint: "draft/career-level/list", draftId: draftId },
+    { id: "selectCareerType", endpoint: "draft/career-type/list", draftId: draftId, showId: false },
+    { id: "selectCareerLevel", endpoint: "draft/career-level/list", draftId: draftId, showId: false },
     // { id: "selectAbbrvPosition", endpoint: "draft/job-abbriviation/list", draftId: draftId },
     { id: "selectKBO", endpoint: "draft/kbo/list", draftId: draftId },
     { id: "selectCostCenter", endpoint: "draft/cost-center/list", draftId: draftId },
@@ -45,6 +45,7 @@ async function initializeList() {
     { id: "selectPersonalSubareaName", endpoint: "draft/personnel-sub-area/list", draftId: draftId },
     { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId, showId: true },
     { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
+    { id: "selectCoordinationWith", endpoint: "draft/position/list", draftId: draftId, showId: true },
     { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId },
     { id: "selectSubSkillGroupMain", endpoint: "draft/sub-skill-group/list", draftId: draftId },
     { id: "selectSkillGroupSecond", endpoint: "draft/skill-group/list", draftId: draftId },
@@ -84,17 +85,17 @@ async function saveAsDraft() {
   loader(true);
   const save = await saveInputAttribut(type);
   if (save.status == 200) {
-    loader(false);
-    swal("Saved", "Save as Draft", "success");
     const getPosition =
       $("#selectBasket").val() == "Yes" && save.data.jobFormations && save.data.jobFormations.length > 0
         ? save.data.jobFormations[0].unitName
         : $("#inputPositionName").val();
     const sanitizedPosition = encodeURIComponent(getPosition);
+    swal("Saved", "Save as Draft", "success");
     setTimeout(() => {
+      loader(false);
       window.location.href =
         "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
-    }, 2500);
+    }, 7500);
   } else {
     const message = save.message || save.title || "Failed to save job .";
     swal("Error", message, "error");
