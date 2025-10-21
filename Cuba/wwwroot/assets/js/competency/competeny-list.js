@@ -129,6 +129,7 @@ async function handleSearchCompetency() {
     spinner.style.display = "none";
   } catch (error) {}
 }
+
 function changeDataSource(dataSource) {
   $("#dataSource-summary").val(dataSource).trigger("change");
   document.getElementById("dataSource-summary").disabled = true;
@@ -281,6 +282,7 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
       console.warn(`Baris dengan ID #tr-${jobCode} tidak ditemukan!`);
       return;
     }
+    console.log("jobCode", jobCode);
     row.querySelectorAll("td[data-index]").forEach((td) => td.remove());
     const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");

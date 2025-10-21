@@ -24,6 +24,10 @@ const appState = new Proxy(
       page: 1,
       pageSize: 10,
     },
+    payloadSummary: {
+      Page: 1,
+      PageSize: 10,
+    },
     payloadLogHistory: {
       page: 1,
       limit: 5,

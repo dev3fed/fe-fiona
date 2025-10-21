@@ -25,7 +25,7 @@ const infoValueChain = async (id) => {
         <div style="width: 60px; height: 15px; background: #0b74c7; margin-top: 40px; z-index: 1;"></div>
         <div
             style="width: 120px; height: 0; border-left: 85px solid transparent; border-right: 85px solid transparent; border-top: 45px solid #0b74c7; margin-top: -1px; z-index: 1;">
-        </div>=================================
+        </div>
     `;
     let coreContent = `                
             <div class="section core-process" style="margin-bottom: 18px;">

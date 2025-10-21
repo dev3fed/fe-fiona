@@ -311,7 +311,7 @@ async function fetchDetailPositionBehavior(payload) {
   }
 }
 
-async function fetchSummalyList(payload) {
+async function fetchSummaryList(payload) {
   const url = `${url_api}/api/TechnicalCompetency/summary-competency-mapping`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
@@ -323,7 +323,7 @@ async function fetchSummalyList(payload) {
     } else {
       return {
         success: true,
-        data: result.data,
+        data: result,
       };
     }
   } catch (error) {

@@ -10,6 +10,7 @@ async function triggleDetailJob(val) {
     };
     const queryString = new URLSearchParams(payload).toString();
     const resultDetail = await fetchDetailJob(queryString);
+    console.log("resultDetail", resultDetail);
     let detailInfo = resultDetail.data;
     let infoSkillGroup = resultDetail.data.skillGroups;
     let incumbent = resultDetail.data.incumbents[0];
@@ -81,7 +82,9 @@ async function triggleDetailJob(val) {
       </div>
        <div class="col-6">
           <label style="color:#9F9FA5;fonti-size:12px">SK Number</label><br/>
-          <label style="font-weight: 600;font-size: 14px">${incumbent.sourceOfSk || "-"}</label><br/>
+          <label style="font-weight: 600;font-size: 14px">${
+            resultDetail.data.incumbents.length > 0 ? incumbent.sourceOfSk : "-"
+          }</label><br/>
       </div>
     `;
     const cardsgContent = `
@@ -126,15 +129,21 @@ async function triggleDetailJob(val) {
     const cardIncumbent = `
             <div class="col-3">
                 <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-                <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeId || "-"}</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${
+                  resultDetail.data.incumbents.length > 0 ? incumbent?.employeeId : "-"
+                }</label><br/>
             </div>
             <div class="col-3">
                 <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-                <label style="font-weight: 600;font-size: 14px">${incumbent?.employeeName || "-"}</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${
+                  resultDetail.data.incumbents.length > 0 ? incumbent?.employeeName : "-"
+                }</label><br/>
             </div>
             <div class="col-6">
                 <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
-                <label style="font-weight: 600;font-size: 14px">${incumbent?.prlPlan || "-"}</label><br/>
+                <label style="font-weight: 600;font-size: 14px">${
+                  resultDetail.data.incumbents.length > 0 ? incumbent?.prlPlan : "-"
+                }</label><br/>
             </div>
     `;
     const attributeContent = document.getElementById("job-attribute");
