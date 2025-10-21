@@ -80,15 +80,22 @@ const renderTableSummary = (resultList) => {
       .map((element, i) => {
         // Determine status styling
         let statusText = element.kkjStatus || "N/A";
+        let statusClass = (statusText || "").toLowerCase();
+        let isNotAvailable = statusClass === "not-available" || statusClass === "not available";
+        let bgColor = isNotAvailable ? "#FAE9EB" : "#b9fbc0";
+        let textColor = isNotAvailable ? "#D02138" : "#16a34a";
         let statusHtml = `<span style="
-            display: inline-block;
-            background-color: #b9fbc0;
-            color: #16a34a;
-            font-weight: 500;
-            padding: 4px 12px;
-            border-radius: 4px;
-            line-height: 1;
-            ">${statusText}</span>`;
+          display:inline-block;
+          width:120px;
+          text-align:center;
+          background-color:${bgColor};
+          color:${textColor};
+          font-weight:500;
+          padding:8px 0;
+          border-radius:4px;
+          line-height:1;
+          box-sizing:border-box;
+          ">${statusText}</span>`;
         const startIndex = (listData.meta.page - 1) * listData.meta.limit;
         const valString = JSON.stringify(element).replace(/"/g, "&quot;");
         return `

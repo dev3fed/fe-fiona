@@ -1,8 +1,5 @@
 function handleDataLoad() {
-  const payload = {
-    Page: 1,
-    PageSize: 5,
-  };
+  const payload = getState("payloadDraftList");
   try {
     serviceDraftList(payload);
   } catch (error) {
@@ -12,6 +9,41 @@ function handleDataLoad() {
 
 document.addEventListener("dataLoaded", handleDataLoad);
 document.addEventListener("DOMContentLoaded", handleDataLoad);
+
+$("#createdDateDraft").datepicker({
+  onSelect: async function (formattedDate, date, inst) {
+    let formatted = "";
+    if (formattedDate) {
+      const [month, day, year] = formattedDate.split("/");
+      formatted = `${day}-${month}-${year}`;
+    } else {
+      formatted = "";
+    }
+    const payloadDraftList = getState("payloadDraftList");
+    const payload = {
+      ...payloadDraftList,
+      Page: 1,
+      CreatedDate: formatted,
+    };
+    setState("payloadDraftList", payload);
+    serviceDraftList(payload);
+  },
+});
+
+$("#search-draftrasci").on("input", async function () {
+  const searchValue = $(this).val();
+  if (searchValue.length < 4 && searchValue.length !== 0) {
+    return;
+  }
+  const payloadDraftList = getState("payloadDraftList");
+  const payload = {
+    ...payloadDraftList,
+    search: searchValue,
+    Page: 1,
+  };
+  setState("payloadDraftList", payload);
+  serviceDraftList(payload);
+});
 
 function openFormEmptyDraft() {
   const modal = new bootstrap.Modal(document.getElementById("modalformEmptydraft"));
@@ -314,17 +346,12 @@ function handlePageChange(pageNumber) {
 
 function handleChangeItemsPerPage(event) {
   const itemsPerPage = parseInt(event.target.value, 10);
-
-  // Update payloadDraftList state
   const payloadDraftList = getState("payloadDraftList");
   setState("payloadDraftList", { ...payloadDraftList, PageSize: itemsPerPage });
-
-  // Prepare payload for service request
   const payload = {
     Page: payloadDraftList.Page,
     PageSize: itemsPerPage,
   };
-  // Call the service function to fetch data
   serviceDraftList(payload);
 }
 

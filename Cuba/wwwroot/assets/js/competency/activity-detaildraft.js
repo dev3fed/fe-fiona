@@ -264,10 +264,19 @@ const openModalApprovalActivityCompe = async () => {
   try {
     const selectedValue = document.querySelector('input[name="activityRadio"]:checked').value;
     const detailProficiency = getState("detailProficiency");
+    const dataDraft = getState("dataDetailDraft");
     const spinBtn = document.getElementById("spinBtnActivityCompe");
 
     if (spinBtn) spinBtn.style.display = "inline-block";
     detailProficiency.proficiencyLevel = selectedValue;
+    const payload = {
+      draftId: dataDraft.draftId,
+      positionCode: detailProficiency.positionCode,
+      compCode: detailProficiency.compCode,
+      compeType: detailProficiency.compeType,
+      proficiencyLevel: detailProficiency.proficiencyLevel,
+    };
+    console.log("payload", payload);
     const result = await fetchSaveProficiencyLevel(payload);
     if (result.success === true) {
       const modalEditActivityCompe = document.getElementById("modalEditActivityCompe");

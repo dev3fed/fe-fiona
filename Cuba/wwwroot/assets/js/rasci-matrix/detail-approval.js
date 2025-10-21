@@ -433,7 +433,7 @@ const handleReject = async () => {
     const rejectComment = document.getElementById("rejectComment")?.value || "";
     const spinBtn = document.getElementById("spinbtnReject");
     if (spinBtn) spinBtn.style.display = "inline-block";
-    const queryString = `/${detailApproval.draftId}/${rejectComment}`;
+    const queryString = `${detailApproval.draftId}/${rejectComment}`;
     const result = await fetchReject(queryString);
 
     if (result.success === true) {

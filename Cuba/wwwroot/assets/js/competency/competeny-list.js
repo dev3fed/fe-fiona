@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("pills-approval-tab").style.display = "none";
     document.getElementById("pills-history-tab").style.display = "none";
     document.getElementById("pills-compreq-tab").style.display = "none";
+    document.getElementById("btnAddSpecificCompe").style.display = "none";
   }
   fetctDataSourceComp();
   bodypageMandatory();
@@ -140,6 +141,8 @@ function changeDataSource(dataSource) {
     document.getElementById("pills-approval-tab").style.display = "flex";
     document.getElementById("pills-history-tab").style.display = "flex";
     document.getElementById("pills-compreq-tab").style.display = "flex";
+    document.getElementById("btnAddSpecificCompe").style.display = "inline-block";
+
     getSummaryList(dataSource);
     // document.getElementById("btnCreateDraft").style.display = "none";
   } else {
@@ -147,6 +150,8 @@ function changeDataSource(dataSource) {
     document.getElementById("pills-approval-tab").style.display = "none";
     document.getElementById("pills-history-tab").style.display = "none";
     document.getElementById("pills-compreq-tab").style.display = "none";
+    document.getElementById("btnAddSpecificCompe").style.display = "none";
+
     // document.getElementById("btnCreateDraft").style.display = "flex";
   }
 }
@@ -282,7 +287,6 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
       console.warn(`Baris dengan ID #tr-${jobCode} tidak ditemukan!`);
       return;
     }
-    console.log("jobCode", jobCode);
     row.querySelectorAll("td[data-index]").forEach((td) => td.remove());
     const staticTds = Array.from(row.querySelectorAll("td")).filter((td) => !td.dataset.index);
     let rowContent = staticTds.map((td) => td.outerHTML).join("");
