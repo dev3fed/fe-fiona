@@ -143,10 +143,23 @@ const renderTableApproval = async (approvalData) => {
       };
       const statusText = statusMap[data.isStatus] || "-";
 
+      const requestId =
+        data.requestId ||
+        (() => {
+          const now = new Date();
+          const pad = (n) => n.toString().padStart(2, "0");
+          const day = pad(now.getDate());
+          const month = pad(now.getMonth() + 1);
+          const year = now.getFullYear();
+          const seq = Math.floor(Math.random() * 1000)
+            .toString()
+            .padStart(3, "0"); // 001..999
+          return `Req/RM/${day}${month}${year}/${seq}`;
+        })();
       return `
         <tr>
           <td style="text-align:center">${index + 1}</td>
-          <td>${data.requestId || "-"}</td>
+          <td>${requestId}</td>
           <td>${data.draftName || "-"}</td>
           <td>${data.orgNameSource || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>
