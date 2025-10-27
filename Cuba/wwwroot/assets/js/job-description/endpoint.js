@@ -468,3 +468,106 @@ async function createDraft({ draftRasciId, draftName, draftOrganizationId, descr
     throw error;
   }
 }
+
+// const uploadSvg = async (svgBlob, jobId, draftId) => {
+//   const response = await fetch('/api/job-description/detail-draft/upload-svg-blob', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({
+//       svgBlob: svgBlob, // bisa base64 atau direct SVG string
+//       fileName: 'organization-chart',
+//       jobId: jobId,
+//       draftId: draftId
+//     })
+//   });
+
+//   const result = await response.json();
+//   console.log('Upload result:', result);
+// };
+async function uploadSvg(svgBlob, jobId, draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/detail-draft/upload-svg-blob`;
+  console.log("Uploading SVG blob to API:", api, { svgBlob, jobId, draftId });
+  try {
+    // Create FormData for blob upload
+    const formData = new FormData();
+    formData.append("svgFile", svgBlob, "organization-chart.svg");
+    formData.append("fileName", "organization-chart");
+    formData.append("jobId", jobId.toString());
+    formData.append("draftId", draftId.toString());
+
+    // Use fetch directly instead of ajaxRequest for FormData
+    const response = await fetch(api, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        // Don't set Content-Type header - let browser set it automatically for FormData
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error uploading SVG blob to API from" + api + "with error: " + error);
+    throw error;
+  }
+}
+
+// Alternative: Upload SVG as base64 string (if API expects JSON)
+async function uploadSvgAsBase64(svgBlob, jobId, draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/detail-draft/upload-svg-base64`;
+  console.log("Uploading SVG as base64 to API:", api, { jobId, draftId });
+  try {
+    // Convert blob to base64
+    const base64Data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Remove the data:image/svg+xml;base64, prefix
+        const base64 = reader.result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(svgBlob);
+    });
+
+    const result = await ajaxRequest(api, "POST", {
+      svgData: base64Data,
+      fileName: "organization-chart",
+      jobId: jobId,
+      draftId: draftId,
+      mimeType: "image/svg+xml",
+    });
+    return result;
+  } catch (error) {
+    console.error("Error uploading SVG base64 to API from" + api + "with error: " + error);
+    throw error;
+  }
+}
+
+// Alternative: Upload SVG as raw string (if API expects SVG text)
+async function uploadSvgAsString(svgBlob, jobId, draftId) {
+  const api = `${url.baseUrl}/${url["job-description"]}/detail-draft/upload-svg-string`;
+  console.log("Uploading SVG as string to API:", api, { jobId, draftId });
+  try {
+    // Convert blob to string
+    const svgString = await svgBlob.text();
+
+    const result = await ajaxRequest(api, "POST", {
+      svgContent: svgString,
+      fileName: "organization-chart",
+      jobId: jobId,
+      draftId: draftId,
+      contentType: "image/svg+xml",
+    });
+    return result;
+  } catch (error) {
+    console.error("Error uploading SVG string to API from" + api + "with error: " + error);
+    throw error;
+  }
+}

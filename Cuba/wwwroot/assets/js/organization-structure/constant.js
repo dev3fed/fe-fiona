@@ -397,6 +397,8 @@ const CHART_LOADING_HTML = `
 `;
 
 const defaultNodeId = "10132406";
+const directReportAttrIds =
+  "#selectFunction, #FunctionSwitch, #selectDivision, #DivisionSwitch, #selectSubDivision, #SubDivisionSwitch, #selectDepartment, #DepartmentSwitch, #selectSection, #SectionSwitch";
 
 const logData = {
   status: "create",

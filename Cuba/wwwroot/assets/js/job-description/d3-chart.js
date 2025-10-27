@@ -297,54 +297,49 @@ function convertForeignObjectToSVGText(svgElement) {
     group.setAttribute("class", "org-chart-node");
     group.setAttribute("id", `node-${Math.random().toString(36).substr(2, 9)}`);
 
+    // Check if this node should have "pointed" class by looking for background color in the div
+    const divStyle = div.getAttribute("style") || "";
+    const isPointedNode =
+      divStyle.includes("background-color: rgb(229, 229, 229)") ||
+      divStyle.includes("background-color:#e5e5e5") ||
+      divStyle.includes("#e5e5e5");
+
+    if (isPointedNode) {
+      group.setAttribute("class", "org-chart-node pointed");
+    }
+
     if (nodeType === "non-basket-node") {
-      // Handle regular non-basket node
+      // Handle regular non-basket node - simplified to show only position name
       const positionDiv = div.querySelector("div:first-child div");
-      const prlDiv = div.querySelector("div:nth-child(2) div:first-child div");
-      const formationDiv = div.querySelector("div:nth-child(2) div:nth-child(2) div");
-
       const position = positionDiv?.textContent || "Unknown";
-      const prl = prlDiv?.textContent || "";
-      const formation = formationDiv?.textContent || "";
 
-      // Get font sizes using dynamic sizing for SVG export (2px larger)
-      const positionFontSize = getSVGHeaderFontSize(position); // Use smaller header font
-      const prlFontSize = getSVGFontSize(prl);
-      const formationFontSize = getSVGFontSize(formation);
+      // Get font size using dynamic sizing for SVG export (larger font for better readability)
+      const positionFontSize = getSVGHeaderFontSize(position);
 
       // Check for border style (detect dotted border from inline styles)
-      const divStyle = div.getAttribute("style") || "";
-      const isDotted = divStyle.includes("dotted");
+      const nodeStyle = div.getAttribute("style") || "";
+      const isDotted = nodeStyle.includes("dotted");
       const strokeDashArray = isDotted ? "5,5" : "none";
 
-      // Main border rect
+      // Check if this is a pointed node by checking the group class
+      const isPointed = group.getAttribute("class").includes("pointed");
+      const fillColor = isPointed ? "#e5e5e5" : "white";
+
+      // Main border rect - uses full width for position name only
       const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       rect.setAttribute("x", x);
       rect.setAttribute("y", y);
       rect.setAttribute("width", width);
       rect.setAttribute("height", height);
-      rect.setAttribute("fill", "white");
+      rect.setAttribute("fill", fillColor);
       rect.setAttribute("stroke", "black");
       rect.setAttribute("stroke-width", "2");
       rect.setAttribute("stroke-dasharray", strokeDashArray);
       group.appendChild(rect);
 
-      // Position section (left side - 80% width to match HTML flex:2 vs flex:0.5 ratio)
-      const positionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      const positionWidth = parseFloat(width) * 0.8; // 2/(2+0.5) = 0.8
-      positionRect.setAttribute("x", x);
-      positionRect.setAttribute("y", y);
-      positionRect.setAttribute("width", positionWidth);
-      positionRect.setAttribute("height", height);
-      positionRect.setAttribute("fill", "none");
-      positionRect.setAttribute("stroke", "black");
-      positionRect.setAttribute("stroke-width", "2");
-      positionRect.setAttribute("stroke-dasharray", strokeDashArray);
-      group.appendChild(positionRect);
-
-      // Position text
+      // Position text - centered in the full box
       const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      positionText.setAttribute("x", parseFloat(x) + positionWidth / 2);
+      positionText.setAttribute("x", parseFloat(x) + parseFloat(width) / 2);
       positionText.setAttribute("y", parseFloat(y) + parseFloat(height) / 2);
       positionText.setAttribute("text-anchor", "middle");
       positionText.setAttribute("dominant-baseline", "central");
@@ -356,80 +351,13 @@ function convertForeignObjectToSVGText(svgElement) {
       positionText.setAttribute("user-select", "none");
       positionText.setAttribute("contenteditable", "false");
 
-      // Apply text wrapping for long position names
-      wrapSVGText(positionText, position, positionWidth - 10, positionFontSize);
+      // Apply text wrapping for long position names - use full width with padding
+      wrapSVGText(positionText, position, parseFloat(width) - 20, positionFontSize);
       group.appendChild(positionText);
-
-      // Right section (20% width) - split into PRL and Formation to match HTML flex:0.5 ratio
-      const rightX = parseFloat(x) + positionWidth;
-      const rightWidth = parseFloat(width) - positionWidth;
-      const halfHeight = parseFloat(height) / 2;
-
-      // PRL section (top right)
-      const prlRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      prlRect.setAttribute("x", rightX);
-      prlRect.setAttribute("y", y);
-      prlRect.setAttribute("width", rightWidth);
-      prlRect.setAttribute("height", halfHeight);
-      prlRect.setAttribute("fill", "none");
-      prlRect.setAttribute("stroke", "black");
-      prlRect.setAttribute("stroke-width", "2");
-      prlRect.setAttribute("stroke-dasharray", strokeDashArray);
-      group.appendChild(prlRect);
-
-      // PRL text
-      const prlText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      prlText.setAttribute("x", rightX + rightWidth / 2);
-      prlText.setAttribute("y", parseFloat(y) + halfHeight / 2);
-      prlText.setAttribute("text-anchor", "middle");
-      prlText.setAttribute("dominant-baseline", "central");
-      prlText.setAttribute("font-size", prlFontSize);
-      prlText.setAttribute("font-weight", "bold");
-      prlText.setAttribute("fill", "#666");
-      prlText.setAttribute("font-family", "Arial, sans-serif");
-      prlText.setAttribute("pointer-events", "none");
-      prlText.setAttribute("user-select", "none");
-      prlText.setAttribute("contenteditable", "false");
-
-      // Apply text wrapping for PRL text
-      wrapSVGText(prlText, prl, rightWidth - 10, prlFontSize);
-      group.appendChild(prlText);
-
-      // Formation section (bottom right)
-      const formationRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      formationRect.setAttribute("x", rightX);
-      formationRect.setAttribute("y", parseFloat(y) + halfHeight);
-      formationRect.setAttribute("width", rightWidth);
-      formationRect.setAttribute("height", halfHeight);
-      formationRect.setAttribute("fill", "none");
-      formationRect.setAttribute("stroke", "black");
-      formationRect.setAttribute("stroke-width", "2");
-      formationRect.setAttribute("stroke-dasharray", strokeDashArray);
-      group.appendChild(formationRect);
-
-      // Formation text
-      const formationText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      formationText.setAttribute("x", rightX + rightWidth / 2);
-      formationText.setAttribute("y", parseFloat(y) + halfHeight + halfHeight / 2);
-      formationText.setAttribute("text-anchor", "middle");
-      formationText.setAttribute("dominant-baseline", "central");
-      formationText.setAttribute("font-size", formationFontSize);
-      formationText.setAttribute("font-weight", "bold");
-      formationText.setAttribute("fill", "#666");
-      formationText.setAttribute("font-family", "Arial, sans-serif");
-      formationText.setAttribute("pointer-events", "none");
-      formationText.setAttribute("user-select", "none");
-      formationText.setAttribute("contenteditable", "false");
-      formationText.setAttribute("user-select", "none");
-      formationText.setAttribute("contenteditable", "false");
-
-      // Apply text wrapping for formation text
-      wrapSVGText(formationText, formation, rightWidth - 10, formationFontSize);
-      group.appendChild(formationText);
     } else if (nodeType === "basket-non-merge-node") {
       // Check for border style (detect dotted border from inline styles)
-      const divStyle = div.getAttribute("style") || "";
-      const isDotted = divStyle.includes("dotted");
+      const basketStyle = div.getAttribute("style") || "";
+      const isDotted = basketStyle.includes("dotted");
       const strokeDashArray = isDotted ? "5,5" : "none";
 
       // Get the position name from the first row
@@ -445,13 +373,27 @@ function convertForeignObjectToSVGText(svgElement) {
       const rowHeight = 50;
       const totalHeight = totalRows * rowHeight;
 
+      // Check if this is a pointed node by checking the group class
+      const isPointedNonMerge = group.getAttribute("class").includes("pointed");
+      const fillColorNonMerge = isPointedNonMerge ? "#e5e5e5" : "white";
+      console.log(
+        "Basket non-merge node - position:",
+        position,
+        "group class:",
+        group.getAttribute("class"),
+        "isPointed:",
+        isPointedNonMerge,
+        "fillColor:",
+        fillColorNonMerge
+      );
+
       // Main container rect
       const containerRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       containerRect.setAttribute("x", x);
       containerRect.setAttribute("y", y);
       containerRect.setAttribute("width", width);
       containerRect.setAttribute("height", totalHeight);
-      containerRect.setAttribute("fill", "white");
+      containerRect.setAttribute("fill", fillColorNonMerge);
       containerRect.setAttribute("stroke", "black");
       containerRect.setAttribute("stroke-width", "2");
       containerRect.setAttribute("stroke-dasharray", strokeDashArray);
@@ -487,124 +429,58 @@ function convertForeignObjectToSVGText(svgElement) {
       wrapSVGText(positionText, position, parseFloat(width) - 10, getSVGHeaderFontSize(position));
       group.appendChild(positionText);
 
-      // Process each basket row
+      // Process each basket row - simplified to show only basket names (full width)
       basketContentRows.forEach((row, index) => {
         const currentY = parseFloat(y) + (index + 1) * rowHeight;
 
-        // Get the three columns from the row
+        // Get only the basket name from the row
         const columns = row.querySelectorAll("div");
         const basketName = columns[0]?.textContent || "";
-        const prl = columns[1]?.textContent || "";
-        const formation = columns[2]?.textContent || "";
 
-        // Calculate column widths (1.8:0.6:0.6 ratio)
-        const col1Width = parseFloat(width) * 0.6; // 1.8/(1.8+0.6+0.6) = 0.6
-        const col2Width = parseFloat(width) * 0.2; // 0.6/(1.8+0.6+0.6) = 0.2
-        const col3Width = parseFloat(width) * 0.2; // 0.6/(1.8+0.6+0.6) = 0.2
+        // Full width container for basket name only
+        const basketRowRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        basketRowRect.setAttribute("x", x);
+        basketRowRect.setAttribute("y", currentY);
+        basketRowRect.setAttribute("width", width);
+        basketRowRect.setAttribute("height", rowHeight);
+        basketRowRect.setAttribute("fill", "none");
+        basketRowRect.setAttribute("stroke", "black");
+        basketRowRect.setAttribute("stroke-width", "2");
+        basketRowRect.setAttribute("stroke-dasharray", strokeDashArray);
+        group.appendChild(basketRowRect);
 
-        // Column 1: Basket Name
-        const col1Rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        col1Rect.setAttribute("x", x);
-        col1Rect.setAttribute("y", currentY);
-        col1Rect.setAttribute("width", col1Width);
-        col1Rect.setAttribute("height", rowHeight);
-        col1Rect.setAttribute("fill", "none");
-        col1Rect.setAttribute("stroke", "black");
-        col1Rect.setAttribute("stroke-width", "2");
-        col1Rect.setAttribute("stroke-dasharray", strokeDashArray);
-        group.appendChild(col1Rect);
+        // Basket Name Text (centered in full width)
+        const basketText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        basketText.setAttribute("x", parseFloat(x) + parseFloat(width) / 2);
+        basketText.setAttribute("y", currentY + rowHeight / 2);
+        basketText.setAttribute("text-anchor", "middle");
+        basketText.setAttribute("dominant-baseline", "central");
+        basketText.setAttribute("font-size", getSVGBasketNonMergeHeaderFontSize(basketName));
+        basketText.setAttribute("font-weight", "bold");
+        basketText.setAttribute("fill", "#666");
+        basketText.setAttribute("font-family", "Arial, sans-serif");
+        basketText.setAttribute("pointer-events", "none");
+        basketText.setAttribute("user-select", "none");
+        basketText.setAttribute("contenteditable", "false");
 
-        const col1Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        col1Text.setAttribute("x", parseFloat(x) + col1Width / 2);
-        col1Text.setAttribute("y", currentY + rowHeight / 2);
-        col1Text.setAttribute("text-anchor", "middle");
-        col1Text.setAttribute("dominant-baseline", "central");
-        col1Text.setAttribute("font-size", getSVGBasketNonMergeHeaderFontSize(basketName));
-        col1Text.setAttribute("font-weight", "bold");
-        col1Text.setAttribute("fill", "#666");
-        col1Text.setAttribute("font-family", "Arial, sans-serif");
-        col1Text.setAttribute("pointer-events", "none");
-        col1Text.setAttribute("user-select", "none");
-        col1Text.setAttribute("contenteditable", "false");
-
-        // Apply text wrapping for basket name
-        wrapSVGText(col1Text, basketName, col1Width - 10, getSVGBasketNonMergeHeaderFontSize(basketName));
-        group.appendChild(col1Text);
-
-        // Column 2: PRL
-        const col2X = parseFloat(x) + col1Width;
-        const col2Rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        col2Rect.setAttribute("x", col2X);
-        col2Rect.setAttribute("y", currentY);
-        col2Rect.setAttribute("width", col2Width);
-        col2Rect.setAttribute("height", rowHeight);
-        col2Rect.setAttribute("fill", "none");
-        col2Rect.setAttribute("stroke", "black");
-        col2Rect.setAttribute("stroke-width", "2");
-        col2Rect.setAttribute("stroke-dasharray", strokeDashArray);
-        group.appendChild(col2Rect);
-
-        const col2Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        col2Text.setAttribute("x", col2X + col2Width / 2);
-        col2Text.setAttribute("y", currentY + rowHeight / 2);
-        col2Text.setAttribute("text-anchor", "middle");
-        col2Text.setAttribute("dominant-baseline", "central");
-        col2Text.setAttribute("font-size", getSVGFontSize(prl));
-        col2Text.setAttribute("font-weight", "bold");
-        col2Text.setAttribute("fill", "#666");
-        col2Text.setAttribute("font-family", "Arial, sans-serif");
-        col2Text.setAttribute("pointer-events", "none");
-        col2Text.setAttribute("user-select", "none");
-        col2Text.setAttribute("contenteditable", "false");
-
-        // Apply text wrapping for PRL text
-        wrapSVGText(col2Text, prl, col2Width - 10, getSVGFontSize(prl));
-        group.appendChild(col2Text);
-
-        // Column 3: Formation
-        const col3X = col2X + col2Width;
-        const col3Rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        col3Rect.setAttribute("x", col3X);
-        col3Rect.setAttribute("y", currentY);
-        col3Rect.setAttribute("width", col3Width);
-        col3Rect.setAttribute("height", rowHeight);
-        col3Rect.setAttribute("fill", "none");
-        col3Rect.setAttribute("stroke", "black");
-        col3Rect.setAttribute("stroke-width", "2");
-        col3Rect.setAttribute("stroke-dasharray", strokeDashArray);
-        group.appendChild(col3Rect);
-
-        const col3Text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        col3Text.setAttribute("x", col3X + col3Width / 2);
-        col3Text.setAttribute("y", currentY + rowHeight / 2);
-        col3Text.setAttribute("text-anchor", "middle");
-        col3Text.setAttribute("dominant-baseline", "central");
-        col3Text.setAttribute("font-size", getSVGFontSize(formation));
-        col3Text.setAttribute("font-weight", "bold");
-        col3Text.setAttribute("fill", "#666");
-        col3Text.setAttribute("font-family", "Arial, sans-serif");
-        col3Text.setAttribute("pointer-events", "none");
-        col3Text.setAttribute("user-select", "none");
-        col3Text.setAttribute("contenteditable", "false");
-
-        // Apply text wrapping for formation text
-        wrapSVGText(col3Text, formation, col3Width - 10, getSVGFontSize(formation));
-        group.appendChild(col3Text);
+        // Apply text wrapping for basket name - use full width with padding
+        wrapSVGText(basketText, basketName, parseFloat(width) - 20, getSVGBasketNonMergeHeaderFontSize(basketName));
+        group.appendChild(basketText);
       });
     } else if (nodeType === "basket-merge-node") {
       // Get the data for this node to see the tags
-      const nodeData = div.closest("foreignObject")?.__data__?.data;
+      const existingNodeData = div.closest("foreignObject")?.__data__?.data;
 
       // Find basket tag and analyze it
-      const basketTag = nodeData?.tags?.find((tag) => tag.includes("basket_"));
+      const basketTag = existingNodeData?.tags?.find((tag) => tag.includes("basket_"));
 
       if (basketTag) {
         const basketParts = basketTag.split("_");
       }
 
       // Check for border style (detect dotted border from inline styles)
-      const divStyle = div.getAttribute("style") || "";
-      const isDotted = divStyle.includes("dotted");
+      const mergeStyle = div.getAttribute("style") || "";
+      const isDotted = mergeStyle.includes("dotted");
       const strokeDashArray = isDotted ? "5,5" : "none";
 
       // Get the position name from the first row
@@ -634,13 +510,27 @@ function convertForeignObjectToSVGText(svgElement) {
       const rowHeight = 50;
       const totalHeight = totalRows * rowHeight;
 
+      // Check if this is a pointed node by checking the group class
+      const isPointedMerge = group.getAttribute("class").includes("pointed");
+      const fillColorMerge = isPointedMerge ? "#e5e5e5" : "white";
+      console.log(
+        "Basket merge node - position:",
+        position,
+        "group class:",
+        group.getAttribute("class"),
+        "isPointed:",
+        isPointedMerge,
+        "fillColor:",
+        fillColorMerge
+      );
+
       // Main container rect
       const containerRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       containerRect.setAttribute("x", x);
       containerRect.setAttribute("y", y);
       containerRect.setAttribute("width", width);
       containerRect.setAttribute("height", totalHeight);
-      containerRect.setAttribute("fill", "white");
+      containerRect.setAttribute("fill", fillColorMerge);
       containerRect.setAttribute("stroke", "black");
       containerRect.setAttribute("stroke-width", "2");
       containerRect.setAttribute("stroke-dasharray", strokeDashArray);
@@ -676,225 +566,45 @@ function convertForeignObjectToSVGText(svgElement) {
       wrapSVGBasketText(positionText, position, parseFloat(width), getSVGBasketMergeHeaderFontSize(position));
       group.appendChild(positionText);
 
-      // Get the data for this node to extract bc_formation values properly
-      console.log("=== EXISTING NODE DATA ===");
-      console.log("Node data:", nodeData);
-      console.log("Node tags:", nodeData?.tags);
-
-      // Parse bracket information from basket tag (same logic as HTML generation)
-      const basketTagForSVG = nodeData?.tags?.find((tag) => tag.includes("basket_"));
-      console.log("Basket tag for SVG:", basketTagForSVG);
-      console.log("All nodeData tags:", nodeData?.tags);
-
-      // Also try to get from the div class attribute as backup
-      const divClasses = div.getAttribute("class") || "";
-      console.log("Div classes:", divClasses);
-      const classBasketTag = divClasses.split(" ").find((cls) => cls.includes("basket_"));
-      console.log("Class basket tag:", classBasketTag);
-
-      // Use either nodeData tags or class attribute
-      const finalBasketTag = basketTagForSVG || classBasketTag;
-      console.log("Final basket tag:", finalBasketTag);
-
-      const bracketSplitted = finalBasketTag ? finalBasketTag.split("_").slice(2) : [];
-      console.log("Bracket splitted for SVG:", bracketSplitted);
-
-      // If no bracket data from tags, try to get from DOM right section
-      if (bracketSplitted.length === 0) {
-        console.log("No bracket data from tags, checking DOM...");
-        console.log("Right section element:", rightSection);
-        console.log("Bracket rows from DOM:", bracketRows);
-      }
-
-      // Process position-PRL rows and generate brackets using tag-based logic
-
-      // First, generate all position-PRL rows
+      // Process position-PRL rows - simplified to show only basket names (full width)
       Array.from(positionPrlRows).forEach((row, index) => {
-        console.log("Processing position-PRL row:", row);
+        console.log("Processing basket name row:", row);
         const currentY = parseFloat(y) + (index + 1) * rowHeight;
 
-        // Get position name and PRL from DOM
+        // Get basket name from DOM
         const columns = row.querySelectorAll("div");
         const basketName = columns[0]?.textContent || "";
-        const prlFromDOM = columns[1]?.textContent || "18";
 
-        // Left section: Position Name and PRL (85% width to match HTML)
-        const leftWidth = parseFloat(width) * 0.85; // 85% for left section (matches HTML)
-        const leftRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        leftRect.setAttribute("x", x);
-        leftRect.setAttribute("y", currentY);
-        leftRect.setAttribute("width", leftWidth);
-        leftRect.setAttribute("height", rowHeight);
-        leftRect.setAttribute("fill", "none");
-        leftRect.setAttribute("stroke", "black");
-        leftRect.setAttribute("stroke-width", "1");
-        leftRect.setAttribute("stroke-dasharray", "none");
-        group.appendChild(leftRect);
+        // Full width container for basket name only
+        const fullRowRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        fullRowRect.setAttribute("x", x);
+        fullRowRect.setAttribute("y", currentY);
+        fullRowRect.setAttribute("width", width);
+        fullRowRect.setAttribute("height", rowHeight);
+        fullRowRect.setAttribute("fill", "none");
+        fullRowRect.setAttribute("stroke", "black");
+        fullRowRect.setAttribute("stroke-width", "1");
+        fullRowRect.setAttribute("stroke-dasharray", "none");
+        group.appendChild(fullRowRect);
 
-        // Position Name (80% of left section to match HTML proportions)
-        const positionWidth = leftWidth * 0.8;
-        const positionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        positionRect.setAttribute("x", x);
-        positionRect.setAttribute("y", currentY);
-        positionRect.setAttribute("width", positionWidth);
-        positionRect.setAttribute("height", rowHeight);
-        positionRect.setAttribute("fill", "none");
-        positionRect.setAttribute("stroke", "black");
-        positionRect.setAttribute("stroke-width", "1");
-        positionRect.setAttribute("stroke-dasharray", "none");
-        group.appendChild(positionRect);
+        // Basket Name Text (centered in full width)
+        const basketText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        basketText.setAttribute("x", parseFloat(x) + parseFloat(width) / 2);
+        basketText.setAttribute("y", currentY + rowHeight / 2);
+        basketText.setAttribute("text-anchor", "middle");
+        basketText.setAttribute("dominant-baseline", "central");
+        basketText.setAttribute("font-size", getSVGFontSize(basketName));
+        basketText.setAttribute("font-weight", "bold");
+        basketText.setAttribute("fill", "#666");
+        basketText.setAttribute("font-family", "Arial, sans-serif");
+        basketText.setAttribute("pointer-events", "none");
+        basketText.setAttribute("user-select", "none");
+        basketText.setAttribute("contenteditable", "false");
 
-        const positionText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        positionText.setAttribute("x", parseFloat(x) + positionWidth / 2);
-        positionText.setAttribute("y", currentY + rowHeight / 2);
-        positionText.setAttribute("text-anchor", "middle");
-        positionText.setAttribute("dominant-baseline", "central");
-        positionText.setAttribute("font-size", getSVGFontSize(basketName));
-        positionText.setAttribute("font-weight", "bold");
-        positionText.setAttribute("fill", "#666");
-        positionText.setAttribute("font-family", "Arial, sans-serif");
-        positionText.setAttribute("pointer-events", "none");
-        positionText.setAttribute("user-select", "none");
-        positionText.setAttribute("contenteditable", "false");
-
-        // Apply text wrapping for basket name in merge
-        wrapSVGBasketText(positionText, basketName, positionWidth, getSVGFontSize(basketName));
-        group.appendChild(positionText);
-
-        // PRL (30% of left section)
-        const formationX = parseFloat(x) + positionWidth;
-        const formationWidth = leftWidth - positionWidth;
-        const formationRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        formationRect.setAttribute("x", formationX);
-        formationRect.setAttribute("y", currentY);
-        formationRect.setAttribute("width", formationWidth);
-        formationRect.setAttribute("height", rowHeight);
-        formationRect.setAttribute("fill", "none");
-        formationRect.setAttribute("stroke", "black");
-        formationRect.setAttribute("stroke-width", "1");
-        formationRect.setAttribute("stroke-dasharray", "none");
-        group.appendChild(formationRect);
-
-        const formationText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        formationText.setAttribute("x", formationX + formationWidth / 2);
-        formationText.setAttribute("y", currentY + rowHeight / 2);
-        formationText.setAttribute("text-anchor", "middle");
-        formationText.setAttribute("dominant-baseline", "central");
-        formationText.setAttribute("font-size", getSVGFontSize(prlFromDOM));
-        formationText.setAttribute("font-weight", "bold");
-        formationText.setAttribute("fill", "#666");
-        formationText.setAttribute("font-family", "Arial, sans-serif");
-        formationText.setAttribute("pointer-events", "none");
-        formationText.setAttribute("user-select", "none");
-        formationText.setAttribute("contenteditable", "false");
-
-        // Apply text wrapping for formation text in basket merge
-        wrapSVGText(formationText, prlFromDOM, formationWidth - 10, getSVGFontSize(prlFromDOM));
-        group.appendChild(formationText);
+        // Apply text wrapping for basket name - use full width with padding
+        wrapSVGBasketText(basketText, basketName, parseFloat(width) - 20, getSVGFontSize(basketName));
+        group.appendChild(basketText);
       });
-
-      // Now generate brackets using tag-based logic (same as HTML generation)
-      const rightX = parseFloat(x) + parseFloat(width) * 0.85;
-      const rightWidth = parseFloat(width) * 0.15;
-      let bracketCurrentY = parseFloat(y) + rowHeight; // Start after position name row
-
-      if (bracketSplitted.length > 0) {
-        // Use tag-based approach
-        console.log("Using tag-based bracket generation");
-        bracketSplitted.forEach((bracket, bracketIndex) => {
-          const matchResult = bracket.match(/(\d+)\((\d+)\)/) || ["", "", ""];
-          const count = matchResult[1];
-          const jumlahFormasiRaw = matchResult[2];
-          const getJumlahFormasi = jumlahFormasiRaw || "1";
-          const heightPerBracket = (count ? parseInt(count) : 1) * 50;
-
-          console.log(
-            `SVG Bracket ${bracketIndex}: count=${count}, formasi=${getJumlahFormasi}, height=${heightPerBracket}px`
-          );
-
-          const bracketRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-          bracketRect.setAttribute("x", rightX);
-          bracketRect.setAttribute("y", bracketCurrentY);
-          bracketRect.setAttribute("width", rightWidth);
-          bracketRect.setAttribute("height", heightPerBracket);
-          bracketRect.setAttribute("fill", "none");
-          bracketRect.setAttribute("stroke", "black");
-          bracketRect.setAttribute("stroke-width", "1");
-          bracketRect.setAttribute("stroke-dasharray", "none");
-          group.appendChild(bracketRect);
-
-          const bracketText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          bracketText.setAttribute("x", rightX + rightWidth / 2);
-          bracketText.setAttribute("y", bracketCurrentY + heightPerBracket / 2);
-          bracketText.setAttribute("text-anchor", "middle");
-          bracketText.setAttribute("dominant-baseline", "central");
-          bracketText.setAttribute("font-size", getSVGFontSize(getJumlahFormasi));
-          bracketText.setAttribute("font-weight", "bold");
-          bracketText.setAttribute("fill", "#333");
-          bracketText.setAttribute("font-family", "Arial, sans-serif");
-          bracketText.setAttribute("pointer-events", "none");
-          bracketText.setAttribute("user-select", "none");
-          bracketText.setAttribute("contenteditable", "false");
-          bracketText.textContent = getJumlahFormasi;
-          group.appendChild(bracketText);
-
-          // Move to next bracket position
-          bracketCurrentY += heightPerBracket;
-        });
-      } else {
-        // Fallback to DOM-based approach if no tag data
-        console.log("Using DOM-based bracket generation as fallback");
-        let currentBracketIndex = 0;
-
-        Array.from(positionPrlRows).forEach((row, index) => {
-          if (currentBracketIndex < bracketRows.length) {
-            const bracketDiv = bracketRows[currentBracketIndex];
-            const currentRowY = parseFloat(y) + (index + 1) * rowHeight;
-
-            // Extract formation value from node data
-            const bcIndex = index + 1;
-            const formationValue = nodeData?.[`bc_${bcIndex}_jumlah_formasi`] || "1";
-
-            // Get the height of this bracket from style
-            const bracketStyle = bracketDiv.getAttribute("style") || "";
-            const heightMatch = bracketStyle.match(/height:(\d+)px/);
-            const bracketHeight = heightMatch ? parseInt(heightMatch[1]) : rowHeight;
-
-            console.log(`DOM Bracket ${currentBracketIndex}: formasi=${formationValue}, height=${bracketHeight}px`);
-
-            const bracketRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            bracketRect.setAttribute("x", rightX);
-            bracketRect.setAttribute("y", currentRowY);
-            bracketRect.setAttribute("width", rightWidth);
-            bracketRect.setAttribute("height", bracketHeight);
-            bracketRect.setAttribute("fill", "none");
-            bracketRect.setAttribute("stroke", "black");
-            bracketRect.setAttribute("stroke-width", "1");
-            bracketRect.setAttribute("stroke-dasharray", "none");
-            group.appendChild(bracketRect);
-
-            const bracketText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            bracketText.setAttribute("x", rightX + rightWidth / 2);
-            bracketText.setAttribute("y", currentRowY + bracketHeight / 2);
-            bracketText.setAttribute("text-anchor", "middle");
-            bracketText.setAttribute("dominant-baseline", "central");
-            bracketText.setAttribute("font-size", getSVGFontSize(formationValue));
-            bracketText.setAttribute("font-weight", "bold");
-            bracketText.setAttribute("fill", "#333");
-            bracketText.setAttribute("font-family", "Arial, sans-serif");
-            bracketText.setAttribute("pointer-events", "none");
-            bracketText.setAttribute("user-select", "none");
-            bracketText.setAttribute("contenteditable", "false");
-            bracketText.textContent = formationValue;
-            group.appendChild(bracketText);
-
-            // Only increment if this bracket spans exactly one row
-            if (bracketHeight <= rowHeight) {
-              currentBracketIndex++;
-            }
-          }
-        });
-      }
     } else {
       // Fallback for other node types
       const innerDivs = div?.querySelectorAll("div");
@@ -951,6 +661,12 @@ function getChartExportData() {
   const grandChildrenNodes = orgChartData.processedData.filter((node) =>
     childrenNodes.map((child) => child.id).includes(node.parentId)
   );
+
+  // Add "pointed" tag to the focused node if it exists
+  if (selfNode && !selfNode.tags.includes("pointed")) {
+    selfNode.tags.push("pointed");
+  }
+
   const cloneOrgChartData = { ...orgChartData };
   cloneOrgChartData.processedData = [selfNode, parentNode, ...childrenNodes, ...grandChildrenNodes].filter(Boolean);
   return {
@@ -980,6 +696,54 @@ function chartExportSVG() {
     hideChartLoading("chart-container-custom");
   }, 5000);
   applyStaticChartPositioning();
+}
+
+async function chartUploadSVG() {
+  const data = getChartExportData();
+
+  return new Promise((resolve, reject) => {
+    try {
+      initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+      showChartLoading("chart-container-custom");
+
+      setTimeout(() => {
+        chart.expandAll();
+      }, 2000);
+
+      setTimeout(() => {
+        chart.fit();
+      }, 3000);
+
+      setTimeout(async () => {
+        try {
+          const datasvg = await prepareAndUploadSVG();
+          console.log("Generated SVG blob for upload:", datasvg);
+
+          if (datasvg) {
+            console.log("✅ SVG blob successfully generated");
+            resolve(datasvg);
+          } else {
+            console.error("❌ SVG blob is null");
+            reject(new Error("Failed to generate SVG blob"));
+          }
+        } catch (error) {
+          console.error("❌ Error in prepareAndUploadSVG:", error);
+          reject(error);
+        }
+      }, 4000);
+
+      setTimeout(() => {
+        initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+        if (chart) chart.fit();
+        hideChartLoading("chart-container-custom");
+      }, 5000);
+
+      applyStaticChartPositioning();
+    } catch (error) {
+      console.error("❌ Error in chartUploadSVG:", error);
+      reject(error);
+    }
+  });
 }
 
 function chartExportPDF() {
@@ -1081,6 +845,53 @@ function prepareAndExportSVG() {
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error("Error in prepareAndExportSVG:", error);
+  }
+}
+
+// Function untuk generate SVG blob file - return blob untuk diolah di luar
+async function prepareAndUploadSVG() {
+  try {
+    const svg = document.querySelector(".chart-container-custom svg");
+    if (!svg) {
+      console.error("SVG element not found");
+      return null;
+    }
+
+    // Clone the SVG element, so we don't modify the original
+    const clonedSvg = svg.cloneNode(true);
+
+    // Remove node button elements before converting to SVG
+    const nodeButtonForeignObjects = clonedSvg.querySelectorAll(".node-button-foreign-object");
+    nodeButtonForeignObjects.forEach((button) => button.remove());
+
+    // Remove paging button elements as well
+    const pagingButtonWrappers = clonedSvg.querySelectorAll(".paging-button-wrapper");
+    pagingButtonWrappers.forEach((button) => button.remove());
+
+    convertForeignObjectToSVGText(clonedSvg);
+
+    // Add metadata to help PowerPoint recognize individual nodes
+    clonedSvg.setAttribute("data-org-chart", "true");
+    clonedSvg.setAttribute("data-node-count", clonedSvg.querySelectorAll(".org-chart-node").length);
+    clonedSvg.setAttribute("style", "pointer-events: none; user-select: none;");
+    clonedSvg.setAttribute("data-text-editable", "false");
+
+    // Add specific PowerPoint compatibility attributes
+    clonedSvg.setAttribute("xmlns:ppt", "http://schemas.microsoft.com/office/powerpoint");
+    clonedSvg.setAttribute("ppt:editable", "false");
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSvg);
+    console.log("SVG String length for blob:", svgString.length);
+
+    // Create blob file dari SVG string dan return untuk diolah di luar
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+
+    console.log("SVG blob created successfully:", svgBlob);
+    return svgBlob;
+  } catch (error) {
+    console.error("Error in prepareAndUploadSVG:", error);
+    return null;
   }
 }
 
@@ -1291,7 +1102,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
       }
 
       if (d.data.tags.includes("pointed")) {
-        // gyesish background
+        // greyish background
         backgroundSelected = "#e5e5e5";
       }
 

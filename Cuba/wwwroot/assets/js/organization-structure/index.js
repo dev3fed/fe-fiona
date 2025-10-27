@@ -865,6 +865,18 @@ $(document).ready(async function () {
     },
   ]);
 
+  // $("#searchDraft").on("input", function () {
+  //   const searchTerm = $(this).val().toLowerCase();
+  //   const filteredDrafts = storeData.listDraft.filter((draft) => draft.draftName.toLowerCase().includes(searchTerm));
+  //   getTableListDraft(filteredDrafts);
+  // });
+
+  // Handle draft filter row changes
+  $("#draftFilterRow").on("change input", "input, select", function () {
+    alert("masok");
+  });
+  // filter date range picker for draft created date
+
   await checkDataOrganization(storeData.listDraft);
 
   $("#createDraft").on("click", function () {
@@ -900,3 +912,70 @@ $(document).ready(async function () {
     }, 2000);
   }
 });
+
+// Function to filter drafts by date
+function filterDraftsByDate(selectedDate) {
+  if (!selectedDate || !storeData.listDraft) return;
+
+  try {
+    // Parse the selected date
+    const filterDate = new Date(selectedDate);
+
+    // Filter drafts by created date
+    const filteredDrafts = storeData.listDraft.filter((draft) => {
+      if (!draft.createdDate) return true; // Include drafts without date
+
+      const draftDate = new Date(draft.createdDate);
+      return draftDate.toDateString() === filterDate.toDateString();
+    });
+
+    console.log("Filtered drafts by date:", filteredDrafts.length);
+    getTableListDraft(filteredDrafts.filter((x) => x.id !== 1));
+  } catch (error) {
+    console.error("Error filtering drafts by date:", error);
+  }
+}
+
+// Function to filter drafts by search term
+function filterDraftsBySearch(searchTerm) {
+  if (!storeData.listDraft) return;
+
+  const filteredDrafts = storeData.listDraft.filter((draft) =>
+    draft.draftName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  console.log("Filtered drafts by search:", filteredDrafts.length);
+  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1));
+}
+
+// Function to update all draft filters comprehensively
+function updateDraftFilters() {
+  const searchTerm = $("#searchDraft").val();
+  const selectedDate = $("#draftCreatedDate").val();
+
+  if (!storeData.listDraft) return;
+
+  let filteredDrafts = [...storeData.listDraft];
+
+  // Apply search filter
+  if (searchTerm) {
+    filteredDrafts = filteredDrafts.filter((draft) => draft.draftName.toLowerCase().includes(searchTerm.toLowerCase()));
+  }
+
+  // Apply date filter
+  if (selectedDate) {
+    try {
+      const filterDate = new Date(selectedDate);
+      filteredDrafts = filteredDrafts.filter((draft) => {
+        if (!draft.createdDate) return true;
+        const draftDate = new Date(draft.createdDate);
+        return draftDate.toDateString() === filterDate.toDateString();
+      });
+    } catch (error) {
+      console.error("Error applying date filter:", error);
+    }
+  }
+
+  console.log("Comprehensive filter applied, results:", filteredDrafts.length);
+  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1));
+}

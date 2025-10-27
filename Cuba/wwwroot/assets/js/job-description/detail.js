@@ -142,7 +142,7 @@ function prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft) {
     const objKoordinasi = { ...paramsKoordinasi };
     objKoordinasi.jobId = jobId;
     objKoordinasi.prlOrg = prlOrg;
-    objKoordinasi.pihakInternal = item.pihakInternal || "";
+    objKoordinasi.pihakInternal = item.internal || "";
     objKoordinasi.aktivitas = item.aktivitas || "";
     objKoordinasi.internalProcess = item.internalProcess || null;
     objKoordinasi.jobReferences = [];
@@ -159,7 +159,7 @@ function prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft) {
     const objRelasi = { ...paramsRelasi };
     objRelasi.jobId = jobId;
     objRelasi.prlOrg = prlOrg;
-    objRelasi.pihakEksternal = item.pihakEksternal || "";
+    objRelasi.pihakEksternal = item.eksternal || "";
     objRelasi.aktivitas = item.aktivitas || "";
     objRelasi.jobReferences = [];
     if (item.jobReferences && item.jobReferences.length > 0) {
@@ -920,7 +920,7 @@ $(document).ready(async function () {
     updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
   }
 
-  // focusNode(jobId);
+  focusNode(jobId);
 
   // $(".summernote").summernote("disable");
 
@@ -959,34 +959,78 @@ $(document).ready(async function () {
 
   $("#handleExportPng").on("click", async function () {
     try {
-      console.log("Saving draft with params");
-      const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
-      console.log("Saving draft with params:", params);
-      const save = await downloadWord(params);
+      console.log("🚀 Starting SVG generation...");
+      const dataSvg = await chartUploadSVG();
 
-      // Check if the response contains the expected data structure
-      if (!save || !save.data || !save.data.fileUrl) {
-        console.error("Invalid response from downloadWord:", save);
-        swalAlert("Error", "Failed to generate document. Invalid server response.", "error");
-        return;
+      if (dataSvg) {
+        // Test: Convert blob to URL untuk memastikan valid
+        const testUrl = URL.createObjectURL(dataSvg);
+        // Clean up test URL
+        setTimeout(() => URL.revokeObjectURL(testUrl), 100);
+
+        const uploadResult = await uploadSvg(dataSvg, jobId, prlOrg);
+
+        if (uploadResult && uploadResult.success) {
+          console.log("✅ SVG uploaded successfully:", uploadResult);
+          swal("Success", "SVG uploaded successfully!", "success");
+
+          // Generate and download Word document after successful SVG upload
+          try {
+            console.log("🚀 Starting Word document generation...");
+            const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
+            console.log("Generating Word document with params:", params);
+
+            const wordResult = await downloadWord(params);
+
+            // Check if the response contains the expected data structure
+            if (!wordResult || !wordResult.data || !wordResult.data.fileUrl) {
+              console.error("Invalid response from downloadWord:", wordResult);
+              swal(
+                "Warning",
+                "SVG uploaded successfully, but failed to generate Word document. Invalid server response.",
+                "warning"
+              );
+              return;
+            }
+
+            // Download file
+            const link = document.createElement("a");
+            link.href = wordResult.data.fileUrl;
+            link.download = `Job_Description_${jobId}.docx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Clean up the blob URL to free memory
+            setTimeout(() => {
+              URL.revokeObjectURL(wordResult.data.fileUrl);
+            }, 100);
+
+            console.log("✅ Word document downloaded successfully");
+            swal("Success", "SVG uploaded and Word document generated successfully!", "success");
+          } catch (error) {
+            console.error("❌ Error generating Word document:", error);
+            swal(
+              "Warning",
+              `SVG uploaded successfully, but failed to generate Word document: ${error.message}`,
+              "warning"
+            );
+          }
+        } else {
+          console.error("❌ Failed to upload SVG:", uploadResult);
+          const errorMsg = uploadResult?.message || "Failed to upload SVG. Please try again.";
+          swal("Error", errorMsg, "error");
+        }
+      } else {
+        console.error("❌ SVG blob is null or undefined");
+        swal("Error", "Failed to generate SVG. Please try again.", "error");
       }
-
-      // download file
-      const link = document.createElement("a");
-      link.href = save.data.fileUrl;
-      link.download = `Job_Description_${jobId}.docx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Clean up the blob URL to free memory
-      setTimeout(() => {
-        URL.revokeObjectURL(save.data.fileUrl);
-      }, 100);
     } catch (error) {
-      console.error("Error downloading word document:", error);
-      swalAlert("Error", "Failed to generate document. Please try again.", "error");
+      console.error("❌ Error in handleExportPng:", error);
+      swal("Error", `Failed to generate SVG: ${error.message}`, "error");
     }
+
+    return;
   });
 
   $("#saveDraft").on("click", async function () {

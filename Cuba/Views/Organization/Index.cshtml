@@ -232,7 +232,29 @@
                             </div>
                             <div class="tab-pane fade" id="draft" role="tabpanel" aria-labelledby="pillsDraft">
                                 <div class="card-body">
-                                    <div class="row">
+                                    <div class="row" id="draftFilterRow">
+                                        <div class="col-3">
+                                            <div class="input-group date" id="dt-draft-created-date" data-target-input="nearest">
+                                                <div class="input-group-text" data-target="#dt-draft-created-date" data-toggle="datetimepicker"><i
+                                                        data-feather="calendar" style="width: 20px;"></i></div>
+                                                <input class="datepicker-here form-control digits" type="text" data-language="en" id="draftCreatedDate"
+                                                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Created Date">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="faq-form">
+                                                <input class="form-control" type="text" id="searchDraft" placeholder="Search.."><i class="search-icon"
+                                                    data-feather="search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 offset-3 text-end">
+                                            <button class="btn btn-primary me-2 btn-icon" type="button" id="createDraft">
+                                                <img src="/assets/images/rasci/plus.svg" alt="Filter Icon"
+                                                    style="margin-top: -1px;margin-right: 2px;"> Create Draft
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row m-t-10">
                                         <div class="col-12">
                                             <div class="table-responsive">
                                                 <table class="tableMasterData table table-hover w-100" id="draftList">
@@ -245,27 +267,34 @@
                             <div class="tab-pane fade" id="request" role="tabpanel" aria-labelledby="pillsRequest">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-2">
-                                            <div class="input-group date" id="dtMinimum" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dtMinimum"
-                                                    data-toggle="datetimepicker"><i data-feather="calendar"
-                                                        style="width: 20px;"></i></div>
-                                                <input class="form-control" type="text" name="datePicker"
-                                                    id="createDate" placeholder="Submitted Date">
+                                        <div class="col-3">
+                                            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                                                        data-feather="calendar" style="width: 20px;"></i></div>
+                                                <input class="datepicker-here form-control digits" type="text" data-language="en"
+                                                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date"
+                                                    id="submittedDate">
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                                                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+                                                        data-feather="calendar" style="width: 20px;"></i></div>
+                                                <input class="datepicker-here form-control digits" type="text" data-language="en"
+                                                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date"
+                                                    id="approvalDate">
                                             </div>
                                         </div>
                                         <div class="col-2">
-                                            <div class="input-group date" id="dtMinimum2" data-target-input="nearest">
-                                                <div class="input-group-text" data-target="#dtMinimum2"
-                                                    data-toggle="datetimepicker"><i data-feather="calendar"
-                                                        style="width: 20px;"></i></div>
-                                                <input class="form-control" type="text" name="datePicker"
-                                                    placeholder="Approved/Reject Date">
-                                            </div>
+                                            <select class="form-select digits" id="statusApproval">
+                                                <option value="Status:submitted" selected>Submit</option>
+                                                <option value="Status:approved">Approval</option>
+                                                <option value="Status:rejected">Reject</option>
+                                            </select>
                                         </div>
                                         <div class="col-4">
                                             <div class="faq-form">
-                                                <input class="form-control" type="text" placeholder="Search.."><i
+                                                <input class="form-control" type="text" placeholder="Search.." id="searchApproval"><i
                                                     class="search-icon" data-feather="search"></i>
                                             </div>
                                         </div>
@@ -337,6 +366,9 @@
     <script src="@Url.Content("~/assets/js/sweet-alert/sweetalert.min.js")"></script>
     <script src="@Url.Content("~/assets/js/datepicker/daterange-picker/moment.min.js")"></script>
     <script src="@Url.Content("~/assets/js/datepicker/daterange-picker/daterangepicker.js")"></script>
+    <script src="@Url.Content("~/assets/js/datepicker/date-picker/datepicker.js")"></script>
+    <script src="@Url.Content("~/assets/js/datepicker/date-picker/datepicker.en.js")"></script>
+    <script src="@Url.Content("~/assets/js/datepicker/date-picker/datepicker.custom.js")"></script>
     @* <script src="@Url.Content("~/assets/js/datepicker/daterange-picker/daterange-picker.custom.js")"></script> *@
 
 

@@ -78,11 +78,53 @@ function clearAllInput() {
   $("#selectCoordination").val("No").trigger("change");
 }
 
-async function insertFormPostion(paramId) {
-  const getDetailPosition = await chartJobDetail({
+async function getDetailJob(jobCode = "10163465") {
+  loader(true);
+  const detailJob = await chartJobDetail({
     draftId: organizationAttribute.orgUnitId,
-    jobCode: paramId,
+    jobCode: jobCode,
   });
+  loader(false);
+  return detailJob;
+}
+
+async function fillAttributeDirectReport(dataDetail) {
+  const data = dataDetail.data;
+
+  //  unset disabled from function to section select and switch
+  $(directReportAttrIds).prop("disabled", false);
+  $("#inputDirectReport").val(data.positionCode);
+
+  if (data?.functionCode) {
+    $("#selectFunction").val(data?.functionCode).trigger("change");
+    $("#selectFunction, #FunctionSwitch").prop("disabled", true);
+  }
+  if (data?.parentCode) {
+    $("#selectOrgUnitParentName").append(
+      new Option(`${data?.parentName} (${data?.parentCode})`, data?.parentCode, true, true)
+    );
+    $("#selectOrgUnitParentName").prop("disabled", true);
+  }
+  if (data?.divisionCode) {
+    $("#selectDivision").append(new Option(data?.divisionName, data?.divisionCode, true, true));
+    $("#selectDivision, #DivisionSwitch").prop("disabled", true);
+  }
+  if (data?.subDivisionCode) {
+    $("#selectSubDivision").append(new Option(data?.subDivisionName, data?.subDivisionCode, true, true));
+    $("#selectSubDivision, #SubDivisionSwitch").prop("disabled", true);
+  }
+  if (data?.departmentCode) {
+    $("#selectDepartment").append(new Option(data?.departmentName, data?.departmentCode, true, true));
+    $("#selectDepartment, #DepartmentSwitch").prop("disabled", true);
+  }
+  if (data?.sectionCode) {
+    $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
+    $("#selectSection, #SectionSwitch").prop("disabled", true);
+  }
+}
+
+async function insertFormPostion(paramId) {
+  const getDetailPosition = await getDetailJob(paramId);
   const form = document.querySelectorAll(".form-control[required], .form-select[required]");
   // remove class is-invalid from all form elements
   form.forEach((element) => {
@@ -101,30 +143,13 @@ async function insertFormPostion(paramId) {
   $("#inputPositionName").val(positionName);
   $("#selectPrlOrg").val(data?.prlOrgFrom).trigger("change");
   $("#selectPrlOrgTo").val(data?.prlOrgTo).trigger("change");
-  $("#selectFunction").val(data?.functionCode).trigger("change");
+  // $("#selectFunction").val(data?.functionCode).trigger("change");
   $("#inputOrgUnitName").val(data?.unitName);
   $("#inputFormation").val(data?.formation);
   if (data?.directReportCode) {
     $("#selectDirectReport").append(
       new Option(`${data?.directReportName} (${data?.directReportCode})`, data?.directReportCode, true, true)
     );
-  }
-  if (data?.parentCode) {
-    $("#selectOrgUnitParentName").append(
-      new Option(`${data?.parentName} (${data?.parentCode})`, data?.parentCode, true, true)
-    );
-  }
-  if (data?.divisionCode) {
-    $("#selectDivision").append(new Option(data?.divisionName, data?.divisionCode, true, true));
-  }
-  if (data?.subDivisionCode) {
-    $("#selectSubDivision").append(new Option(data?.subDivisionName, data?.subDivisionCode, true, true));
-  }
-  if (data?.departmentCode) {
-    $("#selectDepartment").append(new Option(data?.departmentName, data?.departmentCode, true, true));
-  }
-  if (data?.sectionCode) {
-    $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
   }
   if (data?.kbo) {
     $("#selectKBO").append(new Option(data?.kbo, data?.kbo, true, true));
@@ -161,13 +186,16 @@ async function insertFormPostion(paramId) {
   const arrayBasket = [];
   if (data.isBasket) {
     data.subOrdinates.forEach((item, index) => {
-      console.log("item", item);
       const [prlFrom, prlTo] = item.prlOrg.includes("-") ? item.prlOrg.split("-") : [item.prlOrg, item.prlOrg];
+      // check form params.formationBasket if prlOrg and filter based on PRL range
+
       const params = { ...subOrdinates };
+      const formationBasket = (item.formationBasket || []).filter((formation) => {
+        const prl = formation.prlOrg.includes("-") ? formation.prlOrg.split("-") : [formation.prlOrg, formation.prlOrg];
+        return getPrlNumber(prl[0]) >= getPrlNumber(prlFrom) && getPrlNumber(prl[1]) <= getPrlNumber(prlTo);
+      });
       const positionName =
-        item?.formationBasket?.length > 0
-          ? item.formationBasket.map((x) => x.positionName).join(", ")
-          : item.positionName;
+        formationBasket?.length > 0 ? formationBasket.map((x) => x.positionName).join(", ") : item.positionName;
       params.subPosId = index + 1;
       params.unitCode = item.unitCode;
       params.unitName = item.unitName;
@@ -193,7 +221,9 @@ async function insertFormPostion(paramId) {
         jobAbbrivationName: "",
         isNew: false,
       };
-      console.log("params", params);
+
+      console.log("formationBasket", formationBasket);
+      params.formationBasket = formationBasket;
       arrayBasket.push(params);
     });
     localStorage.setItem("subJobPos", JSON.stringify(arrayBasket));
@@ -639,7 +669,7 @@ function formattedInputAttribut(type) {
       .text()
       .replace(/\s*\(.*?\)\s*/g, "") || "";
   // directReport
-  payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
+  payload.directReportTo.jobPositionCode = $("#inputDirectReport").val();
   payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
   // abbreviation
 
@@ -799,6 +829,10 @@ async function saveInputAttribut(type) {
       }
     }
   }
+
+  // console.log("formPositionParam", formPositionParam);
+  // loading(false);
+  // return;
 
   // Check if basket is selected and type is "edit"
   let result;

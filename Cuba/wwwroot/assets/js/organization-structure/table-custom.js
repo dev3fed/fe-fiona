@@ -217,23 +217,19 @@ function getTableSubordinateList(dataSet) {
 }
 
 async function getTableListDraft(params) {
+  console.log("draftList", params);
+  // createdDate descending
+  params = params.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
   if ($.fn.DataTable.isDataTable("#draftList")) {
     $("#draftList").DataTable().destroy();
   }
   $("#draftList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-    buttons: [
-      {
-        text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Draft Organization Structure',
-        className: "btn btn-primary tet-white asik dt-custom-btn",
-        action: function (e, dt, node, config) {
-          $("#modalCreateDraftSO").modal("show");
-        },
-      },
-    ],
+    buttons: [],
     autoWidth: false,
     data: params,
     sort: false,
+    searching: false, // Disable the search box
     columns: [
       {
         title: "No",
@@ -331,6 +327,7 @@ async function getTableListDraft(params) {
 }
 
 function getTableListApproval(params) {
+  params = params.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
   if ($.fn.DataTable.isDataTable("#approvalList")) {
     $("#approvalList").DataTable().destroy();
   }

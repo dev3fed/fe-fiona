@@ -44,7 +44,8 @@ async function initializeList() {
     { id: "selectPersonalAreaName", endpoint: "draft/personnel-area/list", draftId: draftId },
     { id: "selectPersonalSubareaName", endpoint: "draft/personnel-sub-area/list", draftId: draftId },
     { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId, showId: true },
-    { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
+    // { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
+    { id: "selectDirectReport", endpoint: "chart/job/list", draftId: draftId, showId: true },
     { id: "selectCoordinationWith", endpoint: "draft/position/list", draftId: draftId, showId: true },
     { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId },
     { id: "selectSubSkillGroupMain", endpoint: "draft/sub-skill-group/list", draftId: draftId },
@@ -330,8 +331,18 @@ function deleteSubPos(countSubPosDiv) {
 
 $(document).ready(async function () {
   loader(true);
+  $("#selectOrgUnitParentName").attr("disabled", true);
   // remove local storage subJobPos
   localStorage.setItem("subJobPos", JSON.stringify([]));
+
+  $("#selectDirectReport").on("change", async function (event) {
+    loader(true);
+    const value = event.target.value;
+    const detailDirectReport = await getDetailJob(value);
+    await fillAttributeDirectReport(detailDirectReport);
+    // const detailDirectReport
+    console.log("Direct Report selected:", detailDirectReport);
+  });
 
   $("#selectBasket").on("change", function (event) {
     // console.log("basket selected");

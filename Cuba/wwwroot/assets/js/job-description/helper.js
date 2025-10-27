@@ -952,6 +952,7 @@ async function focusNode(nodeId) {
 
     // Update chart data (assuming this function handles chart rendering)
     renderOrgChart(dataChart.data, nodeId, true);
+    // renderOrgChart(test1, "10132410", true);
 
     // Wait for chart to complete rendering before hiding loading
     setTimeout(() => {
