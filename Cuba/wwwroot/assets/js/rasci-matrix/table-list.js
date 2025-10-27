@@ -866,10 +866,9 @@ async function openModalDeleteBusinesspro() {
   const dataDeleteProsbis = getState("dataDeleteProsbis");
   const modal = new bootstrap.Modal(document.getElementById("modalDeleteBp"));
   modal.show();
-
   const bodyLabel = `<label>Are you sure want to delete this business process?</label>
                     <h6 class="mt-2" style="font-weight: bold;">
-                        ${dataDeleteProsbis.indexGroup} ${dataDeleteProsbis.description}
+                        ${dataDeleteProsbis.indexNumber} ${dataDeleteProsbis.description}
                     </h6>`;
   document.getElementById("form-deletebp").innerHTML = bodyLabel;
 }

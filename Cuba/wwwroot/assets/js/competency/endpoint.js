@@ -52,13 +52,13 @@ async function fetchCompetencyMapping(payload) {
   }
 }
 
-async function fetchDraftList() {
-  const url = `${url_api}/api/TechnicalCompetency/draft-competency?page=1&pageSize=10`;
+async function fetchDraftList(params) {
+  const url = `${url_api}/api/TechnicalCompetency/draft-competency?${params}`;
   try {
     const result = await ajaxRequest(url, "GET");
     return {
       success: true,
-      data: result.data.data,
+      data: result.data,
     };
   } catch (error) {
     console.log("error", error);
@@ -311,7 +311,7 @@ async function fetchDetailPositionBehavior(payload) {
   }
 }
 
-async function fetchSummalyList(payload) {
+async function fetchSummaryList(payload) {
   const url = `${url_api}/api/TechnicalCompetency/summary-competency-mapping`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
@@ -323,7 +323,7 @@ async function fetchSummalyList(payload) {
     } else {
       return {
         success: true,
-        data: result.data,
+        data: result,
       };
     }
   } catch (error) {
@@ -553,12 +553,12 @@ async function fetchLoghistoryList(payload) {
 // END OLD API SERVICE COMPETENCY
 async function fetchData() {
   try {
-    const [draftList] = await Promise.all([fetchDraftList()]);
-    console.log("draftList", draftList);
+    // const [draftList] = await Promise.all([fetchDraftList()]);
+    // console.log("draftList", draftList);
     // appState.competencyMapping = dataCompetency.data.competencyMapping;
     // appState.jobList = dataCompetency.data.jobList;
     // appState.competencyList = dataCompetency.data.competencyList;
-    appState.draftList = draftList.data;
+    // appState.draftList = draftList.data;
     document.dispatchEvent(new Event("dataLoaded"));
   } catch (error) {
     console.error("Error fetching data", error);

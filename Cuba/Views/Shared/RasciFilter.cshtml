@@ -605,8 +605,14 @@
                 </button>
                 <!-- Right aligned buttons -->
                 <div>
-                    <button class="btn btn-outline-primary" type="button" onclick="resetAllFilterRasci()"><i
-                            class="icon-close" style="font-size: 12px; margin-right: 8px;"></i> Reset Filter</button>
+                    <button class="btn btn-outline-primary" type="button" onclick="resetAllFilterRasci()">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                id="resetSpinner" role="status"></div>
+                            <span class="btn-text"><i class="icon-close"
+                                    style="font-size: 12px; margin-right: 8px;"></i> Reset Filter</span>
+                        </div>
+                    </button>
                     <button id="applyFilterBtn" class="btn btn-primary" type="button" onclick="applyFilterRasci()">
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"

@@ -1,41 +1,81 @@
-document.addEventListener("dataLoaded", async function () {
-  const draftList = getState("draftList");
+function handleDataLoad() {
+  const payload = getState("payloadDraftList");
   try {
-    if (draftList && Array.isArray(draftList)) {
-      const IsNotEmpty = draftList.length;
+    serviceDraftList(payload);
+  } catch (error) {
+    console.error("Error fetching or loading data:", error);
+  }
+}
+document.addEventListener("dataLoaded", handleDataLoad);
+document.addEventListener("DOMContentLoaded", handleDataLoad);
+
+async function serviceDraftList(payload) {
+  try {
+    const queryString = new URLSearchParams(payload).toString();
+    const dataDraft = await fetchDraftList(queryString);
+    console.log("dataDraft", dataDraft.data);
+    if (dataDraft && dataDraft.data && Array.isArray(dataDraft?.data.data)) {
+      const IsNotEmpty = dataDraft?.data.data.length;
       handleClickCard(IsNotEmpty);
-      loadTableBodyDraft(draftList);
+      loadTableBodyDraft(dataDraft.data);
       feather.replace();
-    } else {
-      console.error("No data found or invalid data structure");
     }
   } catch (error) {
     console.error("Error fetching or loading data:", error);
   }
-});
-document.addEventListener("DOMContentLoaded", async function () {
-  const draftList = getState("draftList");
-  try {
-    if (draftList && Array.isArray(draftList)) {
-      const IsNotEmpty = draftList.length;
-      handleClickCard(IsNotEmpty);
-      loadTableBodyDraft(draftList);
-      feather.replace();
+}
+
+$("#createdDateDraft").datepicker({
+  onSelect: async function (formattedDate, date, inst) {
+    let formatted = "";
+    if (formattedDate) {
+      const [month, day, year] = formattedDate.split("/");
+      formatted = `${day}-${month}-${year}`;
     } else {
-      console.log("cek");
-      console.error("No data found or invalid data structure");
+      formatted = "";
     }
-  } catch (error) {
-    console.error("Error fetching or loading data:", error);
-  }
+    const payloadDraftList = getState("payloadDraftList");
+    const payload = {
+      ...payloadDraftList,
+      Page: 1,
+      CreatedDate: formatted,
+    };
+    setState("payloadDraftList", payload);
+    serviceDraftList(payload);
+  },
 });
 
-function loadTableBodyDraft(dataList) {
+$("#search-draftcompe").on("input", async function () {
+  const searchValue = $(this).val();
+  if (searchValue.length < 4 && searchValue.length !== 0) {
+    return;
+  }
+  const payloadDraftList = getState("payloadDraftList");
+  const payload = {
+    ...payloadDraftList,
+    search: searchValue,
+    Page: 1,
+  };
+  setState("payloadDraftList", payload);
+  serviceDraftList(payload);
+});
+
+function loadTableBodyDraft(response) {
+  console.log("response", response);
+  const { data: dataList, currentPage: page, pageSize, totalRecords: total } = response;
+  if (!dataList || dataList.length === 0) {
+    document.getElementById(
+      "body-draft",
+    ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+    return;
+  }
   const bodyContent = dataList
     .map((val, i) => {
+      const startIndex = (page - 1) * pageSize;
+      console.log("startIndex", startIndex);
       return `
         <tr>
-          <th scope="row" style="text-align:center">${i + 1}</th>
+          <th scope="row" style="text-align:center">${startIndex + i + 1}</th>
           <td>${val.draftName || "-"}</td>
           <td>${val.draftSoName || "-"}</td>
           <td>${val.createdBy ? val.createdBy : "-"}
@@ -92,15 +132,133 @@ function loadTableBodyDraft(dataList) {
   if (tableBody) {
     tableBody.innerHTML = bodyContent;
   }
+  const itemsPerPage = pageSize;
+  const totalPages = Math.ceil(total / itemsPerPage);
+  const currentPage = page;
+  const start = (page - 1) * itemsPerPage + 1;
+  renderPagination(currentPage, totalPages);
   const totalPage = document.getElementById("total-page");
-  const listPage = document.getElementById("list-page");
-  if (totalPage && listPage) {
-    totalPage.innerHTML = bodyTotalPage;
-    listPage.innerHTML = bodyListPage;
+
+  if (totalPage) {
+    totalPage.innerHTML = `
+      <div class="row">
+        <div class="col-2">
+          <select class="form-select digits"  style="width:62%;" id="limitPage" onchange="handleChangeItemsPerPage(event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <div class="col-10">
+          <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
+      total < itemsPerPage * page ? total : itemsPerPage * page
+    } of ${total} records</label>
+        </div>
+      </div>
+    `;
   }
+  let selectElement = document.getElementById("limitPage");
+  selectElement.value = pageSize;
 }
 
-// start section create draft competency
+function renderPagination(currentPage, totalPages) {
+  const paginationContainer = document.getElementById("list-page");
+  if (!paginationContainer) return;
+
+  let pagesToShow = 3;
+  let startPage = Math.max(currentPage - Math.floor(pagesToShow / 2), 1);
+  let endPage = Math.min(startPage + pagesToShow - 1, totalPages);
+
+  if (endPage - startPage + 1 < pagesToShow) {
+    startPage = Math.max(endPage - pagesToShow + 1, 1);
+  }
+
+  const paginationButtons = [];
+  paginationButtons.push(`
+    <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+      <a 
+        class="page-link" 
+        href="javascript:void(0)"  
+        ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handlePageChange(${1})"`}
+      >
+      ←
+      </a>
+    </li>
+  `);
+
+  paginationButtons.push(`
+      <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+        <a 
+          class="page-link" 
+          href="javascript:void(0)"  
+          ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handlePageChange(${currentPage - 1})"`}
+        >
+          «
+        </a>
+      </li>
+    `);
+  for (let i = startPage; i <= endPage; i++) {
+    paginationButtons.push(`
+      <li class="page-item ${i === currentPage ? "active" : ""}">
+        <a class="page-link" href="javascript:void(0)" onclick="handlePageChange(${i})">${i}</a>
+      </li>
+    `);
+  }
+
+  paginationButtons.push(`
+      <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+        <a 
+          class="page-link" 
+          href="javascript:void(0)" 
+          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handlePageChange(${currentPage + 1})"`}
+        >
+          » 
+        </a>
+      </li>
+    `);
+  paginationButtons.push(`
+      <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+        <a 
+          class="page-link" 
+          href="javascript:void(0)" 
+          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handlePageChange(${totalPages})"`}
+        >
+          →
+        </a>
+      </li>
+    `);
+
+  paginationContainer.innerHTML = `
+    <nav aria-label="Page navigation">
+      <ul class="pagination id="pagination-list" pagination-primary">
+        ${paginationButtons.join("")}
+      </ul>
+    </nav>
+  `;
+}
+function handlePageChange(pageNumber) {
+  const payloadDraftList = getState("payloadDraftList");
+  setState("payloadDraftList", { ...payloadDraftList, Page: pageNumber });
+  const payload = {
+    Page: pageNumber,
+    PageSize: payloadDraftList.PageSize,
+  };
+  serviceDraftList(payload);
+}
+
+function handleChangeItemsPerPage(event) {
+  const itemsPerPage = parseInt(event.target.value, 10);
+  const payloadDraftList = getState("payloadDraftList");
+  setState("payloadDraftList", { ...payloadDraftList, PageSize: itemsPerPage });
+  const payload = {
+    Page: payloadDraftList.Page,
+    PageSize: itemsPerPage,
+  };
+  serviceDraftList(payload);
+}
 
 function openFormDraft() {
   const modal = new bootstrap.Modal(document.getElementById("modalformDraft"));

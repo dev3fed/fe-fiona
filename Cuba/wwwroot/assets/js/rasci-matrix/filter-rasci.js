@@ -56,7 +56,6 @@ document.addEventListener("dataLoaded", async function () {
       const levelProsbis = ["l1", "l2", "l3", "l4", "l5", "l6"];
       const checkboxAll = document.getElementById("level-lall");
 
-      // Peta untuk mengonversi string menjadi angka
       const levelMapping = {
         l1: 1,
         l2: 2,
@@ -71,7 +70,6 @@ document.addEventListener("dataLoaded", async function () {
         levelProsbis.forEach((level) => {
           const checkbox = document.getElementById(`level-${level}`);
           if (checkbox && checkbox.checked) {
-            // Ubah dari string menjadi angka berdasarkan levelMapping
             levelFilter.push(levelMapping[level]);
           }
         });
@@ -238,10 +236,16 @@ function resetRasciNotation() {
 //==================== start reset all filter rasci matrix ===========================//
 const resetAllFilterRasci = async () => {
   const result = await getState("filterJobList");
+  const resetSpinner = document.getElementById("resetSpinner");
+  if (resetSpinner) {
+    resetSpinner.style.display = "inline-block";
+  }
+  setState("disabledJobId", []);
+  setState("selectedJobId", []);
   updateLevels([1, 2, 3, 4, 5, 6, 7, 8], result);
   const switchAll = document.getElementById("switch-all");
   switchAll.checked = true;
-  ["1", "2", "3", "4", "5", "6"].forEach((lvl) => {
+  ["1", "2", "3", "4", "5", "6", "7", "8"].forEach((lvl) => {
     const switchElement = document.getElementById(`switch-level${lvl}`);
     if (switchElement) {
       switchElement.checked = true;
@@ -251,14 +255,16 @@ const resetAllFilterRasci = async () => {
 
   resetRasciNotation();
   resetProssesBusiness();
-  setState("disabledJobId", []);
-  setState("selectedJobId", []);
+
   ["1", "2", "3", "4", "5", "6", "7", "8"].forEach((level) => {
     const searchInput = document.getElementById(`search-joblevel${level}`);
     if (searchInput) {
       searchInput.value = "";
     }
   });
+  setTimeout(() => {
+    resetSpinner.style.display = "none";
+  }, 600);
 };
 //==================== end reset all filter rasci matrix ===========================//
 function toggleLevelElements(level, isDisabled) {

@@ -56,13 +56,15 @@
                         <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">Position</button>
                         <div class="dropdown-menu" aria-labelledby="btnSearchType">
-                            <a class="dropdown-item" onclick="onSelectType('Position')" value="position">Position</a>
-                            <a class="dropdown-item" onclick="onSelectType('Division')" value="Division">Division</a>
-                            <a class="dropdown-item" onclick="onSelectType('Department')"
+                            <a class="dropdown-item" onclick="selectTypePosition('Position')"
+                                value="position">Position</a>
+                            <a class="dropdown-item" onclick="selectTypePosition('Division')"
+                                value="Division">Division</a>
+                            <a class="dropdown-item" onclick="selectTypePosition('Department')"
                                 value="Department">Department</a>
                         </div>
                     </div>
-                    <input class="form-control" type="text" placeholder="Search"
+                    <input class="form-control" type="text" placeholder="Search" id="inputSearchSummary"
                         style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                 </div>
             </div>
@@ -71,25 +73,31 @@
             <span class="mt-2 mb-2" style="min-width: 130px;">KKJ Status</span>
             <div class="faq-form">
                 <select class="form-select" aria-label="Default select example" id="status-summary">
-                    <option value="available">Available</option>
                     <option value="all">All Status</option>
-                    <option value="not-available">Not available</option>
-                    <option value="waiting-approval">Waiting approval</option>
-                    <option value="on-progress">On progress</option>
+                    <option value="available">Available</option>
+                    <option value="not available">Not available</option>
+                    <option value="waiting approval">Waiting approval</option>
+                    <option value="on progress">On progress</option>
                 </select>
             </div>
         </div>
         <div class="col-2" style="padding-left: 0;margin-top:15px">
             <div class="faq-form">
                 <span class="mt-2 mb-2" style="min-width: 130px;"></span>
-                <button id="btnSearchCompe" class="btn btn-primary" type="button">
+                <button id="btnSearchCompe" class="btn btn-primary" type="button" onclick="triggerSearchSummary()">
                     <div class="d-flex align-items-center">
                         <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                            id="loadingSearch" role="status"></div>
+                            id="loadingSearchSummary"></div>
                         <span class="btn-text">Search</span>
                     </div>
                 </button>
-                <button class="btn btn-outline-primary" type="button" id="clearButton">Clear</button>
+                <button class="btn btn-outline-primary" type="button" id="clearButton" onclick="clearSearchSummary()">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                            id="loadingClearSummary"></div>
+                        <span class="btn-text">Clear</span>
+                    </div>
+                </button>
             </div>
         </div>
         <div class="col-12 mt-3">

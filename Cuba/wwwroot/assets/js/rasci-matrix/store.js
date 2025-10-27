@@ -155,6 +155,10 @@ const appState = new Proxy(
       Page: 1,
       PageSize: 5,
     },
+    payloadSummary: {
+      Page: 1,
+      PageSize: 10,
+    },
     // approvalData: [
     //   {
     //     requestId: "Req/RM/01122024/001",
@@ -186,7 +190,9 @@ const appState = new Proxy(
             detailDraft();
           }
         } else if (property === "dataDetailAproval") {
-          detailApproval();
+          if (value && Object.keys(value).length > 0) {
+            detailApproval();
+          }
         } else if (property === "editDrafProsbis") {
           updateSelectEditProsbis();
         } else if (property === "checkedParentId") {

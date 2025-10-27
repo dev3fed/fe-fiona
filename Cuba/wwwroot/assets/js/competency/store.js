@@ -24,6 +24,14 @@ const appState = new Proxy(
       page: 1,
       pageSize: 10,
     },
+    payloadDraftList: {
+      Page: 1,
+      PageSize: 5,
+    },
+    payloadSummary: {
+      Page: 1,
+      PageSize: 10,
+    },
     payloadLogHistory: {
       page: 1,
       limit: 5,

@@ -1,0 +1,120 @@
+<!-- Include Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .modal-dialog.modal-detailjob {
+        max-width: 75% !important;
+        margin: 50px auto;
+    }
+
+    /* Custom scrollbar styles */
+    .scrollable-jobdetail {
+        max-height: 460px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .scrollable-jobdetail::-webkit-scrollbar {
+        width: 10px;
+        height: 8px;
+    }
+
+    .scrollable-jobdetail::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    .scrollable-jobdetail::-webkit-scrollbar-thumb {
+        background: #006ca9;
+        border-radius: 10px;
+    }
+
+    .scrollable-jobdetail::-webkit-scrollbar-thumb:hover {
+        background: #006ca9;
+    }
+</style>
+
+
+<div class="modal fade" id="ModalDetailSummary" tabindex="-1" role="dialog" aria-labelledby="ModalDetailSummaryLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-detailjob bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalDetailSummaryTitle">Position Detail</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h6 style="font-weight: bold;" id="jobnameSummary"></h6>
+                    <ul class="nav nav-tabs nav-primary mt-3" id="pills-job-tab" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" id="pills-summaryInfo-tab" data-bs-toggle="pill"
+                                href="#pills-summaryInfo" role="tab" aria-controls="pills-summaryInfo"
+                                aria-selected="true">Position
+                                Info</a></li>
+                        <li class="nav-item"><a class="nav-link" id="pills-relatedsummary-tab" data-bs-toggle="pill"
+                                href="#pills-relatedsummary" role="tab" aria-controls="pills-relatedsummary"
+                                aria-selected="false">Related Business Process</a></li>
+                    </ul>
+                    <div class="tab-content" id="pills-businessContent">
+                        <div class="tab-pane fade show active" id="pills-summaryInfo" role="tabpanel"
+                            aria-labelledby="pills-summaryInfo-tab">
+                            <div class="mt-1 scrollable-jobdetail">
+                                <!-- Card job attribut start-->
+                                <div class="custom-card-draft">
+                                    <div class="header-card-draft">
+                                        Info
+                                    </div>
+                                    <div class="row" style="padding-top: 20px;" id="jobSummary">
+                                    </div>
+                                </div>
+                                <!-- Card job attribut end-->
+
+                                <!-- Card skill Group & subskill start-->
+                                <div class="custom-card-draft">
+                                    <div class="header-card-draft">
+                                        Skill Group & Sub Skill Group
+                                    </div>
+                                    <div class="row" id="skillSummary">
+
+                                    </div>
+                                </div>
+                                <!-- Card skill Group & subskill end-->
+
+                                <!-- Card Incumbent start-->
+                                <div class="custom-card-draft">
+                                    <div class="header-card-draft">
+                                        Incumbent
+                                    </div>
+                                    <div class="row mt-4" id="incumbentSummary">
+
+                                    </div>
+                                </div>
+                                <!-- Card Incumbent end-->
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-relatedsummary" role="tabpanel"
+                            aria-labelledby="pills-relatedsummary-tab">
+                            <div class="mb-0 m-t-10" id="total-summary"></div>
+                            <div class="table-responsive scrollable" style=" max-height: 300px;">
+                                <table class="table tbl-border ">
+                                    <thead id="summary-details-header">
+                                    </thead>
+                                    <tbody id="summary-details-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer  d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                            class="icon-arrow-left"></i> Back</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

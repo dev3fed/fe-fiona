@@ -261,12 +261,21 @@ const searchJob = async (event, level) => {
     }
   }
 };
-
+// ========================= start cut select job id with prl =========================//
+const getSelectedJobIdWithPrl = (selectedId) => {
+  const selectedIdCut = (selectedId || []).map((s) => {
+    if (typeof s !== "string") return s;
+    const parts = s.split("|");
+    return parts[0];
+  });
+  return selectedIdCut;
+};
+// ========================= end cut select job id with prl =========================//
 //========================== start reset each jobs level card filter ==========================//
 const resetDirekturUtama = async () => {
   const result = await getState("filterJobList");
-  updateLevels([1, 2, 3, 4, 5, 6], result);
   setState("selectedJobId", []);
+  updateLevels([1, 2, 3, 4, 5, 6], result);
   const searchInput = document.getElementById(`search-joblevel1`);
   if (searchInput) {
     searchInput.value = "";
@@ -274,12 +283,12 @@ const resetDirekturUtama = async () => {
 };
 const resetVicePresident = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 2);
   const descendants = findAllDescendants(cekLevel, result);
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
-  resetChildrens([2, 3, 4, 5, 6], result, selectedId, resetAllId);
+  resetChildrens([2, 3, 4, 5, 6, 7, 8], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel2`);
   if (searchInput) {
     searchInput.value = "";
@@ -287,12 +296,12 @@ const resetVicePresident = async () => {
 };
 const resetManager = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 3);
   const descendants = findAllDescendants(cekLevel, result);
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
-  resetChildrens([3, 4, 5, 6], result, selectedId, resetAllId);
+  resetChildrens([3, 4, 5, 6, 7, 8], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel3`);
   if (searchInput) {
     searchInput.value = "";
@@ -300,12 +309,12 @@ const resetManager = async () => {
 };
 const resetAstManager = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 4);
   const descendants = findAllDescendants(cekLevel, result);
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
-  resetChildrens([4, 5, 6], result, selectedId, resetAllId);
+  resetChildrens([4, 5, 6, 7, 8], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel4`);
   if (searchInput) {
     searchInput.value = "";
@@ -313,12 +322,12 @@ const resetAstManager = async () => {
 };
 const resetSupervisor = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 5);
   const descendants = findAllDescendants(cekLevel, result);
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
-  resetChildrens([5, 6], result, selectedId, resetAllId);
+  resetChildrens([5, 6, 7, 8], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel5`);
   if (searchInput) {
     searchInput.value = "";
@@ -326,12 +335,12 @@ const resetSupervisor = async () => {
 };
 const resetAnalyst = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 6);
   const descendants = findAllDescendants(cekLevel, result);
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
-  resetChildrens([6], result, selectedId, resetAllId);
+  resetChildrens([6, 7, 8], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel6`);
   if (searchInput) {
     searchInput.value = "";
@@ -340,12 +349,12 @@ const resetAnalyst = async () => {
 
 const resetJrSupervisor = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 7);
   const descendants = findAllDescendants(cekLevel, result);
   const resetAllId = cekLevel.concat(descendants).map((item) => item.id);
-  resetChildrens([7], result, selectedId, resetAllId);
+  resetChildrens([7, 8], result, selectedId, resetAllId);
   const searchInput = document.getElementById(`search-joblevel7`);
   if (searchInput) {
     searchInput.value = "";
@@ -353,7 +362,7 @@ const resetJrSupervisor = async () => {
 };
 const resetJrOperator = async () => {
   const result = await getState("filterJobList");
-  const selectedId = await getState("selectedJobId");
+  const selectedId = getSelectedJobIdWithPrl(await getState("selectedJobId"));
   const findJobList = result.filter((value) => selectedId.includes(value.id));
   const cekLevel = findJobList.filter((value) => value.level === 8);
   const descendants = findAllDescendants(cekLevel, result);

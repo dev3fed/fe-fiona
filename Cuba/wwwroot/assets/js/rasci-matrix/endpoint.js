@@ -441,7 +441,7 @@ async function fetchApprovalList(payload) {
   }
 }
 
-async function fetchSummalyList(payload) {
+async function fetchSummaryList(payload) {
   console.log("payload", payload);
   const url = `${url_api}/api/rasci-matrix/draft/summary-rasci-mapping`;
   try {
@@ -454,7 +454,7 @@ async function fetchSummalyList(payload) {
     } else {
       return {
         success: true,
-        data: result.data,
+        data: result,
       };
     }
   } catch (error) {
