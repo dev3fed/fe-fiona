@@ -266,7 +266,7 @@
                             </div>
                             <div class="tab-pane fade" id="request" role="tabpanel" aria-labelledby="pillsRequest">
                                 <div class="card-body">
-                                    <div class="row">
+                                    <div class="row" id="approvalFilterRow">
                                         <div class="col-3">
                                             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
                                                 <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
@@ -287,9 +287,11 @@
                                         </div>
                                         <div class="col-2">
                                             <select class="form-select digits" id="statusApproval">
-                                                <option value="Status:submitted" selected>Submit</option>
-                                                <option value="Status:approved">Approval</option>
-                                                <option value="Status:rejected">Reject</option>
+                                                <option value="all" selected>All</option>
+                                                <option value="isSubmitted">On Review</option>
+                                                <option value="isApproved">Approved</option>
+                                                <option value="isRejected">Rejected</option>
+                                                <option value="isFinalized">Finalized</option>
                                             </select>
                                         </div>
                                         <div class="col-4">

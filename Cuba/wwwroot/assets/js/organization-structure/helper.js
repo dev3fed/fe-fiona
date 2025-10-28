@@ -51,7 +51,6 @@ function checkDataOrganizationLocalStorage() {
   const data = JSON.parse(localStorage.getItem("organizationAttribute"));
   if (data) {
     Object.keys(organizationAttribute).forEach((key) => {
-      console.log(data[key]);
       if (data[key]) {
         organizationAttribute[key] = data[key];
       }
@@ -70,7 +69,7 @@ function clearAllInput() {
   localStorage.setItem("subJobPos", JSON.stringify([]));
   $("[id^=select]").val(null).trigger("change");
   $("[id^=input]").val(null);
-  $("[id^=modalSelect]").val(null).trigger("change");
+  // Only clear modal inputs without triggering change events to avoid unwanted side effects
   $("[id^=modalInput]").val(null);
   $("#selectBasket").val("No").trigger("change");
   $("#selectNeckFunction").val("No").trigger("change");
@@ -99,9 +98,9 @@ async function fillAttributeDirectReport(dataDetail) {
     $("#selectFunction").val(data?.functionCode).trigger("change");
     $("#selectFunction, #FunctionSwitch").prop("disabled", true);
   }
-  if (data?.parentCode) {
+  if (data?.unitCode) {
     $("#selectOrgUnitParentName").append(
-      new Option(`${data?.parentName} (${data?.parentCode})`, data?.parentCode, true, true)
+      new Option(`${data?.unitName} (${data?.unitCode})`, data?.unitCode, true, true)
     );
     $("#selectOrgUnitParentName").prop("disabled", true);
   }
@@ -123,7 +122,7 @@ async function fillAttributeDirectReport(dataDetail) {
   }
 }
 
-async function insertFormPostion(paramId) {
+async function insertFormPosition(paramId) {
   const getDetailPosition = await getDetailJob(paramId);
   const form = document.querySelectorAll(".form-control[required], .form-select[required]");
   // remove class is-invalid from all form elements
@@ -143,6 +142,12 @@ async function insertFormPostion(paramId) {
   $("#inputPositionName").val(positionName);
   $("#selectPrlOrg").val(data?.prlOrgFrom).trigger("change");
   $("#selectPrlOrgTo").val(data?.prlOrgTo).trigger("change");
+
+  // Manually update PRL To options to ensure it's populated correctly
+  if (typeof updatePrlToOptions === "function") {
+    updatePrlToOptions(data?.prlOrgFrom, data?.prlOrgTo);
+  }
+
   // $("#selectFunction").val(data?.functionCode).trigger("change");
   $("#inputOrgUnitName").val(data?.unitName);
   $("#inputFormation").val(data?.formation);
@@ -192,7 +197,15 @@ async function insertFormPostion(paramId) {
       const params = { ...subOrdinates };
       const formationBasket = (item.formationBasket || []).filter((formation) => {
         const prl = formation.prlOrg.includes("-") ? formation.prlOrg.split("-") : [formation.prlOrg, formation.prlOrg];
-        return getPrlNumber(prl[0]) >= getPrlNumber(prlFrom) && getPrlNumber(prl[1]) <= getPrlNumber(prlTo);
+        // Check if there's any overlap between PRL range and filter range
+        // Range overlaps if: max(start1, start2) <= min(end1, end2)
+        const prlStart = getPrlNumber(prl[0]);
+        const prlEnd = getPrlNumber(prl[1]);
+        const filterStart = getPrlNumber(prlFrom);
+        const filterEnd = getPrlNumber(prlTo);
+
+        const hasOverlap = Math.max(prlStart, filterStart) <= Math.min(prlEnd, filterEnd);
+        return hasOverlap;
       });
       const positionName =
         formationBasket?.length > 0 ? formationBasket.map((x) => x.positionName).join(", ") : item.positionName;
@@ -222,7 +235,6 @@ async function insertFormPostion(paramId) {
         isNew: false,
       };
 
-      console.log("formationBasket", formationBasket);
       params.formationBasket = formationBasket;
       arrayBasket.push(params);
     });
@@ -1144,9 +1156,60 @@ function clearInputModal() {
   });
 }
 
+async function getRangePrlSubPosition() {
+  const prlOrgFrom = $("#selectPrlOrg").val();
+  const prlOrgTo = $("#selectPrlOrgTo").val();
+  if (!prlOrgFrom || !prlOrgTo) {
+    swal("Error", "Please select PRL Org and PRL Org To 2", "error");
+    return;
+  }
+
+  // Convert to integers and validate
+  const prlFromInt = parseInt(prlOrgFrom);
+  const prlToInt = parseInt(prlOrgTo);
+
+  // Find indices with proper validation
+  const prlFromIndex = prl.indexOf(prlFromInt);
+  const prlToIndex = prlToInt ? prl.indexOf(prlToInt) : prlFromIndex;
+
+  // Handle invalid indices
+  if (prlFromIndex === -1) {
+    console.warn("Invalid prlOrgFrom value:", prlOrgFrom);
+    return;
+  }
+
+  // Cut array prl from prlOrgFrom to prlOrgTo (or just prlOrgFrom if prlOrgTo is not set)
+  const prlRangeFixed =
+    prlToIndex !== -1 && prlToIndex >= prlFromIndex ? prl.slice(prlFromIndex, prlToIndex + 1) : prl.slice(prlFromIndex);
+  return prlRangeFixed;
+}
+
+$("#modalSelectPrlOrg").on("change", async function (event) {
+  // Only execute if modal is visible to avoid unwanted triggers during clearAllInput
+  if (!$("#modalAddSubPosition").is(":visible")) {
+    console.log("modalSelectPrlOrg change event skipped - modal not visible");
+    return;
+  }
+
+  const value = $(this).val();
+  const prlRangeFixed = await getRangePrlSubPosition();
+  const prlToRange = prlRangeFixed.filter((item) => item > parseInt(value));
+  // update modalSelectPrlOrgTo options
+  getDataList([
+    {
+      dataId: "modalSelectPrlOrgTo",
+      data: prlToRange.map((item) => ({ id: item, text: item })),
+      dropdownParent: $("#modalAddSubPosition"),
+    },
+  ]);
+});
+
 async function modalSubPosition() {
+  // prlOrgFrom or prlOrgTo is required
   const draftId = organizationAttribute.orgUnitId;
   const _abbrv = await abbrvPositionList(organizationAttribute.orgUnitId);
+  const prlRangeFixed = await getRangePrlSubPosition();
+
   $("#modalAddSubPosition").modal("show");
   clearInputModal();
   getDataListAsync([
@@ -1158,17 +1221,15 @@ async function modalSubPosition() {
       showId: false,
     },
   ]);
-
   getDataList([
-    // modalSelectPrlOrgSubPos
     {
       dataId: "modalSelectPrlOrg",
-      data: prl.map((item) => ({ id: item, text: item })),
+      data: prlRangeFixed.map((item) => ({ id: item, text: item })),
       dropdownParent: $("#modalAddSubPosition"),
     },
     {
       dataId: "modalSelectPrlOrgTo",
-      data: prl.map((item) => ({ id: item, text: item })),
+      data: prlRangeFixed.map((item) => ({ id: item, text: item })),
       dropdownParent: $("#modalAddSubPosition"),
     },
     {
@@ -1230,8 +1291,6 @@ async function editSubPosition(id) {
       $("#modalInputSubPositionName" + (idx === 0 ? "" : idx + 1)).val(item.positionName);
     });
   } else {
-    console.log("masuk basket non merge");
-    console.log({ prlOrg });
     $("#modalSelectPrlOrgSubPos").val(prlOrg).trigger("change");
   }
   $("#modalInputFormation").val(data.formation);
@@ -1361,6 +1420,7 @@ async function modalJobPopup(params) {
   }
   const positionName = data?.isBasket ? data?.unitName : data?.positionName;
   $("#jobName").text(checkValue(positionName));
+  $("#isBasket").val(data?.isBasket);
   $("#inputOUCode").val(data.unitCode);
   $("#inputPositionCode").val(data.positionCode);
   $("#modalPrlOrg").text(checkValue(data.prlOrg));
@@ -1415,7 +1475,9 @@ async function modalJobPopup(params) {
   $("#modalDetailJob").modal("show");
   $("#nonBasketIncumbent").show();
   $("#incumbentCard").show();
+  $("#showJobdesc").show();
   if (data?.isBasket) {
+    $("#showJobdesc").hide();
     $("#positionListCard, #basketIncumbent").show();
     $("#nonBasketIncumbent").hide();
     $(".no-basket").hide();
@@ -1537,13 +1599,22 @@ async function modalJobPopup(params) {
     const $positionBody = $("#tablePositionListBody").empty();
     let globalCount = 0;
     (sortedPositionList || []).forEach((group, i) => {
+      // postionName and link to job Description page
       group.dataPosition.forEach((item, j) => {
+        console.log("item:", item.prlOrg);
+        const positionName =
+          item.positionName +
+          ` <a href="javascript:void(0)" class="p-l-5" onclick="showJobDesc('` +
+          data.unitCode +
+          `','` +
+          item.prlOrg +
+          `')"> Jobdesc Page <i class="fas fa-info-circle"></i></a>`;
         globalCount++;
         console.log("globalCount:", globalCount);
         if (j == 0) {
           $positionBody.append(`<tr>
             <td>${globalCount}</td>
-            <td>${item.positionName}</td>
+            <td>${positionName}</td>
             <td>${item.careerLevel}</td>
             <td>${item.prlOrg}</td>
             <td rowspan="${group.totalRow}">${item.formation}</td>
@@ -1551,7 +1622,7 @@ async function modalJobPopup(params) {
         } else {
           $positionBody.append(`<tr>
         <td>${globalCount}</td>
-        <td>${item.positionName}</td>
+        <td>${positionName}</td>
         <td>${item.careerLevel}</td>
         <td>${item.prlOrg}</td>
         </tr>`);
@@ -1679,7 +1750,7 @@ function hideModal(id) {
   $("#" + id).modal("hide");
 }
 
-function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0, userRole: "user" }) {
+function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0, userRole: "user" }, data) {
   const user = getStatusDraft.userRole;
   const status = getStatusDraft.step;
   // swith case by parameter buttonTable and lastPath
@@ -1705,9 +1776,12 @@ function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0,
           </div>`;
     case "positionList":
       if (lastPath === "draft-detail") {
-        const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
+        let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailPositionDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+        if (data?.actionType === "Delete") {
+          editPositionDraft = "";
+        }
         if (status >= 1) {
           return `${detailPositionDraft}`;
         }
@@ -1829,7 +1903,6 @@ function helperDatePicker() {
 // helper orgTree
 // ======================
 function createHierarchy(data, parentId = null) {
-  console.log("createHierarchy called data:", parentId);
   return data
     .filter((item) => item.pid === parentId)
     .map((item) => ({
@@ -1844,7 +1917,7 @@ function createHierarchy(data, parentId = null) {
 async function helperOrgTree(params) {
   // di cblock dulu karena bikin error kalo pakai draft datanya jadi belasan ribu
   // console.log("helperOrgTree called with params:", params);
-  return;
+  // return;
   params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
   console.log("helperOrgTree processed params:", params);
   //  remove duplicate id in params

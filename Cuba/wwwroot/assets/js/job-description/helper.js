@@ -799,7 +799,7 @@ async function saveReference() {
   await saveReferenceAttribute();
 }
 
-function checkButtonTable(buttonTable, id, lastPath) {
+function checkButtonTable(buttonTable, id, lastPath, data) {
   const user = localStorage.getItem("user") === "admin" ? "admin" : "admin";
   const status = "2";
   // swith case by parameter buttonTable and lastPath
@@ -825,9 +825,14 @@ function checkButtonTable(buttonTable, id, lastPath) {
           </div>`;
     case "positionList":
       if (lastPath === "draft-detail") {
-        const editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
+        console.log("data", data.actionType);
+        let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
+        if (data.actionType == "Delete") {
+          alert("masok");
+          editPositionDraft = "";
+        }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
       } else {
         const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;

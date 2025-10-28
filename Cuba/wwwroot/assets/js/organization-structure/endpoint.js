@@ -225,8 +225,8 @@ async function draftFinalize(params, file) {
   }
 }
 
-async function approvedList() {
-  const api = `${url.baseUrl}/${url["api-organization"]}/approval/list`;
+async function approvedList(page = 1, pageSize = 10) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/approval/list?page=${page}&pageSize=${pageSize}  `;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;

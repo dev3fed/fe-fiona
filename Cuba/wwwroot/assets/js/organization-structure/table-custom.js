@@ -249,10 +249,22 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
+          const createdDate = new Date(data.createdDate);
+          // indonesian date format dd/mm/yyyy
+          const formattedDate = createdDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          const formattedTime = createdDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
           return `
           <span>${data?.createdBy}</span>
           <br/>
-          <span class="text-muted f-12">${data.createdDate}</span>
+          <span class="text-muted f-12">${formattedDate} ${formattedTime}</span>
           `;
         },
       },
@@ -261,10 +273,21 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
+          const modifiedDate = new Date(data.modifiedDate);
+          const formattedDate = modifiedDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          const formattedTime = modifiedDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
           return `
           <span>${data?.modifiedBy}</span>
           <br/>
-          <span class="text-muted f-12">${data?.modifiedDate}</span>
+          <span class="text-muted f-12">${formattedDate} ${formattedTime}</span>
           `;
         },
       },
@@ -359,13 +382,49 @@ function getTableListApproval(params) {
       },
       {
         title: "Submitted Date",
-        data: "submittedDate",
         width: "15%",
+        data: null,
+        render: function (data) {
+          const submittedDate = new Date(data.submittedDate);
+          const formattedDate = submittedDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          const formattedTime = submittedDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          return `
+          <span class="text-muted f-12">${formattedDate} ${formattedTime}</span>
+          `;
+        },
       },
       {
         title: "Approval/Reject Date",
-        data: "rejectedDate",
         width: "15%",
+        data: null,
+        render: function (data) {
+          const date = data?.approvalDate ? data.approvalDate : data.rejectedDate;
+          if (!date) {
+            return "-";
+          }
+          const approvalDate = new Date(date);
+          const formattedDate = approvalDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          const formattedTime = approvalDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          return `
+          <span class="text-muted f-12">${formattedDate} ${formattedTime}</span>
+          `;
+        },
       },
       {
         title: "Status",
@@ -377,7 +436,7 @@ function getTableListApproval(params) {
 
           if (data.isSubmitted) {
             statusText = "On Review";
-            statusClass = "label-info-custom";
+            statusClass = "label-warning-custom";
           }
           if (data.isRejected) {
             statusText = "Rejected";
@@ -434,7 +493,6 @@ function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "
         width: "15%",
         data: null,
         render: function (data) {
-          console.log("data", data);
           let text = "Created New Job";
           if (data.actionType === "Update") {
             text = "Edit Job";
@@ -480,7 +538,8 @@ function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "
             "positionList",
             data.unitCode,
             window.location.pathname.split("/").pop(),
-            getStatusDraft
+            getStatusDraft,
+            data
           );
         },
       },

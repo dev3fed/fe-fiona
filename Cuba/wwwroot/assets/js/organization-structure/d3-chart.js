@@ -1288,7 +1288,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
     .linkUpdate(function (d) {
       d3.select(this).attr("stroke", "black").attr("stroke-width", 1);
       // if tags include isCoordinator doted
-      if (d.data.tags.includes("isCoordinator")) {
+      if (d.data.tags.includes("coordination")) {
         d3.select(this).attr("stroke-dasharray", "5,5");
       } else {
         d3.select(this).attr("stroke-dasharray", "none");

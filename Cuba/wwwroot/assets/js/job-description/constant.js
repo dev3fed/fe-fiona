@@ -824,6 +824,7 @@ const defaultNodeId = "10132406";
 const jobId = urlParams.get("jobId");
 const prlOrg = urlParams.get("prlOrg");
 const positionCode = urlParams.get("positionCode");
+const master = urlParams.get("master");
 
 const DATA_NOT_FOUND = `Data not found`;
 

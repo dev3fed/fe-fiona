@@ -89,40 +89,44 @@ async function checkPage() {
   }
 }
 
+function updateDatetoIndonesianFormat(dateString) {
+  const date = new Date(dateString);
+  const options = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  };
+  return date.toLocaleDateString("id-ID", options);
+}
+
 async function initializeDraftDetail(getDraft) {
-  const createdDate = new Date(getDraft?.createdDate);
-  const updatedDate = getDraft?.modifiedDate ? new Date(getDraft?.modifiedDate) : null;
-  const submittedDate = getDraft?.submittedDate ? new Date(getDraft?.submittedDate) : null;
-  const rejectedDate = getDraft?.rejectedDate ? new Date(getDraft?.rejectedDate) : null;
-  const approvedDate = getDraft?.approvedDate ? new Date(getDraft?.approvedDate) : null;
+  const createdDate = updateDatetoIndonesianFormat(getDraft?.createdDate);
+  const updatedDate = getDraft?.modifiedDate ? updateDatetoIndonesianFormat(getDraft?.modifiedDate) : null;
+  const submittedDate = getDraft?.submittedDate ? updateDatetoIndonesianFormat(getDraft?.submittedDate) : null;
+  const rejectedDate = getDraft?.rejectedDate ? updateDatetoIndonesianFormat(getDraft?.rejectedDate) : null;
+  const approvedDate = getDraft?.approvedDate ? updateDatetoIndonesianFormat(getDraft?.approvedDate) : null;
   const rejectApproved = approvedDate ? approvedDate : rejectedDate;
-  console.log("getDraft", getDraft);
-  console.log("createdDate", createdDate);
-  console.log("updatedDate", updatedDate);
-  console.log("submittedDate", submittedDate);
-  console.log("rejectApproved", rejectApproved);
 
   $("#draftName").text(getDraft?.draftName);
   $("#draftNameApproval").text(getDraft?.draftName);
   $("#requestId").text(getDraft?.draftId);
   $("#requestIdApproval").text(getDraft?.draftId);
   $("#createdBy").text(getDraft?.createdBy);
-  $("#createdDate").text(createdDate.toLocaleDateString() + " " + createdDate.toLocaleTimeString());
+  $("#createdDate").text(createdDate);
   $("#updatedBy").text(getDraft?.modifiedBy);
-  $("#updatedDate").text(updatedDate ? updatedDate.toLocaleDateString() + " " + updatedDate.toLocaleTimeString() : "");
+  $("#updatedDate").text(updatedDate ? updatedDate : "-");
   $("#submittedBy").text(getDraft?.submittedBy ?? "System");
-  $("#submittedDate").text(
-    submittedDate ? submittedDate.toLocaleDateString() + " " + submittedDate.toLocaleTimeString() : "-"
-  );
+  $("#submittedDate").text(submittedDate ? submittedDate : "-");
   $("#approvedRejectBy").text("System");
-  $("#approvedRejectDate").text(
-    rejectApproved ? rejectApproved.toLocaleDateString() + " " + rejectApproved.toLocaleTimeString() : "-"
-  );
+  $("#approvedRejectDate").text(rejectApproved ? rejectApproved : "-");
   let statusText = "Draft";
   let statusClass = "bg-secondary";
   if (getDraft.isSubmitted) {
     statusText = "On Review";
-    statusClass = "label-info-custom";
+    statusClass = "label-warning-custom";
   }
   if (getDraft.isRejected) {
     statusText = "Rejected";
@@ -731,7 +735,6 @@ $(document).ready(async function () {
         "No SK",
         "PJS Position",
         "helper idou x prl",
-        "lookup ke zhroom fadil",
       ];
 
       // Add header row

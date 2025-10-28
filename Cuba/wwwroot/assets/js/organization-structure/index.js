@@ -660,9 +660,16 @@ async function showRasciMatrix() {
 }
 
 // redirect to job description
-async function showJobDesc() {
-  const getOuCode = $(`#inputOUCode`).val();
-  window.open("/job-description/detail?master=true&id=" + getOuCode, "_blank");
+async function showJobDesc(ouCode = null, prlOrgRange = null) {
+  let getOuCode = $(`#inputOUCode`).val();
+  let prlOrg = $("#modalPrlOrg").text();
+  let isBasket = $("#isBasket").val();
+  if (isBasket == "true") {
+    getOuCode = ouCode;
+    prlOrg = prlOrgRange;
+  }
+  const urlJobDesc = `/job-description/detail?master=true&jobId=${getOuCode}&prlOrg=${prlOrg}`;
+  window.open(urlJobDesc, "_blank");
 }
 
 // confirm delete draft
@@ -845,9 +852,10 @@ $("#selectDraftOrganization").change(async function () {
 });
 
 $(document).ready(async function () {
-  const getDataDraft = await chartDraftList(1, 99);
-  const getDataApproval = await approvedList();
+  const getDataDraft = await chartDraftList(1, 999);
+  const getDataApproval = await approvedList(1, 999);
   storeData.listDraft = getDataDraft.data;
+  storeData.listApproval = getDataApproval.data;
   // initialize table
   await checkDataOrganization(storeData.listDraft);
   const focusNode = urlParams.get("focusNode");
@@ -856,7 +864,8 @@ $(document).ready(async function () {
 
   console.log("storeData.listDraft", storeData.listDraft);
 
-  getTableListDraft(storeData.listDraft.filter((x) => x.id !== 1));
+  getTableListDraft(storeData.listDraft.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
+  console.log("storeData.listDraft", storeData.listDraft);
   getTableListApproval(getDataApproval.data);
   getDataList([
     {
@@ -865,16 +874,102 @@ $(document).ready(async function () {
     },
   ]);
 
-  // $("#searchDraft").on("input", function () {
-  //   const searchTerm = $(this).val().toLowerCase();
-  //   const filteredDrafts = storeData.listDraft.filter((draft) => draft.draftName.toLowerCase().includes(searchTerm));
-  //   getTableListDraft(filteredDrafts);
-  // });
+  $("#approvalFilterRow").on("change input", "input, select", function () {
+    const changedElement = $(this);
+    const elementId = changedElement.attr("id");
+    const elementValue = changedElement.val();
+
+    // Handle specific approval filter elements
+    if (elementId === "approvalDate") {
+      console.log("Approval date changed:", elementValue);
+      // Determine type based on current status
+      const statusApproval = $("#statusApproval").val();
+      const dateType =
+        statusApproval === "isApproved" || statusApproval === "isRejected" ? "approvalDate" : "submittedDate";
+      filterApprovalsByDate(elementValue, dateType);
+    } else if (elementId === "submittedDate") {
+      console.log("Submitted date changed:", elementValue);
+      // Always use submittedDate type for this field
+      filterApprovalsByDate(elementValue, "submittedDate");
+    } else if (elementId === "searchApproval") {
+      console.log("Approval search changed:", elementValue);
+      filterApprovalsBySearch(elementValue);
+    } else if (elementId === "statusApproval") {
+      console.log("Approval status changed:", elementValue);
+      // No need to reset data, updateApprovalFilters handles all filtering
+      updateApprovalFilters();
+      return; // Early return to avoid double call to updateApprovalFilters
+    }
+
+    // Update comprehensive approval filters
+    updateApprovalFilters();
+  });
+
+  // Initialize approval datepicker with onSelect callback
+  $("#approvalDate")
+    .datepicker("destroy")
+    .datepicker({
+      language: "en",
+      position: "bottom left",
+      multipleDatesSeparator: ", ",
+      onSelect: function (formattedDate, date, inst) {
+        console.log("Approval datepicker date selected:", formattedDate);
+        // Determine type based on current status
+        const statusApproval = $("#statusApproval").val();
+        const dateType =
+          statusApproval === "isApproved" || statusApproval === "isRejected" ? "approvalDate" : "submittedDate";
+        filterApprovalsByDate(formattedDate, dateType);
+        updateApprovalFilters();
+      },
+    });
+
+  $("#submittedDate").datepicker({
+    language: "en",
+    position: "bottom left",
+    multipleDatesSeparator: ", ",
+    onSelect: function (formattedDate, date, inst) {
+      console.log("Submitted datepicker date selected:", formattedDate);
+      // Determine type based on current status
+      const statusApproval = $("#statusApproval").val();
+      const dateType =
+        statusApproval === "isApproved" || statusApproval === "isRejected" ? "approvalDate" : "submittedDate";
+      filterApprovalsByDate(formattedDate, dateType);
+      updateApprovalFilters();
+    },
+  });
 
   // Handle draft filter row changes
   $("#draftFilterRow").on("change input", "input, select", function () {
-    alert("masok");
+    const changedElement = $(this);
+    const elementId = changedElement.attr("id");
+    const elementValue = changedElement.val();
+
+    // Handle specific elements
+    if (elementId === "draftCreatedDate") {
+      console.log("Draft created date changed:", elementValue);
+      filterDraftsByDate(elementValue);
+    } else if (elementId === "searchDraft") {
+      console.log("Draft search changed:", elementValue);
+      filterDraftsBySearch(elementValue);
+    }
+
+    // Update comprehensive filters
+    updateDraftFilters();
   });
+
+  // Initialize datepicker with onSelect callback (destroy existing instance first if any)
+  $("#draftCreatedDate")
+    .datepicker("destroy")
+    .datepicker({
+      language: "en",
+      position: "bottom left",
+      multipleDatesSeparator: ", ",
+      onSelect: function (formattedDate, date, inst) {
+        console.log("Datepicker date selected:", formattedDate);
+        filterDraftsByDate(formattedDate);
+        updateDraftFilters();
+      },
+    });
   // filter date range picker for draft created date
 
   await checkDataOrganization(storeData.listDraft);
@@ -930,7 +1025,7 @@ function filterDraftsByDate(selectedDate) {
     });
 
     console.log("Filtered drafts by date:", filteredDrafts.length);
-    getTableListDraft(filteredDrafts.filter((x) => x.id !== 1));
+    getTableListDraft(filteredDrafts.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
   } catch (error) {
     console.error("Error filtering drafts by date:", error);
   }
@@ -945,7 +1040,7 @@ function filterDraftsBySearch(searchTerm) {
   );
 
   console.log("Filtered drafts by search:", filteredDrafts.length);
-  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1));
+  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
 }
 
 // Function to update all draft filters comprehensively
@@ -977,5 +1072,130 @@ function updateDraftFilters() {
   }
 
   console.log("Comprehensive filter applied, results:", filteredDrafts.length);
-  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1));
+  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
+}
+
+// Function to filter approvals by date
+function filterApprovalsByDate(selectedDate, type) {
+  if (!selectedDate || !storeData.listApproval) return;
+
+  try {
+    // Parse the selected date
+    const filterDate = new Date(selectedDate);
+
+    // Filter approvals by different date fields based on type
+    const filteredApprovals = storeData.listApproval.filter((approval) => {
+      let targetDate;
+
+      if (type === "approvalDate") {
+        // For approval date, check approvedDate or rejectedDate
+        targetDate = approval.approvedDate || approval.rejectedDate;
+      } else {
+        // Default to submittedDate for other cases
+        targetDate = approval.submittedDate || approval.createdDate;
+      }
+
+      if (!targetDate) return true; // Include approvals without the target date
+
+      const approvalDate = new Date(targetDate);
+      return approvalDate.toDateString() === filterDate.toDateString();
+    });
+
+    console.log(`Filtered approvals by ${type || "submitted"} date:`, filteredApprovals.length);
+    getTableListApproval(filteredApprovals);
+  } catch (error) {
+    console.error("Error filtering approvals by date:", error);
+  }
+}
+
+// Function to filter approvals by search term
+function filterApprovalsBySearch(searchTerm) {
+  // if (!storeData.listApproval) return;
+
+  console.log("storeData.listApproval", storeData.listApproval);
+  console.log("searchTerm", searchTerm);
+
+  const filteredApprovals = storeData.listApproval.filter((approval) =>
+    approval.draftName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  getTableListApproval(filteredApprovals);
+}
+
+// Function to update all approval filters comprehensively
+function updateApprovalFilters() {
+  const searchTerm = $("#searchApproval").val();
+  const approvalDate = $("#approvalDate").val();
+  const submittedDate = $("#submittedDate").val();
+  const statusApproval = $("#statusApproval").val();
+
+  if (!storeData.listApproval) return;
+
+  // Start with original data, don't modify storeData.listApproval directly
+  let filteredApprovals = [...storeData.listApproval];
+
+  // Apply status filter first
+  if (statusApproval && statusApproval != "all") {
+    filteredApprovals = filteredApprovals.filter((data) => {
+      if (statusApproval == "isSubmitted") {
+        return (
+          data.isSubmitted == true && data.isRejected == false && data.isApproved == false && data.isFinalized == false
+        );
+      } else if (statusApproval == "isRejected") {
+        return data.isRejected == true && data.isApproved == false;
+      } else if (statusApproval == "isApproved") {
+        return data.isApproved == true;
+      } else if (statusApproval == "isFinalized") {
+        return data.isFinalized == true;
+      }
+      return true;
+    });
+  }
+
+  // Apply search filter
+  if (searchTerm) {
+    filteredApprovals = filteredApprovals.filter((approval) =>
+      approval.draftName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // Apply date filters
+  if (approvalDate || submittedDate) {
+    try {
+      filteredApprovals = filteredApprovals.filter((approval) => {
+        let matchesFilter = true;
+
+        // Check approval date filter
+        if (approvalDate) {
+          const filterDate = new Date(approvalDate);
+          const targetDate = approval.approvedDate || approval.rejectedDate;
+          if (targetDate) {
+            const approvalDateObj = new Date(targetDate);
+            matchesFilter = matchesFilter && approvalDateObj.toDateString() === filterDate.toDateString();
+          } else {
+            matchesFilter = false; // No approval/rejection date available
+          }
+        }
+
+        // Check submitted date filter
+        if (submittedDate) {
+          const filterDate = new Date(submittedDate);
+          const targetDate = approval.submittedDate || approval.createdDate;
+          if (targetDate) {
+            const submittedDateObj = new Date(targetDate);
+            matchesFilter = matchesFilter && submittedDateObj.toDateString() === filterDate.toDateString();
+          } else {
+            matchesFilter = false; // No submitted date available
+          }
+        }
+
+        return matchesFilter;
+      });
+    } catch (error) {
+      console.error("Error applying date filters:", error);
+    }
+  }
+
+  console.log("Comprehensive approval filter applied, results:", filteredApprovals.length);
+  getTableListApproval(filteredApprovals);
 }

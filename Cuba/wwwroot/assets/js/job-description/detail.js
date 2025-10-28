@@ -1,4 +1,4 @@
-const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+let getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
 
 // Debounce function untuk search
 let searchTimeout;
@@ -624,6 +624,36 @@ function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid
   console.error(`${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. `);
 }
 $(document).ready(async function () {
+  console.log("Document is ready", master);
+  loader(true);
+  if (master) {
+    const draftExistingJobDesc = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+    const dataListDraft = await draftList();
+    if (!draftExistingJobDesc || draftExistingJobDesc.draftOrganizationId == "" || draftExistingJobDesc == undefined) {
+      const data = dataListDraft.data[0];
+      getDraftExisting = {
+        draftId: data.draftId,
+        draftOrganizationId: data.draftOrganizationId,
+        draftRasciId: data.draftRasciId,
+        draftName: data.draftName,
+      };
+      console.log("getDraftExisting", getDraftExisting);
+      localStorage.setItem(
+        "draftExistingJobDesc",
+        JSON.stringify({
+          draftId: getDraftExisting.draftId,
+          draftOrganizationId: getDraftExisting.draftOrganizationId,
+          draftRasciId: getDraftExisting.draftRasciId,
+          draftName: getDraftExisting.draftName,
+        })
+      );
+    }
+  }
+  // return;
+  // await 3 seconds delay to simulate loading
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  loader(false);
+
   refreshDataLocalStorage();
   let activeTab = "identifikasi";
   if (activeTab) {
@@ -634,6 +664,7 @@ $(document).ready(async function () {
   // $("#modalJobCompareDetail").modal("show");
   // await applySelectedData(jobId, prlOrg, prlOrg);
 
+  console.log("getDraftExisting", getDraftExisting);
   let getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
   for (const key in getDataJobDesc) {
     if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
@@ -919,7 +950,7 @@ $(document).ready(async function () {
     localStorage.setItem("stk", JSON.stringify(getDataJobDesc.stk.data));
     updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
   }
-
+  loader(false);
   focusNode(jobId);
 
   // $(".summernote").summernote("disable");

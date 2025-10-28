@@ -98,6 +98,9 @@
 @* style link *@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css">
 <div class="page-body">
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -137,17 +140,16 @@
                                 <span id="draftName" class="f-w-600" style="font-size: 18px;"></span>
                                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" class="p-l-5" style="margin-top: -1px;" id="editDraftName">
                             </div>
-                            <span id="requestId" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                         <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
                             <span id="" class="text-black-50" style="font-size: 14px;">Created by</span>
-                            <span id="createdDate" class="f-w-200" style="font-size: 14px;"></span>
                             <span id="createdBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <span id="createdDate" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                         <div class="col-4 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
                             <span id="" class="text-black-50" style="font-size: 14px;">Updated by</span>
-                            <span id="updatedDate" class="f-w-200" style="font-size: 14px;"></span>
                             <span id="updatedBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <span id="updatedDate" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                     </div>
                     <div class="row" style="margin-top: 20px;" id="infoApproval">
@@ -157,17 +159,16 @@
                                 <span id="draftNameApproval" class="f-w-600" style="font-size: 18px;"></span>
                                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" class="p-l-5" style="margin-top: -1px;" id="editDraftName">
                             </div>
-                            <span id="requestIdApproval" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                         <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
                             <span id="" class="text-black-50" style="font-size: 14px;">Submitted Date</span>
-                            <span id="submittedDate" class="f-w-200" style="font-size: 14px;"></span>
-                            <span id="submittedBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <span id="submittedDate" class="f-w-600" style="font-size: 16px;"></span>
+                            <span id="submittedBy" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                         <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
                             <span id="" class="text-black-50" style="font-size: 14px;">Approved/Reject Date</span>
-                            <span id="approvedRejectDate" class="f-w-200" style="font-size: 14px;"></span>
-                            <span id="approvedRejectBy" class="f-w-600" style="font-size: 16px;"></span>
+                            <span id="approvedRejectDate" class="f-w-600" style="font-size: 16px;"></span>
+                            <span id="approvedRejectBy" class="f-w-200" style="font-size: 14px;"></span>
                         </div>
                         <div class="col-3 text-center d-flex flex-column" style="padding: 10px;border-right: 1px solid #bfbfc2;">
                             <span id="" class="text-black-50" style="font-size: 14px;">Status</span>

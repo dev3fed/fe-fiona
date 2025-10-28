@@ -329,8 +329,41 @@ function deleteSubPos(countSubPosDiv) {
   $("#subPosDiv" + countSubPosDiv).remove();
 }
 
+// Function to update PRL To options based on PRL From value
+function updatePrlToOptions(selectedPrlFrom, selectedPrlTo) {
+  const selectedValue = selectedPrlFrom || $("#selectPrlOrg").val();
+  if (!selectedValue) return;
+
+  const prlIndex = prl.indexOf(parseInt(selectedValue));
+  const prlToOptions = prl.slice(prlIndex);
+
+  // Only clear and repopulate if basket is selected
+  if ($("#selectBasket").val() == "Yes") {
+    $("#selectPrlOrgTo").empty();
+    prlToOptions.forEach((value) => {
+      $("#selectPrlOrgTo").append(new Option(value, value));
+    });
+
+    // If selectedPrlTo is provided, set it as the selected value
+    if (selectedPrlTo && prlToOptions.includes(parseInt(selectedPrlTo))) {
+      $("#selectPrlOrgTo").val(selectedPrlTo);
+    }
+  }
+}
+
 $(document).ready(async function () {
   loader(true);
+
+  $("#selectPrlOrg").on("change", function () {
+    // Only update if this is a manual change and basket is selected
+    if ($("#selectBasket").val() == "Yes") {
+      updatePrlToOptions($(this).val());
+    }
+  });
+
+  // $('#selectPrlOrgTo').on('change', function () {
+  //   alert('masok 2');
+  // });
   $("#selectOrgUnitParentName").attr("disabled", true);
   // remove local storage subJobPos
   localStorage.setItem("subJobPos", JSON.stringify([]));
@@ -341,7 +374,6 @@ $(document).ready(async function () {
     const detailDirectReport = await getDetailJob(value);
     await fillAttributeDirectReport(detailDirectReport);
     // const detailDirectReport
-    console.log("Direct Report selected:", detailDirectReport);
   });
 
   $("#selectBasket").on("change", function (event) {
@@ -372,19 +404,19 @@ $(document).ready(async function () {
 
   $("#duplicateButton").click(async function () {
     const duplicate = $("#selectJobReference").val();
-    insertFormPostion(duplicate);
+    insertFormPosition(duplicate);
     // duplicateJob(duplicate);
   });
 
   $("#addSubPosition").click(function () {
     $("#modalAddSubPosition").modal("show");
+    alert("masko 4");
     modalSubPosition();
   });
 
   $("#modalInputFormation").on("change", function (event) {
     const countFormation = event.target.value;
     const subPosDiv = $("#subPosDiv").children();
-    console.log(countFormation);
   });
 
   $("#saveSubPos").click(function () {
@@ -430,7 +462,6 @@ $(document).ready(async function () {
       // Skip validation for certain fields if basket is "Yes"
 
       if (type === "text" || type === "number" || type === "email") {
-        console.log("masuk sini", value);
         if (!value) {
           input.classList.add("is-invalid");
           hasErrors = true;
@@ -516,8 +547,9 @@ $(document).ready(async function () {
     const positionId = urlParams.get("unitCode");
     const positionName = $("#inputPositionName").val();
     const draftName = organizationAttribute.orgUnitName;
-    let type = "create";
-    if (positionId) type = "edit";
+    let type = "Create";
+    if (positionId) type = "Edit";
+    let textButton = "Yes, " + type;
     const action = [
       {
         button: "Cancel",
@@ -527,7 +559,7 @@ $(document).ready(async function () {
         },
       },
       {
-        button: type,
+        button: textButton,
         className: "btn-primary",
         callbackFunction: "saveAsDraft",
       },
@@ -556,7 +588,7 @@ $(document).ready(async function () {
   if (positionId) {
     $("#headerForm").text("Edit Position");
     $("#breadcrumbForm").text("Edit Position");
-    await insertFormPostion(positionId);
+    await insertFormPosition(positionId);
     const formattedParams = formattedInputAttribut("edit");
     let logState = JSON.parse(localStorage.getItem("logState"));
     logState.status = "edit";
