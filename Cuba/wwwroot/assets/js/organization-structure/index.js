@@ -654,9 +654,15 @@ function callSelect2Edit(params) {
 }
 
 //  redirect to rasci matrix
-async function showRasciMatrix() {
-  const getOuCode = $(`#inputOUCode`).val();
-  window.open("/Rasci/index?master=true&id=" + getOuCode, "_blank");
+async function showRasciMatrix(prlOrgRange = null) {
+  let getOuCode = $(`#inputOUCode`).val();
+  let prlOrg = $("#modalPrlOrg").text();
+  let isBasket = $("#isBasket").val();
+  if (isBasket == "true") {
+    prlOrg = prlOrgRange;
+  }
+  const urlRasci = `/Rasci/Index?ouId=${getOuCode}&prlOrg=${prlOrg}`;
+  window.open(urlRasci, "_blank");
 }
 
 // redirect to job description

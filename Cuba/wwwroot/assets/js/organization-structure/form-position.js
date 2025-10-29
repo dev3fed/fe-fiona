@@ -96,7 +96,7 @@ async function saveAsDraft() {
       loader(false);
       window.location.href =
         "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
-    }, 7500);
+    }, 1500);
   } else {
     const message = save.message || save.title || "Failed to save job .";
     swal("Error", message, "error");
@@ -335,7 +335,7 @@ function updatePrlToOptions(selectedPrlFrom, selectedPrlTo) {
   if (!selectedValue) return;
 
   const prlIndex = prl.indexOf(parseInt(selectedValue));
-  const prlToOptions = prl.slice(prlIndex);
+  const prlToOptions = prl.slice(prlIndex + 1);
 
   // Only clear and repopulate if basket is selected
   if ($("#selectBasket").val() == "Yes") {
@@ -370,6 +370,8 @@ $(document).ready(async function () {
 
   $("#selectDirectReport").on("change", async function (event) {
     loader(true);
+    // wait 200 ms
+    // await new Promise((resolve) => setTimeout(resolve, 200));
     const value = event.target.value;
     const detailDirectReport = await getDetailJob(value);
     await fillAttributeDirectReport(detailDirectReport);
@@ -404,7 +406,7 @@ $(document).ready(async function () {
 
   $("#duplicateButton").click(async function () {
     const duplicate = $("#selectJobReference").val();
-    insertFormPosition(duplicate);
+    await insertFormPosition(duplicate);
     // duplicateJob(duplicate);
   });
 

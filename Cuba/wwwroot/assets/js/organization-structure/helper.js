@@ -77,7 +77,8 @@ function clearAllInput() {
   $("#selectCoordination").val("No").trigger("change");
 }
 
-async function getDetailJob(jobCode = "10163465") {
+async function getDetailJob(jobCode) {
+  console.log("getDetailJob jobCode", jobCode);
   loader(true);
   const detailJob = await chartJobDetail({
     draftId: organizationAttribute.orgUnitId,
@@ -93,15 +94,14 @@ async function fillAttributeDirectReport(dataDetail) {
   //  unset disabled from function to section select and switch
   $(directReportAttrIds).prop("disabled", false);
   $("#inputDirectReport").val(data.positionCode);
+  console.log("inputDirectReport", data.positionCode);
 
   if (data?.functionCode) {
     $("#selectFunction").val(data?.functionCode).trigger("change");
     $("#selectFunction, #FunctionSwitch").prop("disabled", true);
   }
   if (data?.unitCode) {
-    $("#selectOrgUnitParentName").append(
-      new Option(`${data?.unitName} (${data?.unitCode})`, data?.unitCode, true, true)
-    );
+    $("#selectOrgUnitParentName").append(new Option(data?.unitName, data?.unitCode, true, true));
     $("#selectOrgUnitParentName").prop("disabled", true);
   }
   if (data?.divisionCode) {
@@ -152,9 +152,9 @@ async function insertFormPosition(paramId) {
   $("#inputOrgUnitName").val(data?.unitName);
   $("#inputFormation").val(data?.formation);
   if (data?.directReportCode) {
-    $("#selectDirectReport").append(
-      new Option(`${data?.directReportName} (${data?.directReportCode})`, data?.directReportCode, true, true)
-    );
+    $("#selectDirectReport")
+      .append(new Option(`${data?.directReportName}`, data?.parentCode, true, true))
+      .trigger("change");
   }
   if (data?.kbo) {
     $("#selectKBO").append(new Option(data?.kbo, data?.kbo, true, true));
@@ -590,9 +590,9 @@ function formattedInputAttribut(type) {
   payload.unit.prlOrgFrom = $("#selectPrlOrg").val();
   payload.unit.prlOrgTo = isBasket ? $("#selectPrlOrgTo").val() : null;
   payload.unit.formation = $("#inputFormation").val() == "" ? 1 : $("#inputFormation").val();
-  payload.unit.isNeckFunction = $("#selectNeckFunction").prop("checked") ? true : false;
-  payload.unit.isProject = $("#selectIsProject").prop("checked") ? true : false;
-  payload.unit.isCoordinate = $("#selectCoordination").prop("checked") ? true : false;
+  payload.unit.isNeckFunction = $("#selectNeckFunction").val() == "Yes" ? true : false;
+  payload.unit.isProject = $("#selectIsProject").val() == "Yes" ? true : false;
+  payload.unit.isCoordinate = $("#selectCoordination").val() == "Yes" ? true : false;
   payload.unit.kbo = $("#selectKBO").val();
   payload.unit.costCenter = $("#selectCostCenter").val();
   // career type
@@ -1475,7 +1475,10 @@ async function modalJobPopup(params) {
   $("#modalDetailJob").modal("show");
   $("#nonBasketIncumbent").show();
   $("#incumbentCard").show();
-  $("#showJobdesc").show();
+  //
+  if (!organizationAttribute.isMasterData) {
+    $("#showJobdesc").show();
+  }
   if (data?.isBasket) {
     $("#showJobdesc").hide();
     $("#positionListCard, #basketIncumbent").show();
@@ -1598,9 +1601,11 @@ async function modalJobPopup(params) {
     // Render position list table
     const $positionBody = $("#tablePositionListBody").empty();
     let globalCount = 0;
+    let arrayAddedPrlOrg = [];
     (sortedPositionList || []).forEach((group, i) => {
       // postionName and link to job Description page
       group.dataPosition.forEach((item, j) => {
+        arrayAddedPrlOrg.push(item.prlOrg);
         console.log("item:", item.prlOrg);
         const positionName =
           item.positionName +
@@ -1629,6 +1634,9 @@ async function modalJobPopup(params) {
         }
       });
     });
+    // <button class=" btn btn-primary" type="button" id="showRasciMatrix" onclick="showRasciMatrix()"> Show RASCI Matrix </button>
+    // update button showRasciMatrix to include prlOrg arrayAddedPrlOrg
+    $("#showRasciMatrix").attr("onclick", `showRasciMatrix(['${arrayAddedPrlOrg.join("','")}'])`);
   } else {
     // alert("masuk non basket");
     $("#nonBasketIncumbent").show();
