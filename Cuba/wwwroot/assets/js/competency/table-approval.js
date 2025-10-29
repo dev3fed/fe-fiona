@@ -1,4 +1,15 @@
+document.addEventListener("DOMContentLoaded", async function () {
+  await approvalData();
+  feather.replace();
+});
 document.addEventListener("dataLoaded", async function () {
+  try {
+    await approvalData();
+  } catch (error) {
+    console.error("Error loading data history:", error);
+  }
+});
+const approvalData = async () => {
   try {
     const payload = getState("payloadApproval");
     const statusApproval = document.getElementById("statusApproval").value;
@@ -6,15 +17,13 @@ document.addEventListener("dataLoaded", async function () {
     setState("payloadApproval", payload);
 
     const result = await fetchApprovalList(payload);
-    console.log("result", result);
     if (result.data.data.length > 0) {
       renderTableApproval(result.data);
     }
   } catch (error) {
-    console.error("Error loading data history:", error);
+    console.error("Error loading approval data:", error);
   }
-});
-
+};
 $("#compeApprovalDate").datepicker({
   onSelect: async function (formattedDate) {
     const payloadApproval = getState("payloadApproval");

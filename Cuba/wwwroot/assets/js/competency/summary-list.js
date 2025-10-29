@@ -104,7 +104,7 @@ const renderTableSummary = (resultList) => {
               <td>${element.positionName || "N/A"}</td>
               <td style="text-align:center">${element.functionName || "N/A"}</td>
               <td style="text-align:center">${element.divisionName || "N/A"}</td>
-              <td style="width: 120px;">${statusHtml}</td>
+              <td style="width: 120px;text-align:center">${statusHtml}</td>
               <td style="text-align:center;width: 100px;">
                <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
           /"/g,
@@ -151,9 +151,7 @@ const renderTableSummary = (resultList) => {
 };
 const selectTypePosition = (text) => {
   const payloadSummary = getState("payloadSummary");
-  console.log("text", text);
   let payload = { ...payloadSummary, keySearch: text.toLowerCase() };
-  console.log("payload", payload);
   setState("payloadSummary", payload);
   document.getElementById("btnSearchType").innerText = text;
   document.getElementById("inputSearchSummary").value = "";
@@ -165,7 +163,6 @@ const triggerSearchSummary = async () => {
     const spinner = document.getElementById("loadingSearchSummary");
     spinner.style.display = "inline-block";
     let payload = { ...payloadSummary, searchValue: searchValue };
-    console.log("payload", payload);
     setState("payloadSummary", payload);
     const result = await fetchSummaryList(payload);
     renderTableSummary(result);

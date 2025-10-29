@@ -277,6 +277,57 @@ function updateHeaderCheckboxProsbis() {
   }
 }
 
+async function searchMatrixByParams(ouIdArray, prlOrgArray) {
+  selectedJobIds = ouIdArray;
+  selectedPrlIds = prlOrgArray;
+  const draftSoId = getState("draftSoId");
+  const draftRasciId = getState("draftRasciId");
+  const payload = {
+    draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+    unitCode: selectedJobIds, // Menggabungkan ID job
+    prlOrg: selectedPrlIds,
+    row: 1,
+    rowSize: 15,
+  };
+
+  const payloadJob = {
+    col: 1,
+    colSize: 10,
+    indexNumber: [],
+    draftRasciId: draftRasciId == "master" ? null : draftRasciId,
+    draftSoId: draftSoId,
+    unitCode: selectedJobIds,
+    prlOrg: selectedPrlIds,
+  };
+
+  try {
+    const resultPosition = await fetchPositionMatrix(payloadJob);
+    const resultMatrix = await fetchProsbisMatrix(payload);
+    const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+    if (resultMatrix.success === true) {
+      SelectedProsbisId = [];
+      setState("isSearchMatrix", true);
+      setState("idSearchProsbis", "");
+      setState("payloadPosition", payloadJob);
+      setState("payloadProsbis", payload);
+      setState("actionType", "POS_THEN_BP");
+      setState("actionExport", "searchByPosition");
+      setState("resultProsbis", resultMatrix.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultMatrix.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      loadTableBody(resultMatrix.data);
+      loadTableHeader(resultPosition.data);
+      mapRasciCells(combineIndex, resultPosition.data);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+      selectedJobIds = [];
+      selectedPrlIds = [];
+    }
+  } catch (error) {
+    console.error("Error fetching data matrix", error);
+  }
+}
 async function applySearch() {
   const draftSoId = getState("draftSoId");
   const draftRasciId = getState("draftRasciId");
@@ -322,7 +373,7 @@ async function applySearch() {
           setState("totalProsbis", resultMatrix.totalResult);
           setState("totalJob", resultPosition.totalResult);
           loadTableBody(resultMatrix.data);
-          appendDynamicHeader(resultPosition.data);
+          loadTableHeader(resultPosition.data);
           mapRasciCells(combineIndex, resultPosition.data);
           setState("currentPageY", 1);
           setState("currentPageX", 1);
@@ -375,7 +426,7 @@ async function applySearch() {
           setState("totalProsbis", resultMatrix.totalResult);
           setState("totalJob", resultPosition.totalResult);
           loadTableBody(resultMatrix.data);
-          appendDynamicHeader(resultPosition.data);
+          loadTableHeader(resultPosition.data);
           mapRasciCells(combineIndex, resultPosition.data);
           setState("currentPageY", 1);
           setState("currentPageX", 1);
@@ -415,7 +466,7 @@ async function applySearch() {
           setState("totalProsbis", resultMatrix.totalResult);
           setState("totalJob", 0);
           loadTableBody(resultMatrix.data);
-          appendDynamicHeader([]);
+          loadTableHeader([]);
           setState("currentPageY", 1);
           setState("currentPageX", 1);
           if (modal) {

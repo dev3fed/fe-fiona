@@ -13,7 +13,7 @@ async function triggleDetailJob(val) {
     console.log("resultDetail", resultDetail);
     let detailInfo = resultDetail.data;
     let infoSkillGroup = resultDetail.data.skillGroups;
-    let incumbent = resultDetail.data.incumbents[0];
+    let incumbent = resultDetail.data.incumbents;
     let division = detailInfo?.division?.divisionName || "-";
     let department = detailInfo?.department?.departmentName || "-";
     let careerType = detailInfo?.unit.careerTypeName || "-";
@@ -83,7 +83,7 @@ async function triggleDetailJob(val) {
        <div class="col-6">
           <label style="color:#9F9FA5;fonti-size:12px">SK Number</label><br/>
           <label style="font-weight: 600;font-size: 14px">${
-            resultDetail.data.incumbents.length > 0 ? incumbent.sourceOfSk : "-"
+            incumbent.length > 0 ? incumbent[0].sourceOfSk : "-"
           }</label><br/>
       </div>
     `;
@@ -130,19 +130,19 @@ async function triggleDetailJob(val) {
             <div class="col-3">
                 <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
                 <label style="font-weight: 600;font-size: 14px">${
-                  resultDetail.data.incumbents.length > 0 ? incumbent?.employeeId : "-"
+                  incumbent.length > 0 ? incumbent[0].employeeId : "-"
                 }</label><br/>
             </div>
             <div class="col-3">
                 <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
                 <label style="font-weight: 600;font-size: 14px">${
-                  resultDetail.data.incumbents.length > 0 ? incumbent?.employeeName : "-"
+                  incumbent.length > 0 ? incumbent[0].employeeName : "-"
                 }</label><br/>
             </div>
             <div class="col-6">
                 <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
                 <label style="font-weight: 600;font-size: 14px">${
-                  resultDetail.data.incumbents.length > 0 ? incumbent?.prlPlan : "-"
+                  incumbent.length > 0 ? incumbent[0].prlPlan : "-"
                 }</label><br/>
             </div>
     `;
@@ -316,7 +316,7 @@ async function handleShowRasci() {
       setState("totalProsbis", resultMatrix.totalResult);
       setState("totalJob", resultPosition.totalResult);
       loadTableBody(resultMatrix.data);
-      appendDynamicHeader(resultPosition.data);
+      loadTableHeader(resultPosition.data);
       mapRasciCells(combineIndex, resultPosition.data);
       setState("currentPageY", 1);
       setState("currentPageX", 1);

@@ -153,7 +153,7 @@ const renderTableApproval = async (approvalData) => {
           const year = now.getFullYear();
           const seq = Math.floor(Math.random() * 1000)
             .toString()
-            .padStart(3, "0"); // 001..999
+            .padStart(3, "0");
           return `Req/RM/${day}${month}${year}/${seq}`;
         })();
       return `

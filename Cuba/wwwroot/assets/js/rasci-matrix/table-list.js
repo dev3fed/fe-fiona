@@ -1,32 +1,54 @@
 document.addEventListener("dataLoaded", async function () {
   try {
-    if (appState.resultProsbis.length > 0) {
-      const payloadPosition = getState("payloadPosition");
-      const prosbisNumber = appState.resultProsbis.map((val) => val.indexNumber);
-      if (prosbisNumber.length > 0) {
-        const resultPosition = await fetchPositionMatrix({
-          ...payloadPosition,
-          indexNumber: prosbisNumber,
-        });
-        setState("payloadPosition", {
-          ...payloadPosition,
-          indexNumber: prosbisNumber,
-        });
-        setTimeout(() => {
-          loadTableBody(appState.resultProsbis);
-          loadTableHeader(resultPosition.data);
-          mapRasciCells(prosbisNumber, resultPosition.data);
-          hideLoading();
-        }, 100);
-      }
+    const { prlOrgArray, ouIdArray } = getUrlOrgParams(window.location.search);
+    if (ouIdArray.length > 0 && prlOrgArray.length > 0) {
+      await searchMatrixByParams(ouIdArray, prlOrgArray);
+      hideLoading();
+      feather.replace();
+    } else {
+      defaultLoadMatrix();
     }
     //  else {
     //   showDataEmpty();
     // }
-    hideLoading();
   } catch (error) {}
 });
-
+function getUrlOrgParams(search = window.location.search) {
+  const params = new URLSearchParams(search);
+  const ouId = params.get("ouId");
+  const prlOrgRaw = params.get("prlOrg");
+  const prlOrgArray = prlOrgRaw ? prlOrgRaw.split(",").map((s) => s.trim()) : [];
+  const ouIdArray = prlOrgArray.length > 1 ? Array(prlOrgArray.length).fill(ouId) : ouId ? [ouId] : [];
+  return { prlOrgArray, ouIdArray };
+}
+async function defaultLoadMatrix() {
+  try {
+    const payload = {
+      draftRasciId: selectedValue === "master" ? null : selectedValue,
+      level: [],
+      indexNumber: appState.defaultIndexNumber,
+      row: 1,
+      rowSize: 15,
+    };
+    const payloadPosition = getState("payloadPosition");
+    const resultMatrix = await fetchProsbisMatrix(payload);
+    const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+    if (combineIndex.length > 0) {
+      const resultPosition = await fetchPositionMatrix({
+        ...payloadPosition,
+        indexNumber: combineIndex,
+      });
+      setState("payloadPosition", {
+        ...payloadPosition,
+        indexNumber: combineIndex,
+      });
+      loadTableBody(resultMatrix.data);
+      loadTableHeader(resultPosition.data);
+      mapRasciCells(combineIndex, resultPosition.data);
+      hideLoading();
+    }
+  } catch (error) {}
+}
 document.addEventListener("DOMContentLoaded", async function () {
   let selectElement = document.querySelector("#dataSource-rasci");
   infoValueChain(selectElement.value);
@@ -265,7 +287,6 @@ function renderStaticHeader() {
 }
 function appendDynamicHeader(jobTitleList) {
   const headerRow = document.querySelector("#table-header tr");
-
   if (!headerRow) {
     console.error("Element #table-header tr tidak ditemukan!");
     return;
@@ -375,7 +396,7 @@ function loadTableBody(prosbisList) {
                   <li onclick="sendDetailbp(${valString})" style="display: ${isMaster ? "none" : "flex"}">
                     <a class="dropdown-item"><img src="/assets/images/rasci/pencil.svg" alt="Filter Icon">Edit</a>
                   </li>
-                  <li onclick="checkChildrenProsbis(${valString})" style="display: ${isMaster ? "none" : "flex"} ">
+                   <li onclick="checkChildrenProsbis(${valString})" style="display: ${isMaster ? "none" : "flex"} ">
                     <a class="dropdown-item" style="color: red !important;">
                       <img src="/assets/images/rasci/small_redtrush.svg" alt="Filter Icon">Delete
                     </a>
@@ -574,7 +595,7 @@ async function handleCollapse(id) {
     const resultPosition = await fetchPositionMatrix(jobPayload);
     setTimeout(() => {
       loadTableBody(resultMatrix.data);
-      appendDynamicHeader(resultPosition.data);
+      loadTableHeader(resultPosition.data);
       mapRasciCells(indexNumbers, resultPosition.data);
       setState("payloadProsbis", payload);
       setState("payloadPosition", jobPayload);
@@ -709,14 +730,24 @@ async function clearInput() {
   const spinner = document.getElementById("loadingClear");
   const clearButton = document.getElementById("clearButton");
   spinner.style.display = "inline-block";
+  const { prlOrgArray, ouIdArray } = getUrlOrgParams(window.location.search);
+  if (ouIdArray.length > 0 && prlOrgArray.length > 0) {
+    const params = new URLSearchParams(window.location.search);
+    if (ouIdArray.length > 0 && prlOrgArray.length > 0 && params.has("ouId") && params.has("prlOrg")) {
+      // Hapus parameter ouId dan prlOrg dari URL (reset)
+      params.delete("ouId");
+      params.delete("prlOrg");
+      const newSearch = params.toString();
+      const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }
   setState("resultProsbis", []);
   setState("resultJabatan", []);
   setState("idProsbis", []);
   setState("resetIdProsbis", []);
   setState("currentPageY", 1);
   setState("currentPageX", 1);
-  console.log("first draftRasciId", draftRasciId);
-  console.log("first draftSoId", draftSoId);
   const result = await changeDataSource(draftRasciId, draftSoId);
   if (result) {
     spinner.style.display = "none";
@@ -771,8 +802,6 @@ async function lastStateTableMatrix() {
       setState("resultProsbis", resultProsbis.data);
       setState("resultJabatan", resultPosition.data);
       setState("totalProsbis", resultProsbis.totalResult);
-      console.log("resultProsbis.totalResult", resultProsbis.totalResult);
-
       setState("totalJob", resultPosition.totalResult);
       setState("currentPageY", 1);
       setState("currentPageX", 1);

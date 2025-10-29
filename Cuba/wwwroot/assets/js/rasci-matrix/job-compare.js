@@ -134,7 +134,7 @@ async function applyCompare() {
       setState("totalProsbis", resultMatrix.totalResult);
       setState("totalJob", resultPosition.totalResult);
       loadTableBody(resultMatrix.data);
-      appendDynamicHeader(resultPosition.data);
+      loadTableHeader(resultPosition.data);
       mapRasciCells(combineIndex, resultPosition.data);
       setState("currentPageY", 1);
       setState("currentPageX", 1);

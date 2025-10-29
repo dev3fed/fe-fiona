@@ -476,12 +476,7 @@ async function fetchData() {
       rowSize: 15,
     };
 
-    const [resultSimulation, filterJobList] = await Promise.all([
-      fetchProsbisMatrix(payload),
-      fetchFilterJobList("master"),
-    ]);
-    appState.indexNumberProsbis = resultSimulation.data.map((val) => val.indexNumber);
-    appState.resultProsbis = resultSimulation.data;
+    const [filterJobList] = await Promise.all([fetchFilterJobList("master")]);
     setState("payloadProsbis", payload);
     const combinedData = [
       ...filterJobList?.level1.map((item) => ({ ...item, type: "level1" })),

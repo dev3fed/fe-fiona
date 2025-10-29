@@ -15,7 +15,6 @@ $(document).ready(function () {
     }
   }
 
-  // Fungsi untuk menampilkan alert error
   function showAlert(message) {
     $errorMessage
       .html(
@@ -25,17 +24,17 @@ $(document).ready(function () {
       .removeClass("hidden-alert");
   }
 
-  // Fungsi untuk menyembunyikan alert error
   function hideAlert() {
     $errorMessage.addClass("hidden-alert");
   }
 
-  // Validasi form saat input berubah
   $username.add($password).on("input", toggleLoginButton);
 
   // Event handler untuk tombol login
   $loginButton.click(async function (e) {
     e.preventDefault();
+    const spinner = document.getElementById("loginSpinner");
+    spinner.style.display = "inline-block";
 
     try {
       const result = await loginApi({
@@ -45,17 +44,20 @@ $(document).ready(function () {
 
       if (result.status === 200) {
         const { menuPermission, modules, token, name, employeeId } = result.data;
+        setTimeout(() => {
+          spinner.style.display = "none";
+          localStorage.setItem("userName", name);
+          localStorage.setItem("userId", employeeId);
+          localStorage.setItem("module", JSON.stringify(modules));
+          localStorage.setItem("listMenu", JSON.stringify(menuPermission));
+          localStorage.setItem("token", token);
 
-        localStorage.setItem("userName", name);
-        localStorage.setItem("userId", employeeId);
-        localStorage.setItem("module", JSON.stringify(modules));
-        localStorage.setItem("listMenu", JSON.stringify(menuPermission));
-        localStorage.setItem("token", token);
-
-        // Redirect after login
-        window.location.href = `${baseUrl}HomePage/Index`;
+          // Redirect after login
+          window.location.href = `${baseUrl}HomePage/Index`;
+        }, 500);
       } else {
         showAlert(result.message);
+        spinner.style.display = "none";
       }
     } catch (error) {
       showAlert("An error occurred during login. Please try again.");

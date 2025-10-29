@@ -35,7 +35,7 @@ async function loadMorePosition(page) {
       const cuttingPosition = positionList.slice(10); // Pangkas 10 data di awal
       setState("resultJabatan", cuttingPosition);
       setState("totalJob", resultPosition.totalResult);
-      appendDynamicHeader(cuttingPosition);
+      loadTableHeader(cuttingPosition);
       mapRasciCells(indexNumberList, cuttingPosition);
       loader.style.display = "none";
       isLoading = false;
@@ -45,7 +45,7 @@ async function loadMorePosition(page) {
     } else {
       setState("resultJabatan", positionList);
       setState("totalJob", resultPosition.totalResult);
-      appendDynamicHeader(positionList);
+      loadTableHeader(positionList);
       mapRasciCells(indexNumberList, positionList);
       loader.style.display = "none";
       isLoading = false;
@@ -74,8 +74,7 @@ const loadMoreProsbisOnly = async (currentPageY) => {
       };
       const resultProsbis = await fetchProsbisMatrix(payload);
       const combineProsbis = [...dataStoreProsbis, ...resultProsbis.data];
-      const allProsbis =
-        combineProsbis.length > 45 ? combineProsbis.slice(15) : combineProsbis;
+      const allProsbis = combineProsbis.length > 45 ? combineProsbis.slice(15) : combineProsbis;
       setState("resultProsbis", allProsbis);
       setTimeout(() => {
         loadTableBody(allProsbis);
@@ -116,8 +115,7 @@ const loadMorePositionAndProsbis = async (currentPageY, currentPageX) => {
       };
       const resultProsbis = await fetchProsbisMatrix(payload);
       const combineProsbis = [...dataStoreProsbis, ...resultProsbis.data];
-      const allProsbis =
-        combineProsbis.length > 45 ? combineProsbis.slice(15) : combineProsbis;
+      const allProsbis = combineProsbis.length > 45 ? combineProsbis.slice(15) : combineProsbis;
       const combineIndex = allProsbis.map((val) => val.indexNumber);
       setState("resultProsbis", allProsbis);
       if (storageDataPosition.length > 10) {
@@ -125,7 +123,7 @@ const loadMorePositionAndProsbis = async (currentPageY, currentPageX) => {
         const positionList = await fetchMultiplePage(numberLoop, []);
         setTimeout(() => {
           loadTableBody(allProsbis);
-          appendDynamicHeader(positionList);
+          loadTableHeader(positionList);
           mapRasciCells(combineIndex, positionList);
           setState("currentPageY", currentPageY + 1);
           isLoading = false;
@@ -147,7 +145,7 @@ const loadMorePositionAndProsbis = async (currentPageY, currentPageX) => {
         const resultPosition = await fetchPositionMatrix(payloadJob);
         setTimeout(() => {
           loadTableBody(allProsbis);
-          appendDynamicHeader(resultPosition.data);
+          loadTableHeader(resultPosition.data);
           mapRasciCells(combineIndex, resultPosition.data);
           setState("currentPageY", currentPageY + 1);
           isLoading = false;
@@ -188,20 +186,16 @@ const loadMoreProsbisAndPosition = async (currentPageY, currentPageX) => {
       };
       const resultProsbis = await fetchProsbisMatrix(payload);
       const combineProsbis = [...dataStoreProsbis, ...resultProsbis.data];
-      const allProsbis =
-        combineProsbis.length > 45 ? combineProsbis.slice(15) : combineProsbis;
+      const allProsbis = combineProsbis.length > 45 ? combineProsbis.slice(15) : combineProsbis;
       const combineIndex = allProsbis.map((val) => val.indexNumber);
       setState("resultProsbis", allProsbis);
       if (combineIndex.length > 0 && resultProsbis.success === true) {
         if (storageDataPosition.length > 10) {
           const numberLoop = [currentPageX - 1, currentPageX];
-          const positionList = await fetchMultiplePage(
-            numberLoop,
-            combineIndex,
-          );
+          const positionList = await fetchMultiplePage(numberLoop, combineIndex);
           setTimeout(() => {
             loadTableBody(allProsbis);
-            appendDynamicHeader(positionList);
+            loadTableHeader(positionList);
             mapRasciCells(combineIndex, positionList);
             setState("currentPageY", currentPageY + 1);
             isLoading = false;
@@ -225,7 +219,7 @@ const loadMoreProsbisAndPosition = async (currentPageY, currentPageX) => {
 
           setTimeout(() => {
             loadTableBody(allProsbis);
-            appendDynamicHeader(resultPosition.data);
+            loadTableHeader(resultPosition.data);
             mapRasciCells(combineIndex, resultPosition.data);
             setState("currentPageY", currentPageY + 1);
             isLoading = false;
@@ -259,10 +253,7 @@ const restoreProsbisOnly = async () => {
       row: currentPageY - 3,
       rowSize: 15,
     };
-    const rowToRemove =
-      resultProsbis.length != 45
-        ? Math.max(0, resultProsbis.length + 15 - 45)
-        : 15;
+    const rowToRemove = resultProsbis.length != 45 ? Math.max(0, resultProsbis.length + 15 - 45) : 15;
     const getDataProsbis = await fetchProsbisMatrix(payload);
     const cuttingProsbis = resultProsbis.slice(0, -rowToRemove);
     const combinedProsbis = [...getDataProsbis.data, ...cuttingProsbis];
@@ -295,10 +286,7 @@ async function restorePositionAndProsbis() {
       row: currentPageY - 3,
       rowSize: 15,
     };
-    const rowToRemove =
-      resultProsbis.length != 45
-        ? Math.max(0, resultProsbis.length + 15 - 45)
-        : 15;
+    const rowToRemove = resultProsbis.length != 45 ? Math.max(0, resultProsbis.length + 15 - 45) : 15;
     const getDataProsbis = await fetchProsbisMatrix(payload);
     const cuttingProsbis = resultProsbis.slice(0, -rowToRemove);
     const combinedProsbis = [...getDataProsbis.data, ...cuttingProsbis];
@@ -309,7 +297,7 @@ async function restorePositionAndProsbis() {
       const positionList = await fetchMultiplePage(numberLoop, []);
       setTimeout(() => {
         loadTableBody(combinedProsbis);
-        appendDynamicHeader(positionList);
+        loadTableHeader(positionList);
         mapRasciCells(indexNumberList, positionList);
         setState("currentPageY", currentPageY - 1);
         isLoading = false;
@@ -332,7 +320,7 @@ async function restorePositionAndProsbis() {
       const resultPosition = await fetchPositionMatrix(payloadJob);
       setTimeout(() => {
         loadTableBody(combinedProsbis);
-        appendDynamicHeader(resultPosition.data);
+        loadTableHeader(resultPosition.data);
         mapRasciCells(indexNumberList, resultPosition.data);
         setState("currentPageY", currentPageY - 1);
         isLoading = false;
@@ -365,10 +353,7 @@ async function restoreProsbisAndPosition() {
       row: currentPageY - 3,
       rowSize: 15,
     };
-    const rowToRemove =
-      resultProsbis.length != 45
-        ? Math.max(0, resultProsbis.length + 15 - 45)
-        : 15;
+    const rowToRemove = resultProsbis.length != 45 ? Math.max(0, resultProsbis.length + 15 - 45) : 15;
     const getDataProsbis = await fetchProsbisMatrix(payload);
     const cuttingProsbis = resultProsbis.slice(0, -rowToRemove);
     const combinedProsbis = [...getDataProsbis.data, ...cuttingProsbis];
@@ -379,7 +364,7 @@ async function restoreProsbisAndPosition() {
       const positionList = await fetchMultiplePage(numberLoop, indexNumberList);
       setTimeout(() => {
         loadTableBody(combinedProsbis);
-        appendDynamicHeader(positionList);
+        loadTableHeader(positionList);
         mapRasciCells(indexNumberList, positionList);
         setState("currentPageY", currentPageY - 1);
         isLoading = false;
@@ -402,7 +387,7 @@ async function restoreProsbisAndPosition() {
       const resultPosition = await fetchPositionMatrix(payloadJob);
       setTimeout(() => {
         loadTableBody(combinedProsbis);
-        appendDynamicHeader(resultPosition.data);
+        loadTableHeader(resultPosition.data);
         mapRasciCells(indexNumberList, resultPosition.data);
         setState("currentPageY", currentPageY - 1);
         isLoading = false;
@@ -432,15 +417,12 @@ async function restorePosition() {
         ...payloadPosition,
         col: currentPageX - 2,
       };
-      const rowToRemove =
-        storageDataPosition.length != 20
-          ? Math.max(0, storageDataPosition.length + 10 - 20)
-          : 10;
+      const rowToRemove = storageDataPosition.length != 20 ? Math.max(0, storageDataPosition.length + 10 - 20) : 10;
 
       const cuttingPosition = storageDataPosition.slice(0, -rowToRemove);
       const resultPosition = await fetchPositionMatrix(payloadJob);
       const combinedPosition = [...resultPosition.data, ...cuttingPosition];
-      appendDynamicHeader(combinedPosition);
+      loadTableHeader(combinedPosition);
       mapRasciCells(indexNumberList, combinedPosition);
       setState("currentPageX", currentPageX - 1);
       loader.style.display = "none";

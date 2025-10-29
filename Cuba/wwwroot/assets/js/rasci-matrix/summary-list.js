@@ -105,7 +105,7 @@ const renderTableSummary = (resultList) => {
               <td>${element.positionName || "N/A"}</td>
               <td style="text-align:center">${element.functionName || "N/A"}</td>
               <td style="text-align:center">${element.divisionName || "N/A"}</td>
-              <td style="width: 120px;">${statusHtml}</td>
+              <td style="width: 120px;text-align:center">${statusHtml}</td>
               <td style="text-align:center;width: 100px;">
                <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
           /"/g,

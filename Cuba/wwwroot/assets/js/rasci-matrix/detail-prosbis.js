@@ -301,7 +301,7 @@ const applySeriesProses = async () => {
       setState("totalProsbis", resultMatrix.totalResult);
       setState("totalJob", resultPosition.totalResult);
       loadTableBody(resultMatrix.data);
-      appendDynamicHeader(resultPosition.data);
+      loadTableHeader(resultPosition.data);
       mapRasciCells(combineIndex, resultPosition.data);
       if (modal && modalProsbis) {
         modal.hide();
@@ -359,7 +359,7 @@ const showRasciMatrixBybp = async () => {
         setState("totalProsbis", resultMatrix.totalResult);
         setState("totalJob", resultPosition.totalResult);
         loadTableBody(resultMatrix.data);
-        appendDynamicHeader(resultPosition.data);
+        loadTableHeader(resultPosition.data);
         mapRasciCells(combineIndex, resultPosition.data);
         if (modal && resultPosition.success === true) {
           spinner.style.display = "none";
