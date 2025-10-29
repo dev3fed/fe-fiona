@@ -1,6 +1,6 @@
 // 'http://localhost:5075/api/job-description/draft/list/1/10' \
 async function draftList() {
-  const api = `${url.baseUrl}/${url["job-description"]}/draft/list/1/10`;
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/list/1/999`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;

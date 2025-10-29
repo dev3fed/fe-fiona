@@ -688,8 +688,10 @@ function formattedInputAttribut(type) {
       .text()
       .replace(/\s*\(.*?\)\s*/g, "") || "";
   // directReport
+  const jobPositionName = $("#selectDirectReport option:selected").text();
+  // const jobPositionName = $("#selectDirectReport option:selected").text() + " (" + $("#inputDirectReport").val() + ")";
   payload.directReportTo.jobPositionCode = $("#inputDirectReport").val();
-  payload.directReportTo.jobPositionName = $("#selectDirectReport option:selected").text();
+  payload.directReportTo.jobPositionName = jobPositionName;
   // abbreviation
 
   if (!isBasket) {
