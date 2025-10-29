@@ -509,7 +509,7 @@ function createJobDesc(jobId, prlOrg, positionCode) {
 }
 
 function detailJobDesc(jobId, prlOrg, positionCode) {
-  const redirectTo = `/job-description/detail?jobId=${jobId}&prlOrg=${prlOrg}&positionCode=${positionCode}`;
+  const redirectTo = `/job-description/detail?master=true&jobId=${jobId}&prlOrg=${prlOrg}&positionCode=${positionCode}`;
   window.location.href = redirectTo;
 }
 
@@ -1375,6 +1375,7 @@ async function saveJobDescItem(type, id, isAdd = true) {
       }
       updateCalculateLsAvailable(arraySelectedBusPro, arrayRemovedBusPro);
     }
+    console.log("newItem", newItem);
     lsData.push(newItem);
     localStorage.setItem(ls.ls, JSON.stringify(lsData));
     updateTable(type, lsData, [...tabCusJD[type], "action"]);

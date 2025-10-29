@@ -503,18 +503,18 @@
                                         <span style="font-size: 17px;">10. POSISI DALAM STRUKTUR ORGANISASI</span>
                                         <div class="row">
                                             <div class="col-12 mt-2">
-                                                <button class="btn btn-primary btn-sm" onclick="chartExportIMG()">Export Image</button>
-                                                <button class="btn btn-primary btn-sm" onclick="chart.exportImg()">Export Image</button>
-                                                <button class="btn btn-primary btn-sm" onclick="chartExportSVG()">Export SVG</button>
-                                                <button class="btn btn-primary btn-sm" onclick="chartExportPDF()">Export PDF</button>
-                                                <button class="btn btn-primary btn-sm" onclick="chart.fit();">Fit to the screen</button>
-                                                <button onclick="chart.zoomIn().render().fit();" class="btn btn-primary btn-sm">
+                                                <button class="btn btn-primary btn-sm" id="exportImageBtn" onclick="chartExportIMG()">Export Image</button>
+                                                @* <button class="btn btn-primary btn-sm" onclick="chart.exportImg()">Export Image</button> *@
+                                                <button class="btn btn-primary btn-sm" id="exportSVGBtn" onclick="chartExportSVG()">Export SVG</button>
+                                                <button class="btn btn-primary btn-sm" id="exportPDFBtn" onclick="chartExportPDF()">Export PDF</button>
+                                                <button class="btn btn-primary btn-sm" id="fitToScreenBtn" onclick="chart.fit();">Fit to the screen</button>
+                                                <button onclick="chart.zoomIn().render().fit();" id="zoomInBtn" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-search-plus"></i> zoom in
                                                 </button>
-                                                <button onclick="chart.zoomOut().render().fit();" class="btn btn-primary btn-sm">
+                                                <button onclick="chart.zoomOut().render().fit();" id="zoomOutBtn" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-search-minus"></i> zoom out
                                                 </button>
-                                                <button onclick="chartCompact()" class="btn btn-primary btn-sm">
+                                                <button onclick="chartCompact()" id="chartCompactBtn" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-sitemap"></i> compact
                                                 </button>
                                             </div>
@@ -527,7 +527,7 @@
                     </div>
                     <div class="card-footer d-flex justify-content-end">
                         <button class="btn btn-outline-primary   m-r-10" type="button" id="handleExportPng">
-                            Download Job Description PDF
+                            Download Job Description Word
                         </button>
                         <button class="btn btn-primary " type="button" id="saveDraft">
                             Save as Draft

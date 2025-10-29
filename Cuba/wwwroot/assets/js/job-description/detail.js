@@ -625,29 +625,34 @@ function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid
 }
 
 function readOnlyPage() {
-  // alert("masok");
-  // $('#addJobReference')
-  // $("input, textarea, select").attr("disabled", true);
-  // $(".btn-add, .btn-delete, .btn-save-draft, .btn-publish, .btn-generate, .btn-apply").hide();
-  // $(".summernote").attr("contenteditable", false);
+  $(".btn").hide();
+  $("#labelFulfillTugasHa").hide();
+  $("#handleExportPng").show();
+  $("#exportImageBtn, #exportSVGBtn, #exportPDFBtn, #fitToScreenBtn, #zoomInBtn, #zoomOutBtn, #chartCompactBtn").show();
+}
+async function getDetailJob(jobCode) {
+  loader(true);
+  const detailJob = await chartJobDetail({
+    draftId: getDraftExisting.draftOrganizationId,
+    jobCode: jobCode,
+  });
+  loader(false);
+  return detailJob;
 }
 
 $(document).ready(async function () {
-  console.log("Document is ready", master);
   loader(true);
   if (master) {
-    readOnlyPage();
     const draftExistingJobDesc = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
     const dataListDraft = await draftList();
     if (!draftExistingJobDesc || draftExistingJobDesc.draftOrganizationId == "" || draftExistingJobDesc == undefined) {
       const data = dataListDraft.data[0];
       getDraftExisting = {
-        draftId: data.draftId,
-        draftOrganizationId: data.draftOrganizationId,
-        draftRasciId: data.draftRasciId,
-        draftName: data.draftName,
+        draftId: "1",
+        draftOrganizationId: "1",
+        draftRasciId: "1",
+        draftName: "Master Data",
       };
-      console.log("getDraftExisting", getDraftExisting);
       localStorage.setItem(
         "draftExistingJobDesc",
         JSON.stringify({
@@ -659,10 +664,12 @@ $(document).ready(async function () {
       );
     }
   }
+  const detailJobSO = await getDetailJob(jobId);
+  console.log("detailJobSO", detailJobSO);
+
   // return;
   // await 3 seconds delay to simulate loading
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  loader(false);
 
   refreshDataLocalStorage();
   let activeTab = "identifikasi";
@@ -682,11 +689,24 @@ $(document).ready(async function () {
       getDataJobDesc[key] = null;
     }
   }
-  if (getDataJobDesc?.identifikasiJabatan) {
+  if (getDataJobDesc?.identifikasiJabatan != null) {
     console.log("identifikasiJabatan", getDataJobDesc.identifikasiJabatan);
 
     updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
   } else {
+    const dataParams = detailJobSO.data || {};
+    console.log("dataParams", dataParams);
+    const identifikasi = {
+      jobName: dataParams.positionName || "",
+      unitKerjaFungsi: dataParams.functionName || "",
+      lokasiKerja: dataParams.location || "",
+      direktorat: dataParams.directorate.directorateName || "",
+      atasanLangsung: dataParams.directReportName || "",
+      noSuratKeputusan: dataParams.sourceOfSK || "",
+      tanggalSuratKeputusan: dataParams.skDate || "",
+    };
+
+    updateIdentifikasiJob(identifikasi);
     console.error("Identifikasi Jabatan data is null or undefined");
     console.log("call generate new");
     getDataJobDesc = await generateJobDescDataNonEditable(getDraftExisting, jobId, prlOrg, prlOrg);
@@ -695,117 +715,111 @@ $(document).ready(async function () {
 
   console.log("getDataJobDesc", getDataJobDesc);
 
+  const initializeEditor = () => {
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
+      console.log("CKEditor 4.8.0 is available, initializing...");
+
+      document.querySelectorAll(".summernote").forEach((element) => {
+        // Ensure element has an ID for CKEditor 4
+        if (!element.id) {
+          element.id = "ckeditor-" + Math.random().toString(36).substr(2, 9);
+        }
+
+        // CKEditor 4.8.0 optimized configuration
+        const editor = CKEDITOR.replace(element.id, {
+          toolbar: [
+            { name: "editing", items: ["Undo", "Redo"] },
+            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+          ],
+          removePlugins: "elementspath", // Remove bottom path bar
+          resize_enabled: false,
+          height: 220,
+          uiColor: "#ffffff",
+          enterMode: CKEDITOR.ENTER_P, // Use <p> tags for Enter
+          shiftEnterMode: CKEDITOR.ENTER_BR, // Use <br> for Shift+Enter
+          allowedContent: true, // Allow all content - important for v4.8.0
+          fillEmptyBlocks: false, // Don't fill empty blocks with &nbsp;
+          autoParagraph: false, // Don't auto-wrap content in <p> tags
+          startupFocus: false, // Don't auto-focus editor on load
+          // Specific settings for CKEditor 4.8.0
+          entities: false, // Don't convert characters to HTML entities
+          basicEntities: false, // Don't convert basic entities
+          forceEnterMode: true, // Force the enter mode setting
+        });
+
+        // Store the editor instance for compatibility
+        element.ckeditorInstance = {
+          getData: () => editor.getData(),
+          setData: (data) => editor.setData(data),
+          _editor: editor, // Store reference to actual CKEditor instance
+        };
+
+        // Set initial data when editor is ready
+        editor.on("instanceReady", function () {
+          editor.setData(getDataJobDesc?.fungsiJabatan?.deskripsi || "");
+          console.log("✅ CKEditor 4.8.0 successfully initialized for element:", element.id);
+
+          // Ensure proper focus behavior for text input
+          editor.focus();
+        });
+
+        // Handle editor errors
+        editor.on("error", function (evt) {
+          console.error("❌ CKEditor 4.8.0 error:", evt.data);
+          setupContentEditable(element);
+        });
+
+        // Additional event for better text editing experience
+        editor.on("key", function (evt) {
+          // Ensure spacebar works properly
+          if (evt.data.keyCode === 32) {
+            // Spacebar
+            return true; // Allow the space
+          }
+        });
+      });
+    } else {
+      console.log("CKEditor 4.8.0 not available, using contenteditable fallback");
+      document.querySelectorAll(".summernote").forEach((element) => {
+        setupContentEditable(element);
+      });
+    }
+  };
+
+  // Helper function for contenteditable fallback
+  function setupContentEditable(element) {
+    element.contentEditable = true;
+    element.innerHTML = getDataJobDesc?.fungsiJabatan?.deskripsi || "";
+    element.style.border = "1px solid #ddd";
+    element.style.padding = "12px";
+    element.style.minHeight = "120px";
+    element.style.outline = "none";
+    element.style.borderRadius = "4px";
+    element.style.fontSize = "14px";
+    element.style.lineHeight = "1.5";
+    element.style.backgroundColor = "#ffffff";
+
+    element.ckeditorInstance = {
+      getData: () => element.innerHTML,
+      setData: (data) => (element.innerHTML = data),
+    };
+
+    console.log("📝 Contenteditable fallback initialized for .summernote element");
+  }
+
+  // Try to initialize immediately, or wait a bit if scripts are still loading
+  if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
+    initializeEditor();
+  } else {
+    console.log("CKEditor 4.8.0 not ready yet, waiting 500ms...");
+    setTimeout(initializeEditor, 500);
+  }
+
+  localStorage.setItem("fungsi", JSON.stringify({}));
   if (getDataJobDesc.fungsiJabatan) {
     localStorage.setItem("fungsi", JSON.stringify(getDataJobDesc?.fungsiJabatan));
 
-    // Debug CKEditor availability
-    console.log("Checking CKEditor availability...");
-    console.log("typeof CKEDITOR:", typeof CKEDITOR);
-    console.log("window.CKEDITOR:", window.CKEDITOR);
-
-    // Initialize CKEditor 4 with better detection and fallback
-    const initializeEditor = () => {
-      if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
-        console.log("CKEditor 4.8.0 is available, initializing...");
-
-        document.querySelectorAll(".summernote").forEach((element) => {
-          // Ensure element has an ID for CKEditor 4
-          if (!element.id) {
-            element.id = "ckeditor-" + Math.random().toString(36).substr(2, 9);
-          }
-
-          // CKEditor 4.8.0 optimized configuration
-          const editor = CKEDITOR.replace(element.id, {
-            toolbar: [
-              { name: "editing", items: ["Undo", "Redo"] },
-              { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
-              { name: "paragraph", items: ["BulletedList", "NumberedList"] },
-            ],
-            removePlugins: "elementspath", // Remove bottom path bar
-            resize_enabled: false,
-            height: 220,
-            uiColor: "#ffffff",
-            enterMode: CKEDITOR.ENTER_P, // Use <p> tags for Enter
-            shiftEnterMode: CKEDITOR.ENTER_BR, // Use <br> for Shift+Enter
-            allowedContent: true, // Allow all content - important for v4.8.0
-            fillEmptyBlocks: false, // Don't fill empty blocks with &nbsp;
-            autoParagraph: false, // Don't auto-wrap content in <p> tags
-            startupFocus: false, // Don't auto-focus editor on load
-            // Specific settings for CKEditor 4.8.0
-            entities: false, // Don't convert characters to HTML entities
-            basicEntities: false, // Don't convert basic entities
-            forceEnterMode: true, // Force the enter mode setting
-          });
-
-          // Store the editor instance for compatibility
-          element.ckeditorInstance = {
-            getData: () => editor.getData(),
-            setData: (data) => editor.setData(data),
-            _editor: editor, // Store reference to actual CKEditor instance
-          };
-
-          // Set initial data when editor is ready
-          editor.on("instanceReady", function () {
-            editor.setData(getDataJobDesc?.fungsiJabatan?.deskripsi || "");
-            console.log("✅ CKEditor 4.8.0 successfully initialized for element:", element.id);
-
-            // Ensure proper focus behavior for text input
-            editor.focus();
-          });
-
-          // Handle editor errors
-          editor.on("error", function (evt) {
-            console.error("❌ CKEditor 4.8.0 error:", evt.data);
-            setupContentEditable(element);
-          });
-
-          // Additional event for better text editing experience
-          editor.on("key", function (evt) {
-            // Ensure spacebar works properly
-            if (evt.data.keyCode === 32) {
-              // Spacebar
-              return true; // Allow the space
-            }
-          });
-        });
-      } else {
-        console.log("CKEditor 4.8.0 not available, using contenteditable fallback");
-        document.querySelectorAll(".summernote").forEach((element) => {
-          setupContentEditable(element);
-        });
-      }
-    };
-
-    // Helper function for contenteditable fallback
-    function setupContentEditable(element) {
-      element.contentEditable = true;
-      element.innerHTML = getDataJobDesc?.fungsiJabatan?.deskripsi || "";
-      element.style.border = "1px solid #ddd";
-      element.style.padding = "12px";
-      element.style.minHeight = "120px";
-      element.style.outline = "none";
-      element.style.borderRadius = "4px";
-      element.style.fontSize = "14px";
-      element.style.lineHeight = "1.5";
-      element.style.backgroundColor = "#ffffff";
-
-      element.ckeditorInstance = {
-        getData: () => element.innerHTML,
-        setData: (data) => (element.innerHTML = data),
-      };
-
-      console.log("📝 Contenteditable fallback initialized for .summernote element");
-    }
-
-    // Try to initialize immediately, or wait a bit if scripts are still loading
-    if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
-      initializeEditor();
-    } else {
-      console.log("CKEditor 4.8.0 not ready yet, waiting 500ms...");
-      setTimeout(initializeEditor, 500);
-    }
-
-    console.log(getDataJobDesc?.fungsiJabatan);
     getDataJobDesc?.fungsiJabatan.jobReferences.map((item) => {
       const textReference = `(Reference from : ${item.jobReference.jobName}) - ${
         item.jobReference.skNumber ? item.jobReference.skNumber : "-"
@@ -815,13 +829,16 @@ $(document).ready(async function () {
         `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
       );
     });
+  } else {
   }
 
+  localStorage.setItem("tugasUmum", JSON.stringify([]));
   if (getDataJobDesc.tugasTanggungJawabUmum) {
     localStorage.setItem("tugasUmum", JSON.stringify(getDataJobDesc.tugasTanggungJawabUmum.data));
     updateTable("tugasUmum", getDataJobDesc.tugasTanggungJawabUmum.data, tabCusJD.tugasUmum);
   }
 
+  localStorage.setItem("lsAvailable", JSON.stringify({}));
   if (getDataJobDesc.countTugasHa) {
     const countAll = getDataJobDesc.countTugasHa.data.length;
     const available = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "AVAILABLE");
@@ -858,26 +875,33 @@ $(document).ready(async function () {
       $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
     }
   }
+
+  localStorage.setItem("tugasHa", JSON.stringify([]));
   if (getDataJobDesc.tugasTanggungJawabAkhir) {
     const cleanObj = getDataJobDesc.tugasTanggungJawabAkhir.data.filter((item) => item.responsible.length > 0);
     localStorage.setItem("tugasHa", JSON.stringify(cleanObj));
     updateTable("tugasHa", cleanObj, [...tabCusJD.tugasHa, "action"]);
   }
 
+  localStorage.setItem("wewenang", JSON.stringify([]));
   if (getDataJobDesc.wewenang) {
     localStorage.setItem("wewenang", JSON.stringify(getDataJobDesc.wewenang.data));
     updateTable("wewenang", getDataJobDesc.wewenang.data, tabCusJD.wewenang);
   }
 
+  localStorage.setItem("koordinasiInternal", JSON.stringify([]));
   if (getDataJobDesc.koordinasiInternal) {
     localStorage.setItem("koordinasiInternal", JSON.stringify(getDataJobDesc.koordinasiInternal.data));
     updateTable("koordinasi", getDataJobDesc.koordinasiInternal.data, [...tabCusJD.koordinasi, "action"]);
   }
 
+  localStorage.setItem("relasiEksternal", JSON.stringify([]));
   if (getDataJobDesc.relasiEksternal) {
     localStorage.setItem("relasiEksternal", JSON.stringify(getDataJobDesc.relasiEksternal.data));
     updateTable("relation", getDataJobDesc.relasiEksternal.data, [...tabCusJD.relation, "action"]);
   }
+
+  localStorage.setItem("persyaratanJabatan", JSON.stringify([]));
   if (getDataJobDesc.persyaratanJabatan) {
     getDataJobDesc.persyaratanJabatan.data.map((item) => {
       item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
@@ -886,6 +910,7 @@ $(document).ready(async function () {
     updateTable("persyaratan", getDataJobDesc.persyaratanJabatan.data, tabCusJD.pj);
   }
 
+  localStorage.setItem("persyaratanKhusus", JSON.stringify([]));
   if (getDataJobDesc.persyaratanKhusus) {
     // getDataJobDesc.persyaratanKhusus.data.map((item) => {
     //   item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
@@ -966,6 +991,11 @@ $(document).ready(async function () {
     );
     localStorage.setItem("stk", JSON.stringify(getDataJobDesc.stk.data));
     updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
+  }
+
+  if (master) {
+    // hide button inside table
+    readOnlyPage();
   }
   loader(false);
   focusNode(jobId);

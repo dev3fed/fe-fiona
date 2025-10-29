@@ -571,3 +571,15 @@ async function uploadSvgAsString(svgBlob, jobId, draftId) {
     throw error;
   }
 }
+
+async function chartJobDetail(params) {
+  const api = `${url.baseUrl}/${url["organization-structure"]}/chart/job/detail?draftId=${params.draftId}&unitCode=${params.jobCode}`;
+  try {
+    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#chartJobPositionList").html("Error fetching data from API");
+    throw error;
+  }
+}

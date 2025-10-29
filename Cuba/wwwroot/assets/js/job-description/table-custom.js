@@ -106,7 +106,8 @@ function getTableListJobDes() {
         width: "10%",
         data: null,
         render: function (data) {
-          if (data.jobDescStatus == "not available") {
+          console.log(data.jobDescStatus);
+          if (data.jobDescStatus == "NOT AVAILABLE") {
             return `
             <button class="" style="padding:5px 10px ;font-size:12px;width:80%;color:white;background:#006ca9;border:none"  onclick="createJobDesc('${data.jobId}','${data.prlOrg}','${data.positionCode}')"><i class="fas fa-plus p-r-5"></i> Create</button>
             `;
