@@ -176,6 +176,12 @@ async function insertFormPosition(paramId) {
   if (data?.careerTypeName) {
     $("#selectCareerType").append(new Option(data?.careerTypeName, 1, true, true));
   }
+  if (data?.isProject) {
+    $("#selectIsProject").val("Yes");
+  }
+  if (data?.isNeck) {
+    $("#selectNeckFunction").val("Yes");
+  }
 
   const arraySkillGroup = ["selectSkillGroupMain", "selectSkillGroupSecond", "selectSkillGroupThird"];
   const arraySubSkillGroup = ["selectSubSkillGroupMain", "selectSubSkillGroupSecond", "selectSubSkillGroupThird"];
