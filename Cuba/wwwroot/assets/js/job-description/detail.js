@@ -623,10 +623,20 @@ async function searchJobCompare(event, isPercentage = false) {
 function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid atau kosong") {
   console.error(`${errorMessage} dari endpoint => ${url.baseUrl}/${url["job-description"]}/${endpoint}. `);
 }
+
+function readOnlyPage() {
+  // alert("masok");
+  // $('#addJobReference')
+  // $("input, textarea, select").attr("disabled", true);
+  // $(".btn-add, .btn-delete, .btn-save-draft, .btn-publish, .btn-generate, .btn-apply").hide();
+  // $(".summernote").attr("contenteditable", false);
+}
+
 $(document).ready(async function () {
   console.log("Document is ready", master);
   loader(true);
   if (master) {
+    readOnlyPage();
     const draftExistingJobDesc = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
     const dataListDraft = await draftList();
     if (!draftExistingJobDesc || draftExistingJobDesc.draftOrganizationId == "" || draftExistingJobDesc == undefined) {
@@ -890,10 +900,11 @@ $(document).ready(async function () {
   const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
   const divKompetensiPerilaku = $("#kompetensiPerilaku");
 
-  localStorage.setItem("kompetensiTeknis", JSON.stringify(getDataJobDesc.kompetensiTeknis.data || {}));
-  localStorage.setItem("kompetensiPerilaku", JSON.stringify(getDataJobDesc.kompetensiPerilaku.data || []));
+  localStorage.setItem("kompetensiTeknis", JSON.stringify(getDataJobDesc?.kompetensiTeknis?.data || {}));
+  localStorage.setItem("kompetensiPerilaku", JSON.stringify(getDataJobDesc?.kompetensiPerilaku?.data || []));
 
   if (
+    getDataJobDesc?.kompetensiTeknis?.data?.komtekMandatori &&
     Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekMandatori) &&
     getDataJobDesc.kompetensiTeknis.data.komtekMandatori.length > 0
   ) {
@@ -907,6 +918,7 @@ $(document).ready(async function () {
   }
 
   if (
+    getDataJobDesc?.kompetensiTeknis?.data?.komtekGeneral &&
     Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekGeneral) &&
     getDataJobDesc.kompetensiTeknis.data.komtekGeneral.length > 0
   ) {
@@ -920,6 +932,7 @@ $(document).ready(async function () {
   }
 
   if (
+    getDataJobDesc?.kompetensiTeknis?.data?.komtekSpesifik &&
     Array.isArray(getDataJobDesc.kompetensiTeknis.data.komtekSpesifik) &&
     getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.length > 0
   ) {
@@ -932,7 +945,11 @@ $(document).ready(async function () {
     divKompetensiTeknisSpesifik.empty().append($ul);
   }
 
-  if (Array.isArray(getDataJobDesc.kompetensiPerilaku.data) && getDataJobDesc.kompetensiPerilaku.data.length > 0) {
+  if (
+    getDataJobDesc?.kompetensiPerilaku?.data &&
+    Array.isArray(getDataJobDesc.kompetensiPerilaku.data) &&
+    getDataJobDesc.kompetensiPerilaku.data.length > 0
+  ) {
     const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
     getDataJobDesc.kompetensiPerilaku.data.forEach((item) => {
       $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
