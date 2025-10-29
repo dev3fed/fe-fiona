@@ -181,6 +181,7 @@ async function insertFormPosition(paramId) {
   }
   if (data?.isNeck) {
     $("#selectNeckFunction").val("Yes");
+    // $("#selectNeckFunction").val("Yes");
   }
 
   const arraySkillGroup = ["selectSkillGroupMain", "selectSkillGroupSecond", "selectSkillGroupThird"];
