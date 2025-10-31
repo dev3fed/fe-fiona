@@ -639,6 +639,20 @@ async function listDetailJobs(params) {
   }
 }
 
+// /api/organization-structure/draft/upload/zhroom/{draftId}
+async function uploadZhroomDraftSO(params, file) {
+  const api = `${url.baseUrl}/${url["api-organization"]}/draft/upload/zhroom/${params}`;
+  console.log("file", file);
+  try {
+    const result = await ajaxRequestFile(api, "POST", params, file); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#chartJobPositionList").html("Error fetching data from API");
+    throw error;
+  }
+}
+
 // 'https://cnt-be-dev2.devserver.fed-insight.com/api/ExportOrganization/export-zhroom-to-excel?draftId=e02be91d-8f09-4030-b33c-a7920efb961a' \
 async function exportZhroomToExcel(params) {
   const api = `${url.baseUrl}/${url["api-export-organization"]}/export-zhroom-to-excel?draftId=${params.draftId}`;

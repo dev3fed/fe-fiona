@@ -397,6 +397,8 @@ const CHART_LOADING_HTML = `
 `;
 
 const defaultNodeId = "10132406";
+// const defaultMasterId = "1";
+const defaultMasterId = "00000000-0000-0000-0000-000000000001";
 const directReportAttrIds =
   "#selectFunction, #FunctionSwitch, #selectDivision, #DivisionSwitch, #selectSubDivision, #SubDivisionSwitch, #selectDepartment, #DepartmentSwitch, #selectSection, #SectionSwitch";
 

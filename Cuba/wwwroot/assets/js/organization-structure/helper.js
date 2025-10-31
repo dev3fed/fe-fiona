@@ -1,3 +1,16 @@
+function confirmFunction(title, text) {
+  // give alert confirm
+  return swal({
+    title: title || "Are you sure?",
+    text: text || "Make sure all data is correct before proceeding.",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((willProceed) => {
+    return willProceed; // true if user clicks OK, false if user clicks Cancel
+  });
+}
+
 function loader(status) {
   if (status == true) {
     $("#loading-overlay").addClass("show").show();
@@ -31,7 +44,7 @@ async function checkDataOrganization(draftList) {
   if (!organizationAttribute.orgUnitId || !organizationAttribute.orgUnitName) {
     if (draftList && draftList.length > 0) {
       console.log("draftList", draftList);
-      const firstDraft = draftList.find((item) => item.draftId == "1");
+      const firstDraft = draftList.find((item) => item.draftId == defaultMasterId);
       console.log("firstDraft", firstDraft);
       organizationAttribute.orgUnitId = firstDraft.draftId;
       organizationAttribute.orgUnitName = firstDraft.draftName;
@@ -55,7 +68,7 @@ function checkDataOrganizationLocalStorage() {
         organizationAttribute[key] = data[key];
       }
     });
-    organizationAttribute.isMasterData = organizationAttribute.draftId == "1" ? true : false;
+    organizationAttribute.isMasterData = organizationAttribute.draftId == defaultMasterId ? true : false;
   }
 }
 

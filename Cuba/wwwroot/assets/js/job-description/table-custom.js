@@ -106,8 +106,8 @@ function getTableListJobDes() {
         width: "10%",
         data: null,
         render: function (data) {
-          console.log(data.jobDescStatus);
-          if (data.jobDescStatus == "NOT AVAILABLE") {
+          console.log({ draftExistingJobDesc });
+          if (data.jobDescStatus == "NOT AVAILABLE" && draftExistingJobDesc.draftId != 1) {
             return `
             <button class="" style="padding:5px 10px ;font-size:12px;width:80%;color:white;background:#006ca9;border:none"  onclick="createJobDesc('${data.jobId}','${data.prlOrg}','${data.positionCode}')"><i class="fas fa-plus p-r-5"></i> Create</button>
             `;
@@ -123,7 +123,6 @@ function getTableListJobDes() {
 }
 
 async function getTableListDraft(params) {
-  console.log("params", params);
   if ($.fn.DataTable.isDataTable("#draftList")) {
     $("#draftList").DataTable().destroy();
   }
@@ -189,8 +188,6 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
-          // return "asik";
-          console.log("data", data);
           const draftId =
             data.draftOrganizationId + "|" + data.draftRasciId + "|" + data.draftId + "|" + data.draftName;
           return checkButtonTable("draftList", draftId, "draft-detail");
@@ -271,7 +268,6 @@ async function getTableListDraftDetail() {
           order: data.order,
         },
         success: function (res) {
-          console.log("res", res);
           callback({
             draw: data.draw,
             recordsTotal: res.count || 0,

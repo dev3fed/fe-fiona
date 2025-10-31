@@ -240,6 +240,10 @@ async function confirmSubmitApproval(id) {
   $("#modalConfirm").modal("hide");
   swal("Approved", "draft has been approved.", "success");
   loader(false);
+  // wait 2sc then redirect to organization index
+  setTimeout(() => {
+    window.location.href = "/organization/index?activeTab=request";
+  }, 1000);
 }
 async function confirmRejectApproval(id) {
   loader(true);
@@ -250,6 +254,9 @@ async function confirmRejectApproval(id) {
   $("#modalConfirm").modal("hide");
   swal("Rejected", "draft has been rejected.", "success");
   loader(false);
+  setTimeout(() => {
+    window.location.href = "/organization/index?activeTab=draft";
+  }, 1000);
 }
 
 async function previewDesignCost() {
@@ -334,7 +341,11 @@ function finalizeApproval() {
 
 async function clickUploadFunction() {
   const file = $("#fileImportDraft")[0].files[0];
-  const sendFile = await uploadDataDraftSO(organizationAttribute.orgUnitId, file);
+  const sendFile = await uploadZhroomDraftSO(organizationAttribute.orgUnitId, file);
+  if (sendFile.status != 200) {
+    swal("Failed", "Failed to import data draft", "error");
+    return;
+  }
   swal("Success", "Data has been imported", "success");
   hideModal(`modalConfirm`);
 }
@@ -858,21 +869,9 @@ $(document).ready(async function () {
   });
 
   $("#importDataDraft").on("click", async function () {
-    // $("#fileImportDraft").val("");
-    const draftId = urlParams.get("draftId");
-    const importData = await exportDraftToExcel({ draftId });
-    if (importData) {
-      const url = window.URL.createObjectURL(new Blob([importData.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `import-draft-${draftId}.xlsx`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } else {
-      const message = importData?.message ?? "Failed to download template";
-      swal("Failed", message, "error");
+    const uploadFile = await confirmFunction("Upload", "Are you sure want to upload file?");
+    if (uploadFile) {
+      $("#fileImportDraft").click();
     }
   });
 
