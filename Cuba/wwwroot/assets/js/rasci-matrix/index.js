@@ -485,7 +485,8 @@ const handleExportMatrix = async () => {
     const payloadProsbis = getState("payloadProsbis");
     const payloadPosition = getState("payloadPosition");
     const actionExport = getState("actionExport");
-
+    const loader = document.getElementById("loader");
+    loader.style.display = "flex";
     let payload = {};
     let filename = "rasci_matrix_export.xlsx";
 
@@ -541,6 +542,7 @@ const handleExportMatrix = async () => {
     const result = await fetchExportRasciMatrix(payload);
     if (result.success) {
       console.log("result", result);
+      loader.style.display = "none";
       // File download already handled inside fetchExportRasciMatrix
       // Optionally show a success message here
     } else {

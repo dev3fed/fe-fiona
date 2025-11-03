@@ -139,12 +139,51 @@ const renderTableApproval = async (approvalData) => {
       };
 
       const statusMap = {
-        1: "Approval",
-        2: "Reject",
-        3: "Submit",
+        Approved: "Approval",
+        Rejected: "Reject",
+        Submitted: "On Review",
       };
-      const statusText = statusMap[data.isStatus] || "-";
-
+      function getStatusColor(status) {
+        switch (status) {
+          case 0:
+            return "#FFA800";
+          case "Approved":
+            return "#D1FED3";
+          case "Rejected":
+            return "#F9E9EA";
+          case "Submitted":
+            return "#FEE9B0";
+          default:
+            return "#E4E6EF";
+        }
+      }
+      function getTextColor(status) {
+        switch (status) {
+          case 0:
+            return "#000000";
+          case "Approved":
+            return "#4DB043";
+          case "Rejected":
+            return "#CD2536";
+          case "Submitted":
+            return "#B08803";
+          default:
+            return "#000000";
+        }
+      }
+      const statusText = statusMap[data.statusText] || "-";
+      let statusHtml = `<span style="
+          display:inline-block;
+          width:120px;
+          text-align:center;
+          background-color:${getStatusColor(data.statusText)};
+          color:${getTextColor(data.statusText)};
+          font-weight:500;
+          padding:8px 0;
+          border-radius:4px;
+          line-height:1;
+          box-sizing:border-box;
+          ">${statusText}</span>`;
       return `
         <tr>
           <td style="text-align:center">${index + 1}</td>
@@ -153,7 +192,7 @@ const renderTableApproval = async (approvalData) => {
           <td>${data.draftSoName || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>
           <td>${formatDate(data.modifiedDate)}</td>
-          <td>${data.statusText}</td>
+          <td>${statusHtml}</td>
           <td style="width: 100px;text-align:center">
         <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
           <i class="icon-eye"></i> 

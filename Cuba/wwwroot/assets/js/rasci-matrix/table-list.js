@@ -6,7 +6,9 @@ document.addEventListener("dataLoaded", async function () {
       hideLoading();
       feather.replace();
     } else {
-      defaultLoadMatrix();
+      await defaultLoadMatrix();
+      hideLoading();
+      feather.replace();
     }
     //  else {
     //   showDataEmpty();
@@ -45,7 +47,6 @@ async function defaultLoadMatrix() {
       loadTableBody(resultMatrix.data);
       loadTableHeader(resultPosition.data);
       mapRasciCells(combineIndex, resultPosition.data);
-      hideLoading();
     }
   } catch (error) {}
 }
@@ -119,6 +120,7 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
 });
 
 function fetchDatasource(draftId = null) {
+  console.log("draftId", draftId);
   $.ajax({
     url: `${url_api}/api/Utilities/selection`,
     dataType: "json",
@@ -128,20 +130,25 @@ function fetchDatasource(draftId = null) {
       search: "",
     },
     success: function (response) {
+      console.log("response", response);
       if (response && response.data && response.data.result) {
         let $select = $("#dataSource-rasci");
-        $select.find("option:not(:first)").remove(); // Hapus opsi lama kecuali yang pertama
-
-        response.data.result.forEach((item) => {
+        $select.find("option:not(:first)").remove();
+        const excludedIds = new Set(["1", "00000000-0000-0000-0000-000000000001"]);
+        const result = Array.isArray(response?.data?.result)
+          ? response.data.result.filter((item) => !excludedIds.has(String(item?.id)))
+          : [];
+        console.log("result", result);
+        result.forEach((item) => {
           let isSelected = draftId && item.id == draftId;
           let $option = new Option(item.text, item.id, isSelected, isSelected);
-          $($option).attr("data-draftso", item.draftSo); // Tambahkan atribut data-draftso
+          $($option).attr("data-draftso", item.draftSo);
           $select.append($option);
         });
 
         if (draftId) {
           let newOption = new Option(`Draft ${draftId}`, draftId, true, true);
-          $(newOption).attr("data-draftso", "your-value-here"); // Jika perlu, set manual
+          $(newOption).attr("data-draftso", "your-value-here");
           $select.append(newOption);
         }
 
@@ -159,10 +166,11 @@ function fetchDatasource(draftId = null) {
 }
 
 async function changeDataSource(dataSource, draftSo) {
+  console.log("dataSource", dataSource);
+  console.log("draftSo", draftSo);
   try {
     const defaultIndexNumber = getState("defaultIndexNumber");
     $("#dataSource-summary").val(dataSource).trigger("change");
-    console.log("dataSource", dataSource);
     document.getElementById("dataSource-summary").disabled = true;
     if (dataSource !== "master" && dataSource !== "" && dataSource !== null) {
       // document.getElementById("pills-warningtab").style.display = "flex";
@@ -230,7 +238,6 @@ async function changeDataSource(dataSource, draftSo) {
     return false;
   }
 }
-// Event listener untuk infinite scroll
 
 const showDataEmpty = () => {
   const textInfo = document.getElementById("text-info");
@@ -292,7 +299,6 @@ function appendDynamicHeader(jobTitleList) {
     return;
   }
 
-  // Mulai dengan header statis yang mungkin masih ada
   let staticHeaders = "";
   headerRow.querySelectorAll("th:not(.jabatan-cell)").forEach((th) => {
     staticHeaders += th.outerHTML;
@@ -304,7 +310,6 @@ function appendDynamicHeader(jobTitleList) {
     return;
   }
 
-  // Bangun header content dinamis
   let dynamicHeaders = "";
   jobTitleList.forEach((val) => {
     const uniqueClass = `jabatan-level-${val.level}`;
@@ -421,7 +426,7 @@ function getRowById(rowId) {
 function getAllIndexNumbers() {
   const indexNumbers = [];
   document.querySelectorAll("#table-body tr").forEach((row) => {
-    const indexNumber = row.id.replace("row-", ""); // Ambil dari id row
+    const indexNumber = row.id.replace("row-", "");
     if (indexNumber) indexNumbers.push(indexNumber);
   });
   return indexNumbers;
@@ -611,7 +616,6 @@ async function handleCollapse(id) {
   };
 
   if (!isExpanded) {
-    // Expand logic
     setState("idProsbis", [...appState.idProsbis, parentId]);
     setState(
       "resetIdProsbis",
@@ -621,7 +625,6 @@ async function handleCollapse(id) {
     const selectedIds = filterChild(appState.idProsbis, appState.resetIdProsbis);
     await updateStatesAndRender(selectedIds);
   } else {
-    // Collapse logic
     const currentSelected = [...appState.idProsbis];
     const indexToRemove = currentSelected.indexOf(parentId);
 

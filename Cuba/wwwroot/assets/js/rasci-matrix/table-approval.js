@@ -139,10 +139,49 @@ const renderTableApproval = async (approvalData) => {
       const statusMap = {
         1: "Approval",
         2: "Reject",
-        3: "Submit",
+        3: "On Review",
       };
+      function getStatusColor(status) {
+        switch (status) {
+          case 0:
+            return "#FFA800";
+          case 1:
+            return "#D1FED3";
+          case 2:
+            return "#F9E9EA";
+          case 3:
+            return "#FEE9B0";
+          default:
+            return "#E4E6EF";
+        }
+      }
+      function getTextColor(status) {
+        switch (status) {
+          case 0:
+            return "#000000";
+          case 1:
+            return "#4DB043";
+          case 2:
+            return "#CD2536";
+          case 3:
+            return "#B08803";
+          default:
+            return "#000000";
+        }
+      }
       const statusText = statusMap[data.isStatus] || "-";
-
+      let statusHtml = `<span style="
+          display:inline-block;
+          width:120px;
+          text-align:center;
+          background-color:${getStatusColor(data.isStatus)};
+          color:${getTextColor(data.isStatus)};
+          font-weight:500;
+          padding:8px 0;
+          border-radius:4px;
+          line-height:1;
+          box-sizing:border-box;
+          ">${statusText}</span>`;
       const requestId =
         data.requestId ||
         (() => {
@@ -164,7 +203,7 @@ const renderTableApproval = async (approvalData) => {
           <td>${data.orgNameSource || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>
           <td>${formatDate(data.modifiedDate)}</td>
-          <td>${statusText}</td>
+          <td>${statusHtml}</td>
           <td style="width: 100px;text-align:center">
         <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
           <i class="icon-eye"></i> 

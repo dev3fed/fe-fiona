@@ -1,6 +1,26 @@
 async function detailDraft() {
   try {
     const dataDraft = getState("dataDetailDraft");
+    const labelStatus = {
+      0: "Draft",
+      1: "Approved",
+      2: "Rejected",
+      3: "On Review",
+    };
+    const STATUS_COLORS = {
+      0: { bg: "#FFA800", text: "#000000" },
+      1: { bg: "#D1FED3", text: "#4DB043" },
+      2: { bg: "#F9E9EA", text: "#CD2536" },
+      3: { bg: "#FEE9B0", text: "#B08803" },
+    };
+
+    function getStatusColor(status) {
+      return STATUS_COLORS[status]?.bg ?? "#E4E6EF";
+    }
+
+    function getTextColor(status) {
+      return STATUS_COLORS[status]?.text ?? "#000000";
+    }
     const payload = {
       Page: 1,
       PageSize: 5,
@@ -9,34 +29,55 @@ async function detailDraft() {
     const listData = await fetchDraftListProsbis(dataDraft.draftId, queryString);
     if (dataDraft) {
       const bodyInfo = `
-      <div class="col-3 custom-col">
-        <label style="color:#9F9FA5">Draft Name</label>
-        <div style="display: flex; align-items: center; font-weight: 600; font-size: 14px;">
-          <span style="flex-grow: 1; text-align: center; padding-left: 10px">${dataDraft.draftName}</span>
-             <button class=" btn btn-outline-light btn-small-icon" type="button" onclick="handleRename()">
-              <img src="/assets/images/rasci/icon_pencil.svg" alt="Filter Icon">
+      <div class="${dataDraft.isStatus != 0 ? "col-3" : "col-4"} custom-col" style="text-align:center">
+        <label style="color:#9F9FA5; display:block">Draft Name</label>
+        <div style="font-weight: 600; font-size: 14px; display:flex; flex-direction:column; align-items:center;">
+          <span style="padding-left: 10px">${dataDraft.draftName}</span>
+          <button class="btn btn-outline-light btn-small-icon mt-2" type="button" onclick="handleRename()">
+        <img src="/assets/images/rasci/icon_pencil.svg" alt="Filter Icon">
           </button>
         </div>
       </div>
-      <div class="col-3 custom-col">
-        <label style="color:#9F9FA5">Organization Data Source</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.draftSO.draftParentName}</label>
+      <div class="${dataDraft.isStatus != 0 ? "col-3" : "col-4"} custom-col" style="text-align:center">
+        <label style="color:#9F9FA5; display:block">Organization Data Source</label>
+        <label style="font-weight: 600;font-size: 14px; display:block">${dataDraft.draftSO.draftParentName}</label>
       </div>
-      <div class="col-3 custom-col">
-        <label style="color:#9F9FA5">Created by</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
-        <label style="color:#9F9FA5">${
+      <div class="col-2 custom-col" style="text-align:center">
+        <label style="color:#9F9FA5; display:block">Created by</label>
+        <label style="font-weight: 600;font-size: 14px; display:block">${
+          dataDraft.createdBy ? dataDraft.createdBy : "-"
+        }</label>
+        <label style="color:#9F9FA5; display:block">${
           dataDraft.createdDate ? new Date(dataDraft.createdDate).toLocaleDateString() : "-"
         }</label>
       </div>
-      <div class="col-3 custom-col">
-        <label style="color:#9F9FA5">Updated by</label>
-        <label style="font-weight: 600;font-size: 14px">${dataDraft.createdBy ? dataDraft.createdBy : "-"}</label>
-        <label style="color:#9F9FA5">${
+      <div class="col-2 custom-col" style="text-align:center">
+        <label style="color:#9F9FA5; display:block">Updated by</label>
+        <label style="font-weight: 600;font-size: 14px; display:block">${
+          dataDraft.createdBy ? dataDraft.createdBy : "-"
+        }</label>
+        <label style="color:#9F9FA5; display:block">${
           dataDraft.createdDate ? new Date(dataDraft.createdDate).toLocaleDateString() : "-"
         }</label>
       </div>
-    `;
+      ${
+        dataDraft.isStatus != 0
+          ? `
+       <div class="col-2 custom-col" style="text-align:center">
+        <label style="color:#9F9FA5; display:block">Status</label>
+        <label style="font-size: 14px;  background-color: ${getStatusColor(dataDraft.isStatus)};color: ${getTextColor(
+              dataDraft.isStatus,
+            )}; font-weight:500;
+          width:100px;text-align:center;
+          padding:8px 0;
+          border-radius:4px;
+          line-height:1;
+          box-sizing:border-box; display:inline-block;">${labelStatus[dataDraft.isStatus] || "-"}</label>
+       </div>
+      `
+          : ``
+      }
+        `;
       const draftInfo = document.getElementById("draft-info");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
@@ -50,7 +91,35 @@ async function detailDraft() {
       </div>
     `;
       const emptyActivity = document.getElementById("empty-activity");
+
       if (emptyActivity) emptyActivity.innerHTML = bodyEmpty;
+      const isWarning = dataDraft.draftSO.isApproved;
+      if (isWarning === false) {
+        document.getElementById("warning-draft").style.display = "block";
+        const soName = dataDraft.draftSO.draftName || "N/A";
+        const warning = document.getElementById("warning-draft");
+        const warningText = `
+        <div style="
+          display: inline-block;
+          white-space: nowrap;
+          background: #FFF8E1;
+          border: 1px solid #8A6600;
+          margin-top:12px;
+          border-radius: 4px;
+          padding: 6px 18px;
+          color: #7A5A00;
+          font-size: 12px;
+          box-sizing: border-box;
+          ">
+          Can not submit to approval because organization data source from
+          <strong style="font-weight:600; color:#554200;">${soName}</strong>
+          draft has not been finalized.
+        </div>
+      `;
+        if (warning) warning.innerHTML = warningText;
+        const btnSubmit = document.getElementById("detail-draft-submitted");
+        if (btnSubmit) btnSubmit.disabled = true;
+      }
     }
   } catch (error) {}
 }

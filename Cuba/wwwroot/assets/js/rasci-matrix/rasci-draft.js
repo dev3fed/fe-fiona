@@ -402,6 +402,17 @@ async function handleOpenDetail(id) {
   }
   const dataDraft = await fetchDraftProsbisByid(id);
   if (dataDraft.status === 200) {
+    console.log("dataDraft", dataDraft.data.isStatus);
+    const status = dataDraft.data.isStatus;
+    const detailSubmittedBtn = document.getElementById("detail-draft-submitted");
+    const deleteDrafBtn = document.getElementById("delete-detail-draft");
+    // jika status != 3 show btn submit to approval and delete btn
+    {
+      const show = status !== 3 ? "inline-block" : "none";
+      [detailSubmittedBtn, deleteDrafBtn].forEach((btn) => {
+        if (btn) btn.style.display = show;
+      });
+    }
     // const dataDetail = dataDraft.data.draftDetail[0];
     // const dataInfo = dataDraft.data.draftInfo;
     // const notation = JSON.parse(dataDetail.rasciNotation);
@@ -497,6 +508,7 @@ async function handleSaveCreateDraft() {
         modal.hide();
       }
       let draftId = result?.data?.draftRasci?.draftId;
+      let draftSo = result?.data?.draftRasci?.draftSO.draftId;
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -519,7 +531,9 @@ async function handleSaveCreateDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          fetchDatasource(draftId);
+          await fetchDatasource(draftId);
+          await fetctListDatasource(draftId);
+          changeDataSource(draftId, draftSo);
           if (dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
@@ -569,6 +583,8 @@ async function handleSaveDraft() {
       if (modal) {
         modal.hide();
       }
+      let draftId = result?.data?.draftRasci?.draftId;
+      let draftSo = result?.data?.draftRasci?.draftSO.draftId;
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -591,7 +607,9 @@ async function handleSaveDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          fetchDatasource();
+          await fetchDatasource(draftId);
+          await fetctListDatasource(draftId);
+          changeDataSource(draftId, draftSo);
           if (dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
@@ -640,6 +658,8 @@ async function handleSaveEmptyDraft() {
       if (modal) {
         modal.hide();
       }
+      let draftId = result?.data?.draftRasci?.draftId;
+      let draftSo = result?.data?.draftRasci?.draftSO.draftId;
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -662,7 +682,9 @@ async function handleSaveEmptyDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          fetchDatasource();
+          await fetchDatasource(draftId);
+          await fetctListDatasource(draftId);
+          changeDataSource(draftId, draftSo);
           if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);

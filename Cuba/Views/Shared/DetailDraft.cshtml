@@ -182,6 +182,9 @@
             @* <div style="padding-top: 20px;" id="detail-job">
             </div> *@
         </div>
+        <div id="warning-draft" style="display: none;">
+       
+        </div>
         <!-- Card detail end-->
 
         <!-- card footer start-->
@@ -189,14 +192,15 @@
             <button class="btn btn-outline-light" type="button" onclick="handleBack()">
                 <i class="icon-arrow-left"></i> Back
             </button>
-            <button class="btn btn-outline-danger" type="button" onclick="deleteDraftFromdetail()">
+            <button class="btn btn-outline-danger" type="button" onclick="deleteDraftFromdetail()"
+                id="delete-detail-draft">
                 <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
             </button>
             @* <button class=" btn btn-outline-light" type="button" onclick="handleOpenDetailBp()">
                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit Draft
             </button> *@
-            <button class="btn btn-primary" type="button" onclick="openDetailApproval()"> Submit to Approval<i
-                    class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+            <button class="btn btn-primary" type="button" onclick="openDetailApproval()" id="detail-draft-submitted">
+                Submit to Approval<i class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
         </div>
         <!-- card footer end-->
     </div>
