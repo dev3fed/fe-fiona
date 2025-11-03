@@ -9,6 +9,10 @@ function debounceSearchJobCompare(event, delay = 800) {
   }, delay);
 }
 
+function backToList() {
+  window.location.href = "/job-description/index";
+}
+
 function confirmApply() {
   swal("Success", "Job Description has been applied", "success");
 }
@@ -627,16 +631,14 @@ function showEndpointErrorAlert(endpoint, data, errorMessage = "Data tidak valid
 function readOnlyPage() {
   $(".btn").hide();
   $("#labelFulfillTugasHa").hide();
-  $("#handleExportPng").show();
+  $("#handleExportPng , #backToListBtn").show();
   $("#exportImageBtn, #exportSVGBtn, #exportPDFBtn, #fitToScreenBtn, #zoomInBtn, #zoomOutBtn, #chartCompactBtn").show();
 }
 async function getDetailJob(jobCode) {
-  loader(true);
   const detailJob = await chartJobDetail({
     draftId: getDraftExisting.draftOrganizationId,
     jobCode: jobCode,
   });
-  loader(false);
   return detailJob;
 }
 
@@ -663,6 +665,7 @@ $(document).ready(async function () {
         })
       );
     }
+    readOnlyPage();
   }
   const detailJobSO = await getDetailJob(jobId);
   console.log("detailJobSO", detailJobSO);
@@ -683,6 +686,7 @@ $(document).ready(async function () {
 
   console.log("getDraftExisting", getDraftExisting);
   let getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
+  loader(false);
   for (const key in getDataJobDesc) {
     if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
       showEndpointErrorAlert(`job-description/${key}/show`, getDataJobDesc[key]);
@@ -997,7 +1001,6 @@ $(document).ready(async function () {
     // hide button inside table
     readOnlyPage();
   }
-  loader(false);
   focusNode(jobId);
 
   // $(".summernote").summernote("disable");

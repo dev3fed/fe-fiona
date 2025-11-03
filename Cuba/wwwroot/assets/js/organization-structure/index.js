@@ -564,19 +564,6 @@ async function moveJob(dataSelectFiltered) {
   }
 }
 
-function confirmFunction(title, text) {
-  // give alert confirm
-  return swal({
-    title: title || "Are you sure?",
-    text: text || "Make sure all data is correct before proceeding.",
-    icon: "warning",
-    buttons: true,
-    dangerMode: true,
-  }).then((willProceed) => {
-    return willProceed; // true if user clicks OK, false if user clicks Cancel
-  });
-}
-
 // confirm edit job
 async function confirmEditJob() {
   const positionId = $("#inputOUCode").val();
@@ -870,7 +857,7 @@ $(document).ready(async function () {
 
   console.log("storeData.listDraft", storeData.listDraft);
 
-  getTableListDraft(storeData.listDraft.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
+  getTableListDraft(storeData.listDraft.filter((x) => x.id != defaultMasterId && !x.isSubmitted && !x.isApproved));
   console.log("storeData.listDraft", storeData.listDraft);
   getTableListApproval(getDataApproval.data);
   getDataList([
@@ -1031,7 +1018,7 @@ function filterDraftsByDate(selectedDate) {
     });
 
     console.log("Filtered drafts by date:", filteredDrafts.length);
-    getTableListDraft(filteredDrafts.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
+    getTableListDraft(filteredDrafts.filter((x) => x.id != defaultMasterId && !x.isSubmitted && !x.isApproved));
   } catch (error) {
     console.error("Error filtering drafts by date:", error);
   }
@@ -1046,7 +1033,7 @@ function filterDraftsBySearch(searchTerm) {
   );
 
   console.log("Filtered drafts by search:", filteredDrafts.length);
-  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
+  getTableListDraft(filteredDrafts.filter((x) => x.id != defaultMasterId && !x.isSubmitted && !x.isApproved));
 }
 
 // Function to update all draft filters comprehensively
@@ -1078,7 +1065,7 @@ function updateDraftFilters() {
   }
 
   console.log("Comprehensive filter applied, results:", filteredDrafts.length);
-  getTableListDraft(filteredDrafts.filter((x) => x.id !== 1 && !x.isSubmitted && !x.isApproved));
+  getTableListDraft(filteredDrafts.filter((x) => x.id != defaultMasterId && !x.isSubmitted && !x.isApproved));
 }
 
 // Function to filter approvals by date

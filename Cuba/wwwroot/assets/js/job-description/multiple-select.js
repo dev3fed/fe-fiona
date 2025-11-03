@@ -35,18 +35,70 @@ function getDataListAsync(data, id, placeholder) {
   });
 }
 
+// function getDataList(data) {
+//   data.forEach((item) => {
+//     item.data = [{ id: "", text: "Select an option" }, ...item.data];
+//     if (item.data && item.data.length > 0) {
+//       let dropdownParent = item.dropdownParent ?? null;
+//       $(`#${item.dataId}`).empty();
+//       $(`#${item.dataId}`).select2({
+//         allowClear: true,
+//         placeholder: item.placeholder || "Select an option",
+//         data: item.data,
+//         dropdownParent: dropdownParent,
+//       });
+//     }
+//     if (item.isHide) {
+//       $(`#${item.dataId}`).next(".select2-container").css("display", "none");
+//     }
+//   });
+// }
+
 function getDataList(data) {
   data.forEach((item) => {
     item.data = [{ id: "", text: "Select an option" }, ...item.data];
     if (item.data && item.data.length > 0) {
       let dropdownParent = item.dropdownParent ?? null;
       $(`#${item.dataId}`).empty();
-      $(`#${item.dataId}`).select2({
-        allowClear: true,
-        placeholder: item.placeholder || "Select an option",
-        data: item.data,
-        dropdownParent: dropdownParent,
-      });
+      $(`#${item.dataId}`)
+        .select2({
+          allowClear: true,
+          placeholder: item.placeholder || "Select an option",
+          data: item.data,
+          dropdownParent: dropdownParent,
+          minimumInputLength: 0,
+          closeOnSelect: true,
+          escapeMarkup: function (markup) {
+            return markup;
+          },
+          templateResult: function (option) {
+            if (!option.id) {
+              return option.text;
+            }
+            return option.text;
+          },
+          templateSelection: function (option) {
+            return option.text;
+          },
+        })
+        .on("select2:open", function (e) {
+          // Auto focus pada search input ketika dropdown dibuka
+          const elementId = $(this).attr("id");
+          setTimeout(function () {
+            // Cari search field berdasarkan aria-controls yang terkait dengan element ID
+            const searchField = $(`.select2-search__field[aria-controls*="${elementId}"]`);
+            if (searchField.length > 0) {
+              searchField[0].focus();
+            } else {
+              // Fallback: cari dropdown yang terakhir dibuka
+              const lastDropdown = $(".select2-dropdown:last");
+              const fallbackSearchField = lastDropdown.find(".select2-search__field");
+              if (fallbackSearchField.length > 0) {
+                fallbackSearchField[0].focus();
+              }
+            }
+          }, 100);
+        });
     }
     if (item.isHide) {
       $(`#${item.dataId}`).next(".select2-container").css("display", "none");
