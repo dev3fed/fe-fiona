@@ -367,6 +367,11 @@ function handleBack() {
   if (emptyActivity) emptyActivity.innerHTML = "";
   const tblActivity = document.getElementById("detail-prosbis");
   if (tblActivity) tblActivity.innerHTML = "";
+  const warning = document.getElementById("warning-draft");
+  if (warning) warning.innerHTML = "";
+  // set enable btn submit detail-draft-submitted
+  const detailSubmittedBtn = document.getElementById("detail-draft-submitted");
+  if (detailSubmittedBtn) detailSubmittedBtn.disabled = false;
   if (draftDetail) {
     draftDetail.style.display = "none";
   }
