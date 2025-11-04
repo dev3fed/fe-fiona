@@ -6,8 +6,36 @@ const detailApproval = async () => {
       0: "Draft",
       1: "Approved",
       2: "Rejected",
-      3: "Submitted",
+      3: "On Review",
     };
+    function getStatusColor(status) {
+      switch (status) {
+        case 0:
+          return "#FFA800";
+        case 1:
+          return "#D1FED3";
+        case 2:
+          return "#F9E9EA";
+        case 3:
+          return "#FEE9B0";
+        default:
+          return "#E4E6EF";
+      }
+    }
+    function getTextColor(status) {
+      switch (status) {
+        case 0:
+          return "#000000";
+        case 1:
+          return "#4DB043";
+        case 2:
+          return "#CD2536";
+        case 3:
+          return "#B08803";
+        default:
+          return "#000000";
+      }
+    }
     const payload = {
       Page: 1,
       PageSize: 5,
@@ -21,7 +49,7 @@ const detailApproval = async () => {
     if (btnApprove) btnApprove.style.display = isHidden ? "none" : "inline-block";
     if (detailApproval) {
       const infoBody = `
-     <div class="col-2 custom-col">
+     <div class="col-3 custom-col">
         <label style="color:#9F9FA5">Draft Name</label>
         <label style="font-weight: 600;font-size: 14px">${detailApproval.draftName || "-"}</label>
         <label>-</label>
@@ -30,7 +58,7 @@ const detailApproval = async () => {
         <label style="color:#9F9FA5">Organization Data Source</label>
         <label style="font-weight: 600;font-size: 14px">${detailApproval.draftSO?.draftName || "-"}</label>
     </div>
-    <div class="col-3 custom-col">
+    <div class="col-2 custom-col">
         <label style="color:#9F9FA5">Submitted Date</label>
         <label style="font-weight: 600;font-size: 14px">${detailApproval.modifiedBy || "-"}</label>
         <label>${detailApproval.modifiedDate ? new Date(detailApproval.modifiedDate).toLocaleDateString() : "-"}</label>
@@ -43,7 +71,14 @@ const detailApproval = async () => {
     </div>
     <div class="col-2 custom-col">
         <label style="color:#9F9FA5">Status</label>
-        <label style="font-weight: 600;font-size: 14px">${labelStatus[detailApproval.isStatus] || "-"}</label>
+        <label style="font-weight: 600;font-size: 14px;background-color: ${getStatusColor(
+          detailApproval.isStatus,
+        )};color: ${getTextColor(detailApproval.isStatus)}; font-weight:500;
+          width:100px;text-align:center;
+          padding:8px 0;
+          border-radius:4px;
+          line-height:1;
+          box-sizing:border-box; display:inline-block;">${labelStatus[detailApproval.isStatus] || "-"}</label>
     </div>`;
       if (listData.data.length > 0) {
         console.log("listData", listData);
