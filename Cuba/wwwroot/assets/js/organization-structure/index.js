@@ -65,10 +65,11 @@ $(".chart-container-custom").on("click", "foreignObject", async function (e) {
 function changeOrganization(value, text) {
   organizationAttribute.orgUnitId = value;
   organizationAttribute.orgUnitName = text;
-  organizationAttribute.isMasterData = organizationAttribute.orgUnitId == "1" ? true : false;
+  organizationAttribute.isMasterData = organizationAttribute.orgUnitId == defaultMasterId ? true : false;
+  // organizationAttribute.isMasterData = organizationAttribute.orgUnitId == defaultMasterId ? true : false;
   localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
   const buttons = ["#createJob", "#designCost", "#editJob", "#deleteJob", "#duplicateJob"];
-  buttons.forEach((button) => $(button).toggle(organizationAttribute.orgUnitId !== "1"));
+  buttons.forEach((button) => $(button).toggle(organizationAttribute.orgUnitId !== defaultMasterId));
   if (organizationAttribute.isMasterData) {
     $("#pillsSoSection").attr("style", "display:none !important");
     $("#labelChart").attr("style", "display:none !important");
