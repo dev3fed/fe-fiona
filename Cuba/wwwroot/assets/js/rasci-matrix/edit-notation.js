@@ -26,9 +26,7 @@ async function openModalNotRow(result) {
         comment: item.comment,
       };
     });
-    const modal = new bootstrap.Modal(
-      document.getElementById("modalNotationRow"),
-    );
+    const modal = new bootstrap.Modal(document.getElementById("modalNotationRow"));
     modal.show();
     const formContent = `
         <div class="col-12">
@@ -97,9 +95,7 @@ async function saveNotationRow() {
       draftJobSource: draftSoId,
       orgUnitCode: dataDetailProsbis.unitCode,
       orgPrl: dataDetailProsbis.prlOrg,
-      busProsMapped: [
-        { parentId: dataDetailProsbis.indexGroup, rasciNotation },
-      ],
+      busProsMapped: [{ parentId: dataDetailProsbis.indexGroup, rasciNotation }],
     };
     const result = await submitDraftProsbis(inputValue);
     if (result.status === 200) {
