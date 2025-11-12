@@ -39,12 +39,12 @@ function fetctDataSourceComp(draftId = null) {
     success: function (response) {
       if (response && response.data && response.data.result) {
         let $select = $("#dataSource-competency");
-        $select.find("option:not(:first)").remove(); // Hapus opsi lama kecuali yang pertama
+        $select.empty(); // Hapus semua opsi
         const excludedIds = new Set(["1", "00000000-0000-0000-0000-000000000001"]);
         const result = Array.isArray(response?.data?.result)
           ? response.data.result.filter((item) => !excludedIds.has(String(item?.id)))
           : [];
-        excludedIds.forEach((item) => {
+        result.forEach((item) => {
           let isSelected = draftId && item.id == draftId;
           let $option = new Option(item.text, item.id, isSelected, isSelected);
           $($option).attr("data-draftso", item.draftSo); // Tambahkan atribut data-draftso
@@ -62,7 +62,10 @@ function fetctDataSourceComp(draftId = null) {
           allowClear: true,
         });
 
-        if (draftId) {
+        // Set default value to "master" if no draftId specified
+        if (!draftId) {
+          $select.val("master").trigger("change");
+        } else if (draftId) {
           $select.val(draftId).trigger("change");
         }
       }
