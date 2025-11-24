@@ -318,9 +318,7 @@ const cardSelectedJoblist = (param) => {
   document.getElementById("selected-job").innerHTML = bodyJoblist;
 };
 const deleteJoblistBp = (id) => {
-  console.log("first", id);
   const dataProsbis = getState("insertProsbis");
-  console.log("first", dataProsbis);
   const removeData = dataProsbis.jobMapped.filter((item) => Number(item.orgUnitCode) !== Number(id));
   const result = { ...dataProsbis, jobMapped: removeData };
   setState("insertProsbis", result);
@@ -515,10 +513,12 @@ function onInputProsbis(event) {
 function onCheck(event, rasciCode) {
   const isChecked = event.target.checked;
   const commentInput = document.getElementById(`comment${rasciCode}`);
-
   commentInput.disabled = !isChecked;
   commentInput.value = isChecked ? commentInput.value : "";
-
+  const btn = $("#btn-selectedjob");
+  const level = $("#idprosbisLevel").val();
+  const jobId = $("#jobId").val();
+  const inputProsbis = $("#inputProsbis").val();
   const rasciNotation = getState("rasciNotation");
 
   const updatedRasciNotation = rasciNotation.map((letter) => {
@@ -533,6 +533,13 @@ function onCheck(event, rasciCode) {
   });
   setState("rasciNotation", updatedRasciNotation);
   tblChangeNotationRef(updatedRasciNotation);
+  const checkedCount = updatedRasciNotation.filter((l) => l.isChecked).length;
+
+  if (level && level !== "Choose" && jobId && inputProsbis && inputProsbis.trim().length > 0 && checkedCount > 0) {
+    btn.prop("disabled", false);
+  } else {
+    btn.prop("disabled", true);
+  }
 }
 
 function updateComment(rasciCode, value) {
@@ -584,17 +591,17 @@ const triggleSelectJob = () => {
   }, 200);
 };
 
-$(document).on("change", "#idprosbisLevel, #jobId", function () {
-  const level = $("#idprosbisLevel").val();
-  const jobId = $("#jobId").val();
-  const inputProsbis = $("#inputProsbis").val();
-  const btn = $("#btn-selectedjob");
-  if (level && level !== "Choose" && jobId && inputProsbis && inputProsbis.trim().length > 0) {
-    btn.prop("disabled", false);
-  } else {
-    btn.prop("disabled", true);
-  }
-});
+// $(document).on("change", "#idprosbisLevel, #jobId", function () {
+//   const level = $("#idprosbisLevel").val();
+//   const jobId = $("#jobId").val();
+//   const inputProsbis = $("#inputProsbis").val();
+//   const btn = $("#btn-selectedjob");
+//   if (level && level !== "Choose" && jobId && inputProsbis && inputProsbis.trim().length > 0) {
+//     btn.prop("disabled", false);
+//   } else {
+//     btn.prop("disabled", true);
+//   }
+// });
 
 async function saveAsDraft() {
   try {

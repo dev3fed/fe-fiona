@@ -25,6 +25,7 @@ function getUrlOrgParams(search = window.location.search) {
 }
 async function defaultLoadMatrix() {
   try {
+    const selectedValue = $("#dataSource-rasci").val();
     const payload = {
       draftRasciId: selectedValue === "master" ? null : selectedValue,
       level: [],
@@ -54,7 +55,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   let selectElement = document.querySelector("#dataSource-rasci");
   infoValueChain(selectElement.value);
   if (selectElement.value === "master" || selectElement.value === "" || selectElement.value === null) {
-    // document.getElementById("pills-warningtab").style.display = "none";
     document.getElementById("pills-draft-tab").style.display = "none";
     document.getElementById("pills-approval-tab").style.display = "none";
     document.getElementById("pills-log-history-tab").style.display = "none";
@@ -64,8 +64,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("btnAddNotation").style.display = "none";
     document.getElementById("btnDeleteDetail").style.display = "none";
     document.getElementById("btnEditDetail").style.display = "none";
-
-    // document.getElementById("btnFormdraft").style.display = "flex";
   }
   showLoading();
   // loadTableHeader(appState.resultJabatan);
@@ -120,7 +118,6 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
 });
 
 function fetchDatasource(draftId = null) {
-  console.log("draftId", draftId);
   $.ajax({
     url: `${url_api}/api/Utilities/selection`,
     dataType: "json",
@@ -130,7 +127,6 @@ function fetchDatasource(draftId = null) {
       search: "",
     },
     success: function (response) {
-      console.log("response", response);
       if (response && response.data && response.data.result) {
         let $select = $("#dataSource-rasci");
         $select.find("option:not(:first)").remove();
@@ -138,7 +134,6 @@ function fetchDatasource(draftId = null) {
         const result = Array.isArray(response?.data?.result)
           ? response.data.result.filter((item) => !excludedIds.has(String(item?.id)))
           : [];
-        console.log("result", result);
         result.forEach((item) => {
           let isSelected = draftId && item.id == draftId;
           let $option = new Option(item.text, item.id, isSelected, isSelected);
@@ -166,8 +161,6 @@ function fetchDatasource(draftId = null) {
 }
 
 async function changeDataSource(dataSource, draftSo) {
-  console.log("dataSource", dataSource);
-  console.log("draftSo", draftSo);
   try {
     const defaultIndexNumber = getState("defaultIndexNumber");
     $("#dataSource-summary").val(dataSource).trigger("change");

@@ -176,8 +176,8 @@ function updateSelect2ByNotation() {
 
 async function onSelectProsbisNonRef(event) {
   const prosbisId = event.target.value;
-  if (!prosbisId) return;
-  $("#btn-selectedbusiness").prop("disabled", false);
+  // if (!prosbisId) return;
+  // $("#btn-selectedbusiness").prop("disabled", false);
 
   try {
   } catch (error) {}
@@ -533,7 +533,7 @@ const tblRasciNotation = (rasciNotation) => {
                  type="checkbox" 
                  data-rasci="${letter.rasciCode}" 
                  ${letter.isChecked ? "checked" : ""} 
-                 onclick="onCheck(event, '${letter.rasciCode}')">
+                 onclick="onCheckNotation(event, '${letter.rasciCode}')">
         </label>
       </th>
       <td style="text-align:center">
@@ -621,7 +621,7 @@ function tblChangeNotation(rasciNotation) {
                  type="checkbox" 
                  data-rasci="${letter.rasciCode}" 
                  ${letter.isChecked ? "checked" : ""} 
-                 onclick="onCheck(event, '${letter.rasciCode}')">
+                 onclick="onCheckNotation(event, '${letter.rasciCode}')">
         </label>
       </th>
       <td style="text-align:center">
@@ -654,7 +654,7 @@ function tblChangeNotationRow(rasciNotation) {
                  type="checkbox" 
                  data-rasci="${letter.rasciCode}" 
                  ${letter.isChecked ? "checked" : ""} 
-                 onclick="onCheck(event, '${letter.rasciCode}')">
+                 onclick="onCheckNotation(event, '${letter.rasciCode}')">
         </label>
       </th>
       <td style="text-align:center">
@@ -676,12 +676,43 @@ function tblChangeNotationRow(rasciNotation) {
   document.getElementById("tbl-notatrow-body").innerHTML = tdBody;
 }
 
+function onCheckNotation(event, rasciCode) {
+  const isChecked = event.target.checked;
+  const commentInput = document.getElementById(`comment${rasciCode}`);
+  commentInput.disabled = !isChecked;
+  commentInput.value = isChecked ? commentInput.value : "";
+  const selectedBusinessId = $("#businessId");
+  const selectedLevel = $("#levelId");
+  const selectedJobId = document.getElementById("jobIdPosition");
+  const btn = $("#btn-selectedbusiness");
+  const rasciNotation = getState("rasciNotation");
+
+  const updatedRasciNotation = rasciNotation.map((letter) => {
+    if (letter.rasciCode === rasciCode) {
+      return {
+        ...letter,
+        isChecked,
+        comment: isChecked ? commentInput.value : "",
+      };
+    }
+    return letter;
+  });
+  setState("rasciNotation", updatedRasciNotation);
+  tblChangeNotationRef(updatedRasciNotation);
+  const checkedCount = updatedRasciNotation.filter((l) => l.isChecked).length;
+
+  if (selectedBusinessId && selectedLevel && selectedJobId && checkedCount > 0) {
+    btn.prop("disabled", false);
+  } else {
+    btn.prop("disabled", true);
+  }
+}
+
 function backChangeNotationRow() {
   const rasciNotation = getState("rasciNotation");
   const updatedRasciNotation = rasciNotation.map((letter) => {
     return { ...letter, comment: "", isChecked: false };
   });
-  console.log("rasciNotation", rasciNotation);
   setState("dataDetailProsbis", {});
   setState("rasciNotation", updatedRasciNotation);
 }

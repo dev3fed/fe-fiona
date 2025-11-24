@@ -360,6 +360,7 @@ function handleBack() {
   const mainMatrix = document.getElementById("main-matrix");
   const headerMatrix = document.getElementById("header-matrix");
   const headerDetail = document.getElementById("header-detail-draft");
+  const payloadDraft = getState("payloadDraftList");
   setState("dataDetailDraft", {});
   const draftInfo = document.getElementById("draft-info");
   if (draftInfo) draftInfo.innerHTML = "";
@@ -384,6 +385,7 @@ function handleBack() {
   if (headerMatrix) {
     headerMatrix.style.display = "block";
   }
+  serviceDraftList(payloadDraft);
   // set window reload
   // window.location.reload();
 }
@@ -407,7 +409,6 @@ async function handleOpenDetail(id) {
   }
   const dataDraft = await fetchDraftProsbisByid(id);
   if (dataDraft.status === 200) {
-    console.log("dataDraft", dataDraft.data.isStatus);
     const status = dataDraft.data.isStatus;
     const detailSubmittedBtn = document.getElementById("detail-draft-submitted");
     const deleteDrafBtn = document.getElementById("delete-detail-draft");
@@ -442,6 +443,7 @@ function handleDeleteProsbisDraft(id) {
 
 async function confirmDeleteProsbisDraft() {
   const id = getState("deleteDraftProsbis");
+  const draftId = getState("draftRasciId");
   try {
     const result = await deleteProsbisDraft(id);
     if (result.status === 200) {
@@ -463,7 +465,6 @@ async function confirmDeleteProsbisDraft() {
             },
           },
         }).then(async () => {
-          setState("deleteDraftProsbis", "");
           const payload = {
             Page: 1,
             PageSize: 5,
@@ -473,6 +474,32 @@ async function confirmDeleteProsbisDraft() {
           const IsNotEmpty = dataDraft.data.length;
           changeemptyPageDraft(IsNotEmpty);
           loadTableBodyDraft(dataDraft);
+          if (id === draftId) {
+            const trigger = document.querySelector(
+              '[data-bs-target="#pills-matrix"], a[href="#pills-matrix"], button[data-bs-target="#pills-matrix"]',
+            );
+            if (trigger) {
+              if (window.bootstrap && bootstrap.Tab) {
+                try {
+                  new bootstrap.Tab(trigger).show();
+                } catch (e) {
+                  trigger.click();
+                }
+              } else {
+                trigger.click();
+              }
+            }
+
+            await fetchDatasource();
+            await fetctListDatasource();
+            setState("draftSoId", null);
+            setState("draftRasciId", null);
+            await changeDataSource("master", null);
+          } else {
+            await fetchDatasource(draftId);
+            await fetctListDatasource(draftId);
+          }
+          setState("deleteDraftProsbis", "");
         });
       }, 100);
     }
@@ -508,12 +535,13 @@ async function handleSaveCreateDraft() {
     const modaldraft = document.getElementById("modalcreateDraft");
     const modal = bootstrap.Modal.getInstance(modaldraft);
     const result = await createDraftRasci(payload);
+    let selectedOption = $(this).find(":selected");
+    let selectedDraftSo = selectedOption.attr("data-draftso");
+    const selectedValue = $("#dataSource-rasci").val();
     if (result.success === true) {
       if (modal) {
         modal.hide();
       }
-      let draftId = result?.data?.draftRasci?.draftId;
-      let draftSo = result?.data?.draftRasci?.draftSO.draftId;
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -536,9 +564,9 @@ async function handleSaveCreateDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          await fetchDatasource(draftId);
-          await fetctListDatasource(draftId);
-          changeDataSource(draftId, draftSo);
+          await fetchDatasource(selectedValue);
+          await fetctListDatasource(selectedValue);
+          changeDataSource(selectedValue, selectedDraftSo);
           if (dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
@@ -584,12 +612,13 @@ async function handleSaveDraft() {
     const modaldraft = document.getElementById("modalformDraft");
     const modal = bootstrap.Modal.getInstance(modaldraft);
     const result = await createDraftRasci(payload);
+    let selectedOption = $(this).find(":selected");
+    let selectedDraftSo = selectedOption.attr("data-draftso");
+    const selectedValue = $("#dataSource-rasci").val();
     if (result.success === true) {
       if (modal) {
         modal.hide();
       }
-      let draftId = result?.data?.draftRasci?.draftId;
-      let draftSo = result?.data?.draftRasci?.draftSO.draftId;
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -612,9 +641,9 @@ async function handleSaveDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          await fetchDatasource(draftId);
-          await fetctListDatasource(draftId);
-          changeDataSource(draftId, draftSo);
+          await fetchDatasource(selectedValue);
+          await fetctListDatasource(selectedValue);
+          changeDataSource(selectedValue, selectedDraftSo);
           if (dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);
@@ -659,12 +688,13 @@ async function handleSaveEmptyDraft() {
     const modaldraft = document.getElementById("modalformEmptydraft");
     const modal = bootstrap.Modal.getInstance(modaldraft);
     const result = await createDraftRasci(payload);
+    let selectedOption = $(this).find(":selected");
+    let selectedDraftSo = selectedOption.attr("data-draftso");
+    const selectedValue = $("#dataSource-rasci").val();
     if (result.success === true) {
       if (modal) {
         modal.hide();
       }
-      let draftId = result?.data?.draftRasci?.draftId;
-      let draftSo = result?.data?.draftRasci?.draftSO.draftId;
       setTimeout(() => {
         swal({
           title: "SUCCESS",
@@ -687,9 +717,9 @@ async function handleSaveEmptyDraft() {
           };
           const queryString = new URLSearchParams(payload).toString();
           const dataDraft = await fetchDraftProsbis(queryString);
-          await fetchDatasource(draftId);
-          await fetctListDatasource(draftId);
-          changeDataSource(draftId, draftSo);
+          await fetchDatasource(selectedValue);
+          await fetctListDatasource(selectedValue);
+          changeDataSource(selectedValue, selectedDraftSo);
           if (dataDraft && dataDraft.data && Array.isArray(dataDraft.data)) {
             const IsNotEmpty = dataDraft.data.length;
             handleClickCard(IsNotEmpty);

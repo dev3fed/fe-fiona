@@ -438,6 +438,7 @@ async function handleRename() {
 async function handleSubmitRenameDraft() {
   const draftRename = document.getElementById("draftRename");
   const spinner = document.getElementById("loadingRenameDraft");
+  const draftId = getState("draftRasciId");
   spinner.style.display = "inline-block";
   const dataDraft = getState("dataDetailDraft");
   const payload = {
@@ -468,6 +469,8 @@ async function handleSubmitRenameDraft() {
         const id = result.data.data.draftId;
         const dataDraft = await fetchDraftProsbisByid(id);
         setState("dataDetailDraft", dataDraft.data);
+        await fetchDatasource(draftId);
+        await fetctListDatasource(draftId);
       });
     }, 200);
   } else {
