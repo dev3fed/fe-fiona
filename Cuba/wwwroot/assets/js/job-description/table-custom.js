@@ -106,10 +106,13 @@ function getTableListJobDes() {
         width: "10%",
         data: null,
         render: function (data) {
-          console.log({ draftExistingJobDesc });
-          if (data.jobDescStatus == "NOT AVAILABLE" && draftExistingJobDesc.draftId != 1) {
+          if (data.jobDescStatus == "NOT AVAILABLE" && draftExistingJobDesc.draftId != defaultMasterId) {
             return `
             <button class="" style="padding:5px 10px ;font-size:12px;width:80%;color:white;background:#006ca9;border:none"  onclick="createJobDesc('${data.jobId}','${data.prlOrg}','${data.positionCode}')"><i class="fas fa-plus p-r-5"></i> Create</button>
+            `;
+          } else if (data.jobDescStatus == "AVAILABLE" && draftExistingJobDesc.draftId != defaultMasterId) {
+            return `
+            <button class="" style="padding:5px 10px ;font-size:12px;width:80%;color:black;background:transparent;border:1px solid black"  onclick="createJobDesc('${data.jobId}','${data.prlOrg}','${data.positionCode}')"><i class="fas fa-eye p-r-5"></i> Detail</button>
             `;
           } else {
             return `

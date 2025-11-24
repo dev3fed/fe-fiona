@@ -949,7 +949,7 @@ async function focusNode(nodeId) {
 
   try {
     const dataChart = await chartShow({
-      draftId: getDraftExisting.draftOrganizationId,
+      draftId: getDraftExisting.organizationDraftId,
       jobCode: nodeId,
       depth: 5,
     });

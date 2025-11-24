@@ -9,6 +9,7 @@ let statusAction = "add";
 let dataAvailable = true;
 const token = localStorage.getItem("token");
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const defaultMasterId = "00000000-0000-0000-0000-000000000001";
 const urlParams = new URLSearchParams(window.location.search);
 let helperId = "";
 const uuid = {
@@ -21,6 +22,7 @@ const draftExistingJobDesc = {
   draftOrganizationId: null,
   draftRasciId: null,
   draftName: null,
+  organizationDraftId: null,
 };
 
 const selectedData = {

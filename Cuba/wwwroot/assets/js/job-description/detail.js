@@ -649,11 +649,13 @@ $(document).ready(async function () {
     const dataListDraft = await draftList();
     if (!draftExistingJobDesc || draftExistingJobDesc.draftOrganizationId == "" || draftExistingJobDesc == undefined) {
       const data = dataListDraft.data[0];
+      console.log("data =>", data);
       getDraftExisting = {
-        draftId: "1",
-        draftOrganizationId: "1",
-        draftRasciId: "1",
-        draftName: "Master Data",
+        draftId: data.draftId,
+        draftOrganizationId: data.draftOrganizationId,
+        draftRasciId: data.draftRasciId,
+        draftName: data.draftName,
+        organizationDraftId: data.organizationDraftId,
       };
       localStorage.setItem(
         "draftExistingJobDesc",
@@ -662,6 +664,7 @@ $(document).ready(async function () {
           draftOrganizationId: getDraftExisting.draftOrganizationId,
           draftRasciId: getDraftExisting.draftRasciId,
           draftName: getDraftExisting.draftName,
+          organizationDraftId: getDraftExisting.organizationDraftId,
         })
       );
     }

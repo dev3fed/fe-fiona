@@ -1,8 +1,8 @@
 function updateDraftLs(id) {
   const data = id.split("|");
-  draftExistingJobDesc.draftId = data[2];
-  draftExistingJobDesc.draftRasciId = data[1];
   draftExistingJobDesc.draftOrganizationId = data[0];
+  draftExistingJobDesc.draftRasciId = data[1];
+  draftExistingJobDesc.draftId = data[2];
   draftExistingJobDesc.draftName = data[3];
   localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
   $("#selectJobDescDraft").append(
@@ -12,7 +12,9 @@ function updateDraftLs(id) {
         "|" +
         draftExistingJobDesc.draftRasciId +
         "|" +
-        draftExistingJobDesc.draftId,
+        draftExistingJobDesc.draftId +
+        "|" +
+        draftExistingJobDesc.organizationDraftId,
       true,
       true
     )
@@ -23,6 +25,7 @@ async function checkDraftSelected(listDraft) {
   localStorage.getItem("draftExistingJobDesc") ??
     localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
   const data = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+  console.log("data draftExistingJobDesc from ls", draftExistingJobDesc);
   Object.keys(draftExistingJobDesc).forEach((key) => {
     if (data[key]) {
       draftExistingJobDesc[key] = data[key];
@@ -33,19 +36,25 @@ async function checkDraftSelected(listDraft) {
     // get first draft
     const firstDraft = listDraft[0];
     draftExistingJobDesc.draftId = firstDraft.draftId;
-    draftExistingJobDesc.draftRasciId = firstDraft.draftRasciId;
-    draftExistingJobDesc.draftOrganizationId = firstDraft.draftOrganizationId;
-    draftExistingJobDesc.draftName = firstDraft.draftName;
+    draftExistingJobDesc.draftRasciId = firstDraft.draftRasciId ? firstDraft.draftRasciId : "";
+    draftExistingJobDesc.draftOrganizationId = firstDraft.draftOrganizationId ? firstDraft.draftOrganizationId : "";
+    draftExistingJobDesc.draftName = firstDraft.draftName ? firstDraft.draftName : "";
+    draftExistingJobDesc.organizationDraftId = firstDraft.organizationDraftId ? firstDraft.organizationDraftId : "";
     localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
   }
-
+  console.log("draftExistingJobDesc", draftExistingJobDesc);
   const draftId =
+    draftExistingJobDesc.draftId +
+    "|" +
+    (draftExistingJobDesc.draftRasciId ? draftExistingJobDesc.draftRasciId : "") +
+    "|" +
     draftExistingJobDesc.draftOrganizationId +
     "|" +
-    draftExistingJobDesc.draftRasciId +
+    draftExistingJobDesc.draftName +
     "|" +
-    draftExistingJobDesc.draftId;
+    draftExistingJobDesc.organizationDraftId;
   // append value to input
+  console.log("Selected draft :>", draftId);
   $("#selectJobDescDraft").val(draftId).trigger("change");
 
   // disable selectJobDescDraft if draftId is not empty
@@ -88,7 +97,9 @@ $(document).ready(async function () {
           "|" +
           saveData.data.draftId +
           "|" +
-          saveData.data.draftName
+          saveData.data.draftName +
+          "|" +
+          saveData.data.organizationDraftId
       );
     } else {
       swal("Failed to save draft", { icon: "error" });
@@ -98,12 +109,23 @@ $(document).ready(async function () {
   // get draft list
   const dataListDraft = await draftList();
   const rasciList = await getRasciList();
+  console.log("dataListDraft", dataListDraft);
   console.log("rasciList", rasciList);
+  const test = dataListDraft.data[0];
+  console.log("test", test);
+  console.log(
+    `${test.draftId}|${test.draftRasciId ? test.draftRasciId : ""}|${test.draftOrganizationId}|${test.draftName}|${
+      test.organizationDraftId
+    }`
+  );
+
   getDataList([
     {
       dataId: "selectJobDescDraft",
       data: dataListDraft.data.map((item) => ({
-        id: item.draftOrganizationId + "|" + item.draftRasciId + "|" + item.draftId,
+        id: `${item.draftId}|${item.draftRasciId ? item.draftRasciId : ""}|${item.draftOrganizationId}|${
+          item.draftName
+        }|${item.organizationDraftId}`,
         text: item.draftName,
       })),
     },
@@ -168,10 +190,12 @@ $(document).ready(async function () {
       $("#pills-warningtab").show();
     }
     const data = value.split("|");
-    draftExistingJobDesc.draftId = data[2];
+    console.log("data draft selected:", data);
+    draftExistingJobDesc.draftId = data[0];
     draftExistingJobDesc.draftRasciId = data[1];
-    draftExistingJobDesc.draftOrganizationId = data[0];
+    draftExistingJobDesc.draftOrganizationId = data[2];
     draftExistingJobDesc.draftName = $(this).find("option:selected").text();
+    draftExistingJobDesc.organizationDraftId = data[4];
     localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
     if (draftExistingJobDesc.draftId != "" && draftExistingJobDesc.draftId != null) {
       getTableListJobDes();
