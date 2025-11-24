@@ -635,8 +635,9 @@ function readOnlyPage() {
   $("#exportImageBtn, #exportSVGBtn, #exportPDFBtn, #fitToScreenBtn, #zoomInBtn, #zoomOutBtn, #chartCompactBtn").show();
 }
 async function getDetailJob(jobCode) {
+  console.log("getDraftExisting", getDraftExisting);
   const detailJob = await chartJobDetail({
-    draftId: getDraftExisting.draftOrganizationId,
+    draftId: getDraftExisting.organizationDraftId,
     jobCode: jobCode,
   });
   return detailJob;
@@ -701,13 +702,14 @@ $(document).ready(async function () {
 
     updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
   } else {
+    alert("masok");
     const dataParams = detailJobSO.data || {};
-    console.log("dataParams", dataParams);
+    console.log("dataParams ==>>", dataParams);
     const identifikasi = {
       jobName: dataParams.positionName || "",
       unitKerjaFungsi: dataParams.functionName || "",
       lokasiKerja: dataParams.location || "",
-      direktorat: dataParams.directorate.directorateName || "",
+      direktorat: dataParams?.directorate?.directorateName || "",
       atasanLangsung: dataParams.directReportName || "",
       noSuratKeputusan: dataParams.sourceOfSK || "",
       tanggalSuratKeputusan: dataParams.skDate || "",
