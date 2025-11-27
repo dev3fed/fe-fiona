@@ -317,17 +317,17 @@
                         <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit
                     </button>
                     <button class=" btn btn-primary btn-icon dropdown-toggle" id="handleExport" style="" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export</button>
-                    @* <div class=" dropdown-menu" aria-labelledby="handleExport">
-                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportPdf" style="padding: 12px;">
+                    <div class=" dropdown-menu" aria-labelledby="handleExport">
+                        <a class="dropdown-item" href="javascript:void(0);" onclick="handleExportFun('pdf')" id="handleExportPdf" style="padding: 12px;">
                             Export PDF
                         </a>
-                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportPng"  style="padding: 12px;">
+                        <a class="dropdown-item" href="javascript:void(0);" onclick="handleExportFun('png')" id="handleExportPng"  style="padding: 12px;">
                             Export PNG
                         </a>
-                        <a class="dropdown-item" href="javascript:void(0);" id="handleExportSvg"  style="padding: 12px;">
+                        <a class="dropdown-item" href="javascript:void(0);" onclick="handleExportFun('svg')" id="handleExportSvg"  style="padding: 12px;">
                             Export SVG
                         </a>
-                    </div> *@
+                    </div>
                     <button class=" btn btn-primary" type="button" id="duplicateJob" onclick="handleDuplicate()">Duplicate</button>
                     <button class=" btn btn-primary" type="button" id="showJobdesc" onclick="showJobDesc()"> Show Jobdesc </button>
                     <button class=" btn btn-primary" type="button" id="showRasciMatrix" onclick="showRasciMatrix()"> Show RASCI Matrix </button>
