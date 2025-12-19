@@ -68,7 +68,7 @@ async function triggleDetailJob(val) {
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Function</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.functionName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo.function.functionName || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Division</label>
