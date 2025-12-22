@@ -93,33 +93,34 @@ async function detailDraft() {
       const emptyActivity = document.getElementById("empty-activity");
 
       if (emptyActivity) emptyActivity.innerHTML = bodyEmpty;
-      const isWarning = dataDraft.draftSO.isApproved;
-      if (isWarning === false) {
-        document.getElementById("warning-draft").style.display = "block";
-        const soName = dataDraft.draftSO.draftName || "N/A";
-        const warning = document.getElementById("warning-draft");
-        const warningText = `
-        <div style="
-          display: inline-block;
-          white-space: nowrap;
-          background: #FFF8E1;
-          border: 1px solid #8A6600;
-          margin-top:12px;
-          border-radius: 4px;
-          padding: 6px 18px;
-          color: #7A5A00;
-          font-size: 12px;
-          box-sizing: border-box;
-          ">
-          Can not submit to approval because organization data source from
-          <strong style="font-weight:600; color:#554200;">${soName}</strong>
-          draft has not been finalized.
-        </div>
-      `;
-        if (warning) warning.innerHTML = warningText;
-        const btnSubmit = document.getElementById("detail-draft-submitted");
-        if (btnSubmit) btnSubmit.disabled = true;
-      }
+    }
+    
+    const isWarning = dataDraft.draftSO.isApproved;
+    if (isWarning === false) {
+      document.getElementById("warning-draft").style.display = "block";
+      const soName = dataDraft.draftSO.draftName || "N/A";
+      const warning = document.getElementById("warning-draft");
+      const warningText = `
+      <div style="
+        display: inline-block;
+        white-space: nowrap;
+        background: #FFF8E1;
+        border: 1px solid #8A6600;
+        margin-top:12px;
+        border-radius: 4px;
+        padding: 6px 18px;
+        color: #7A5A00;
+        font-size: 12px;
+        box-sizing: border-box;
+        ">
+        Can not submit to approval because organization data source from
+        <strong style="font-weight:600; color:#554200;">${soName}</strong>
+        draft has not been finalized.
+      </div>
+    `;
+      if (warning) warning.innerHTML = warningText;
+      const btnSubmit = document.getElementById("detail-draft-submitted");
+      if (btnSubmit) btnSubmit.disabled = true;
     }
   } catch (error) {}
 }

@@ -1,8 +1,6 @@
 document.addEventListener("dataLoaded", async function () {
   try {
     const payload = getState("payloadApproval");
-    const statusApproval = document.getElementById("statusApproval").value;
-    payload.Filter = statusApproval;
     setState("payloadApproval", payload);
     const queryString = new URLSearchParams(payload).toString();
 
@@ -18,18 +16,28 @@ document.addEventListener("dataLoaded", async function () {
 $("#approvalDate").datepicker({
   onSelect: async function (formattedDate) {
     const payloadApproval = getState("payloadApproval");
+    const statusApproval = document.getElementById("statusApproval").value;
     const [month, day, year] = formattedDate.split("/");
-    const approvedDateFilter = `ApprovedDate:${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    
+    let dateFilterKey = "ApprovedDate";
+    if (statusApproval === "Status:Reject") {
+      dateFilterKey = "RejectedDate";
+    }
+    if (statusApproval === "Status:On Review") {
+      dateFilterKey = "SubmittedDate";
+    }
+    
+    const approvalDateFilter = `${dateFilterKey}:${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 
     let filterValue = (payloadApproval.Filter || "")
       .split(",")
-      .filter((f) => !/^ApprovedDate:/i.test(f.trim()))
+      .filter((f) => !/^ApprovedDate:/i.test(f.trim()) && !/^RejectedDate:/i.test(f.trim()))
       .join(",");
 
     if (filterValue) {
-      filterValue = `${approvedDateFilter},${filterValue}`;
+      filterValue = `${approvalDateFilter},${filterValue}`;
     } else {
-      filterValue = approvedDateFilter;
+      filterValue = approvalDateFilter;
     }
 
     const payload = {
@@ -44,6 +52,27 @@ $("#approvalDate").datepicker({
     renderTableApproval(result.data);
   },
 });
+
+$("#approvalDate").on("input change", async function () {
+  if ($(this).val() === "") {
+    const payloadApproval = getState("payloadApproval");
+    let filterValue = (payloadApproval.Filter || "")
+      .split(",")
+      .filter((f) => !/^ApprovedDate:/i.test(f.trim()) && !/^RejectedDate:/i.test(f.trim()) && !/^SubmittedDate:/i.test(f.trim()))
+      .join(",");
+
+    const payload = {
+      ...payloadApproval,
+      Filter: filterValue,
+      Page: 1,
+    };
+    setState("payloadApproval", payload);
+    const queryString = new URLSearchParams(payload).toString();
+    const result = await fetchApprovalList(queryString);
+    renderTableApproval(result.data);
+  }
+});
+
 $("#submittedDate").datepicker({
   onSelect: async function (formattedDate) {
     const payloadApproval = getState("payloadApproval");
@@ -73,6 +102,27 @@ $("#submittedDate").datepicker({
     renderTableApproval(result.data);
   },
 });
+
+$("#submittedDate").on("input change", async function () {
+  if ($(this).val() === "") {
+    const payloadApproval = getState("payloadApproval");
+    let filterValue = (payloadApproval.Filter || "")
+      .split(",")
+      .filter((f) => !/^SubmittedDate:/i.test(f.trim()))
+      .join(",");
+
+    const payload = {
+      ...payloadApproval,
+      Filter: filterValue,
+      Page: 1,
+    };
+    setState("payloadApproval", payload);
+    const queryString = new URLSearchParams(payload).toString();
+    const result = await fetchApprovalList(queryString);
+    renderTableApproval(result.data);
+  }
+});
+
 document.getElementById("statusApproval").addEventListener("change", async function () {
   const statusApproval = this.value;
   const payloadApproval = getState("payloadApproval");
@@ -182,23 +232,10 @@ const renderTableApproval = async (approvalData) => {
           line-height:1;
           box-sizing:border-box;
           ">${statusText}</span>`;
-      const requestId =
-        data.requestId ||
-        (() => {
-          const now = new Date();
-          const pad = (n) => n.toString().padStart(2, "0");
-          const day = pad(now.getDate());
-          const month = pad(now.getMonth() + 1);
-          const year = now.getFullYear();
-          const seq = Math.floor(Math.random() * 1000)
-            .toString()
-            .padStart(3, "0");
-          return `Req/RM/${day}${month}${year}/${seq}`;
-        })();
       return `
         <tr>
           <td style="text-align:center">${index + 1}</td>
-          <td>${requestId}</td>
+          <td>${data.requestNumber || "-"}</td>
           <td>${data.draftName || "-"}</td>
           <td>${data.orgNameSource || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>

@@ -2020,6 +2020,7 @@ async function helperOrgTree(params) {
 // ======================
 // helper bagan org
 // ======================
+
 async function focusNode(nodeId) {
   // Show loading with proper container detection
   showChartLoading("chart-container-custom");

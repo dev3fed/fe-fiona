@@ -103,6 +103,17 @@ async function confirmDuplicate(id) {
   swal("Success", "Position has been duplicated", "success");
   loader(false);
 }
+function handleExportFun(type) {
+  const focusNodeId = $("#modalOrgUnitId").text();
+  $("#modalDetailJob").modal("hide");
+  if (type === "svg") {
+    chartExportSVG(focusNodeId);
+  } else if (type === "pdf") {
+    chartExportPDF(focusNodeId);
+  } else if (type === "png") {
+    chartExportPNG(focusNodeId);
+  }
+}
 
 async function duplicateJob() {
   const positionName = $("#jobName").text();

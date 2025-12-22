@@ -973,12 +973,14 @@ function chartZoomIn() {
   chart.zoomIn();
 }
 
-function chartExportSVG() {
-  const data = getChartExportData();
-  console.log("Exporting chart as SVG:", data);
-  console.log("Exporting chart as SVG:", data.cloneOrgChartData);
-  initializeChart(data.cloneOrgChartData, null, true);
+async function chartExportSVG(focusNodeId = null) {
   showChartLoading("chart-container-custom");
+  const dataInitial = getChartExportData();
+  if (focusNodeId) {
+    await focusNode(focusNodeId);
+  }
+  const dataNew = getChartExportData();
+  initializeChart(dataNew.cloneOrgChartData, null, true);
   setTimeout(() => {
     chart.expandAll();
   }, 2000);
@@ -989,18 +991,21 @@ function chartExportSVG() {
     prepareAndExportSVG();
   }, 4000);
   setTimeout(() => {
-    initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+    initializeChart(dataInitial.orgChartData, dataInitial.isAutoExpand ? dataInitial.focusNodeId : null);
     if (chart) chart.fit();
     hideChartLoading("chart-container-custom");
   }, 5000);
   applyStaticChartPositioning();
 }
 
-function chartExportPDF() {
-  const data = getChartExportData();
-  console.log("Exporting chart as PDF:", data);
-  console.log("Exporting chart as PDF:", data.cloneOrgChartData);
-  initializeChart(data.cloneOrgChartData, null, true);
+async function chartExportPDF(focusNodeId = null) {
+  showChartLoading("chart-container-custom");
+  const dataInitial = getChartExportData();
+  if (focusNodeId) {
+    await focusNode(focusNodeId);
+  }
+  const dataNew = getChartExportData();
+  initializeChart(dataNew.cloneOrgChartData, null, true);
   showChartLoading("chart-container-custom");
   setTimeout(() => {
     chart.expandAll();
@@ -1025,16 +1030,18 @@ function chartExportPDF() {
     hideChartLoading("chart-container-custom");
   }, 4000);
   setTimeout(() => {
-    initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+    initializeChart(dataInitial.orgChartData, dataInitial.isAutoExpand ? dataInitial.focusNodeId : null);
     if (chart) chart.fit();
   }, 5000);
   applyStaticChartPositioning();
 }
-function chartExportIMG() {
-  const data = getChartExportData();
-  console.log("Exporting chart as PDF:", data);
-  console.log("Exporting chart as PDF:", data.cloneOrgChartData);
-  initializeChart(data.cloneOrgChartData, null, true);
+async function chartExportIMG(focusNodeId = null) {
+  const dataInitial = getChartExportData();
+  if (focusNodeId) {
+    await focusNode(focusNodeId);
+  }
+  const dataNew = getChartExportData();
+  initializeChart(dataNew.cloneOrgChartData, null, true);
   showChartLoading("chart-container-custom");
   setTimeout(() => {
     chart.expandAll();
@@ -1047,7 +1054,7 @@ function chartExportIMG() {
     hideChartLoading("chart-container-custom");
   }, 4000);
   setTimeout(() => {
-    initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+    initializeChart(dataInitial.orgChartData, dataInitial.isAutoExpand ? dataInitial.focusNodeId : null);
     if (chart) chart.fit();
   }, 5000);
   applyStaticChartPositioning();

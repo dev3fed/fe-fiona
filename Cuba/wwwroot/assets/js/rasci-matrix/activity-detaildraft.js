@@ -396,7 +396,7 @@ async function detailAddprosbis(id, draftRasciId) {
     const dataFooter = dataActivity?.data.rasciMapping;
     const modalTitle = document.getElementById("modalDetaildraftAddBpTitle");
     if (modalTitle) {
-      modalTitle.innerHTML = `Activity Detail Add/Edit RASCI`;
+      modalTitle.innerHTML = `Activity Add New Business Process`;
     }
     const elementFooter = dataFooter
       .map((item, index) => {
@@ -497,7 +497,7 @@ async function detailDeleteBp(id, draftRasciId) {
         <div >
             <label class="form-label" style="width:25%">Business Process Index</label>
              <label> : </label>
-            <b class="form-label">${dataInfo.indexGroup}</b>
+            <b class="form-label">${dataInfo.indexNumber}</b>
 
         </div>
       </div>
@@ -703,7 +703,7 @@ const renderTableEditnotActivity = async (id, draftRasciId) => {
     const contentBody = `
       <div class="row">
         <div class="col-12 ">
-            <label>Position: ${detailInfo[0].positionCode} - ${detailInfo[0].positionName}</label>
+            <label>Position: ${detailInfo[0].positionName}(${detailInfo[0].positionCode})</label>
             <hr style="margin-top: 0;" />
         </div>
         <div class="col-12 mb-2 d-flex justify-content-end">

@@ -85,6 +85,10 @@ const renderTableSummary = (resultList) => {
         let isNotAvailable = statusClass === "not-available" || statusClass === "not available";
         let bgColor = isNotAvailable ? "#FAE9EB" : "#b9fbc0";
         let textColor = isNotAvailable ? "#D02138" : "#16a34a";
+        let capitalizedStatus = statusText
+          .split("-")
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(" ");
         let statusHtml = `<span style="
           display:inline-block;
           width:120px;
@@ -96,7 +100,7 @@ const renderTableSummary = (resultList) => {
           border-radius:4px;
           line-height:1;
           box-sizing:border-box;
-          ">${statusText}</span>`;
+          ">${capitalizedStatus}</span>`;
         const startIndex = (listData.meta.page - 1) * listData.meta.limit;
         const valString = JSON.stringify(element).replace(/"/g, "&quot;");
         return `
