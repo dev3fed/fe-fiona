@@ -15,6 +15,7 @@ const appState = new Proxy(
       page: 1,
       pageSize: 15,
     },
+    payloadDetailJob: {},
     payloadCompetency: {
       dataSource: selectedValue,
       page: 1,

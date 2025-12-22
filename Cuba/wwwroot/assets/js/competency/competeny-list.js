@@ -272,6 +272,7 @@ function loadTableBody(jobList) {
 function handleClickPosition(unitCode, prlOrg) {
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
   modal.show();
+  setState("payloadDetailJob", { unitCode, prlOrg });
   modalInfoPosition(unitCode, prlOrg);
   cardTblMandatory(unitCode, prlOrg);
   cardTblGeneral(unitCode, prlOrg);

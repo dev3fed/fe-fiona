@@ -1,12 +1,13 @@
 function selectSkillGroupTechnical(url) {
   const selectedValue = $("#dataSource-competency").val();
+  console.log("url", url);
   $("#skillGroupTechnical")
     .select2({
       placeholder: "Choose",
       allowClear: true,
       delay: 250,
       ajax: {
-        url: url,
+        url: url ? url : `${url_api}/api/Utilities/selection`,
         dataType: "json",
         data: function (params) {
           return {
@@ -46,7 +47,7 @@ function subSkillGroupBySg(url) {
       allowClear: true,
       delay: 250,
       ajax: {
-        url: url,
+        url: url ? url : `${url_api}/api/Utilities/selection`,
         dataType: "json",
         data: function (params) {
           return {

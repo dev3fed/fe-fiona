@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sgName: selectedText,
       ssgName: "",
     };
+
     const queryString = "?" + new URLSearchParams(payload).toString();
     const listData = await fetchTechnicalList(queryString);
     $("#subSkillGroupTechnical").val(null).trigger("change");

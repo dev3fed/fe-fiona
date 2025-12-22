@@ -507,7 +507,6 @@ async function handleDetailInfo(type, code) {
     const modal = new bootstrap.Modal(document.getElementById("ModalDetailKkj"));
 
     modal.show();
-    // Set the title of the modal id ModalDetailKkjTitle
     const modalTitle = document.getElementById("ModalDetailKkjTitle");
     if (modalTitle) {
       modalTitle.innerHTML = `${type} Competency Detail`;
@@ -588,16 +587,19 @@ async function handleDetailInfo(type, code) {
 }
 
 const handleCloseBehavior = async () => {
-  console.log("first close");
-  // const modalElement = document.getElementById("ModalDetailPos");
-  //   const closeModal = bootstrap.Modal.getInstance(modalElement);
-  //   if (closeModal) {
-  //     closeModal.hide();
-  //   }
+  const payload = getState("payloadDetailJob");
 
-  const modal = document.getElementById("ModalDetailKkj");
-  if (modal) {
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+  await modalInfoPosition(payload.unitCode, payload.prlOrg);
+  await cardTblMandatory(payload.unitCode, payload.prlOrg);
+  await cardTblGeneral(payload.unitCode, payload.prlOrg);
+  await cardTblSpecific(payload.unitCode, payload.prlOrg);
+  await cardTblBehavior(payload.unitCode, payload.prlOrg);
+
+  const closeModal = document.getElementById("ModalDetailKkj");
+  if (closeModal) {
+    const bootstrapModal = bootstrap.Modal.getInstance(closeModal);
     bootstrapModal.hide();
   }
+  const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
+  modal.show();
 };
