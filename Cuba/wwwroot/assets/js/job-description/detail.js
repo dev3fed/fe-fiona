@@ -849,13 +849,13 @@ $(document).ready(async function () {
 
   localStorage.setItem("lsAvailable", JSON.stringify({}));
   if (getDataJobDesc.countTugasHa) {
-    const countAll = getDataJobDesc.countTugasHa.data.length;
-    const available = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "AVAILABLE");
-    const notAvailable = getDataJobDesc.countTugasHa.data.filter((item) => item.status === "NOT AVAILABLE");
-    const countAvailable = available.length;
-    const countNotAvailable = notAvailable.length;
-    const codeAvailable = available.map((item) => item.indexNumber);
-    const codeNotAvailable = notAvailable.map((item) => item.indexNumber);
+    const countAll = getDataJobDesc?.countTugasHa?.data?.length;
+    const available = getDataJobDesc?.countTugasHa?.data?.filter((item) => item.status === "AVAILABLE");
+    const notAvailable = getDataJobDesc?.countTugasHa?.data?.filter((item) => item.status === "NOT AVAILABLE");
+    const countAvailable = available?.length;
+    const countNotAvailable = notAvailable?.length;
+    const codeAvailable = available?.map((item) => item.indexNumber);
+    const codeNotAvailable = notAvailable?.map((item) => item.indexNumber);
 
     const lsAvailable = {
       available,
