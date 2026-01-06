@@ -681,6 +681,12 @@ async function showJobDesc(ouCode = null, prlOrgRange = null) {
 async function confirmDeleteDraft(id) {
   loader(true);
   let rollback = await rollbackDraftSO(id);
+  if (rollback.data.status == "Failed") {
+    // data.desctiption
+    swal("Error", rollback.data.description, "error");
+    loader(false);
+    return;
+  }
   if (rollback) {
     storeData.listDraft = storeData.listDraft.filter((x) => x.draftId != id);
     localStorage.setItem("listDraft", JSON.stringify(storeData.listDraft));
