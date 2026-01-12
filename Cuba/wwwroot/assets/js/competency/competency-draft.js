@@ -13,6 +13,7 @@ async function serviceDraftList(payload) {
   try {
     const queryString = new URLSearchParams(payload).toString();
     const dataDraft = await fetchDraftList(queryString);
+    console.log("payload", payload);
     console.log("dataDraft", dataDraft.data);
     if (dataDraft && dataDraft.data && Array.isArray(dataDraft?.data.data)) {
       const IsNotEmpty = dataDraft?.data.data.length;
@@ -30,15 +31,16 @@ $("#createdDateDraft").datepicker({
     let formatted = "";
     if (formattedDate) {
       const [month, day, year] = formattedDate.split("/");
-      formatted = `${day}-${month}-${year}`;
+      formatted = `${year}-${month}-${day}`;
     } else {
       formatted = "";
     }
     const payloadDraftList = getState("payloadDraftList");
+    console.log("formatted", formatted);
     const payload = {
       ...payloadDraftList,
       Page: 1,
-      CreatedDate: formatted,
+      filter: `Createddate:${formatted}`,
     };
     setState("payloadDraftList", payload);
     serviceDraftList(payload);
@@ -625,6 +627,7 @@ function handleBack() {
   const mainCompetency = document.getElementById("main-competency");
   const headerCompetency = document.getElementById("header-competency");
   const headerDetail = document.getElementById("header-detail-draft");
+  const payload = getState("payloadDraftList");
   setState("dataDetailDraft", {});
   const draftInfo = document.getElementById("draft-competencyinfo");
   if (draftInfo) draftInfo.innerHTML = "";
@@ -645,4 +648,5 @@ function handleBack() {
   if (headerCompetency) {
     headerCompetency.style.display = "block";
   }
+  serviceDraftList(payload);
 }

@@ -128,41 +128,79 @@
                                 <div class="split-card-row ">
                                     <div>
                                         <div class="table-responsive m-t-6 scrollable-posdetail">
-                                            <h6 id="labelMandatory"></h6>
-                                            <table class="mt-2 mb-3 table tbl-border">
-                                                <thead id="mandatory-competency-header">
-                                                </thead>
-                                                <tbody id="mandatory-competency-body">
-                                                </tbody>
-                                            </table>
+                                            <div id="mandatory-content" style="display: none;">
+                                                <h6 id="labelMandatory"></h6>
+                                                <table class="mt-2 mb-3 table tbl-border">
+                                                    <thead id="mandatory-competency-header">
+                                                    </thead>
+                                                    <tbody id="mandatory-competency-body">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div id="mandatory-no-data" style="display: block;">
+                                                <h6>Mandatory (0/5)</h6>
+                                                <div class="competency-box" style="margin-top:10px">
+                                                    <span class="icon"><img
+                                                            src="/assets/images/competency/vector.svg"></span>
+                                                    <span class="desc">There is no data </span>
+                                                </div>
+                                            </div>
+                                            <div id="general-competency-content" style="display: none;">
+                                                <h6 id="labelCore"></h6>
+                                                <table class="table mb-3 tbl-border mt-2">
+                                                    <thead id="technical-competency-header">
+                                                    </thead>
+                                                    <tbody id="technical-competency-body">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div id="general-no-data" style="display: block;margin-top:10px">
+                                                <h6>General (0/3)</h6>
+                                                <div class="competency-box" style="margin-top:10px">
+                                                    <span class="icon"><img
+                                                            src="/assets/images/competency/vector.svg"></span>
+                                                    <span class="desc">There is no data </span>
+                                                </div>
+                                            </div>
+                                            <div id="specific-competency-content" style="display: none;">
+                                                <h6 id="labelSpecific"> </h6>
+                                                <table class="table mb-3 tbl-border mt-2">
+                                                    <thead id="technical-specifit-header">
+                                                    </thead>
+                                                    <tbody id="technical-specifit-body">
+                                                    </tbody>
+                                                </table>
+                                            </div>
 
-                                            <h6 id="labelCore"></h6>
-                                            <table class="table mb-3 tbl-border mt-2">
-                                                <thead id="technical-competency-header">
-                                                </thead>
-                                                <tbody id="technical-competency-body">
-                                                </tbody>
-                                            </table>
-
-                                            <h6 id="labelSpecific"> </h6>
-                                            <table class="table mb-3 tbl-border mt-2">
-                                                <thead id="technical-specifit-header">
-                                                </thead>
-                                                <tbody id="technical-specifit-body">
-                                                </tbody>
-                                            </table>
-
+                                            <div id="specific-no-data" style="display: block; margin-top:10px">
+                                                <h6>Spesific (0/9)</h6>
+                                                <div class="competency-box" style="margin-top:10px">
+                                                    <span class="icon"><img
+                                                            src="/assets/images/competency/vector.svg"></span>
+                                                    <span class="desc">There is no data </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
                                         <div class="table-responsive m-t-6 scrollable-posdetail">
-                                            <table class="mt-2 mb-3 table tbl-border">
+                                            <div id="behavior-content" style="display: none;">
+                                                <table class="mt-2 mb-3 table tbl-border">
+                                                    <h6>Behavior</h6>
+                                                    <thead id="mandatory-behavior-header">
+                                                    </thead>
+                                                    <tbody id="mandatory-behavior-body">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div id="behavior-no-data" style="display: block;">
                                                 <h6>Behavior</h6>
-                                                <thead id="mandatory-behavior-header">
-                                                </thead>
-                                                <tbody id="mandatory-behavior-body">
-                                                </tbody>
-                                            </table>
+                                                <div class="competency-box" style="margin-top:10px">
+                                                    <span class="icon"><img
+                                                            src="/assets/images/competency/vector.svg"></span>
+                                                    <span class="desc">There is no data </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -248,7 +286,7 @@
                     <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
                         id="btnAddSpecificCompe">
                         <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
-                        Add Specific Competency
+                        Add Technical Competency
                     </button>
                 </div>
             </div>

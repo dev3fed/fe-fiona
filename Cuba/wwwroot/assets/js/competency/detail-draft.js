@@ -349,6 +349,9 @@ const handleSubmitRenameDraft = async () => {
           const detailResult = await fetchDetailDraft(dataDraft.draftId);
           if (detailResult.success === true) {
             setState("dataDetailDraft", detailResult.data);
+
+            await fetctDataSourceComp(dataDraft.draftId);
+            await fetctListDatasource(dataDraft.draftId);
           }
         });
       }, 200);

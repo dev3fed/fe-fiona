@@ -7,11 +7,9 @@ const modalInfoPosition = async (code, prl) => {
       pageSize: 10,
     };
     const queryString = `${code}/${prl}?` + new URLSearchParams(payload).toString();
-    console.log("queryString", queryString);
     const result = await fetchDetailPositionInfo(queryString);
     if (result.success === true) {
       const detailInformation = result?.data.jobDetail[0];
-      console.log("detailInformation", detailInformation);
       setState("jobInformation", detailInformation);
       if (detailInformation) {
         const positionName = `
@@ -247,10 +245,18 @@ const cardTblMandatory = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionMandatory(payload);
+    const mandatoryNoData = document.getElementById("mandatory-no-data");
+    const mandatoryContent = document.getElementById("mandatory-content");
+    if (mandatoryContent) {
+      mandatoryContent.style.display = result.data !== undefined ? "block" : "none";
+    }
+    if (mandatoryNoData) {
+      mandatoryNoData.style.display = result.data !== undefined ? "none" : " block";
+    }
     if (result.success === true) {
       const listMandatory = result?.data.compData || [];
-      console.log("listMandatory", listMandatory);
       const labelMandatory = document.getElementById("labelMandatory");
+
       if (labelMandatory) {
         labelMandatory.innerHTML = `Mandatory (${listMandatory.length}/5)`;
       }
@@ -288,6 +294,15 @@ const cardTblGeneral = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionTechnical(payload);
+    const generalNoData = document.getElementById("general-no-data");
+    const generalContent = document.getElementById("general-competency-content");
+    if (generalContent) {
+      generalContent.style.display = result.data !== undefined ? "block" : "none";
+    }
+    if (generalNoData) {
+      generalNoData.style.display = result.data !== undefined ? "none" : " block";
+    }
+
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
@@ -334,10 +349,23 @@ const cardTblSpecific = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionTechnical(payload);
+    const specificNoData = document.getElementById("specific-no-data");
+    const specificContent = document.getElementById("specific-competency-content");
+    if (specificContent) {
+      specificContent.style.display = result.data !== undefined ? "block" : "none";
+    }
+    if (specificNoData) {
+      specificNoData.style.display = result.data !== undefined ? "none" : " block";
+    }
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
       const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
       const labelSpecific = document.getElementById("labelSpecific");
+      const specificNoData = document.getElementById("specific-no-data");
+
+      if (specificNoData) {
+        specificNoData.style.display = specificCompetencies.length > 0 ? "none" : " block";
+      }
       if (labelSpecific) {
         labelSpecific.innerHTML = `Specific (${specificCompetencies.length}/9)`;
       }
@@ -381,6 +409,14 @@ const cardTblBehavior = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionBehavior(queryString);
+    const behaviorNoData = document.getElementById("behavior-no-data");
+    const behaviorContent = document.getElementById("behavior-content");
+    if (behaviorContent) {
+      behaviorContent.style.display = result.data.behaviourList.length > 0 ? "block" : "none";
+    }
+    if (behaviorNoData) {
+      behaviorNoData.style.display = result.data.behaviourList.length > 0 ? "none" : " block";
+    }
     if (result.success === true) {
       const listBehavior = result?.data.behaviourList[0]?.behaviouralDictionary || [];
       const theadMandatory = `
@@ -440,7 +476,6 @@ const cardTblBehavior = async (code, prl) => {
 // };
 
 const onBehaviorClick = async (type, code) => {
-  console.log("first code", type, code);
   try {
     const dataDetail = await fetchCompeBehaviorDetail(code);
     const modalElement = document.getElementById("ModalDetailPos");
@@ -454,7 +489,6 @@ const onBehaviorClick = async (type, code) => {
     if (modalTitle) {
       modalTitle.innerHTML = `${type} Competency Detail`;
     }
-    console.log("dataDetail", dataDetail);
     const formContent = `
     <div class="col-12 scrollable-content" style="min-height: 620px;">
         <div class="mb-2">

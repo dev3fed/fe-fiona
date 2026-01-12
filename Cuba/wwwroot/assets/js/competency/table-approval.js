@@ -191,7 +191,13 @@ const renderTableApproval = async (approvalData) => {
           <td>${data.draftName || "-"}</td>
           <td>${data.draftSoName || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>
-          <td>${formatDate(data.modifiedDate)}</td>
+            <td>${
+              data.statusText === "Approved"
+                ? formatDate(data.approvedDate)
+                : data.statusText === "Submitted"
+                ? "-"
+                : formatDate(data.rejectedDate)
+            }</td>
           <td>${statusHtml}</td>
           <td style="width: 100px;text-align:center">
         <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
