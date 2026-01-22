@@ -601,7 +601,7 @@ function formattedInputAttribut(type) {
   payload.unit.unitCode = type == "edit" ? unitCode : null;
   payload.unit.unitName = $("#inputOrgUnitName").val();
   //  remove jika ada text didalam kurung
-  payload.unit.unitName = payload.unit.unitName.replace(/\s*\(.*?\)\s*/g, "");
+  // payload.unit.unitName = payload.unit.unitName.replace(/\s*\(.*?\)\s*/g, "");
   payload.unit.positionName = $("#inputPositionName").val();
   payload.unit.layer = 4;
   payload.unit.isBasket = $("#selectBasket").val() == "Yes" ? true : false;
@@ -760,7 +760,8 @@ function formattedInputAttribut(type) {
 
 async function saveInputAttribut(type) {
   const formPositionParam = formattedInputAttribut(type);
-  console.log("formPositionParam", formPositionParam);
+  // console.log("formPositionParam", formPositionParam);
+  // return;
   const basket = formPositionParam.unit.isBasket;
   // compare formPositionParam with localStorage logState.initParams
   const logState = JSON.parse(localStorage.getItem("logState"));

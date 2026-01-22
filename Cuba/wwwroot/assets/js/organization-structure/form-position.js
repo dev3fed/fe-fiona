@@ -47,12 +47,17 @@ async function initializeList() {
     // { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
     { id: "selectDirectReport", endpoint: "chart/job/list", draftId: draftId, showId: true },
     { id: "selectCoordinationWith", endpoint: "draft/position/list", draftId: draftId, showId: true },
-    { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId },
-    { id: "selectSubSkillGroupMain", endpoint: "draft/sub-skill-group/list", draftId: draftId },
-    { id: "selectSkillGroupSecond", endpoint: "draft/skill-group/list", draftId: draftId },
-    { id: "selectSubSkillGroupSecond", endpoint: "draft/sub-skill-group/list", draftId: draftId },
-    { id: "selectSkillGroupThird", endpoint: "draft/skill-group/list", draftId: draftId },
-    { id: "selectSubSkillGroupThird", endpoint: "draft/sub-skill-group/list", draftId: draftId },
+    { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId, showId: false },
+    {
+      id: "selectSubSkillGroupMain",
+      endpoint: "draft/sub-skill-group/list",
+      draftId: draftId,
+      showId: false,
+    },
+    { id: "selectSkillGroupSecond", endpoint: "draft/skill-group/list", draftId: draftId, showId: false },
+    { id: "selectSubSkillGroupSecond", endpoint: "draft/sub-skill-group/list", draftId: draftId, showId: false },
+    { id: "selectSkillGroupThird", endpoint: "draft/skill-group/list", draftId: draftId, showId: false },
+    { id: "selectSubSkillGroupThird", endpoint: "draft/sub-skill-group/list", draftId: draftId, showId: false },
   ]);
   return [
     {
@@ -85,17 +90,17 @@ async function saveAsDraft() {
   hideModal(`modalConfirm`);
   loader(true);
   const save = await saveInputAttribut(type);
+  console.log("save", save.data.unit.unitCode);
+  // loader(false);
+  // return;
   if (save.status == 200) {
-    const getPosition =
-      $("#selectBasket").val() == "Yes" && save.data.jobFormations && save.data.jobFormations.length > 0
-        ? save.data.jobFormations[0].unitName
-        : $("#inputPositionName").val();
+    const getPosition = $("#inputPositionName").val();
     const sanitizedPosition = encodeURIComponent(getPosition);
     swal("Saved", "Save as Draft", "success");
     setTimeout(() => {
       loader(false);
       window.location.href =
-        "/organization/index?focusNode=" + save.data.unitCode + "&positionName=" + sanitizedPosition;
+        "/organization/index?focusNode=" + save.data.unit.unitCode + "&positionName=" + sanitizedPosition;
     }, 1500);
   } else {
     const message = save.message || save.title || "Failed to save job .";
@@ -385,6 +390,256 @@ $(document).ready(async function () {
     checkBasketSelected(selectBasket);
   });
 
+  // Konfigurasi skill groups untuk pendekatan yang lebih dinamis
+  const skillGroupConfigs = [
+    {
+      mainId: "selectSkillGroupMain",
+      subId: "selectSubSkillGroupMain",
+      label: "Skill Group Main",
+    },
+    {
+      mainId: "selectSkillGroupSecond",
+      subId: "selectSubSkillGroupSecond",
+      label: "Skill Group Second",
+    },
+    {
+      mainId: "selectSkillGroupThird",
+      subId: "selectSubSkillGroupThird",
+      label: "Skill Group Third",
+    },
+  ];
+
+  // Helper function untuk setup skill group events
+  function setupSkillGroupEvents(config) {
+    const { mainId, subId, label } = config;
+
+    // Event ketika skill group main berubah
+    $(`#${mainId}`).on("change", function (event) {
+      const value = event.target.value;
+      $(`#${subId}`).val(null).trigger("change");
+
+      if (value) {
+        getDataListAsync([
+          {
+            id: subId,
+            endpoint: "draft/sub-skill-group/list",
+            draftId: organizationAttribute.orgUnitId,
+            showId: false,
+            dependOn: [
+              {
+                get: "text",
+                inputType: "select2",
+                urlParam: "skillGroup",
+                valueFrom: mainId,
+              },
+            ],
+          },
+        ]);
+      }
+    });
+
+    // Event ketika sub skill group dropdown dibuka
+    $(`#${subId}`).on("select2:opening", function (e) {
+      const skillGroupValue = $(`#${mainId}`).val();
+      if (!skillGroupValue) {
+        e.preventDefault();
+        swal("Warning", `Please select ${label} first`, "warning");
+        return false;
+      }
+    });
+  }
+
+  // Setup semua skill group events secara dinamis
+  skillGroupConfigs.forEach((config) => setupSkillGroupEvents(config));
+
+  // const selectPrlOrg = $("#selectPrlOrg").val();
+  // const selectPrlOrgTo = $("#selectPrlOrgTo").val();
+  // const selectCareerType = $("#selectCareerType").val();
+  // ketika ada pergerakan di tiga id itu, career level harus di refresh
+  $("#selectPrlOrg, #selectPrlOrgTo, #selectCareerType").on("change", function () {
+    console.log("refresh career level");
+    $("#selectCareerLevel").val(null).trigger("change");
+    getDataListAsync([
+      {
+        id: "selectCareerLevel",
+        endpoint: "draft/career-level/list",
+        draftId: organizationAttribute.orgUnitId,
+        showId: false,
+        dependOn: [
+          {
+            get: "value",
+            inputType: "select2",
+            urlParam: "prlOrgFrom",
+            valueFrom: "selectPrlOrg",
+          },
+          {
+            get: "value",
+            inputType: "select2",
+            urlParam: "prlOrgTo",
+            valueFrom: "selectPrlOrgTo",
+          },
+          {
+            get: "text",
+            inputType: "select2",
+            urlParam: "careerType",
+            valueFrom: "selectCareerType",
+          },
+        ],
+      },
+    ]);
+  });
+
+  function getPrlRangeLimited() {
+    const prlOrg = $("#modalSelectPrlOrg").val();
+    const prlOrgTo = $("#modalSelectPrlOrgTo").val();
+    // check if prlOrgTo or prlOrg is null or empty
+    if (prlOrgTo == null || prlOrgTo == "" || prlOrg == null || prlOrg == "") {
+      // semua option yang memili id berawalan modalSelectPrlOrgSubPos dihapus listnya
+      $("[id^=modalSelectPrlOrgSubPos]").empty();
+      return;
+    }
+    const listPrl = prl.filter((item) => item >= parseInt(prlOrg) && item <= parseInt(prlOrgTo));
+    const prlRangeLimited = [];
+    for (let i = 0; i < prlRange.length; i++) {
+      const range = prlRange[i];
+      const [start, end] = range.split("-").map(Number);
+      // check if start or end is in listPrl
+      if (listPrl.includes(start) || listPrl.includes(end)) {
+        prlRangeLimited.push(range);
+      }
+    }
+    return prlRangeLimited;
+  }
+  $("#modalSelectPrlOrg, #modalSelectPrlOrgTo").on("change", function () {
+    // terus slicing prlRange
+    // find all id that start with modalSelectPrlOrgSubPos and clear its options
+    const prlRange = getPrlRangeLimited();
+    if (!prlRange) return;
+    const arrayObjDataList = [];
+    $("[id^=modalSelectPrlOrgSubPos]").each(function () {
+      $(this).empty();
+      arrayObjDataList.push({
+        dataId: $(this).attr("id"),
+        data: prlRange.map((item) => ({ id: item, text: item })),
+        dropdownParent: $("#modalAddSubPosition"),
+      });
+    });
+    getDataListAsync([
+      {
+        id: "modalSelectCareerLevel",
+        endpoint: "draft/career-level/list",
+        draftId: organizationAttribute.orgUnitId,
+        dropdownParent: $("#modalAddSubPosition"),
+        showId: false,
+        dependOn: [
+          {
+            get: "value",
+            inputType: "select2",
+            urlParam: "prlOrgFrom",
+            valueFrom: "modalSelectPrlOrg",
+          },
+          {
+            get: "value",
+            inputType: "select2",
+            urlParam: "prlOrgTo",
+            valueFrom: "modalSelectPrlOrgTo",
+          },
+          {
+            get: "text",
+            inputType: "select2",
+            urlParam: "careerType",
+            valueFrom: "selectCareerType",
+          },
+        ],
+      },
+    ]);
+
+    getDataList(arrayObjDataList);
+  });
+
+  // ketika salah satu modalSelectPrlOrgSubPos dipilih, maka yang lain harus di filter juga
+  // $(document).on("change", "[id^=modalSelectPrlOrgSubPos]", function () {
+  //   const prlRangeLimited = getPrlRangeLimited();
+  //   if (!prlRangeLimited) return;
+
+  //   const currentSelectId = $(this).attr("id");
+  //   console.log("prlRangeLimited", prlRangeLimited);
+
+  //   // Kumpulkan semua nilai yang sudah dipilih dari dropdown LAIN (exclude current dropdown)
+  //   const allSelectedValues = [];
+  //   $("[id^=modalSelectPrlOrgSubPos]").each(function () {
+  //     const selectId = $(this).attr("id");
+  //     const value = $(this).val();
+
+  //     // Skip current dropdown yang sedang berubah
+  //     if (selectId !== currentSelectId && value) {
+  //       allSelectedValues.push(value);
+  //     }
+  //   });
+
+  //   const uniqueSelectedValues = [...new Set(allSelectedValues)];
+  //   console.log("uniqueSelectedValues", uniqueSelectedValues);
+
+  //   // Update dropdown lain (exclude current dropdown)
+  //   $("[id^=modalSelectPrlOrgSubPos]").each(function () {
+  //     const $currentSelect = $(this);
+  //     const currentValue = $currentSelect.val();
+  //     const selectId = $currentSelect.attr("id");
+
+  //     // Skip dropdown yang sedang berubah
+  //     if (selectId === currentSelectId) {
+  //       return;
+  //     }
+
+  //     // Filter data: hilangkan yang sudah dipilih dropdown lain, tapi pertahankan current value dropdown ini
+  //     const filteredData = prlRangeLimited.filter((item) => {
+  //       if (item === currentValue) {
+  //         return true; // keep current value of this dropdown
+  //       }
+  //       return !uniqueSelectedValues.includes(item);
+  //     });
+
+  //     getDataList([
+  //       {
+  //         dataId: selectId,
+  //         data: filteredData.map((item) => ({ id: item, text: item })),
+  //         dropdownParent: $("#modalAddSubPosition"),
+  //       },
+  //     ]);
+
+  //     // Restore value jika masih ada di filtered data
+  //     if (currentValue && filteredData.includes(currentValue)) {
+  //       $currentSelect.val(currentValue);
+  //     }
+  //   });
+  // });
+
+  $("#modalSelectCareerLevel").on("select2:opening", function (e) {
+    // check selectPrlOrg selectPrlOrgTo dan text selectCareerType
+    const selectPrlOrg = $("#modalSelectPrlOrg").val();
+    const selectPrlOrgTo = $("#modalSelectPrlOrgTo").val();
+    if (!selectPrlOrg || !selectPrlOrgTo) {
+      e.preventDefault();
+      swal("Warning", `Please select PRL Org range`, "warning");
+      return false;
+    }
+  });
+  $("#selectCareerLevel").on("select2:opening", function (e) {
+    // check selectBasket
+    const selectBasket = $("#selectBasket").val();
+    if (selectBasket == "Yes") {
+      return;
+    }
+    // check selectPrlOrg selectPrlOrgTo dan text selectCareerType
+    const selectPrlOrg = $("#selectPrlOrg").val();
+    const selectPrlOrgTo = $("#selectPrlOrgTo").val();
+    const selectCareerType = $("#selectCareerType").val();
+    if (!selectPrlOrg) {
+      e.preventDefault();
+      swal("Warning", `Please select PRL Org first`, "warning");
+      return false;
+    }
+  });
   $("#selectCoordination").on("change", function (event) {
     const value = event.target.value;
     $("#selectCoordinationWith").attr("disabled", true);
@@ -412,7 +667,6 @@ $(document).ready(async function () {
 
   $("#addSubPosition").click(function () {
     $("#modalAddSubPosition").modal("show");
-    alert("masko 4");
     modalSubPosition();
   });
 
@@ -420,9 +674,79 @@ $(document).ready(async function () {
     const countFormation = event.target.value;
     const subPosDiv = $("#subPosDiv").children();
   });
+  function subPosFormValidation() {
+    const requiredFields = [
+      { id: "modalSelectCareerLevel", name: "Career Level", value: $("#modalSelectCareerLevel").val() },
+      { id: "modalSelectAbbrvPosition", name: "Abbreviation Position", value: $("#modalSelectAbbrvPosition").val() },
+      { id: "modalSelectPrlOrg", name: "PRL Org", value: $("#modalSelectPrlOrg").val() },
+      { id: "modalSelectPrlOrgTo", name: "PRL Org To", value: $("#modalSelectPrlOrgTo").val() },
+      { id: "modalInputFormation", name: "Formation", value: $("#modalInputFormation").val() },
+    ];
+
+    // Cek field mana yang kosong
+    const emptyFields = [];
+    requiredFields.forEach((field) => {
+      if (!field.value || field.value.trim() === "") {
+        emptyFields.push(field.name);
+      }
+    });
+
+    // Cek semua modalSelectPrlOrgSubPos juga harus diisi
+    const prlSubPosFields = [];
+    const selectedPrlValues = []; // Untuk cek duplikasi
+
+    // check range prl limited
+    const prlRange = getPrlRangeLimited();
+
+    $("[id^=modalSelectPrlOrgSubPos]").each(function (index) {
+      const value = $(this).val();
+      const positionName = $("#modalInputSubPositionName" + (index === 0 ? "" : index + 1)).val();
+
+      if (!value || value.trim() === "") {
+        prlSubPosFields.push(`PRL Range for Position ${index + 1}`);
+      } else {
+        // Cek duplikasi PRL Range
+        if (selectedPrlValues.includes(value)) {
+          prlSubPosFields.push(`Duplicate PRL Range "${value}" found in Position ${index + 1}`);
+        } else {
+          selectedPrlValues.push(value);
+        }
+      }
+
+      if (!positionName || positionName.trim() === "") {
+        prlSubPosFields.push(`Position Name ${index + 1}`);
+      }
+    });
+
+    // Check apakah semua PRL range sudah dipilih
+    if (prlRange && selectedPrlValues.length > 0) {
+      const unselectedRanges = prlRange.filter((range) => !selectedPrlValues.includes(range));
+      if (unselectedRanges.length > 0) {
+        prlSubPosFields.push(
+          `PRL Ranges not assigned: ${unselectedRanges.join(
+            ", "
+          )}. Please assign all available PRL ranges or adjust the range.`
+        );
+      }
+    }
+
+    const allEmptyFields = [...emptyFields, ...prlSubPosFields];
+
+    if (allEmptyFields.length > 0) {
+      const fieldList = allEmptyFields.map((field) => `  • ${field}`).join("\n\n");
+      swal("Validation Error", `Please fill in the following required fields:\n\n${fieldList}`, "warning");
+      return false;
+    }
+
+    return true;
+  }
 
   $("#saveSubPos").click(function () {
-    // swal("Saved", "Save Sub Position", "success");
+    const isValid = subPosFormValidation();
+    if (!isValid) {
+      return; // Stop execution if validation fails
+    }
+    // Proceed with save if validation passes
     addSubPosition();
   });
 

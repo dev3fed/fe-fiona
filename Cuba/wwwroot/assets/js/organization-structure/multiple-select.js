@@ -1,6 +1,24 @@
 function getDataListAsync(data) {
   data.forEach((item) => {
     const draftId = item.draftId;
+    const dependOn = item.dependOn ? item.dependOn : null;
+    // berarti ada dependOn menambahkan url param, contoh: &skillGroup=value
+    let additionalParams = "";
+    if (dependOn) {
+      dependOn.forEach((depend) => {
+        console.log("depend", depend);
+        let dependValue =
+          depend.get == "text" ? $(`#${depend.valueFrom} option:selected`).text() : $(`#${depend.valueFrom}`).val();
+        console.log("dependValue", dependValue);
+        if (depend.inputType && depend.inputType == "select2") {
+          dependValue = dependValue ? dependValue : "";
+        }
+        if (dependValue) {
+          additionalParams += `&${depend.urlParam}=` + dependValue.replace(/\s*\(.*?\)\s*/g, "");
+        }
+      });
+    }
+    console.log("additionalParams", additionalParams);
     $(`#${item.id}`)
       .select2({
         dropdownParent: item.dropdownParent ?? null,
@@ -8,7 +26,7 @@ function getDataListAsync(data) {
         allowClear: true,
         delay: 250,
         ajax: {
-          url: `${url.baseUrl}/${url["api-organization"]}/${item.endpoint}?draftId=` + draftId,
+          url: `${url.baseUrl}/${url["api-organization"]}/${item.endpoint}?draftId=` + draftId + additionalParams,
           dataType: "json",
           data: function (params) {
             return {
@@ -20,7 +38,7 @@ function getDataListAsync(data) {
           // item bisa diakses melalui closure
           processResults: function (data, params) {
             params.page = params.page || 1;
-            console.log(data, params, item); // item tersedia di sini
+            // console.log(data, params, item); // item tersedia di sini
             return {
               results: data.data.map((dataItem) => ({
                 id: dataItem.unitCode || dataItem.Id || dataItem.id, // The ID for Select2
