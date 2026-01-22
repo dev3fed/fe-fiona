@@ -161,9 +161,7 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
 };
 
 const openModalApprovalDepthLevel = async () => {
-  // get value from input radio id radioinlineNone
   try {
-    //
     const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
     const draftId = $("#dataSource-competency").val();
     const detailProficiency = getState("detailProficiency");
