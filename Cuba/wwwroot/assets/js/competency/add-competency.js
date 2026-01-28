@@ -29,26 +29,23 @@ const openSpecificCompetency = async () => {
 
   const formContent = `
     <div class="row mb-2">
-      <div class="col-2 d-flex">
-        <span class="form-label" style="min-width: 130px;">Competency Draft</span>
-        <span class="mx-1">:</span>
-      </div>
-      <div class="col-10 fw-bold">
-        ${draftName}
+      <div class="col-12 d-flex align-items-center">
+        <div style="min-width:150px; font-weight:500; margin-right:6px;">Competency Draft</div>
+        <div style="margin-right:6px;">:</div>
+        <div class="fw-bold flex-fill">${draftName}</div>
       </div>
     </div>
 
     <div class="row mb-2">
-      <div class="col-2 d-flex">
-        <span class="form-label" style="min-width: 130px;">Position</span>
-        <span class="mx-1">:</span>
-      </div>
-      <div class="col-10 fw-bold">
-        ${jobInformation.positionName || "N/A"}
+      <div class="col-12 d-flex align-items-center">
+        <div style="min-width:150px; font-weight:500; margin-right:6px;">Position</div>
+        <div style="margin-right:6px;">:</div>
+        <div class="fw-bold flex-fill">${jobInformation.positionName || "N/A"}</div>
       </div>
     </div>
+
     <div class="col-12">
-    <hr>
+      <hr>
       <div class="col mb-3">
         <div class="m-t-15 m-checkbox-inline custom-radio-ml">
             <div class="form-check form-check-inline radio radio-primary">
@@ -656,9 +653,13 @@ const onSelectPositionRefer = async (event) => {
     if (competencyList.length > 0) {
       const elementComperef = document.getElementById("table-comperef");
       elementComperef.style.display = "block";
+      console.log("competencyList", competencyList);
       const dataMandatory = competencyList.filter((item) => item.compType.toLowerCase() === "mandatory");
       const dataGeneral = competencyList.filter((item) => item.compType.toLowerCase() === "general");
       const dataSpecific = competencyList.filter((item) => item.compType.toLowerCase() === "specific");
+      console.log("dataMandatory", dataMandatory);
+      console.log("dataGeneral", dataGeneral);
+      console.log("dataSpecific", dataSpecific);
       const bodyTableCompeRef = `
       <label class="form-label">Specific Competencies of Manager Event Management</label>
                         <div class="card-tablebusinessreference">

@@ -51,6 +51,27 @@ $("#compeApprovalDate").datepicker({
     renderTableApproval(result.data);
   },
 });
+$("#compeApprovalDate").on("input change", async function () {
+  if ($(this).val() === "") {
+    const payloadApproval = getState("payloadApproval");
+    let filterValue = (payloadApproval.Filter || "")
+      .split(",")
+      .filter(
+        (f) =>
+          !/^ApprovedDate:/i.test(f.trim()) && !/^RejectedDate:/i.test(f.trim()) && !/^SubmittedDate:/i.test(f.trim()),
+      )
+      .join(",");
+
+    const payload = {
+      ...payloadApproval,
+      Filter: filterValue,
+      Page: 1,
+    };
+    setState("payloadApproval", payload);
+    const result = await fetchApprovalList(payload);
+    renderTableApproval(result.data);
+  }
+});
 $("#compesubmitedDate").datepicker({
   onSelect: async function (formattedDate) {
     const payloadApproval = getState("payloadApproval");
@@ -77,6 +98,24 @@ $("#compesubmitedDate").datepicker({
     const result = await fetchApprovalList(payload);
     renderTableApproval(result.data);
   },
+});
+$("#compesubmitedDate").on("input change", async function () {
+  if ($(this).val() === "") {
+    const payloadApproval = getState("payloadApproval");
+    let filterValue = (payloadApproval.Filter || "")
+      .split(",")
+      .filter((f) => !/^submitteddate:/i.test(f.trim()))
+      .join(",");
+
+    const payload = {
+      ...payloadApproval,
+      Filter: filterValue,
+      Page: 1,
+    };
+    setState("payloadApproval", payload);
+    const result = await fetchApprovalList(payload);
+    renderTableApproval(result.data);
+  }
 });
 document.getElementById("statusApproval").addEventListener("change", async function () {
   const statusApproval = this.value;
@@ -133,7 +172,7 @@ const renderTableApproval = async (approvalData) => {
         const date = new Date(dateStr);
         if (isNaN(date)) return "-";
         const pad = (n) => n.toString().padStart(2, "0");
-        return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}, ${pad(date.getHours())}:${pad(
+        return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}, ${pad(date.getHours())}:${pad(
           date.getMinutes(),
         )}`;
       };
@@ -191,7 +230,13 @@ const renderTableApproval = async (approvalData) => {
           <td>${data.draftName || "-"}</td>
           <td>${data.draftSoName || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>
-          <td>${formatDate(data.modifiedDate)}</td>
+            <td>${
+              data.statusText === "Approved"
+                ? formatDate(data.approvedDate)
+                : data.statusText === "Submitted"
+                  ? "-"
+                  : formatDate(data.rejectedDate)
+            }</td>
           <td>${statusHtml}</td>
           <td style="width: 100px;text-align:center">
         <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
@@ -228,8 +273,8 @@ const renderTableApproval = async (approvalData) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-      listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
-    } of ${listData.total} records</label>
+                listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
+              } of ${listData.total} records</label>
             </div>
           </div>
         `;
@@ -366,8 +411,6 @@ function handleApprovalBack() {
   }
 }
 const handleDetailApproval = async (id) => {
-  console.log("cek");
-  console.log("first", id);
   try {
     const approvalDetail = document.getElementById("approval-detail");
     const mainCompetency = document.getElementById("main-competency");
@@ -386,7 +429,6 @@ const handleDetailApproval = async (id) => {
       headerCompetency.style.display = "none";
     }
     const detailResult = await fetchDetailDraft(id);
-    console.log("detailResult", detailResult);
     if (detailResult.success === true) {
       setState("dataDetailApproval", detailResult.data);
     }

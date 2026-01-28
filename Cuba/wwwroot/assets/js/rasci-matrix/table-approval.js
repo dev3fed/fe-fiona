@@ -18,7 +18,7 @@ $("#approvalDate").datepicker({
     const payloadApproval = getState("payloadApproval");
     const statusApproval = document.getElementById("statusApproval").value;
     const [month, day, year] = formattedDate.split("/");
-    
+
     let dateFilterKey = "ApprovedDate";
     if (statusApproval === "Status:Reject") {
       dateFilterKey = "RejectedDate";
@@ -26,7 +26,7 @@ $("#approvalDate").datepicker({
     if (statusApproval === "Status:On Review") {
       dateFilterKey = "SubmittedDate";
     }
-    
+
     const approvalDateFilter = `${dateFilterKey}:${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 
     let filterValue = (payloadApproval.Filter || "")
@@ -58,7 +58,10 @@ $("#approvalDate").on("input change", async function () {
     const payloadApproval = getState("payloadApproval");
     let filterValue = (payloadApproval.Filter || "")
       .split(",")
-      .filter((f) => !/^ApprovedDate:/i.test(f.trim()) && !/^RejectedDate:/i.test(f.trim()) && !/^SubmittedDate:/i.test(f.trim()))
+      .filter(
+        (f) =>
+          !/^ApprovedDate:/i.test(f.trim()) && !/^RejectedDate:/i.test(f.trim()) && !/^SubmittedDate:/i.test(f.trim()),
+      )
       .join(",");
 
     const payload = {
@@ -180,8 +183,8 @@ const renderTableApproval = async (approvalData) => {
         if (!dateStr) return "-";
         const date = new Date(dateStr);
         if (isNaN(date)) return "-";
-        const pad = (n) => n.toString().padStart(2, "0");
-        return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}, ${pad(date.getHours())}:${pad(
+        const pad = (n) => n.toString()?.padStart(2, "0");
+        return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}, ${pad(date.getHours())}:${pad(
           date.getMinutes(),
         )}`;
       };
@@ -239,7 +242,13 @@ const renderTableApproval = async (approvalData) => {
           <td>${data.draftName || "-"}</td>
           <td>${data.orgNameSource || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>
-          <td>${formatDate(data.modifiedDate)}</td>
+          <td>${
+            data.statusText === "Approved"
+              ? formatDate(data.approvedDate)
+              : data.statusText === "Submitted"
+                ? "-"
+                : formatDate(data.rejectedDate)
+          }</td>
           <td>${statusHtml}</td>
           <td style="width: 100px;text-align:center">
         <button class="btn btn-outline-primary" type="button" onclick="handleDetailApproval('${data.draftId}')">
@@ -276,8 +285,8 @@ const renderTableApproval = async (approvalData) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-      listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
-    } of ${listData.total} records</label>
+                listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
+              } of ${listData.total} records</label>
             </div>
           </div>
         `;

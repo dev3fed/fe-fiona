@@ -74,7 +74,7 @@ document.getElementById("status-summary").addEventListener("change", async funct
   } catch (error) {}
 });
 const renderTableSummary = (resultList) => {
-  if (resultList.data.data.length > 0) {
+  if (resultList && resultList.data && Array.isArray(resultList.data.data) && resultList.data.data.length > 0) {
     const listData = resultList.data;
     const bodySummary = listData.data
       .map((element, i) => {
@@ -82,11 +82,25 @@ const renderTableSummary = (resultList) => {
         let statusText = element.kkjStatus || "N/A";
         let statusClass = (statusText || "").toLowerCase();
         let isNotAvailable = statusClass === "not-available" || statusClass === "not available";
+        const valString = JSON.stringify(element).replace(/"/g, "&quot;");
+
+        const actionButtons = isNotAvailable
+          ? `<button class="btn btn-primary btn-icon" type="button">
+                 <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
+                 Add Competency
+               </button>`
+          : `<button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
+              /"/g,
+              "&quot;",
+            )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
+                 <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
+                 <span>Detail</span>
+               </button>`;
         let bgColor = isNotAvailable ? "#FAE9EB" : "#b9fbc0";
         let textColor = isNotAvailable ? "#D02138" : "#16a34a";
         let capitalizedStatus = statusText
           .split("-")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
           .join(" ");
         let statusHtml = `<span style="
           display:inline-block;
@@ -101,7 +115,6 @@ const renderTableSummary = (resultList) => {
           box-sizing:border-box;
           ">${capitalizedStatus}</span>`;
         const startIndex = (listData.meta.page - 1) * listData.meta.limit;
-        const valString = JSON.stringify(element).replace(/"/g, "&quot;");
         return `
             <tr>
               <td style="text-align:center">${startIndex + i + 1}</td>
@@ -109,14 +122,8 @@ const renderTableSummary = (resultList) => {
               <td style="text-align:center">${element.functionName || "N/A"}</td>
               <td style="text-align:center">${element.divisionName || "N/A"}</td>
               <td style="width: 120px;text-align:center">${statusHtml}</td>
-              <td style="text-align:center;width: 100px;">
-               <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
-          /"/g,
-          "&quot;",
-        )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
-               <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
-               <span>Detail</span>
-               </button> 
+              <td style="text-align:center;width:${isNotAvailable ? "200px" : "100px"}">
+               ${actionButtons}
               </td>
             </tr>`;
       })
@@ -150,14 +157,51 @@ const renderTableSummary = (resultList) => {
         `;
     }
     let selectElement = document.getElementById("limitPageSummary");
-    selectElement.value = listData.meta.limit;
+    if (selectElement) selectElement.value = listData.meta.limit;
+  } else {
+    // Handle empty or missing data: clear table, reset pagination and totals
+    const meta =
+      resultList && resultList.data && resultList.data.meta ? resultList.data.meta : { limit: 10, count: 0, page: 1 };
+    document.getElementById(
+      "body-summary",
+    ).innerHTML = `<tr><td colspan="6" style="text-align:center">No records found</td></tr>`;
+    const currentPage = meta.page || 1;
+    const totalPages = Math.max(1, Math.ceil((meta.count || 0) / (meta.limit || 1)));
+    renderPaginationSummary(currentPage, totalPages);
+    const totalPage = document.getElementById("total-summary-page");
+    if (totalPage) {
+      const start = 0;
+      const end = 0;
+      totalPage.innerHTML = `
+          <div class="row">
+            <div class="col-2">
+              <select class="form-select digits"  style="width:62%;" id="limitPageSummary" onchange="changeNumberSummaryPage(event)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="col-10">
+              <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${end} of ${
+        meta.count || 0
+      } records</label>
+            </div>
+          </div>
+        `;
+    }
+    let selectElement = document.getElementById("limitPageSummary");
+    if (selectElement) selectElement.value = meta.limit || 10;
   }
 };
+
 const selectTypePosition = (text) => {
   const payloadSummary = getState("payloadSummary");
   let payload = { ...payloadSummary, keySearch: text.toLowerCase() };
   setState("payloadSummary", payload);
-  document.getElementById("btnSearchType").innerText = text;
+  document.getElementById("searchTypeSummary").innerText = text;
   document.getElementById("inputSearchSummary").value = "";
 };
 const triggerSearchSummary = async () => {
@@ -169,6 +213,7 @@ const triggerSearchSummary = async () => {
     let payload = { ...payloadSummary, searchValue: searchValue };
     setState("payloadSummary", payload);
     const result = await fetchSummaryList(payload);
+    console.log("result", result);
     renderTableSummary(result);
     spinner.style.display = "none";
   } catch (error) {}
@@ -252,7 +297,7 @@ function renderPaginationSummary(currentPage, totalPages) {
 const clearSearchSummary = async () => {
   try {
     document.getElementById("inputSearchSummary").value = "";
-    document.getElementById("btnSearchType").innerText = "Position";
+    document.getElementById("searchTypeSummary").innerText = "Position";
     const spinner = document.getElementById("loadingClearSummary");
     spinner.style.display = "inline-block";
     const statusEl = document.getElementById("status-summary");
@@ -300,3 +345,9 @@ async function changeNumberSummaryPage(event) {
   const result = await fetchSummaryList(payload);
   renderTableSummary(result);
 }
+
+const showDetail = async (data) => {
+  try {
+    console.log("data", data);
+  } catch (error) {}
+};
