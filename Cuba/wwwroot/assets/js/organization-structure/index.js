@@ -6,9 +6,10 @@ async function initializeHelper() {
       jobCode: defaultNodeId,
       depth: 3,
     });
-    // const dataChart = test1;
-    // renderOrgChart(dataChart, "10135490", false);
-    console.log("Data chart fetched ==>:", dataChart);
+    // const dataChart = test2;
+    // console.log("dataChart", dataChart);
+    // renderOrgChart(dataChart.data, "10164009", false);
+    console.log("Data chart fetched ==>:", dataChart.data);
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
       if (typeof hideChartLoading === "function") {
@@ -16,7 +17,7 @@ async function initializeHelper() {
       }
       console.log("Chart initialization and loading completed");
     }, 1500); // Wait 1.5 seconds for chart to fully render
-    helperOrgTree(dataChart.data);
+    // helperOrgTree(dataChart);
   } catch (error) {
     console.error("Error in initializeHelper:", error);
     // Hide loading and show error message on failure
@@ -133,7 +134,7 @@ async function duplicateJob() {
     "",
     action,
     "40%",
-    1
+    1,
   );
   $("#modalConfirm").modal("show");
 }
@@ -199,13 +200,14 @@ function confirmDeleteOption(value) {
   swal(
     "Saved",
     "Activity delete Manager Strategic Planning position has been saved to draft Evaluasi Struktur Organisasi 2025",
-    "success"
+    "success",
   );
 }
 
 // modal confirm delete job
 async function confirmDeleteJob(unitCode) {
   const positionId = $("#inputOUCode").val();
+  const prlOrg = $("#modalPrlOrg").text();
   const positionName = $("#jobName").text();
   const deleteOption = $("input[name='deleteOption']:checked").val();
   const tableVarious = $("#editMoveVariousTable");
@@ -218,7 +220,7 @@ async function confirmDeleteJob(unitCode) {
   if (deleteOption == "deleteAll") {
     const willProceed = await confirmFunction(
       "Confirm Delete",
-      "Are you sure you want to delete " + positionName + " ?"
+      "Are you sure you want to delete " + positionName + " ?",
     );
     if (!willProceed) {
       return; // User cancelled, exit function
@@ -227,7 +229,7 @@ async function confirmDeleteJob(unitCode) {
     const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
       unitCode: positionId,
-      prlOrg: "8-9",
+      prlOrg: prlOrg,
       userId: "system",
     });
     if (deleteData) {
@@ -245,7 +247,7 @@ async function confirmDeleteJob(unitCode) {
     }
     const willProceed = await confirmFunction(
       "Confirm Delete & Move",
-      "Are you sure you want to delete " + positionName + " & move subordinates?"
+      "Are you sure you want to delete " + positionName + " & move subordinates?",
     );
     if (!willProceed) {
       return; // User cancelled, exit function
@@ -258,8 +260,8 @@ async function confirmDeleteJob(unitCode) {
     await moveJob(movePosition);
     const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
-      unitCode: unitCode,
-      prlOrg: "8-9",
+      unitCode: positionId,
+      prlOrg: prlOrg,
       userId: "system",
     });
     if (deleteData) {
@@ -279,7 +281,7 @@ async function confirmDeleteJob(unitCode) {
     }
     const willProceed = await confirmFunction(
       "Confirm Delete & Move",
-      "Are you sure you want to delete " + positionName + " & move subordinates?"
+      "Are you sure you want to delete " + positionName + " & move subordinates?",
     );
     if (!willProceed) {
       return; // User cancelled, exit function
@@ -288,8 +290,8 @@ async function confirmDeleteJob(unitCode) {
     await moveJob(dataSelectFiltered);
     const deleteData = await deleteJobAndSubordinates({
       draftId: organizationAttribute.orgUnitId,
-      unitCode: unitCode,
-      prlOrg: "8-9",
+      unitCode: positionId,
+      prlOrg: prlOrg,
       userId: "system",
     });
     if (deleteData) {
@@ -318,6 +320,7 @@ async function handleEditJob() {
       unitName: item.unitName,
     })) ?? [];
   if (!dataSub.length) {
+    localStorage.removeItem("backPage");
     window.location.href = "/organization/form-position?unitCode=" + getPositionById;
     return;
   }
@@ -398,7 +401,7 @@ async function handleDeleteJob() {
   if (!dataSub.length) {
     const willProceed = await confirmFunction(
       "Confirm Delete",
-      "Are you sure you want to delete " + positionName + " ?"
+      "Are you sure you want to delete " + positionName + " ?",
     );
     if (!willProceed) {
       return; // User cancelled, exit function
@@ -582,6 +585,7 @@ async function confirmEditJob() {
   const editPositionBox = $("input[name='editPositionBox']:checked").val();
   if (editPositionBox == "editSelf") {
     loader(true);
+    localStorage.removeItem("backPage");
     window.location.href = "/organization/form-position?unitCode=" + positionId;
   } else {
     const table = $("#editMoveVariousTable");
@@ -736,7 +740,7 @@ async function deleteDraft(paramsId) {
     "All Position title in this draft will be deleted, including related RASCI notations, Competencies, and Position Descriptions",
     action,
     "",
-    paramsId
+    paramsId,
   );
 }
 
@@ -1005,7 +1009,9 @@ $(document).ready(async function () {
 
       // Positioname & satinize before     const sanitizedPosition = getPosition.replace(/&/g, "%26"), replace back to & when display
 
-      $("#searchOrgNode").append(new Option(positionName, focusNode, true, true)).trigger("change");
+      $("#searchOrgNode")
+        .append(new Option(positionName, focusNode, true, true))
+        .trigger("change");
     }, 1000);
   } else {
     initializeHelper();
@@ -1047,7 +1053,7 @@ function filterDraftsBySearch(searchTerm) {
   if (!storeData.listDraft) return;
 
   const filteredDrafts = storeData.listDraft.filter((draft) =>
-    draft.draftName.toLowerCase().includes(searchTerm.toLowerCase())
+    draft.draftName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   console.log("Filtered drafts by search:", filteredDrafts.length);
@@ -1127,7 +1133,7 @@ function filterApprovalsBySearch(searchTerm) {
   console.log("searchTerm", searchTerm);
 
   const filteredApprovals = storeData.listApproval.filter((approval) =>
-    approval.draftName.toLowerCase().includes(searchTerm.toLowerCase())
+    approval.draftName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   getTableListApproval(filteredApprovals);
@@ -1166,7 +1172,7 @@ function updateApprovalFilters() {
   // Apply search filter
   if (searchTerm) {
     filteredApprovals = filteredApprovals.filter((approval) =>
-      approval.draftName.toLowerCase().includes(searchTerm.toLowerCase())
+      approval.draftName.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }
 

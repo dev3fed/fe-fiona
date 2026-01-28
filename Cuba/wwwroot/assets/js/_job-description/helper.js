@@ -249,7 +249,7 @@ async function searchJobCompare(event, isPercentage) {
               <i class="fas fa-info-circle" data-toggle="popover" data-placement="top" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"></i> 
             </div>
           </div>
-        `
+        `,
       )
       .join("");
 
@@ -269,7 +269,7 @@ async function searchJobCompare(event, isPercentage) {
             ${item.name}
           </div>
         </div>
-      `
+      `,
     )
     .join("");
 
@@ -678,7 +678,7 @@ async function checkboxReference(val) {
 async function saveReference() {
   const dataSelected = selectedData.selectedJobDesc;
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
-    (item) => !item.id.includes("all") && item.checked
+    (item) => !item.id.includes("all") && item.checked,
   );
   console.log("checkboxList", checkboxList);
   const checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
@@ -823,7 +823,8 @@ async function saveReference() {
   });
 }
 
-function checkButtonTable(buttonTable, id, lastPath) {
+function checkButtonTable(buttonTable, id, lastPath, data) {
+  console.log("data", data);
   const user = localStorage.getItem("user") === "admin" ? "admin" : "admin";
   const status = "2";
   // swith case by parameter buttonTable and lastPath
@@ -895,15 +896,15 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-      ? '<i class="fas fa-check-circle text-success"></i>'
-      : '<i class="fas fa-exclamation-circle text-warning"></i>';
+        ? '<i class="fas fa-check-circle text-success"></i>'
+        : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
       message +
       `
-    </div>`
+    </div>`,
   );
 
   if (note) {
@@ -912,7 +913,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
         <strong>Note:</strong> ` +
         note +
         `
-      </div>`
+      </div>`,
     );
   }
 
@@ -926,7 +927,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
             item.callback +
             `)()">` +
             item.button +
-            `</button>`
+            `</button>`,
         );
         return;
       }
@@ -935,7 +936,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           item.className +
           ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
           item.button +
-          `</button>`
+          `</button>`,
       );
     });
   }

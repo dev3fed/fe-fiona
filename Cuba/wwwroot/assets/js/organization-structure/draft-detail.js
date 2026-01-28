@@ -56,11 +56,12 @@
 
 async function checkPage() {
   // cons
-  alert("masok");
   const status = 3;
   const user = JSON.parse(localStorage.getItem("user")) === "admin" ? "superadmin" : "superadmin";
+  console.log("status", status);
+  console.log("user", user);
   $("#statusApproval").html(
-    `<span class="p-2 b-r-8 w-100 text-center ${statusApprovalClass[1]}">${statusApproval[1]}</span>`
+    `<span class="p-2 b-r-8 w-100 text-center ${statusApprovalClass[1]}">${statusApproval[1]}</span>`,
   );
   // delete draft and submit approval must be hide, becouse it used only for draft detail page
   $("#deleteDraft, #submitApproval").hide();
@@ -72,7 +73,6 @@ async function checkPage() {
     $("#statusApproval, #acceptApproval, #rejectApproval").hide();
     $("#deleteDraft, #submitApproval").show();
   } else {
-    alert("maok");
     $("#detailTitle").text("Approval Detail");
     $("#draftDetailBreadcrumb").text("Approval Detail");
     $("#statusApproval, #acceptApproval, #rejectApproval").show();
@@ -168,19 +168,25 @@ async function backToOrg(params) {
   }
 }
 async function confirmDeleteDraft(id) {
-  console.log("confirmDeleteDraft", id);
   let rollback = await rollbackDraftSO(id);
-  if (rollback) {
-    swal("Success", "Draft has been deleted", "success");
-    // wait 2s
-    // setTimeout(() => {
-    //   window.location.href = "/organization/index";
-    // }, 3000);
+  console.log("rollback", rollback);
+  if (rollback.data.status == "Failed") {
+    // data.desctiption
+    swal("Error", rollback.data.description, "error");
+    return;
+  } else {
+    if (rollback) {
+      swal("Success", "Draft has been deleted", "success");
+      // wait 2s
+      // setTimeout(() => {
+      //   window.location.href = "/organization/index";
+      // }, 3000);
+    }
+    // wait 2s then redirect to organization index
+    setTimeout(() => {
+      window.location.href = "/organization/index";
+    }, 2000);
   }
-  // wait 2s then redirect to organization index
-  setTimeout(() => {
-    window.location.href = "/organization/index";
-  }, 2000);
 }
 
 function deleteDraft() {
@@ -208,7 +214,7 @@ function deleteDraft() {
     "All Position title in this draft will be deleted, including related RASCI notations, Competencies, and Position Descriptions",
     action,
     "",
-    urlParams.get("draftId")
+    urlParams.get("draftId"),
   );
 }
 
@@ -331,7 +337,7 @@ function submitToApproval() {
     "You cannot change data after submit",
     action,
     "",
-    draftId
+    draftId,
   );
 }
 
@@ -351,6 +357,7 @@ async function clickUploadFunction() {
 }
 
 function editPositionDraft(id) {
+  localStorage.setItem("backPage", "draft-detail");
   window.location.href = "/organization/form-position?unitCode=" + id;
 }
 
@@ -366,48 +373,48 @@ async function detailPositionDraftOld(id) {
   }
   console.log("findPosition", findPosition);
   $("#jobName").text(
-    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
+    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName,
   );
   $("#positionName").text(
-    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
+    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName,
   );
   $("#abbrvPosition").text(
-    findPosition.abbreviationName == "" || findPosition.abbreviationName == null ? "-" : findPosition.abbreviationName
+    findPosition.abbreviationName == "" || findPosition.abbreviationName == null ? "-" : findPosition.abbreviationName,
   );
   $("#orgUnitName").text(findPosition.unitName == "" || findPosition.unitName == null ? "-" : findPosition.unitName);
   $("#orgPrl").text(findPosition.prlOrg == "" || findPosition.prlOrg == null ? "-" : findPosition.prlOrg);
   $("#formation").text(findPosition.formation == "" || findPosition.formation == null ? "-" : findPosition.formation);
   $("#careerType").text(
-    findPosition.careerTypeName == "" || findPosition.careerTypeName == null ? "-" : findPosition.careerTypeName
+    findPosition.careerTypeName == "" || findPosition.careerTypeName == null ? "-" : findPosition.careerTypeName,
   );
   $("#careerLevel").text(
-    findPosition.careerLevelName == "" || findPosition.careerLevelName == null ? "-" : findPosition.careerLevelName
+    findPosition.careerLevelName == "" || findPosition.careerLevelName == null ? "-" : findPosition.careerLevelName,
   );
   $("#basket").text(findPosition.basket.length > 0 ? "Yes" : "No");
   $("#directReport").text(
-    findPosition.directorateName == "" || findPosition.directorateName == null ? "-" : findPosition.directorateName
+    findPosition.directorateName == "" || findPosition.directorateName == null ? "-" : findPosition.directorateName,
   );
   $("#neckFunction").text(findPosition.isNeck ? "Yes" : "No");
   $("#isProject").text(findPosition.isProject ? "Yes" : "No");
   $("#coordination").text(findPosition.coordinationWith !== "" ? "Yes" : "No");
   $("#coordinationWith").text(
-    findPosition.coordinationWith == "" || findPosition.coordinationWith == null ? "-" : findPosition.coordinationWith
+    findPosition.coordinationWith == "" || findPosition.coordinationWith == null ? "-" : findPosition.coordinationWith,
   );
   $("#directorate").text(
-    findPosition.directorateName == "" || findPosition.directorateName == null ? "-" : findPosition.directorateName
+    findPosition.directorateName == "" || findPosition.directorateName == null ? "-" : findPosition.directorateName,
   );
   $("#division").text(
-    findPosition.divisionName == "" || findPosition.divisionName == null ? "-" : findPosition.divisionName
+    findPosition.divisionName == "" || findPosition.divisionName == null ? "-" : findPosition.divisionName,
   );
   $("#subDivision").text(
-    findPosition.subDivisionName == "" || findPosition.subDivisionName == null ? "-" : findPosition.subDivisionName
+    findPosition.subDivisionName == "" || findPosition.subDivisionName == null ? "-" : findPosition.subDivisionName,
   );
   $("#department").text(
-    findPosition.departmentName == "" || findPosition.departmentName == null ? "-" : findPosition.departmentName
+    findPosition.departmentName == "" || findPosition.departmentName == null ? "-" : findPosition.departmentName,
   );
   $("#section").text(findPosition.section == "" || findPosition.section == null ? "-" : findPosition.section);
   $("#personnelAreaName").text(
-    findPosition.sectionName == "" || findPosition.sectionName == null ? "-" : findPosition.sectionName
+    findPosition.sectionName == "" || findPosition.sectionName == null ? "-" : findPosition.sectionName,
   );
 
   const skillGroup = findPosition?.skillGroups ? findPosition?.skillGroups : [];
@@ -431,11 +438,12 @@ async function detailapproval(id) {
   await modalJobPopup(id);
 }
 
-async function confirmRollback(unitCode) {
-  // alert("confirmRollback" + unitCode);
+async function confirmRollback(unitCodePrlOrg) {
+  const [unitCode, prlOrg] = unitCodePrlOrg.split(",");
   const rollback = await deleteJobAndSubordinates({
     draftId: organizationAttribute.orgUnitId,
     unitCode: unitCode,
+    prlOrg: prlOrg,
     userId: "system",
   });
 
@@ -448,7 +456,7 @@ async function confirmRollback(unitCode) {
   // const getDataDraft = await draftDetailById(organizationAttribute.orgUnitId);
 }
 
-function deletePositionDraft(positionId) {
+function deletePositionDraft(positionId, prlOrg) {
   const action = [
     {
       button: "Back",
@@ -470,7 +478,7 @@ function deletePositionDraft(positionId) {
     "All information in the draft related to this position will be rollback, including details about subordinates, RASCI notations, Competencies, and Position Descriptions",
     action,
     "",
-    positionId
+    `${positionId},${prlOrg}`,
   );
 }
 
@@ -491,7 +499,7 @@ function acceptApproval() {
     "Approve Request",
     `Are you sure want to approve this <b>${draftName}</b> draft?`,
     "",
-    action
+    action,
   );
 }
 
@@ -511,7 +519,7 @@ function rejectApproval() {
     "Reject Request",
     "Reject Comment <br> <textarea class='form-control' id='rejectReason' rows='3'></textarea>",
     "",
-    action
+    action,
   );
 }
 
@@ -525,6 +533,7 @@ function checkButtonDraftDetail(data) {
   const rejectApprovalButton = $("#rejectApproval");
   const finalizeConfirm = $("#finalize");
   const deleteDraft = $("#deleteDraft");
+  const exportPSSHCButton = $("#exportFilePSSHC");
 
   // submitApprovalButton.toggle(!data.isSubmitted && !data.isApproved && !data.isFinalized);
   // acceptApprovalButton.toggle(data.isSubmitted && !data.isApproved);
@@ -537,6 +546,7 @@ function checkButtonDraftDetail(data) {
   finalizeConfirm.hide();
   console.log("data", data);
   // data.isApproved = true;
+  exportPSSHCButton.hide();
   let step = 0;
   let userRole = "admin";
   if (data?.isSubmitted) {
@@ -563,6 +573,7 @@ function checkButtonDraftDetail(data) {
     submitApprovalButton.hide();
     acceptApprovalButton.hide();
     rejectApprovalButton.hide();
+    exportPSSHCButton.show();
     finalizeConfirm.show();
     deleteDraft.hide();
   }
@@ -572,6 +583,7 @@ function checkButtonDraftDetail(data) {
     $("#editDraftName").hide();
     step = 4;
     submitApprovalButton.hide();
+    exportPSSHCButton.hide();
     finalizeConfirm.hide();
     deleteDraft.hide();
   }
@@ -581,12 +593,12 @@ function checkButtonDraftDetail(data) {
     $("#infoApproval").hide();
   } else {
     // $("#draftNameApproval").text(data?.draftName);
+    $("#exportTemplate").hide();
     $("#detailTitle").text("Approval Detail");
     $("#draftDetailBreadcrumb").text("Approval Detail");
     $("#infoDraft").hide();
-    finalizeConfirm.hide();
+    // finalizeConfirm.hide();
   }
-  console.log("step", step);
 
   if (lastPath === "approval-detail") {
     $("#editDraftName,#submitApproval,#downloadTemplate, #exportDataDraft, #importDataDraft").hide();
@@ -848,24 +860,65 @@ $(document).ready(async function () {
   });
 
   $("#exportDataDraft").click(async function () {
-    // alert("Export Data Draft feature is coming soon!");
-    const draftId = urlParams.get("draftId");
-    const exportData = await exportZhroomToExcel({ draftId });
-    if (exportData) {
-      const url = window.URL.createObjectURL(new Blob([exportData.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `export-draft-${draftId}.xlsx`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } else {
-      const message = exportData?.message ?? "Failed to export data";
-      swal("Failed", message, "error");
-    }
+    try {
+      const draftId = urlParams.get("draftId");
+      const exportData = await exportZhroomToExcel({ draftId });
+      const draftName = $("#draftName").text().replace(/\s+/g, "-").toLowerCase();
 
-    // window.location.href = "/organization/import-template";
+      if (exportData) {
+        console.log("exportData", exportData);
+        // Untuk responseType blob, data sudah berupa Blob object
+        const blob =
+          exportData instanceof Blob
+            ? exportData
+            : new Blob([exportData], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `export-draft-${draftName}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        swal("Failed", "Failed to export data", "error");
+      }
+    } catch (error) {
+      console.error("Export error:", error);
+      swal("Failed", "Failed to export data: " + error.message, "error");
+    }
+  });
+
+  $("#exportFilePSSHC").on("click", async function () {
+    try {
+      const draftId = urlParams.get("draftId");
+      const exportData = await exportSshcToExcel({ draftId });
+      const draftName = $("#draftName").text().replace(/\s+/g, "-").toLowerCase();
+      if (exportData) {
+        const blob =
+          exportData instanceof Blob
+            ? exportData
+            : new Blob([exportData], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `export-psshc-draft-${draftName}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        swal("Failed", "Failed to export PSSHC data", "error");
+      }
+    } catch (error) {
+      console.error("Export PSSHC error:", error);
+      swal("Failed", "Failed to export PSSHC data: " + error.message, "error");
+    }
   });
 
   $("#importDataDraft").on("click", async function () {
@@ -897,7 +950,7 @@ $(document).ready(async function () {
       "All data in this draft will be replaced with the data in the file",
       action,
       "",
-      1
+      1,
     );
 
     // const file = $("#fileImportDraft")[0].files[0];

@@ -59,6 +59,7 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
+          console.log("check data", data);
           return checkButtonTable("draftList", data.draftId, "draftList");
         },
       },

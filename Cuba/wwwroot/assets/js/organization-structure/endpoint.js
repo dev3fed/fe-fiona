@@ -655,9 +655,10 @@ async function uploadZhroomDraftSO(params, file) {
 
 // 'https://cnt-be-dev2.devserver.fed-insight.com/api/ExportOrganization/export-zhroom-to-excel?draftId=e02be91d-8f09-4030-b33c-a7920efb961a' \
 async function exportZhroomToExcel(params) {
+  console.log("params", params.draftId);
   const api = `${url.baseUrl}/${url["api-export-organization"]}/export-zhroom-to-excel?draftId=${params.draftId}`;
   try {
-    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(api, "GET", null, "blob"); // Menggunakan ajaxRequest dengan responseType blob
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
@@ -670,7 +671,20 @@ async function exportZhroomToExcel(params) {
 async function exportDraftToExcel(params) {
   const api = `${url.baseUrl}/${url["api-export-organization"]}/export-draft-to-excel?draftId=${params.draftId}`;
   try {
-    const result = await ajaxRequest(api, "GET", params); // Menggunakan ajaxRequest
+    const result = await ajaxRequest(api, "GET", null, "blob"); // Menggunakan ajaxRequest dengan responseType blob
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// /api/ExportOrganization/export-sshc-to-excel
+async function exportSshcToExcel(params) {
+  const api = `${url.baseUrl}/${url["api-export-organization"]}/export-sshc-to-excel?draftId=${params.draftId}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
   } catch (error) {
     console.error("Error fetching data from API");
