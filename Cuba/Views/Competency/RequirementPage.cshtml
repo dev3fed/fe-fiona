@@ -81,26 +81,40 @@
                 </select>
             </div>
         </div>
-        <div class="col-2" style="padding-left: 0;margin-top:15px">
-            <div class="faq-form">
-                <span class="mt-2 mb-2" style="min-width: 130px;"></span>
-                <button id="btnSearchCompe" class="btn btn-primary" type="button" onclick="triggerSearchSummary()">
-                    <div class="d-flex align-items-center">
-                        <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                            id="loadingSearchSummary"></div>
-                        <span class="btn-text">Search</span>
-                    </div>
+        <div class="col-2">
+            <span class="mt-2 mb-2" style="min-width: 130px; visibility: hidden;">Action</span>
+            <div class="faq-form d-flex align-items-center" style="gap:8px; margin-top:0;">
+                <button id="btnSearchCompe" class="btn btn-primary d-flex align-items-center" type="button"
+                    onclick="triggerSearchSummary()">
+                    <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                        id="loadingSearchSummary"></div>
+                    <span class="btn-text">Search</span>
                 </button>
-                <button class="btn btn-outline-primary" type="button" id="clearButton" onclick="clearSearchSummary()">
-                    <div class="d-flex align-items-center">
-                        <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                            id="loadingClearSummary"></div>
-                        <span class="btn-text">Clear</span>
-                    </div>
+                <button class="btn btn-outline-primary d-flex align-items-center" type="button" id="clearButton"
+                    onclick="clearSearchSummary()">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" style="display: none;"
+                        id="loadingClearSummary"></div>
+                    <span class="btn-text">Clear</span>
                 </button>
             </div>
         </div>
-        <div class="col-12 mt-3">
+        <div class="col-12 ">
+            <div style="
+        display: inline-block;
+        white-space: nowrap;
+        background: #FAE9EB;
+        border: 1px solid #D02138;
+        margin-top:12px;
+        border-radius: 4px;
+        padding: 6px 18px;
+        color: #D02138;
+        font-size: 12px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+        ">
+                There are 1 positions with requirement (KKJ) are not available
+                <strong style="font-weight:600; color:#D02138;">[Click here to show]</strong>
+            </div>
             <div class="table-responsive" style=" max-height: 450px;">
                 <table class="table tbl-border-summary">
                     <thead id="tbl-summary-header" style="background-color: #006CA9;">
