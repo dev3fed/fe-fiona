@@ -180,7 +180,7 @@ async function insertFormPosition(paramId) {
   }
   if (data?.personnelSubAreaCode) {
     $("#selectPersonalSubareaName").append(
-      new Option(data?.personnelSubAreaName, data?.personnelSubAreaCode, true, true)
+      new Option(data?.personnelSubAreaName, data?.personnelSubAreaCode, true, true),
     );
   }
   if (data?.careerLevelName) {
@@ -205,6 +205,24 @@ async function insertFormPosition(paramId) {
   if (skillGroup.length > 0) {
     data.skillGroups.forEach((item, index) => {
       $(`#${arraySkillGroup[index]}`).append(new Option(item.skillGroupName, item.skillGroupCode, true, true));
+      if (item.skillGroupCode) {
+        getDataListAsync([
+          {
+            id: arraySubSkillGroup[index],
+            endpoint: "draft/sub-skill-group/list",
+            draftId: organizationAttribute.orgUnitId,
+            showId: false,
+            dependOn: [
+              {
+                get: "text",
+                inputType: "select2",
+                urlParam: "skillGroup",
+                valueFrom: arraySkillGroup[index],
+              },
+            ],
+          },
+        ]);
+      }
       $(`#${arraySubSkillGroup[index]}`).append(new Option(item.subSkillGroupName, item.subSkillGroupCode, true, true));
     });
   }
@@ -380,7 +398,7 @@ function updatedAll(dataObject) {
     $("#selectCoordination").prop("checked", true);
     $("#selectCoordination").trigger("change");
     $("#selectCoordinationWith").append(
-      new Option(draftDetail?.coordinationWith, draftDetail?.coordinationWith, true, true)
+      new Option(draftDetail?.coordinationWith, draftDetail?.coordinationWith, true, true),
     );
     $("#selectCoordinationWith").attr("disabled", false);
   }
@@ -391,7 +409,7 @@ function updatedAll(dataObject) {
   $("#selectDepartment").append(new Option(draftDetail?.department, draftDetail?.department, true, true));
   $("#selectSection").append(new Option(draftDetail?.section, draftDetail?.section, true, true));
   $("#selectPersonalAreaName").append(
-    new Option(draftDetail?.personalAreaName, draftDetail?.personalAreaName, true, true)
+    new Option(draftDetail?.personalAreaName, draftDetail?.personalAreaName, true, true),
   );
 
   console.log("draftSsg", draftSsg);
@@ -444,7 +462,7 @@ function updatedAllSubordinate(dataObject) {
     $("#selectCoordination").prop("checked", true);
     $("#selectCoordination").trigger("change");
     $("#selectCoordinationWith").append(
-      new Option(draftDetail?.coordinationWith, draftDetail?.coordinationWith, true, true)
+      new Option(draftDetail?.coordinationWith, draftDetail?.coordinationWith, true, true),
     );
     $("#selectCoordinationWith").attr("disabled", false);
   }
@@ -455,7 +473,7 @@ function updatedAllSubordinate(dataObject) {
   $("#selectDepartment").append(new Option(draftDetail?.department, draftDetail?.department, true, true));
   $("#selectSection").append(new Option(draftDetail?.section, draftDetail?.section, true, true));
   $("#selectPersonalAreaName").append(
-    new Option(draftDetail?.personalAreaName, draftDetail?.personalAreaName, true, true)
+    new Option(draftDetail?.personalAreaName, draftDetail?.personalAreaName, true, true),
   );
 }
 
@@ -897,10 +915,10 @@ function saveEmployeeDetails(payload, data) {
   payload.prlOrg = $("#selectPrlOrg").val();
   payload.prlOrgTo = $("#selectPrlOrgTo").val();
   payload.orgUnitParentId = lsListPosition.find(
-    (item) => item.orgUnitParentId == $("#selectOrgUnitParentName").val()
+    (item) => item.orgUnitParentId == $("#selectOrgUnitParentName").val(),
   )?.orgUnitParentId;
   payload.orgUnitParent = lsListPosition.find(
-    (item) => item.orgUnitParentId == $("#selectOrgUnitParentName").val()
+    (item) => item.orgUnitParentId == $("#selectOrgUnitParentName").val(),
   )?.orgUnitParent;
   payload.directReportId = lsListPosition.find((item) => item.positionId == $("#selectDirectReport").val())?.positionId;
   payload.directReport = lsListPosition.find((item) => item.positionId == $("#selectDirectReport").val())?.positionName;
@@ -951,13 +969,13 @@ function saveEmployeeDetails(payload, data) {
     payload.listSubPosition = getDataList;
   }
   const checkData = lsListDetailDraft.find(
-    (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+    (item) => item.positionId == payload.positionId && item.draftId == payload.draftId,
   );
   console.log("checkData 1", checkData, payload.draftId);
 
   if (checkData) {
     const index = lsListDetailDraft.findIndex(
-      (item) => item.positionId == payload.positionId && item.draftId == payload.draftId
+      (item) => item.positionId == payload.positionId && item.draftId == payload.draftId,
     );
     lsListDetailDraft[index] = payload;
   } else {
@@ -1016,12 +1034,12 @@ function saveOrgDetails(payload) {
   });
 
   const checkData = lsListDraftOrgNode.find(
-    (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
+    (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId,
   );
   console.log("checkData 1", checkData, payload.draftId);
   if (checkData) {
     const index = lsListDraftOrgNode.findIndex(
-      (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId
+      (item) => item.id_position == payload.positionId && item.draft_id == payload.draftId,
     );
     lsListDraftOrgNode[index] = orgPayload;
   } else {
@@ -1291,12 +1309,12 @@ async function editSubPosition(id) {
   $("#modalInputSubPosId").val(data.subPosId);
   if (data.careerLevel.careerLevelCode) {
     $("#modalSelectCareerLevel").append(
-      new Option(data.careerLevel.careerLevelName, data.careerLevel.careerLevelCode, true, true)
+      new Option(data.careerLevel.careerLevelName, data.careerLevel.careerLevelCode, true, true),
     );
   }
   if (data.abbrivation.jobAbbrivationCode) {
     $("#modalSelectAbbrvPosition").append(
-      new Option(data.abbrivation.careerJobName, data.abbrivation.jobAbbrivationCode, true, true)
+      new Option(data.abbrivation.careerJobName, data.abbrivation.jobAbbrivationCode, true, true),
     );
   }
 
@@ -1309,7 +1327,7 @@ async function editSubPosition(id) {
     data.formationBasket.forEach((item, idx) => {
       if (idx !== 0) addSubPos(item);
       $("#modalSelectPrlOrgSubPos" + (idx === 0 ? "" : idx + 1)).append(
-        new Option(item.prlOrg, item.prlOrg, true, true)
+        new Option(item.prlOrg, item.prlOrg, true, true),
       );
       $("#modalInputSubPositionName" + (idx === 0 ? "" : idx + 1)).val(item.positionName);
     });
@@ -1453,7 +1471,7 @@ async function modalJobPopup(params) {
   $("#modalOrgUnitName").text(checkValue(data.unitName));
   $("#modalPositionId").text(checkValue(data.positionCode));
   $("#modalPositionName").text(checkValue(data?.positionName));
-  $("#modalOrgPositionName").text(data?.positionName ? data?.positionName : data?.orgUnitName ?? "");
+  $("#modalOrgPositionName").text(data?.positionName ? data?.positionName : (data?.orgUnitName ?? ""));
 
   $("#modalDirectReportOrgUnitId").text(checkValue(data.parentCode));
   $("#modalDirectReportOrgUnitName").text(checkValue(data.parentName));
@@ -1512,14 +1530,14 @@ async function modalJobPopup(params) {
     // Render incumbents table
     // data?.incumbents make unique by item.personCode
     data.incumbents = data.incumbents.filter(
-      (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode)
+      (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode),
     );
     data.incumbents = data.incumbents.sort((a, b) => a.personCode.localeCompare(b.personCode));
 
     // data?.positionList make unique by item.positionCode item.positionName and item.prlOrg
     data.positionList = data.positionList.filter(
       (item, index, self) =>
-        index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg)
+        index === self.findIndex((t) => t.positionName === item.positionName && t.prlOrg === item.prlOrg),
     );
 
     const positionList = data.positionList.sort((a, b) => a.positionName.localeCompare(b.positionName));
@@ -1671,7 +1689,7 @@ async function modalJobPopup(params) {
 
       $("#basketIncumbent").show();
       data.incumbents = data.incumbents.filter(
-        (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode)
+        (item, index, self) => index === self.findIndex((t) => t.personCode === item.personCode),
       );
       data.incumbents = data.incumbents.sort((a, b) => a.personCode.localeCompare(b.personCode));
       const $basketBody = $("#tableBasketIncumbent tbody").empty();
@@ -1723,15 +1741,15 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-      ? '<i class="fas fa-check-circle text-success"></i>'
-      : '<i class="fas fa-exclamation-circle text-warning"></i>';
+        ? '<i class="fas fa-check-circle text-success"></i>'
+        : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
       message +
       `
-    </div>`
+    </div>`,
   );
 
   if (note) {
@@ -1740,7 +1758,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
         <strong>Note:</strong> ` +
         note +
         `
-      </div>`
+      </div>`,
     );
   }
 
@@ -1754,7 +1772,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
             item.callback +
             `)()">` +
             item.button +
-            `</button>`
+            `</button>`,
         );
         return;
       }
@@ -1763,7 +1781,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           item.className +
           ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
           item.button +
-          `</button>`
+          `</button>`,
       );
     });
   }
@@ -1782,6 +1800,7 @@ function hideModal(id) {
 }
 
 function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0, userRole: "user" }, data) {
+  console.log("check data:", data);
   const user = getStatusDraft.userRole;
   const status = getStatusDraft.step;
   // swith case by parameter buttonTable and lastPath
@@ -1809,7 +1828,7 @@ function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0,
       if (lastPath === "draft-detail") {
         let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editPositionDraft('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailPositionDraft('${id}')"> <i class="icon-eye f-16"></i></button>`;
-        const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}')"><i class="icon-trash f-16"></i></button>`;
+        const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deletePositionDraft('${id}','${data?.prlOrg}')"><i class="icon-trash f-16"></i></button>`;
         if (data?.actionType === "Delete") {
           editPositionDraft = "";
         }
@@ -1922,7 +1941,7 @@ function helperDatePicker() {
     },
     function (start, end, label) {
       $(this).val(start.format("YYYY-MM-DD"));
-    }
+    },
   );
 
   $('input[name="datePicker"]').on("apply.daterangepicker", function (ev, picker) {
@@ -2074,11 +2093,9 @@ async function changeDataDesignCostFilter(value) {
     totalCostYearAdjustment: 0,
   };
 
-  const result = await (value === "function"
-    ? designCostByFunction
-    : value === "division"
-    ? designCostByDivision
-    : designCostByLevel)({
+  const result = await (
+    value === "function" ? designCostByFunction : value === "division" ? designCostByDivision : designCostByLevel
+  )({
     draftId: organizationAttribute.orgUnitId,
     page: 1,
     pageSize: 10,

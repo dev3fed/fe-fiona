@@ -296,6 +296,7 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
+          console.log("check data", data);
           return checkButtonTable("draftList", data.draftId, lastPath);
         },
       },
@@ -539,7 +540,7 @@ function getTableListDraftDetail(params, getStatusDraft = { step: 0, userRole: "
             data.unitCode,
             window.location.pathname.split("/").pop(),
             getStatusDraft,
-            data
+            data,
           );
         },
       },

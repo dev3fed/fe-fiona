@@ -809,7 +809,7 @@ function convertForeignObjectToSVGText(svgElement) {
           const heightPerBracket = (count ? parseInt(count) : 1) * 50;
 
           console.log(
-            `SVG Bracket ${bracketIndex}: count=${count}, formasi=${getJumlahFormasi}, height=${heightPerBracket}px`
+            `SVG Bracket ${bracketIndex}: count=${count}, formasi=${getJumlahFormasi}, height=${heightPerBracket}px`,
           );
 
           const bracketRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -949,7 +949,7 @@ function getChartExportData() {
   const parentNode = orgChartData.processedData.find((node) => node.id === selfNode?.parentId);
   const childrenNodes = orgChartData.processedData.filter((node) => node.parentId === selfNode?.id);
   const grandChildrenNodes = orgChartData.processedData.filter((node) =>
-    childrenNodes.map((child) => child.id).includes(node.parentId)
+    childrenNodes.map((child) => child.id).includes(node.parentId),
   );
   const cloneOrgChartData = { ...orgChartData };
   cloneOrgChartData.processedData = [selfNode, parentNode, ...childrenNodes, ...grandChildrenNodes].filter(Boolean);
@@ -1138,7 +1138,7 @@ function handleNodeExpansion(focusNodeId) {
     chart
       .setExpanded(
         focusNodeId, // Use the provided focus node ID
-        true // Force expand
+        true, // Force expand
       )
       .render();
 
@@ -1155,8 +1155,6 @@ function handleNodeExpansion(focusNodeId) {
 
 // Function to process and prepare chart data
 function processChartData(rawData) {
-  console.log("Processing chart data...", rawData);
-
   const dataMerged = rawData.filter((item) => item.isMergeFormation && item.basket);
 
   let tagsCustomMergeArray = [];
@@ -1221,9 +1219,6 @@ function processChartData(rawData) {
     tagsCustomMergeArray.push(tagCustomMerge);
   });
 
-  console.log("Data processing completed. Processed items:", dataMerged.length);
-  console.log("Custom merge tags:", tagsCustomMergeArray);
-
   return {
     processedData: rawData,
     mergedData: dataMerged,
@@ -1233,9 +1228,8 @@ function processChartData(rawData) {
 
 // Function to initialize the organizational chart
 function initializeChart(processedDataResult, focusNodeId, forceCompact = false) {
-  console.log("Initializing organizational chart...");
-  console.log("forceCompact:", forceCompact);
-
+  console.log("Initializing chart with data:", processedDataResult);
+  console.log("Focus node ID:", focusNodeId);
   let isCompact = true;
   if (focusNodeId) {
     const selfObject = processedDataResult.processedData.find((item) => item.id == focusNodeId);
@@ -1265,7 +1259,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
     }
 
     const lengthRelative = processedDataResult.processedData.filter(
-      (item) => item.parentId === selfObject.parentId
+      (item) => item.parentId === selfObject.parentId,
     ).length;
 
     if (lengthRelative < 6) {
@@ -1417,16 +1411,16 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
 
         return `
                 <div id="basket-merge-node" class="basket-merge ${d.data.tags.find((tag) =>
-                  tag.includes("basket_")
+                  tag.includes("basket_"),
                 )}" style="width:${d.width}px;height:${
-          d.height
-        }px;display:flex;flex-direction:column;${borderStyle};background-color:${backgroundSelected};">
+                  d.height
+                }px;display:flex;flex-direction:column;${borderStyle};background-color:${backgroundSelected};">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px ${borderDot} ${colorSelected};overflow:hidden;">
                     <div style="font-size:${getBasketMergeHeaderFontSize(
-                      d.data.org_unit_name
+                      d.data.org_unit_name,
                     )};color:#666;text-align:center;font-weight:bold;padding:2px;overflow:hidden;word-wrap:break-word;">${
-          d.data.org_unit_name
-        }</div>
+                      d.data.org_unit_name
+                    }</div>
                   </div>
                   <div style="display:flex;flex-direction:row;align-items:stretch;">
                     <div style="width:85%;display:flex;flex-direction:column;">
@@ -1552,7 +1546,8 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
 
   const self = dataChart.find((item) => item.id == focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
-  console.log("Self node: ==>", self.id);
+  console.log("Self node: ==>", self);
+  console.log("Parent node: ==>", parent);
   let forceCompact = false;
   if (self.id == "10132405") {
     forceCompact = true;
@@ -1568,6 +1563,7 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   processed.processedData.forEach((item) => {
     item.parentId = item.pid || null;
   });
+
   localStorage.setItem("focusNodeId", JSON.stringify(focusNodeId));
   localStorage.setItem("orgChartData", JSON.stringify(processed));
   localStorage.setItem("isAutoExpand", JSON.stringify(isAutoExpand));

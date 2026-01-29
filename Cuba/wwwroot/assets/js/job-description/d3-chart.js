@@ -384,7 +384,7 @@ function convertForeignObjectToSVGText(svgElement) {
         "isPointed:",
         isPointedNonMerge,
         "fillColor:",
-        fillColorNonMerge
+        fillColorNonMerge,
       );
 
       // Main container rect
@@ -521,7 +521,7 @@ function convertForeignObjectToSVGText(svgElement) {
         "isPointed:",
         isPointedMerge,
         "fillColor:",
-        fillColorMerge
+        fillColorMerge,
       );
 
       // Main container rect
@@ -659,7 +659,7 @@ function getChartExportData() {
   const parentNode = orgChartData.processedData.find((node) => node.id === selfNode?.parentId);
   const childrenNodes = orgChartData.processedData.filter((node) => node.parentId === selfNode?.id);
   const grandChildrenNodes = orgChartData.processedData.filter((node) =>
-    childrenNodes.map((child) => child.id).includes(node.parentId)
+    childrenNodes.map((child) => child.id).includes(node.parentId),
   );
 
   // Add "pointed" tag to the focused node if it exists
@@ -926,7 +926,7 @@ function handleNodeExpansion(focusNodeId) {
     chart
       .setExpanded(
         focusNodeId, // Use the provided focus node ID
-        true // Force expand
+        true, // Force expand
       )
       .render();
 
@@ -1021,6 +1021,7 @@ function processChartData(rawData) {
 
 // Function to initialize the organizational chart
 function initializeChart(processedDataResult, focusNodeId, forceCompact = false) {
+  console.log("Initializing chart with data:", processedDataResult);
   let isCompact = true;
   if (focusNodeId) {
     const selfObject = processedDataResult.processedData.find((item) => item.id == focusNodeId);
@@ -1042,7 +1043,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
     }
 
     const lengthRelative = processedDataResult.processedData.filter(
-      (item) => item.parentId === selfObject.parentId
+      (item) => item.parentId === selfObject.parentId,
     ).length;
 
     if (lengthRelative < 6) {
@@ -1189,16 +1190,16 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
 
         return `
                 <div id="basket-merge-node" class="basket-merge ${d.data.tags.find((tag) =>
-                  tag.includes("basket_")
+                  tag.includes("basket_"),
                 )}" style="width:${d.width}px;height:${
-          d.height
-        }px;display:flex;flex-direction:column;${borderStyle};background-color:${backgroundSelected};">
+                  d.height
+                }px;display:flex;flex-direction:column;${borderStyle};background-color:${backgroundSelected};">
                   <div class="node-content" style="width:100%;height:50px;display:flex;align-items:center;justify-content:center;border-bottom:1px ${borderDot} ${colorSelected};overflow:hidden;">
                     <div style="font-size:${getBasketMergeHeaderFontSize(
-                      d.data.org_unit_name
+                      d.data.org_unit_name,
                     )};color:#666;text-align:center;font-weight:bold;padding:6px;overflow:hidden;word-wrap:break-word;">${
-          d.data.org_unit_name
-        }</div>
+                      d.data.org_unit_name
+                    }</div>
                   </div>
                   <div style="flex-direction:row;align-items:stretch;">
                     <div style="width:100%;flex-direction:column;">

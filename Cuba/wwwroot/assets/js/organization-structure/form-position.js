@@ -99,6 +99,10 @@ async function saveAsDraft() {
     swal("Saved", "Save as Draft", "success");
     setTimeout(() => {
       loader(false);
+      if (localStorage.getItem("backPage") && localStorage.getItem("backPage") === "draft-detail") {
+        window.location.href = "/organization/draft-detail?draftId=" + organizationAttribute.orgUnitId;
+        return;
+      }
       window.location.href =
         "/organization/index?focusNode=" + save.data.unit.unitCode + "&positionName=" + sanitizedPosition;
     }, 1500);
@@ -724,8 +728,8 @@ $(document).ready(async function () {
       if (unselectedRanges.length > 0) {
         prlSubPosFields.push(
           `PRL Ranges not assigned: ${unselectedRanges.join(
-            ", "
-          )}. Please assign all available PRL ranges or adjust the range.`
+            ", ",
+          )}. Please assign all available PRL ranges or adjust the range.`,
         );
       }
     }
@@ -897,11 +901,17 @@ $(document).ready(async function () {
       "",
       action,
       "50%",
-      ""
+      "",
     );
   });
 
   $("#back").click(function () {
+    const backPage = localStorage.getItem("backPage");
+    alert(backPage);
+    if (backPage && backPage === "draft-detail") {
+      window.location.href = "/organization/draft-detail?draftId=" + organizationAttribute.orgUnitId;
+      return;
+    }
     window.location.href = "/organization/index";
   });
 
