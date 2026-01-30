@@ -51,6 +51,33 @@ async function detailDraft() {
         const emptyActivity = document.getElementById("empty-activity");
         if (emptyActivity) emptyActivity.innerHTML = bodyEmpty;
       }
+      const isWarning = dataDraft.draftSO.isApproved;
+      if (isWarning === false) {
+        document.getElementById("warning-draft-competency").style.display = "block";
+        const soName = dataDraft.draftSO.draftName || "N/A";
+        const warning = document.getElementById("warning-draft-competency");
+        const warningText = `
+      <div style="
+        display: inline-block;
+        white-space: nowrap;
+        background: #FFF8E1;
+        border: 1px solid #8A6600;
+        margin-top:12px;
+        border-radius: 4px;
+        padding: 6px 18px;
+        color: #7A5A00;
+        font-size: 12px;
+        box-sizing: border-box;
+        ">
+        Can not submit to approval because organization data source from
+        <strong style="font-weight:600; color:#554200;">${soName}</strong>
+        draft has not been finalized.
+      </div>
+    `;
+        if (warning) warning.innerHTML = warningText;
+        const btnSubmit = document.getElementById("detail-draft-submitted");
+        if (btnSubmit) btnSubmit.disabled = true;
+      }
     }
   } catch (error) {}
 }
@@ -209,10 +236,10 @@ async function renderTableActivity(listData) {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.totalPages < itemsPerPage * listData.currentPage
-          ? listData.totalPages
-          : itemsPerPage * listData.currentPage
-      } of ${listData.totalPages} records</label>
+                listData.totalPages < itemsPerPage * listData.currentPage
+                  ? listData.totalPages
+                  : itemsPerPage * listData.currentPage
+              } of ${listData.totalPages} records</label>
             </div>
           </div>
         `;
@@ -326,7 +353,6 @@ const handleSubmitRenameDraft = async () => {
     const modalRenameDraft = document.getElementById("modalRenameDraft");
     const modal = bootstrap.Modal.getInstance(modalRenameDraft);
     if (modal) modal.hide();
-    console.log("result", result);
     const draftName = result?.data?.data.draftName;
     if (result.success === true) {
       setTimeout(() => {
@@ -382,8 +408,6 @@ const handleSubmitRenameDraft = async () => {
 
 const deleteDetailDraft = () => {
   const dataDraft = getState("dataDetailDraft");
-  console.log("dataDraft", dataDraft);
-  // open modal dengan id modalDraftDelete
   const modal = new bootstrap.Modal(document.getElementById("modalDraftDelete"));
   modal.show();
 };
@@ -394,8 +418,6 @@ async function confirmDeleteDetailcompeDraft() {
   if (spinBtn) spinBtn.style.display = "inline-block";
   try {
     const deleteResult = await fetchDeleteDraft(draftId);
-    console.log("spinBtn", spinBtn);
-    console.log("deleteResult", deleteResult);
     if (deleteResult.success === true) {
       const modalDelDraft = document.getElementById("modalDraftDelete");
       const modal = bootstrap.Modal.getInstance(modalDelDraft);
@@ -439,7 +461,6 @@ async function handleSubmitApproval() {
     const result = await fetchSubmitDraftCompetency(dataDraft.draftId);
     const modalDetailAprroval = document.getElementById("modalDraftAprroval");
     const modal = bootstrap.Modal.getInstance(modalDetailAprroval);
-    console.log("result", result);
     if (result.success === true) {
       if (modal) {
         modal.hide();

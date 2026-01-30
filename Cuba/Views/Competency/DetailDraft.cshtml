@@ -138,6 +138,9 @@
             <div class="row" style="padding-top: 20px;" id="draftactivity-competency">
             </div>
         </div>
+        <div id="warning-draft-competency" style="display: none;">
+
+        </div>
         <!-- Card detail end-->
 
         <!-- card footer start-->
@@ -151,8 +154,8 @@
             @* <button class=" btn btn-outline-light" type="button" onclick="triggleEditCompetency()">
                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit Draft
             </button> *@
-            <button class="btn btn-primary" type="button" onclick="openDetailApproval()"> Submit to Approval<i
-                    class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+            <button class="btn btn-primary" type="button" onclick="openDetailApproval()" id="detail-draft-submitted">
+                Submit to Approval<i class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
         </div>
         <!-- card footer end-->
     </div>
