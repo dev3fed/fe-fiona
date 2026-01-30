@@ -746,8 +746,8 @@ async function deleteDraft(paramsId) {
 
 // redirect to detail draft
 function detailDraft(id) {
+  changeOrganization(id, storeData.listDraft.find((x) => x.draftId == id).draftName);
   window.location.href = "/organization/draft-detail?draftId=" + id;
-  changeOrganization(id, lsListDraft.find((x) => x.draftId == id).draftName);
 }
 
 // redirect to detail approval
@@ -989,7 +989,7 @@ $(document).ready(async function () {
 
   await checkDataOrganization(storeData.listDraft);
 
-  $("#createDraft").on("click", function () {
+  $("#createDraft, #createViaDraftTab").on("click", function () {
     $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
     $("#inputDraftName").val("");
     return true;
