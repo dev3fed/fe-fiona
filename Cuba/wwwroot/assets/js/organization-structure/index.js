@@ -8,7 +8,7 @@ async function initializeHelper() {
     });
     // const dataChart = test2;
     // console.log("dataChart", dataChart);
-    // renderOrgChart(dataChart.data, "10164009", false);
+    // renderOrgChart(dataChart.data, "10164009", true);
     console.log("Data chart fetched ==>:", dataChart.data);
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {

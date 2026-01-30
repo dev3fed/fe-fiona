@@ -329,10 +329,10 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   const onlyShowdata = localStorage.getItem("onlyShowdata") || "";
   if (onlyShowdata !== "") {
     $(
-      "#v-pills-stkReference-tab, #v-pills-fungsiReference-tab, #v-pills-tugasHaReference-tab, #v-pills-koordinasiInternalReference-tab, #v-pills-relasiEksternalReference-tab"
+      "#v-pills-stkReference-tab, #v-pills-fungsiReference-tab, #v-pills-tugasHaReference-tab, #v-pills-koordinasiInternalReference-tab, #v-pills-relasiEksternalReference-tab",
     ).hide();
     $(
-      "#fungsiReference, #tugasHaReference, #koordinasiInternalReference, #relasiEksternalReference, #stkReference"
+      "#fungsiReference, #tugasHaReference, #koordinasiInternalReference, #relasiEksternalReference, #stkReference",
     ).hide();
     if (onlyShowdata == "stk") {
       $("#v-pills-stkReference-tab").show();
@@ -362,7 +362,7 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 
   const codeAvailableSelectedArray =
     getDataJobDesc?.tugasTanggungJawabAkhir?.data?.flatMap(
-      (item) => item.tanggungJawabProses?.map((proses) => proses.indexNumber) || []
+      (item) => item.tanggungJawabProses?.map((proses) => proses.indexNumber) || [],
     ) || [];
 
   const codeAvailableSelected = codeAvailableSelectedArray.filter((v, i, a) => a.indexOf(v) === i);
@@ -418,13 +418,13 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   updateTableSelected(
     "koordinasiInternalReference",
     getDataJobDesc?.koordinasiInternal?.data || [],
-    tabCusJD.koordinasi
+    tabCusJD.koordinasi,
   );
   updateTableSelected("relasiEksternalReference", getDataJobDesc?.relasiEksternal?.data || [], tabCusJD.relation);
   updateTableSelected(
     "stkReference",
     getDataJobDesc?.stk?.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined) || [],
-    ["no", ...tabCusJD.stk]
+    ["no", ...tabCusJD.stk],
   );
 
   // hideChartLoading("chk-job-list-percentage");
@@ -536,7 +536,7 @@ async function searchJobCompare(event, isPercentage = false) {
       }).then((res) => ({
         jobIdTo: item.jobIdTarget,
         data: res.data,
-      }))
+      })),
     );
 
     const details = await Promise.all(detailPromises);
@@ -666,7 +666,7 @@ $(document).ready(async function () {
           draftRasciId: getDraftExisting.draftRasciId,
           draftName: getDraftExisting.draftName,
           organizationDraftId: getDraftExisting.organizationDraftId,
-        })
+        }),
       );
     }
     readOnlyPage();
@@ -702,7 +702,6 @@ $(document).ready(async function () {
 
     updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
   } else {
-    alert("masok");
     const dataParams = detailJobSO.data || {};
     console.log("dataParams ==>>", dataParams);
     const identifikasi = {
@@ -835,7 +834,7 @@ $(document).ready(async function () {
       }`;
       $("#fungsiReferenceContainer").append(`<li>${item.fungsiJabatan}</li>`);
       $("#fungsiReferenceContainer").append(
-        `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
+        `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`,
       );
     });
   } else {
@@ -878,7 +877,7 @@ $(document).ready(async function () {
 
     if (!isFullFilled) {
       $label.html(
-        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`,
       );
     } else {
       $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
@@ -945,7 +944,7 @@ $(document).ready(async function () {
     const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
     getDataJobDesc.kompetensiTeknis.data.komtekMandatori.forEach((item) => {
       $ul.append(
-        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`,
       );
     });
     divKompetensiTeknisMandatory.empty().append($ul);
@@ -959,7 +958,7 @@ $(document).ready(async function () {
     const $ul = $('<ul style=""></ul>');
     getDataJobDesc.kompetensiTeknis.data.komtekGeneral.forEach((item) => {
       $ul.append(
-        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`,
       );
     });
     divKompetensiTeknisGeneral.empty().append($ul);
@@ -973,7 +972,7 @@ $(document).ready(async function () {
     const $ul = $('<ul style=""></ul>');
     getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
       $ul.append(
-        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`,
       );
     });
     divKompetensiTeknisSpesifik.empty().append($ul);
@@ -996,7 +995,7 @@ $(document).ready(async function () {
   if (getDataJobDesc.stk) {
     // filter stk.data to remove items with empty stkNumber is null or undefined
     getDataJobDesc.stk.data = getDataJobDesc.stk.data.filter(
-      (item) => item.stkNumber !== null && item.stkNumber !== undefined
+      (item) => item.stkNumber !== null && item.stkNumber !== undefined,
     );
     localStorage.setItem("stk", JSON.stringify(getDataJobDesc.stk.data));
     updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
@@ -1074,7 +1073,7 @@ $(document).ready(async function () {
               swal(
                 "Warning",
                 "SVG uploaded successfully, but failed to generate Word document. Invalid server response.",
-                "warning"
+                "warning",
               );
               return;
             }
@@ -1099,7 +1098,7 @@ $(document).ready(async function () {
             swal(
               "Warning",
               `SVG uploaded successfully, but failed to generate Word document: ${error.message}`,
-              "warning"
+              "warning",
             );
           }
         } else {
@@ -1124,8 +1123,6 @@ $(document).ready(async function () {
     if (!confirm) {
       return;
     }
-
-    alert("masok");
 
     // Use the new function to prepare job description data
     const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
@@ -1209,7 +1206,7 @@ $(document).ready(async function () {
       "",
       action,
       "50%",
-      1
+      1,
     );
   });
 
@@ -1235,7 +1232,7 @@ $(document).ready(async function () {
       "",
       action,
       "30%",
-      1
+      1,
     );
   });
 
@@ -1255,7 +1252,7 @@ $(document).ready(async function () {
 
     if (!isFullFilled) {
       $label.html(
-        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button`
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button`,
       );
     } else {
       $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);

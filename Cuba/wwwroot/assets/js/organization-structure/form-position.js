@@ -46,7 +46,7 @@ async function initializeList() {
     { id: "selectOrgUnitParentName", endpoint: "draft/unit/list", draftId: draftId, showId: true },
     // { id: "selectDirectReport", endpoint: "draft/position/list", draftId: draftId, showId: true },
     { id: "selectDirectReport", endpoint: "chart/job/list", draftId: draftId, showId: true },
-    { id: "selectCoordinationWith", endpoint: "draft/position/list", draftId: draftId, showId: true },
+    { id: "selectCoordinationWith", endpoint: "chart/job/list", draftId: draftId },
     { id: "selectSkillGroupMain", endpoint: "draft/skill-group/list", draftId: draftId, showId: false },
     {
       id: "selectSubSkillGroupMain",
