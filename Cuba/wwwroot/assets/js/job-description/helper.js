@@ -256,7 +256,7 @@ function getJobReference(params) {
   updateIdentifikasiJob(params.identifikasi);
   updateTable("tugasUmum", params.tugasUmum, ["id", "header", "tugas"]);
   updateTable("wewenang", params.wewenang, ["id", "wewenang"]);
-  updateTable("persyaratan", params.education);
+  updateTable("persyaratanJabatan", params.education);
 }
 
 async function getJobReferenceDetail() {
@@ -692,7 +692,11 @@ async function saveReferenceAttribute() {
   };
 
   if (checboxFungsi != undefined) {
-    const localData = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
+    const localData =
+      localStorage.getItem("fungsi") == "" || localStorage.getItem("fungsi") == "{}"
+        ? { deskripsi: "", jobReferences: [] }
+        : JSON.parse(localStorage.getItem("fungsi"));
+    console.log("localData fungsi", localData);
     let dataFungsi = "";
     const fungsiElement = document.querySelector("#fungsiTextReference");
     if (fungsiElement && fungsiElement.ckeditorInstance) {
@@ -825,7 +829,6 @@ function checkButtonTable(buttonTable, id, lastPath, data) {
           </div>`;
     case "positionList":
       if (lastPath === "draft-detail") {
-        console.log("data", data.actionType);
         let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
@@ -1046,7 +1049,7 @@ function editData(params, index) {
   if (params == "relation") params = "relasiEksternal";
   if (params == "tugasHa") params = "tugasHa";
   if (params == "stk") params = "stk";
-  if (params == "pk") params = "persyaratanKhusus";
+  if (params == "persyaratanKhusus") params = "persyaratanKhusus";
   let data = [];
   try {
     const storageData = localStorage.getItem(params);
@@ -1077,6 +1080,7 @@ function editData(params, index) {
     if (willEdit) {
       params == "relasiEksternal" ? (params = "relation") : params;
       params == "koordinasiInternal" ? (params = "koordinasi") : params;
+      console.log("Editing item:", itemToEdit, "at index:", index, "in params:", params);
       updateJobDescItem(params, index, false);
     }
   });
@@ -1088,7 +1092,7 @@ function deleteData(params, index) {
   if (params == "relation") paramsLs = "relasiEksternal";
   if (params == "tugasHa") paramsLs = "tugasHa";
   if (params == "stk") paramsLs = "stk";
-  if (params == "pk") paramsLs = "persyaratanKhusus";
+  if (params == "persyaratanKhusus") paramsLs = "persyaratanKhusus";
 
   // Get data from localStorage based on the params
   let data = [];
@@ -1313,7 +1317,7 @@ function refreshTableDisplay(params, data) {
         tableHeaders = [...tabCusJD.stk, "action"];
         break;
       case "persyaratanKhusus":
-        tableHeaders = [...tabCusJD.pk, "action"];
+        tableHeaders = [...tabCusJD.persyaratanKhusus, "action"];
         break;
       default:
         console.warn("Unknown params for table refresh:", params);
@@ -1337,9 +1341,17 @@ async function saveJobDescItem(type, id, isAdd = true) {
   const confirm = await confirmFunction("Save Item", `Are you sure you want to ${isAdd ? "add" : "update"} this item?`);
   if (!confirm) return;
   if (isAdd) {
-    const lsData = localStorage.getItem(ls.ls) !== "" ? JSON.parse(localStorage.getItem(ls.ls)) : [];
+    const lsData =
+      localStorage.getItem(ls.ls) == "" ||
+      localStorage.getItem(ls.ls) == null ||
+      localStorage.getItem(ls.ls) == undefined
+        ? []
+        : JSON.parse(localStorage.getItem(ls.ls));
+    console.log("lsData before add", lsData);
     const newItem = { ...ls.defaultData };
     // get data from ckeditor instance or fallback to element content
+    // const lsParam = type;
+    // let tableParam = type;
     ls.ids.forEach((itemId) => {
       const element = document.querySelector(`#${itemId}`);
       if (element && element.ckeditorInstance) {
@@ -1377,6 +1389,8 @@ async function saveJobDescItem(type, id, isAdd = true) {
     console.log("newItem", newItem);
     lsData.push(newItem);
     localStorage.setItem(ls.ls, JSON.stringify(lsData));
+    console.log("lsData", lsData);
+    console.log("type", type);
     updateTable(type, lsData, [...tabCusJD[type], "action"]);
     $("#modalAddJobDescItem").modal("hide");
     swal("Success", `${type.toUpperCase()} item added successfully`, "success");
@@ -1719,7 +1733,9 @@ function updateJobDescItem(type, id, isAdd = true) {
   localStorage.setItem("arrayRemovedBusPro", JSON.stringify([]));
   localStorage.setItem("arraySelectedBusPro", JSON.stringify([]));
   // Implement edit logic based on type and id
+  console.log(`Update Job Description Item - Type: ${type}, ID: ${id}, Is Add: ${isAdd}`);
   const mapping = mappingAddUpdate[type];
+  console.log("mapping", mapping);
   if (!mapping) {
     swal("Error", "Unsupported item type for editing", "error");
     return;
@@ -1823,9 +1839,15 @@ function updateJobDescItem(type, id, isAdd = true) {
       });
     }
 
+    console.log("itemData", itemData);
+    console.log("mapping", mapping);
+
     // create text area by looping mapping.ids and fill with data from ls[id]
     mapping.ids.forEach((itemId) => {
+      console.log("itemId", itemId);
+      console.log(mapping.listIds);
       const isList = mapping.listIds && mapping.listIds.includes(itemId);
+      console.log("isList", isList);
       let value = "";
       if (isList && Array.isArray(itemData[itemId])) {
         // Convert array to HTML ul/li format

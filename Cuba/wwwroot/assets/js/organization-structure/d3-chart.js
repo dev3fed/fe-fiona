@@ -1546,14 +1546,17 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
 
   const self = dataChart.find((item) => item.id == focusNodeId);
-  const dataCoodination = self.coordinationWith ? self.coordinationWith : {};
-  if (dataCoodination) {
-    dataCoodination["pid"] = self.id;
-    dataCoodination["coordination"] = true;
-    dataCoodination["tags"] = ["coordination"];
-    dataChart.push(dataCoodination);
+  console.log("Self node data:", self);
+  const dataCoordination =
+    self.coordinationWith == null || self.coordinationWith === undefined ? {} : self.coordinationWith;
+  if (Object.keys(dataCoordination).length > 0) {
+    console.log("Node has coordination role:", dataCoordination);
+    dataCoordination["pid"] = self.id;
+    dataCoordination["coordination"] = true;
+    dataCoordination["tags"] = ["coordination"];
+    dataChart.push(dataCoordination);
   }
-  console.log("dataCoodination", dataCoodination);
+  // console.log("dataCoodination", dataCoodination);
   console.log("Focus node: ==>", focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
   console.log("Self node: ==>", self);

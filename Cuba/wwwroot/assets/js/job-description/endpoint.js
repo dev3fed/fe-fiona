@@ -1,6 +1,19 @@
 // 'http://localhost:5075/api/job-description/draft/list/1/10' \
-async function draftList() {
-  const api = `${url.baseUrl}/${url["job-description"]}/draft/list/1/999`;
+async function draftList(page = 1, pageSize = 10) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/list/${page}/${pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    $("#resultJabatan").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// https://cnt.dev.be.testing.fed-insight.com/api/job-description/draft/approval/list/1/10
+async function draftApprovalList(page = 1, pageSize = 10) {
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/approval/list/${page}/${pageSize}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;
@@ -18,8 +31,8 @@ async function draftList() {
 //       page: 0,
 //       pageSize: 9999,
 //     });
-async function draftListJobDesc({ draftId = "", position = "", status = "available", pageSize = 999 }) {
-  const api = `${url.baseUrl}/${url["job-description"]}/get-list-positions/0/${pageSize}?position=${position}&division=&function=&department=&status=${status}&draftId=${draftId}`;
+async function draftListJobDesc({ draftId = "", position = "", status = "available", page = 0, pageSize = 999 }) {
+  const api = `${url.baseUrl}/${url["job-description"]}/get-list-positions/${page}/${pageSize}?position=${position}&division=&function=&department=&status=${status}&draftId=${draftId}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;

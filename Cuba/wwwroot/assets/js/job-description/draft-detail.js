@@ -3,7 +3,7 @@ async function checkPage() {
   const status = 3;
   const user = JSON.parse(localStorage.getItem("user")) === "admin" ? "superadmin" : "superadmin";
   $("#statusApproval").html(
-    `<span class="p-2 b-r-8 w-100 text-center ${statusApprovalClass[1]}">${statusApproval[1]}</span>`
+    `<span class="p-2 b-r-8 w-100 text-center ${statusApprovalClass[1]}">${statusApproval[1]}</span>`,
   );
   // delete draft and submit approval must be hide, becouse it used only for draft detail page
   $("#deleteDraft, #submitApproval").hide();
@@ -90,7 +90,7 @@ function deleteDraft() {
     "All Job Description data in this draft will be deleted",
     action,
     "",
-    1
+    1,
   );
 }
 
@@ -168,7 +168,7 @@ function submitToApproval() {
     "You cannot change data after submit",
     action,
     "",
-    draftId
+    draftId,
   );
 }
 
@@ -191,43 +191,43 @@ function detailPositionDraft(id) {
   const findPosition = lsListDetailDraft.find((x) => x.positionId == id);
   console.log("findPosition", findPosition);
   $("#positionName").text(
-    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName
+    findPosition.positionName == "" || findPosition.positionName == null ? "-" : findPosition.positionName,
   );
   $("#abbrvPosition").text(
-    findPosition.abbrvPosition == "" || findPosition.abbrvPosition == null ? "-" : findPosition.abbrvPosition
+    findPosition.abbrvPosition == "" || findPosition.abbrvPosition == null ? "-" : findPosition.abbrvPosition,
   );
   $("#orgUnitName").text(
-    findPosition.orgUnitName == "" || findPosition.orgUnitName == null ? "-" : findPosition.orgUnitName
+    findPosition.orgUnitName == "" || findPosition.orgUnitName == null ? "-" : findPosition.orgUnitName,
   );
   $("#orgPrl").text(findPosition.prlOrg == "" || findPosition.prlOrg == null ? "-" : findPosition.prlOrg);
   $("#formation").text(findPosition.formation == "" || findPosition.formation == null ? "-" : findPosition.formation);
   $("#careerType").text(
-    findPosition.careerType == "" || findPosition.careerType == null ? "-" : findPosition.careerType
+    findPosition.careerType == "" || findPosition.careerType == null ? "-" : findPosition.careerType,
   );
   $("#careerLevel").text(
-    findPosition.careerLevel == "" || findPosition.careerLevel == null ? "-" : findPosition.careerLevel
+    findPosition.careerLevel == "" || findPosition.careerLevel == null ? "-" : findPosition.careerLevel,
   );
   $("#basket").text(findPosition.isBasket == "Yes" ? "Yes" : "No");
   $("#directReport").text(
-    findPosition.directReport == "" || findPosition.directReport == null ? "-" : findPosition.directReport
+    findPosition.directReport == "" || findPosition.directReport == null ? "-" : findPosition.directReport,
   );
   $("#neckFunction").text(findPosition.neckFunction ? "Yes" : "No");
   $("#isProject").text(findPosition.isProject ? "Yes" : "No");
   $("#coordination").text(findPosition.isCoordination ? "Yes" : "No");
   $("#coordinationWith").text(
-    findPosition.coordinationWith == "" || findPosition.coordinationWith == null ? "-" : findPosition.coordinationWith
+    findPosition.coordinationWith == "" || findPosition.coordinationWith == null ? "-" : findPosition.coordinationWith,
   );
   $("#directorate").text(findPosition.function == "" || findPosition.function == null ? "-" : findPosition.function);
   $("#division").text(findPosition.division == "" || findPosition.division == null ? "-" : findPosition.division);
   $("#subDivision").text(
-    findPosition.subDivision == "" || findPosition.subDivision == null ? "-" : findPosition.subDivision
+    findPosition.subDivision == "" || findPosition.subDivision == null ? "-" : findPosition.subDivision,
   );
   $("#department").text(
-    findPosition.department == "" || findPosition.department == null ? "-" : findPosition.department
+    findPosition.department == "" || findPosition.department == null ? "-" : findPosition.department,
   );
   $("#section").text(findPosition.section == "" || findPosition.section == null ? "-" : findPosition.section);
   $("#personnelAreaName").text(
-    findPosition.personalAreaName == "" || findPosition.personalAreaName == null ? "-" : findPosition.personalAreaName
+    findPosition.personalAreaName == "" || findPosition.personalAreaName == null ? "-" : findPosition.personalAreaName,
   );
 
   $("#modalMainSkillGroup").text(findPosition.mainSkillGroup);
@@ -263,7 +263,7 @@ function deletePositionDraft(positionId) {
     "Delete Data",
     `Are you sure you want to delete the activity data for ${getPosition.positionName}?`,
     "All information in the draft related to this position will be deleted, including details about subordinates, RASCI notations, Competencies, and Position Descriptions",
-    action
+    action,
   );
 }
 
@@ -289,7 +289,7 @@ function acceptApproval() {
     "Approve Request",
     "Are you sure want to approve this Evaluasi Struktur Organisasi 2025 draft?",
     "",
-    action
+    action,
   );
 }
 
@@ -309,7 +309,7 @@ function rejectApproval() {
     "Reject Request",
     "Reject Comment <br> <textarea class='form-control' id='rejectReason' rows='3'></textarea>",
     "",
-    action
+    action,
   );
 }
 
@@ -406,7 +406,7 @@ function deleteJobDesc() {
     "All data in this job description will be deleted",
     action,
     "",
-    1
+    1,
   );
 }
 
@@ -477,7 +477,7 @@ $(document).ready(async function () {
       "All data in this draft will be replaced with the data in the file",
       action,
       "",
-      1
+      1,
     );
 
     // const file = $("#fileImportDraft")[0].files[0];
