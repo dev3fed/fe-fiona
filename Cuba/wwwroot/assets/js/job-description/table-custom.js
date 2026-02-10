@@ -8,15 +8,7 @@ function getTableListJobDes() {
   $("#jobdescList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"d-flex justify-content-between bottom"lip><"clear">', // Make bottom flex as well
     buttons: [],
-    autoWidth: false,
-    processing: true,
     serverSide: true,
-    fixedColumns: {
-      start: 1,
-      end: 1,
-    },
-    scrollX: true,
-    scrollCollapse: true,
     ajax: function (data, callback, settings) {
       $.ajax({
         url: `${url.baseUrl}/${url["job-description"]}/get-list-positions/${data.start}/${data.length}?position=${
@@ -125,22 +117,16 @@ function getTableListJobDes() {
   });
 }
 
-async function getTableListDraft(params) {
+function getTableListDraft(params) {
+  params = params.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
   if ($.fn.DataTable.isDataTable("#draftList")) {
     $("#draftList").DataTable().destroy();
   }
   $("#draftList").DataTable({
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
-    buttons: [
-      {
-        text: '<img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Create Job Description Draft',
-        className: "btn btn-primary tet-white asik dt-custom-btn",
-        action: function (e, dt, node, config) {
-          $("#modalCreateDraftSO").modal("show");
-        },
-      },
-    ],
+    buttons: [],
     autoWidth: false,
+    searching: false, // Disable the search box
     data: params,
     sort: false,
     columns: [
@@ -191,8 +177,9 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
+          console.log("data", data);
           const draftId =
-            data.draftOrganizationId + "|" + data.draftRasciId + "|" + data.draftId + "|" + data.draftName;
+            data.draftOrganizationId + "|" + data.draftRasciMatrixId + "|" + data.draftId + "|" + data.draftName;
           return checkButtonTable("draftList", draftId, "draft-detail");
         },
       },
@@ -338,30 +325,7 @@ async function getTableListDraftDetail() {
 // editSubPosition button on table subPositionList
 
 function getTableListApproval(params) {
-  params = [
-    {
-      id: 1,
-      draftId: "D0001",
-      draftName: "Draft 1",
-      submittedDate: "2021-09-02",
-      rejectedDate: "2021-09-02",
-      isSubmitted: true,
-      isRejected: false,
-      isApproved: false,
-      isFinalized: false,
-    },
-    {
-      id: 2,
-      draftId: "D0002",
-      draftName: "Draft 2",
-      submittedDate: "2021-09-02",
-      rejectedDate: "2021-09-02",
-      isSubmitted: true,
-      isRejected: false,
-      isApproved: false,
-      isFinalized: false,
-    },
-  ];
+  params = params.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
 
   if ($.fn.DataTable.isDataTable("#approvalList")) {
     $("#approvalList").DataTable().destroy();
@@ -394,35 +358,75 @@ function getTableListApproval(params) {
       },
       {
         title: "Submitted Date",
-        data: "submittedDate",
         width: "15%",
+        data: null,
+        render: function (data) {
+          const submittedDate = new Date(data.submittedDate);
+          const formattedDate = submittedDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          const formattedTime = submittedDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          return `
+          <span class="text-muted f-12">${formattedDate} ${formattedTime}</span>
+          `;
+        },
       },
       {
         title: "Approval/Reject Date",
-        data: "rejectedDate",
         width: "15%",
+        data: null,
+        render: function (data) {
+          const date = data?.approvalDate ? data.approvalDate : data.rejectedDate;
+          if (!date) {
+            return "-";
+          }
+          const approvalDate = new Date(date);
+          const formattedDate = approvalDate.toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+          const formattedTime = approvalDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          return `
+          <span class="text-muted f-12">${formattedDate} ${formattedTime}</span>
+          `;
+        },
       },
       {
         title: "Status",
         data: null,
         width: "15%",
         render: function (data) {
+          let statusText = "Draft";
+          let statusClass = "bg-secondary";
+
           if (data.isSubmitted) {
-            data.status = 1;
+            statusText = "On Review";
+            statusClass = "label-warning-custom";
           }
-
           if (data.isRejected) {
-            data.status = 2;
+            statusText = "Rejected";
+            statusClass = "label-danger-custom";
           }
-
           if (data.isApproved) {
-            data.status = 3;
+            statusText = "Approved";
+            statusClass = "label-success-custom";
           }
-
           if (data.isFinalized) {
-            data.status = 4;
+            statusText = "Finalized";
+            statusClass = "label-primary-custom";
           }
-          return `<span class="p-2 b-r-8 ${statusApprovalClass[data.status]}">${statusApproval[data.status]}</span>`;
+          return `<span class="p-2 b-r-8 ${statusClass}">${statusText}</span>`;
         },
       },
       {

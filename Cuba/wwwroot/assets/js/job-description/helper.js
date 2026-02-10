@@ -58,7 +58,7 @@ function updateTable(params, data, rowHeader) {
 
       if (header === "index") {
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
         );
         if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
           // Single item - display as span with tooltip
@@ -72,7 +72,7 @@ function updateTable(params, data, rowHeader) {
           const listItems = uniqueTanggungJawab
             .map(
               (process) =>
-                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`,
             )
             .join("");
           row += `<td class="tdClass">
@@ -180,7 +180,7 @@ function updateTableSelected(params, data, rowHeader, refer) {
 
       if (header === "index") {
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
-          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
         );
         if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
           // Single item - display as span with tooltip
@@ -194,7 +194,7 @@ function updateTableSelected(params, data, rowHeader, refer) {
           const listItems = uniqueTanggungJawab
             .map(
               (process) =>
-                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`,
             )
             .join("");
           row += `<td class="tdClass" style="padding-left:10px !important">
@@ -256,7 +256,7 @@ function getJobReference(params) {
   updateIdentifikasiJob(params.identifikasi);
   updateTable("tugasUmum", params.tugasUmum, ["id", "header", "tugas"]);
   updateTable("wewenang", params.wewenang, ["id", "wewenang"]);
-  updateTable("persyaratan", params.education);
+  updateTable("persyaratanJabatan", params.education);
 }
 
 async function getJobReferenceDetail() {
@@ -289,7 +289,7 @@ async function getJobReferenceDetail() {
   lsFungsi.jobReferences.map((item) => {
     const textReference = `(Reference from : ${item.jobName}) - ${item.skNumber ? item.skNumber : "-"}`;
     $("#fungsiReferenceContainer").append(
-      `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
+      `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`,
     );
   });
 
@@ -596,7 +596,7 @@ function callConfirmReference() {
     "",
     action,
     "50%",
-    1
+    1,
   );
 }
 
@@ -604,7 +604,7 @@ async function saveReferenceAttribute() {
   loader(true);
   const onlyShowdata = localStorage.getItem("onlyShowdata") == "" ? false : localStorage.getItem("onlyShowdata");
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
-    (item) => !item.id.includes("all") && item.checked
+    (item) => !item.id.includes("all") && item.checked,
   );
   const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) ?? "[]";
   let checboxFungsi = checkboxList.find((item) => item.id === "checkbox_fungsi");
@@ -659,7 +659,7 @@ async function saveReferenceAttribute() {
         arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
       });
       const uniqueSelectedBusPro = arraySelectedBusPro.filter(
-        (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+        (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
       );
       updateCalculateLsAvailable(uniqueSelectedBusPro);
     }
@@ -692,7 +692,11 @@ async function saveReferenceAttribute() {
   };
 
   if (checboxFungsi != undefined) {
-    const localData = localStorage.getItem("fungsi") !== "" ? JSON.parse(localStorage.getItem("fungsi")) : [];
+    const localData =
+      localStorage.getItem("fungsi") == "" || localStorage.getItem("fungsi") == "{}"
+        ? { deskripsi: "", jobReferences: [] }
+        : JSON.parse(localStorage.getItem("fungsi"));
+    console.log("localData fungsi", localData);
     let dataFungsi = "";
     const fungsiElement = document.querySelector("#fungsiTextReference");
     if (fungsiElement && fungsiElement.ckeditorInstance) {
@@ -825,12 +829,10 @@ function checkButtonTable(buttonTable, id, lastPath, data) {
           </div>`;
     case "positionList":
       if (lastPath === "draft-detail") {
-        console.log("data", data.actionType);
         let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
         if (data.actionType == "Delete") {
-          alert("masok");
           editPositionDraft = "";
         }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
@@ -875,15 +877,15 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-      ? '<i class="fas fa-check-circle text-success"></i>'
-      : '<i class="fas fa-exclamation-circle text-warning"></i>';
+        ? '<i class="fas fa-check-circle text-success"></i>'
+        : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
       message +
       `
-    </div>`
+    </div>`,
   );
 
   if (note) {
@@ -892,7 +894,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
         <strong>Note:</strong> ` +
         note +
         `
-      </div>`
+      </div>`,
     );
   }
 
@@ -908,7 +910,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
             item.className +
             ` m-r-5" onclick="window.${callbackId}()">` +
             item.button +
-            `</button>`
+            `</button>`,
         );
         return;
       }
@@ -917,7 +919,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           item.className +
           ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
           item.button +
-          `</button>`
+          `</button>`,
       );
     });
   }
@@ -988,7 +990,7 @@ function showChartLoading(
   isCustom = false,
   height = "480px",
   width = "100%",
-  text = "Loading Chart..."
+  text = "Loading Chart...",
 ) {
   let container = document.querySelector(`.${containerClass}`);
   container.innerHTML = CHART_LOADING_HTML;
@@ -1047,7 +1049,7 @@ function editData(params, index) {
   if (params == "relation") params = "relasiEksternal";
   if (params == "tugasHa") params = "tugasHa";
   if (params == "stk") params = "stk";
-  if (params == "pk") params = "persyaratanKhusus";
+  if (params == "persyaratanKhusus") params = "persyaratanKhusus";
   let data = [];
   try {
     const storageData = localStorage.getItem(params);
@@ -1078,6 +1080,7 @@ function editData(params, index) {
     if (willEdit) {
       params == "relasiEksternal" ? (params = "relation") : params;
       params == "koordinasiInternal" ? (params = "koordinasi") : params;
+      console.log("Editing item:", itemToEdit, "at index:", index, "in params:", params);
       updateJobDescItem(params, index, false);
     }
   });
@@ -1089,7 +1092,7 @@ function deleteData(params, index) {
   if (params == "relation") paramsLs = "relasiEksternal";
   if (params == "tugasHa") paramsLs = "tugasHa";
   if (params == "stk") paramsLs = "stk";
-  if (params == "pk") paramsLs = "persyaratanKhusus";
+  if (params == "persyaratanKhusus") paramsLs = "persyaratanKhusus";
 
   // Get data from localStorage based on the params
   let data = [];
@@ -1164,7 +1167,7 @@ function mergeData(params, index) {
 
   const modalBusProMergeBody = document.getElementById("modalBusProMergeBody");
   const uniqueBusPro = getDataSelected.tanggungJawabProses.filter(
-    (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+    (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
   );
   const textUniqueBusPro = uniqueBusPro.map((process) => process.indexNumber + " - " + process.description);
   modalBusProMergeBody.innerHTML = "";
@@ -1195,7 +1198,7 @@ function mergeData(params, index) {
   for (let [idx, item] of getDataElsewhere.entries()) {
     // unique indexNumber from item.tanggungJawabProses
     const uniqueIndex = item.tanggungJawabProses.filter(
-      (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber)
+      (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
     );
     let textIndexDescription = uniqueIndex.map((process) => process.indexNumber + " - " + process.description);
     tbodBisproMerge.innerHTML += `
@@ -1223,7 +1226,7 @@ async function mergeBusPro() {
   }
   const confirm = await confirmFunction(
     "Merge Business Processes",
-    "Are you sure you want to merge the selected business processes?"
+    "Are you sure you want to merge the selected business processes?",
   );
   if (!confirm) return;
   const selectedIndexes = checkboxes.map((checkbox) => parseInt(checkbox.value));
@@ -1314,7 +1317,7 @@ function refreshTableDisplay(params, data) {
         tableHeaders = [...tabCusJD.stk, "action"];
         break;
       case "persyaratanKhusus":
-        tableHeaders = [...tabCusJD.pk, "action"];
+        tableHeaders = [...tabCusJD.persyaratanKhusus, "action"];
         break;
       default:
         console.warn("Unknown params for table refresh:", params);
@@ -1338,9 +1341,17 @@ async function saveJobDescItem(type, id, isAdd = true) {
   const confirm = await confirmFunction("Save Item", `Are you sure you want to ${isAdd ? "add" : "update"} this item?`);
   if (!confirm) return;
   if (isAdd) {
-    const lsData = localStorage.getItem(ls.ls) !== "" ? JSON.parse(localStorage.getItem(ls.ls)) : [];
+    const lsData =
+      localStorage.getItem(ls.ls) == "" ||
+      localStorage.getItem(ls.ls) == null ||
+      localStorage.getItem(ls.ls) == undefined
+        ? []
+        : JSON.parse(localStorage.getItem(ls.ls));
+    console.log("lsData before add", lsData);
     const newItem = { ...ls.defaultData };
     // get data from ckeditor instance or fallback to element content
+    // const lsParam = type;
+    // let tableParam = type;
     ls.ids.forEach((itemId) => {
       const element = document.querySelector(`#${itemId}`);
       if (element && element.ckeditorInstance) {
@@ -1378,6 +1389,8 @@ async function saveJobDescItem(type, id, isAdd = true) {
     console.log("newItem", newItem);
     lsData.push(newItem);
     localStorage.setItem(ls.ls, JSON.stringify(lsData));
+    console.log("lsData", lsData);
+    console.log("type", type);
     updateTable(type, lsData, [...tabCusJD[type], "action"]);
     $("#modalAddJobDescItem").modal("hide");
     swal("Success", `${type.toUpperCase()} item added successfully`, "success");
@@ -1484,7 +1497,7 @@ function updateCalculateLsAvailable(arraySelectedBusPro = [], arrayRemovedBusPro
       codeNotAvailable,
       countAvailable,
       countNotAvailable,
-    })
+    }),
   );
   localStorage.setItem("arraySelectedBusPro", JSON.stringify([]));
   const isFullFilled = countAvailable === countAll || countNotAvailable === 0;
@@ -1497,7 +1510,7 @@ function updateCalculateLsAvailable(arraySelectedBusPro = [], arrayRemovedBusPro
 
   if (!isFullFilled) {
     $label.html(
-      `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`
+      `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`,
     );
   } else {
     $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
@@ -1588,7 +1601,7 @@ async function addSelectedBusPro() {
 
   const confirm = await confirmFunction(
     "Add Business Processes",
-    `Are you sure you want to add the selected business processes?`
+    `Are you sure you want to add the selected business processes?`,
   );
   if (!confirm) return;
   const existingSelected = JSON.parse(localStorage.getItem("arraySelectedBusPro")) || [];
@@ -1622,7 +1635,7 @@ async function addSelectedBusPro() {
 async function removeSelectedBusPro(value) {
   const confirm = await confirmFunction(
     "Remove Business Process",
-    `Are you sure you want to remove the business process ${value}?`
+    `Are you sure you want to remove the business process ${value}?`,
   );
   if (!confirm) return;
 
@@ -1720,7 +1733,9 @@ function updateJobDescItem(type, id, isAdd = true) {
   localStorage.setItem("arrayRemovedBusPro", JSON.stringify([]));
   localStorage.setItem("arraySelectedBusPro", JSON.stringify([]));
   // Implement edit logic based on type and id
+  console.log(`Update Job Description Item - Type: ${type}, ID: ${id}, Is Add: ${isAdd}`);
   const mapping = mappingAddUpdate[type];
+  console.log("mapping", mapping);
   if (!mapping) {
     swal("Error", "Unsupported item type for editing", "error");
     return;
@@ -1745,8 +1760,8 @@ function updateJobDescItem(type, id, isAdd = true) {
       $("#modalAddJobDescItemBody").append(`
           <div class="form-group mb-3">
             <label style="font-weight: bold;font-size: 1rem;" for="${itemId}">${itemId
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase())}</label>
+              .replace(/([A-Z])/g, " $1")
+              .replace(/^./, (str) => str.toUpperCase())}</label>
             <textarea id="${itemId}" class="form-control" rows="4"></textarea>
           </div>
         `);
@@ -1824,9 +1839,15 @@ function updateJobDescItem(type, id, isAdd = true) {
       });
     }
 
+    console.log("itemData", itemData);
+    console.log("mapping", mapping);
+
     // create text area by looping mapping.ids and fill with data from ls[id]
     mapping.ids.forEach((itemId) => {
+      console.log("itemId", itemId);
+      console.log(mapping.listIds);
       const isList = mapping.listIds && mapping.listIds.includes(itemId);
+      console.log("isList", isList);
       let value = "";
       if (isList && Array.isArray(itemData[itemId])) {
         // Convert array to HTML ul/li format
@@ -1838,8 +1859,8 @@ function updateJobDescItem(type, id, isAdd = true) {
       $("#modalAddJobDescItemBody").append(`
           <div class="form-group mb-3">
             <label style="font-weight: bold;font-size: 1rem;" for="${itemId}">${itemId
-        .replace(/([A-Z])/g, " $1")
-        .replace(/^./, (str) => str.toUpperCase())}</label>
+              .replace(/([A-Z])/g, " $1")
+              .replace(/^./, (str) => str.toUpperCase())}</label>
             <textarea id="${itemId}" class="form-control" rows="4">${value || ""}</textarea>
           </div>
         `);

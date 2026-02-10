@@ -1536,6 +1536,7 @@ function setupCenteringMonitor() {
 
 // Main function to initialize the entire chart system
 function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
+  console.log("Rendering org chart with focusNodeId:", focusNodeId, "isAutoExpand:", isAutoExpand);
   if (!dataChart) {
     dataChart = [];
   }
@@ -1545,6 +1546,18 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
 
   const self = dataChart.find((item) => item.id == focusNodeId);
+  console.log("Self node data:", self);
+  const dataCoordination =
+    self.coordinationWith == null || self.coordinationWith === undefined ? {} : self.coordinationWith;
+  if (Object.keys(dataCoordination).length > 0) {
+    console.log("Node has coordination role:", dataCoordination);
+    dataCoordination["pid"] = self.id;
+    dataCoordination["coordination"] = true;
+    dataCoordination["tags"] = ["coordination"];
+    dataChart.push(dataCoordination);
+  }
+  // console.log("dataCoodination", dataCoodination);
+  console.log("Focus node: ==>", focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
   console.log("Self node: ==>", self);
   console.log("Parent node: ==>", parent);

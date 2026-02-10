@@ -327,12 +327,13 @@ async function getAllJobDescData(draftExisting, id, prlOrgParam, prlOrgTarget) {
 async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   // showChartLoading("chk-job-list-percentage");
   const onlyShowdata = localStorage.getItem("onlyShowdata") || "";
+  console.log("onlyShowdata", onlyShowdata);
   if (onlyShowdata !== "") {
     $(
-      "#v-pills-stkReference-tab, #v-pills-fungsiReference-tab, #v-pills-tugasHaReference-tab, #v-pills-koordinasiInternalReference-tab, #v-pills-relasiEksternalReference-tab"
+      "#v-pills-stkReference-tab, #v-pills-fungsiReference-tab, #v-pills-tugasHaReference-tab, #v-pills-koordinasiInternalReference-tab, #v-pills-relasiEksternalReference-tab ,#v-pills-persyaratanJabatanReference-tab",
     ).hide();
     $(
-      "#fungsiReference, #tugasHaReference, #koordinasiInternalReference, #relasiEksternalReference, #stkReference"
+      "#fungsiReference, #tugasHaReference, #koordinasiInternalReference, #relasiEksternalReference, #stkReference, #persyaratanJabatanReference",
     ).hide();
     if (onlyShowdata == "stk") {
       $("#v-pills-stkReference-tab").show();
@@ -349,6 +350,9 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
     } else if (onlyShowdata == "relation") {
       $("#v-pills-relasiEksternalReference-tab").show();
       $("#relasiEksternalReference").show();
+    } else if (onlyShowdata == "persyaratan") {
+      $("#v-pills-persyaratanJabatanReference-tab").show();
+      $("#persyaratanJabatanReference").show();
     }
     localStorage.setItem("onlyShowdata", onlyShowdata);
   }
@@ -362,7 +366,7 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 
   const codeAvailableSelectedArray =
     getDataJobDesc?.tugasTanggungJawabAkhir?.data?.flatMap(
-      (item) => item.tanggungJawabProses?.map((proses) => proses.indexNumber) || []
+      (item) => item.tanggungJawabProses?.map((proses) => proses.indexNumber) || [],
     ) || [];
 
   const codeAvailableSelected = codeAvailableSelectedArray.filter((v, i, a) => a.indexOf(v) === i);
@@ -418,13 +422,13 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   updateTableSelected(
     "koordinasiInternalReference",
     getDataJobDesc?.koordinasiInternal?.data || [],
-    tabCusJD.koordinasi
+    tabCusJD.koordinasi,
   );
   updateTableSelected("relasiEksternalReference", getDataJobDesc?.relasiEksternal?.data || [], tabCusJD.relation);
   updateTableSelected(
     "stkReference",
     getDataJobDesc?.stk?.data.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined) || [],
-    ["no", ...tabCusJD.stk]
+    ["no", ...tabCusJD.stk],
   );
 
   // hideChartLoading("chk-job-list-percentage");
@@ -432,47 +436,57 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 }
 
 async function searchJobCompare(event, isPercentage = false) {
-  // return;
-
   const chkJobList = document.getElementById("chk-job-list");
   // const jobSelectedList = document.getElementById("job-selected-list");
 
   function callPopover(param, dataDetail) {
+    console.log("dataDetail in popover", dataDetail);
     // Generate popoverContent dynamically with if-else for status
-    const popoverContent = (dataDetail?.data || [])
-      .map((item) => {
-        let statusText = "";
-        let statusColor = "";
-        let statusIcon = "";
-        if (item?.status === "AVAILABLE") {
-          statusText = "Available";
-          statusColor = "#06BE00";
-          statusIcon = "available";
-        } else if (item?.status === "NOT AVAILABLE") {
-          statusText = "Not Available";
-          statusColor = "#D02138";
-          statusIcon = "nonavail";
-        } else {
-          statusText = "Unknown";
-          statusColor = "#999";
-          statusIcon = "unknown";
-        }
-        return `
-          <tr>
-          <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
-          <td style="place-items:center">
-            <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
-            <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
-            </div>
-          </td>
-          <td style="color:${statusColor};text-align:center">
-            <span>${statusText}</span>
-            <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
-          </td>
-          </tr>
-          `;
-      })
-      .join("");
+    const dataArray = dataDetail?.data || [];
+    let popoverContent = "";
+
+    if (dataArray.length === 0) {
+      popoverContent = `
+        <tr>
+          <td colspan="3" style="text-align:center;">No Data Available</td>
+        </tr>
+      `;
+    } else {
+      popoverContent = dataArray
+        .map((item) => {
+          let statusText = "";
+          let statusColor = "";
+          let statusIcon = "";
+          if (item?.status === "AVAILABLE") {
+            statusText = "Available";
+            statusColor = "#06BE00";
+            statusIcon = "available";
+          } else if (item?.status === "NOT AVAILABLE") {
+            statusText = "Not Available";
+            statusColor = "#D02138";
+            statusIcon = "nonavail";
+          } else {
+            statusText = "Unknown";
+            statusColor = "#999";
+            statusIcon = "unknown";
+          }
+          return `
+            <tr>
+            <td>${item?.indexNumberFrom || ""} - ${item?.descriptionFrom || ""}</td>
+            <td style="place-items:center">
+              <div style="width:20px; height:20px; background-color:#E3E3E3; border-radius:50%; border:1px solid #9F9FA5; display:flex; align-items:center; justify-content:center;">
+              <span style="font-weight:bold;font-size: 12px;">${item?.notation || "R"}</span>
+              </div>
+            </td>
+            <td style="color:${statusColor};text-align:center">
+              <span>${statusText}</span>
+              <img src="/assets/images/rasci/${statusIcon}.svg" alt="${statusText} Icon" style="padding-left: 2px;vertical-align:middle;">
+            </td>
+            </tr>
+            `;
+        })
+        .join("");
+    }
     $(`[data-toggle="popOver${param}"]`).popover({
       html: true,
       sanitize: false,
@@ -485,7 +499,7 @@ async function searchJobCompare(event, isPercentage = false) {
             <th style="width: 55%;">Business Process</th>
             <th style="width: 15%;">Notation</th>
             <th style="width: 30%;">Availability of reference</th>
-            <tr>
+            </tr>
         </thead>
         <tbody>
         ${popoverContent}
@@ -498,50 +512,18 @@ async function searchJobCompare(event, isPercentage = false) {
   }
 
   if (isPercentage) {
-    console.log("getDraftExisting", getDraftExisting);
     showChartLoading("chk-job-list-percentage", true, "480px", "100%", "Please wait, fetching data...");
     const value = event;
     const chkJobListPercentage = document.getElementById("chk-job-list-percentage");
-    const params = {
-      draftId: getDraftExisting.draftId,
-      jobId: jobId,
-      prlOrg: prlOrg,
-      percentage: value,
-    };
 
-    const result = await getSimilarities(params);
+    const jobSimilaritiesData = JSON.parse(localStorage.getItem("jobSimilaritiesData"));
+    const jobSimilaritiesDetails = JSON.parse(localStorage.getItem("jobSimilaritiesDetails"));
+    const data = jobSimilaritiesData?.filter((item) => item.percentage >= value);
+    console.log("jobSimilaritiesData", jobSimilaritiesData);
+    console.log("data filtered", data);
     // dan urutan berdasarkan percentage yang paling tinggi
-    const dataCompare = result?.data
-      .map((item) => ({
-        id: item?.jobIdTarget,
-        name: item?.positionNameTarget,
-        percentage: item?.matchPercentage,
-        jobIdFrom: item?.jobIdSource,
-        prlOrgFrom: item?.prlOrgSource,
-        jobIdTarget: item?.jobIdTarget,
-        prlOrgTo: item?.prlOrgTarget,
-      }))
-      .sort((a, b) => b.percentage - a.percentage);
 
-    // Fetch all details in parallel instead of sequentially
-    const detailPromises = dataCompare.map((item) =>
-      getAllTanggungJawabJobToJob({
-        draftId: getDraftExisting.draftId,
-        jobIdFrom: jobId,
-        prlOrgFrom: prlOrg,
-        jobIdTo: item.jobIdTarget,
-        prlOrgTo: item.prlOrgTo,
-        page: 1,
-        pageSize: 99,
-      }).then((res) => ({
-        jobIdTo: item.jobIdTarget,
-        data: res.data,
-      }))
-    );
-
-    const details = await Promise.all(detailPromises);
-
-    for (const item of dataCompare) {
+    for (const item of data) {
       let color = "";
       if (item.percentage >= 90) {
         color = "background-color: #28a745";
@@ -558,7 +540,7 @@ async function searchJobCompare(event, isPercentage = false) {
     }
     const storeId = [];
     let innerHTML = "";
-    for (let item of dataCompare) {
+    for (let item of data) {
       innerHTML += `
         <div class="row-item">
       <div class="column-item-name pointer" onClick="applyCompare(${item.id},${item.prlOrgTo},'${item.prlOrgTo}')">
@@ -570,21 +552,17 @@ async function searchJobCompare(event, isPercentage = false) {
       `;
       storeId.push(item.id);
     }
-    if (result?.data?.length === 0) {
+    if (data.length === 0) {
       innerHTML = DATA_NOT_FOUND_HTML;
     }
     chkJobListPercentage.innerHTML = innerHTML;
     storeId.forEach((item) => {
-      const dataDetail = details.find((detail) => detail.jobIdTo === item);
+      const dataDetail = jobSimilaritiesDetails.find((detail) => detail.jobIdTo === item);
       callPopover(item, dataDetail);
     });
 
     // Hide loading after processing is complete
     hideChartLoading("animate-chk");
-
-    // Reinitialize popovers after updating the inner HTML
-
-    // $('[data-toggle="popover"]').popover();
   } else {
     const value = event?.target?.value || "";
     showChartLoading("chk-job-list", true, "480px", "100%", "Please wait, fetching data...");
@@ -633,6 +611,23 @@ function readOnlyPage() {
   $("#labelFulfillTugasHa").hide();
   $("#handleExportPng , #backToListBtn").show();
   $("#exportImageBtn, #exportSVGBtn, #exportPDFBtn, #fitToScreenBtn, #zoomInBtn, #zoomOutBtn, #chartCompactBtn").show();
+
+  // Delay CKEditor readonly setting to ensure it's fully initialized
+  setTimeout(() => {
+    const summernoteElement = document.querySelector(".summernote");
+    if (summernoteElement && summernoteElement.ckeditorInstance && summernoteElement.ckeditorInstance._editor) {
+      try {
+        summernoteElement.ckeditorInstance._editor.setReadOnly(true);
+        console.log("CKEditor set to readonly mode");
+      } catch (error) {
+        console.error("Failed to set CKEditor readonly:", error);
+        // Fallback: disable contenteditable
+        if (summernoteElement.contentEditable) {
+          summernoteElement.contentEditable = "false";
+        }
+      }
+    }
+  }, 1000);
 }
 async function getDetailJob(jobCode) {
   console.log("getDraftExisting", getDraftExisting);
@@ -666,12 +661,59 @@ $(document).ready(async function () {
           draftRasciId: getDraftExisting.draftRasciId,
           draftName: getDraftExisting.draftName,
           organizationDraftId: getDraftExisting.organizationDraftId,
-        })
+        }),
       );
     }
     readOnlyPage();
   }
   const detailJobSO = await getDetailJob(jobId);
+
+  async function updateDataSimilarities() {
+    $("#addJobReference").hide();
+    const result = await getSimilarities({
+      draftId: getDraftExisting.draftId,
+      jobId: jobId,
+      prlOrg: prlOrg,
+      percentage: 50,
+    });
+    const data = result?.data || [];
+    if (data.length > 0) {
+      const dataCompare = data
+        .map((item) => ({
+          id: item?.jobIdTarget,
+          name: item?.positionNameTarget,
+          percentage: item?.matchPercentage,
+          jobIdFrom: item?.jobIdSource,
+          prlOrgFrom: item?.prlOrgSource,
+          jobIdTarget: item?.jobIdTarget,
+          prlOrgTo: item?.prlOrgTarget,
+        }))
+        .sort((a, b) => b.percentage - a.percentage);
+      localStorage.setItem("jobSimilaritiesData", JSON.stringify(dataCompare));
+
+      const detailPromises = dataCompare.map((item) =>
+        getAllTanggungJawabJobToJob({
+          draftId: getDraftExisting.draftId,
+          jobIdFrom: jobId,
+          prlOrgFrom: prlOrg,
+          jobIdTo: item.jobIdTarget,
+          prlOrgTo: item.prlOrgTo,
+          page: 1,
+          pageSize: 99,
+        }).then((res) => ({
+          jobIdTo: item.jobIdTarget,
+          data: res.data,
+        })),
+      );
+      const jobSimilaritiesDetails = await Promise.all(detailPromises);
+      localStorage.setItem("jobSimilaritiesDetails", JSON.stringify(jobSimilaritiesDetails));
+      console.log("jobSimilaritiesDetails", jobSimilaritiesDetails);
+    }
+    $("#addJobReference").show();
+    return result;
+  }
+
+  updateDataSimilarities();
   console.log("detailJobSO", detailJobSO);
 
   // return;
@@ -702,7 +744,6 @@ $(document).ready(async function () {
 
     updateIdentifikasiJob(getDataJobDesc?.identifikasiJabatan);
   } else {
-    alert("masok");
     const dataParams = detailJobSO.data || {};
     console.log("dataParams ==>>", dataParams);
     const identifikasi = {
@@ -835,7 +876,7 @@ $(document).ready(async function () {
       }`;
       $("#fungsiReferenceContainer").append(`<li>${item.fungsiJabatan}</li>`);
       $("#fungsiReferenceContainer").append(
-        `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`
+        `<p style="font-size: 12px; font-style: italic; margin-top: -10px; margin-bottom: 10px;">${textReference}</p>`,
       );
     });
   } else {
@@ -878,7 +919,7 @@ $(document).ready(async function () {
 
     if (!isFullFilled) {
       $label.html(
-        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button. [See detail]`,
       );
     } else {
       $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);
@@ -912,11 +953,11 @@ $(document).ready(async function () {
 
   localStorage.setItem("persyaratanJabatan", JSON.stringify([]));
   if (getDataJobDesc.persyaratanJabatan) {
-    getDataJobDesc.persyaratanJabatan.data.map((item) => {
-      item.pj = [item.pendidikanMinimal, ...item.pengalamanKerja];
-    });
     localStorage.setItem("persyaratanJabatan", JSON.stringify(getDataJobDesc.persyaratanJabatan.data));
-    updateTable("persyaratan", getDataJobDesc.persyaratanJabatan.data, tabCusJD.pj);
+    updateTable("persyaratanJabatan", getDataJobDesc.persyaratanJabatan.data, [
+      ...tabCusJD.persyaratanJabatan,
+      "action",
+    ]);
   }
 
   localStorage.setItem("persyaratanKhusus", JSON.stringify([]));
@@ -925,7 +966,7 @@ $(document).ready(async function () {
     //   item.pk = [item.pendidikanMinimal, item.pengalamanKerja];
     // });
     localStorage.setItem("persyaratanKhusus", JSON.stringify([]));
-    // updateTable("persyaratanKhusus", [], [...tabCusJD.pk, "action"]);
+    updateTable("persyaratanKhusus", [], [...tabCusJD.persyaratanKhusus, "action"]);
     // localStorage.setItem("persyaratanKhusus", JSON.stringify(getDataJobDesc.persyaratanKhusus.data));
     // updateTable("persyaratanKhusus", getDataJobDesc.persyaratanKhusus.data, [...tabCusJD.pk, "action"]);
   }
@@ -945,7 +986,7 @@ $(document).ready(async function () {
     const $ul = $("<ul style='list-style-type: disc; padding-left: 20px;'></ul>");
     getDataJobDesc.kompetensiTeknis.data.komtekMandatori.forEach((item) => {
       $ul.append(
-        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekMandatoriName}</span><span>${item.level}</span></li>`,
       );
     });
     divKompetensiTeknisMandatory.empty().append($ul);
@@ -959,7 +1000,7 @@ $(document).ready(async function () {
     const $ul = $('<ul style=""></ul>');
     getDataJobDesc.kompetensiTeknis.data.komtekGeneral.forEach((item) => {
       $ul.append(
-        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekGeneralName}</span><span>${item.level}</span></li>`,
       );
     });
     divKompetensiTeknisGeneral.empty().append($ul);
@@ -973,7 +1014,7 @@ $(document).ready(async function () {
     const $ul = $('<ul style=""></ul>');
     getDataJobDesc.kompetensiTeknis.data.komtekSpesifik.forEach((item) => {
       $ul.append(
-        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`
+        `<li style="display: flex; justify-content: space-between;"><span>${item.komtekSpesifikName}</span><span>${item.level}</span></li>`,
       );
     });
     divKompetensiTeknisSpesifik.empty().append($ul);
@@ -996,14 +1037,13 @@ $(document).ready(async function () {
   if (getDataJobDesc.stk) {
     // filter stk.data to remove items with empty stkNumber is null or undefined
     getDataJobDesc.stk.data = getDataJobDesc.stk.data.filter(
-      (item) => item.stkNumber !== null && item.stkNumber !== undefined
+      (item) => item.stkNumber !== null && item.stkNumber !== undefined,
     );
     localStorage.setItem("stk", JSON.stringify(getDataJobDesc.stk.data));
     updateTable("stk", getDataJobDesc.stk.data, [...tabCusJD.stk, "action"]);
   }
 
   if (master) {
-    // hide button inside table
     readOnlyPage();
   }
   focusNode(jobId);
@@ -1074,7 +1114,7 @@ $(document).ready(async function () {
               swal(
                 "Warning",
                 "SVG uploaded successfully, but failed to generate Word document. Invalid server response.",
-                "warning"
+                "warning",
               );
               return;
             }
@@ -1099,7 +1139,7 @@ $(document).ready(async function () {
             swal(
               "Warning",
               `SVG uploaded successfully, but failed to generate Word document: ${error.message}`,
-              "warning"
+              "warning",
             );
           }
         } else {
@@ -1125,26 +1165,25 @@ $(document).ready(async function () {
       return;
     }
 
-    alert("masok");
-
     // Use the new function to prepare job description data
     const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
-    return;
+    // console.log("Prepared params for saving draft:", params);
+    // return;
 
     // Uncomment below when ready to save
-    // loader(true);
-    // const save = await updateDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
-    // if (save.statusCode === 200) {
-    //   loader(false);
-    //   swalAlert("Success", "Draft saved successfully", "success");
-    //   // redirect to job-desc.html
-    //   setTimeout(() => {
-    //     window.location.href = "/job-description/index";
-    //   }, 1500);
-    // } else {
-    //   loader(false);
-    //   swalAlert("Error", save.message || "Failed to save draft", "error");
-    // }
+    loader(true);
+    const save = await updateDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
+    if (save.statusCode === 200) {
+      loader(false);
+      swalAlert("Success", "Draft saved successfully", "success");
+      // redirect to job-desc.html
+      setTimeout(() => {
+        window.location.href = "/job-description/index";
+      }, 1500);
+    } else {
+      loader(false);
+      swalAlert("Error", save.message || "Failed to save draft", "error");
+    }
   });
 
   // searchReferenceBy radio button
@@ -1209,7 +1248,7 @@ $(document).ready(async function () {
       "",
       action,
       "50%",
-      1
+      1,
     );
   });
 
@@ -1235,7 +1274,7 @@ $(document).ready(async function () {
       "",
       action,
       "30%",
-      1
+      1,
     );
   });
 
@@ -1255,7 +1294,7 @@ $(document).ready(async function () {
 
     if (!isFullFilled) {
       $label.html(
-        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button`
+        `${countAvailable}/${countAll} of business processes have been fulfilled. You can add them by clicking add data or add from references button`,
       );
     } else {
       $label.html(`All business processes have been fulfilled (${countAll}/${countAll})`);

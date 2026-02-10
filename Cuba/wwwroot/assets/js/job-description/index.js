@@ -16,16 +16,20 @@ function updateDraftLs(id) {
         "|" +
         draftExistingJobDesc.organizationDraftId,
       true,
-      true
-    )
+      true,
+    ),
   );
 }
 
-async function checkDraftSelected(listDraft) {
+function detailDraft(params) {
+  updateDraftLs(params);
+  window.location.href = "/job-description/draft-detail?draftId=" + draftExistingJobDesc.draftId;
+}
+
+function checkDraftSelected(listDraft) {
   localStorage.getItem("draftExistingJobDesc") ??
     localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
   const data = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
-  console.log("data draftExistingJobDesc from ls", draftExistingJobDesc);
   Object.keys(draftExistingJobDesc).forEach((key) => {
     if (data[key]) {
       draftExistingJobDesc[key] = data[key];
@@ -99,7 +103,7 @@ $(document).ready(async function () {
           "|" +
           saveData.data.draftName +
           "|" +
-          saveData.data.organizationDraftId
+          saveData.data.organizationDraftId,
       );
     } else {
       swal("Failed to save draft", { icon: "error" });
@@ -107,22 +111,18 @@ $(document).ready(async function () {
   });
 
   // get draft list
-  const dataListDraft = await draftList();
+  const dataListDraft = await draftList(1, 9999);
+  const dataListApproval = await draftApprovalList(1, 9999);
   const rasciList = await getRasciList();
-  console.log("dataListDraft", dataListDraft);
-  console.log("rasciList", rasciList);
-  const test = dataListDraft.data[0];
-  console.log("test", test);
-  console.log(
-    `${test.draftId}|${test.draftRasciId ? test.draftRasciId : ""}|${test.draftOrganizationId}|${test.draftName}|${
-      test.organizationDraftId
-    }`
-  );
+  storeData.listDraft = dataListDraft.data;
+  storeData.listApproval = dataListApproval.data;
+  storeData.rasciList = rasciList.data;
+  console.log("storeData.listDraft", storeData.listDraft);
 
   getDataList([
     {
       dataId: "selectJobDescDraft",
-      data: dataListDraft.data.map((item) => ({
+      data: storeData.listDraft.map((item) => ({
         id: `${item.draftId}|${item.draftRasciId ? item.draftRasciId : ""}|${item.draftOrganizationId}|${
           item.draftName
         }|${item.organizationDraftId}`,
@@ -135,10 +135,11 @@ $(document).ready(async function () {
       dropdownParent: $("#modalCreateDraftJobDesc"),
     },
   ]);
-  await checkDraftSelected(dataListDraft.data);
+  checkDraftSelected(storeData.listDraft);
   updateNotifNotAvailable();
 
-  await getTableListDraft(dataListDraft.data);
+  getTableListDraft(storeData.listDraft.filter((x) => x.draftId != defaultMasterId));
+  getTableListApproval(storeData.listApproval);
 
   //
 
@@ -175,10 +176,26 @@ $(document).ready(async function () {
     $("#modalCreateDraftJobDesc").modal("show");
   });
 
-  getTableListApproval();
   getTableListLog();
 
-  checkDraftSelected(dataListDraft.data);
+  checkDraftSelected(storeData.listDraft);
+
+  function updateDraftSelection(data, selectedElement) {
+    draftExistingJobDesc.draftId = data[0];
+    draftExistingJobDesc.draftRasciId = data[1];
+    draftExistingJobDesc.draftOrganizationId = data[2];
+    draftExistingJobDesc.draftName = selectedElement.find("option:selected").text();
+    draftExistingJobDesc.organizationDraftId = data[4];
+    localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
+    if (draftExistingJobDesc.draftId != "" && draftExistingJobDesc.draftId != null) {
+      getTableListJobDes();
+      updateNotifNotAvailable();
+    }
+    $("#pillsJDSection").show();
+    if (draftExistingJobDesc.draftId == defaultMasterId) {
+      $("#pillsJDSection").attr("style", "display:none !important");
+    }
+  }
 
   $("#selectJobDescDraft").change(function () {
     const value = $(this).val();
@@ -191,16 +208,7 @@ $(document).ready(async function () {
     }
     const data = value.split("|");
     console.log("data draft selected:", data);
-    draftExistingJobDesc.draftId = data[0];
-    draftExistingJobDesc.draftRasciId = data[1];
-    draftExistingJobDesc.draftOrganizationId = data[2];
-    draftExistingJobDesc.draftName = $(this).find("option:selected").text();
-    draftExistingJobDesc.organizationDraftId = data[4];
-    localStorage.setItem("draftExistingJobDesc", JSON.stringify(draftExistingJobDesc));
-    if (draftExistingJobDesc.draftId != "" && draftExistingJobDesc.draftId != null) {
-      getTableListJobDes();
-      updateNotifNotAvailable();
-    }
+    updateDraftSelection(data, $(this));
   });
 
   function updateNotifNotAvailable() {
@@ -214,8 +222,146 @@ $(document).ready(async function () {
     }).then((result) => {
       $("#notifNotAvailable").show();
       $("#notifNotAvailable").text(
-        `There are ${result.count} positions with job descriptions not available. Click here to show.`
+        `There are ${result.count} positions with job descriptions not available. Click here to show.`,
       );
     });
+  }
+
+  // Generic filter function that works for both approvals and drafts
+  function applyFilters(filterType) {
+    const isApproval = filterType === "approval";
+    const dataSource = isApproval ? storeData.listApproval : storeData.listDraft;
+
+    if (!dataSource) return;
+
+    let filteredData = [...dataSource];
+
+    // Get filter values based on type
+    if (isApproval) {
+      const searchTerm = $("#searchApproval").val();
+      const approvalDate = $("#approvalDate").val();
+      const submittedDate = $("#submittedDate").val();
+      const statusApproval = $("#statusApproval").val();
+
+      // Apply status filter for approvals
+      if (statusApproval && statusApproval !== "all") {
+        filteredData = filteredData.filter((data) => {
+          const statusMap = {
+            isSubmitted: () => data.isSubmitted && !data.isRejected && !data.isApproved && !data.isFinalized,
+            isRejected: () => data.isRejected && !data.isApproved,
+            isApproved: () => data.isApproved,
+            isFinalized: () => data.isFinalized,
+          };
+          return statusMap[statusApproval] ? statusMap[statusApproval]() : true;
+        });
+      }
+
+      // Apply search filter
+      if (searchTerm) {
+        filteredData = filteredData.filter((item) => item.draftName.toLowerCase().includes(searchTerm.toLowerCase()));
+      }
+
+      // Apply date filters for approvals
+      if (approvalDate || submittedDate) {
+        try {
+          filteredData = filteredData.filter((approval) => {
+            let matches = true;
+
+            if (approvalDate) {
+              const filterDate = new Date(approvalDate).toDateString();
+              const targetDate = approval.approvedDate || approval.rejectedDate;
+              matches = matches && (targetDate ? new Date(targetDate).toDateString() === filterDate : false);
+            }
+
+            if (submittedDate) {
+              const filterDate = new Date(submittedDate).toDateString();
+              const targetDate = approval.submittedDate || approval.createdDate;
+              matches = matches && (targetDate ? new Date(targetDate).toDateString() === filterDate : false);
+            }
+
+            return matches;
+          });
+        } catch (error) {
+          console.error("Error applying date filters:", error);
+        }
+      }
+
+      console.log("Approval filter applied, results:", filteredData.length);
+      getTableListApproval(filteredData);
+    } else {
+      // Draft filtering
+      const searchTerm = $("#searchDraft").val();
+      const selectedDate = $("#draftCreatedDate").val();
+
+      // Apply search filter
+      if (searchTerm) {
+        filteredData = filteredData.filter((draft) => draft.draftName.toLowerCase().includes(searchTerm.toLowerCase()));
+      }
+
+      // Apply date filter
+      if (selectedDate) {
+        try {
+          const filterDate = new Date(selectedDate).toDateString();
+          filteredData = filteredData.filter((draft) => {
+            return draft.createdDate ? new Date(draft.createdDate).toDateString() === filterDate : true;
+          });
+        } catch (error) {
+          console.error("Error applying date filter:", error);
+        }
+      }
+
+      console.log("Draft filter applied, results:", filteredData.length);
+      getTableListDraft(filteredData.filter((x) => x.id != defaultMasterId && !x.isSubmitted && !x.isApproved));
+    }
+  }
+
+  // Simplified update functions
+  const updateApprovalFilters = () => applyFilters("approval");
+  const updateDraftFilters = () => applyFilters("draft");
+
+  // Simplified event handlers
+  $("#approvalFilterRow").on("change input", "input, select", function () {
+    console.log(`Approval filter changed: ${$(this).attr("id")} = ${$(this).val()}`);
+    updateApprovalFilters();
+  });
+
+  $("#draftFilterRow").on("change input", "input, select", function () {
+    console.log(`Draft filter changed: ${$(this).attr("id")} = ${$(this).val()}`);
+    updateDraftFilters();
+  });
+
+  // Simplified datepicker configurations
+  const datepickerConfig = {
+    language: "en",
+    position: "bottom left",
+    multipleDatesSeparator: ", ",
+  };
+
+  $("#draftCreatedDate")
+    .datepicker("destroy")
+    .datepicker({
+      ...datepickerConfig,
+      onSelect: () => updateDraftFilters(),
+    });
+
+  $("#approvalDate")
+    .datepicker("destroy")
+    .datepicker({
+      ...datepickerConfig,
+      onSelect: () => updateApprovalFilters(),
+    });
+
+  $("#submittedDate").datepicker({
+    ...datepickerConfig,
+    onSelect: () => updateApprovalFilters(),
+  });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTab = urlParams.get("activeTab");
+  if (activeTab) {
+    const linkTab = "#pills" + activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+    setTimeout(() => {
+      $(linkTab).tab("show");
+    }, 1000);
   }
 });

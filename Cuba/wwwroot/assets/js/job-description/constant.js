@@ -17,6 +17,11 @@ const uuid = {
   uniquePosCode: "",
 };
 
+const storeData = {
+  listDraft: [],
+  listOrgNode: [],
+};
+
 const draftExistingJobDesc = {
   draftId: null,
   draftOrganizationId: null,
@@ -716,8 +721,9 @@ const tabCusJD = {
   wewenang: ["no", "wewenang"],
   koordinasi: ["no", "internal", "aktivitas"],
   relation: ["no", "eksternal", "aktivitas"],
-  pj: ["pj"],
+  persyaratanJabatan: ["pengalamanKerja"],
   stk: ["stkNumber", "stkTitle"],
+  persyaratanKhusus: ["deskripsi"],
 };
 
 // Chart Loading HTML Template
@@ -892,6 +898,32 @@ const mappingAddUpdate = {
       jdJobReferences: [],
     },
   },
+  persyaratanJabatan: {
+    ls: "persyaratanJabatan",
+    ids: ["pengalamanKerja"],
+    listIds: ["pengalamanKerja"],
+    toolbar: true,
+    toolbarType: TOOLBAR_SHORT,
+    defaultData: {
+      jobId: "",
+      prlOrg: "",
+      pengalamanKerja: "",
+      jdJobReferences: [],
+    },
+  },
+  persyaratanKhusus: {
+    ls: "persyaratanKhusus",
+    ids: ["deskripsi"],
+    listIds: ["deskripsi"],
+    toolbar: true,
+    toolbarType: TOOLBAR_SHORT,
+    defaultData: {
+      jobId: "",
+      prlOrg: "",
+      deskripsi: "",
+      jdJobReferences: [],
+    },
+  },
 };
 const paramsJobReferences = [
   {
@@ -970,7 +1002,14 @@ const paramsSaveDraft = {
       jobReferences: [],
     },
   ],
-  persyaratanJabatan: [], // ambil dari local storage
+  persyaratanJabatan: [
+    {
+      jobId: "10135490",
+      prlOrg: "23",
+      pengalamanKerja: [],
+      jdJobReferences: [],
+    },
+  ], // ambil dari local storage
   persyaratanKhusus: [], // ambil dari local storage
   stk: [
     {
