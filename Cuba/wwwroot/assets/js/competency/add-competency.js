@@ -401,12 +401,12 @@ function updateButtonStateBySelectsAndCompetency() {
   }
 }
 
-async function onSelectSg(event) {
-  updateButtonStateBySelectsAndCompetency();
-}
-async function onSelectSsg(event) {
-  updateButtonStateBySelectsAndCompetency();
-}
+// async function onSelectSg(event) {
+//   updateButtonStateBySelectsAndCompetency();
+// }
+// async function onSelectSsg(event) {
+//   updateButtonStateBySelectsAndCompetency();
+// }
 async function onSelectCompetency(event) {
   try {
     const idPosition = event.target.value || null;

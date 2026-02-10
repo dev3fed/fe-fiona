@@ -10,7 +10,7 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
   const result = await fetchProficiencyLevel(queryString);
   console.log("result", result);
   setState("detailProficiency", { ...result.data, compeType: compeType });
-  const competencyLevel = result.data.proficiencyLevel;
+  const competencyLevel = result.data?.proficiencyLevel === 0 ? result.data?.masterValue : result.data.proficiencyLevel;
   const compeCategory = result.data.competencyType || compeType;
   const detailData = result.data;
 

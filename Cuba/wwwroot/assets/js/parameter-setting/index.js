@@ -10,15 +10,15 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
     type == "delete"
       ? '<i class="fas fa-exclamation-triangle text-danger"></i>'
       : type == "success"
-      ? '<i class="fas fa-check-circle text-success"></i>'
-      : '<i class="fas fa-exclamation-circle text-warning"></i>';
+        ? '<i class="fas fa-check-circle text-success"></i>'
+        : '<i class="fas fa-exclamation-circle text-warning"></i>';
   let title = `<span class="p-l-10">` + titleModal + `</span>`;
   $("#modalConfirmTitle").html(icon + title);
   $("#modalConfirmBody").html(
     `<div class="f-14" role="alert">` +
       message +
       `
-    </div>`
+    </div>`,
   );
 
   if (note) {
@@ -27,7 +27,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
         <strong>Note:</strong> ` +
         note +
         `
-      </div>`
+      </div>`,
     );
   }
 
@@ -41,7 +41,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
             item.callback +
             `)()">` +
             item.button +
-            `</button>`
+            `</button>`,
         );
         return;
       }
@@ -50,7 +50,7 @@ function modalConfrimHelper(type, titleModal, message, note, action, modalSize, 
           item.className +
           ` m-r-5" onclick="(async () => { await ${item.callbackFunction}(\`${paramsId}\`); })()">` +
           item.button +
-          `</button>`
+          `</button>`,
       );
     });
   }
@@ -81,12 +81,12 @@ async function confirmSave() {
   // value radio button name radio1
 
   const update = await editMandatoryAsync({
-    "compCode": $("#code").val(),
-    "careerType": $('#type').val(),
-    "careerLevel": $('#level').val(),
-    "proficiencyLevel": $('input[name="radio1"]:checked').val()
+    compCode: $("#code").val(),
+    careerType: $("#type").val(),
+    careerLevel: $("#level").val(),
+    proficiencyLevel: $('input[name="radio1"]:checked').val(),
   });
-  
+
   hideModal(`modalConfirm`);
 
   swal("Success", "Data has been saved", "success");
@@ -170,8 +170,7 @@ const handleDetailCompetency = async (id) => {
   }
 };
 
-const openModalEditDepth = (level,type,name,compCode, proficiencyLevel) => {
- 
+const openModalEditDepth = (level, type, name, compCode, proficiencyLevel) => {
   const compeCategory = { category: "mandatory" };
   const competencyLevel = { level: 1 };
   const dataJob = { job_name: "Job Name" };
@@ -232,9 +231,7 @@ const openModalEditDepth = (level,type,name,compCode, proficiencyLevel) => {
             <div class="mt-3">
               <label style="color:#9F9FA5">Mandatory Competency</label>
             
-              <h6 style="color:#03A9F4; cursor: pointer"  onclick="handleDetailCompetency('${compCode}')">${
-                name
-              }</h6>
+              <h6 style="color:#03A9F4; cursor: pointer"  onclick="handleDetailCompetency('${compCode}')">${name}</h6>
             </div>
         </div>
         <div class="col-12">
@@ -255,17 +252,17 @@ const openModalEditDepth = (level,type,name,compCode, proficiencyLevel) => {
   }
 };
 
-
 // $('#btnSaveDraft').on('click', async function() {
 //   alert('masok')
 // });
 
 async function loadTableHeader(params) {
-  const headerCareerType = params.filter((item, index, self) =>
-    index === self.findIndex((t) => t.careerType === item.careerType)
+  const headerCareerType = params.filter(
+    (item, index, self) => index === self.findIndex((t) => t.careerType === item.careerType),
   );
-  const listHeader = params.filter((item, index, self) =>
-      index === self.findIndex((t) => t.careerLevel === item.careerLevel &&  t.careerType === item.careerType)
+  const listHeader = params.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.careerLevel === item.careerLevel && t.careerType === item.careerType),
   );
   let headerTop = ``;
   let headerBottom = ``;
@@ -283,15 +280,20 @@ async function loadTableHeader(params) {
     });
   });
 
-  const contentHeader = `
+  const contentHeader =
+    `
       <tr style="height: 30px;">
         <th rowspan="2" class="headcol head-cell color-mandatory" style="position:sticky;top:0; z-index:1 vertical-align: middle;text-align: center;">
             <span style="padding-left:10px;">Mandatory Competency</span>
         </th>
-        `+ headerTop +`
+        ` +
+    headerTop +
+    `
       </tr>
       <tr style="height: 50px;">
-        `+ headerBottom +`
+        ` +
+    headerBottom +
+    `
       </tr>
     `;
 
@@ -302,19 +304,21 @@ function mapCompetencyCells(data) {
   let cell = ``;
   data.dataHeader.forEach((header) => {
     // console.log({header})
-    const isAvailable = data.allData.find((x) => x.careerType === header.careerType && x.careerLevel === header.careerLevel && x.name === data.item.name );
-    if(isAvailable.proficiencyLevel) {
-    cell += `<td>
+    const isAvailable = data.allData.find(
+      (x) => x.careerType === header.careerType && x.careerLevel === header.careerLevel && x.name === data.item.name,
+    );
+    if (isAvailable.proficiencyLevel) {
+      cell += `<td>
                 <div class="competency-container">
                     <div class="competency-value">
                         ${isAvailable.proficiencyLevel ?? "-"}
                       </div>
                       <img src="../assets/images/rasci/pencil_rasci.svg" alt="Edit Icon" class="edit-icon" onclick="openModalEditDepth('${header.careerLevel}','${header.careerType}','${data.item.name}','${data.item.compCode}', ${
-                          data.item?.proficiencyLevel
-                        })">
+                        data.item?.proficiencyLevel
+                      })">
                     </div>
                 </td>`;
-    }else{
+    } else {
       cell += `<td></td>`;
     }
   });
@@ -338,11 +342,12 @@ function mapCompetencyCells(data) {
 }
 
 async function loadTableBody(params) {
-  const headerCareerType = params.filter((item, index, self) =>
-    index === self.findIndex((t) => t.careerType === item.careerType)
+  const headerCareerType = params.filter(
+    (item, index, self) => index === self.findIndex((t) => t.careerType === item.careerType),
   );
-  const listHeader = params.filter((item, index, self) =>
-      index === self.findIndex((t) => t.careerLevel === item.careerLevel &&  t.careerType === item.careerType)
+  const listHeader = params.filter(
+    (item, index, self) =>
+      index === self.findIndex((t) => t.careerLevel === item.careerLevel && t.careerType === item.careerType),
   );
   let dataHeader = [];
   headerCareerType.forEach((item, index) => {
@@ -355,16 +360,14 @@ async function loadTableBody(params) {
     });
   });
 
-  const getALlName = params.filter((item, index, self) => 
-    index === self.findIndex((t) => t.name === item.name)
-  );
-  let bodyContent = ``; 
-  let compeCells = ``; 
+  const getALlName = params.filter((item, index, self) => index === self.findIndex((t) => t.name === item.name));
+  let bodyContent = ``;
+  let compeCells = ``;
   getALlName.forEach((item, index) => {
     compeCells = mapCompetencyCells({
       item: item,
       dataHeader: dataHeader,
-      allData:params
+      allData: params,
     });
     bodyContent += `
               <tr>
@@ -376,7 +379,6 @@ async function loadTableBody(params) {
                   </td>
                     ${compeCells}
               </tr>`;
-              
   });
   $("#table-body").append(bodyContent);
   // let headerTop = ``;
@@ -438,17 +440,17 @@ async function updateTableSkillGroup(params) {
   //   },
   // ];
   const data = params.map((item, index) => {
-  return{
-    id: index + 1,
-    totalSkillGroup: item.name,
-    sg1: item.main,
-    sg2: item.second,
-    sg3: item.third,
-  }
+    return {
+      id: index + 1,
+      totalSkillGroup: item.name,
+      sg1: item.main,
+      sg2: item.second,
+      sg3: item.third,
+    };
   });
 
-  const table = document.getElementById('table-body-skill-group');
-  table.innerHTML = '';
+  const table = document.getElementById("table-body-skill-group");
+  table.innerHTML = "";
   data.forEach((item, index) => {
     console.log(item);
     const row = table.insertRow(index);
@@ -466,16 +468,15 @@ async function updateTableSkillGroup(params) {
 }
 
 function handleAction(index) {
-  console.log('handleAction', index);
+  console.log("handleAction", index);
   // form-edit-skill-group update
-  const form = document.getElementById('form-edit-skill-group');
+  const form = document.getElementById("form-edit-skill-group");
   // form.reset();
-  form.innerHTML = '';
-  form.innerHTML += 
-  `<input type="hidden" id="editSgId" name="id" value="${index.id-1}">`;
+  form.innerHTML = "";
+  form.innerHTML += `<input type="hidden" id="editSgId" name="id" value="${index.id - 1}">`;
 
-  const data = index
-  if(data.sg1) {
+  const data = index;
+  if (data.sg1) {
     form.innerHTML += `
     <div class="col-md-4">
       <div class="form-group">
@@ -484,7 +485,7 @@ function handleAction(index) {
       </div>
     </div>`;
   }
-  if(data.sg2) {
+  if (data.sg2) {
     form.innerHTML += `
     <div class="col-md-4">
       <div class="form-group">
@@ -493,7 +494,7 @@ function handleAction(index) {
       </div>
     </div>`;
   }
-  if(data.sg3) {
+  if (data.sg3) {
     form.innerHTML += `
     <div class="col-md-4">
       <div class="form-group">
@@ -502,75 +503,69 @@ function handleAction(index) {
       </div>
     </div>`;
   }
-  
 
-  
-  const totalWeight = document.getElementById('total-weight');
+  const totalWeight = document.getElementById("total-weight");
   totalWeight.innerHTML = `Total Weight : 100 %`;
 
-
-  $('#modalSkillGroup').modal('show');
+  $("#modalSkillGroup").modal("show");
 }
 
-$(document).on('change', '.skillGroupEvent', function() {
-  const totalWeight = document.getElementById('total-weight');
-  const sg1 = document.getElementById('sg1')?.value || 0;
-  const sg2 = document.getElementById('sg2')?.value || 0;
-  const sg3 = document.getElementById('sg3')?.value || 0;
+$(document).on("change", ".skillGroupEvent", function () {
+  const totalWeight = document.getElementById("total-weight");
+  const sg1 = document.getElementById("sg1")?.value || 0;
+  const sg2 = document.getElementById("sg2")?.value || 0;
+  const sg3 = document.getElementById("sg3")?.value || 0;
   const total = parseInt(sg1) + parseInt(sg2) + parseInt(sg3);
   totalWeight.innerHTML = `Total Weight : ${total} %`;
-  if(total != 100) {
-    totalWeight.style.color = 'red';
-    totalWeight.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+  if (total != 100) {
+    totalWeight.style.color = "red";
+    totalWeight.style.backgroundColor = "rgba(255, 0, 0, 0.1)";
     totalWeight.innerHTML = `Total Weight : ${total} % (Total weight must be 100%)`;
-    $('#btnSaveSkillGroup').prop('disabled', total !== 100);
-  }
-  else {
-    totalWeight.style.color = '#006CA9';
-    totalWeight.style.backgroundColor = '#E6F6FD';
+    $("#btnSaveSkillGroup").prop("disabled", total !== 100);
+  } else {
+    totalWeight.style.color = "#006CA9";
+    totalWeight.style.backgroundColor = "#E6F6FD";
     totalWeight.innerHTML = `Total Weight : ${total} %`;
-    $('#btnSaveSkillGroup').prop('disabled', false);
+    $("#btnSaveSkillGroup").prop("disabled", false);
   }
 });
 
-$('#btnSaveSkillGroup').on('click', async function() {
-  const sg1 = document.getElementById('sg1')?.value || 0;
-  const sg2 = document.getElementById('sg2')?.value || 0;
-  const sg3 = document.getElementById('sg3')?.value || 0;
-  const isActive = true
-  const id = $('#editSgId').val();
+$("#btnSaveSkillGroup").on("click", async function () {
+  const sg1 = document.getElementById("sg1")?.value || 0;
+  const sg2 = document.getElementById("sg2")?.value || 0;
+  const sg3 = document.getElementById("sg3")?.value || 0;
+  const isActive = true;
+  const id = $("#editSgId").val();
   const data = {
     id: id,
     main: sg1,
     second: sg2,
     third: sg3,
-    isActive: isActive
-  }
+    isActive: isActive,
+  };
   const update = await postWeightSettingAsync(data);
   swal("Success", "Data has been saved", "success");
 });
 
-function cancelEditProficiency(){
-  const isChecked = $(this).prop('checked') ? true : false;
-  $('#editProficiency').prop('checked', !isChecked);
+function cancelEditProficiency() {
+  const isChecked = $(this).prop("checked") ? true : false;
+  $("#editProficiency").prop("checked", !isChecked);
   hideModal(`modalConfirm`);
 }
 
 async function updateProficiencyFeature() {
-  const isChecked = $('#editProficiency').prop('checked') ? '1' : '0';
+  const isChecked = $("#editProficiency").prop("checked") ? "1" : "0";
   await postGeneralAsync({
-    parameterValue: isChecked
-  })
-  
+    parameterValue: isChecked,
+  });
+
   hideModal(`modalConfirm`);
-  swal("Success", `Proficiency feature has been ${isChecked ? 'enabled' : 'disabled'}.`, "success");
- 
+  swal("Success", `Proficiency feature has been ${isChecked ? "enabled" : "disabled"}.`, "success");
 }
 
-
-$('#editProficiency').on('change', async function() {
-  const isChecked = $(this).prop('checked') ? true : false;
-  const text = isChecked ? 'Enable' : 'Disable';
+$("#editProficiency").on("change", async function () {
+  const isChecked = $(this).prop("checked") ? true : false;
+  const text = isChecked ? "Enable" : "Disable";
 
   const action = [
     {
@@ -598,35 +593,28 @@ $('#editProficiency').on('change', async function() {
   );
 });
 
-
 $(document).ready(async function () {
-
-
-  
   // const dataDetailDictionary = await getDetailDictionaryAsync({ compCode: 1 });
   const getDataMandatory = await getListMandatoryAsync({
     page: 1,
     pageSize: 1000,
   });
-  
+
   const dataMandatory = getDataMandatory.data;
   // dataMandatory.data unique by name
-  
+
   loadTableHeader(dataMandatory.data);
   loadTableBody(dataMandatory.data);
-  
-  
+
   const dataGeneral = await getGeneralAsync();
   const getDataWeightSetting = await getWeightSettingAsync();
-  const dataWeightSetting = getDataWeightSetting.data.data
+  const dataWeightSetting = getDataWeightSetting.data.data;
   await updateTableSkillGroup(dataWeightSetting);
-  console.log({dataWeightSetting})
+  console.log({ dataWeightSetting });
 
-  const isActiveEditProficiencyLevel = dataGeneral.data.parametterValue
-  $('#editProficiency').prop('checked', false);
-  if(isActiveEditProficiencyLevel == '1') {
-    $('#editProficiency').prop('checked', true);
+  const isActiveEditProficiencyLevel = dataGeneral.data.parametterValue;
+  $("#editProficiency").prop("checked", false);
+  if (isActiveEditProficiencyLevel == "1") {
+    $("#editProficiency").prop("checked", true);
   }
-
-  
 });
