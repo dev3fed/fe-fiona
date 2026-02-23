@@ -613,6 +613,8 @@ async function saveReferenceAttribute() {
   let checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_relasiEksternalReference"));
   let checkboxStk = checkboxList.filter((item) => item.id.includes("checkbox_stkReference"));
 
+  // console.log("checboxTugasHa", checboxTugasHa);
+  // return;
   // Reset other checkboxes based on onlyShowdata filter
   if (onlyShowdata) {
     if (onlyShowdata !== "stk") checkboxStk = [];
@@ -654,6 +656,8 @@ async function saveReferenceAttribute() {
 
     selectedJobDescReference[dataPath].data = selectedItems;
     if (localStorageKey === "tugasHa") {
+      console.log(checkboxes, config);
+      console.log("selectedItems tugasHa", selectedItems);
       let arraySelectedBusPro = [];
       selectedItems.forEach((item) => {
         arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));

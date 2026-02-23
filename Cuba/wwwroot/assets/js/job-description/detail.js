@@ -243,10 +243,11 @@ async function generateJobDescDataNonEditable(draftExisting, id, prlOrgParam, pr
   };
 
   // Execute all API calls in parallel with error handling
-  const [tugasTanggungJawabUmum, wewenang, persyaratanJabatan] = await Promise.allSettled([
+  const [tugasTanggungJawabUmum, wewenang, persyaratanJabatan, countTugasHa] = await Promise.allSettled([
     safeApiCall(() => generateTanggungJawabUmum(dataDetailJobDesc)),
     safeApiCall(() => generateWewenang(dataDetailJobDesc)),
     safeApiCall(() => generatePersyaratanJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 })),
   ]);
 
   // Return the results, extracting values from settled promises
@@ -254,6 +255,7 @@ async function generateJobDescDataNonEditable(draftExisting, id, prlOrgParam, pr
     tugasTanggungJawabUmum: tugasTanggungJawabUmum.status === "fulfilled" ? tugasTanggungJawabUmum.value : null,
     wewenang: wewenang.status === "fulfilled" ? wewenang.value : null,
     persyaratanJabatan: persyaratanJabatan.status === "fulfilled" ? persyaratanJabatan.value : null,
+    countTugasHa: countTugasHa.status === "fulfilled" ? countTugasHa.value : null,
   };
 }
 
@@ -375,32 +377,48 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 
   let arraytugasTanggungJawabAkhir = [];
 
-  getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
-    const uniqueProses = [];
-    const map = new Map();
-    item.tanggungJawabProses?.forEach((proses) => {
-      if (!map.has(proses.indexNumber)) {
-        console.log("proses.indexNumber", proses.indexNumber);
-        map.set(proses.indexNumber, true); // set any value to Map
-        uniqueProses.push(proses);
-      }
-    });
-    item.tanggungJawabProses = uniqueProses;
-  });
+  // getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
+  //   const uniqueProses = [];
+  //   const map = new Map();
+  //   item.tanggungJawabProses?.forEach((proses) => {
+  //     if (!map.has(proses.indexNumber)) {
+  //       console.log("proses.indexNumber", proses.indexNumber);
+  //       map.set(proses.indexNumber, true); // set any value to Map
+  //       uniqueProses.push(proses);
+  //     }
+  //   });
+  //   item.tanggungJawabProses = uniqueProses;
+  // });
 
   getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
-    item.tanggungJawabProses?.forEach((proses) => {
-      console.log("proses.indexNumber", proses.indexNumber);
-      if (codeNotAvailable.includes(proses.indexNumber) && codeAvailableSelected.includes(proses.indexNumber)) {
-        // Do something if both conditions are met
-        arraytugasTanggungJawabAkhir.push(proses);
-      }
-    });
+    console.log("=====");
+    const arrayProses = item.tanggungJawabProses?.map((proses) => proses.indexNumber) || [];
+    console.log("arrayProses", arrayProses);
+    // check arrayProses if includes codeNotAvailable
+
+    console.log("codeNotAvailable", codeNotAvailable);
+    const hasRelevantProcess = arrayProses.some((code) => codeNotAvailable.includes(code));
+    if (hasRelevantProcess) {
+      console.log("Item has relevant process, adding to arraytugasTanggungJawabAkhir", hasRelevantProcess);
+      arraytugasTanggungJawabAkhir.push(item);
+    }
+    // item.tanggungJawabProses?.forEach((proses) => {
+    //   if (codeNotAvailable.includes(proses.indexNumber)) {
+    //     // Do something if both conditions are met
+    //     isItemAdded = false;
+    //   }
+    // });
+    // if (isItemAdded) {
+    //   console.log("Adding item to arraytugasTanggungJawabAkhir", item);
+    //   arraytugasTanggungJawabAkhir.push(item);
+    // }
   });
 
   const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
+  const notAvailableRefer = codeNotAvailable.filter((code) => !codeAvailableSelected.includes(code));
   console.log("isFullRefer", isFullRefer);
   console.log("arraytugasTanggungJawabAkhir", arraytugasTanggungJawabAkhir);
+  console.log("notAvailableRefer", notAvailableRefer);
   localStorage.setItem("isFullRefer", JSON.stringify(isFullRefer));
 
   $(".notifWarning").hide();
@@ -522,6 +540,12 @@ async function searchJobCompare(event, isPercentage = false) {
     console.log("jobSimilaritiesData", jobSimilaritiesData);
     console.log("data filtered", data);
     // dan urutan berdasarkan percentage yang paling tinggi
+
+    if (data === undefined) {
+      chkJobListPercentage.innerHTML = DATA_NOT_FOUND_HTML;
+      hideChartLoading("animate-chk");
+      return;
+    }
 
     for (const item of data) {
       let color = "";
@@ -668,7 +692,10 @@ $(document).ready(async function () {
   }
   const detailJobSO = await getDetailJob(jobId);
 
+  console.log("jobId, prlOrg", jobId, prlOrg);
   async function updateDataSimilarities() {
+    localStorage.removeItem("jobSimilaritiesData");
+    localStorage.removeItem("jobSimilaritiesDetails");
     $("#addJobReference").hide();
     const result = await getSimilarities({
       draftId: getDraftExisting.draftId,
@@ -732,6 +759,8 @@ $(document).ready(async function () {
 
   console.log("getDraftExisting", getDraftExisting);
   let getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
+  console.log("getDataJobDesc", getDataJobDesc);
+  console.log("getDataJobDesc", getDataJobDesc.countTugasHa);
   loader(false);
   for (const key in getDataJobDesc) {
     if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
@@ -762,8 +791,6 @@ $(document).ready(async function () {
     getDataJobDesc = await generateJobDescDataNonEditable(getDraftExisting, jobId, prlOrg, prlOrg);
     console.log("getDataJobDesc", getDataJobDesc);
   }
-
-  console.log("getDataJobDesc", getDataJobDesc);
 
   const initializeEditor = () => {
     if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
@@ -889,6 +916,9 @@ $(document).ready(async function () {
   }
 
   localStorage.setItem("lsAvailable", JSON.stringify({}));
+  console.log("getDataJobDesc.tugasTanggungJawabUmum", getDataJobDesc.tugasTanggungJawabUmum);
+  console.log("getDataJobDesc.countTugasHa", getDataJobDesc.countTugasHa);
+  console.log("getDataJobDesc", getDataJobDesc);
   if (getDataJobDesc.countTugasHa) {
     const countAll = getDataJobDesc?.countTugasHa?.data?.length;
     const available = getDataJobDesc?.countTugasHa?.data?.filter((item) => item.status === "AVAILABLE");
