@@ -262,6 +262,9 @@
                                 aria-labelledby="pills-compreq-tab">
                                 <div class="card-body" style="padding:12px 5px 15px 5px !important">
                                     <div class="row">
+                                        <div class="col-sm-12">
+                                            <partial name="~/Views/Competency/ModalAddCompeSummary.cshtml" />
+                                        </div>
                                         <partial name="~/Views/Competency/RequirementPage.cshtml" />
                                     </div>
                                 </div>
@@ -311,7 +314,7 @@
     <script>
         const url_api = "@Configuration["AppSettings:ApiUrl"]";
         @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                                                                            const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
 
     </script>
     <!-- Plugins JS start-->
@@ -348,6 +351,7 @@
     <script src="../assets/js/competency/technical-table.js"></script>
     <script src="../assets/js/competency/detail-position.js"></script>
     <script src="../assets/js/competency/add-competency.js"></script>
+    <script src="../assets/js/competency/add-compesummary.js"></script>
     <script src="../assets/js/competency/table-approval.js"></script>
     <script src="../assets/js/competency/detail-approval.js"></script>
     <script src="../assets/js/competency/table-loghistory.js"></script>

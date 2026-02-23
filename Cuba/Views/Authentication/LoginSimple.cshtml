@@ -19,8 +19,14 @@
         width: 20px;
         height: auto;
     }
-    #loginButton .btn-text { width: auto !important; }
-    #loginButton .d-flex { justify-content: center; }
+
+    #loginButton .btn-text {
+        width: auto !important;
+    }
+
+    #loginButton .d-flex {
+        justify-content: center;
+    }
 </style>
 <div class="row m-0">
     <div class="col-12 p-0">
@@ -29,59 +35,62 @@
                 <div class="login-main wow animate__animated animate__zoomIn">
                     <form class="theme-form" id="loginForm">
                         <div><a class="logo"><img class="img-fluid for-light" width="230"
-                                    src="~/assets/images/logo/logo_pertamina.svg" alt="looginpage"><img
-                                    class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png"
-                                    alt="looginpage"></a></div>
-                        <h5 class="mb-4" style="text-align: center;">Integrated Organization Management System</h5>
-                        <div class="alert alert-danger custom-alert d-flex align-items-center hidden-alert"
-                            id="errorMessage">
-                        </div>
-                        <ModalPage />
-                        <div class="form-group" style="margin-top: -5px;">
-                            <label class="col-form-label">Username</label>
-                            <input class="form-control" required="" id="username">
-                        </div>
-                        <div class="form-group">
-                            <label class="col-form-label">Password</label>
-                            <div class="form-input position-relative">
-                                <input class="form-control" type="password" id="password" name="login[password]"
-                                    required="">
-                                <div class="show-hide"><span class="show"> </span></div>
+                                                      src="~/assets/images/logo/logo_pertamina.svg" alt="looginpage"><img
+                            class="img-fluid for-dark" src="~/assets/images/logo/logo_dark.png"
+                            alt="looginpage"></a></div>
+                            <h5 class="mb-4" style="text-align: center;">Integrated Organization Management System</h5>
+                            <div class="alert alert-danger custom-alert d-flex align-items-center hidden-alert"
+                                 id="errorMessage">
                             </div>
-                        </div>
-                        <div class="form-group mb-0">
-                            <div class="text-end mt-3">
-                                @* <button class="btn btn-primary btn-block w-100 mt-3 mb-3"
+                            <ModalPage />
+                            <div class="form-group" style="margin-top: -5px;">
+                                <label class="col-form-label">Username</label>
+                                <input class="form-control" required="" id="username">
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label">Password</label>
+                                <div class="form-input position-relative">
+                                    <input class="form-control" type="password" id="password" name="login[password]"
+                                           required="">
+                                    <div class="show-hide"><span class="show"> </span></div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <div class="text-end mt-3">
+                                    @* <button class="btn btn-primary btn-block w-100 mt-3 mb-3"
                                     id="loginButton">Login</button> *@
 
-                            <button id="loginButton" class="btn btn-primary btn-block w-100 mt-3 mb-3" type="button">
-                                <div class="d-flex align-items-center">
-                                    <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;" id="loginSpinner" role="status" aria-hidden="true"></div>
-                                    <span class="btn-text w-100 text-center">Login</span>
+                                    <button id="loginButton" class="btn btn-primary btn-block w-100 mt-3 mb-3"
+                                            type="button">
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-border spinner-border-sm text-light me-2"
+                                                 style="display: none;" id="loginSpinner" role="status" aria-hidden="true">
+                                            </div>
+                                            <span class="btn-text w-100 text-center">Login</span>
+                                        </div>
+                                    </button>
                                 </div>
-                            </button>
                             </div>
-                        </div>
-                        <p class="mt-4 mb-0 text-center">Copyright &#169; 2024. PT Pertamina Patra Niaga</p>
-                    </form>
+                            <p class="mt-4 mb-0 text-center">Copyright &#169; 2024. PT Pertamina Patra Niaga</p>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<script src="@Url.Content("~/assets/js/login/store.js")"></script>
-<script src="@Url.Content("~/assets/js/login/login.js")"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="@Url.Content("~/assets/js/login/store.js")"></script>
+    <script src="@Url.Content("~/assets/js/login/login.js")"></script>
 
-<script>
-    feather.replace();
-    new WOW().init();
-    const url_api = "@Configuration["AppSettings:ApiUrl"]";
-    const baseUrl = '@Url.Content("~/")';
-    const state = {
+    <script>
+        feather.replace();
+        new WOW().init();
+        const url_api = "@Configuration["AppSettings:ApiUrl"]";
+        const baseUrl = '@Url.Content("~/")';
+        const state = {
         exampleValue: "testing",
         username: null,
         password: null,
@@ -89,10 +98,10 @@
         jobAll: [],
         filterJob: [],
         rasciMapping: []
-    }
+        }
 
-    function onSubmit(username, password) {
+        function onSubmit(username, password) {
         state.username = username
         state.password = password
-    }
-</script>
+        }
+    </script>

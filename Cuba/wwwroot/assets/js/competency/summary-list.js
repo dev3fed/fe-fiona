@@ -85,7 +85,7 @@ const renderTableSummary = (resultList) => {
         const valString = JSON.stringify(element).replace(/"/g, "&quot;");
 
         const actionButtons = isNotAvailable
-          ? `<button class="btn btn-primary btn-icon" type="button">
+          ? `<button class="btn btn-primary btn-icon" type="button" onclick='openAddCompetencySummary(${valString})' aria-label="Add Competency">
                  <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
                  Add Competency
                </button>`
@@ -150,8 +150,8 @@ const renderTableSummary = (resultList) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.meta.count < itemsPerPage * currentPage ? listData.meta.count : itemsPerPage * currentPage
-      } of ${listData.meta.count} records</label>
+                listData.meta.count < itemsPerPage * currentPage ? listData.meta.count : itemsPerPage * currentPage
+              } of ${listData.meta.count} records</label>
             </div>
           </div>
         `;
@@ -162,9 +162,8 @@ const renderTableSummary = (resultList) => {
     // Handle empty or missing data: clear table, reset pagination and totals
     const meta =
       resultList && resultList.data && resultList.data.meta ? resultList.data.meta : { limit: 10, count: 0, page: 1 };
-    document.getElementById(
-      "body-summary",
-    ).innerHTML = `<tr><td colspan="6" style="text-align:center">No records found</td></tr>`;
+    document.getElementById("body-summary").innerHTML =
+      `<tr><td colspan="6" style="text-align:center">No records found</td></tr>`;
     const currentPage = meta.page || 1;
     const totalPages = Math.max(1, Math.ceil((meta.count || 0) / (meta.limit || 1)));
     renderPaginationSummary(currentPage, totalPages);
@@ -186,8 +185,8 @@ const renderTableSummary = (resultList) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${end} of ${
-        meta.count || 0
-      } records</label>
+                meta.count || 0
+              } records</label>
             </div>
           </div>
         `;
@@ -349,5 +348,140 @@ async function changeNumberSummaryPage(event) {
 const showDetail = async (data) => {
   try {
     console.log("data", data);
+  } catch (error) {}
+};
+
+const openAddCompetencySummary = async (data) => {
+  try {
+    console.log("data", data);
+    const competencyList = getState("payloadAddCompetency");
+    console.log("competencyList", competencyList);
+    const draftName = $("#dataSource-competency option:selected").text();
+    setState("jobInformation", data);
+    const jobInformation = data || {};
+
+    const mandatoryCompe = competencyList.filter((item) => item.selectedType === "general");
+    const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
+    const modal = new bootstrap.Modal(document.getElementById("ModalAddCompeSummary"));
+    let mandatoryDisabled = "";
+    let mandatoryLabelStyle = "";
+    let generalDisabled = "";
+    let generalLabelStyle = "";
+    let specificDisabled = "";
+    let specificLabelStyle = "";
+    if (mandatoryCompe.length > 2) {
+      mandatoryDisabled = "disabled";
+      mandatoryLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
+    }
+
+    if (specificCompe.length > 8) {
+      specificDisabled = "disabled";
+      specificLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
+    }
+
+    const formContent = `
+    <div class="row mb-2">
+      <div class="col-12 d-flex align-items-center">
+        <div style="min-width:150px; font-weight:500; margin-right:6px;">Competency Draft</div>
+        <div style="margin-right:6px;">:</div>
+        <div class="fw-bold flex-fill">${draftName}</div>
+      </div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-12 d-flex align-items-center">
+        <div style="min-width:150px; font-weight:500; margin-right:6px;">Position</div>
+        <div style="margin-right:6px;">:</div>
+        <div class="fw-bold flex-fill">${jobInformation.positionName || "N/A"}</div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <hr>
+      <div class="col mb-3">
+        <div class="m-t-15 m-checkbox-inline custom-radio-ml">
+            <div class="form-check form-check-inline radio radio-primary">
+                <input class="form-check-input" id="radioNonreference" type="radio" name="optradio" value="nonReference" onchange="handleRadioChangesummary(event)" checked>
+                <label class="form-check-label mb-0" for="radioNonreference">Add Technical Competency</label>
+            </div>
+            <div class="form-check form-check-inline radio radio-primary">
+                <input class="form-check-input" id="radioReference" type="radio" name="optradio" value="reference" onchange="handleRadioChangesummary(event)" >
+                <label class="form-check-label mb-0" for="radioReference">Add Technical Competency from Reference</label>
+            </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+    const bodyJobRef = `
+  <label class="form-label">Position Reference</label>
+    <select class="form-select digits" name="jobidRefsummary" id="jobidRefsummary" onchange="onSelectPosrefsummary(event)">
+    </select>
+  `;
+
+    const bodySelectSpecific = `
+  <div class="row">
+    <div class="col-12 mt-3 mb-3">
+      <label>Competency</label>
+      <select class="form-select digits" name="compesummaryId" id="compesummaryId" onchange="onSelectCompesummary(event)"></select>
+    </div>
+    <div id="sg-ssg-info" class="col-12" style="display:none;">
+      <label style="color:#03a9f4; cursor:pointer;" 
+             onmouseover="this.style.textDecoration='underline'" 
+             onmouseout="this.style.textDecoration='none'">See dictionary</label>
+      <label id="sg-ssg-label" style="display:block; margin-top:2px;"></label>
+      <hr style="margin-top:20px;margin-bottom:20px"/>
+    </div>
+    
+    <div class="option-row">
+      <div>
+        <label>Proficiency Level</label>
+        <div class="d-flex gap-2">
+          <input type="radio" class="btn-check" name="optLvl" id="level1" autocomplete="off" value="1">
+          <label class="circle-option" for="level1">1</label>
+
+          <input type="radio" class="btn-check" name="optLvl" id="level2" autocomplete="off" value="2">
+          <label class="circle-option" for="level2">2</label>
+
+          <input type="radio" class="btn-check" name="optLvl" id="level3" autocomplete="off" value="3">
+          <label class="circle-option" for="level3">3</label>
+
+          <input type="radio" class="btn-check" name="optLvl" id="level4" autocomplete="off" value="4">
+          <label class="circle-option" for="level4">4</label>
+        </div>
+      </div>
+
+      <div style="margin-left: 30px;">
+        <label>Type</label>
+        <div class="d-flex gap-2">
+          <input type="radio" class="btn-check" name="optType" id="typeMandatory" autocomplete="off" value="mandatory" ${mandatoryDisabled}>
+          <label class="oval-option" for="typeMandatory" style="${mandatoryLabelStyle}">Mandatory</label>
+
+          <input type="radio" class="btn-check" name="optType" id="typeGeneral" autocomplete="off" value="general" ${generalDisabled}>
+          <label class="oval-option" for="typeGeneral" style="${generalLabelStyle}">General</label>
+
+          <input type="radio" class="btn-check" name="optType" id="typeSpecific" autocomplete="off" value="specific" ${specificDisabled}>
+          <label class="oval-option" for="typeSpecific" style="${specificLabelStyle}">Specific</label>
+        </div>
+      </div>
+    </div>
+    <hr class="mt-4"/>
+  </div>
+  `;
+
+    cardSelectedCompesummary(competencyList);
+    document.getElementById("select-speccompesummary").innerHTML = bodySelectSpecific;
+    document.getElementById("compesummaryref").innerHTML = bodyJobRef;
+
+    const bodyContent = document.getElementById("form-compesummary");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+    selectJobRefsummary();
+    skillGroupsummary();
+    subSkillGroupsummary();
+    compesummaryList();
+    modal.show();
+    updateRadioButtonState();
   } catch (error) {}
 };

@@ -291,16 +291,25 @@ function toggleLevelElements(level, isDisabled) {
 
 // ============== get all checked value and prl ==============
 const getCheckedJobAndPrl = () => {
+  const isDisabledJobLevel = getState("disabledJobId");
+  const jobList = getState("filterJobList");
+  const selectedJobId = getState("selectedJobId") || [];
+
   const jobIdFinal = [];
   const prlFinal = [];
-  const isDisabledJobLevel = getState("disabledJobId");
-  $("input[name='check_job']:checked").each(function () {
-    const levelJob = parseInt($(this).attr("leveljob"), 10);
-    if (!isDisabledJobLevel.includes(levelJob)) {
-      jobIdFinal.push(this.value);
-      prlFinal.push($(this).attr("prl"));
-    }
-  });
+  const seenJobIds = new Set();
+
+  jobList
+    .filter((job) => !isDisabledJobLevel.includes(parseInt(job.levelJob || job.level, 10)))
+    .filter((item) => selectedJobId.includes(`${item.id}|${item.prl}`))
+    .forEach((item) => {
+      if (!seenJobIds.has(item.id)) {
+        seenJobIds.add(item.id);
+        jobIdFinal.push(item.id);
+        prlFinal.push(item.prl);
+      }
+    });
+
   return { jobIdFinal, prlFinal };
 };
 
