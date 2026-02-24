@@ -656,7 +656,7 @@ async function saveReferenceAttribute() {
 
     selectedJobDescReference[dataPath].data = selectedItems;
     if (localStorageKey === "tugasHa") {
-      console.log(checkboxes, config);
+      console.log(checkboxes, config, dataPath);
       console.log("selectedItems tugasHa", selectedItems);
       let arraySelectedBusPro = [];
       selectedItems.forEach((item) => {
@@ -793,8 +793,6 @@ async function saveReference() {
   const onlyShowdata = localStorage.getItem("onlyShowdata") ?? false;
   const isFullRefer = JSON.parse(localStorage.getItem("isFullRefer")) ?? false;
   console.log("onlyShowdata", onlyShowdata);
-  console.log("isFullRefer", isFullRefer);
-  console.log("isFullRefer", isFullRefer);
   console.log("isFullRefer", isFullRefer);
 
   // if not full reference or onlyShowdata is tugasHa, call confirm reference
@@ -1488,6 +1486,9 @@ function updateCalculateLsAvailable(arraySelectedBusPro = [], arrayRemovedBusPro
   countAll = available.length + notAvailable.length;
   countAvailable = available.length;
   countNotAvailable = notAvailable.length;
+  // available status = 'AVAILABLE', notAvailable status = 'NOT AVAILABLE'
+  available = available.map((item) => ({ ...item, status: "AVAILABLE" }));
+  notAvailable = notAvailable.map((item) => ({ ...item, status: "NOT AVAILABLE" }));
   codeAvailable = [...new Set(available.map((item) => item.indexNumber))];
   codeNotAvailable = [...new Set(notAvailable.map((item) => item.indexNumber))];
 
