@@ -106,7 +106,7 @@ async function fillAttributeDirectReport(dataDetail) {
 
   //  unset disabled from function to section select and switch
   $(directReportAttrIds).prop("disabled", false);
-  $("#inputDirectReport").val(data.positionCode);
+  console.log("inputDirectReport", data.positionName);
   console.log("inputDirectReport", data.positionCode);
 
   if (data?.functionCode) {
@@ -133,6 +133,10 @@ async function fillAttributeDirectReport(dataDetail) {
     $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
     $("#selectSection, #SectionSwitch").prop("disabled", true);
   }
+
+  $("#selectDirectReport").append(new Option(`${data?.positionName}`, data?.positionCode, true, true));
+
+  // await 2s   $("#inputDirectReport").val(data.positionCode);
 }
 
 async function insertFormPosition(paramId) {
@@ -721,7 +725,7 @@ function formattedInputAttribut(type) {
   // directReport
   const jobPositionName = $("#selectDirectReport option:selected").text();
   // const jobPositionName = $("#selectDirectReport option:selected").text() + " (" + $("#inputDirectReport").val() + ")";
-  payload.directReportTo.jobPositionCode = $("#inputDirectReport").val();
+  payload.directReportTo.jobPositionCode = $("#selectDirectReport").val();
   payload.directReportTo.jobPositionName = jobPositionName;
   // abbreviation
 

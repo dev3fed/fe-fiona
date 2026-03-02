@@ -243,10 +243,11 @@ async function generateJobDescDataNonEditable(draftExisting, id, prlOrgParam, pr
   };
 
   // Execute all API calls in parallel with error handling
-  const [tugasTanggungJawabUmum, wewenang, persyaratanJabatan] = await Promise.allSettled([
+  const [tugasTanggungJawabUmum, wewenang, persyaratanJabatan, countTugasHa] = await Promise.allSettled([
     safeApiCall(() => generateTanggungJawabUmum(dataDetailJobDesc)),
     safeApiCall(() => generateWewenang(dataDetailJobDesc)),
     safeApiCall(() => generatePersyaratanJabatan(dataDetailJobDesc)),
+    safeApiCall(() => getAllTanggungJawabToRasci({ ...dataDetailJobDesc, page: 1, pageSize: 99 })),
   ]);
 
   // Return the results, extracting values from settled promises
@@ -254,6 +255,7 @@ async function generateJobDescDataNonEditable(draftExisting, id, prlOrgParam, pr
     tugasTanggungJawabUmum: tugasTanggungJawabUmum.status === "fulfilled" ? tugasTanggungJawabUmum.value : null,
     wewenang: wewenang.status === "fulfilled" ? wewenang.value : null,
     persyaratanJabatan: persyaratanJabatan.status === "fulfilled" ? persyaratanJabatan.value : null,
+    countTugasHa: countTugasHa.status === "fulfilled" ? countTugasHa.value : null,
   };
 }
 
@@ -375,32 +377,52 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 
   let arraytugasTanggungJawabAkhir = [];
 
-  getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
-    const uniqueProses = [];
-    const map = new Map();
-    item.tanggungJawabProses?.forEach((proses) => {
-      if (!map.has(proses.indexNumber)) {
-        console.log("proses.indexNumber", proses.indexNumber);
-        map.set(proses.indexNumber, true); // set any value to Map
-        uniqueProses.push(proses);
-      }
-    });
-    item.tanggungJawabProses = uniqueProses;
-  });
+  // getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
+  //   const uniqueProses = [];
+  //   const map = new Map();
+  //   item.tanggungJawabProses?.forEach((proses) => {
+  //     if (!map.has(proses.indexNumber)) {
+  //       console.log("proses.indexNumber", proses.indexNumber);
+  //       map.set(proses.indexNumber, true); // set any value to Map
+  //       uniqueProses.push(proses);
+  //     }
+  //   });
+  //   item.tanggungJawabProses = uniqueProses;
+  // });
 
   getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
-    item.tanggungJawabProses?.forEach((proses) => {
-      console.log("proses.indexNumber", proses.indexNumber);
-      if (codeNotAvailable.includes(proses.indexNumber) && codeAvailableSelected.includes(proses.indexNumber)) {
-        // Do something if both conditions are met
-        arraytugasTanggungJawabAkhir.push(proses);
-      }
-    });
+    console.log("=====");
+    const arrayProses = item.tanggungJawabProses?.map((proses) => proses.indexNumber) || [];
+    console.log("arrayProses", arrayProses);
+    // check arrayProses if includes codeNotAvailable
+
+    console.log("codeNotAvailable", codeNotAvailable);
+    const hasRelevantProcess = arrayProses.some((code) => codeNotAvailable.includes(code));
+    if (hasRelevantProcess) {
+      arraytugasTanggungJawabAkhir.push(item);
+    }
+    // item.tanggungJawabProses?.forEach((proses) => {
+    //   if (codeNotAvailable.includes(proses.indexNumber)) {
+    //     // Do something if both conditions are met
+    //     isItemAdded = false;
+    //   }
+    // });
+    // if (isItemAdded) {
+    //   console.log("Adding item to arraytugasTanggungJawabAkhir", item);
+    //   arraytugasTanggungJawabAkhir.push(item);
+    // }
   });
+
+  const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) || {};
+  selectedJobDescReference.tugasTanggungJawabAkhir.data = arraytugasTanggungJawabAkhir;
+  console.log("selectedJobDescReference", selectedJobDescReference);
+  localStorage.setItem("selectedJobDescReference", JSON.stringify(selectedJobDescReference));
 
   const isFullRefer = codeNotAvailable.every((code) => codeAvailableSelected.includes(code));
+  const notAvailableRefer = codeNotAvailable.filter((code) => !codeAvailableSelected.includes(code));
   console.log("isFullRefer", isFullRefer);
   console.log("arraytugasTanggungJawabAkhir", arraytugasTanggungJawabAkhir);
+  console.log("notAvailableRefer", notAvailableRefer);
   localStorage.setItem("isFullRefer", JSON.stringify(isFullRefer));
 
   $(".notifWarning").hide();
@@ -522,6 +544,12 @@ async function searchJobCompare(event, isPercentage = false) {
     console.log("jobSimilaritiesData", jobSimilaritiesData);
     console.log("data filtered", data);
     // dan urutan berdasarkan percentage yang paling tinggi
+
+    if (data === undefined) {
+      chkJobListPercentage.innerHTML = DATA_NOT_FOUND_HTML;
+      hideChartLoading("animate-chk");
+      return;
+    }
 
     for (const item of data) {
       let color = "";
@@ -668,7 +696,10 @@ $(document).ready(async function () {
   }
   const detailJobSO = await getDetailJob(jobId);
 
+  console.log("jobId, prlOrg", jobId, prlOrg);
   async function updateDataSimilarities() {
+    localStorage.removeItem("jobSimilaritiesData");
+    localStorage.removeItem("jobSimilaritiesDetails");
     $("#addJobReference").hide();
     const result = await getSimilarities({
       draftId: getDraftExisting.draftId,
@@ -691,23 +722,23 @@ $(document).ready(async function () {
         .sort((a, b) => b.percentage - a.percentage);
       localStorage.setItem("jobSimilaritiesData", JSON.stringify(dataCompare));
 
-      const detailPromises = dataCompare.map((item) =>
-        getAllTanggungJawabJobToJob({
-          draftId: getDraftExisting.draftId,
-          jobIdFrom: jobId,
-          prlOrgFrom: prlOrg,
-          jobIdTo: item.jobIdTarget,
-          prlOrgTo: item.prlOrgTo,
-          page: 1,
-          pageSize: 99,
-        }).then((res) => ({
-          jobIdTo: item.jobIdTarget,
-          data: res.data,
-        })),
-      );
-      const jobSimilaritiesDetails = await Promise.all(detailPromises);
-      localStorage.setItem("jobSimilaritiesDetails", JSON.stringify(jobSimilaritiesDetails));
-      console.log("jobSimilaritiesDetails", jobSimilaritiesDetails);
+      // const detailPromises = dataCompare.map((item) =>
+      //   getAllTanggungJawabJobToJob({
+      //     draftId: getDraftExisting.draftId,
+      //     jobIdFrom: jobId,
+      //     prlOrgFrom: prlOrg,
+      //     jobIdTo: item.jobIdTarget,
+      //     prlOrgTo: item.prlOrgTo,
+      //     page: 1,
+      //     pageSize: 99,
+      //   }).then((res) => ({
+      //     jobIdTo: item.jobIdTarget,
+      //     data: res.data,
+      //   })),
+      // );
+      // const jobSimilaritiesDetails = await Promise.all(detailPromises);
+      // localStorage.setItem("jobSimilaritiesDetails", JSON.stringify(jobSimilaritiesDetails));
+      // console.log("jobSimilaritiesDetails", jobSimilaritiesDetails);
     }
     $("#addJobReference").show();
     return result;
@@ -732,6 +763,8 @@ $(document).ready(async function () {
 
   console.log("getDraftExisting", getDraftExisting);
   let getDataJobDesc = await getAllJobDescData(getDraftExisting, jobId, prlOrg, prlOrg);
+  console.log("getDataJobDesc", getDataJobDesc);
+  console.log("getDataJobDesc", getDataJobDesc.countTugasHa);
   loader(false);
   for (const key in getDataJobDesc) {
     if (getDataJobDesc[key] === null || getDataJobDesc[key] === undefined) {
@@ -749,7 +782,7 @@ $(document).ready(async function () {
     const identifikasi = {
       jobName: dataParams.positionName || "",
       unitKerjaFungsi: dataParams.functionName || "",
-      lokasiKerja: dataParams.location || "",
+      lokasiKerja: dataParams.location || "Kantor Pusat",
       direktorat: dataParams?.directorate?.directorateName || "",
       atasanLangsung: dataParams.directReportName || "",
       noSuratKeputusan: dataParams.sourceOfSK || "",
@@ -762,8 +795,6 @@ $(document).ready(async function () {
     getDataJobDesc = await generateJobDescDataNonEditable(getDraftExisting, jobId, prlOrg, prlOrg);
     console.log("getDataJobDesc", getDataJobDesc);
   }
-
-  console.log("getDataJobDesc", getDataJobDesc);
 
   const initializeEditor = () => {
     if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
@@ -889,6 +920,9 @@ $(document).ready(async function () {
   }
 
   localStorage.setItem("lsAvailable", JSON.stringify({}));
+  console.log("getDataJobDesc.tugasTanggungJawabUmum", getDataJobDesc.tugasTanggungJawabUmum);
+  console.log("getDataJobDesc.countTugasHa", getDataJobDesc.countTugasHa);
+  console.log("getDataJobDesc", getDataJobDesc);
   if (getDataJobDesc.countTugasHa) {
     const countAll = getDataJobDesc?.countTugasHa?.data?.length;
     const available = getDataJobDesc?.countTugasHa?.data?.filter((item) => item.status === "AVAILABLE");
@@ -951,8 +985,114 @@ $(document).ready(async function () {
     updateTable("relation", getDataJobDesc.relasiEksternal.data, [...tabCusJD.relation, "action"]);
   }
 
+  const dataPJ = [
+    {
+      jobId: "10132410",
+      pjList: [
+        "Sarjana dari berbagai jurusan, diutamakan dari Bisnis/Manajemen.",
+        "S1 dengan pengalaman kerja > 15 tahun, atau S2 dengan pengalaman kerja 12 - 15 tahun.",
+        "Pengalaman kerja di bidang Business Management, diutamakan di bidang Business Planning/Business Development.",
+        "Min. 3 tahun menjabat posisi setingkat VP.",
+      ],
+      kompetensiTeknis: {
+        mandatory: [
+          { name: "HSSE General", level: "3" },
+          { name: "HC Integrated", level: "3" },
+          { name: "Strategic & Business Management", level: "3" },
+          { name: "Risk Fundamental", level: "3" },
+          { name: "Digital & Analytic Insight", level: "3" },
+        ],
+        general: [
+          { name: "Business Knowledge", level: "2" },
+          { name: "Business Opportunity Assessment", level: "2" },
+          { name: "Program Management", level: "2" },
+        ],
+        specific: [
+          { name: "Business Analysis & Forecasting", level: "3" },
+          { name: "Corporate Strategic Planning", level: "3" },
+          { name: "Business Valuation", level: "3" },
+          { name: "Business Modelling", level: "3" },
+          { name: "Business Performance Management", level: "3" },
+          { name: "Portfolio Management", level: "3" },
+          { name: "Corporate Restructuring", level: "3" },
+        ],
+      },
+      kompetensiPerilaku: [
+        { name: "Cultivating Networks & Partnerships" },
+        { name: "Establishing Strategic Direction" },
+        { name: "Operational Decision Making" },
+        { name: "Entrepreneurial Insights" },
+        { name: "Business Acumen" },
+        { name: "Customer Relationship" },
+        { name: "Leading Innovation" },
+        { name: "Technology Savvy" },
+        { name: "Change Leadership" },
+        { name: "Building Organizational Talent" },
+        { name: "Strategic Influence" },
+        { name: "Optimizing Diversity" },
+        { name: "Leading through Vision and Values" },
+        { name: "Inspiring Excellence" },
+        { name: "Learning Agility" },
+      ],
+    },
+    {
+      jobId: "Q1000045",
+      pjList: [
+        "Sarjana dari berbagai jurusan, diutamakan dari Bisnis/Manajemen.",
+        "S1 dengan pengalaman kerja > 15 tahun, atau S2 dengan pengalaman kerja 12 - 15 tahun.",
+        "Pengalaman kerja di bidang Business Management, diutamakan di bidang Business Planning/Business Development.",
+        "Min. 3 tahun menjabat posisi setingkat VP.",
+      ],
+      kompetensiTeknis: {
+        mandatory: [
+          { name: "HSSE General", level: "2" },
+          { name: "HC Integrated", level: "2" },
+          { name: "Strategic & Business Management", level: "2" },
+          { name: "Risk Fundamental", level: "2" },
+          { name: "Digital & Analytic Insight", level: "2" },
+        ],
+        general: [
+          { name: "Marketing Strategy and Planning", level: "3" },
+          { name: "Customer Relation Management", level: "2" },
+          { name: "Sales Strategy and Planning", level: "2" },
+        ],
+        specific: [
+          { name: "Business Opportunity Assessment", level: "2" },
+          { name: "Brand Management", level: "2" },
+          { name: "Stakeholder Management", level: "3" },
+          { name: "Business Partnership Management", level: "3" },
+          { name: "Business Performance Management", level: "2" },
+          { name: "Pricing Management", level: "3" },
+          { name: "Market Research and Competitive Intelligence", level: "3" },
+        ],
+      },
+      kompetensiPerilaku: [
+        { name: "Building Networks" },
+        { name: "Strategic Planning" },
+        { name: "Operational Decision Making" },
+        { name: "Business Insights" },
+        { name: "Customer Orientation" },
+        { name: "Leading Innovation" },
+        { name: "Technology Savvy" },
+        { name: "Facilitating Change" },
+        { name: "Building Talent" },
+        { name: "Creating an Inclusive Environment" },
+        { name: "Influencing" },
+        { name: "Inspiring Others" },
+        { name: "Driving for Results" },
+        { name: "Learning Agility" },
+      ],
+    },
+  ];
   localStorage.setItem("persyaratanJabatan", JSON.stringify([]));
   if (getDataJobDesc.persyaratanJabatan) {
+    if (jobId === "10132410" || jobId === "Q1000045") {
+      getDataJobDesc.persyaratanJabatan.data = [
+        {
+          pengalamanKerja: dataPJ.find((item) => item.jobId === jobId)?.pjList || [],
+        },
+      ];
+    }
     localStorage.setItem("persyaratanJabatan", JSON.stringify(getDataJobDesc.persyaratanJabatan.data));
     updateTable("persyaratanJabatan", getDataJobDesc.persyaratanJabatan.data, [
       ...tabCusJD.persyaratanJabatan,
@@ -974,6 +1114,42 @@ $(document).ready(async function () {
   const divKompetensiTeknisMandatory = $("#kompetensiMandatory");
   const divKompetensiTeknisSpesifik = $("#kompetensiSpesifik");
   const divKompetensiPerilaku = $("#kompetensiPerilaku");
+
+  if (jobId === "10132410" || jobId === "Q1000045") {
+    getDataJobDesc.kompetensiTeknis = {
+      data: {
+        komtekMandatori:
+          dataPJ
+            .find((item) => item.jobId === jobId)
+            ?.kompetensiTeknis?.mandatory.map((item) => ({
+              komtekMandatoriName: item.name,
+              level: item.level,
+            })) || [],
+        komtekGeneral:
+          dataPJ
+            .find((item) => item.jobId === jobId)
+            ?.kompetensiTeknis?.general.map((item) => ({
+              komtekGeneralName: item.name,
+              level: item.level,
+            })) || [],
+        komtekSpesifik:
+          dataPJ
+            .find((item) => item.jobId === jobId)
+            ?.kompetensiTeknis?.specific.map((item) => ({
+              komtekSpesifikName: item.name,
+              level: item.level,
+            })) || [],
+      },
+    };
+    getDataJobDesc.kompetensiPerilaku = {
+      data:
+        dataPJ
+          .find((item) => item.jobId === jobId)
+          ?.kompetensiPerilaku?.map((item) => ({
+            namaKompetensi: item.name,
+          })) || [],
+    };
+  }
 
   localStorage.setItem("kompetensiTeknis", JSON.stringify(getDataJobDesc?.kompetensiTeknis?.data || {}));
   localStorage.setItem("kompetensiPerilaku", JSON.stringify(getDataJobDesc?.kompetensiPerilaku?.data || []));
@@ -1280,6 +1456,7 @@ $(document).ready(async function () {
 
   $("#labelFulfillTugasHa").on("click", function () {
     $("#modalRasciAvailability").modal("show");
+    alert("masok");
 
     const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
     const countAll = lsAvailable.countAll;

@@ -613,6 +613,8 @@ async function saveReferenceAttribute() {
   let checboxEksternal = checkboxList.filter((item) => item.id.includes("checkbox_relasiEksternalReference"));
   let checkboxStk = checkboxList.filter((item) => item.id.includes("checkbox_stkReference"));
 
+  // console.log("checboxTugasHa", checboxTugasHa);
+  // return;
   // Reset other checkboxes based on onlyShowdata filter
   if (onlyShowdata) {
     if (onlyShowdata !== "stk") checkboxStk = [];
@@ -654,6 +656,8 @@ async function saveReferenceAttribute() {
 
     selectedJobDescReference[dataPath].data = selectedItems;
     if (localStorageKey === "tugasHa") {
+      console.log(checkboxes, config, dataPath);
+      console.log("selectedItems tugasHa", selectedItems);
       let arraySelectedBusPro = [];
       selectedItems.forEach((item) => {
         arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
@@ -789,8 +793,6 @@ async function saveReference() {
   const onlyShowdata = localStorage.getItem("onlyShowdata") ?? false;
   const isFullRefer = JSON.parse(localStorage.getItem("isFullRefer")) ?? false;
   console.log("onlyShowdata", onlyShowdata);
-  console.log("isFullRefer", isFullRefer);
-  console.log("isFullRefer", isFullRefer);
   console.log("isFullRefer", isFullRefer);
 
   // if not full reference or onlyShowdata is tugasHa, call confirm reference
@@ -1484,6 +1486,9 @@ function updateCalculateLsAvailable(arraySelectedBusPro = [], arrayRemovedBusPro
   countAll = available.length + notAvailable.length;
   countAvailable = available.length;
   countNotAvailable = notAvailable.length;
+  // available status = 'AVAILABLE', notAvailable status = 'NOT AVAILABLE'
+  available = available.map((item) => ({ ...item, status: "AVAILABLE" }));
+  notAvailable = notAvailable.map((item) => ({ ...item, status: "NOT AVAILABLE" }));
   codeAvailable = [...new Set(available.map((item) => item.indexNumber))];
   codeNotAvailable = [...new Set(notAvailable.map((item) => item.indexNumber))];
 

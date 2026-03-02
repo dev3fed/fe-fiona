@@ -19,7 +19,7 @@ $(document).ready(function () {
     const selectCareerType = $("#selectCareerType").val();
     const selectCareerLevel = event.target.value;
     openAll();
-    $("#selectDirectReport").attr("disabled", true);
+    // $("#selectDirectReport").attr("disabled", true);
     updateAbbrvPosition(selectCareerType, selectCareerLevel);
     updatePrlOrg(selectCareerType, selectCareerLevel);
   });

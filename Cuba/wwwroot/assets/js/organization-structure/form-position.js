@@ -383,6 +383,7 @@ $(document).ready(async function () {
     // await new Promise((resolve) => setTimeout(resolve, 200));
     const value = event.target.value;
     const detailDirectReport = await getDetailJob(value);
+    console.log("detailDirectReport", detailDirectReport);
     await fillAttributeDirectReport(detailDirectReport);
     // const detailDirectReport
   });
