@@ -672,3 +672,54 @@ function closeModalCompesummary() {
   cardSelectedCompesummary([]);
   updateRadioBtnCompesummary();
 }
+
+const saveCompesummary = async () => {
+  try {
+    const payloadAddCompetency = getState("payloadAddCompetency");
+    const spinBtn = document.getElementById("spinBtncompesummary");
+    const ModalAddCompeSummary = document.getElementById("ModalAddCompeSummary");
+    const modal = bootstrap.Modal.getInstance(ModalAddCompeSummary);
+
+    if (spinBtn) spinBtn.style.display = "inline-block";
+    const payload = {
+      draftId: $("#dataSource-competency").val() || null,
+      data: [
+        {
+          unitCode: payloadAddCompetency[0]?.unitCode || "",
+          prlOrg: payloadAddCompetency[0]?.prlOrg || "",
+          competency: payloadAddCompetency.map((item) => ({
+            compCode: item.compeId,
+            level: item.selectedLvl,
+            compType: item.selectedType,
+          })),
+        },
+      ],
+    };
+    console.log("payload", payload);
+    const result = await fetchAddtechnicalCompetency(payload);
+    console.log("result", result);
+    if (result.success === true) {
+      const draftName = $("#dataSource-competency option:selected").text();
+      swal({
+        title: "SUCCESS",
+        icon: "success",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Your activity has been save as draft.</span>
+          <br>
+          <span>You can check in <b>${draftName}</b> at draft tab.</span>
+          `,
+          },
+        },
+      }).then(async () => {
+        if (modal) modal.hide();
+        spinBtn.style.display = "none";
+      });
+    }
+  } catch (error) {
+    console.error("Error saving draft:", error);
+  }
+};

@@ -1,8 +1,6 @@
 // start section add notation by column row
 function openModalEditBusinesspro() {
-  const modal = new bootstrap.Modal(
-    document.getElementById("modalEditBusinesspro"),
-  );
+  const modal = new bootstrap.Modal(document.getElementById("modalEditBusinesspro"));
   modal.show();
   const dataDetailProsbis = getState("dataDetailProsbis");
   const formContent = `
@@ -59,12 +57,10 @@ async function handleEditbp() {
   };
   const result = await submitDraftProsbis(payload);
   if (result.status === 200) {
-    const modalEditBusinesspro = document.getElementById(
-      "modalEditBusinesspro",
-    );
+    const modalEditBusinesspro = document.getElementById("modalEditBusinesspro");
     const modalEditbp = bootstrap.Modal.getInstance(modalEditBusinesspro);
     document.getElementById("draftName").value = "";
-    const resultMatrix = await lastStateTableMatrix();
+    const resultMatrix = await lastStateTableMatrix(payload);
     if (resultMatrix) {
       swal({
         title: "SUCCESS",

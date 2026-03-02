@@ -105,8 +105,8 @@ const cardSelectedNotasilist = (param) => {
                 .map((letter) => {
                   return `<div class="col-1 mb-1">
                           <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
-                    letter.rasciCode
-                  } Icon" style="padding-right:2px">
+                            letter.rasciCode
+                          } Icon" style="padding-right:2px">
                   </div>
                   <div class="col-11" style="text-align:left">
                   <span>: ${letter.comment}</span>
@@ -538,8 +538,8 @@ const tblRasciNotation = (rasciNotation) => {
       </th>
       <td style="text-align:center">
         <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
-        letter.rasciCode
-      } Icon" style="padding-right:2px">
+          letter.rasciCode
+        } Icon" style="padding-right:2px">
       </td>
       <td>
         <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}" 
@@ -626,8 +626,8 @@ function tblChangeNotation(rasciNotation) {
       </th>
       <td style="text-align:center">
         <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
-        letter.rasciCode
-      } Icon" style="padding-right:2px">
+          letter.rasciCode
+        } Icon" style="padding-right:2px">
       </td>
       <td>
         <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
@@ -659,8 +659,8 @@ function tblChangeNotationRow(rasciNotation) {
       </th>
       <td style="text-align:center">
         <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
-        letter.rasciCode
-      } Icon" style="padding-right:2px">
+          letter.rasciCode
+        } Icon" style="padding-right:2px">
       </td>
       <td>
         <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
@@ -742,7 +742,7 @@ async function saveDraftnotation() {
       const btnDraft = document.getElementById("btnDraftnotation");
       btnDraft.disabled = true;
       // btnApproval.disabled = true;
-      const resultMatrix = await lastStateTableMatrix();
+      const resultMatrix = await lastStateTableMatrix(inputValue);
       if (resultMatrix) {
         swal({
           title: "SUCCESS",

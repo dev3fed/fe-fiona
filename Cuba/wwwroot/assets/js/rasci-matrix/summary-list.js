@@ -87,7 +87,7 @@ const renderTableSummary = (resultList) => {
         let textColor = isNotAvailable ? "#D02138" : "#16a34a";
         let capitalizedStatus = statusText
           .split("-")
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
           .join(" ");
         let statusHtml = `<span style="
           display:inline-block;
@@ -112,9 +112,9 @@ const renderTableSummary = (resultList) => {
               <td style="width: 120px;text-align:center">${statusHtml}</td>
               <td style="text-align:center;width: 100px;">
                <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
-          /"/g,
-          "&quot;",
-        )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
+                 /"/g,
+                 "&quot;",
+               )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
                <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
                <span>Detail</span>
                </button> 
@@ -144,8 +144,8 @@ const renderTableSummary = (resultList) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.meta.count < itemsPerPage * currentPage ? listData.meta.count : itemsPerPage * currentPage
-      } of ${listData.meta.count} records</label>
+                listData.meta.count < itemsPerPage * currentPage ? listData.meta.count : itemsPerPage * currentPage
+              } of ${listData.meta.count} records</label>
             </div>
           </div>
         `;
