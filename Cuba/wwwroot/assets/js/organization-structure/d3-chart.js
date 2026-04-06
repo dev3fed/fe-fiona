@@ -1546,9 +1546,14 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
 
   const self = dataChart.find((item) => item.id == focusNodeId);
+  console.log("dataChart:", dataChart);
   console.log("Self node data:", self);
-  const dataCoordination =
-    self.coordinationWith == null || self.coordinationWith === undefined ? {} : self.coordinationWith;
+  const dataCoordination = self
+    ? self.coordinationWith == null || self.coordinationWith === undefined
+      ? {}
+      : self.coordinationWith
+    : {};
+  console.log("Coordination data:", dataCoordination);
   if (Object.keys(dataCoordination).length > 0) {
     console.log("Node has coordination role:", dataCoordination);
     dataCoordination["pid"] = self.id;
@@ -1562,7 +1567,7 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   console.log("Self node: ==>", self);
   console.log("Parent node: ==>", parent);
   let forceCompact = false;
-  if (self.id == "10132405") {
+  if (self && self.id == "10132405") {
     forceCompact = true;
     console.log("Special node 10132405 detected!");
   }
