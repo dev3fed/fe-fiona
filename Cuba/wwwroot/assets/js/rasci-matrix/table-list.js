@@ -355,8 +355,8 @@ function loadTableBody(prosbisList) {
       val.level && idProsbisSelected == val.indexNumber
         ? `level-${val.level} highlight`
         : val.level
-        ? `level-${val.level}`
-        : "";
+          ? `level-${val.level}`
+          : "";
     const bgParent = val.isContextualParent === 1 ? `level-${val.level} prosbisparent` : "";
     const isExpanded = expandedRows.includes(val.indexNumber) ? "chevron-up" : "chevron-down";
 
@@ -509,8 +509,8 @@ function mapRasciCells(indexNumbers, positions) {
         <img  style="display: ${
           isMaster ? "none" : "flex"
         }" src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" class="pencil-icon" onclick="handleEditNotationRow('${
-        value.prlOrg
-      }','${value.unitCode}', '${indexNumber}')">
+          value.prlOrg
+        }','${value.unitCode}', '${indexNumber}')">
       </div>
     </td>
   `;
@@ -773,7 +773,144 @@ async function ChangeSourceDraft() {
   hideAllTooltips();
 }
 
-async function lastStateTableMatrix() {
+async function lastStateTableMatrix(inputValue = "") {
+  const dataStoreProsbis = getState("resultProsbis");
+  const storageDataPosition = getState("resultJabatan");
+  const actionType = getState("actionType");
+
+  if (inputValue.draftType === "Add New Business Process") {
+    return await oldVersionTableMatrix();
+  }
+
+  if (inputValue.draftType?.includes("Edit Business Process")) {
+    return await handleEditBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType);
+  }
+
+  if (inputValue.draftType?.includes("Delete Business Process")) {
+    return await handleDeleteBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType);
+  }
+
+  return await handleNotationUpdate(inputValue, dataStoreProsbis, storageDataPosition, actionType);
+}
+
+async function handleEditBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType) {
+  const prosbisNumber = dataStoreProsbis.map((val) => val.indexNumber);
+  const matchedProsbis = dataStoreProsbis.find((prosbis) => prosbis.indexNumber === inputValue.parentId);
+
+  if (matchedProsbis) {
+    matchedProsbis.description = inputValue.businessProcessName;
+  }
+
+
+  if (actionType === "BP_THEN_JOB" || actionType === "POS_THEN_BP") {
+    loadTableHeader(storageDataPosition);
+    loadTableBody(dataStoreProsbis);
+    mapRasciCells(prosbisNumber, storageDataPosition);
+  } else {
+    updateProsbisState(dataStoreProsbis);
+    loadTableBody(dataStoreProsbis);
+  }
+
+  return true;
+}
+
+async function handleDeleteBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType) {
+  const prosbisNumber = dataStoreProsbis.map((val) => val.indexNumber);
+  const matchedProsbis = dataStoreProsbis.find((prosbis) => prosbis.indexNumber === inputValue.parentId);
+
+  if (matchedProsbis) {
+    const index = dataStoreProsbis.indexOf(matchedProsbis);
+    if (index > -1) {
+      dataStoreProsbis.splice(index, 1);
+    }
+  }
+
+  if (actionType === "BP_THEN_JOB" || actionType === "POS_THEN_BP") {
+    loadTableHeader(storageDataPosition);
+    loadTableBody(dataStoreProsbis);
+    mapRasciCells(prosbisNumber, storageDataPosition);
+  } else {
+    updateProsbisState(dataStoreProsbis);
+    loadTableBody(dataStoreProsbis);
+  }
+
+  return true;
+}
+
+async function handleNotationUpdate(inputValue, dataStoreProsbis, storageDataPosition, actionType) {
+  if (actionType !== "BP_THEN_JOB" && actionType !== "POS_THEN_BP") {
+    return true;
+  }
+
+  const prosbisNumber = dataStoreProsbis.map((val) => val.indexNumber);
+  const matchedPosition = storageDataPosition.find(
+    (pos) => pos.prlOrg === inputValue.orgPrl && pos.unitCode === inputValue.orgUnitCode,
+  );
+
+  if (!matchedPosition) {
+    console.warn("Position data not found for org:", inputValue.orgPrl, inputValue.orgUnitCode);
+    return false;
+  }
+
+  inputValue.busProsMapped.forEach((busProItem) => {
+    updateResponsibilityForBusinessProcess(busProItem, matchedPosition);
+  });
+
+  loadTableHeader(storageDataPosition);
+  loadTableBody(dataStoreProsbis);
+  mapRasciCells(prosbisNumber, storageDataPosition);
+
+  return true;
+}
+
+function updateResponsibilityForBusinessProcess(busProItem, matchedPosition) {
+  const parentId = busProItem.parentId;
+  const rasciNotations = busProItem.rasciNotation;
+  const responsibilityItems = matchedPosition.responsibility.filter((resp) => resp.indexNumber === parentId);
+
+  rasciNotations.forEach((rasciItem) => {
+    updateOrAddNotation(rasciItem, responsibilityItems, matchedPosition, parentId);
+  });
+
+  removeUncheckedNotations(rasciNotations, matchedPosition, parentId);
+}
+
+function updateOrAddNotation(rasciItem, responsibilityItems, matchedPosition, parentId) {
+  const existingResp = responsibilityItems.find((resp) => resp.notation === rasciItem.rasciCode);
+
+  if (existingResp) {
+    existingResp.notation = rasciItem.rasciCode;
+    existingResp.comment = rasciItem.comment;
+  } else if (rasciItem.isChecked) {
+    const newResp = {
+      indexNumber: parentId,
+      unitCode: matchedPosition.unitCode,
+      prlOrg: matchedPosition.prlOrg,
+      notation: rasciItem.rasciCode,
+      comment: rasciItem.comment,
+    };
+    matchedPosition.responsibility.push(newResp);
+  }
+}
+
+function removeUncheckedNotations(rasciNotations, matchedPosition, parentId) {
+  const rasciCodesInInput = rasciNotations.filter((r) => r.isChecked).map((r) => r.rasciCode);
+  matchedPosition.responsibility = matchedPosition.responsibility.filter((resp) => {
+    if (resp.indexNumber === parentId && !rasciCodesInInput.includes(resp.notation)) {
+      return false;
+    }
+    return true;
+  });
+}
+
+function updateProsbisState(dataStoreProsbis) {
+  setState("resultProsbis", dataStoreProsbis);
+  setState("resultJabatan", []);
+  setState("totalProsbis", dataStoreProsbis.length);
+  setState("totalJob", 0);
+}
+
+async function oldVersionTableMatrix() {
   const tableContainer = document.querySelector(".scrollable-table");
   const payloadProsbis = getState("payloadProsbis");
   const payloadPosition = getState("payloadPosition");
@@ -839,7 +976,7 @@ async function lastStateTableMatrix() {
 
     return true;
   } catch (error) {
-    console.error("Error in lastStateTableMatrix:", error);
+    console.error("Error in oldVersionTableMatrix:", error);
     return false;
   }
 }
@@ -913,7 +1050,7 @@ async function handleSaveDeletebp() {
     const modalDeleteBp = document.getElementById("modalDeleteBp");
     const modalDelete = bootstrap.Modal.getInstance(modalDeleteBp);
     document.getElementById("draftName").value = "";
-    const resultMatrix = await lastStateTableMatrix();
+    const resultMatrix = await lastStateTableMatrix(payload);
     if (resultMatrix) {
       swal({
         title: "SUCCESS",

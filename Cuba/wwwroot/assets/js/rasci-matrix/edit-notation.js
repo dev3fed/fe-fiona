@@ -101,7 +101,7 @@ async function saveNotationRow() {
     if (result.status === 200) {
       const modalNotationRow = document.getElementById("modalNotationRow");
       const modal = bootstrap.Modal.getInstance(modalNotationRow);
-      const resultMatrix = await lastStateTableMatrix();
+      const resultMatrix = await lastStateTableMatrix(inputValue);
       if (resultMatrix) {
         swal({
           title: "SUCCESS",
