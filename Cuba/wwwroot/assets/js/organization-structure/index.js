@@ -3,9 +3,7 @@ async function initializeHelper() {
   try {
     // testing
     // const dataChart = test;
-    // renderOrgChart(dataChart.data, "10132409", true);
-    // const dataChart = test2;
-    // renderOrgChart(dataChart.data, "10164009", true);
+    // renderOrgChart(dataChart.data, "30263312", true);
 
     // real
     const dataChart = await chartShow({

@@ -242,7 +242,7 @@ $("#inputPositionName").on("input", function () {
 function checkBasketSelected(selectBasket) {
   // $("#prlOrgDiv, #prlOrgToDiv").toggleClass("col-md-6 col-md-4");
   $("#subPositionDiv").hide();
-  $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv").show();
+  $("#careerLevelDiv, #abbrvPositionDiv, #formationDiv, #prlOrgToDiv").show();
   $("#selectPrlOrgTo").prop("disabled", true);
   $("#inputOrgUnitName").prop("disabled", false);
   // alert("masuk");
@@ -257,6 +257,7 @@ function checkBasketSelected(selectBasket) {
     $("#inputOrgUnitName").prop("disabled", true);
     updateDivSubPosition(subJobPos);
   } else {
+    $("#prlOrgToDiv").hide();
     localStorage.setItem("subJobPos", JSON.stringify([]));
   }
 }
@@ -464,6 +465,22 @@ $(document).ready(async function () {
   $("#selectPrlOrg, #selectPrlOrgTo, #selectCareerType").on("change", function () {
     console.log("refresh career level");
     $("#selectCareerLevel").val(null).trigger("change");
+
+    const params =
+      $("#selectBasket").val() == "No"
+        ? {
+            get: "value",
+            inputType: "select2",
+            urlParam: "prlOrgFrom",
+            valueFrom: "selectPrlOrg",
+          }
+        : {
+            get: "value",
+            inputType: "select2",
+            urlParam: "prlOrgTo",
+            valueFrom: "selectPrlOrgTo",
+          };
+
     getDataListAsync([
       {
         id: "selectCareerLevel",
@@ -477,12 +494,7 @@ $(document).ready(async function () {
             urlParam: "prlOrgFrom",
             valueFrom: "selectPrlOrg",
           },
-          {
-            get: "value",
-            inputType: "select2",
-            urlParam: "prlOrgTo",
-            valueFrom: "selectPrlOrgTo",
-          },
+          params,
           {
             get: "text",
             inputType: "select2",

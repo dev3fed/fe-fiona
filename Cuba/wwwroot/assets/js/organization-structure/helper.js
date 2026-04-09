@@ -43,13 +43,10 @@ async function checkDataOrganization(draftList) {
   // If organizationAttribute is empty or null, select the first available draft
   if (!organizationAttribute.orgUnitId || !organizationAttribute.orgUnitName) {
     if (draftList && draftList.length > 0) {
-      console.log("draftList", draftList);
       const firstDraft = draftList.find((item) => item.draftId == defaultMasterId);
-      console.log("firstDraft", firstDraft);
       organizationAttribute.orgUnitId = firstDraft.draftId;
       organizationAttribute.orgUnitName = firstDraft.draftName;
       organizationAttribute.isMasterData = true;
-      console.log(organizationAttribute);
       localStorage.setItem("organizationAttribute", JSON.stringify(organizationAttribute));
     }
   }
@@ -1804,7 +1801,6 @@ function hideModal(id) {
 }
 
 function checkButtonTable(buttonTable, id, lastPath, getStatusDraft = { step: 0, userRole: "user" }, data) {
-  console.log("check data:", data);
   const user = getStatusDraft.userRole;
   const status = getStatusDraft.step;
   // swith case by parameter buttonTable and lastPath
@@ -1973,10 +1969,8 @@ async function helperOrgTree(params) {
   // console.log("helperOrgTree called with params:", params);
   // return;
   params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
-  console.log("helperOrgTree processed params:", params);
   //  remove duplicate id in params
   params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
-  console.log("helperOrgTree unique params:", params);
 
   $("#orgThreeDiv").jstree("destroy");
   $("#orgThreeDiv").jstree({
@@ -2034,7 +2028,6 @@ async function helperOrgTree(params) {
       // Only trigger for the exact node right-clicked, not its parents
       if (e.target.closest(".jstree-node") && e.target.closest(".jstree-node").id === nodeId) {
         const node = $("#orgThreeDiv").jstree(true).get_node(nodeId);
-        console.log("node", node);
         focusNode(node.id);
         $("#modalOrgTree").modal("hide");
       }
