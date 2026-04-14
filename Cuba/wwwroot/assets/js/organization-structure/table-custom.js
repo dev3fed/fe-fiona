@@ -217,7 +217,6 @@ function getTableSubordinateList(dataSet) {
 }
 
 async function getTableListDraft(params) {
-  console.log("draftList", params);
   // createdDate descending
   params = params.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
   if ($.fn.DataTable.isDataTable("#draftList")) {
@@ -296,7 +295,6 @@ async function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
-          console.log("check data", data);
           return checkButtonTable("draftList", data.draftId, lastPath);
         },
       },

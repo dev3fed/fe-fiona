@@ -1228,8 +1228,8 @@ function processChartData(rawData) {
 
 // Function to initialize the organizational chart
 function initializeChart(processedDataResult, focusNodeId, forceCompact = false) {
-  console.log("Initializing chart with data:", processedDataResult);
-  console.log("Focus node ID:", focusNodeId);
+  // console.log("Initializing chart with data:", processedDataResult);
+  // console.log("Focus node ID:", focusNodeId);
   let isCompact = true;
   if (focusNodeId) {
     const selfObject = processedDataResult.processedData.find((item) => item.id == focusNodeId);
@@ -1270,6 +1270,7 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
   if (forceCompact) {
     isCompact = true;
   }
+  console.log("Is compact mode:", isCompact);
 
   chart = new d3.OrgChart()
     .nodeHeight(function (d) {
@@ -1544,25 +1545,56 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
 
   // remove id duplicate
   dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+  // dataChart.forEach((item) => {
+  //   item.coordinationWith = {};
+  //   item.coordination = false;
+  // });
 
   const self = dataChart.find((item) => item.id == focusNodeId);
-  console.log("Self node data:", self);
-  const dataCoordination =
-    self.coordinationWith == null || self.coordinationWith === undefined ? {} : self.coordinationWith;
+  const dataCoordination = self
+    ? self.coordinationWith == null || self.coordinationWith === undefined
+      ? {}
+      : self.coordinationWith
+    : {};
   if (Object.keys(dataCoordination).length > 0) {
-    console.log("Node has coordination role:", dataCoordination);
     dataCoordination["pid"] = self.id;
     dataCoordination["coordination"] = true;
     dataCoordination["tags"] = ["coordination"];
+    // all dataChart coordinationWith = {}
     dataChart.push(dataCoordination);
   }
-  // console.log("dataCoodination", dataCoodination);
-  console.log("Focus node: ==>", focusNodeId);
   const parent = dataChart.find((item) => item.id == self?.pid);
+
+  const checkUniqueIds = new Set(dataChart.map((item) => item.id));
+  // check which dataChart items have item.coordinationWith that is not empty
+  const coordinationItems = dataChart.filter(
+    (item) => item.coordinationWith && Object.keys(item.coordinationWith).length > 0,
+  );
+  console.log("Data chart items with coordinationWith data:", dataChart);
+
+  console.log("Coordination data:", dataCoordination);
+  console.log("Focus node: ==>", focusNodeId);
   console.log("Self node: ==>", self);
   console.log("Parent node: ==>", parent);
+  console.log(
+    "Unique IDs in dataChart:",
+    checkUniqueIds,
+    "Total unique IDs:",
+    checkUniqueIds.size,
+    "Total items in dataChart:",
+    dataChart.length,
+  );
+  console.log("Items with coordinationWith data:", coordinationItems);
+
+  // cari yang pid nya sama dengan 10132405
+
+  // if (checkUniqueIds.size !== dataChart.length) {
+  //   console.warn("Duplicate IDs found in dataChart. This may cause issues in rendering.");
+  //   const duplicateIds = dataChart.map((item) => item.id).filter((id, index, self) => self.indexOf(id) !== index);
+  //   console.warn("Duplicate IDs:", duplicateIds);
+  // }
   let forceCompact = false;
-  if (self.id == "10132405") {
+  if (self && self.id == "10132405") {
     forceCompact = true;
     console.log("Special node 10132405 detected!");
   }
@@ -1572,10 +1604,18 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
     dataChart.unshift(parent);
   }
 
+  const specialNode = dataChart.find((item) => item.pid == "10132405");
+  if (specialNode) {
+    console.log("Special node with pid 10132405 found:", specialNode);
+  } else {
+    console.log("No special node with pid 10132405 found");
+  }
+
   const processed = processChartData(dataChart);
   processed.processedData.forEach((item) => {
     item.parentId = item.pid || null;
   });
+  console.log("Processed data ready for chart initialization:", processed);
 
   localStorage.setItem("focusNodeId", JSON.stringify(focusNodeId));
   localStorage.setItem("orgChartData", JSON.stringify(processed));

@@ -1,17 +1,17 @@
 async function initializeHelper() {
   showChartLoading("chart-container-custom");
   try {
+    // testing
     // const dataChart = test;
-    // renderOrgChart(dataChart, "10135490", true);
-    // const dataChart = test2;
-    // renderOrgChart(dataChart.data, "10164009", true);
+    // renderOrgChart(dataChart.data, "30263312", true);
+
+    // real
     const dataChart = await chartShow({
       draftId: organizationAttribute.orgUnitId,
       jobCode: defaultNodeId,
       depth: 3,
     });
     renderOrgChart(dataChart.data, defaultNodeId, false);
-    console.log("Data chart fetched ==>:", dataChart.data);
     setTimeout(() => {
       if (typeof hideChartLoading === "function") {
         hideChartLoading("chart-container-custom");
