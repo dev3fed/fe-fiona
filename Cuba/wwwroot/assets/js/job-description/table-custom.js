@@ -177,7 +177,6 @@ function getTableListDraft(params) {
         width: "15%",
         data: null,
         render: function (data) {
-          console.log("data", data);
           const draftId =
             data.draftOrganizationId + "|" + data.draftRasciMatrixId + "|" + data.draftId + "|" + data.draftName;
           return checkButtonTable("draftList", draftId, "draft-detail");
@@ -233,7 +232,7 @@ function getTableListDraft(params) {
   // });
 }
 
-async function getTableListDraftDetail() {
+async function getTableListDraftDetail(data) {
   if ($.fn.DataTable.isDataTable("#draftListDetail")) {
     $("#draftListDetail").DataTable().destroy();
   }
@@ -242,39 +241,7 @@ async function getTableListDraftDetail() {
     dom: '<"d-flex justify-content-between"fB>rt<"bottom"ip><"clear">',
     buttons: [],
     autoWidth: false,
-    ajax: function (data, callback, settings) {
-      //  `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/${draftId}/${page}/${pageSize}`;
-      $.ajax({
-        url: `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/fe817219-f352-4a0d-8720-60cfeee1a1ad/${
-          data.start || 0
-        }/${data.length || 9999}`,
-        // url: `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/${draftExistingJobDesc.draftId}/${data.start}/${data.length}`,
-        type: "GET",
-        data: {
-          draw: data.draw,
-          start: data.start,
-          length: data.length,
-          search: data.search,
-          order: data.order,
-        },
-        success: function (res) {
-          callback({
-            draw: data.draw,
-            recordsTotal: res.count || 0,
-            recordsFiltered: res.count || 0,
-            data: res.data || [],
-          });
-        },
-        error: function () {
-          callback({
-            draw: data.draw,
-            recordsTotal: 0,
-            recordsFiltered: 0,
-            data: [],
-          });
-        },
-      });
-    },
+    data: data,
     sort: false,
     columns: [
       {
@@ -316,7 +283,7 @@ async function getTableListDraftDetail() {
         width: "20%",
         data: null,
         render: function (data) {
-          return checkButtonTable("positionList", data.positionId, window.location.pathname.split("/").pop());
+          return checkButtonTable("positionListApproval", data.positionId, window.location.pathname.split("/").pop());
         },
       },
     ],
@@ -361,6 +328,10 @@ function getTableListApproval(params) {
         width: "15%",
         data: null,
         render: function (data) {
+          const date = data?.submittedDate;
+          if (!date) {
+            return "-";
+          }
           const submittedDate = new Date(data.submittedDate);
           const formattedDate = submittedDate.toLocaleDateString("id-ID", {
             day: "2-digit",
@@ -435,7 +406,9 @@ function getTableListApproval(params) {
         className: "text-center",
         data: null,
         render: function (data) {
-          return checkButtonTable("approvalList", data.id, "approval-detail");
+          const draftId =
+            data.draftOrganizationId + "|" + data.draftRasciMatrixId + "|" + data.draftId + "|" + data.draftName;
+          return checkButtonTable("approvalList", draftId, "approval-detail");
         },
       },
     ],

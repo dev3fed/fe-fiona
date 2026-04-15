@@ -49,26 +49,33 @@ function importDraft() {
 function exportDraft() {
   alert("exportDraft");
 }
-async function backToOrg(params) {
-  window.location.href = "/organization/index";
+async function backToList(params) {
+  window.location.href = "/job-description/index?activeTab=draft";
 }
 
 async function confirmDeleteDraft(id) {
-  // lsListDraft = lsListDraft.filter((x) => x.draftId != id);
-  // lsListDetailDraft = lsListDetailDraft.filter((x) => x.draftId != id);
-  // lsListPosition = lsListPosition.filter((x) => x.draftId != id);
-  // lsListOrgNode = lsListOrgNode.filter((x) => x.draftId != id);
-  // localStorage.setItem("listDraft", JSON.stringify(lsListDraft));
-  // localStorage.setItem("listDetailDraft", JSON.stringify(lsListDetailDraft));
-  // localStorage.setItem("listPosition", JSON.stringify(lsListPosition));
-  // localStorage.setItem("listOrgNode", JSON.stringify(lsListOrgNode));
-  // changeOrganization(0, "Master Data SO");
-  swal("Success", "Draft has been deleted", "success");
-  // window.location.href = "/organization/index";
+  loader(true);
+  // Fixed: draftId is at index [0] in the standard format
+  let deleteData = await draftDelete(id);
+  if (deleteData) {
+    hideModal(`modalConfirm`);
+    swal("Success", "Draft has been deleted", "success");
+    localStorage.removeItem("draftExistingJobDesc");
+    setTimeout(() => {
+      window.location.href = "/job-description/index";
+    }, 1000);
+  } else {
+    swal("Failed to delete draft", "error");
+  }
+  loader(false);
 }
 
-function deleteDraft() {
-  // const getDraftById = lsListDraft.find((x) => x.draftId == organizationAttribute.orgUnitId);
+async function deleteDraft(paramsId) {
+  const data = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+  console.log("draftObj", data);
+  // Format: draftId|draftRasciId|draftOrganizationId|draftName|organizationDraftId
+  const draft = storeData.listDraft.find((x) => x.draftId == split[0]);
+
   const action = [
     {
       button: "Cancel",
@@ -86,11 +93,11 @@ function deleteDraft() {
   modalConfrimHelper(
     "delete",
     "Delete Draft",
-    `Are you sure want to delete <b></b> draft?`,
-    "All Job Description data in this draft will be deleted",
+    `Are you sure want to delete <b>${draft?.draftName}</b> draft?`,
+    "All Position title in this draft will be deleted, including related RASCI notations, Competencies, and Position Descriptions",
     action,
     "",
-    1,
+    draft?.draftId,
   );
 }
 
@@ -431,7 +438,30 @@ $(document).ready(async function () {
   // await initializeDraftDetail(getDataDraft.data);
   checkButtonDraftDetail(getDataDraft.data);
 
-  getTableListDraftDetail();
+  console.log("draftId", draftId);
+  const getDataListDraft = await draftDetailListById({ draftId: draftId, page: 1, size: 99999 });
+  console.log("getDataListDraft", getDataListDraft);
+  getTableListDraftDetail(getDataListDraft.data);
+
+  $(".tab-custom").on("click", function () {
+    $(this).attr("id");
+    $(".tab-custom").removeClass("active");
+    $(this).addClass("active");
+
+    const value = $(this).attr("id").toLowerCase();
+    console.log(
+      "getDataListDraft.data",
+      getDataListDraft.data.filter((x) => x.jobName.includes("B2C")),
+    );
+    console.log("value", value);
+    if (value == "all") {
+      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.sourceType == draftId));
+    } else {
+      console.log("value", value);
+      console.log("getDataListDraft.data", getDataListDraft.data);
+      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.actionType.toLowerCase() == value));
+    }
+  });
 
   // checkPage();
   // getTableListDraftDetail(lsListDetailDraft.filter((x) => x.draftId == draftId));
