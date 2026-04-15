@@ -449,16 +449,10 @@ $(document).ready(async function () {
     $(this).addClass("active");
 
     const value = $(this).attr("id").toLowerCase();
-    console.log(
-      "getDataListDraft.data",
-      getDataListDraft.data.filter((x) => x.jobName.includes("B2C")),
-    );
     console.log("value", value);
     if (value == "all") {
-      getTableListDraftDetail(getDataListDraft.data.filter((x) => x.sourceType == draftId));
+      getTableListDraftDetail(getDataListDraft.data);
     } else {
-      console.log("value", value);
-      console.log("getDataListDraft.data", getDataListDraft.data);
       getTableListDraftDetail(getDataListDraft.data.filter((x) => x.actionType.toLowerCase() == value));
     }
   });

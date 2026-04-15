@@ -256,6 +256,15 @@ async function getTableListDraftDetail(data) {
         title: "Activity Type",
         data: "actionType",
         width: "15%",
+        render: function (data) {
+          let text = "Created New Job";
+          if (data.actionType === "Update") {
+            text = "Edit Job";
+          } else if (data.actionType === "Delete") {
+            text = "Delete Job";
+          }
+          return text;
+        },
       },
       {
         title: "ID Position",
