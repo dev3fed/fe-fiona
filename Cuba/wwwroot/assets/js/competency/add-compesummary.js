@@ -19,7 +19,7 @@ async function cardSelectedCompesummary(competencyList) {
     const mandatoryContent =
       mandatoryCount > 0
         ? `
-        <div class="table-responsive " style="max-height: 200px;">
+        <div class="table-responsive " style="max-height: 120px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -63,7 +63,7 @@ async function cardSelectedCompesummary(competencyList) {
     const generalContent =
       generalCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 150px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 110px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -107,7 +107,7 @@ async function cardSelectedCompesummary(competencyList) {
     const specificContent =
       specificCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 150px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 140px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -154,7 +154,7 @@ async function cardSelectedCompesummary(competencyList) {
         <!-- Mandatory -->
         <div class="row mb-2">
           <div class="col-12">
-            <label>Mandatory (${mandatoryCount}/3)</label>
+            <label>Mandatory (${mandatoryCount}/5)</label>
           </div>
           ${mandatoryContent}
         </div>
@@ -162,7 +162,7 @@ async function cardSelectedCompesummary(competencyList) {
          <!-- Specific -->
         <div class="row mb-2">
           <div class="col-12">
-            <label>General (${generalCount}/1)</label>
+            <label>General (${generalCount}/3)</label>
           </div>
           ${generalContent}
         </div>
@@ -365,7 +365,7 @@ function updateRadioBtnCompesummary() {
   const typeSpecificLabel = document.querySelector('label[for="typeSpecific"]');
 
   if (typeMandatoryInput && typeMandatoryLabel) {
-    if (mandatoryCompe.length > 2) {
+    if (mandatoryCompe.length > 4) {
       typeMandatoryInput.disabled = true;
       typeMandatoryLabel.style.backgroundColor = "#E0E0E0";
       typeMandatoryLabel.style.color = "#A0A0A0";
@@ -377,7 +377,7 @@ function updateRadioBtnCompesummary() {
     }
   }
   if (typeGeneralInput && typeGeneralLabel) {
-    if (generalCompe.length > 0) {
+    if (generalCompe.length > 2) {
       typeGeneralInput.disabled = true;
       typeGeneralLabel.style.backgroundColor = "#E0E0E0";
       typeGeneralLabel.style.color = "#A0A0A0";

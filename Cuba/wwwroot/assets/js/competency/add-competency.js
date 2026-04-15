@@ -5,7 +5,10 @@ const openSpecificCompetency = async () => {
   const jobInformation = getState("jobInformation");
   const closeModal = bootstrap.Modal.getInstance(modalDetailPos);
   const competencyList = getState("payloadAddCompetency");
-  const mandatoryCompe = competencyList.filter((item) => item.selectedType === "general");
+  console.log("competencyList", competencyList);
+
+  const mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
+  const generalCompe = competencyList.filter((item) => item.selectedType === "general");
   const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
   const modal = new bootstrap.Modal(document.getElementById("modalAddCompetency"));
   closeModal.hide();
@@ -17,11 +20,14 @@ const openSpecificCompetency = async () => {
   let specificDisabled = "";
   let specificLabelStyle = "";
 
-  if (mandatoryCompe.length > 2) {
+  if (mandatoryCompe.length > 4) {
     mandatoryDisabled = "disabled";
     mandatoryLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
   }
-
+  if (generalCompe.length > 2) {
+    generalDisabled = "disabled";
+    generalLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
+  }
   if (specificCompe.length > 8) {
     specificDisabled = "disabled";
     specificLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
@@ -148,7 +154,7 @@ function updateRadioButtonState() {
   const typeSpecificLabel = document.querySelector('label[for="typeSpecific"]');
 
   if (typeMandatoryInput && typeMandatoryLabel) {
-    if (mandatoryCompe.length > 2) {
+    if (mandatoryCompe.length > 4) {
       typeMandatoryInput.disabled = true;
       typeMandatoryLabel.style.backgroundColor = "#E0E0E0";
       typeMandatoryLabel.style.color = "#A0A0A0";
@@ -160,7 +166,7 @@ function updateRadioButtonState() {
     }
   }
   if (typeGeneralInput && typeGeneralLabel) {
-    if (generalCompe.length > 0) {
+    if (generalCompe.length > 2) {
       typeGeneralInput.disabled = true;
       typeGeneralLabel.style.backgroundColor = "#E0E0E0";
       typeGeneralLabel.style.color = "#A0A0A0";
@@ -208,7 +214,7 @@ async function cardSelectedCompetency(competencyList) {
     const mandatoryContent =
       mandatoryCount > 0
         ? `
-        <div class="table-responsive " style="max-height: 200px;">
+        <div class="table-responsive " style="max-height: 120px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -252,7 +258,7 @@ async function cardSelectedCompetency(competencyList) {
     const generalContent =
       generalCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 150px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 110px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -296,7 +302,7 @@ async function cardSelectedCompetency(competencyList) {
     const specificContent =
       specificCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 150px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 140px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -343,15 +349,15 @@ async function cardSelectedCompetency(competencyList) {
         <!-- Mandatory -->
         <div class="row mb-2">
           <div class="col-12">
-            <label>Mandatory (${mandatoryCount}/3)</label>
+            <label>Mandatory (${mandatoryCount}/5)</label>
           </div>
           ${mandatoryContent}
         </div>
 
-         <!-- Specific -->
+         <!-- General -->
         <div class="row mb-2">
           <div class="col-12">
-            <label>General (${generalCount}/1)</label>
+            <label>General (${generalCount}/3)</label>
           </div>
           ${generalContent}
         </div>

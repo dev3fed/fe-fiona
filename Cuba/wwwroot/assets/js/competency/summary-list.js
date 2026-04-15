@@ -360,7 +360,8 @@ const openAddCompetencySummary = async (data) => {
     setState("jobInformation", data);
     const jobInformation = data || {};
 
-    const mandatoryCompe = competencyList.filter((item) => item.selectedType === "general");
+    const mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
+    const generalCompe = competencyList.filter((item) => item.selectedType === "general");
     const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
     const modal = new bootstrap.Modal(document.getElementById("ModalAddCompeSummary"));
     let mandatoryDisabled = "";
@@ -369,11 +370,14 @@ const openAddCompetencySummary = async (data) => {
     let generalLabelStyle = "";
     let specificDisabled = "";
     let specificLabelStyle = "";
-    if (mandatoryCompe.length > 2) {
+    if (mandatoryCompe.length > 4) {
       mandatoryDisabled = "disabled";
       mandatoryLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
     }
-
+    if (generalCompe.length > 2) {
+      generalDisabled = "disabled";
+      generalLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";
+    }
     if (specificCompe.length > 8) {
       specificDisabled = "disabled";
       specificLabelStyle = "background-color: #E0E0E0; color: #A0A0A0; cursor: not-allowed;";

@@ -261,7 +261,7 @@
 
 
 <div class="modal fade" id="modalAddCompetency" tabindex="-1" role="dialog" aria-labelledby="modalAddCompetencyLabel"
-    aria-hidden="true">
+     aria-hidden="true">
     <div class="modal-dialog custom-competency bounceInDown animated" role="document">
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
@@ -299,37 +299,37 @@
                             </div>
                             <div class="d-flex mt-1 justify-content-end">
                                 <button class="btn btn btn-primary" type="button" id="btn-selectedCompe"
-                                    onclick="triggleSelectCompe()" disabled>
+                                        onclick="triggleSelectCompe()" disabled>
                                     Select Competency</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6" style="display: block;" id="selectedcompe">
+                            <label class="form-label">Selected Technical Competencies</label>
+                            <div class="card-tblspesific" id="selected-compe">
+
                             </div>
                         </div>
                     </div>
-                    <div class="col-6" style="display: block;" id="selectedcompe">
-                        <label class="form-label">Selected Technical Competencies</label>
-                        <div class="card-tblspesific" id="selected-compe">
-
-                        </div>
+                </div>
+                <div class="modal-footer  d-flex justify-content-end">
+                    <div>
+                        <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                                onclick="closeModalCompetency()"><i class="icon-arrow-left"></i> Back</button>
+                        <button id="btnDraftcompetency" class="btn btn-primary" type="button"
+                                onclick="handleSaveDraftCompe()">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                     id="spinBtncompetency" role="status"></div>
+                                <span class="btn-text"> Save</span>
+                            </div>
+                        </button>
                     </div>
-                </div>
-            </div>
-            <div class="modal-footer  d-flex justify-content-end">
-                <div>
-                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
-                        onclick="closeModalCompetency()"><i class="icon-arrow-left"></i> Back</button>
-                    <button id="btnDraftcompetency" class="btn btn-primary" type="button"
-                        onclick="handleSaveDraftCompe()">
-                        <div class="d-flex align-items-center">
-                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                                id="spinBtncompetency" role="status"></div>
-                            <span class="btn-text"> Save</span>
-                        </div>
-                    </button>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
-</div>
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
