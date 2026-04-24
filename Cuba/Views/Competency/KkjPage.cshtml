@@ -9,7 +9,7 @@
     <div class="btn-group w-100" role="group" aria-label="Button group with nested dropdown">
         <div class="btn-group" role="group">
             <button class="btn btn-light dropdown-toggle" id="btnSearchType" type="button" data-bs-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">Position</button>
+                    aria-haspopup="true" aria-expanded="false">Position</button>
             <div class="dropdown-menu" aria-labelledby="btnSearchType">
                 <a class="dropdown-item" onclick="onSelectType('position')" value="position">Position</a>
                 <a class="dropdown-item" onclick="onSelectType('division')" value="division">Division</a>
@@ -17,14 +17,14 @@
             </div>
         </div>
         <input class="form-control" type="text" placeholder="Search" id="inputText"
-            style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+               style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
     </div>
 </div>
 <div class="col-2" style="padding-left: 0;">
     <button id="btnSearchCompe" class="btn btn-primary" type="button" onclick="handleSearchCompetency()">
         <div class="d-flex align-items-center">
             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;" id="loadingSearchCompe"
-                role="status"></div>
+                 role="status"></div>
             <span class="btn-text">Search</span>
         </div>
     </button>
@@ -33,50 +33,50 @@
 <div class="col-1 d-flex justify-content-end" style="padding-left: 0;">
     <div class="btn-group" role="group">
         <button class="btn btn-primary dropdown-toggle btn-icon" id="btnGroupVerticalDrop1" type="button"
-            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
-                src="~/assets/images/rasci/icon_menudots.svg" alt="Filter Icon"
-                style="margin-top: -1px;">Option</button>
-        <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-            <a class="dropdown-item">
-                <img src="~/assets/images/rasci/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
-                Export
-            </a>
-            <a class="dropdown-item" id="btnCreateDraft" onclick="openFormDraft()">
-                <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon" style="margin-top: -1px;">Create
-                Draft
-            </a>
-        </div>
-    </div>
-</div>
-<div class="col-12 mt-3" id="empty-competency">
-
-    <div class="empty-bodycompetency">
-
-    </div>
-</div>
-<div class="col-12" id="table-competency">
-    <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
-    <partial name="~/Views/Competency/ModalDetailPosition.cshtml" />
-    <partial name="~/Views/Competency/ModalDetailKkj.cshtml" />
-    <partial name="~/Views/Competency/ModalAddCompetency.cshtml" />
-
-    <div class="row">
-        <div class=" mt-3">
-            <div id="table-container" class="scrollable-table table-wrapper">
-                <table class="tbl custom-border-table competency-matrix" style=" table-layout: fixed;">
-                    <thead id="table-header">
-
-                    </thead>
-                    <tbody id="table-body">
-
-                    </tbody>
-                </table>
-                <!-- end :: List Requirement KKJ Table -->
-            </div>
-            <div id="loader">
-                <div class="spinner"></div>
-                <p class="loading-text">Loading Data...</p>
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
+            src="~/assets/images/rasci/icon_menudots.svg" alt="Filter Icon"
+            style="margin-top: -1px;">Option</button>
+            <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
+                <a class="dropdown-item">
+                    <img src="~/assets/images/rasci/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
+                    Export
+                </a>
+                <a class="dropdown-item" id="btnCreateDraft" onclick="openFormDraft()">
+                    <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon" style="margin-top: -1px;">Create
+                    Draft
+                </a>
             </div>
         </div>
     </div>
-</div>
+    <div class="col-12 mt-3" id="empty-competency">
+
+        <div class="empty-bodycompetency">
+
+        </div>
+    </div>
+    <div class="col-12" id="table-competency">
+        <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
+        <partial name="~/Views/Competency/ModalDetailPosition.cshtml" />
+        <partial name="~/Views/Competency/ModalDetailKkj.cshtml" />
+        <partial name="~/Views/Competency/ModalAddCompetency.cshtml" />
+
+        <div class="row">
+            <div class=" mt-3">
+                <div id="table-container" class="scrollable-table table-wrapper">
+                    <table class="tbl custom-border-table competency-matrix" style=" table-layout: fixed;">
+                        <thead id="table-header">
+
+                        </thead>
+                        <tbody id="table-body">
+
+                        </tbody>
+                    </table>
+                    <!-- end :: List Requirement KKJ Table -->
+                </div>
+                <div id="loader">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Loading Data...</p>
+                </div>
+            </div>
+        </div>
+    </div>

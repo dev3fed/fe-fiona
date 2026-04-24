@@ -218,87 +218,89 @@
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary" id="pills-competency-tabcontent" role="tablist">
                             <li class="nav-item"><a class="nav-link active" id="pills-kkj-tab" data-bs-toggle="pill"
-                                    href="#pills-kkj" role="tab" aria-controls="pills-kkj"
-                                    aria-selected="true">Requirement (KKJ)</a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-compreq-tab" data-bs-toggle="pill"
-                                    href="#pills-compreq" role="tab" aria-controls="pills-compreq"
-                                    aria-selected="false">Summary
+                                                        href="#pills-kkj" role="tab" aria-controls="pills-kkj"
+                                                        aria-selected="true">Requirement (KKJ)</a></li>
+                                <li class="nav-item"><a class="nav-link" id="pills-compreq-tab" data-bs-toggle="pill"
+                                                        href="#pills-compreq" role="tab" aria-controls="pills-compreq"
+                                                        aria-selected="false">Summary
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-dictionary-tab" data-bs-toggle="pill"
-                                    href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
-                                    aria-selected="false">Dictionary
+                                <li class="nav-item"><a class="nav-link" id="pills-dictionary-tab" data-bs-toggle="pill"
+                                                        href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
+                                                        aria-selected="false">Dictionary
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
-                                    href="#pills-draft" role="tab" aria-controls="pills-draft"
-                                    aria-selected="false">Draft
+                                <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
+                                                        href="#pills-draft" role="tab" aria-controls="pills-draft"
+                                                        aria-selected="false">Draft
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-approval-tab" data-bs-toggle="pill"
-                                    href="#pills-approval" role="tab" aria-controls="pills-approval"
-                                    aria-selected="false">Approval
+                                <li class="nav-item"><a class="nav-link" id="pills-approval-tab" data-bs-toggle="pill"
+                                                        href="#pills-approval" role="tab" aria-controls="pills-approval"
+                                                        aria-selected="false">Approval
                                 </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-history-tab" data-bs-toggle="pill"
-                                    href="#pills-history" role="tab" aria-controls="pills-history"
-                                    aria-selected="false">Log History
+                                <li class="nav-item"><a class="nav-link" id="pills-history-tab" data-bs-toggle="pill"
+                                                        href="#pills-history" role="tab" aria-controls="pills-history"
+                                                        aria-selected="false">Log History
                                 </a></li>
-                        </ul>
-                        <div class="tab-content" id="pills-competency-tabcontent">
-                            <div class="tab-pane fade show active" id="pills-kkj" role="tabpanel"
-                                aria-labelledby="pills-kkj-tab">
-                                <div class="card-body" style="padding:15px 5px 15px 5px !important">
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <partial name="~/Views/Competency/ModalEditDepthLevel.cshtml" />
-                                            <partial name="~/Views/Competency/ModalWarning.cshtml" />
-                                            <partial name="~/Views/Competency/ModalSaveDraft.cshtml" />
-                                            <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
-                                            <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
+                            </ul>
+                            <div class="tab-content" id="pills-competency-tabcontent">
+                                <div class="tab-pane fade show active" id="pills-kkj" role="tabpanel"
+                                     aria-labelledby="pills-kkj-tab">
+                                    <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <partial name="~/Views/Competency/ModalEditDepthLevel.cshtml" />
+                                                <partial name="~/Views/Competency/ModalWarning.cshtml" />
+                                                <partial name="~/Views/Competency/ModalSaveDraft.cshtml" />
+                                                <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
+                                                <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
+
+                                            </div>
+                                            <partial name="~/Views/Competency/KkjPage.cshtml" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade " id="pills-compreq" role="tabpanel"
+                                     aria-labelledby="pills-compreq-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <partial name="~/Views/Competency/ModalAddCompeSummary.cshtml" />
+                                                <partial name="~/Views/Competency/ModalSummaryInfo.cshtml" />
+                                            </div>
+                                            <partial name="~/Views/Competency/RequirementPage.cshtml" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="pills-dictionary" role="tabpanel"
+                                     aria-labelledby="pills-dictionary-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <partial name="~/Views/Competency/DictionaryPage.cshtml" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="pills-draft" role="tabpanel"
+                                     aria-labelledby="pills-draft-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <partial name="~/Views/Competency/DraftPage.cshtml" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="pills-approval" role="tabpanel"
+                                     aria-labelledby="pills-approval-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <partial name="~/Views/Competency/ApprovalPage.cshtml" />
 
                                         </div>
-                                        <partial name="~/Views/Competency/KkjPage.cshtml" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane fade " id="pills-compreq" role="tabpanel"
-                                aria-labelledby="pills-compreq-tab">
-                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <partial name="~/Views/Competency/ModalAddCompeSummary.cshtml" />
+                                <div class="tab-pane fade" id="pills-history" role="tabpanel"
+                                     aria-labelledby="pills-history-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <partial name="~/Views/Competency/HistoryPage.cshtml" />
                                         </div>
-                                        <partial name="~/Views/Competency/RequirementPage.cshtml" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-dictionary" role="tabpanel"
-                                aria-labelledby="pills-dictionary-tab">
-                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
-                                    <div class="row">
-                                        <partial name="~/Views/Competency/DictionaryPage.cshtml" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-draft" role="tabpanel"
-                                aria-labelledby="pills-draft-tab">
-                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
-                                    <div class="row">
-                                        <partial name="~/Views/Competency/DraftPage.cshtml" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-approval" role="tabpanel"
-                                aria-labelledby="pills-approval-tab">
-                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
-                                    <div class="row">
-                                        <partial name="~/Views/Competency/ApprovalPage.cshtml" />
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="pills-history" role="tabpanel"
-                                aria-labelledby="pills-history-tab">
-                                <div class="card-body" style="padding:12px 5px 15px 5px !important">
-                                    <div class="row">
-                                        <partial name="~/Views/Competency/HistoryPage.cshtml" />
                                     </div>
                                 </div>
                             </div>
@@ -307,54 +309,54 @@
                 </div>
             </div>
         </div>
+        <!-- Container-fluid Ends-->
     </div>
-    <!-- Container-fluid Ends-->
-</div>
-@section Script {
-    <script>
-        const url_api = "@Configuration["AppSettings:ApiUrl"]";
-        @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+    @section Script {
+        <script>
+            const url_api = "@Configuration["AppSettings:ApiUrl"]";
+            @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
 
-    </script>
-    <!-- Plugins JS start-->
-    <script src="../assets/js/sidebar-menu.js"></script>
-    <script src="../assets/js/slick/slick.min.js"></script>
-    <script src="../assets/js/slick/slick.js"></script>
-    <script src="../assets/js/header-slick.js"></script>
-    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
-    <script src="../assets/js/datepicker/date-picker/datepicker.js"></script>
-    <script src="../assets/js/datepicker/date-picker/datepicker.en.js"></script>
-    <script src="../assets/js/datepicker/date-picker/datepicker.custom.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
-    <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/datatable/datatables/datatable.custom.js"></script>
-    <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
-    <!-- Plugins JS Ends-->
-    <!-- Theme js-->
-    <script src="../assets/js/script.js"></script>
-    <script src="../assets/js/competency/store.js"></script>
-    <script src="../assets/js/competency/endpoint.js"></script>
-    <script src="../assets/js/competency/helpers.js"></script>
-    <script src="../assets/js/competency/competeny-list.js"></script>
-    <script src="../assets/js/competency/summary-list.js"></script>
-    <script src="../assets/js/competency/proficiency-level.js"></script>
-    <script src="../assets/js/competency/detail-competency.js"></script>
-    <script src="../assets/js/competency/activity-detaildraft.js"></script>
-    <script src="../assets/js/competency/scroll-table.js"></script>
-    <script src="../assets/js/competency/competency-draft.js"></script>
-    <script src="../assets/js/competency/detail-draft.js"></script>
-    <script src="../assets/js/competency/dictionary-list.js"></script>
-    <script src="../assets/js/competency/behavior-table.js"></script>
-    <script src="../assets/js/competency/technical-table.js"></script>
-    <script src="../assets/js/competency/detail-position.js"></script>
-    <script src="../assets/js/competency/add-competency.js"></script>
-    <script src="../assets/js/competency/add-compesummary.js"></script>
-    <script src="../assets/js/competency/table-approval.js"></script>
-    <script src="../assets/js/competency/detail-approval.js"></script>
-    <script src="../assets/js/competency/table-loghistory.js"></script>
+        </script>
+        <!-- Plugins JS start-->
+        <script src="../assets/js/sidebar-menu.js"></script>
+        <script src="../assets/js/slick/slick.min.js"></script>
+        <script src="../assets/js/slick/slick.js"></script>
+        <script src="../assets/js/header-slick.js"></script>
+        <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+        <script src="../assets/js/datepicker/date-picker/datepicker.js"></script>
+        <script src="../assets/js/datepicker/date-picker/datepicker.en.js"></script>
+        <script src="../assets/js/datepicker/date-picker/datepicker.custom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+        <script src="../assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
+        <script src="../assets/js/datatable/datatables/datatable.custom.js"></script>
+        <script src="../assets/js/sweet-alert/sweetalert.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
+        <!-- Plugins JS Ends-->
+        <!-- Theme js-->
+        <script src="../assets/js/script.js"></script>
+        <script src="../assets/js/competency/store.js"></script>
+        <script src="../assets/js/competency/endpoint.js"></script>
+        <script src="../assets/js/competency/helpers.js"></script>
+        <script src="../assets/js/competency/competeny-list.js"></script>
+        <script src="../assets/js/competency/summary-list.js"></script>
+        <script src="../assets/js/competency/proficiency-level.js"></script>
+        <script src="../assets/js/competency/detail-competency.js"></script>
+        <script src="../assets/js/competency/activity-detaildraft.js"></script>
+        <script src="../assets/js/competency/scroll-table.js"></script>
+        <script src="../assets/js/competency/competency-draft.js"></script>
+        <script src="../assets/js/competency/detail-draft.js"></script>
+        <script src="../assets/js/competency/dictionary-list.js"></script>
+        <script src="../assets/js/competency/behavior-table.js"></script>
+        <script src="../assets/js/competency/technical-table.js"></script>
+        <script src="../assets/js/competency/detail-position.js"></script>
+        <script src="../assets/js/competency/detail-possummary.js"></script>
+        <script src="../assets/js/competency/add-competency.js"></script>
+        <script src="../assets/js/competency/add-compesummary.js"></script>
+        <script src="../assets/js/competency/table-approval.js"></script>
+        <script src="../assets/js/competency/detail-approval.js"></script>
+        <script src="../assets/js/competency/table-loghistory.js"></script>
 
 
-}
+    }
