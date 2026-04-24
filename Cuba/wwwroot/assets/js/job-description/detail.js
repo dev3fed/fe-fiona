@@ -1456,7 +1456,6 @@ $(document).ready(async function () {
 
   $("#labelFulfillTugasHa").on("click", function () {
     $("#modalRasciAvailability").modal("show");
-    alert("masok");
 
     const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
     const countAll = lsAvailable.countAll;

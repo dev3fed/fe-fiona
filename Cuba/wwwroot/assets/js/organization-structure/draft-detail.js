@@ -654,8 +654,8 @@ $(document).ready(async function () {
     if (value == "all") {
       getTableListDraftDetail(getDataListDraft.data.filter((x) => x.draftId == draftId));
     } else {
-      console.log("value", value);
       console.log("getDataListDraft.data", getDataListDraft.data);
+      console.log("value", value);
       getTableListDraftDetail(getDataListDraft.data.filter((x) => x.draftId == draftId && x.actionType == value));
     }
   });

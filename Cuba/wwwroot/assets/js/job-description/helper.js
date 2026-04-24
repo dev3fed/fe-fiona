@@ -834,7 +834,20 @@ function checkButtonTable(buttonTable, id, lastPath, data) {
         let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
         const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
-        if (data.actionType == "Delete") {
+        if (data?.actionType == "Delete") {
+          editPositionDraft = "";
+        }
+        return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
+      } else {
+        const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
+        return `${detail}`;
+      }
+    case "positionListApproval":
+      if (lastPath === "draft-detail") {
+        let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
+        const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
+        const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
+        if (data?.actionType == "Delete") {
           editPositionDraft = "";
         }
         return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;

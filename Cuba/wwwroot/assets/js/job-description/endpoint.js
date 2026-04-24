@@ -282,7 +282,7 @@ async function draftRenameById({ draftId, draftName, description = "" }) {
 }
 
 // /api/job-description/draft/detail/list-detail/{draftId}/{page}/{pageSize}
-async function draftDetailListById({ draftId, page = 1, pageSize = 10 }) {
+async function draftDetailListById({ draftId, page = 1, pageSize = 99999 }) {
   const api = `${url.baseUrl}/${url["job-description"]}/draft/detail/list-detail/${draftId}/${page}/${pageSize}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
