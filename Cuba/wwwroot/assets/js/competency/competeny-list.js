@@ -270,6 +270,7 @@ function loadTableBody(jobList) {
 }
 
 function handleClickPosition(unitCode, prlOrg) {
+  console.log("unitCode,prlOrg", unitCode, prlOrg);
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
   modal.show();
   setState("payloadDetailJob", { unitCode, prlOrg });

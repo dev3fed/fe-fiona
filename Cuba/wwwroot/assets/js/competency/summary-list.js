@@ -348,6 +348,16 @@ async function changeNumberSummaryPage(event) {
 const showDetail = async (data) => {
   try {
     console.log("data", data);
+    const unitCode = data.unitCode || "";
+    const prlOrg = data.prlOrg || "";
+    const modal = new bootstrap.Modal(document.getElementById("ModalSummaryInfo"));
+    modal.show();
+    setState("payloadDetailJob", { unitCode, prlOrg });
+    modalSummaryInfoPosition(unitCode, prlOrg);
+    cardTblSummaryMandatory(unitCode, prlOrg);
+    cardTblSummaryGeneral(unitCode, prlOrg);
+    cardTblSummarySpecific(unitCode, prlOrg);
+    cardTblSummaryBehavior(unitCode, prlOrg);
   } catch (error) {}
 };
 
