@@ -129,8 +129,13 @@ async function initializeJobDescriptionData() {
     const rasciList = await getRasciList();
 
     // Update store data
-    storeData.listDraft = dataListDraft.data;
-    storeData.listApproval = dataListApproval.data;
+    // urutan berdasarjan createdDate dari yang paling baru ke yang paling lama
+    storeData.listDraft = dataListDraft.data.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+    console.log("Fetched Draft List:", storeData.listDraft);
+
+    storeData.listApproval = dataListApproval.data
+      .filter((item) => item.isSubmitted)
+      .sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
     storeData.rasciList = rasciList.data;
 
     console.log("Draft List:", storeData.listDraft);

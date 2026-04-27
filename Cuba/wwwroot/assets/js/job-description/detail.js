@@ -1210,6 +1210,7 @@ $(document).ready(async function () {
     divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
   }
 
+  localStorage.setItem("stk", JSON.stringify([]));
   if (getDataJobDesc.stk) {
     // filter stk.data to remove items with empty stkNumber is null or undefined
     getDataJobDesc.stk.data = getDataJobDesc.stk.data.filter(

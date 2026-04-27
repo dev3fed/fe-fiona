@@ -268,6 +268,12 @@ async function getJobReferenceDetail() {
     localStorage.getItem("relasiEksternal") !== "" ? JSON.parse(localStorage.getItem("relasiEksternal")) : [];
   const lsStk = localStorage.getItem("stk") !== "" ? JSON.parse(localStorage.getItem("stk")) : [];
 
+  console.log("lsFungsi", lsFungsi);
+  console.log("lsTugasHa", lsTugasHa);
+  console.log("lsKoordinasiInternal", lsKoordinasiInternal);
+  console.log("lsRelasiEksternal", lsRelasiEksternal);
+  console.log("lsStk", lsStk, localStorage.getItem("stk"));
+
   // Initialize CKEditor for .summernote elements
   if (typeof CKEDITOR !== "undefined" && CKEDITOR) {
     document.querySelectorAll(".summernote").forEach((element) => {
@@ -286,6 +292,9 @@ async function getJobReferenceDetail() {
     });
   }
 
+  console.log("lsFungsi", lsFungsi);
+  // remove p inside fungsiReferenceContainer to prevent duplicates
+  $("#fungsiReferenceContainer p").remove();
   lsFungsi.jobReferences.map((item) => {
     const textReference = `(Reference from : ${item.jobName}) - ${item.skNumber ? item.skNumber : "-"}`;
     $("#fungsiReferenceContainer").append(
@@ -293,11 +302,13 @@ async function getJobReferenceDetail() {
     );
   });
 
+  console.log("lsStk.length", lsStk.length);
   // Filter data arrays properly
   const filteredTugasHa =
     lsTugasHa.length > 0 && Array.isArray(lsTugasHa)
       ? lsTugasHa.filter((item) => item.responsible && item.responsible.length > 0)
       : [];
+  console.log("lsTugasHa", lsTugasHa);
   const filteredStk =
     lsStk.length > 0 && Array.isArray(lsStk)
       ? lsStk.filter((item) => item.stkNumber !== null && item.stkNumber !== undefined)
@@ -833,24 +844,12 @@ function checkButtonTable(buttonTable, id, lastPath, data) {
       if (lastPath === "draft-detail") {
         let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
         const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
-        const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
+        // const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
         if (data?.actionType == "Delete") {
           editPositionDraft = "";
         }
-        return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
-      } else {
-        const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
-        return `${detail}`;
-      }
-    case "positionListApproval":
-      if (lastPath === "draft-detail") {
-        let editPositionDraft = `<button class="btn-custom-outline-primary" onclick="editJobDesc('${id}')"> <i class="icon-pencil f-16"></i></button>`;
-        const detailPositionDraft = `<button class="btn-custom-outline-dark" onclick="detailJobDesc('${id}')"> <i class="icon-eye f-16"></i></button>`;
-        const deletePositionDraft = `<button class="btn-custom-outline-danger" onclick="deleteJobDesc('${id}')"><i class="icon-trash f-16"></i></button>`;
-        if (data?.actionType == "Delete") {
-          editPositionDraft = "";
-        }
-        return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
+        return `${editPositionDraft} ${detailPositionDraft} `;
+        // return `${editPositionDraft} ${detailPositionDraft} ${deletePositionDraft}`;
       } else {
         const detail = `<button class="btn-custom-outline-dark" onclick="detailapproval('${id}')"> <i class="icon-eye f-16"></i></button>`;
         return `${detail}`;

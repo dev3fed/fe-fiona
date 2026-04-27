@@ -417,12 +417,16 @@ function deleteJobDesc() {
   );
 }
 
-function detailJobDesc() {
-  window.location.href = "/job-description/detail?create=true&id=1";
+function detailJobDesc(id) {
+  const split = id.split("|");
+  window.location.href =
+    "/job-description/detail?jobId=" + split[0] + "&prlOrg=" + split[1] + "&positionCode=" + split[2];
 }
 
-function editJobDesc() {
-  window.location.href = "/job-description/detail?create=true&id=1";
+function editJobDesc(id) {
+  const split = id.split("|");
+  // detail?jobId=Q1000043&prlOrg=21&positionCode=undefined
+  window.location.href = `/job-description/detail?jobId=${split[0]}&prlOrg=${split[1]}&positionCode=${split[2]}&draft=true`;
 }
 
 $(document).ready(async function () {
@@ -433,9 +437,6 @@ $(document).ready(async function () {
     window.location.href = "/job-description/index";
   }
   await initializeDraftDetail(getDataDraft.data);
-  // checkDataOrganizationLocalStorage();
-  // checkDataOrganization();
-  // await initializeDraftDetail(getDataDraft.data);
   checkButtonDraftDetail(getDataDraft.data);
 
   console.log("draftId", draftId);
@@ -455,6 +456,13 @@ $(document).ready(async function () {
     } else {
       getTableListDraftDetail(getDataListDraft.data.filter((x) => x.actionType.toLowerCase() == value));
     }
+  });
+
+  $("#editDraftName").on("click", function () {
+    $("#inputDraftName").val($("#draftName").text());
+    $("#modalLabelOSDraft").text("Edit Draft Name");
+    $("#createDraftSO").text("Update Draft Name");
+    $("#modalCreateDraftSO").modal("show").attr("style", "z-index: 1070");
   });
 
   // checkPage();
