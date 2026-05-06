@@ -254,10 +254,11 @@ async function getTableListDraftDetail(data) {
       },
       {
         title: "Activity Type",
-        data: "actionType",
+        data: null,
         width: "15%",
         render: function (data) {
           let text = "Created New Job";
+          console.log("data", data);
           if (data.actionType === "Update") {
             text = "Edit Job";
           } else if (data.actionType === "Delete") {
@@ -292,7 +293,8 @@ async function getTableListDraftDetail(data) {
         width: "20%",
         data: null,
         render: function (data) {
-          return checkButtonTable("positionListApproval", data.positionId, window.location.pathname.split("/").pop());
+          const id = data.jobId + "|" + data.prlOrg + "|" + data.positionCode;
+          return checkButtonTable("positionList", id, window.location.pathname.split("/").pop());
         },
       },
     ],
