@@ -6,6 +6,7 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
     compeType: compeType,
     competencyCode: compCode,
   };
+  console.log("payload", payload);
   const queryString = "?" + new URLSearchParams(payload).toString();
   const result = await fetchProficiencyLevel(queryString);
   console.log("result", result);
@@ -28,6 +29,7 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
 
   // Fungsi untuk membuat radio button secara dinamis
   const renderRadioButtons = (levels, selectedLevel, compeCategory) => {
+    console.log("levels", levels);
     let radioButtons = levels
       .map((level) => {
         // Kondisi disabled jika compeCategory === "general" dan level < selectedLevel
@@ -51,21 +53,21 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
       .join("");
 
     // Tambahkan opsi "No Level/Remove" jika compeCategory === "specific"
-    if (compeCategory === "specific") {
-      radioButtons += `
+    // if (compeCategory === "specific") {
+    radioButtons += `
             <div class="form-check form-check-inline radio radio-primary">
               <input
                 class="form-check-input"
                 id="radioinlineNone"
                 type="radio"
                 name="radio1"
-                value="none"
+                value="0"
                 onchange="changeLevel()"
-                ${selectedLevel === "none" ? "checked" : ""}
+                ${selectedLevel === "0" ? "checked" : ""}
               >
-              <label class="form-check-label mb-0" for="radioinlineNone">No Level/Remove</label>
+              <label class="form-check-label mb-0" for="radioinlineNone">Remove</label>
             </div>`;
-    }
+    // }
 
     return radioButtons;
   };

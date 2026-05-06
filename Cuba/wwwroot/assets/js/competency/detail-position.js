@@ -242,7 +242,6 @@ const modalInfoPosition = async (code, prl) => {
 const cardTblMandatory = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
   const payload = `${dataSource}/${code}/${prl}`;
-
   try {
     const result = await fetchDetailPositionMandatory(payload);
     const mandatoryNoData = document.getElementById("mandatory-no-data");
@@ -265,6 +264,8 @@ const cardTblMandatory = async (code, prl) => {
             <th scope="col" style="width: 40px;text-align:center">No</th>
             <th scope="col" style="width: 400px">Competency</th>
             <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+            <th scope="col" style="width: 70px;text-align:center">Action</th>
+
           </tr>`;
 
       const bodyMandatory = listMandatory
@@ -276,6 +277,12 @@ const cardTblMandatory = async (code, prl) => {
                 element.compCode
               }')">${element.name}</td>
               <td style="text-align:Center">${element.proficiencyLevel}</td>
+              <td style="text-align:Center">
+                <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
+                  element,
+                ).replace(/"/g, "&quot;")},${code},${prl});">
+
+              </td>
             </tr>`;
         })
         .join("");
@@ -316,6 +323,8 @@ const cardTblGeneral = async (code, prl) => {
               <th scope="col" style="width: 40px;text-align:center">No</th>
               <th scope="col" style="width: 300px">Competency</th>
               <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
+            <th scope="col" style="width: 70px;text-align:center">Action</th>
+
             </tr>`;
 
       const bodyTechnical = listTechnical
@@ -329,8 +338,11 @@ const cardTblGeneral = async (code, prl) => {
                 }')">
                 ${element.compName}</td>
                 <td style="text-align:Center">${element.level}</td>
-              
-
+               <td style="text-align:Center">
+                  <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
+                    element,
+                  ).replace(/"/g, "&quot;")},${code},${prl});">
+              </td>
               </tr>`;
         })
         .join("");
@@ -374,6 +386,8 @@ const cardTblSpecific = async (code, prl) => {
               <th scope="col" style="width: 40px;text-align:center">No</th>
               <th scope="col" style="width: 300px">Competency</th>
               <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
+            <th scope="col" style="width: 70px;text-align:center">Action</th>
+
             </tr>`;
 
       const bodyTechnical = listTechnical
@@ -386,7 +400,11 @@ const cardTblSpecific = async (code, prl) => {
                   element.compCode
                 }')">${element.compName}</td>
                 <td style="text-align:Center">${element.level}</td>
-
+                <td style="text-align:Center">
+                  <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
+                    element,
+                  ).replace(/"/g, "&quot;")},${code},${prl})">
+              </td>
               </tr>`;
         })
         .join("");
@@ -636,4 +654,17 @@ const handleCloseBehavior = async () => {
   }
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
   modal.show();
+};
+
+const openEditDepthLevel = (element, code, prl) => {
+  const jobCode = `${code};${prl}`;
+  const compCode = element.compCode;
+  const compeType = element.compType;
+  const modal = document.getElementById("ModalDetailPos");
+  openModalEditDepth(jobCode, compCode, compeType);
+
+  if (modal) {
+    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+    bootstrapModal.hide();
+  }
 };

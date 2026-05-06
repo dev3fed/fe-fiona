@@ -3,12 +3,41 @@ document.addEventListener("DOMContentLoaded", function () {
   feather.replace();
 });
 
+const getSummaryListNotAvailable = async (draftId) => {
+  try {
+    let selectElement = document.querySelector("#dataSource-competency");
+    const payload = {
+      dataSource: selectElement ? selectElement.value : null,
+      page: 1,
+      limit: 10,
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const resultList = await fetchNotAvailable(queryString);
+    console.log("resultList", resultList.data.length);
+    const totalRow = resultList.data.length;
+    const warningList = document.getElementById("warning-list");
+    const tableSummary = document.getElementById("table-summary");
+    if (warningList) {
+      if (totalRow > 0) {
+        warningList.style.display = "inline-block";
+        tableSummary.style.marginTop = "0px";
+        warningList.innerHTML = `There are ${totalRow} positions with requirement (KKJ) are not available
+          <strong style="font-weight:600; color:#D02138;cursor:pointer;" onclick="handleShowWarning()">[Click here to show]</strong>`;
+      } else {
+        warningList.style.display = "none";
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching summary list:", error);
+  }
+};
 const getSummaryList = async (draftId) => {
   try {
     let statusValue = document.getElementById("status-summary").value;
+    let selectElement = document.querySelector("#dataSource-competency");
     console.log("statusValue", statusValue);
     const payload = {
-      dataSource: "master",
+      dataSource: selectElement ? selectElement.value : null,
       keySearch: "",
       searchValue: "",
       filter: statusValue === "all" ? ["available", "not-available", "waiting-approval", "on-progress"] : [statusValue],
@@ -347,7 +376,6 @@ async function changeNumberSummaryPage(event) {
 
 const showDetail = async (data) => {
   try {
-    console.log("data", data);
     const unitCode = data.unitCode || "";
     const prlOrg = data.prlOrg || "";
     const modal = new bootstrap.Modal(document.getElementById("ModalSummaryInfo"));
@@ -363,9 +391,7 @@ const showDetail = async (data) => {
 
 const openAddCompetencySummary = async (data) => {
   try {
-    console.log("data", data);
     const competencyList = getState("payloadAddCompetency");
-    console.log("competencyList", competencyList);
     const draftName = $("#dataSource-competency option:selected").text();
     setState("jobInformation", data);
     const jobInformation = data || {};
@@ -498,4 +524,21 @@ const openAddCompetencySummary = async (data) => {
     modal.show();
     updateRadioButtonState();
   } catch (error) {}
+};
+
+const handleShowWarning = async () => {
+  try {
+    document.getElementById("status-summary").value = "not available";
+    const payloadSummary = getState("payloadSummary");
+    const payload = { ...payloadSummary, searchValue: "", filter: ["not available"], limit: 10, page: 1 };
+
+    setState("payloadSummary", payload);
+    const result = await fetchSummaryList(payload);
+
+    if (result) {
+      renderTableSummary(result);
+    }
+  } catch (error) {
+    console.error("Error in handleShowWarning:", error);
+  }
 };

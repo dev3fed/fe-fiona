@@ -150,6 +150,7 @@ function changeDataSource(dataSource) {
     document.getElementById("btnAddSpecificCompe").style.display = "inline-block";
 
     getSummaryList(dataSource);
+    getSummaryListNotAvailable(dataSource);
     // document.getElementById("btnCreateDraft").style.display = "none";
   } else {
     document.getElementById("pills-draft-tab").style.display = "none";

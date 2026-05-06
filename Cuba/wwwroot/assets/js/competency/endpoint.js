@@ -487,6 +487,29 @@ async function fetchSubmitDraftCompetency(payload) {
     };
   }
 }
+async function fetchNotAvailable(payload) {
+  const url = `${url_api}/api/TechnicalCompetency/not-available?dataSource=${payload}`;
+  try {
+    const result = await ajaxRequest(url, "POST");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 async function fetchApprovalList(payload) {
   const url = `${url_api}/api/TechnicalCompetency/draft-competency/approval-list`;
   try {

@@ -100,7 +100,7 @@
         </div>
         <div class="col-12 ">
             <div style="
-                display: inline-block;
+                display: none;
                 white-space: nowrap;
                 background: #FAE9EB;
                 border: 1px solid #D02138;
@@ -111,11 +111,10 @@
                 font-size: 12px;
                 box-sizing: border-box;
                 margin-bottom: 12px;
-                ">
-                There are 1 positions with requirement (KKJ) are not available
-                <strong style="font-weight:600; color:#D02138;cursor:pointer;">[Click here to show]</strong>
+                " id="warning-list">
+                
             </div>
-            <div class="table-responsive" style=" max-height: 350px;">
+            <div class="table-responsive" style=" max-height: 350px; margin-top: 10px;" id="table-summary">
                 <table class="table tbl-border-summary">
                     <thead id="tbl-summary-header" style="background-color: #006CA9;">
                         <tr>
@@ -134,11 +133,11 @@
                 </table>
             </div>
         </div>
-        <div class="col-10 mt-3">
+        <div class="col-9 mt-3">
             <div id="total-summary-page">
             </div>
         </div>
-        <div class="col-2 mt-3">
+        <div class="col-3 mt-3 d-flex justify-content-end">
             <div id="list-summary-page">
             </div>
         </div>

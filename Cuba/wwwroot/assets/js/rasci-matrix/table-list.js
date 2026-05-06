@@ -177,6 +177,7 @@ async function changeDataSource(dataSource, draftSo) {
       document.getElementById("btnDeleteDetail").style.display = "inline-block";
       document.getElementById("btnEditDetail").style.display = "inline-block";
       getSummaryList(dataSource);
+      getSummaryListNotAvailable(dataSource);
       // document.getElementById("btnFormdraft").style.display = "none";
     } else {
       // document.getElementById("pills-warningtab").style.display = "none";
@@ -800,7 +801,6 @@ async function handleEditBusinessProcess(inputValue, dataStoreProsbis, storageDa
   if (matchedProsbis) {
     matchedProsbis.description = inputValue.businessProcessName;
   }
-
 
   if (actionType === "BP_THEN_JOB" || actionType === "POS_THEN_BP") {
     loadTableHeader(storageDataPosition);
