@@ -499,7 +499,7 @@ async function fetchNotAvailable(payload) {
     } else {
       return {
         success: true,
-        data: result.data,
+        data: result,
       };
     }
   } catch (error) {

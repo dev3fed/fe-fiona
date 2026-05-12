@@ -13,8 +13,7 @@ const getSummaryListNotAvailable = async (draftId) => {
     };
     const queryString = "?" + new URLSearchParams(payload).toString();
     const resultList = await fetchNotAvailable(queryString);
-    console.log("resultList", resultList.data.length);
-    const totalRow = resultList.data.length;
+    const totalRow = resultList.data.meta.totalRecords || 0;
     const warningList = document.getElementById("warning-list");
     const tableSummary = document.getElementById("table-summary");
     if (warningList) {

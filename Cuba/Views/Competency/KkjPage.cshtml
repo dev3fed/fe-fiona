@@ -28,7 +28,14 @@
             <span class="btn-text">Search</span>
         </div>
     </button>
-    <button class="btn btn-outline-primary" type="button" id="clearButton">Clear</button>
+    @* <button class="btn btn-outline-primary" type="button" id="clearButton">Clear</button> *@
+    <button id="clearButton" class="btn btn-outline-primary " type="button" onclick="clearInput()" style="width: 90px;">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;" id="loadingClear"
+                 role="status"></div>
+            <span class="btn-text">Clear</span>
+        </div>
+    </button>
 </div>
 <div class="col-1 d-flex justify-content-end" style="padding-left: 0;">
     <div class="btn-group" role="group">

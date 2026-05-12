@@ -47,6 +47,9 @@ const appState = new Proxy(
     resultJob: [],
     resultCompetency: [],
     resultMapping: [],
+    dataMandatory: [],
+    dataGeneral: [],
+    dataSpecific: [],
     totalJob: 0,
     totalCompetency: 0,
     // remove below

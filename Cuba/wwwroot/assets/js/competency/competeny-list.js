@@ -343,3 +343,22 @@ function handleInputDraftName(value) {
   }
   btnSave.disabled = value.length > 3 ? false : true;
 }
+
+async function clearInput() {
+  const spinner = document.getElementById("loadingClear");
+  const clearButton = document.getElementById("clearButton");
+  spinner.style.display = "inline-block";
+  document.getElementById("inputText").value = "";
+  setState("resultCompetency", []);
+  setState("resultJob", []);
+  setState("resultMapping", []);
+  setState("totalJob", 0);
+  setState("totalCompetency", 0);
+  setState("currentPageY", 1);
+  setState("currentPageX", 1);
+  document.getElementById("empty-competency").style.display = "block";
+  document.getElementById("table-competency").style.display = "none";
+  setTimeout(() => {
+    spinner.style.display = "none";
+  }, 300);
+}
