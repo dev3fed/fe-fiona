@@ -573,6 +573,70 @@ async function fetchLoghistoryList(payload) {
     };
   }
 }
+async function fetchExportCompetencyMatrix(payload) {
+  const url = `${url_api}/api/DataCompetency/export-to-excel${payload}`;
+  try {
+    const response = await $.ajax({
+      url,
+      type: "GET",
+      data: JSON.stringify(payload),
+      contentType: "application/json",
+      xhrFields: {
+        responseType: "blob",
+      },
+    });
+
+    // Create a link to download the file
+    const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    link.download = `competency-matrix-${timestamp}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON?.message || "Error exporting file",
+    };
+  }
+}
+
+async function fetchExportSgSsg(payload) {
+  const url = `${url_api}/api/DataCompetency/export-sg-ssg-to-excel${payload}`;
+  try {
+    const response = await $.ajax({
+      url,
+      type: "GET",
+      data: JSON.stringify(payload),
+      contentType: "application/json",
+      xhrFields: {
+        responseType: "blob",
+      },
+    });
+
+    // Create a link to download the file
+    const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    link.download = `sg-ssg-${timestamp}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON?.message || "Error exporting file",
+    };
+  }
+}
+
 // END OLD API SERVICE COMPETENCY
 async function fetchData() {
   try {

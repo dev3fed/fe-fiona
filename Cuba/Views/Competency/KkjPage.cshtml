@@ -44,9 +44,13 @@
             src="~/assets/images/rasci/icon_menudots.svg" alt="Filter Icon"
             style="margin-top: -1px;">Option</button>
             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                <a class="dropdown-item">
+                <a class="dropdown-item" onclick="handleExportCompetency()">
                     <img src="~/assets/images/rasci/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
                     Export
+                </a>
+                <a class="dropdown-item" onclick="handleExportSgSsg()">
+                    <img src="~/assets/images/rasci/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
+                    Export SG & SSG
                 </a>
                 <a class="dropdown-item" id="btnCreateDraft" onclick="openFormDraft()">
                     <img src="~/assets/images/rasci/plus-black.svg" alt="Filter Icon" style="margin-top: -1px;">Create
@@ -80,7 +84,7 @@
                     </table>
                     <!-- end :: List Requirement KKJ Table -->
                 </div>
-                <div id="loader">
+                <div id="loader-competency">
                     <div class="spinner"></div>
                     <p class="loading-text">Loading Data...</p>
                 </div>

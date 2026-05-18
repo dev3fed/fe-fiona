@@ -12,6 +12,7 @@ const appState = new Proxy(
     currentPageX: 1,
     payloadJob: {
       dataSource: selectedValue,
+      filter: "position",
       page: 1,
       pageSize: 15,
     },

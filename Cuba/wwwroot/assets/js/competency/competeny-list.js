@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   bodypageMandatory();
   bodypageTechnical();
   bodypageBehavior();
-  const loader = document.getElementById("loader");
+  const loader = document.getElementById("loader-competency");
   loader.style.display = "none";
   // loadTableHeader(competencyList);
   // loadTableBody(jobList);
@@ -185,29 +185,53 @@ function renderStaticHeader() {
 }
 
 function appendDynamicHeader(competencyList) {
-  const totalMandatory = competencyList.filter((item) => item.compType === "mandatory").length;
-  const totalGeneral = competencyList.filter((item) => item.compType === "general").length;
-  const totalSpecific = competencyList.filter((item) => item.compType === "specific").length;
+  if (!competencyList || competencyList.length === 0) {
+    console.warn("competencyList is empty or invalid");
+    return;
+  }
 
+  const headerContent = buildHeaderContent(competencyList);
+  updateHeaderDOM(headerContent);
+}
+
+function buildHeaderContent(competencyList) {
+  const categoryTotals = calculateCategoryTotals(competencyList);
+  const row1HTML = buildHeaderRow1(categoryTotals);
+  const row2HTML = buildHeaderRow2(competencyList);
+
+  return row1HTML + row2HTML;
+}
+
+function calculateCategoryTotals(competencyList) {
+  return {
+    mandatory: competencyList.filter((item) => item.compType === "mandatory").length,
+    general: competencyList.filter((item) => item.compType === "general").length,
+    specific: competencyList.filter((item) => item.compType === "specific").length,
+  };
+}
+
+function buildHeaderRow1(categoryTotals) {
   let row1HTML = `
   <tr style="height: 30px;">
     <th rowspan="2" class="headcol head-cell" style="position:sticky; top:0; left:0; z-index:2; vertical-align: middle; text-align: center;">
       <span style="padding-left:10px;">Job Title</span>
     </th>`;
 
-  if (totalMandatory > 0) {
-    row1HTML += `<th class="tg-baqh competency-cell color-mandatory" colspan="${totalMandatory}" >Mandatory</th>`;
+  if (categoryTotals.mandatory > 0) {
+    row1HTML += `<th class="tg-baqh competency-cell color-mandatory" colspan="${categoryTotals.mandatory}">Mandatory</th>`;
   }
-  if (totalGeneral > 0) {
-    row1HTML += `<th class="tg-baqh competency-cell color-general" colspan="${totalGeneral}" >General</th>`;
+  if (categoryTotals.general > 0) {
+    row1HTML += `<th class="tg-baqh competency-cell color-general" colspan="${categoryTotals.general}">General</th>`;
   }
-  if (totalSpecific > 0) {
-    row1HTML += `<th class="tg-baqh competency-cell color-specific" colspan="${totalSpecific}" >Specific</th>`;
+  if (categoryTotals.specific > 0) {
+    row1HTML += `<th class="tg-baqh competency-cell color-specific" colspan="${categoryTotals.specific}">Specific</th>`;
   }
 
   row1HTML += `</tr>`;
+  return row1HTML;
+}
 
-  // Baris kedua: kompetensi per kolom
+function buildHeaderRow2(competencyList) {
   let row2HTML = `<tr style="height: 50px;">`;
 
   competencyList.forEach((val) => {
@@ -221,12 +245,46 @@ function appendDynamicHeader(competencyList) {
   });
 
   row2HTML += `</tr>`;
+  return row2HTML;
+}
 
-  // Gabungkan kedua baris
-  const headerContent = row1HTML + row2HTML;
-  document.getElementById("table-header").innerHTML = headerContent;
+function updateHeaderDOM(headerContent) {
+  const headerTable = document.getElementById("table-header");
+  if (headerTable) {
+    headerTable.innerHTML = headerContent;
+    initializeTooltips();
+  } else {
+    console.error("table-header element not found");
+  }
+}
 
-  initializeTooltips();
+function createTableRowHTML(val) {
+  return `
+    <tr id="tr-${val.unitCode};${val.prlOrg}" class="clusterize-cluster">
+      <td class="headcol" style="text-align:left;font-size:12px;font-weight: 500 !important;">
+        <div class="joblist-cell-wrapper">
+          <div class="flex-fill joblist-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
+            title="${val.positionName}"
+            onclick="handleClickPosition('${val.unitCode}', '${val.prlOrg}')">
+            ${val.positionName}
+          </div>
+          <div class="ellipsis-menu joblist-row-ellipsis">
+            <div class="dropright">
+              <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
+                style="border: none; background: transparent; cursor: pointer;">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li onclick="handleClickPosition('${val.unitCode}','${val.prlOrg}')">
+                  <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Icon">Detail</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `;
 }
 
 function loadTableBody(jobList) {
@@ -234,40 +292,51 @@ function loadTableBody(jobList) {
   if (!tableBody) return;
 
   let bodyContent = "";
-
   jobList?.forEach((val) => {
-    const valString = JSON.stringify(val).replace(/"/g, "&quot;");
-    bodyContent += `
-      <tr id="tr-${val.unitCode};${val.prlOrg}" class="clusterize-cluster">
-        <td class="headcol" style="text-align:left;font-size:12px;font-weight: 500 !important;">
-          <div class="joblist-cell-wrapper">
-            <div class="flex-fill joblist-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
-              title="${val.positionName}"
-              onclick="handleClickPosition('${val.unitCode}', '${val.prlOrg}')">
-              ${val.positionName}
-            </div>
-            <div class="ellipsis-menu joblist-row-ellipsis">
-              <div class="dropright">
-                <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
-                  style="border: none; background: transparent; cursor: pointer;">
-                  <i class="fas fa-ellipsis-v"></i>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <li onclick="handleClickPosition('${val.unitCode}','${val.prlOrg}')">
-                    <a class="dropdown-item"><img src="/assets/images/rasci/eye.svg" alt="Icon">Detail</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </td>
-      </tr>
-    `;
+    bodyContent += createTableRowHTML(val);
   });
 
   tableBody.innerHTML = bodyContent;
+  updateTableBodyDOM();
+}
+
+function updateTableBodyDOM() {
   feather.replace();
   initializeTooltips();
+}
+
+function addTableRow(jobItem) {
+  const tableBody = document.getElementById("table-body");
+  if (!tableBody) return;
+
+  const newRow = document.createElement("tr");
+  newRow.innerHTML = createTableRowHTML(jobItem);
+  tableBody.appendChild(newRow);
+  updateTableBodyDOM();
+}
+
+function updateTableRow(unitCode, prlOrg, jobItem) {
+  const tableBody = document.getElementById("table-body");
+  if (!tableBody) return;
+
+  const rowId = `tr-${unitCode};${prlOrg}`;
+  const existingRow = document.getElementById(rowId);
+
+  if (existingRow) {
+    existingRow.outerHTML = createTableRowHTML(jobItem);
+  } else {
+    addTableRow(jobItem);
+  }
+
+  updateTableBodyDOM();
+}
+
+function removeTableRow(unitCode, prlOrg) {
+  const rowId = `tr-${unitCode};${prlOrg}`;
+  const row = document.getElementById(rowId);
+  if (row) {
+    row.remove();
+  }
 }
 
 function handleClickPosition(unitCode, prlOrg) {
@@ -362,3 +431,47 @@ async function clearInput() {
     spinner.style.display = "none";
   }, 300);
 }
+
+const handleExportCompetency = async () => {
+  try {
+    const payloadJob = getState("payloadJob");
+    const loader = document.getElementById("loader-competency");
+    loader.style.display = "flex";
+    const payload = {
+      filterBy: payloadJob.filter,
+      search: payloadJob.search,
+    };
+    const filteredPayload = Object.fromEntries(
+      Object.entries(payload).filter(([_, value]) => value !== "" && value !== null && value !== undefined),
+    );
+    const queryString = "/" + payloadJob.dataSource + "?" + new URLSearchParams(filteredPayload).toString();
+    const result = await fetchExportCompetencyMatrix(queryString);
+    if (result.success) {
+      loader.style.display = "none";
+    } else {
+      console.error("Export failed:", result.error);
+    }
+  } catch (error) {}
+};
+
+const handleExportSgSsg = async () => {
+  try {
+    const payloadJob = getState("payloadJob");
+    const loader = document.getElementById("loader-competency");
+    loader.style.display = "flex";
+    const payload = {
+      filterBy: payloadJob.filter,
+      search: payloadJob.search,
+    };
+    const filteredPayload = Object.fromEntries(
+      Object.entries(payload).filter(([_, value]) => value !== "" && value !== null && value !== undefined),
+    );
+    const queryString = "/" + payloadJob.dataSource + "?" + new URLSearchParams(filteredPayload).toString();
+    const result = await fetchExportSgSsg(queryString);
+    if (result.success) {
+      loader.style.display = "none";
+    } else {
+      console.error("Export failed:", result.error);
+    }
+  } catch (error) {}
+};

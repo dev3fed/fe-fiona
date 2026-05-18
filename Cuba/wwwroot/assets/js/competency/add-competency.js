@@ -1074,9 +1074,11 @@ const handleSaveDraftCompe = async () => {
           },
         },
       }).then(async () => {
-        handleSearchCompetency();
-        if (modal) modal.hide();
-        spinBtn.style.display = "none";
+        setTimeout(() => {
+          handleSearchCompetency();
+          if (modal) modal.hide();
+          spinBtn.style.display = "none";
+        }, 200);
       });
     }
   } catch (error) {
