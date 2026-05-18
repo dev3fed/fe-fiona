@@ -373,7 +373,9 @@ i.jstree-icon.jstree-ocl {
   color: #aaa;
   font-family: Arial, sans-serif;
   margin: 20px auto;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 #drop-zone.dragover {
   background-color: #f9f9f9;
@@ -442,4 +444,9 @@ i.jstree-icon.jstree-ocl {
   .modal-xl-custom-larger {
     max-width: 1400px !important;
   }
+}
+
+.modal-xl-custom {
+  max-width: 90% !important;
+  width: 90% !important;
 }

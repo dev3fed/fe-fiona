@@ -839,6 +839,471 @@ const DATA_NOT_FOUND = `Data not found`;
 const TOOLBAR_FULL = ["bold", "italic", "|", "bulletedList", "numberedList", "|", "undo", "redo"];
 const TOOLBAR_SHORT = ["undo", "redo"];
 
+const MUST_BULLETED_LIST = ["persyaratanJabatan", "tugasHa"];
+
+const TEST_1 = [
+  {
+    available: [],
+    notAvailable: [
+      {
+        jobId: "Q1000047",
+        prlOrg: "16-18",
+        code: "MFR-317",
+        indexNumber: "10.5.4.1",
+        description: "Melakukan analisis penambahan aset dan proses kapitalisasi asset baru",
+        level: "4",
+        status: "NOT AVAILABLE",
+      },
+      {
+        jobId: "Q1000047",
+        prlOrg: "16-18",
+        code: "MER-41",
+        indexNumber: "11.1.3.2",
+        description: "Melakukan monitoring risiko",
+        level: "4",
+        status: "NOT AVAILABLE",
+      },
+      {
+        jobId: "Q1000047",
+        prlOrg: "16-18",
+        code: "DMB-134",
+        indexNumber: "13.2.2.6",
+        description: "Melakukan post mortem proyek",
+        level: "4",
+        status: "NOT AVAILABLE",
+      },
+      {
+        jobId: "Q1000047",
+        prlOrg: "16-18",
+        code: "ICC-3",
+        indexNumber: "14.1.1.1",
+        description: "Accuracy Review",
+        level: "4",
+        status: "NOT AVAILABLE",
+      },
+      {
+        jobId: "Q1000047",
+        prlOrg: "16-18",
+        code: "ICC-5",
+        indexNumber: "14.1.1.1.1.1",
+        description: "Compare predicted vs actual",
+        level: "6",
+        status: "NOT AVAILABLE",
+      },
+    ],
+    countAll: 5,
+    codeAvailable: [],
+    codeNotAvailable: ["10.5.4.1", "11.1.3.2", "13.2.2.6", "14.1.1.1", "14.1.1.1.1.1"],
+    countAvailable: 0,
+    countNotAvailable: 5,
+  },
+];
+
+const TEST_2 = [
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor dan mengevaluasi kegiatan penyusunan dokumen investasi serta Project Management Plan (PMP) pengembangan aset/infrastruktur ruang lingkup proyek pada Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya dokumen project summary dan project timeline",
+      "Tersedianya dokumen cost benefit analysis",
+      "Tersedianya hasil analisis risiko",
+      "Tersedianya materi presentasi pengajuan investasi",
+      "Tersedianya tujuan dan ruang lingkup proyek",
+      "Tersedianya jadwal dan biaya proyek",
+      "Tersedianya rencana risk management, stakeholders management, komunikasi, quality management, procurement management, resources management (termasuk struktur organisasi proyek), HSSE management proyek",
+      "Tersedianya hasil integrasi multi project dalam satu dokumen project FID",
+    ],
+    lead: [
+      "Tingkat akurasi dan kelengkapan PMP pengembangan aset/infrastruktur operasi",
+      "Tingkat akurasi hasil identifikasi dan analisis risiko",
+      "Tingkat akurasi, kelengkapan, dan ketepatan terkait hasil evaluasi risiko",
+    ],
+    tanggungJawabProses: [
+      {
+        code: "ACM-37",
+        indexNumber: "5.1.2.5",
+        description: "Menyusun dokumen investasi",
+      },
+      {
+        code: "ACM-53",
+        indexNumber: "5.1.3.1",
+        description: "Melakukan penyusunan Project Management Plan (PMP) pengembangan aset/infrastruktur",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "ACM-37",
+        indexNumber: "5.1.2.5",
+        description: "Menyusun dokumen investasi",
+      },
+      {
+        code: "ACM-53",
+        indexNumber: "5.1.3.1",
+        description: "Melakukan penyusunan Project Management Plan (PMP) pengembangan aset/infrastruktur",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor dan mengevaluasi pengelolaan cost & schedule control project (CPI dan SPI) serta pengelolaan persetujuan laporan TCR ruang lingkup proyek pada Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya rencana optimalisasi cost & schedule",
+      "Tersedianya hasil monitoring dan kontrol cost project terhadap budget",
+      "Tersedianya hasil evaluasi terkait optimalisasi cost & schedule",
+      "Terlaksananya pengelolaan persetujuan laporan TCR",
+    ],
+    lead: ["Tingkat kesesuaian realisasi cost project terhadap budget"],
+    tanggungJawabProses: [
+      {
+        code: "ACM-136",
+        indexNumber: "5.1.4.2",
+        description: "Mengelola cost & schedule control project (CPI dan SPI)",
+      },
+      {
+        code: "ACM-158",
+        indexNumber: "5.1.6.2",
+        description: "Melakukan penyusunan laporan TCR (Technical Completion Report)",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "ACM-136",
+        indexNumber: "5.1.4.2",
+        description: "Mengelola cost & schedule control project (CPI dan SPI)",
+      },
+      {
+        code: "ACM-158",
+        indexNumber: "5.1.6.2",
+        description: "Melakukan penyusunan laporan TCR (Technical Completion Report)",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor dan mengevaluasi kegiatan perizinan terkait perizinan pra-proyek ruang lingkup proyek pada Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya hasil identifikasi pengajuan perizinan operasi/project",
+      "Tersedianya hasil identifikasi persyaratan dokumen perizinan operasi/project",
+      "Tersedianya hasil identifikasi metode pengurusan perizinan operasi/project (pihak internal/ pihak ketiga)",
+      "Terlaksananya pengelolaan perizinan (permit) yang dibutuhkan untuk operasi/project (termasuk biaya administrasi)",
+      "Tersedianya hasil evaluasi terhadap efektivitas proses perizinan operasi/project",
+    ],
+    lead: ["Tingkat kelengkapan dokumen perizinan operasi/project", "Tingkat ketepatan waktu pengelolaan perizinan"],
+    tanggungJawabProses: [
+      {
+        code: "MIE-170",
+        indexNumber: "12.4.2.2",
+        description: "Mengelola kegiatan perizinan",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MIE-170",
+        indexNumber: "12.4.2.2",
+        description: "Mengelola kegiatan perizinan",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor dan mengevaluasi permintaan pembayaran utang ruang lingkup fungsi Reliability & Project Development pada Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya surat permintaan pembayaran",
+      "Tersedianya dokumen PR/PO/SA/GR dan SP3",
+      "Terlaksananya proses penagihan",
+      "Tersedianya hasil verifikasi dan analisis kelayakan dokumen pembayaran",
+      "Tersedianya hasil analisis surat permintaan pembayaran",
+    ],
+    lead: ["Tingkat kelengkapan surat permintaan pembayaran"],
+    tanggungJawabProses: [
+      {
+        code: "MFR-298",
+        indexNumber: "10.5.3.1",
+        description: "Melakukan permintaan pembayaran utang",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MFR-298",
+        indexNumber: "10.5.3.1",
+        description: "Melakukan permintaan pembayaran utang",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan 1, memonitor dan mengevaluasi kegiatan settlement realisasi biaya WBS ke AUC dalam proses analisis penambahan aset dan proses kapitalisasi asset baru terkait ruang lingkup Regional Sumbagut",
+    ],
+    output: [
+      "Terlaksananya settlement realisasi biaya WBS ke AUC",
+      "Tersedianya dokumen Asset Under Construction (AUC)",
+    ],
+    lead: ["Tingkat ketepatan waktu kegiatan settlement", "Tingkat kelengkapan dokumen AUC"],
+    tanggungJawabProses: [
+      {
+        code: "MFR-317",
+        indexNumber: "10.5.4.1",
+        description: "Melakukan analisis penambahan aset dan proses kapitalisasi asset baru",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MFR-317",
+        indexNumber: "10.5.4.1",
+        description: "Melakukan analisis penambahan aset dan proses kapitalisasi asset baru",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan 2, memonitor dan mengevaluasi kegiatan settlement realisasi biaya WBS ke AUC dalam proses analisis penambahan aset dan proses kapitalisasi asset baru terkait ruang lingkup Regional Sumbagut",
+    ],
+    output: [
+      "Terlaksananya settlement realisasi biaya WBS ke AUC",
+      "Tersedianya dokumen Asset Under Construction (AUC)",
+    ],
+    lead: ["Tingkat ketepatan waktu kegiatan settlement", "Tingkat kelengkapan dokumen AUC"],
+    tanggungJawabProses: [
+      {
+        code: "MFR-317",
+        indexNumber: "10.5.4.1",
+        description: "Melakukan analisis penambahan aset dan proses kapitalisasi asset baru",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MFR-317",
+        indexNumber: "10.5.4.1",
+        description: "Melakukan analisis penambahan aset dan proses kapitalisasi asset baru",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor dan mengevaluasi kegiatan penyusunan Purchase Request dalam proses pengajuan permintaan pengadaan DP3 ruang lingkup fungsi Reliability & Project Development Regional Sumbagut",
+    ],
+    output: ["Tersedianya purchase request"],
+    lead: ["Tingkat kelengkapan purchase request"],
+    tanggungJawabProses: [
+      {
+        code: "DPR-882",
+        indexNumber: "3.4.2.1",
+        description: "Mengelola pengajuan permintaan pengadaan",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "DPR-882",
+        indexNumber: "3.4.2.1",
+        description: "Mengelola pengajuan permintaan pengadaan",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor dan mengevaluasi kegiatan pengelolaan usulan dan realisasi ABI dan ABO ruang lingkup fungsi Reliability & Project Development Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya susunan anggaran & rencana kerja investasi dalam tahapan inisiasi proyek",
+      "Tersedianya dokumen usulan Anggaran Biaya Investasi (ABI) dan Anggaran Biaya Operasional (ABO)",
+      "Terlaksananya pengelolaan usulan dan realisasi ABI dan ABO",
+      "Tersedianya hasil monitoring implementasi anggaran",
+    ],
+    lead: [
+      "Tingkat akurasi, kelengkapan, dan kemutakhiran dokumen usulan",
+      "Tingkat kesesuaian realisasi ABI dan ABO dengan rencana",
+    ],
+    tanggungJawabProses: [
+      {
+        code: "MFR-20",
+        indexNumber: "10.1.2.1",
+        description: "Melakukan pengawasan dan pengendalian implementasi anggaran",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MFR-20",
+        indexNumber: "10.1.2.1",
+        description: "Melakukan pengawasan dan pengendalian implementasi anggaran",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor, dan mengevaluasi pelaksanaan dan evaluasi penerapan TKDN dalam ruang lingkup Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya hasil review perhitungan nilai TKDN",
+      "Tersedianya laporan pelaksanaan TKDN",
+      "Terlaksananya stakeholder management terkait TKDN",
+      "Terlaksananya pengelolaan verifikasi TKDN",
+      "Tersedianya hasil monitoring dan evaluasi terhadap implementasi TKDN",
+      "Tersedianya usulan rekomendasi perbaikan terkait dengan dokumen acuan kerja dan sistem/ program TKDN",
+    ],
+    lead: [
+      "Peningkatan penggunaan produk dalam negeri pada proses pengadaan barang/jasa",
+      "Tingkat penggunaan produk dalam negeri pada proses pengadaan barang/jasa",
+      "Tingkat kesesuaian, akurasi, dan peningkatan penerapan penggunaan produk dalam negeri",
+    ],
+    tanggungJawabProses: [
+      {
+        code: "MER-441",
+        indexNumber: "11.5.3.3",
+        description: "Mengelola pelaksanaan TKDN",
+      },
+      {
+        code: "MER-447",
+        indexNumber: "11.5.3.4",
+        description: "Melakukan evaluasi penerapan TKDN di perusahaan",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MER-441",
+        indexNumber: "11.5.3.3",
+        description: "Mengelola pelaksanaan TKDN",
+      },
+      {
+        code: "MER-447",
+        indexNumber: "11.5.3.4",
+        description: "Melakukan evaluasi penerapan TKDN di perusahaan",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor, dan mengevaluasi pengelolaan penyusunan perjanjian/kontrak di Fungsi Reliability & Project Development Regional Sumbagut",
+    ],
+    output: [
+      "Tersedianya dokumen draft perjanjian/ kontrak",
+      "Tersedianya hasil review dan amandemen kontrak",
+      "Tersedianya hasil finalisasi draft perjanjian/kontrak",
+      "Tersedianya hasil monitoring terhadap implementasi perjanjian/kontrak",
+    ],
+    lead: [
+      "Tingkat kelengkapan dokumen perjanjian/kontrak",
+      "Tingkat kemutakhiran data terkait implementasi perjanjian/kontrak",
+    ],
+    tanggungJawabProses: [
+      {
+        code: "MIE-194",
+        indexNumber: "12.4.3.2",
+        description: "Mengelola proses negosiasi perjanjian/kontrak",
+      },
+      {
+        code: "MIE-200",
+        indexNumber: "12.4.3.3",
+        description: "Mengelola proses penyusunan perjanjian/kontrak",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MIE-194",
+        indexNumber: "12.4.3.2",
+        description: "Mengelola proses negosiasi perjanjian/kontrak",
+      },
+      {
+        code: "MIE-200",
+        indexNumber: "12.4.3.3",
+        description: "Mengelola proses penyusunan perjanjian/kontrak",
+      },
+    ],
+    jobReferences: [],
+  },
+  {
+    jobId: "10163795",
+    prlOrg: "16",
+    uraian: null,
+    responsible: [
+      "Mengarahkan, memonitor, dan mengevaluasi pengelolaan risiko bisnis dan operasi di Fungsi Reliability & Project Development Regional Sumbagut",
+    ],
+    output: [
+      "Terlaksananya identifikasi, analisis, dan evaluasi risiko",
+      "Draft usulan mitigasi risiko",
+      "Terlaksananya pengelolaan, evaluasi, dan monitoring risiko",
+    ],
+    lead: ["Tingkat ketepatan waktu dalam penyusunan risk register dan risk monitoring"],
+    tanggungJawabProses: [
+      {
+        code: "MER-24",
+        indexNumber: "11.1.2.1",
+        description: "Melakukan identifikasi risiko",
+      },
+      {
+        code: "MER-38",
+        indexNumber: "11.1.3.1",
+        description: "Menyusun mitigasi risiko",
+      },
+      {
+        code: "MER-41",
+        indexNumber: "11.1.3.2",
+        description: "Melakukan monitoring risiko",
+      },
+    ],
+    hasilAkhirProses: [
+      {
+        code: "MER-24",
+        indexNumber: "11.1.2.1",
+        description: "Melakukan identifikasi risiko",
+      },
+      {
+        code: "MER-38",
+        indexNumber: "11.1.3.1",
+        description: "Menyusun mitigasi risiko",
+      },
+      {
+        code: "MER-41",
+        indexNumber: "11.1.3.2",
+        description: "Melakukan monitoring risiko",
+      },
+    ],
+    jobReferences: [],
+  },
+];
+
 const mappingAddUpdate = {
   tugasHa: {
     ls: "tugasHa",

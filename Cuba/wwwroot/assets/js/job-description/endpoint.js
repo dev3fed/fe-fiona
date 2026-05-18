@@ -326,8 +326,15 @@ async function updateDetailDraft({ draftId, jobId, prlOrg, data }) {
     const result = await ajaxRequest(api, "PUT", data);
     return result;
   } catch (error) {
-    // Do not throw error, just return null or empty result
-    return error;
+    console.error("Error in updateDetailDraft API:", error);
+    // Return a plain object — never return the jqXHR object directly,
+    // because jqXHR is a Thenable and would cause the caller's await to follow its rejected state.
+    return {
+      statusCode: error?.status || 500,
+      success: false,
+      message: error?.responseJSON?.message || error?.responseText || "Failed to save draft",
+      data: null,
+    };
   }
 }
 
@@ -593,6 +600,18 @@ async function chartJobDetail(params) {
   } catch (error) {
     console.error("Error fetching data from API");
     $("#chartJobPositionList").html("Error fetching data from API");
+    throw error;
+  }
+}
+
+// https://cnt-api.dev.fed-insight.com/api/sk-list?Page=1&PageSize=5
+async function getSkList(page = 1, pageSize = 5) {
+  const api = `${url.baseUrl}/api/sk-list?Page=${page}&PageSize=${pageSize}`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API from" + api + "with error: " + error);
     throw error;
   }
 }

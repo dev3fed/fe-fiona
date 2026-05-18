@@ -18,8 +18,10 @@ function updateIdentifikasiJob(params) {
 }
 
 function updateTable(params, data, rowHeader) {
+  console.log(`Updating table for ${params} with data:`, data, "and rowHeader:", rowHeader);
   // get table body
   const tableBody = $(`#${params}Table tbody`);
+  console.log("tableBody", tableBody);
   tableBody.empty();
   let row = "";
   if (data.length === 0) {
@@ -33,11 +35,11 @@ function updateTable(params, data, rowHeader) {
   // if items in data is not array, convert to array
   if (!Array.isArray(data)) {
     // data = [data];
-    console.warn(`Data for ${params} is not an array, converting to array`);
     return false;
   }
 
   data.forEach((item, inc) => {
+    console.log(`Processing item ${inc} for ${params}:`, item);
     const reference = item.jobReferences !== undefined && item.jobReferences.length > 0 ? item.jobReferences[0] : "";
     const referenceHtml =
       reference !== ""
@@ -182,6 +184,126 @@ function updateTableSelected(params, data, rowHeader, refer) {
         const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
           (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
         );
+        if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
+          // Single item - display as span with tooltip
+          row += `<td class="tdClass text-primary">
+            <span data-bs-toggle="tooltip" data-bs-trigger="click" title="${uniqueTanggungJawab[0]?.description}">
+              ${uniqueTanggungJawab[0]?.indexNumber}
+            </span>
+          </td>`;
+        } else if (uniqueTanggungJawab && uniqueTanggungJawab.length > 1) {
+          // Multiple items - display as list
+          const listItems = uniqueTanggungJawab
+            .map(
+              (process) =>
+                `<li><span class="text-primary" style="cursor:pointer" data-bs-toggle="tooltip" data-bs-trigger="click" title="${process?.description}">${process?.indexNumber}</span></li>`,
+            )
+            .join("");
+          row += `<td class="tdClass" style="padding-left:10px !important">
+            <ul style="margin: 0; list-style-type: disc; padding-left: 15px !important;">
+              ${listItems}
+            </ul>
+          </td>`;
+        } else {
+          // No data
+          row += `<td class="tdClass text-primary">-</td>`;
+        }
+        return;
+      }
+      // header inside customTableHeader
+      if (customTableHeaderNoArray.includes(header)) {
+        if (Array.isArray(item[header])) {
+          item[header] = item[header].join(", ");
+        }
+      }
+
+      if (customTableHeaderCleaned.includes(header)) {
+        item[header] = item[header].toString().replace(/[\[\]"]/g, "");
+      }
+
+      const arrayType = Array.isArray(item[header]);
+      if (arrayType) {
+        const isHeaderArray = customTableHeaderHeader.includes(header);
+        row += `<td class="tdClass" ><ul style="list-style-type:
+        ${isHeaderArray ? "none" : "disc"}; padding-left: 20px; margin: 0; padding-left: 15px !important;
+        ">`;
+        item[header].forEach((arrayItem) => {
+          row += `<li>${arrayItem}</li>`;
+        });
+        row += `</ul>
+              ${referenceHtml}
+              </td>`;
+        return;
+      }
+      if (header === "action") {
+        row += `<td class="p-3">
+          <button type="button" class="btn btn-primary" id="editData${idx}" onclick="editData(${idx})"> <i class="fas fa-edit"></i></button>
+          <button type="button" class="btn btn-danger" id="deleteData${idx}" onclick="deleteData(${idx})"> <i class="fas fa-trash"></i></button>
+        </td>`;
+        return;
+      }
+      row += `<td class="tdClass">${item[header]}${header !== "id" ? referenceHtml : ""}</td>`;
+    });
+
+    row += `</tr>`;
+    tableBody.append(row);
+  });
+
+  $('[data-bs-toggle="tooltip"]').tooltip({
+    trigger: "click",
+  });
+}
+
+function updateTableRecommend(params, data, rowHeader, refer) {
+  const tableBody = $(`#${params}Table tbody`);
+  // console.log(" Updating recommendation table for", params, "with data:", data, "and rowHeader:", rowHeader);
+  tableBody.empty();
+  let row = "";
+  if (data.length === 0) {
+    row = `<tr>
+      <td colspan="100%" class="text-center p-30">Data not found</td>
+    </tr>`;
+    tableBody.append(row);
+    return;
+  }
+
+  // if items in data is not array, convert to array
+  if (!Array.isArray(data)) {
+    // data = [data];
+    return false;
+  }
+
+  data.forEach((item, inc) => {
+    console.log(item.idx);
+    // console.log("Processing item", item, "with reference", item.reference);
+    const reference = item.reference ? item.reference : "";
+    const referenceHtml =
+      reference !== "" ? `<br/><span style="font-size:10px;color:grey">(reference from : ${reference})</span>` : "";
+    row = `<tr>`;
+    if (!rowHeader) {
+      row += `<td class="tdClass">${item}</td>`;
+      row += `</tr>`;
+      tableBody.append(row);
+      return;
+    }
+    rowHeader.forEach((header, idx) => {
+      if (header === "no") {
+        // row += `<td class="tdClass">${inc + 1}</td>`;
+        row += `<td class="p-3" style="place-content: flex-start">
+        <label class="container-radio m-0">
+          <input onclick="selectRecommendRow(this)" type="radio" name="radio_${params}" id="checkbox_${item.idx}" class="checkbox_animated checbox-compare">
+          <span class="radiomark" style="top:30%;left:10px;width:17px;height:17px" ></span>
+        </label>
+      </td>`;
+        return;
+      }
+
+      if (header === "index") {
+        console.log("Processing index header for item", item?.tanggungJawabProses);
+        const uniqueTanggungJawab = item?.tanggungJawabProses?.filter(
+          (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
+        );
+        console.log("Unique tanggung jawab for item", item, "is", uniqueTanggungJawab);
         if (uniqueTanggungJawab && uniqueTanggungJawab.length === 1) {
           // Single item - display as span with tooltip
           row += `<td class="tdClass text-primary">
@@ -524,9 +646,103 @@ function detailJobDesc(jobId, prlOrg, positionCode) {
   window.location.href = redirectTo;
 }
 
+function selectRecommendRow(val) {
+  const $table = $(val).closest("table");
+  $table.find("tr").css("background-color", "");
+  $(val).closest("tr").css("background-color", "#d4edda");
+
+  const $card = $(val).closest(".card");
+  $card.find(".card-header").addClass("bg-success text-white");
+}
+
+function saveRecommendation() {
+  const selectedInputs = $("#modalRecomendationBody input[type='radio']:checked");
+  if (selectedInputs.length === 0) {
+    swal("No selection", "Please select a recommendation before saving.", "warning");
+    return;
+  }
+  const selectedIds = selectedInputs
+    .map(function () {
+      return $(this).attr("id");
+    })
+    .get();
+  const cleanedSelectedIds = selectedIds.map((id) => id.replace("checkbox_", ""));
+  const data = JSON.parse(localStorage.getItem("dataTugasHARecom"));
+  const selectedData = data.filter((item) => cleanedSelectedIds.includes(item.idx.toString()));
+
+  if (selectedData.length > 0) {
+    const confrim = confirmFunction("Are you sure?", "Do you want to apply this recommendation?");
+    confrim.then((willApply) => {
+      if (willApply) {
+        saveRecommendationAttribute(selectedData);
+        $("#modalJobCompareDetail, #modalJobCompare").modal("hide");
+      } else {
+        swal("Cancelled", "Your recommendation has not been applied.", "info");
+      }
+    });
+  }
+}
+
+async function saveRecommendationAttribute(selectedData) {
+  loader(true);
+
+  console.log("Selected data for recommendation:", selectedData);
+  const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) ?? {};
+
+  // Add jobReferences to each selected item
+  const processedItems = selectedData.map((item) => {
+    if (!Array.isArray(item.jobReferences)) {
+      item.jobReferences = [];
+    }
+    item.jobReferences.push({
+      jobId: selectedData?.jobReferences?.jobId || null,
+      jobName: selectedData?.jobReferences?.jobName || null,
+      skNumber: selectedData?.jobReferences?.noSuratKeputusan || null,
+      prlOrg: selectedData?.jobReferences?.prlOrg || null,
+    });
+    return item;
+  });
+
+  // Collect unique tanggungJawabProses for availability calculation
+  let arraySelectedBusPro = [];
+  processedItems.forEach((item) => {
+    arraySelectedBusPro.push(...(item?.tanggungJawabProses ?? []));
+  });
+  const uniqueSelectedBusPro = arraySelectedBusPro.filter(
+    (process, index, self) => index === self.findIndex((p) => p.indexNumber === process.indexNumber),
+  );
+  updateCalculateLsAvailable(uniqueSelectedBusPro);
+
+  // Update tugasHa localStorage
+  let localData = [];
+  try {
+    const storedData = localStorage.getItem("tugasHa");
+    if (storedData && storedData !== "") {
+      localData = JSON.parse(storedData);
+    }
+    if (!Array.isArray(localData)) {
+      localData = [];
+    }
+  } catch (error) {
+    console.warn("Error parsing localStorage for tugasHa:", error);
+    localData = [];
+  }
+
+  localData.push(...processedItems);
+  localStorage.setItem("tugasHa", JSON.stringify(localData));
+
+  saveTugasHa();
+
+  await getJobReferenceDetail();
+  $("#modalRecomendation").modal("hide");
+  loader(false);
+  swal("Success!", "Recommendation saved to your job description", "success");
+}
+
 async function checkboxReference(val) {
   const isChecked = val.checked;
   const id = val.id;
+
   if (id !== "checkbox_jobdesc_all") {
     if (val.id.includes("all")) {
       const splitVal = val.id.split("all")[0];
@@ -557,20 +773,77 @@ function confirmFunction(title, text) {
 }
 
 async function callOtherRecommendations() {
+  loader(true);
+  saveReferenceAttribute();
   const getDataJobDesc = JSON.parse(localStorage.getItem("selectedJobDescReference"));
   const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
   const notAvailable = lsAvailable?.notAvailable || [];
   const getUniqueCode = notAvailable.map((item) => item.code);
   const codeNotAvailable = [...new Set(getUniqueCode)];
-  console.log("codeNotAvailable", codeNotAvailable);
-  console.log("notAvailable", notAvailable);
-  const getRecommendationBusPro = await getAllRecommendationTaskAndResponsibilities({
-    draftId: getDraftExisting.draftId,
-    jobId,
-    prlOrg,
-    businessProcessCode: codeNotAvailable,
+  const notAvailableList = TEST_1[0].notAvailable || [];
+  const dataTugasHARecom = TEST_2;
+  localStorage.setItem("dataTugasHARecom", JSON.stringify([]));
+  const modalBody = document.getElementById("modalRecomendationBody");
+  const cleanObjTugasHARecom = dataTugasHARecom
+    .filter((item) => item.responsible.length > 0)
+    .map((item, idx) => {
+      return {
+        idx: idx + 1,
+        ...item,
+      };
+    });
+  localStorage.setItem("dataTugasHARecom", JSON.stringify(cleanObjTugasHARecom));
+  // updateTable("tugasHa", dataTugasHA, [...tabCusJD.tugasHa, "action"]);
+
+  const accordionItems = notAvailableList
+    .map(
+      (item, index) => `
+    <div class="card">
+      <div class="card-header" id="heading${item.indexNumber.replace(/\./g, "_")}">
+        <h5 class="mb-0">
+          <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${item.indexNumber.replace(/\./g, "_")}" aria-expanded="false" aria-controls="collapse${item.indexNumber.replace(/\./g, "_")}">
+            <span class="me-2">#${index + 1}</span>${item.indexNumber} - ${item.description}
+          </button>
+        </h5>
+      </div>
+      <div class="collapse" id="collapse${item.indexNumber.replace(/\./g, "_")}" aria-labelledby="heading${item.indexNumber.replace(/\./g, "_")}">
+        <div class="card-body">
+          <div class="table-responsive m-t-10">
+              <table class="tableMasterData w-100" id="tugasHaRecom${item.indexNumber.replace(/\./g, "_")}Table">
+                  <thead>
+                      <tr>
+                          <th style="width:2%"></th>
+                          <th style="width:2%">No</th>
+                          <th style="width:25%">Tugas & Tanggung Jawab</th>
+                          <th style="width:25%">Hasil Akhir Yang Diharapkan</th>
+                          <th style="width:25%">Leading Indicator</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr class="p-20">
+                          <td colspan="6" class="p-15 text-center">Data Not Found</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+    </div>`,
+    )
+    .join("");
+
+  modalBody.innerHTML = `
+    <div class="default-according" id="accordion1">
+      ${accordionItems || '<p class="text-center text-muted p-3">No items to display.</p>'}
+    </div>`;
+
+  notAvailableList.forEach((item) => {
+    const findData = cleanObjTugasHARecom.filter((data) =>
+      data.tanggungJawabProses.some((proses) => proses.indexNumber === item.indexNumber),
+    );
+    updateTableRecommend(`tugasHaRecom${item.indexNumber.replace(/\./g, "_")}`, findData || [], tabCusJD.tugasHa);
   });
-  console.log("getRecommendationBusPro", getRecommendationBusPro);
+  loader(false);
   $("#modalRecomendation").modal("show");
 }
 
@@ -588,7 +861,12 @@ function callConfirmReference() {
       className: "btn-outline-dark",
       callback: function () {
         hideModal(`modalConfirm`);
+        loader(true);
         saveReferenceAttribute();
+        $("#modalJobCompare").modal("hide");
+        $("#modalJobCompareDetail").modal("hide");
+        loader(false);
+        swal("Success!", "Reference saved to your job description", "success");
       },
     },
     {
@@ -596,6 +874,7 @@ function callConfirmReference() {
       className: "btn-primary",
       callback: function () {
         hideModal(`modalConfirm`);
+
         callOtherRecommendations();
       },
     },
@@ -612,7 +891,6 @@ function callConfirmReference() {
 }
 
 async function saveReferenceAttribute() {
-  loader(true);
   const onlyShowdata = localStorage.getItem("onlyShowdata") == "" ? false : localStorage.getItem("onlyShowdata");
   const checkboxList = Array.from(document.querySelectorAll("input[type=checkbox].checbox-compare")).filter(
     (item) => !item.id.includes("all") && item.checked,
@@ -766,10 +1044,6 @@ async function saveReferenceAttribute() {
   saveTugasHa();
 
   await getJobReferenceDetail();
-  $("#modalJobCompare").modal("hide");
-  $("#modalJobCompareDetail").modal("hide");
-  loader(false);
-  swal("Success!", "Reference saved to your job description", "success");
 }
 
 async function saveTugasHa() {
@@ -971,6 +1245,633 @@ async function focusNode(nodeId) {
     });
     console.log("dataChart for focusNode:", dataChart);
 
+    const dataTest = {
+      status: 200,
+      message: "Success",
+      data: [
+        {
+          layering: "L2",
+          org_unit_name: "Retail Marketing",
+          pid: "10132544",
+          gl: "GL1",
+          position: "VP Marketing",
+          prl: "23",
+          jumlah_formasi: 34,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "Pemasaran Regional",
+          id_position_atasan_langsung: "10132544",
+          id: "10163455",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163455",
+          id_position: "30313912",
+          id_position_parent: "30259031",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          layering: "L3",
+          org_unit_name: "Market Research & Pricing",
+          pid: "10163455",
+          gl: "GL2",
+          position: "Manager Market Research & Pricing",
+          prl: "20",
+          jumlah_formasi: 11,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "Retail Marketing",
+          id_position_atasan_langsung: "10163455",
+          id: "10163456",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163456",
+          id_position: "30313913",
+          id_position_parent: "30313912",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          layering: "L3",
+          org_unit_name: "Event Management",
+          pid: "10163455",
+          gl: "GL2",
+          position: "Manager Event Management",
+          prl: "19",
+          jumlah_formasi: 10,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "Retail Marketing",
+          id_position_atasan_langsung: "10163455",
+          id: "10163461",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163461",
+          id_position: "30313924",
+          id_position_parent: "30313912",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          layering: "L3",
+          org_unit_name: "B2C Marketing & Loyalty Program",
+          pid: "10163455",
+          gl: "GL2",
+          position: "Manager B2C Marketing & Loyalty Program",
+          prl: "21",
+          jumlah_formasi: 12,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "Retail Marketing",
+          id_position_atasan_langsung: "10163455",
+          id: "10163465",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163465",
+          id_position: "30313934",
+          id_position_parent: "30313912",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          layering: "L3",
+          org_unit_name: "B2C Marketing & Loyalty Program",
+          pid: "10163455",
+          gl: "GL2",
+          position: "Manager B2C Marketing & Loyalty Program",
+          prl: "21",
+          jumlah_formasi: 12,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "Retail Marketing",
+          id_position_atasan_langsung: "10163455",
+          id: "10163465",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163465",
+          id_position: "30313934",
+          id_position_parent: "30313912",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          layering: "L4",
+          org_unit_name: "Marketing Program",
+          pid: "10163465",
+          gl: "GL3",
+          position: "Sr Officer III Marketing Program",
+          prl: "16-18",
+          jumlah_formasi: 1,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "B2C Marketing & Loyalty Program",
+          id_position_atasan_langsung: "10163465",
+          id: "10163466",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163466",
+          id_position: "30313935",
+          id_position_parent: "30313934",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          isMergeFormation: true,
+          bc_1_org_unit_name: "Fuel Marketing Program",
+          bc_1_basket: false,
+          bc_2_id_position_atasan_langsung: "10163465",
+          org_unit_name: "Fuel Marketing Program",
+          gl: "GL3",
+          bc_2_prl: "12-13",
+          bc_1_jumlah_formasi: "1",
+          bc_2_id_position_parent: null,
+          basket: true,
+          bc_1_actionType: "Read",
+          bc_2_org_unit_name: "Fuel Marketing Program",
+          id_position: "30313936",
+          bc_2_id_position: "30313936",
+          bc_1_id_position_atasan_langsung: "10163465",
+          bc_2_basket: false,
+          bc_1_position: "Officer I-II Fuel Marketing Program",
+          bc_2_pid: "10163465",
+          actionType: "Read",
+          bc_2_position: "Jr Officer I-II Fuel Marketing Program",
+          bc_2_jumlah_formasi: "1",
+          coordinationWith: {},
+          project: false,
+          bc_1_gl: "3",
+          bc_2_gl: "3",
+          id_org_unit: "10163467",
+          bc_2_layering: "L6",
+          tags: ["basket_2"],
+          isNeck: false,
+          bc_2_idx: "2",
+          coordination: false,
+          position: "Fuel Marketing Program",
+          bc_1_id_position: "30313936",
+          bc_2_flagMergeFormation: "A",
+          hasChildren: false,
+          bc_1_idx: "1",
+          position_parent: "B2C Marketing & Loyalty Program",
+          jumlah_formasi: 1,
+          bc_2_assistant: false,
+          bc_1_prl: "14-15",
+          bc_1_layering: "L5",
+          id: "10163467",
+          prl: "12-15",
+          bc_1_id_org_unit: "10163467",
+          id_position_parent: "30313934",
+          bc_1_id: "10163467",
+          bc_1_flagMergeFormation: "A",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          layering: "L5",
+          bc_2_id: "10163467",
+          id_position_atasan_langsung: "10163465",
+          pid: "10163465",
+          bc_2_actionType: "Read",
+          bc_2_id_org_unit: "10163467",
+          bc_1_assistant: false,
+          assistant: false,
+          bc_1_pid: "10163465",
+          bc_1_id_position_parent: null,
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+        },
+        {
+          isMergeFormation: true,
+          bc_1_org_unit_name: "Gas Marketing Program",
+          bc_1_basket: false,
+          bc_2_id_position_atasan_langsung: "10163465",
+          org_unit_name: "Gas Marketing Program",
+          gl: "GL3",
+          bc_2_prl: "12-13",
+          bc_1_jumlah_formasi: "1",
+          bc_2_id_position_parent: null,
+          basket: true,
+          bc_1_actionType: "Read",
+          bc_2_org_unit_name: "Gas Marketing Program",
+          id_position: "30313937",
+          bc_2_id_position: "30313937",
+          bc_1_id_position_atasan_langsung: "10163465",
+          bc_2_basket: false,
+          bc_1_position: "Officer I-II Gas Marketing Program",
+          bc_2_pid: "10163465",
+          actionType: "Read",
+          bc_2_position: "Jr Officer I-II Gas Marketing Program",
+          bc_2_jumlah_formasi: "1",
+          coordinationWith: {},
+          project: false,
+          bc_1_gl: "3",
+          bc_2_gl: "3",
+          id_org_unit: "10163468",
+          bc_2_layering: "L6",
+          tags: ["basket_2"],
+          isNeck: false,
+          bc_2_idx: "2",
+          coordination: false,
+          position: "Gas Marketing Program",
+          bc_1_id_position: "30313937",
+          bc_2_flagMergeFormation: "A",
+          hasChildren: false,
+          bc_1_idx: "1",
+          position_parent: "B2C Marketing & Loyalty Program",
+          jumlah_formasi: 1,
+          bc_2_assistant: false,
+          bc_1_prl: "14-15",
+          bc_1_layering: "L5",
+          id: "10163468",
+          prl: "12-15",
+          bc_1_id_org_unit: "10163468",
+          id_position_parent: "30313934",
+          bc_1_id: "10163468",
+          bc_1_flagMergeFormation: "A",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          layering: "L5",
+          bc_2_id: "10163468",
+          id_position_atasan_langsung: "10163465",
+          pid: "10163465",
+          bc_2_actionType: "Read",
+          bc_2_id_org_unit: "10163468",
+          bc_1_assistant: false,
+          assistant: false,
+          bc_1_pid: "10163465",
+          bc_1_id_position_parent: null,
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+        },
+        {
+          isMergeFormation: true,
+          bc_1_org_unit_name: "Digital Marketing Program",
+          bc_1_basket: false,
+          bc_2_id_position_atasan_langsung: "10163465",
+          org_unit_name: "Digital Marketing Program",
+          gl: "GL3",
+          bc_2_prl: "12-13",
+          bc_1_jumlah_formasi: "1",
+          bc_2_id_position_parent: null,
+          basket: true,
+          bc_1_actionType: "Read",
+          bc_2_org_unit_name: "Digital Marketing Program",
+          id_position: "30313938",
+          bc_2_id_position: "30313938",
+          bc_1_id_position_atasan_langsung: "10163465",
+          bc_2_basket: false,
+          bc_1_position: "Officer I-II Digital Marketing Program",
+          bc_2_pid: "10163465",
+          actionType: "Read",
+          bc_2_position: "Jr Officer I-II Digital Marketing Program",
+          bc_2_jumlah_formasi: "1",
+          coordinationWith: {},
+          project: false,
+          bc_1_gl: "3",
+          bc_2_gl: "3",
+          id_org_unit: "10163469",
+          bc_2_layering: "L6",
+          tags: ["basket_2"],
+          isNeck: false,
+          bc_2_idx: "2",
+          coordination: false,
+          position: "Digital Marketing Program",
+          bc_1_id_position: "30313938",
+          bc_2_flagMergeFormation: "A",
+          hasChildren: false,
+          bc_1_idx: "1",
+          position_parent: "B2C Marketing & Loyalty Program",
+          jumlah_formasi: 1,
+          bc_2_assistant: false,
+          bc_1_prl: "14-15",
+          bc_1_layering: "L5",
+          id: "10163469",
+          prl: "12-15",
+          bc_1_id_org_unit: "10163469",
+          id_position_parent: "30313934",
+          bc_1_id: "10163469",
+          bc_1_flagMergeFormation: "A",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          layering: "L5",
+          bc_2_id: "10163469",
+          id_position_atasan_langsung: "10163465",
+          pid: "10163465",
+          bc_2_actionType: "Read",
+          bc_2_id_org_unit: "10163469",
+          bc_1_assistant: false,
+          assistant: false,
+          bc_1_pid: "10163465",
+          bc_1_id_position_parent: null,
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+        },
+        {
+          coordinationWith: {},
+          bc_3_pid: "10163465",
+          bc_3_layering: "L6",
+          coordination: false,
+          bc_2_jumlah_formasi: "1",
+          org_unit_name: "Loyalty Program",
+          bc_1_pid: "10163465",
+          bc_2_prl: "14-15",
+          bc_1_assistant: false,
+          hasChildren: false,
+          bc_1_layering: "L4",
+          id_org_unit: "10163470",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+          bc_3_org_unit_name: "Loyalty Program",
+          tags: ["basket_3"],
+          bc_1_gl: "3",
+          bc_1_org_unit_name: "Loyalty Program",
+          prl: "12-18",
+          bc_1_jumlah_formasi: "1",
+          layering: "L4",
+          position: "Loyalty Program",
+          bc_3_position_parent: "B2C Marketing & Loyalty Program",
+          bc_2_org_unit_name: "Loyalty Program",
+          bc_2_id_position_atasan_langsung: "10163465",
+          id_position: "30313939",
+          bc_2_flagMergeFormation: null,
+          id_position_atasan_langsung: "10163465",
+          bc_2_pid: "10163465",
+          bc_3_id_position_atasan_langsung: "10163465",
+          position_parent: "B2C Marketing & Loyalty Program",
+          bc_3_gl: "3",
+          bc_3_actionType: "Read",
+          bc_1_position: "Sr Officer I-III Loyalty Program",
+          bc_1_basket: false,
+          bc_1_id_position_atasan_langsung: "10163465",
+          gl: "GL3",
+          bc_3_id_position_parent: null,
+          isMergeFormation: false,
+          bc_2_actionType: "Read",
+          bc_3_assistant: false,
+          assistant: false,
+          bc_1_idx: "1",
+          bc_3_idx: "3",
+          bc_3_basket: false,
+          bc_2_gl: "3",
+          bc_1_id_position_parent: null,
+          basket: true,
+          bc_1_id: "10163470",
+          bc_1_id_position: "30313939",
+          isNeck: false,
+          bc_3_id: "10163470",
+          bc_1_flagMergeFormation: null,
+          bc_1_id_org_unit: "10163470",
+          id: "10163470",
+          bc_2_assistant: false,
+          bc_2_id: "10163470",
+          bc_3_id_org_unit: "10163470",
+          bc_3_id_position: "30313939",
+          bc_3_position: "Jr Officer I-II Loyalty Program",
+          bc_3_flagMergeFormation: null,
+          jumlah_formasi: 1,
+          bc_3_jumlah_formasi: "1",
+          bc_2_layering: "L5",
+          pid: "10163465",
+          bc_2_id_position: "30313939",
+          bc_2_id_position_parent: null,
+          bc_3_prl: "12-13",
+          bc_2_idx: "2",
+          bc_2_basket: false,
+          bc_1_actionType: "Read",
+          bc_2_position: "Officer I-II Loyalty Program",
+          id_position_parent: "30313934",
+          actionType: "Read",
+          project: false,
+          bc_1_prl: "16-18",
+          bc_2_id_org_unit: "10163470",
+        },
+        {
+          layering: "L4",
+          org_unit_name: "Brand Management",
+          pid: "10163465",
+          gl: "GL3",
+          position: "Sr Officer II Brand Management",
+          prl: "16-17",
+          jumlah_formasi: 1,
+          coordinationWith: {},
+          actionType: "Read",
+          tags: [],
+          coordination: false,
+          isNeck: false,
+          basket: false,
+          position_parent: "B2C Marketing & Loyalty Program",
+          id_position_atasan_langsung: "10163465",
+          id: "10163471",
+          assistant: false,
+          isMergeFormation: false,
+          id_org_unit: "10163471",
+          id_position: "30313942",
+          id_position_parent: "30313934",
+          project: false,
+          hasChildren: false,
+        },
+        {
+          isMergeFormation: true,
+          bc_1_org_unit_name: "Fuel Brand Management",
+          bc_1_basket: false,
+          bc_2_id_position_atasan_langsung: "10163465",
+          org_unit_name: "Fuel Brand Management",
+          gl: "GL3",
+          bc_2_prl: "12-13",
+          bc_1_jumlah_formasi: "1",
+          bc_2_id_position_parent: null,
+          basket: true,
+          bc_1_actionType: "Read",
+          bc_2_org_unit_name: "Fuel Brand Management",
+          id_position: "30313943",
+          bc_2_id_position: "30313943",
+          bc_1_id_position_atasan_langsung: "10163465",
+          bc_2_basket: false,
+          bc_1_position: "Officer I-II Fuel Brand Management",
+          bc_2_pid: "10163465",
+          actionType: "Read",
+          bc_2_position: "Jr Officer I-II Fuel Brand Management",
+          bc_2_jumlah_formasi: "1",
+          coordinationWith: {},
+          project: false,
+          bc_1_gl: "3",
+          bc_2_gl: "3",
+          id_org_unit: "10163472",
+          bc_2_layering: "L6",
+          tags: ["basket_2"],
+          isNeck: false,
+          bc_2_idx: "2",
+          coordination: false,
+          position: "Fuel Brand Management",
+          bc_1_id_position: "30313943",
+          bc_2_flagMergeFormation: "A",
+          hasChildren: false,
+          bc_1_idx: "1",
+          position_parent: "B2C Marketing & Loyalty Program",
+          jumlah_formasi: 1,
+          bc_2_assistant: false,
+          bc_1_prl: "14-15",
+          bc_1_layering: "L5",
+          id: "10163472",
+          prl: "12-15",
+          bc_1_id_org_unit: "10163472",
+          id_position_parent: "30313934",
+          bc_1_id: "10163472",
+          bc_1_flagMergeFormation: "A",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          layering: "L5",
+          bc_2_id: "10163472",
+          id_position_atasan_langsung: "10163465",
+          pid: "10163465",
+          bc_2_actionType: "Read",
+          bc_2_id_org_unit: "10163472",
+          bc_1_assistant: false,
+          assistant: false,
+          bc_1_pid: "10163465",
+          bc_1_id_position_parent: null,
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+        },
+        {
+          isMergeFormation: true,
+          bc_1_org_unit_name: "Gas Brand Management",
+          bc_1_basket: false,
+          bc_2_id_position_atasan_langsung: "10163465",
+          org_unit_name: "Gas Brand Management",
+          gl: "GL3",
+          bc_2_prl: "12-13",
+          bc_1_jumlah_formasi: "1",
+          bc_2_id_position_parent: null,
+          basket: true,
+          bc_1_actionType: "Read",
+          bc_2_org_unit_name: "Gas Brand Management",
+          id_position: "30313944",
+          bc_2_id_position: "30313944",
+          bc_1_id_position_atasan_langsung: "10163465",
+          bc_2_basket: false,
+          bc_1_position: "Officer I-II Gas Brand Management",
+          bc_2_pid: "10163465",
+          actionType: "Read",
+          bc_2_position: "Jr Officer I-II Gas Brand Management",
+          bc_2_jumlah_formasi: "1",
+          coordinationWith: {},
+          project: false,
+          bc_1_gl: "3",
+          bc_2_gl: "3",
+          id_org_unit: "10163473",
+          bc_2_layering: "L6",
+          tags: ["basket_2"],
+          isNeck: false,
+          bc_2_idx: "2",
+          coordination: false,
+          position: "Gas Brand Management",
+          bc_1_id_position: "30313944",
+          bc_2_flagMergeFormation: "A",
+          hasChildren: false,
+          bc_1_idx: "1",
+          position_parent: "B2C Marketing & Loyalty Program",
+          jumlah_formasi: 1,
+          bc_2_assistant: false,
+          bc_1_prl: "14-15",
+          bc_1_layering: "L5",
+          id: "10163473",
+          prl: "12-15",
+          bc_1_id_org_unit: "10163473",
+          id_position_parent: "30313934",
+          bc_1_id: "10163473",
+          bc_1_flagMergeFormation: "A",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          layering: "L5",
+          bc_2_id: "10163473",
+          id_position_atasan_langsung: "10163465",
+          pid: "10163465",
+          bc_2_actionType: "Read",
+          bc_2_id_org_unit: "10163473",
+          bc_1_assistant: false,
+          assistant: false,
+          bc_1_pid: "10163465",
+          bc_1_id_position_parent: null,
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+        },
+        {
+          isMergeFormation: true,
+          bc_1_org_unit_name: "Digital Brand Management",
+          bc_1_basket: false,
+          bc_2_id_position_atasan_langsung: "10163465",
+          org_unit_name: "Digital Brand Management",
+          gl: "GL3",
+          bc_2_prl: "12-13",
+          bc_1_jumlah_formasi: "1",
+          bc_2_id_position_parent: null,
+          basket: true,
+          bc_1_actionType: "Read",
+          bc_2_org_unit_name: "Digital Brand Management",
+          id_position: "30313945",
+          bc_2_id_position: "30313945",
+          bc_1_id_position_atasan_langsung: "10163465",
+          bc_2_basket: false,
+          bc_1_position: "Officer I-II Digital Brand Management",
+          bc_2_pid: "10163465",
+          actionType: "Read",
+          bc_2_position: "Jr Officer I-II Digital Brand Management",
+          bc_2_jumlah_formasi: "1",
+          coordinationWith: {},
+          project: false,
+          bc_1_gl: "3",
+          bc_2_gl: "3",
+          id_org_unit: "10163474",
+          bc_2_layering: "L6",
+          tags: ["basket_2"],
+          isNeck: false,
+          bc_2_idx: "2",
+          coordination: false,
+          position: "Digital Brand Management",
+          bc_1_id_position: "30313945",
+          bc_2_flagMergeFormation: "A",
+          hasChildren: false,
+          bc_1_idx: "1",
+          position_parent: "B2C Marketing & Loyalty Program",
+          jumlah_formasi: 1,
+          bc_2_assistant: false,
+          bc_1_prl: "14-15",
+          bc_1_layering: "L5",
+          id: "10163474",
+          prl: "12-15",
+          bc_1_id_org_unit: "10163474",
+          id_position_parent: "30313934",
+          bc_1_id: "10163474",
+          bc_1_flagMergeFormation: "A",
+          bc_2_position_parent: "B2C Marketing & Loyalty Program",
+          layering: "L5",
+          bc_2_id: "10163474",
+          id_position_atasan_langsung: "10163465",
+          pid: "10163465",
+          bc_2_actionType: "Read",
+          bc_2_id_org_unit: "10163474",
+          bc_1_assistant: false,
+          assistant: false,
+          bc_1_pid: "10163465",
+          bc_1_id_position_parent: null,
+          bc_1_position_parent: "B2C Marketing & Loyalty Program",
+        },
+      ],
+    };
+
     // Update chart data (assuming this function handles chart rendering)
     renderOrgChart(dataChart.data, nodeId, true);
     // renderOrgChart(test1, "10132410", true);
@@ -1056,6 +1957,14 @@ function hideChartLoading(containerClass) {
   }
 }
 
+// Toggle visibility of #addJobPJ and #addJobReferencePJ buttons based on persyaratanJabatan data length
+function updateAddJobPJVisibility(params, data) {
+  $("#addJobPJ, #addJobReferencePJ").show();
+  if (params === "persyaratanJabatan" && data.length >= 1) {
+    $("#addJobPJ, #addJobReferencePJ").hide();
+  }
+}
+
 // Action button functions for table rows
 function editData(params, index) {
   // Get data from localStorage based on the params
@@ -1064,10 +1973,14 @@ function editData(params, index) {
   if (params == "tugasHa") params = "tugasHa";
   if (params == "stk") params = "stk";
   if (params == "persyaratanKhusus") params = "persyaratanKhusus";
+  if (params == "persyaratanJabatan") params = "persyaratanJabatan";
+
   let data = [];
   try {
     const storageData = localStorage.getItem(params);
     data = storageData ? JSON.parse(storageData) : [];
+
+    updateAddJobPJVisibility(params, data);
   } catch (error) {
     swal("Error", "Failed to load data for editing", "error");
     return;
@@ -1107,7 +2020,9 @@ function deleteData(params, index) {
   if (params == "tugasHa") paramsLs = "tugasHa";
   if (params == "stk") paramsLs = "stk";
   if (params == "persyaratanKhusus") paramsLs = "persyaratanKhusus";
+  if (params == "persyaratanJabatan") paramsLs = "persyaratanJabatan";
 
+  console.log("Attempting to delete item at index:", index, "in params:", paramsLs);
   // Get data from localStorage based on the params
   let data = [];
   try {
@@ -1134,6 +2049,7 @@ function deleteData(params, index) {
   }
 
   const itemToDelete = data[index];
+  console.log("Attempting to delete item:", itemToDelete, "at index:", index, "in params:", paramsLs);
   // Show confirmation before deleting
   swal({
     title: "Are you sure?",
@@ -1158,6 +2074,7 @@ function deleteData(params, index) {
 
       // Refresh the table display using the original params for table name
       refreshTableDisplay(params, data);
+      updateAddJobPJVisibility(params, data);
 
       swal("Deleted!", "The item has been deleted successfully.", "success");
     }
@@ -1247,7 +2164,10 @@ async function mergeBusPro() {
   const tugasHaData = localStorage.getItem("tugasHa") !== "" ? JSON.parse(localStorage.getItem("tugasHa")) : [];
   const itemToMerge = tugasHaData[mergeIndexSelected];
 
-  // Merge tanggungJawabProses from selected items into itemToMerge, avoiding duplicates, and merge lead, output, responsible ass well
+  console.log("Merging item at index:", mergeIndexSelected, "with selected indexes:", selectedIndexes);
+  console.log("Item to merge before:", itemToMerge);
+
+  // Merge tanggungJawabProses from selected items into itemToMerge, avoiding duplicates, and merge lead, output, responsible as well
   selectedIndexes.forEach((idx) => {
     const item = tugasHaData[idx];
     item.tanggungJawabProses.forEach((process) => {
@@ -1257,38 +2177,24 @@ async function mergeBusPro() {
       }
     });
 
-    // Merge lead, output, responsible is array. if data exists, push to array
-    if (item.lead && !itemToMerge.lead) {
-      itemToMerge.lead = [];
-    }
-    if (item.output && !itemToMerge.output) {
-      itemToMerge.output = [];
-    }
-    if (item.responsible && !itemToMerge.responsible) {
-      itemToMerge.responsible = [];
-    }
+    // Merge lead, output, responsible - handle both string and array types
+    ["lead", "output", "responsible"].forEach((field) => {
+      if (!item[field]) return;
 
-    if (item.lead && Array.isArray(item.lead)) {
-      item.lead.forEach((leadItem) => {
-        if (!itemToMerge.lead.some((existing) => JSON.stringify(existing) === JSON.stringify(leadItem))) {
-          itemToMerge.lead.push(leadItem);
+      // Ensure itemToMerge[field] is an array
+      if (!itemToMerge[field]) {
+        itemToMerge[field] = [];
+      } else if (!Array.isArray(itemToMerge[field])) {
+        itemToMerge[field] = [itemToMerge[field]];
+      }
+
+      const values = Array.isArray(item[field]) ? item[field] : [item[field]];
+      values.forEach((val) => {
+        if (val && !itemToMerge[field].some((existing) => JSON.stringify(existing) === JSON.stringify(val))) {
+          itemToMerge[field].push(val);
         }
       });
-    }
-    if (item.output && Array.isArray(item.output)) {
-      item.output.forEach((outputItem) => {
-        if (!itemToMerge.output.some((existing) => JSON.stringify(existing) === JSON.stringify(outputItem))) {
-          itemToMerge.output.push(outputItem);
-        }
-      });
-    }
-    if (item.responsible && Array.isArray(item.responsible)) {
-      item.responsible.forEach((responsibleItem) => {
-        if (!itemToMerge.responsible.some((existing) => JSON.stringify(existing) === JSON.stringify(responsibleItem))) {
-          itemToMerge.responsible.push(responsibleItem);
-        }
-      });
-    }
+    });
   });
 
   // Calculate how many items before mergeIndexSelected will be removed
@@ -1333,8 +2239,10 @@ function refreshTableDisplay(params, data) {
       case "persyaratanKhusus":
         tableHeaders = [...tabCusJD.persyaratanKhusus, "action"];
         break;
+      case "persyaratanJabatan":
+        tableHeaders = [...tabCusJD.persyaratanJabatan, "action"];
+        break;
       default:
-        console.warn("Unknown params for table refresh:", params);
         return;
     }
 
@@ -1354,6 +2262,7 @@ async function saveJobDescItem(type, id, isAdd = true) {
   }
   const confirm = await confirmFunction("Save Item", `Are you sure you want to ${isAdd ? "add" : "update"} this item?`);
   if (!confirm) return;
+  const isMustBulletedList = MUST_BULLETED_LIST.includes(type);
   if (isAdd) {
     const lsData =
       localStorage.getItem(ls.ls) == "" ||
@@ -1403,6 +2312,9 @@ async function saveJobDescItem(type, id, isAdd = true) {
     console.log("newItem", newItem);
     lsData.push(newItem);
     localStorage.setItem(ls.ls, JSON.stringify(lsData));
+    if (type === "persyaratanJabatan") {
+      updateAddJobPJVisibility(type, lsData);
+    }
     console.log("lsData", lsData);
     console.log("type", type);
     updateTable(type, lsData, [...tabCusJD[type], "action"]);
@@ -1423,6 +2335,7 @@ async function saveJobDescItem(type, id, isAdd = true) {
         // Remove wrapping p tags from CKEditor data
         data = data.replace(/^<p>|<\/p>$/g, "").trim();
 
+        //  if isMustBulletedList and data does not contain bulleted list, then seperate per paragraph and convert to array
         // Check if data contains bulleted list and convert to array
         if (data.includes("<ul>") && data.includes("<li>")) {
           // Extract list items and convert to array
@@ -1434,10 +2347,22 @@ async function saveJobDescItem(type, id, isAdd = true) {
             lsData[id][itemId] = data;
           }
         } else {
-          lsData[id][itemId] = data;
+          lsData[id][itemId] = isMustBulletedList
+            ? data
+                .split(/<\/?p>/)
+                .map((line) => line.trim())
+                .filter((line) => line !== "")
+            : data;
         }
       } else if (element) {
-        lsData[id][itemId] = element.value || element.innerHTML;
+        lsData[id][itemId] = isMustBulletedList
+          ? element.value
+            ? element.value
+                .split(/<\/?p>/)
+                .map((line) => line.trim())
+                .filter((line) => line !== "")
+            : []
+          : element.value || element.innerHTML;
       }
     });
 
@@ -1539,7 +2464,7 @@ function relatedBusPro() {
   $("#modalRelatedBusPro").modal("show");
   const modalRelatedBusPro = document.getElementById("modalRelatedBusProBody");
   const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
-  const notAvailable = lsAvailable.notAvailable;
+  const allResponsibilites = [...lsAvailable.notAvailable, ...lsAvailable.available];
   modalRelatedBusPro.innerHTML = "";
   let content = `
       <div class="table-responsive" style="overflow-x: auto;">
@@ -1559,7 +2484,7 @@ function relatedBusPro() {
         `;
   modalRelatedBusPro.innerHTML = content;
   let tbodBispro = document.querySelector(".tbodBispro");
-  for (let item of notAvailable) {
+  for (let item of allResponsibilites) {
     tbodBispro.innerHTML += `
         <tr>
           <td class="p-3" style="place-content: center">
@@ -1571,7 +2496,7 @@ function relatedBusPro() {
         </tr>
       `;
   }
-  if (notAvailable.length === 0) {
+  if (allResponsibilites.length === 0) {
     tbodBispro.innerHTML = `
         <tr class="no-data-row">
           <td colspan="2" class="text-center p-3">
@@ -1603,11 +2528,11 @@ async function addSelectedBusPro() {
     return;
   }
   const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
-  const notAvailable = lsAvailable.notAvailable;
+  const allResponsibilites = [...lsAvailable.notAvailable, ...lsAvailable.available];
   const selectedValues = selectedCheckboxes
     .map((checkbox) => checkbox.value)
     .map((value) => {
-      const matchedItem = notAvailable.find((item) => item.indexNumber === value);
+      const matchedItem = allResponsibilites.find((item) => item.indexNumber === value);
       return {
         indexNumber: matchedItem ? matchedItem.indexNumber : null,
         description: matchedItem ? matchedItem.description : null,
@@ -1784,14 +2709,17 @@ function updateJobDescItem(type, id, isAdd = true) {
         `);
     });
     // Initialize CKEditor 4.8.0 for textareas
+    const isMustBulletedList = MUST_BULLETED_LIST.includes(type);
     if (typeof CKEDITOR !== "undefined" && CKEDITOR && mapping.toolbar) {
       mapping.ids.forEach((itemId) => {
         const editor = CKEDITOR.replace(itemId, {
-          toolbar: [
-            { name: "editing", items: ["Undo", "Redo"] },
-            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
-            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
-          ],
+          toolbar: isMustBulletedList
+            ? [{ name: "paragraph", items: ["BulletedList"] }]
+            : [
+                { name: "editing", items: ["Undo", "Redo"] },
+                { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+                { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+              ],
           removePlugins: "elementspath",
           resize_enabled: false,
           height: 180,
@@ -1884,6 +2812,8 @@ function updateJobDescItem(type, id, isAdd = true) {
     });
     // Initialize CKEditor 4.8.0 for textareas with existing data
     if (typeof CKEDITOR !== "undefined" && CKEDITOR && mapping.toolbar) {
+      // if type included in mustBulletedList then force value to be bulleted list and disable toolbar other than bulleted list
+      const isMustBulletedList = MUST_BULLETED_LIST.includes(type);
       mapping.ids.forEach((itemId) => {
         const isList = mapping.listIds && mapping.listIds.includes(itemId);
         let value = "";
@@ -1896,11 +2826,13 @@ function updateJobDescItem(type, id, isAdd = true) {
         }
 
         const editor = CKEDITOR.replace(itemId, {
-          toolbar: [
-            { name: "editing", items: ["Undo", "Redo"] },
-            { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
-            { name: "paragraph", items: ["BulletedList", "NumberedList"] },
-          ],
+          toolbar: isMustBulletedList
+            ? [{ name: "paragraph", items: ["BulletedList"] }]
+            : [
+                { name: "editing", items: ["Undo", "Redo"] },
+                { name: "basicstyles", items: ["Bold", "Italic", "Underline"] },
+                { name: "paragraph", items: ["BulletedList", "NumberedList"] },
+              ],
           removePlugins: "elementspath",
           resize_enabled: false,
           height: 180,
