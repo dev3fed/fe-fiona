@@ -8,6 +8,7 @@ const modalInfoPosition = async (code, prl) => {
     };
     const queryString = `${code}/${prl}?` + new URLSearchParams(payload).toString();
     const result = await fetchDetailPositionInfo(queryString);
+    // console.log("result", result);
     if (result.success === true) {
       const detailInformation = result?.data.jobDetail[0];
       setState("jobInformation", detailInformation);
@@ -213,15 +214,15 @@ const modalInfoPosition = async (code, prl) => {
         const cardIncumbent = `
         <div class="col-3">
             <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeId}</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.incumbentEmployeeId || "-"}</label><br/>
         </div>
         <div class="col-3">
             <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeName}</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.incumbentEmployeeName || "-"}</label><br/>
         </div>
         <div class="col-6">
             <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
-            <label style="font-weight: 600;font-size: 14px">${detailInformation.prlPlanComp}</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.prl || "-"}</label><br/>
         </div>
 `;
         const jobInfo = document.getElementById("job-info");
@@ -244,6 +245,8 @@ const cardTblMandatory = async (code, prl) => {
   const payload = `${dataSource}/${code}/${prl}`;
   try {
     const result = await fetchDetailPositionMandatory(payload);
+    // console.log("result", result);
+    const payloadAddCompetency = getState("payloadAddCompetency");
     const mandatoryNoData = document.getElementById("mandatory-no-data");
     const mandatoryContent = document.getElementById("mandatory-content");
     if (mandatoryContent) {
@@ -254,6 +257,19 @@ const cardTblMandatory = async (code, prl) => {
     }
     if (result.success === true) {
       const listMandatory = result?.data.compData || [];
+
+      const updatedPayload = [
+        ...(payloadAddCompetency || []),
+        ...listMandatory.map((element) => ({
+          ...element,
+          compeId: element.compCode,
+          compeName: element.name,
+          selectedType: element.compType,
+          selectedLvl: element.proficiencyLevel,
+        })),
+      ];
+      setState("payloadAddCompetency", updatedPayload);
+
       const labelMandatory = document.getElementById("labelMandatory");
 
       if (labelMandatory) {
@@ -301,6 +317,8 @@ const cardTblGeneral = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionTechnical(payload);
+    // console.log("result", result);
+    const payloadAddCompetency = getState("payloadAddCompetency");
     const generalNoData = document.getElementById("general-no-data");
     const generalContent = document.getElementById("general-competency-content");
     if (generalContent) {
@@ -313,6 +331,18 @@ const cardTblGeneral = async (code, prl) => {
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
+      const updatedPayload = [
+        ...(payloadAddCompetency || []),
+        ...generalCompetencies.map((element) => ({
+          ...element,
+          compeId: element.compCode,
+          compeName: element.compName,
+          selectedType: element.compType,
+          selectedLvl: element.level,
+        })),
+      ];
+      setState("payloadAddCompetency", updatedPayload);
+
       const labelCore = document.getElementById("labelCore");
       if (labelCore) {
         labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
@@ -361,6 +391,8 @@ const cardTblSpecific = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionTechnical(payload);
+    // console.log("result", result);
+    const payloadAddCompetency = getState("payloadAddCompetency");
     const specificNoData = document.getElementById("specific-no-data");
     const specificContent = document.getElementById("specific-competency-content");
     if (specificContent) {
@@ -372,6 +404,18 @@ const cardTblSpecific = async (code, prl) => {
     if (result.success === true) {
       const listTechnical = result?.data.compData || [];
       const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
+
+      const updatedPayload = [
+        ...(payloadAddCompetency || []),
+        ...specificCompetencies.map((element) => ({
+          ...element,
+          compeId: element.compCode,
+          compeName: element.compName,
+          selectedType: element.compType,
+          selectedLvl: element.level,
+        })),
+      ];
+      setState("payloadAddCompetency", updatedPayload);
       const labelSpecific = document.getElementById("labelSpecific");
       const specificNoData = document.getElementById("specific-no-data");
 

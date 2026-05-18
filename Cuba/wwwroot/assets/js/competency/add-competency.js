@@ -82,7 +82,7 @@ const openSpecificCompetency = async () => {
     <div id="sg-ssg-info" class="col-12" style="display:none;">
       <label style="color:#03a9f4; cursor:pointer;" 
              onmouseover="this.style.textDecoration='underline'" 
-             onmouseout="this.style.textDecoration='none'">See dictionary</label>
+             onmouseout="this.style.textDecoration='none'" onclick="handleSeeDictionary()">See dictionary</label>
       <label id="sg-ssg-label" style="display:block; margin-top:2px;"></label>
       <hr style="margin-top:20px;margin-bottom:20px"/>
     </div>
@@ -452,6 +452,7 @@ async function removeCompetency(compeId) {
   const competencyList = getState("payloadAddCompetency") || [];
   const updatedList = competencyList.filter((item) => item.compeId !== compeId);
   setState("payloadAddCompetency", updatedList);
+  console.log("compeId", compeId);
   cardSelectedCompetency(updatedList);
   updateRadioButtonState();
 }
@@ -1053,9 +1054,9 @@ const handleSaveDraftCompe = async () => {
         },
       ],
     };
-    console.log("payload", payload);
+    // console.log("payload", payload);
     const result = await fetchAddtechnicalCompetency(payload);
-    console.log("result", result);
+    // console.log("result", result);
     if (result.success === true) {
       const draftName = $("#dataSource-competency option:selected").text();
       swal({
@@ -1073,11 +1074,22 @@ const handleSaveDraftCompe = async () => {
           },
         },
       }).then(async () => {
-        if (modal) modal.hide();
-        spinBtn.style.display = "none";
+        setTimeout(() => {
+          handleSearchCompetency();
+          if (modal) modal.hide();
+          spinBtn.style.display = "none";
+        }, 200);
       });
     }
   } catch (error) {
     console.error("Error saving draft:", error);
   }
+};
+
+const handleSeeDictionary = () => {
+  const competencyId = $("#competencyId").val();
+  console.log("Selected competency:", competencyId);
+  handleDetailCompetency("Technical", competencyId);
+  const modalAddCompetency = bootstrap.Modal.getInstance(document.getElementById("modalAddCompetency"));
+  if (modalAddCompetency) modalAddCompetency.hide();
 };

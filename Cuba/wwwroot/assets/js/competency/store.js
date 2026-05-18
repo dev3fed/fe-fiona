@@ -12,6 +12,7 @@ const appState = new Proxy(
     currentPageX: 1,
     payloadJob: {
       dataSource: selectedValue,
+      filter: "position",
       page: 1,
       pageSize: 15,
     },
@@ -47,6 +48,9 @@ const appState = new Proxy(
     resultJob: [],
     resultCompetency: [],
     resultMapping: [],
+    dataMandatory: [],
+    dataGeneral: [],
+    dataSpecific: [],
     totalJob: 0,
     totalCompetency: 0,
     // remove below
