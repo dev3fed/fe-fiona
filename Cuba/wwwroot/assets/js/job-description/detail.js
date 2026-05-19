@@ -100,10 +100,12 @@ function prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft) {
     objTugasHa.hasilAkhir = item.output || [];
     objTugasHa.leadingIndikator = item.lead || [];
     // Filter unique values
-    objTugasHa.tanggungJawabProses = item.tanggungJawabProses
+    objTugasHa.tanggungJawabProses = (item.tanggungJawabProses || [])
       .map((tr) => tr.code)
       .filter((v, i, a) => a.indexOf(v) === i);
-    objTugasHa.hasilAkhirProses = item.hasilAkhirProses.map((hr) => hr.code).filter((v, i, a) => a.indexOf(v) === i);
+    objTugasHa.hasilAkhirProses = (item.hasilAkhirProses || [])
+      .map((hr) => hr.code)
+      .filter((v, i, a) => a.indexOf(v) === i);
     objTugasHa.jobReferences = [];
     if (item.jobReferences && item.jobReferences.length > 0) {
       objTugasHa.jobReferences = item.jobReferences;
@@ -540,7 +542,11 @@ async function searchJobCompare(event, isPercentage = false) {
 
     const jobSimilaritiesData = JSON.parse(localStorage.getItem("jobSimilaritiesData"));
     const jobSimilaritiesDetails = JSON.parse(localStorage.getItem("jobSimilaritiesDetails"));
-    const data = jobSimilaritiesData?.filter((item) => item.percentage >= value);
+    const selectedSK = $("#selectSK").val() || null;
+    console.log("selectedSK", selectedSK);
+    const data = !selectedSK
+      ? jobSimilaritiesData?.filter((item) => item.percentage >= value)
+      : jobSimilaritiesData?.filter((item) => item.noSk === selectedSK && item.percentage >= value);
     console.log("jobSimilaritiesData", jobSimilaritiesData);
     console.log("data filtered", data);
     // dan urutan berdasarkan percentage yang paling tinggi
@@ -657,6 +663,39 @@ function readOnlyPage() {
     }
   }, 1000);
 }
+async function generateAndDownloadWord() {
+  try {
+    console.log("🚀 Starting Word document generation...");
+    const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
+    console.log("Generating Word document with params:", params);
+
+    const wordResult = await downloadWord(params);
+
+    if (!wordResult || !wordResult.data || !wordResult.data.fileUrl) {
+      console.error("Invalid response from downloadWord:", wordResult);
+      swal("Warning", "Failed to generate Word document. Invalid server response.", "warning");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = wordResult.data.fileUrl;
+    link.download = `Job_Description_${jobId}.docx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(wordResult.data.fileUrl);
+    }, 100);
+
+    console.log("✅ Word document downloaded successfully");
+    swal("Success", "Word document generated successfully!", "success");
+  } catch (error) {
+    console.error("❌ Error generating Word document:", error);
+    swal("Warning", `Failed to generate Word document: ${error.message}`, "warning");
+  }
+}
+
 async function getDetailJob(jobCode) {
   console.log("getDraftExisting", getDraftExisting);
   const detailJob = await chartJobDetail({
@@ -667,6 +706,14 @@ async function getDetailJob(jobCode) {
 }
 
 $(document).ready(async function () {
+  // $("#modalRecomendation").modal("show");
+  // modalRecomendationBody
+  // make list in modalRecomendationBody with codeNotAvailable
+
+  localStorage.setItem("selectedJobDescReference", JSON.stringify([]));
+  localStorage.setItem("isFullRefer", JSON.stringify(false));
+
+  // return;
   loader(true);
   if (master) {
     const draftExistingJobDesc = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
@@ -695,12 +742,20 @@ $(document).ready(async function () {
     readOnlyPage();
   }
   const detailJobSO = await getDetailJob(jobId);
+  getDataListAsync([
+    {
+      id: "selectSK",
+      endpoint: "chart/job/list",
+      // draftId: draftId,
+    },
+  ]);
+  // const skList = await getSkList(1, 999);
+  // console.log("skList", skList);
 
-  console.log("jobId, prlOrg", jobId, prlOrg);
   async function updateDataSimilarities() {
     localStorage.removeItem("jobSimilaritiesData");
     localStorage.removeItem("jobSimilaritiesDetails");
-    $("#addJobReference").hide();
+    // $()
     const result = await getSimilarities({
       draftId: getDraftExisting.draftId,
       jobId: jobId,
@@ -722,25 +777,31 @@ $(document).ready(async function () {
         .sort((a, b) => b.percentage - a.percentage);
       localStorage.setItem("jobSimilaritiesData", JSON.stringify(dataCompare));
 
-      // const detailPromises = dataCompare.map((item) =>
-      //   getAllTanggungJawabJobToJob({
-      //     draftId: getDraftExisting.draftId,
-      //     jobIdFrom: jobId,
-      //     prlOrgFrom: prlOrg,
-      //     jobIdTo: item.jobIdTarget,
-      //     prlOrgTo: item.prlOrgTo,
-      //     page: 1,
-      //     pageSize: 99,
-      //   }).then((res) => ({
-      //     jobIdTo: item.jobIdTarget,
-      //     data: res.data,
-      //   })),
-      // );
-      // const jobSimilaritiesDetails = await Promise.all(detailPromises);
-      // localStorage.setItem("jobSimilaritiesDetails", JSON.stringify(jobSimilaritiesDetails));
-      // console.log("jobSimilaritiesDetails", jobSimilaritiesDetails);
+      $(
+        "#addJobReference, #referenceFunction, #referenceTugasHa, #referenceKoordinasi, #referenceRelasi, #referencePk, #addJobReferencePJ, #referenceSTK",
+      ).prop("disabled", false);
+      // all class spinner display none
+      $(".spinner-border").hide();
+
+      const detailPromises = dataCompare.map((item) =>
+        getAllTanggungJawabJobToJob({
+          draftId: getDraftExisting.draftId,
+          jobIdFrom: jobId,
+          prlOrgFrom: prlOrg,
+          jobIdTo: item.jobIdTarget,
+          prlOrgTo: item.prlOrgTo,
+          page: 1,
+          pageSize: 99,
+        }).then((res) => ({
+          jobIdTo: item.jobIdTarget,
+          data: res.data,
+        })),
+      );
+      const jobSimilaritiesDetails = await Promise.all(detailPromises);
+      localStorage.setItem("jobSimilaritiesDetails", JSON.stringify(jobSimilaritiesDetails));
+      console.log("jobSimilaritiesDetails", jobSimilaritiesDetails);
     }
-    $("#addJobReference").show();
+
     return result;
   }
 
@@ -1094,6 +1155,11 @@ $(document).ready(async function () {
       ];
     }
     localStorage.setItem("persyaratanJabatan", JSON.stringify(getDataJobDesc.persyaratanJabatan.data));
+    console.log("persyaratanJabatan", getDataJobDesc.persyaratanJabatan.data);
+    if (getDataJobDesc.persyaratanJabatan.data.length >= 1) {
+      $("#addJobPJ, #addJobReferencePJ").hide();
+    }
+
     updateTable("persyaratanJabatan", getDataJobDesc.persyaratanJabatan.data, [
       ...tabCusJD.persyaratanJabatan,
       "action",
@@ -1275,62 +1341,26 @@ $(document).ready(async function () {
 
         if (uploadResult && uploadResult.success) {
           console.log("✅ SVG uploaded successfully:", uploadResult);
-          swal("Success", "SVG uploaded successfully!", "success");
-
-          // Generate and download Word document after successful SVG upload
-          try {
-            console.log("🚀 Starting Word document generation...");
-            const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
-            console.log("Generating Word document with params:", params);
-
-            const wordResult = await downloadWord(params);
-
-            // Check if the response contains the expected data structure
-            if (!wordResult || !wordResult.data || !wordResult.data.fileUrl) {
-              console.error("Invalid response from downloadWord:", wordResult);
-              swal(
-                "Warning",
-                "SVG uploaded successfully, but failed to generate Word document. Invalid server response.",
-                "warning",
-              );
-              return;
-            }
-
-            // Download file
-            const link = document.createElement("a");
-            link.href = wordResult.data.fileUrl;
-            link.download = `Job_Description_${jobId}.docx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Clean up the blob URL to free memory
-            setTimeout(() => {
-              URL.revokeObjectURL(wordResult.data.fileUrl);
-            }, 100);
-
-            console.log("✅ Word document downloaded successfully");
-            swal("Success", "SVG uploaded and Word document generated successfully!", "success");
-          } catch (error) {
-            console.error("❌ Error generating Word document:", error);
-            swal(
-              "Warning",
-              `SVG uploaded successfully, but failed to generate Word document: ${error.message}`,
-              "warning",
-            );
-          }
         } else {
-          console.error("❌ Failed to upload SVG:", uploadResult);
-          const errorMsg = uploadResult?.message || "Failed to upload SVG. Please try again.";
-          swal("Error", errorMsg, "error");
+          console.warn("⚠️ SVG upload failed, proceeding to download Word document anyway:", uploadResult);
+          swal(
+            "Warning",
+            uploadResult?.message || "SVG upload failed, but Word document will still be downloaded.",
+            "warning",
+          );
         }
+
+        // Generate and download Word document regardless of SVG upload result
+        await generateAndDownloadWord();
       } else {
         console.error("❌ SVG blob is null or undefined");
         swal("Error", "Failed to generate SVG. Please try again.", "error");
       }
     } catch (error) {
       console.error("❌ Error in handleExportPng:", error);
-      swal("Error", `Failed to generate SVG: ${error.message}`, "error");
+      swal("Error", `Failed to generate SVG: ${error.message}, still proceeding to download Word document.`, "error");
+
+      await generateAndDownloadWord();
     }
 
     return;
@@ -1349,17 +1379,24 @@ $(document).ready(async function () {
 
     // Uncomment below when ready to save
     loader(true);
-    const save = await updateDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
-    if (save.statusCode === 200) {
+    try {
+      const save = await updateDetailDraft({ draftId: getDraftExisting.draftId, jobId, prlOrg, data: params });
+      console.log("Save draft response:", save);
+      if (save && save?.value?.status === 200) {
+        loader(false);
+        swal("Success", "Draft saved successfully", "success");
+        // redirect to job-desc.html
+        setTimeout(() => {
+          window.location.href = "/job-description/index";
+        }, 1500);
+      } else {
+        loader(false);
+        swal("Error", save?.message || "Failed to save draft", "error");
+      }
+    } catch (err) {
+      console.error("saveDraft error:", err);
+      swal("Error", err.message || "Failed to save draft", "error");
       loader(false);
-      swalAlert("Success", "Draft saved successfully", "success");
-      // redirect to job-desc.html
-      setTimeout(() => {
-        window.location.href = "/job-description/index";
-      }, 1500);
-    } else {
-      loader(false);
-      swalAlert("Error", save.message || "Failed to save draft", "error");
     }
   });
 
@@ -1382,6 +1419,13 @@ $(document).ready(async function () {
     const value = $(this).val();
     console.log("Selected debt amount option:", value);
     console.log(getDraftExisting, "getDraftExisting");
+    searchJobCompare(value, true);
+  });
+
+  $("#selectSK").on("change", function () {
+    const value = $(this).val();
+    console.log("Selected SK option:", value);
+    const valuePercentage = $("input[name='percentage-amount']:checked").val();
     searchJobCompare(value, true);
   });
 

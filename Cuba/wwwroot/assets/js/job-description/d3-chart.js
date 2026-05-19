@@ -1304,6 +1304,10 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   if (!dataChart) {
     dataChart = [];
   }
+
+  // Remove duplicates based on id
+  dataChart = dataChart.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+
   dataChart.forEach((item) => (item.id = item.id_org_unit));
 
   const self = dataChart.find((item) => item.id == focusNodeId);

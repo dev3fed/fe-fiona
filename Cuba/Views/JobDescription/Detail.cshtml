@@ -193,7 +193,9 @@
                                         <div class="m-20">
                                             <div class="d-flex justify-content-between"> 
                                                 <span style="font-size: 17px;">1. IDENTIFIKASI JABATAN</span>
-                                                <button class="btn btn-primary  btn-sm " id="addJobReference" onclick="addJobReference()"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">Add Job desc Reference</button>
+                                                    <button class="btn btn-primary btn-sm " id="addJobReference" onclick="addJobReference()" disabled> 
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;">Add Job desc Reference</button>
                                             </div>
                                             <div class="table-responsive">
                                                 <table class="tableIndentifikasi">
@@ -244,7 +246,9 @@
                                             </div>
                                             <span id="fungsiReferenceContainer"></span>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary " id="referenceFunction" onclick="addJobReference('fungsi')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="referenceFunction" onclick="addJobReference('fungsi')" disabled> 
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                             </div>
                                         </div>
                                     </div>
@@ -275,7 +279,9 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary " id="referenceTugasHa" onclick="addJobReference('tugasHa')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="referenceTugasHa" onclick="addJobReference('tugasHa')" disabled>
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                                 <button class="btn btn-primary " id="addJobTugasHa" onclick="updateJobDescItem('tugasHa',0)"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Data</button>
                                             </div>
                                         </div>
@@ -340,7 +346,9 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary " id="referenceKoordinasi" onclick="addJobReference('koordinasi')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="referenceKoordinasi" onclick="addJobReference('koordinasi')" disabled>
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                                 <button class="btn btn-primary " id="addJobKoordinasi" onclick="updateJobDescItem('koordinasi',0)"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Data</button>
                                             </div>
                                         </div>
@@ -367,7 +375,9 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary " id="referenceRelasi" onclick="addJobReference('relation')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="referenceRelasi" onclick="addJobReference('relation')" disabled>
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                                 <button class="btn btn-primary " id="addJobRelasi" onclick="updateJobDescItem('relation',0)"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Data</button>
                                             </div>
                                         </div>
@@ -391,7 +401,9 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary "  onclick="addJobReference('persyaratan')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="addJobReferencePJ" onclick="addJobReference('persyaratan')" disabled>
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                                 <button class="btn btn-primary " id="addJobPJ" onclick="updateJobDescItem('persyaratanJabatan',0)"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Data</button>
                                             </div>
                                             <div class="table-responsive m-t-20">
@@ -410,7 +422,9 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary "  onclick="addJobReference('persyaratan')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary" id="referencePK"  onclick="addJobReference('persyaratan')" disabled>
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                                 <button class="btn btn-primary " id="addJobPk" onclick="updateJobDescItem('persyaratanKhusus',0)"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Data</button>
                                             </div>
                                             <div class="table-responsive m-t-20">
@@ -496,7 +510,9 @@
                                                 </table>
                                             </div>
                                             <div class="d-flex justify-content-end m-t-20 gap-2">
-                                                <button class="btn btn-primary " id="referenceSTK" onclick="addJobReference('stk')"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
+                                                <button class="btn btn-primary " id="referenceSTK" onclick="addJobReference('stk')" disabled>
+                                                    <div class="spinner spinner-border spinner-border-sm text-light me-2" style="" role="status"></div>
+                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Job Reference</button>
                                                 <button class="btn btn-primary " id="addJobSTK" onclick="updateJobDescItem('stk',0)"> <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;margin-right: 2px;"> Add Data</button>
                                             </div>
                                         </div>

@@ -1,25 +1,31 @@
-function getDataListAsync(data, id, placeholder) {
+function getDataListAsync(data) {
   data.forEach((item) => {
-    $(`#${item}`)
+    console.log("item", item);
+    $(`#${item?.id}`)
       .select2({
         placeholder: "Choose",
         allowClear: true,
         delay: 250,
         ajax: {
-          url: `${url}/api/Utilities/selection`,
+          url: `${url.baseUrl}/api/sk-list`,
           dataType: "json",
           data: function (params) {
             return {
-              search: params.term || "",
-              page: params.page || 1,
-              type: "jobposition",
+              Search: params.term || "",
+              Page: params.page || 1,
+              PageSize: 10,
             };
           },
-          processResults: function (data) {
+          processResults: function (response, params) {
+            const page = params.page || 1;
+            const items = (response.data?.data ?? []).map((sk) => ({
+              id: sk.numberSk,
+              text: `${sk.numberSk} - ${sk.title}`,
+            }));
             return {
-              results: data.data.jobPosition,
+              results: items,
               pagination: {
-                more: data.data.pagination.more,
+                more: page * (response.data?.pageSize ?? 10) < (response.data?.total ?? 0),
               },
             };
           },
