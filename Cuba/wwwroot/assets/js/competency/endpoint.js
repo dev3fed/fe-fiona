@@ -414,7 +414,7 @@ async function fetchAddtechnicalCompetency(payload) {
     if (result.status === 400) {
       return {
         success: false,
-        error: result.message,
+        error: result.data,
       };
     } else {
       return {

@@ -226,7 +226,7 @@ const renderTableApproval = async (approvalData) => {
       return `
         <tr>
           <td style="text-align:center">${index + 1}</td>
-          <td>${data.requestId || "-"}</td>
+          <td>${data.requestNumber || "-"}</td>
           <td>${data.draftName || "-"}</td>
           <td>${data.draftSoName || "-"}</td>
           <td>${formatDate(data.createdDate)}</td>

@@ -521,6 +521,10 @@ const handleRadioChangesummary = (event) => {
 const onSelectPosrefsummary = async (event) => {
   const dataSource = $("#dataSource-competency").val();
   const idPosition = event.target.value || null;
+  const fullText = event.target.options[event.target.selectedIndex].text;
+  const positionName = fullText.includes("(")
+    ? fullText.substring(fullText.indexOf("(") + 1, fullText.indexOf(")")).trim()
+    : fullText;
   console.log("idPosition", idPosition);
   try {
     const payload = {
@@ -543,7 +547,7 @@ const onSelectPosrefsummary = async (event) => {
       console.log("dataGeneral", dataGeneral);
       console.log("dataSpecific", dataSpecific);
       const bodyTableCompeRef = `
-      <label class="form-label">Specific Competencies of Manager Event Management</label>
+      <label class="form-label">Technical Competencies of ${positionName}</label>
                         <div class="card-tablebusinessreference">
                             <div class="row">
                                 <div class="col-4">

@@ -646,6 +646,12 @@ function selectSkillGroup() {
 const onSelectPositionRefer = async (event) => {
   const dataSource = $("#dataSource-competency").val();
   const idPosition = event.target.value || null;
+  const fullText = event.target.options[event.target.selectedIndex].text;
+  const positionName = fullText.includes("(")
+    ? fullText.substring(fullText.indexOf("(") + 1, fullText.indexOf(")")).trim()
+    : fullText;
+  console.log("positionName", positionName);
+
   console.log("idPosition", idPosition);
   try {
     const payload = {
@@ -668,7 +674,7 @@ const onSelectPositionRefer = async (event) => {
       console.log("dataGeneral", dataGeneral);
       console.log("dataSpecific", dataSpecific);
       const bodyTableCompeRef = `
-      <label class="form-label">Specific Competencies of Manager Event Management</label>
+      <label class="form-label">Technical Competencies of ${positionName}</label>
                         <div class="card-tablebusinessreference">
                             <div class="row">
                                 <div class="col-4">
@@ -1038,7 +1044,7 @@ const handleSaveDraftCompe = async () => {
     const spinBtn = document.getElementById("spinBtncompetency");
     const modalAddCompetency = document.getElementById("modalAddCompetency");
     const modal = bootstrap.Modal.getInstance(modalAddCompetency);
-
+    const jobInformation = getState("jobInformation");
     if (spinBtn) spinBtn.style.display = "inline-block";
     const payload = {
       draftId: $("#dataSource-competency").val() || null,
@@ -1056,7 +1062,7 @@ const handleSaveDraftCompe = async () => {
     };
     // console.log("payload", payload);
     const result = await fetchAddtechnicalCompetency(payload);
-    // console.log("result", result);
+
     if (result.success === true) {
       const draftName = $("#dataSource-competency option:selected").text();
       swal({
@@ -1079,6 +1085,38 @@ const handleSaveDraftCompe = async () => {
           if (modal) modal.hide();
           spinBtn.style.display = "none";
         }, 200);
+      });
+    } else {
+      console.log("result", result.error.results[0].alreadyExists);
+      const alreadyExistsList = result.error.results[0].alreadyExists
+        .map((item) => `<li>${item.replace(/\s*\([^)]*\)/g, "")}</li>`)
+        .join("");
+      spinBtn.style.display = "none";
+      swal({
+        title: "SAVE FAILED",
+        icon: "error",
+        buttons: {
+          confirm: {
+            text: "OK",
+            value: true,
+            visible: true,
+            className: "",
+            closeModal: true,
+          },
+        },
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">
+              <p style="font-size: 16px; margin: 15px 0;">The competencies below already exist in <strong>${jobInformation.positionName}</strong> position, please select another competency.</p>
+              <div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; text-align: left; max-height: 90px; overflow-y: auto;">
+                <ul style="margin: 0; padding-left: 20px;">
+                  ${alreadyExistsList}
+                </ul>
+              </div>
+            </div>`,
+          },
+        },
       });
     }
   } catch (error) {
