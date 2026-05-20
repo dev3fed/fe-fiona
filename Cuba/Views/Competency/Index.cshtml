@@ -265,6 +265,8 @@
                                             <div class="col-sm-12">
                                                 <partial name="~/Views/Competency/ModalAddCompeSummary.cshtml" />
                                                 <partial name="~/Views/Competency/ModalSummaryInfo.cshtml" />
+                                                <partial name="~/Views/Competency/ModalDictsummary.cshtml" />
+
                                             </div>
                                             <partial name="~/Views/Competency/RequirementPage.cshtml" />
                                         </div>
@@ -315,7 +317,7 @@
         <script>
             const url_api = "@Configuration["AppSettings:ApiUrl"]";
             @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
 
         </script>
         <!-- Plugins JS start-->

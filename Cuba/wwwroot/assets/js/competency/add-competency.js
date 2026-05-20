@@ -502,9 +502,9 @@ function selectJobReference() {
 const handleRadioChange = (event) => {
   const value = event.target.value;
   const jobSelect = $("#jobIdRef");
-  setState("payloadAddCompetency", []);
-  cardSelectedCompetency([]);
-  updateRadioButtonState();
+  // setState("payloadAddCompetency", []);
+  // cardSelectedCompetency([]);
+  // updateRadioButtonState();
   if (value === "reference") {
     $("#comperef").show();
     $("#specCompe, #selectedcompe").hide();
@@ -646,8 +646,8 @@ function selectSkillGroup() {
 const onSelectPositionRefer = async (event) => {
   const dataSource = $("#dataSource-competency").val();
   const idPosition = event.target.value || null;
-  const fullText = event.target.options[event.target.selectedIndex].text;
-  const positionName = fullText.includes("(")
+  const fullText = event.target?.options[event.target.selectedIndex]?.text;
+  const positionName = fullText?.includes("(")
     ? fullText.substring(fullText.indexOf("(") + 1, fullText.indexOf(")")).trim()
     : fullText;
   console.log("positionName", positionName);
@@ -1127,7 +1127,7 @@ const handleSaveDraftCompe = async () => {
 const handleSeeDictionary = () => {
   const competencyId = $("#competencyId").val();
   console.log("Selected competency:", competencyId);
-  handleDetailCompetency("Technical", competencyId);
-  const modalAddCompetency = bootstrap.Modal.getInstance(document.getElementById("modalAddCompetency"));
-  if (modalAddCompetency) modalAddCompetency.hide();
+  handleDictionary("Technical", competencyId);
+  // const modalAddCompetency = bootstrap.Modal.getInstance(document.getElementById("modalAddCompetency"));
+  // if (modalAddCompetency) modalAddCompetency.hide();
 };

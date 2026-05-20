@@ -113,7 +113,7 @@ const renderTableSummary = (resultList) => {
         const valString = JSON.stringify(element).replace(/"/g, "&quot;");
 
         const actionButtons = isNotAvailable
-          ? `<button class="btn btn-primary btn-icon" type="button" onclick='openAddCompetencySummary(${valString})' aria-label="Add Competency">
+          ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency">
                  <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
                  Add Competency
                </button>`
@@ -375,8 +375,7 @@ async function changeNumberSummaryPage(event) {
 
 const showDetail = async (data) => {
   try {
-    const unitCode = data.unitCode || "";
-    const prlOrg = data.prlOrg || "";
+    const { unitCode = "", prlOrg = "" } = data;
     const modal = new bootstrap.Modal(document.getElementById("ModalSummaryInfo"));
     modal.show();
     setState("payloadDetailJob", { unitCode, prlOrg });
@@ -385,6 +384,51 @@ const showDetail = async (data) => {
     cardTblSummaryGeneral(unitCode, prlOrg);
     cardTblSummarySpecific(unitCode, prlOrg);
     cardTblSummaryBehavior(unitCode, prlOrg);
+  } catch (error) {
+    console.error("Error showing detail:", error);
+  }
+};
+
+const loadDetailCompeSummary = async (data) => {
+  try {
+    let competencyList = getState("payloadAddCompetency");
+    const dataSource = $("#dataSource-competency").val();
+    const code = data.unitCode || "";
+    const prl = data.prlOrg || "";
+    const payload = `${dataSource}/${code}/${prl}`;
+
+    const resultMandatory = await fetchDetailPositionMandatory(payload);
+    const resultTechnical = await fetchDetailPositionTechnical(payload);
+
+    if (resultMandatory.data || resultTechnical.data) {
+      const listMandatory = resultMandatory?.data.compData || [];
+      const listTechnical = resultTechnical?.data.compData || [];
+
+      const transformCompetency = (element, isMandatory = false) => ({
+        ...element,
+        compeId: element.compCode,
+        compeName: isMandatory ? element.name : element.compName,
+        selectedType: element.compType,
+        selectedLvl: isMandatory ? element.proficiencyLevel : element.level,
+      });
+
+      const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
+      const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
+
+      competencyList = [
+        ...(competencyList || []),
+        ...listMandatory.map((element) => transformCompetency(element, true)),
+        ...generalCompetencies.map((element) => transformCompetency(element)),
+        ...specificCompetencies.map((element) => transformCompetency(element)),
+      ];
+
+      setState("jobInformation", data);
+      setState("payloadAddCompetency", competencyList);
+    } else {
+      setState("payloadAddCompetency", []);
+    }
+
+    openAddCompetencySummary(data);
   } catch (error) {}
 };
 
@@ -392,9 +436,9 @@ const openAddCompetencySummary = async (data) => {
   try {
     const competencyList = getState("payloadAddCompetency");
     const draftName = $("#dataSource-competency option:selected").text();
-    setState("jobInformation", data);
+    // setState("jobInformation", data);
     const jobInformation = data || {};
-
+    console.log("competencyList", competencyList);
     const mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
     const generalCompe = competencyList.filter((item) => item.selectedType === "general");
     const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
@@ -440,11 +484,11 @@ const openAddCompetencySummary = async (data) => {
       <div class="col mb-3">
         <div class="m-t-15 m-checkbox-inline custom-radio-ml">
             <div class="form-check form-check-inline radio radio-primary">
-                <input class="form-check-input" id="radioNonreference" type="radio" name="optradio" value="nonReference" onchange="handleRadioChangesummary(event)" checked>
+                <input class="form-check-input" id="radioNonreference" type="radio" name="optradio" value="nonRefsummary" onchange="handleRadioChangesummary(event)" checked>
                 <label class="form-check-label mb-0" for="radioNonreference">Add Technical Competency</label>
             </div>
             <div class="form-check form-check-inline radio radio-primary">
-                <input class="form-check-input" id="radioReference" type="radio" name="optradio" value="reference" onchange="handleRadioChangesummary(event)" >
+                <input class="form-check-input" id="radioReference" type="radio" name="optradio" value="refsummary" onchange="handleRadioChangesummary(event)" >
                 <label class="form-check-label mb-0" for="radioReference">Add Technical Competency from Reference</label>
             </div>
         </div>
@@ -467,7 +511,7 @@ const openAddCompetencySummary = async (data) => {
     <div id="sg-ssg-info" class="col-12" style="display:none;">
       <label style="color:#03a9f4; cursor:pointer;" 
              onmouseover="this.style.textDecoration='underline'" 
-             onmouseout="this.style.textDecoration='none'">See dictionary</label>
+             onmouseout="this.style.textDecoration='none'" onclick="handleSeeDictsummary()">See dictionary</label>
       <label id="sg-ssg-label" style="display:block; margin-top:2px;"></label>
       <hr style="margin-top:20px;margin-bottom:20px"/>
     </div>
@@ -540,4 +584,10 @@ const handleShowWarning = async () => {
   } catch (error) {
     console.error("Error in handleShowWarning:", error);
   }
+};
+
+const handleSeeDictsummary = () => {
+  const compesummaryId = $("#compesummaryId").val();
+  console.log("Selected competency:", compesummaryId);
+  handleDictsummary("Technical", compesummaryId);
 };

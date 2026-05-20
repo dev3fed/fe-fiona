@@ -505,13 +505,13 @@ async function triggleCompesummary() {
 const handleRadioChangesummary = (event) => {
   const value = event.target.value;
   const jobSelect = $("#jobidRefsummary");
-  setState("payloadAddCompetency", []);
-  cardSelectedCompesummary([]);
-  updateRadioBtnCompesummary();
-  if (value === "reference") {
+  // setState("payloadAddCompetency", []);
+  // cardSelectedCompesummary([]);
+  // updateRadioBtnCompesummary();
+  if (value === "refsummary") {
     $("#compesummaryref").show();
     $("#specCompesummary, #selectedcompesummary").hide();
-  } else if (value === "nonReference") {
+  } else if (value === "nonRefsummary") {
     jobSelect.val(null).trigger("change");
     $("#table-compesummaryref").hide();
     $("#compesummaryref").hide();
@@ -521,8 +521,8 @@ const handleRadioChangesummary = (event) => {
 const onSelectPosrefsummary = async (event) => {
   const dataSource = $("#dataSource-competency").val();
   const idPosition = event.target.value || null;
-  const fullText = event.target.options[event.target.selectedIndex].text;
-  const positionName = fullText.includes("(")
+  const fullText = event.target?.options[event.target.selectedIndex]?.text;
+  const positionName = fullText?.includes("(")
     ? fullText.substring(fullText.indexOf("(") + 1, fullText.indexOf(")")).trim()
     : fullText;
   console.log("idPosition", idPosition);
@@ -683,6 +683,7 @@ const saveCompesummary = async () => {
     const spinBtn = document.getElementById("spinBtncompesummary");
     const ModalAddCompeSummary = document.getElementById("ModalAddCompeSummary");
     const modal = bootstrap.Modal.getInstance(ModalAddCompeSummary);
+    const jobInformation = getState("jobInformation");
 
     if (spinBtn) spinBtn.style.display = "inline-block";
     const payload = {
@@ -721,6 +722,38 @@ const saveCompesummary = async () => {
       }).then(async () => {
         if (modal) modal.hide();
         spinBtn.style.display = "none";
+      });
+    } else {
+      console.log("result", result.error.results[0].alreadyExists);
+      const alreadyExistsList = result.error.results[0].alreadyExists
+        .map((item) => `<li>${item.replace(/\s*\([^)]*\)/g, "")}</li>`)
+        .join("");
+      spinBtn.style.display = "none";
+      swal({
+        title: "SAVE FAILED",
+        icon: "error",
+        buttons: {
+          confirm: {
+            text: "OK",
+            value: true,
+            visible: true,
+            className: "",
+            closeModal: true,
+          },
+        },
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">
+              <p style="font-size: 16px; margin: 15px 0;">The competencies below already exist in <strong>${jobInformation.positionName}</strong> position, please select another competency.</p>
+              <div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; text-align: left; max-height: 90px; overflow-y: auto;">
+                <ul style="margin: 0; padding-left: 20px;">
+                  ${alreadyExistsList}
+                </ul>
+              </div>
+            </div>`,
+          },
+        },
       });
     }
   } catch (error) {
