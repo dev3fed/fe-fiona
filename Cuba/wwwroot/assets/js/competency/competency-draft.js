@@ -10,6 +10,7 @@ document.addEventListener("dataLoaded", handleDataLoad);
 document.addEventListener("DOMContentLoaded", handleDataLoad);
 
 async function serviceDraftList(payload) {
+  console.log("payload", payload);
   try {
     const queryString = new URLSearchParams(payload).toString();
     const dataDraft = await fetchDraftList(queryString);
