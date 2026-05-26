@@ -66,9 +66,8 @@ function loadTableBodyDraft(response) {
   console.log("response", response);
   const { data: dataList, currentPage: page, pageSize, totalRecords: total } = response;
   if (!dataList || dataList.length === 0) {
-    document.getElementById(
-      "body-draft",
-    ).innerHTML = `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+    document.getElementById("body-draft").innerHTML =
+      `<tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
     return;
   }
   const bodyContent = dataList
@@ -156,8 +155,8 @@ function loadTableBodyDraft(response) {
         </div>
         <div class="col-10">
           <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-      total < itemsPerPage * page ? total : itemsPerPage * page
-    } of ${total} records</label>
+            total < itemsPerPage * page ? total : itemsPerPage * page
+          } of ${total} records</label>
         </div>
       </div>
     `;
@@ -585,6 +584,8 @@ async function handleOpenDetail(id) {
     const mainCompetency = document.getElementById("main-competency");
     const headerCompetency = document.getElementById("header-competency");
     const headerDetail = document.getElementById("header-detail-draft");
+    const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
     if (draftDetail) {
       draftDetail.style.display = "block";
     }
@@ -597,7 +598,12 @@ async function handleOpenDetail(id) {
     if (headerCompetency) {
       headerCompetency.style.display = "none";
     }
-    const detailResult = await fetchDetailDraft(id);
+    const payload = {
+      Page: payloadDetailDraftPage.Page,
+      PageSize: payloadDetailDraftPage.PageSize,
+    };
+    const queryString = `${id}?` + new URLSearchParams(payload).toString();
+    const detailResult = await fetchDetailDraft(queryString);
     if (detailResult.success === true) {
       setState("dataDetailDraft", detailResult.data);
     }

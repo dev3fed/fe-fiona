@@ -167,6 +167,9 @@ const openModalApprovalDepthLevel = async () => {
     const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
     const draftId = $("#dataSource-competency").val();
     const detailProficiency = getState("detailProficiency");
+    const spinBtn = document.getElementById("spinBtnDepthlvl");
+    if (spinBtn) spinBtn.style.display = "inline-block";
+
     const payload = {
       draftId: draftId,
       positionCode: detailProficiency.positionCode,
@@ -199,7 +202,7 @@ const openModalApprovalDepthLevel = async () => {
             },
           },
         }).then(async () => {
-          // spinner.style.display = "none";
+          spinBtn.style.display = "none";
           // const payload = {
           //   Page: 1,
           //   PageSize: 5,

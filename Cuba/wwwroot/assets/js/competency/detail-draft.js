@@ -37,8 +37,8 @@ async function detailDraft() {
         </div>`;
       const draftInfo = document.getElementById("draft-competencyinfo");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
-      console.log("dataDraft?.data.length", dataDraft?.data.length);
-      if (dataDraft?.data.length > 0) {
+      console.log("dataDraft?.totalRecords", dataDraft?.totalRecords);
+      if (dataDraft?.totalRecords > 0) {
         renderTableActivity(dataDraft);
       } else {
         const bodyEmpty = `
@@ -85,30 +85,7 @@ async function detailDraft() {
 async function renderTableActivity(listData) {
   try {
     const bodyDetail = `
-        <div class="col-12" style="text-align: left;">
-           <span style="font-size:13px">Activity Type :</span>
-           <button class="btn btn-outline-light btn-rounded" style="width:60px" type="button">
-              All
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Upload
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Add/Edit Competency to Position
-            </button>
-       </div>
-       <div class="col-4  mt-3" style="text-align: left;">
-          <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
-                    data-feather="search"></i>
-            </div>
-        </div>
-         <div class="col-8 text-end mt-3" style="padding-right:23px">
-            <button class="btn btn-primary" type="button">
-            <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;">  Import</button>
-            <button class="btn btn-primary" type="button">
-              <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;"> Export</button>
-        </div>
+
         <div class="col-12 mt-3">
           <div class="table-responsive scrollable" style=" max-height: 350px;">
               <table class="table tbl-border-add-prosbis">
@@ -215,7 +192,7 @@ async function renderTableActivity(listData) {
       draftDetail.innerHTML = bodyDetail;
     }
     const itemsPerPage = listData.pageSize;
-    const totalPages = Math.ceil(listData.totalPages / itemsPerPage);
+    const totalPages = Math.ceil(listData.totalRecords / itemsPerPage);
     const currentPage = listData.currentPage;
     const start = (listData.currentPage - 1) * itemsPerPage + 1;
     renderPaginationDetailDraft(currentPage, totalPages);
@@ -225,7 +202,7 @@ async function renderTableActivity(listData) {
       totalPage.innerHTML = `
           <div class="row">
             <div class="col-2">
-              <select class="form-select digits"  style="width:62%;" id="limitDetailPage" onchange="handleChangeIDetailItemsPerPage(event)">
+              <select class="form-select digits"  style="width:62%;" id="limitDetailPage" onchange="handleChangeDetailItemsPerPage(event)">
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="15">15</option>
@@ -236,10 +213,10 @@ async function renderTableActivity(listData) {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-                listData.totalPages < itemsPerPage * listData.currentPage
-                  ? listData.totalPages
+                listData.totalRecords < itemsPerPage * listData.currentPage
+                  ? listData.totalRecords
                   : itemsPerPage * listData.currentPage
-              } of ${listData.totalPages} records</label>
+              } of ${listData.totalRecords} records</label>
             </div>
           </div>
         `;
@@ -485,3 +462,97 @@ async function handleSubmitApproval() {
     }
   } catch (error) {}
 }
+
+async function handleDetailPageChange(pageNumber) {
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: pageNumber,
+    PageSize: payloadDetailDraftPage.PageSize,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  console.log("detailResult", detailResult);
+  renderTableActivity(detailResult.data);
+}
+async function handleChangeDetailItemsPerPage(event) {
+  const itemsPerPage = parseInt(event.target.value, 10);
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: payloadDetailDraftPage.Page,
+    PageSize: itemsPerPage,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  console.log("detailResult", detailResult);
+
+  // renderTableActivity(listData);
+}
+
+const inputSearchActivity = async (event) => {
+  const searchValue = event.target.value;
+
+  if (searchValue.length === 0) {
+    const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+    const payload = {
+      ...payloadDetailDraftPage,
+      Page: 1,
+      PageSize: payloadDetailDraftPage.PageSize,
+      Search: "",
+    };
+    setState("payloadDetailDraftPage", payload);
+    const dataDraft = getState("dataDetailDraft");
+    const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
+    const detailResult = await fetchDetailDraft(queryString);
+    console.log("detailResult", detailResult);
+
+    renderTableActivity(detailResult.data);
+    return;
+  }
+
+  if (searchValue.length < 3) {
+    return;
+  }
+
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: 1,
+    PageSize: payloadDetailDraftPage.PageSize,
+    Search: searchValue,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  console.log("detailResult", detailResult);
+
+  renderTableActivity(detailResult.data);
+};
+
+const handleActivityTypeChange = async (event) => {
+  if (!event?.target?.value) return;
+  const selectedValue = event.target.value;
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: 1,
+    PageSize: payloadDetailDraftPage.PageSize,
+    filter: selectedValue,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  console.log("detailResult", detailResult);
+  renderTableActivity(detailResult.data);
+};

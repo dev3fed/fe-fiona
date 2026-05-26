@@ -112,6 +112,34 @@
         margin-top: 25px;
         border-radius: 7px;
     }
+
+    .activity-check-input {
+        display: none;
+    }
+
+    .activity-check-label {
+        border: 1px solid #BFBFC2;
+        border-radius: 26px;
+        padding: 8px 16px;
+        margin-right: 0;
+        cursor: pointer;
+        background-color: #FFFFFF;
+        color: #000000;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    }
+
+    .activity-check-input:checked+.activity-check-label {
+        background-color: #e6f0f6;
+        color: #006ca9;
+        border-color: #006ca9;
+    }
+
+    .activity-check {
+        margin-bottom: 0;
+        display: inline-block;
+        margin-right: 15px;
+    }
 </style>
 
 <div class="card" style="border-radius:8px">
@@ -135,6 +163,49 @@
             <div id="empty-activity">
 
             </div>
+
+            <div class="row" style="padding-top: 20px;">
+                <div class="col-12" style="text-align: left;">
+                    <span style="font-size:13px; ">Activity Type :</span>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeAll" name="activityType"
+                               value="all" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeAll">
+                            All
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeUpload" name="activityType"
+                               value="upload" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeUpload">
+                            Upload
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeAddEdit" name="activityType"
+                               value="Add/Edit Competency to Position" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeAddEdit">
+                            Add/Edit Competency to Position
+                        </label>
+                    </div>
+                </div>
+                <div class="col-4  mt-3" style="text-align: left;">
+                    <div class="faq-form">
+                        <input class="form-control" type="text" placeholder="Search.."
+                               onchange="inputSearchActivity(event)">
+                        <i class="search-icon" data-feather="search"></i>
+                    </div>
+                </div>
+                <div class="col-8 text-end mt-3" style="padding-right:23px">
+                    <button class="btn btn-primary" type="button">
+                        <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;"> Import
+                    </button>
+                    <button class="btn btn-primary" type="button">
+                        <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;"> Export
+                    </button>
+                </div>
+            </div>
+
             <div class="row" style="padding-top: 20px;" id="draftactivity-competency">
             </div>
         </div>
@@ -156,7 +227,7 @@
             </button> *@
             <button class="btn btn-primary" type="button" onclick="openDetailApproval()" id="detail-draft-submitted">
                 Submit to Approval<i class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+            </div>
+            <!-- card footer end-->
         </div>
-        <!-- card footer end-->
     </div>
-</div>

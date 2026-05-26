@@ -124,8 +124,29 @@ const renderTableSummary = (resultList) => {
                  <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
                  <span>Detail</span>
                </button>`;
-        let bgColor = isNotAvailable ? "#FAE9EB" : "#b9fbc0";
-        let textColor = isNotAvailable ? "#D02138" : "#16a34a";
+        let bgColor, textColor;
+        switch (statusClass) {
+          case "on progress":
+            bgColor = "#FFE7C5";
+            textColor = "#E18400";
+            break;
+          case "waiting approval":
+            bgColor = "#E6F0F6";
+            textColor = "#006CA9";
+            break;
+          case "available":
+            bgColor = "#B5FFC7";
+            textColor = "#009024";
+            break;
+          case "not-available":
+          case "not available":
+            bgColor = "#FAE9EB";
+            textColor = "#D02138";
+            break;
+          default:
+            bgColor = "#F5F5F5";
+            textColor = "#666666";
+        }
         let capitalizedStatus = statusText
           .split("-")
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())

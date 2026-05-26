@@ -5,6 +5,7 @@ const appState = new Proxy(
     draftList: [],
     dataEditDraft: {},
     dataDetailDraft: {},
+    dataListDraftActivity: [],
     dataDetailApproval: {},
     deleteDraftCompetency: "",
     selectedType: "position",
@@ -17,6 +18,10 @@ const appState = new Proxy(
       pageSize: 15,
     },
     payloadDetailJob: {},
+    payloadDetailDraftPage: {
+      Page: 1,
+      PageSize: 10,
+    },
     payloadCompetency: {
       dataSource: selectedValue,
       page: 1,

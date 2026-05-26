@@ -435,10 +435,18 @@ async function fetchDeleteActivityDraft(id, positionCode) {
   const url = `${url_api}/api/TechnicalCompetency/draft-competency/delete-action?draftId=${id}&positionCode=${positionCode}`;
   try {
     const result = await ajaxRequest(url, "DELETE");
-    return {
-      success: true,
-      data: result.data,
-    };
+    console.log("result", result);
+    if (result.status === 200) {
+      return {
+        success: true,
+        data: result.data,
+      };
+    } else {
+      return {
+        success: false,
+        error: result.message,
+      };
+    }
   } catch (error) {
     console.log("error", error);
     return {
@@ -488,7 +496,7 @@ async function fetchSubmitDraftCompetency(payload) {
   }
 }
 async function fetchNotAvailable(payload) {
-  const url = `${url_api}/api/TechnicalCompetency/not-available?dataSource=${payload}`;
+  const url = `${url_api}/api/TechnicalCompetency/not-available${payload}`;
   try {
     const result = await ajaxRequest(url, "POST");
     if (result.status === 400) {

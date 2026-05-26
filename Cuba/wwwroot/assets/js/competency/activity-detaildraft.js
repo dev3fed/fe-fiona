@@ -9,28 +9,45 @@ const triggleDetailActivity = async (positionCode) => {
     if (modalTitle) {
       modalTitle.innerHTML = `Activity Detail Add/Edit Competency to Position `;
     }
-
+    const positionLabel = document.getElementById("positionLabelActivityCompe");
+    if (positionLabel) {
+      positionLabel.innerHTML = `Position:<strong style="margin-left: 5px;"> ${result.data[0].jobCode} - ${result.data[0].positionName}</strong>`;
+    }
+    setState("dataListDraftActivity", result.data);
     renderTableEditActivity(result.data);
   } catch (error) {
     console.error("Error fetching activity competency:", error);
   }
 };
+const inputSearchActivityCompe = async (event) => {
+  try {
+    const searchValue = event.target.value;
+    const listData = getState("dataListDraftActivity");
+
+    if (searchValue.length < 3) {
+      renderTableEditActivity(listData);
+      return;
+    }
+
+    const filteredData = listData.filter((item) => {
+      const competencyName = item.competencyName || "";
+      const competencyType = item.competencyType || "";
+      return (
+        competencyName.toLowerCase().includes(searchValue.toLowerCase()) ||
+        competencyType.toLowerCase().includes(searchValue.toLowerCase())
+      );
+    });
+    renderTableEditActivity(filteredData);
+  } catch (error) {
+    console.error("Error searching activity competency:", error);
+  }
+};
+
 const renderTableEditActivity = async (listData) => {
   try {
-    // setState("dataDetailDraft", dataActivity.data);
     const detailInfo = listData;
-    console.log("detailInfo", detailInfo);
     const contentBody = `
       <div class="row">
-        <div class="col-12 ">
-            <label>Position: ${detailInfo[0].jobCode} - ${detailInfo[0].positionName}</label>
-            <hr style="margin-top: 0;" />
-        </div>
-        <div class="col-12 mb-2 d-flex justify-content-end">
-         <button class="btn btn-primary btn-sm" onclick="modalActivityeditCompetency()">
-           <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" style="margin-top: -1px;"> Add Technical Competency
-         </button>
-        </div>
          <div class="col-12 ">
       <div class="card-tblbusiness" style="max-height: 300px;">
         <div class="table-responsive scrollable-posdetail mt-1" style="max-height: 260px;">
@@ -232,6 +249,7 @@ const confirmDeleteActivityDraft = async () => {
   if (spinBtn) spinBtn.style.display = "inline-block";
   try {
     const result = await fetchDeleteActivityDraft(draftId, positionCode);
+    console.log("result", result);
     if (result.success === true) {
       const modalDelDraft = document.getElementById("modalNotifdeleteactivity");
       const modal = bootstrap.Modal.getInstance(modalDelDraft);
@@ -248,10 +266,39 @@ const confirmDeleteActivityDraft = async () => {
           },
         },
       }).then(async () => {
-        const detailResult = await fetchDetailDraft(draftId);
+        const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+        const payload = {
+          ...payloadDetailDraftPage,
+          Page: 1,
+          PageSize: payloadDetailDraftPage.PageSize,
+        };
+        setState("payloadDetailDraftPage", payload);
+        const dataDraft = getState("dataDetailDraft");
+        const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
+        const detailResult = await fetchDetailDraft(queryString);
+        console.log("detailResult", detailResult);
         if (detailResult.success === true) {
+          renderTableActivity(detailResult.data);
           setState("dataDetailDraft", detailResult.data);
         }
+        if (spinBtn) spinBtn.style.display = "none";
+      });
+    } else {
+      const modalDelDraft = document.getElementById("modalNotifdeleteactivity");
+      const modal = bootstrap.Modal.getInstance(modalDelDraft);
+      if (modal) modal.hide();
+      swal({
+        title: "FAILED",
+        icon: "error",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<div style="text-align: center;">Failed to delete Add/Edit Competency to Position activity data. Please try again.</div>`,
+          },
+        },
+      }).then(async () => {
         if (spinBtn) spinBtn.style.display = "none";
       });
     }
