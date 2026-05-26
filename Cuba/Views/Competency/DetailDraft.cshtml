@@ -164,8 +164,8 @@
 
             </div>
 
-            <div class="row" style="padding-top: 20px;">
-                <div class="col-12" style="text-align: left;">
+            <div style="padding-top: 20px; display: none;" id="header-activity-competency">
+                <div style="text-align: left; margin-bottom: 15px;">
                     <span style="font-size:13px; ">Activity Type :</span>
                     <div class="activity-check">
                         <input class="activity-check-input" type="radio" id="activityTypeAll" name="activityType"
@@ -189,20 +189,25 @@
                         </label>
                     </div>
                 </div>
-                <div class="col-4  mt-3" style="text-align: left;">
-                    <div class="faq-form">
-                        <input class="form-control" type="text" placeholder="Search.."
-                               onchange="inputSearchActivity(event)">
-                        <i class="search-icon" data-feather="search"></i>
+                <div
+                    style="display: flex; gap: 15px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div style="max-width: 500px; flex: 1; text-align: left;">
+                        <div class="faq-form">
+                            <input class="form-control" type="text" placeholder="Search.."
+                                   onchange="inputSearchActivity(event)">
+                            <i class="search-icon" data-feather="search"></i>
+                        </div>
                     </div>
-                </div>
-                <div class="col-8 text-end mt-3" style="padding-right:23px">
-                    <button class="btn btn-primary" type="button">
-                        <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;"> Import
-                    </button>
-                    <button class="btn btn-primary" type="button">
-                        <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;"> Export
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" type="button">
+                            <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;">
+                            Import
+                        </button>
+                        <button class="btn btn-primary" type="button">
+                            <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
+                            Export
+                        </button>
+                    </div>
                 </div>
             </div>
 

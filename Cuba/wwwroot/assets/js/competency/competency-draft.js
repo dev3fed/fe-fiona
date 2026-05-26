@@ -640,7 +640,10 @@ function handleBack() {
   const emptyActivity = document.getElementById("empty-activity");
   if (emptyActivity) emptyActivity.innerHTML = "";
   const tblActivity = document.getElementById("draftactivity-competency");
+  const headerActivity = document.getElementById("header-activity-competency");
+
   if (tblActivity) tblActivity.innerHTML = "";
+  if (headerActivity) headerActivity.style.display = "none";
 
   if (draftDetail) {
     draftDetail.style.display = "none";
