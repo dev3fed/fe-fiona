@@ -38,7 +38,9 @@ async function detailDraft() {
       const draftInfo = document.getElementById("draft-competencyinfo");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
       console.log("dataDraft?.totalRecords", dataDraft?.totalRecords);
+      const headerActivity = document.getElementById("header-activity-competency");
       if (dataDraft?.totalRecords > 0) {
+        if (headerActivity) headerActivity.style.display = "block";
         renderTableActivity(dataDraft);
       } else {
         const bodyEmpty = `

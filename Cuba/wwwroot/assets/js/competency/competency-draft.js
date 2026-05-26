@@ -633,6 +633,7 @@ function handleBack() {
   const mainCompetency = document.getElementById("main-competency");
   const headerCompetency = document.getElementById("header-competency");
   const headerDetail = document.getElementById("header-detail-draft");
+  const headerActivity = document.getElementById("header-activity-competency");
   const payload = getState("payloadDraftList");
   setState("dataDetailDraft", {});
   const draftInfo = document.getElementById("draft-competencyinfo");
@@ -641,7 +642,7 @@ function handleBack() {
   if (emptyActivity) emptyActivity.innerHTML = "";
   const tblActivity = document.getElementById("draftactivity-competency");
   if (tblActivity) tblActivity.innerHTML = "";
-
+  if (headerActivity) headerActivity.style.display = "none";
   if (draftDetail) {
     draftDetail.style.display = "none";
   }
