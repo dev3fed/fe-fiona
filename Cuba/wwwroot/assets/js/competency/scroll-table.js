@@ -19,7 +19,7 @@ tableContainer.addEventListener(
     const bottomReached = tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 10;
     const rightReached = tableContainer.scrollLeft + tableContainer.clientWidth >= tableContainer.scrollWidth - 10;
     const leftReached = tableContainer.scrollLeft === 0;
-    const loader = document.getElementById("loader");
+    const loader = document.getElementById("loader-competency");
     let currentPageY = getState("currentPageY");
     let currentPageX = getState("currentPageX");
     const totalCompetency = getState("totalCompetency");
@@ -57,7 +57,7 @@ tableContainer.addEventListener(
 async function loadMoreCompetency(page) {
   try {
     const payloadCompetency = getState("payloadCompetency");
-    const loader = document.getElementById("loader");
+    const loader = document.getElementById("loader-competency");
     const payload = {
       ...payloadCompetency,
       page: page,
@@ -119,7 +119,7 @@ const restoreJob = async () => {
     let currentPageX = getState("currentPageX");
     const payloadJob = getState("payloadJob");
     const payloadCompetency = getState("payloadCompetency");
-    const loader = document.getElementById("loader");
+    const loader = document.getElementById("loader-competency");
     const resultJob = getState("resultJob");
     const resultCompetency = getState("resultCompetency");
 
@@ -183,7 +183,7 @@ const loadMoreJob = async (currentPageY, currentPageX) => {
     const resultCompetency = getState("resultCompetency");
     const payloadCompetency = getState("payloadCompetency");
     const totalJob = getState("totalJob");
-    const loader = document.getElementById("loader");
+    const loader = document.getElementById("loader-competency");
 
     const totalPages = Math.ceil(totalJob / 15);
 
@@ -269,7 +269,7 @@ async function restoreCompetency() {
     const mappingList = getState("resultMapping");
 
     let currentPageX = getState("currentPageX");
-    const loader = document.getElementById("loader");
+    const loader = document.getElementById("loader-competency");
     if (currentPageX > 2) {
       const payloadCompetency = getState("payloadCompetency");
       const posCode = resultJob.map((value) => `${value.unitCode};${value.prlOrg}`);
