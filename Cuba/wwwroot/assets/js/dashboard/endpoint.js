@@ -123,6 +123,17 @@ async function fetchRasciNotationsByJobNameLevel() {
   }
 }
 
+// /api/dashboard/rasci-matrix/average-rasci-notations-by-job-name-level-and-process-level
+async function fetchAverageRasciNotationsByJobNameLevelAndProcessLevel() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/average-rasci-notations-by-job-name-level-and-process-level`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (average-rasci-notations-by-job-name-level-and-process-level):", error);
+  }
+}
+
 // /api/dashboard/rasci-matrix/rasci-notations-vs-formation
 async function fetchRasciNotationsVsFormation() {
   const api = `${url.baseUrl}/${url["dashboard"]}${url["rasci-matrix"]}/rasci-notations-vs-formation`;
@@ -153,5 +164,16 @@ async function fetchTop10SpecificCompetencies() {
     return result;
   } catch (error) {
     console.error("Error fetching data from API (top-10-specific-competencies):", error);
+  }
+}
+
+// https://api-v1.fiona.fed-insight.com/api/dashboard/competency/average-competency-by-job-level
+async function fetchAverageCompetencyByJobLevel() {
+  const api = `${url.baseUrl}/${url["dashboard"]}${url["competency"]}/average-competency-by-job-level`;
+  try {
+    const result = await ajaxRequest(api, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API (average-competency-by-job-level):", error);
   }
 }

@@ -1,3 +1,11 @@
+function loader(status) {
+  if (status == true) {
+    $("#loading-overlay").addClass("show").show();
+  } else {
+    $("#loading-overlay").removeClass("show").hide();
+  }
+}
+
 function getDataList(data) {
   if (!Array.isArray(data)) return;
   data.forEach((item) => {
@@ -43,7 +51,7 @@ function getDataList(data) {
                 `);
                 }
               }, 10);
-            }
+            },
           );
 
           // Add specific handler for clear button click

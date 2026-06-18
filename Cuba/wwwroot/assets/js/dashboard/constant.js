@@ -159,7 +159,7 @@ const dataDesinCost = {
   ],
 };
 
-const arrayDirectorate = [
+const DATA_DIRECTORATE = [
   "Direktorat Utama",
   "Direktorat Keuangan",
   "Direktorat Manajemen Risiko",
@@ -170,7 +170,58 @@ const arrayDirectorate = [
   "Direktorat SDM & Penunjang Bisnis",
 ];
 
-const arrayRegional = [
+const DATA_DIVISION = [
+  "Audit Executive",
+  "Aviation Fuel Business",
+  "Business Development & Subsidiary",
+  "Business Planning & Investment",
+  "Business Risk Management",
+  "Center of Excellence",
+  "Controller",
+  "Corporate Secretary",
+  "Digital & Customer Solution",
+  "Financing & Treasury",
+  "HSSE",
+  "Human Capital",
+  "Industrial & Marine Fuel Business",
+  "Infrastructure Management & Project",
+  "IT",
+  "Legal Counsel",
+  "Marketing",
+  "Operational Risk Management",
+  "Petrochemical Industry Business",
+  "Planning & Trading Development",
+  "Procurement & Asset Management",
+  "Regional Jatimbalinus",
+  "Regional Jawa Bagian Barat",
+  "Regional Jawa Bagian Tengah",
+  "Regional JBB",
+  "Regional JBT",
+  "Regional Kalimantan",
+  "Regional Papua-Maluku",
+  "Regional Sulawesi",
+  "Regional Sumbagsel",
+  "Regional Sumbagut",
+  "Retail Bussines Support",
+  "Retail Fuel Sales",
+  "Retail Gas Sales",
+  "Risk Strategy & Governance",
+  "Supply & Distribution",
+  "Trading Operations",
+];
+
+const DATA_POSITION_LEVEL = [
+  "Director",
+  "VP/EGM/SMOM",
+  "Manager/ Region Manager/ Area manager/ Sales Area Manager/ Setara",
+  "Asst. Manager/Sr. Analyst/Setara",
+  "Sr. Supervisor/Analyst/Setara",
+  "Supervisor/Jr. Analyst/Setara",
+  "Jr. Supervisor/Jr. Assistant/Setara",
+  "Jr. Operator/Jr. Technician/Administrator/Setara",
+];
+
+const DATA_REGIONAL = [
   "Regional Jatimbalinus",
   "Regional Jawa Bagian Barat",
   "Regional Jawa Bagian Tengah",

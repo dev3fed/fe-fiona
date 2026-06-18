@@ -3,132 +3,14 @@
     ViewData["Title"] = "Chart-Widget";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<style>
-    .page-wrapper {
-        overflow:visible !important;
-    }
-    #sticky-os-header {
-        position: -webkit-sticky; /* For Safari */
-        position: sticky !important;
-        top: 75px !important; /* Adjusted to ensure it sticks at the top */
-        z-index: 2;
-        background-color: #fff;
-    }
-
-    .container-fluid, .page-body {
-        overflow: visible !important; /* Ensure parent elements do not restrict sticky behavior */
-        height: 100%; /* Ensure parent elements have a defined height */
-    }
-
-    html, body {
-        height: 100%; /* Ensure the root elements have a defined height */
-    }
-
-
-    .checkbox-solid-primary label:before {
-        background-color: var(--theme-deafult);
-        border-color: var(--theme-deafult);
-        color: #fff;
-    }
-    .checkbox input[type="checkbox"]:checked + label::before {
-        font-family: themify;
-        content: "\e64c";
-        text-align: center;
-        line-height: 1.2;
-        background: #006CA9;
-        color: #fff;
-    }
-    .border-custom {
-        border: 1px solid #EAEAEB;
-        @* border-radius: 10px; *@
-    }
-    .widget-1:hover {
-    /* transform: translateY(-5px); */
-    /* transition: 0.5s; */
-    transform: none;
-    transition: none;
-    }
-    .ellipsis {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 150px;
-        }
-    .no-box-shadow {
-        box-shadow: none !important;
-    }
-    .widget-1 {
-        background-image: none;
-    }
-    .chart-container {
-        display: flex;
-        align-items: center;
-        width: 100%;            /* Pastikan tidak melebihi kolom card */
-    }
-
-    #rasci-notations{
-        display: flex;
-        gap:10px;
-        width: 100%;            /* Pastikan tidak melebihi kolom card */
-    }
-
-    .card-buspro {
-        box-shadow: 0px 0px 0px 0px !important;
-        margin: 0px !important;
-    }
-    .card-rasci-notations {
-        box-shadow: 0px 0px 0px 0px !important;
-        margin: 0px !important;
-        width: 23%;
-    }
-
-    .chart-label {
-        writing-mode: vertical-lr;
-        transform: rotate(180deg);
-        width: 60px;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
-        color: #9F9FA5;
-        margin: 0px !important;
-        padding-bottom: 0px;
-    }
-
-    .widget-round-buspro{
-        border-width: 0px !important;
-    }
-
-    .bg-round-buspro{
-        box-shadow: 0px 0px 0px 0px !important;
-    }
-
-    .card-body-buspro {
-        border: solid 1px #EAEAEB;
-        border-radius: 10px;
-    }
-    #chart-competency-spesific{
-        width: 95% !important;
-        max-width: 100% !important;
-        height: 800px !important;
-    }
-
-    #chart-rasci-buspro-level, #chart-rasci-position-level, #chart-rasci-notaions-formation,#chart-os-position-level {
-        max-width: 100% !important;
-        height: 500px !important;
-    }
-    .m-checkbox-inline label {
-        margin-right: 2px !important;
-    }
-    @* .select2-selection__rendered li.select2-selection__choice {
-        display: none !important;
-        } *@
-        /* Change the background color of the Select2 dropdown */
-       
-</style>
+<link rel="stylesheet" href="~/assets/css/dashboard.css" />
 
 <div id="xTickTooltip" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px 10px; font-size:12px; z-index:9999; pointer-events:none; border-radius:4px;"></div>
 <div id="legendTooltip" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px 10px; font-size:12px; z-index:9999; pointer-events:none; border-radius:4px;"></div>
 <div class="page-body">
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="container-fluid" id="title">
         <div class="page-title mb-0">
             <div class="row">
@@ -368,6 +250,44 @@
                                     <h5 class="f-w-700">Position Level by Directorate</h5>
                                 </div>
                                 <div class="card-body">
+                                    <div class="row mb-4">
+                                        <div class="col-4">
+                                            <div class="row">
+                                                <div class="col-4" style="align-self: self-end;text-align: center;">
+                                                    <label for="">Position Level</label>
+                                                </div>
+                                                <div class="col-8">
+                                                    <select class="form-select digits" name="selectPositionLevel" id="selectPositionLevel" >
+                                                        <option></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="selectDirectoratePLBDContainer">
+                                            <div class="row">
+                                                <div class="col-3" style="align-self: self-end;text-align: center;">
+                                                    <label for="">Directorate</label>
+                                                </div>
+                                                <div class="col-8">
+                                                    <select class="form-select digits" name="selectDirectoratePLBD" id="selectDirectoratePLBD">
+                                                        <option></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="selectDivisionContainer">
+                                            <div class="row">
+                                                <div class="col-3" style="align-self: self-end;text-align: center;">
+                                                    <label for="">Division</label>
+                                                </div>
+                                                <div class="col-8">
+                                                    <select class="form-select digits" name="selectDivision" id="selectDivision">
+                                                        <option></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-12 d-flex justify-content-between mb-4">
                                             <div class="d-flex" style="gap:10px;"> 
@@ -726,7 +646,7 @@
                         <div class="col-sm-12">
                             <div class="card" style="border-radius:8px">
                                 <div class="card-header p-3">
-                                    <h5 class="f-w-700">RASCI Notations by Business Process Level</h5>
+                                    <h5 class="f-w-700">RASCI Notations by Position Level</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -744,6 +664,80 @@
                                             <p class="f-w-400 f-22" style="color: #9F9FA5;">RASCI Notation Total</p>
                                         </div>
                                         <canvas id="chart-rasci-position-level"></canvas>
+                                    </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3 d-flex justify-content-between">
+                                    <h5 class="f-w-700">RASCI Notations in Business Process by Position Level (Average)</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div>
+                                                <div class="col">
+                                                    <div class="m-checkbox-inline">
+                                                        <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                            <input class="form-check-average" id="all" type="checkbox">
+                                                            <label class="form-check-label" for="all">All RASCI</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                            <input class="form-check-average" id="accountable" type="checkbox">
+                                                            <label class="form-check-label" for="accountable">Accountable</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                            <input class="form-check-average" id="responsible" type="checkbox">
+                                                            <label class="form-check-label" for="responsible">Responsible</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                            <input class="form-check-average" id="support" type="checkbox">
+                                                            <label class="form-check-label" for="support">Support</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                            <input class="form-check-average" id="consulted" type="checkbox">
+                                                            <label class="form-check-label" for="consulted">Consulted</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline checkbox checkbox-solid-primary-custom mb-0">
+                                                            <input class="form-check-average" id="informed" type="checkbox">
+                                                            <label class="form-check-label" for="informed">Informed</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row m-t-10">
+                                                <div class="table-responsive">
+                                                    <table class="tableMasterData table table-hover w-100" id="tableAveragePositionLevelBuspro">
+                                                        @* th *@
+                                                        <thead>
+                                                            <tr>
+                                                                <th rowspan="2" style="width: 30%">Position Level</th>
+                                                                <th colspan="5" style="width: 70%">Business Process</th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>L1</th>
+                                                                <th>L2</th>
+                                                                <th>L3</th>
+                                                                <th>L4</th>
+                                                                <th>L5</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @* <div class="chart-container">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;">RASCI Notation Total</p>
+                                        </div>
+                                        <canvas id="chart-rasci-notaions-formation"></canvas>
                                     </div> *@
                                 </div>
                             </div>
@@ -923,11 +917,33 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card" style="border-radius:8px">
+                                <div class="card-header p-3 d-flex justify-content-between">
+                                    <h5 class="f-w-700">Competency by Position Level (Average)</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="chart-label">
+                                            <p class="f-w-400 f-22" style="color: #9F9FA5;margin: 0px !important;padding-bottom: 0px;">Average</p>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <div class="chart-container">
+                                                <canvas id="chart-competency-by-position-level-average"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<partial name="~/Views/Dashboard/ModalOrgShape.cshtml" />
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
