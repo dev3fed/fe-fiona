@@ -156,6 +156,7 @@ const appState = new Proxy(
       PageSize: 5,
     },
     payloadSummary: {
+      keySearch: "position",
       Page: 1,
       PageSize: 10,
     },
