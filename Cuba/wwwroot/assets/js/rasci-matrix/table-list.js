@@ -113,6 +113,8 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
     setState("filterJobList", combinedData);
     ChangeSourceDraft();
     infoValueChain(selectedValue);
+    console.log("selectedDraftSo", selectedDraftSo);
+    console.log("selectedValue", selectedValue);
     changeDataSource(selectedValue, selectedDraftSo);
   } catch (error) {}
 });
@@ -161,10 +163,13 @@ function fetchDatasource(draftId = null) {
 }
 
 async function changeDataSource(dataSource, draftSo) {
+  console.log("dataSource", dataSource, "draftSo", draftSo);
   try {
     const defaultIndexNumber = getState("defaultIndexNumber");
     $("#dataSource-summary").val(dataSource).trigger("change");
     document.getElementById("dataSource-summary").disabled = true;
+    console.log("defaultIndexNumber", defaultIndexNumber);
+
     if (dataSource !== "master" && dataSource !== "" && dataSource !== null) {
       // document.getElementById("pills-warningtab").style.display = "flex";
 
@@ -191,6 +196,7 @@ async function changeDataSource(dataSource, draftSo) {
       document.getElementById("btnEditDetail").style.display = "none";
       // document.getElementById("btnFormdraft").style.display = "flex";
     }
+    console.log("defaultIndexNumber", defaultIndexNumber);
     const payload = {
       indexNumber: defaultIndexNumber,
       expandNumber: [],
@@ -198,7 +204,9 @@ async function changeDataSource(dataSource, draftSo) {
       row: 1,
       rowSize: 15,
     };
+    console.log("payload", payload);
     const resultProsbis = await fetchProsbisMatrix(payload);
+    console.log("resultProsbis", resultProsbis);
     const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
     if (prosbisNumber.length > 0 && resultProsbis.success === true) {
       const payloadJob = {
@@ -212,6 +220,7 @@ async function changeDataSource(dataSource, draftSo) {
       setState("payloadPosition", payloadJob);
       setState("payloadProsbis", payload);
       const resultPosition = await fetchPositionMatrix(payloadJob);
+      console.log("resultPosition", resultPosition);
       setState("isSearchMatrix", false);
       setState("idSearchProsbis", "");
       setState("actionType", "BP_THEN_JOB");
@@ -746,6 +755,7 @@ async function clearInput() {
   setState("currentPageY", 1);
   setState("currentPageX", 1);
   const result = await changeDataSource(draftRasciId, draftSoId);
+  console.log("result", result);
   if (result) {
     spinner.style.display = "none";
     clearButton.blur();

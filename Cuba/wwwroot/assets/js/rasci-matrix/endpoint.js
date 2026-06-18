@@ -442,7 +442,6 @@ async function fetchApprovalList(payload) {
 }
 
 async function fetchSummaryList(payload) {
-  console.log("payload", payload);
   const url = `${url_api}/api/rasci-matrix/draft/summary-rasci-mapping`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
@@ -466,6 +465,29 @@ async function fetchSummaryList(payload) {
   }
 }
 
+async function fetchNotAvailable(payload) {
+  const url = `${url_api}/api/rasci-matrix/draft/position-status-summary/${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 async function fetchData() {
   try {
     const payload = {

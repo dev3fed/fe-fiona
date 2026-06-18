@@ -258,7 +258,7 @@ const triggerSearchSummary = async () => {
     let searchValue = document.getElementById("inputSearchSummary").value;
     const spinner = document.getElementById("loadingSearchSummary");
     spinner.style.display = "inline-block";
-    let payload = { ...payloadSummary, searchValue: searchValue };
+    let payload = { ...payloadSummary, searchValue: searchValue, page: 1, limit: 10 };
     setState("payloadSummary", payload);
     const result = await fetchSummaryList(payload);
     console.log("result", result);
@@ -362,6 +362,8 @@ const clearSearchSummary = async () => {
       searchValue: "",
       keySearch: "Position",
       filter: statusValue === "all" ? ["available", "not-available", "waiting-approval", "on-progress"] : [statusValue],
+      page: 1,
+      limit: 10,
     };
 
     setState("payloadSummary", payload);
