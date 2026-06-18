@@ -66,8 +66,8 @@ async function detailDraft() {
        <div class="col-2 custom-col" style="text-align:center">
         <label style="color:#9F9FA5; display:block">Status</label>
         <label style="font-size: 14px;  background-color: ${getStatusColor(dataDraft.isStatus)};color: ${getTextColor(
-              dataDraft.isStatus,
-            )}; font-weight:500;
+          dataDraft.isStatus,
+        )}; font-weight:500;
           width:100px;text-align:center;
           padding:8px 0;
           border-radius:4px;
@@ -81,7 +81,10 @@ async function detailDraft() {
       const draftInfo = document.getElementById("draft-info");
       if (draftInfo) draftInfo.innerHTML = bodyInfo;
     }
+    const headerActivity = document.getElementById("header-activity");
+
     if (listData.data.length > 0) {
+      if (headerActivity) headerActivity.style.display = "block";
       renderTableActivity(listData);
     } else {
       const bodyEmpty = `
@@ -94,7 +97,7 @@ async function detailDraft() {
 
       if (emptyActivity) emptyActivity.innerHTML = bodyEmpty;
     }
-    
+
     const isWarning = dataDraft.draftSO.isApproved;
     if (isWarning === false) {
       document.getElementById("warning-draft").style.display = "block";
@@ -128,39 +131,7 @@ async function detailDraft() {
 async function renderTableActivity(listData) {
   try {
     const bodyDetail = `
-        <div class="col-12" style="text-align: left;">
-           <span style="font-size:13px">Activity Type :</span>
-           <button class="btn btn-outline-light btn-rounded" style="width:60px" type="button">
-              All
-            </button>
-            <button class="btn btn-outline-light btn-rounded"  type="button">
-              Upload
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Add New Business Process
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Add/Edit RASCI
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Edit Business Process
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Delete Business Process
-            </button>
-       </div>
-       <div class="col-4  mt-3" style="text-align: left;">
-          <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
-                    data-feather="search"></i>
-            </div>
-        </div>
-        <div class="col-8 text-end mt-3" style="padding-right:23px">
-          <button class="btn btn-primary" type="button">
-          <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;"> Import</button>
-            <button class="btn btn-primary" type="button">
-            <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;"> Export</button>
-        </div>
+
         <div class="col-12 mt-3">
           <div class="table-responsive scrollable" style=" max-height: 350px;">
               <table class="table tbl-border-add-prosbis">
@@ -307,8 +278,8 @@ async function renderTableActivity(listData) {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
-      } of ${listData.total} records</label>
+                listData.total < itemsPerPage * listData.page ? listData.total : itemsPerPage * listData.page
+              } of ${listData.total} records</label>
             </div>
           </div>
         `;
@@ -401,6 +372,7 @@ async function handleDetailPageChange(pageNumber) {
   setState("payloadDetailDraftPage", {
     ...payloadDetailDraftPage,
     Page: pageNumber,
+    PageSize: payloadDetailDraftPage.PageSize,
   });
   const payload = {
     Page: pageNumber,
@@ -416,6 +388,7 @@ async function handleChangeIDetailItemsPerPage(event) {
   const payloadDetailDraftPage = getState("payloadDetailDraftPage");
   setState("payloadDetailDraftPage", {
     ...payloadDetailDraftPage,
+    Page: payloadDetailDraftPage.Page,
     PageSize: itemsPerPage,
   });
   const payload = {
@@ -572,21 +545,21 @@ async function handleOpenDetailBp() {
                   <th scope="row">
                     <label class="radio-label" for="checked-body-bp">
                      <input class="checkbox_animated" id="checked-${item.RasciCode.toLowerCase()}" type="checkbox" ${
-          item.IsChecked ? "checked" : ""
-        } onclick="onCheckEdit(event, '${item.RasciCode}')" >
+                       item.IsChecked ? "checked" : ""
+                     } onclick="onCheckEdit(event, '${item.RasciCode}')" >
                     </label>
                   </th>
                   <td style="text-align:center">
                     <img src="/assets/images/rasci/${item.RasciCode.toLowerCase()}.svg" alt="${
-          item.RasciCode
-        } Icon" style="padding-right:2px">
+                      item.RasciCode
+                    } Icon" style="padding-right:2px">
                   </td>
                   <td>
                     <input class="form-control" type="text" placeholder="Type Comment" id="commentEdit${
                       item.RasciCode
                     }" value="${item.Comment}" ${item.IsChecked ? "" : "disabled"} oninput="updateDraftComment('${
-          item.RasciCode
-        }', this.value)">
+                      item.RasciCode
+                    }', this.value)">
                   </td>
               </tr>
           `;
@@ -859,3 +832,79 @@ async function confirmDeleteDetailDraft() {
     }
   } catch (error) {}
 }
+const handleActivityTypeChange = async (event) => {
+  if (!event?.target?.value) return;
+  const selectedValue = event.target.value;
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: 1,
+    PageSize: payloadDetailDraftPage.PageSize,
+    Filter: `drafttype=${selectedValue}`,
+  };
+  console.log("payload", payloadDetailDraftPage);
+  setState("payloadDetailDraftPage", payload);
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = new URLSearchParams(payload).toString();
+  const detailResult = await fetchDraftListProsbis(dataDraft.draftId, queryString);
+  console.log("detailResult", detailResult);
+  renderTableActivity(detailResult);
+};
+
+const inputSearchActivity = async (event) => {
+  const searchValue = event.target.value;
+
+  if (searchValue.length === 0) {
+    const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+    const payload = {
+      ...payloadDetailDraftPage,
+      Page: 1,
+      PageSize: payloadDetailDraftPage.PageSize,
+      Search: "",
+    };
+    setState("payloadDetailDraftPage", payload);
+    const dataDraft = getState("dataDetailDraft");
+    const queryString = new URLSearchParams(payload).toString();
+    const detailResult = await fetchDraftListProsbis(dataDraft.draftId, queryString);
+    console.log("detailResult", detailResult);
+
+    renderTableActivity(detailResult);
+    return;
+  }
+
+  if (searchValue.length < 3) {
+    return;
+  }
+
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: 1,
+    PageSize: payloadDetailDraftPage.PageSize,
+    Search: searchValue,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDraft = getState("dataDetailDraft");
+  const queryString = new URLSearchParams(payload).toString();
+  const detailResult = await fetchDraftListProsbis(dataDraft.draftId, queryString);
+  console.log("detailResult", detailResult);
+
+  renderTableActivity(detailResult);
+};
+
+const exportDraftrasci = async () => {
+  const dataDraft = getState("dataDetailDraft");
+  const loader = document.getElementById("loadingExportDraftrasci");
+  loader.style.display = "flex";
+  try {
+    const result = await fetchExportDraftrasci(dataDraft.draftId);
+    if (result.success) {
+      loader.style.display = "none";
+    } else {
+      loader.style.display = "none";
+    }
+  } catch (error) {}
+};

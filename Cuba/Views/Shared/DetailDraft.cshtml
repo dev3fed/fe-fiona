@@ -114,6 +114,34 @@
         border-radius: 7px;
         margin-right: 10px;
     }
+
+    .activity-check-input {
+        display: none;
+    }
+
+    .activity-check-label {
+        border: 1px solid #BFBFC2;
+        border-radius: 26px;
+        padding: 8px 16px;
+        margin-right: 0;
+        cursor: pointer;
+        background-color: #FFFFFF;
+        color: #000000;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    }
+
+    .activity-check-input:checked+.activity-check-label {
+        background-color: #e6f0f6;
+        color: #006ca9;
+        border-color: #006ca9;
+    }
+
+    .activity-check {
+        margin-bottom: 0;
+        display: inline-block;
+        margin-right: 15px;
+    }
 </style>
 
 <div class="card" style="border-radius:8px">
@@ -177,31 +205,106 @@
             <div id="empty-activity">
 
             </div>
-            <div class="row" style="padding-top: 20px;" id="detail-prosbis">
-            </div>
-            @* <div style="padding-top: 20px;" id="detail-job">
-            </div> *@
-        </div>
-        <div id="warning-draft" style="display: none;">
-       
-        </div>
-        <!-- Card detail end-->
+            <div style="padding-top: 20px; display: none;" id="header-activity">
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <span style="font-size:13px">Activity Type :</span>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeAll" name="activityType"
+                               value="all" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeAll">
+                            All
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeUpload" name="activityType"
+                               value="upload" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeUpload">
+                            Upload
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeAddNewBp" name="activityType"
+                               value="addnew" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeAddNewBp">
+                            Add New Business Process
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeAddEditRasci"
+                               name="activityType" value="addedit" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeAddEditRasci">
+                            Add/Edit RASCI
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeEditBp" name="activityType"
+                               value="editbusiness" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeEditBp">
+                            Edit Business Process
+                        </label>
+                    </div>
+                    <div class="activity-check">
+                        <input class="activity-check-input" type="radio" id="activityTypeDeleteBp" name="activityType"
+                               value="deletebusiness" onchange="handleActivityTypeChange(event)">
+                        <label class="activity-check-label" for="activityTypeDeleteBp">
+                            Delete Business Process
+                        </label>
+                    </div>
+                </div>
+                <div
+                    style="display: flex; gap: 15px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div style="max-width: 500px; flex: 1; text-align: left;">
+                        <div class="faq-form">
+                            <input class="form-control" type="text" placeholder="Search.."
+                                   onchange="inputSearchActivity(event)"><i class="search-icon" data-feather="search"></i>
+                        </div>
+                    </div>
+                    <div class="col-8 text-end mt-3" style="padding-right:23px">
+                        <button class="btn btn-primary" type="button">
+                            <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;">
+                            Import</button>
+                            @* <button class="btn btn-primary" type="button" onclick="exportDraftrasci()">
+                                <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
+                                Export</button> *@
 
-        <!-- card footer start-->
-        <div class="text-end mt-2 mb-2">
-            <button class="btn btn-outline-light" type="button" onclick="handleBack()">
-                <i class="icon-arrow-left"></i> Back
-            </button>
-            <button class="btn btn-outline-danger" type="button" onclick="deleteDraftFromdetail()"
-                id="delete-detail-draft">
-                <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
-            </button>
-            @* <button class=" btn btn-outline-light" type="button" onclick="handleOpenDetailBp()">
+                            <button id="btnExportDraftrasci" class="btn btn-primary" type="button"
+                                    onclick="exportDraftrasci()">
+                                <div class="d-flex align-items-center">
+                                    <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                         id="loadingExportDraftrasci" role="status"></div>
+                                    <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
+                                    <span class="btn-text">Export</span>
+                                </div>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row" style="padding-top: 20px;" id="detail-prosbis">
+                </div>
+                @* <div style="padding-top: 20px;" id="detail-job">
+            </div> *@
+            </div>
+            <div id="warning-draft" style="display: none;">
+
+            </div>
+            <!-- Card detail end-->
+
+            <!-- card footer start-->
+            <div class="text-end mt-2 mb-2">
+                <button class="btn btn-outline-light" type="button" onclick="handleBack()">
+                    <i class="icon-arrow-left"></i> Back
+                </button>
+                <button class="btn btn-outline-danger" type="button" onclick="deleteDraftFromdetail()"
+                        id="delete-detail-draft">
+                    <i class="icon-trash" style="font-size: 1em;"></i> Delete Draft
+                </button>
+                @* <button class=" btn btn-outline-light" type="button" onclick="handleOpenDetailBp()">
                 <img src="~/assets/images/rasci/pen_outline.svg" alt="Filter Icon" style="margin-right: 8px;">Edit Draft
             </button> *@
-            <button class="btn btn-primary" type="button" onclick="openDetailApproval()" id="detail-draft-submitted">
-                Submit to Approval<i class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+                <button class="btn btn-primary" type="button" onclick="openDetailApproval()" id="detail-draft-submitted">
+                    Submit to Approval<i class="icon-arrow-right" style="font-size: 0.8em; margin-left: 5px;"></i> </button>
+                </div>
+                <!-- card footer end-->
+            </div>
         </div>
-        <!-- card footer end-->
-    </div>
-</div>
