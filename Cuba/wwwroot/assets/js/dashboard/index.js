@@ -109,6 +109,12 @@ $(document).ready(async function () {
     }
   });
 
+  // business-process-value-chain
+  $("#business-process-value-chain").on("click", function () {
+    // open new page with url /Rasci/Index
+    window.open("/Rasci/Index", "_blank");
+  });
+
   const chartOsPositionLevel = document.getElementById("chart-os-position-level").getContext("2d");
   const chartRasciBusPro = document.getElementById("chart-rasci-buspro-level").getContext("2d");
   const chartRasciPosition = document.getElementById("chart-rasci-position-level").getContext("2d");
@@ -141,21 +147,23 @@ $(document).ready(async function () {
       loader(false);
     }, 1000);
 
-    $("#exampleModalLabel").text(`${chartType} - ${label}`);
     const formattedValue = value.toLocaleString();
+    $("#label-job-grade-formation").text(` Job Grade : ${label} | Formation Total : ${formattedValue}`);
     $("#ModalOrgShape .modal-body .table-responsive").html(
-      `<table class="table table-bordered">
+      `<table class="tableMasterData table table-hover w-100">
         <thead>
           <tr>
-            <th>Tipe</th>
-            <th>Grade / Posisi</th>
-            <th>Total Posisi</th>
+            <th>No</th>
+            <th>Organization Unit Name</th>
+            <th>Position</th>
+            <th>Formation</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>${chartType}</td>
+            <td>1</td>
             <td>${label}</td>
+            <td>${formattedValue}</td>
             <td>${formattedValue}</td>
           </tr>
         </tbody>
@@ -1062,8 +1070,8 @@ $(document).ready(async function () {
       const levelName = mappingLevelName[level];
       const found = dataAll.averageCompetencyByJobLevel.data.find((item) => item.jobLevelName === levelName);
       dataChart.dataCompetencyByPositionLevelAverage.labels.push(levelName);
-      dataChart.dataCompetencyByPositionLevelAverage.totalGeneric.push(found ? found.totalGeneric : 0);
-      dataChart.dataCompetencyByPositionLevelAverage.totalSpecific.push(found ? found.totalSpecific : 0);
+      dataChart.dataCompetencyByPositionLevelAverage.totalGeneric.push(found ? found.averageGeneric : 0);
+      dataChart.dataCompetencyByPositionLevelAverage.totalSpecific.push(found ? found.averageSpecific : 0);
     });
 
     new Chart(chartCompetencyByPositionLevelAverage, {
@@ -1075,12 +1083,12 @@ $(document).ready(async function () {
           {
             label: "Total Generic",
             data: dataChart.dataCompetencyByPositionLevelAverage.totalGeneric,
-            backgroundColor: "#3389BA",
+            backgroundColor: "#FFEE56",
           },
           {
             label: "Total Specific",
             data: dataChart.dataCompetencyByPositionLevelAverage.totalSpecific,
-            backgroundColor: "#56C5F8",
+            backgroundColor: "#A9FFA7",
           },
         ],
       },

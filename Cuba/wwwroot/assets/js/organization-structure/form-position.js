@@ -6,7 +6,7 @@ function starter() {
 
 async function initializeList() {
   const _function = await functionList(organizationAttribute.orgUnitId);
-  console.log("_function", _function);
+  // console.log("_function", _function);
   const _abbrv = await abbrvPositionList(organizationAttribute.orgUnitId);
   const draftId = organizationAttribute.orgUnitId;
   getDataListAsync([
@@ -90,7 +90,7 @@ async function saveAsDraft() {
   hideModal(`modalConfirm`);
   loader(true);
   const save = await saveInputAttribut(type);
-  console.log("save", save.data.unit.unitCode);
+  // console.log("save", save.data.unit.unitCode);
   // loader(false);
   // return;
   if (save.status == 200) {
@@ -138,11 +138,11 @@ function addSubPosition() {
   dataAddSubPos.unitParentCode = $("#selectOrgUnitParentName").val();
   dataAddSubPos.unitParentName = $("#selectOrgUnitParentName option:selected").text();
   let subJobPos = JSON.parse(localStorage.getItem("subJobPos"));
-  console.log("dataAddSubPos", dataAddSubPos);
+  // console.log("dataAddSubPos", dataAddSubPos);
   //  count how many div with id include subPosDiv
   dataAddSubPos.formationBasket = [];
   const countsubPosDiv = $("[id^=subPosDiv]").length;
-  console.log("countsubPosDiv", countsubPosDiv);
+  // console.log("countsubPosDiv", countsubPosDiv);
   if (countsubPosDiv >= 1) {
     let counted;
     for (let i = 1; i <= countsubPosDiv; i++) {
@@ -157,7 +157,7 @@ function addSubPosition() {
       });
     }
   }
-  console.log("dataAddSubPos", dataAddSubPos);
+  // console.log("dataAddSubPos", dataAddSubPos);
   let id;
   const name =
     dataAddSubPos.formationBasket.length > 1
@@ -266,7 +266,7 @@ function addSubPos() {
   // duplicate div with id subPosDiv
   const newSubPosDiv = $("#subPosDiv").clone();
   const count = $(".sub-pos-card").length + 1;
-  console.log("count", count);
+  // console.log("count", count);
   newSubPosDiv.attr("id", "subPosDiv" + count);
 
   // Remove existing Select2 containers from cloned div
@@ -335,7 +335,7 @@ function addSubPos() {
 }
 
 function deleteSubPos(countSubPosDiv) {
-  console.log("countSubPosDiv", countSubPosDiv);
+  // console.log("countSubPosDiv", countSubPosDiv);
   $("#subPosDiv" + countSubPosDiv).remove();
 }
 
@@ -380,11 +380,17 @@ $(document).ready(async function () {
 
   $("#selectDirectReport").on("change", async function (event) {
     loader(true);
+    // alert("masuk sini");
     // wait 200 ms
     // await new Promise((resolve) => setTimeout(resolve, 200));
     const value = event.target.value;
+    if (!value) {
+      loader(false);
+      return;
+    }
+    // console.log("value", value);
     const detailDirectReport = await getDetailJob(value);
-    console.log("detailDirectReport", detailDirectReport);
+    // console.log("detailDirectReport", detailDirectReport);
     await fillAttributeDirectReport(detailDirectReport);
     // const detailDirectReport
   });
@@ -463,23 +469,15 @@ $(document).ready(async function () {
   // const selectCareerType = $("#selectCareerType").val();
   // ketika ada pergerakan di tiga id itu, career level harus di refresh
   $("#selectPrlOrg, #selectPrlOrgTo, #selectCareerType").on("change", function () {
-    console.log("refresh career level");
+    // console.log("refresh career level");
     $("#selectCareerLevel").val(null).trigger("change");
 
-    const params =
-      $("#selectBasket").val() == "No"
-        ? {
-            get: "value",
-            inputType: "select2",
-            urlParam: "prlOrgFrom",
-            valueFrom: "selectPrlOrg",
-          }
-        : {
-            get: "value",
-            inputType: "select2",
-            urlParam: "prlOrgTo",
-            valueFrom: "selectPrlOrgTo",
-          };
+    const params = {
+      get: "value",
+      inputType: "select2",
+      urlParam: "prlOrgTo",
+      valueFrom: $("#selectBasket").val() == "No" ? "selectPrlOrg" : "selectPrlOrgTo",
+    };
 
     getDataListAsync([
       {
@@ -651,6 +649,9 @@ $(document).ready(async function () {
     const selectPrlOrg = $("#selectPrlOrg").val();
     const selectPrlOrgTo = $("#selectPrlOrgTo").val();
     const selectCareerType = $("#selectCareerType").val();
+    // console.log("selectPrlOrg", selectPrlOrg);
+    // console.log("selectPrlOrgTo", selectPrlOrgTo);
+    // console.log("selectCareerType", selectCareerType);
     if (!selectPrlOrg) {
       e.preventDefault();
       swal("Warning", `Please select PRL Org first`, "warning");
@@ -831,9 +832,9 @@ $(document).ready(async function () {
           }
         }
       }
-      console.log("hasErrors", hasErrors);
-      console.log("input", input);
-      console.log("value", value);
+      // console.log("hasErrors", hasErrors);
+      // console.log("input", input);
+      // console.log("value", value);
     });
     // console.log errornya dimana
 
@@ -920,7 +921,7 @@ $(document).ready(async function () {
 
   $("#back").click(function () {
     const backPage = localStorage.getItem("backPage");
-    alert(backPage);
+    // alert(backPage);
     if (backPage && backPage === "draft-detail") {
       window.location.href = "/organization/draft-detail?draftId=" + organizationAttribute.orgUnitId;
       return;

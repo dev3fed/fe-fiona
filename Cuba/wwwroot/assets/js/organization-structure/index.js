@@ -3,13 +3,14 @@ async function initializeHelper() {
   try {
     // testing
     // const dataChart = test;
-    // renderOrgChart(dataChart.data, "30263312", true);
+    // renderOrgChart(dataChart.data, defaultNodeId, true);
 
     // real
     const dataChart = await chartShow({
       draftId: organizationAttribute.orgUnitId,
-      jobCode: defaultNodeId,
-      depth: 3,
+      // jobCode: defaultNodeId,
+      jobCode: "",
+      depth: 4,
     });
     renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
@@ -18,7 +19,7 @@ async function initializeHelper() {
       }
       console.log("Chart initialization and loading completed");
     }, 1500); // Wait 1.5 seconds for chart to fully render
-    // helperOrgTree(dataChart);
+    helperOrgTree(dataChart);
   } catch (error) {
     console.error("Error in initializeHelper:", error);
     // Hide loading and show error message on failure

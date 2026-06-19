@@ -6,10 +6,10 @@ function getDataListAsync(data) {
     let additionalParams = "";
     if (dependOn) {
       dependOn.forEach((depend) => {
-        console.log("depend", depend);
+        // console.log("depend", depend);
         let dependValue =
           depend.get == "text" ? $(`#${depend.valueFrom} option:selected`).text() : $(`#${depend.valueFrom}`).val();
-        console.log("dependValue", dependValue);
+        // console.log("dependValue", dependValue);
         if (depend.inputType && depend.inputType == "select2") {
           dependValue = dependValue ? dependValue : "";
         }
