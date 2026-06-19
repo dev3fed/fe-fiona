@@ -396,7 +396,7 @@ const CHART_LOADING_HTML = `
   </style>
 `;
 
-const defaultNodeId = "10132406";
+const defaultNodeId = "10132405";
 // const defaultMasterId = "1";
 const defaultMasterId = "00000000-0000-0000-0000-000000000001";
 const directReportAttrIds =
