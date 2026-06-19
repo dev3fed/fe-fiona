@@ -1466,7 +1466,7 @@ async function modalJobPopup(params) {
   $("#inputOUCode").val(data.unitCode);
   $("#inputPositionCode").val(data.positionCode);
   $("#modalPrlOrg").text(checkValue(data.prlOrg));
-  $("#modalFormation").text(checkValue(data?.formation));
+  $("#modalFormation").text(checkValue(data?.totalFormation));
 
   $("#modalOrgUnitId").text(checkValue(data.unitCode));
   $("#modalOrgUnitName").text(checkValue(data.unitName));
@@ -1500,7 +1500,7 @@ async function modalJobPopup(params) {
   $("#modalSKNumber").text(checkValue(data?.sourceOfSK));
 
   $("#modalOrgPRL").text(checkValue(data?.prlOrg));
-  $("#modalFormation").text(checkValue(data?.formation));
+  $("#modalFormation").text(checkValue(data?.totalFormation));
 
   $("#modalNeckFunction").text(checkValue(data?.neckFunction));
   $("#modalIsProject").text(checkValue(data?.isProject));
@@ -1518,6 +1518,7 @@ async function modalJobPopup(params) {
   $("#nonBasketIncumbent").show();
   $("#incumbentCard").show();
   //
+  $("#showJobdesc").show();
   if (!organizationAttribute.isMasterData) {
     $("#showJobdesc").show();
   }
@@ -1966,10 +1967,14 @@ function createHierarchy(data, parentId = null) {
 
 async function helperOrgTree(params) {
   // di cblock dulu karena bikin error kalo pakai draft datanya jadi belasan ribu
-  // console.log("helperOrgTree called with params:", params);
+  console.log("helperOrgTree called with params:", params);
+  params = params.data || [];
   // return;
-  params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
   //  remove duplicate id in params
+  if (!Array.isArray(params)) {
+    console.error("Expected params to be an array, but got:", params);
+    return;
+  }
   params = params.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
 
   $("#orgThreeDiv").jstree("destroy");

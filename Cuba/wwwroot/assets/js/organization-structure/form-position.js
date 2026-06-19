@@ -920,7 +920,7 @@ $(document).ready(async function () {
 
   $("#back").click(function () {
     const backPage = localStorage.getItem("backPage");
-    alert(backPage);
+    // alert(backPage);
     if (backPage && backPage === "draft-detail") {
       window.location.href = "/organization/draft-detail?draftId=" + organizationAttribute.orgUnitId;
       return;

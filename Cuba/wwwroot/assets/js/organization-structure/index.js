@@ -2,23 +2,23 @@ async function initializeHelper() {
   showChartLoading("chart-container-custom");
   try {
     // testing
-    // const dataChart = test;
-    // renderOrgChart(dataChart.data, "30263312", true);
+    const dataChart = test;
+    renderOrgChart(dataChart.data, defaultNodeId, true);
 
     // real
-    const dataChart = await chartShow({
-      draftId: organizationAttribute.orgUnitId,
-      jobCode: defaultNodeId,
-      depth: 3,
-    });
-    renderOrgChart(dataChart.data, defaultNodeId, false);
+    // const dataChart = await chartShow({
+    //   draftId: organizationAttribute.orgUnitId,
+    //   jobCode: defaultNodeId,
+    //   depth: 3,
+    // });
+    // renderOrgChart(dataChart.data, defaultNodeId, false);
     setTimeout(() => {
       if (typeof hideChartLoading === "function") {
         hideChartLoading("chart-container-custom");
       }
       console.log("Chart initialization and loading completed");
     }, 1500); // Wait 1.5 seconds for chart to fully render
-    // helperOrgTree(dataChart);
+    helperOrgTree(dataChart);
   } catch (error) {
     console.error("Error in initializeHelper:", error);
     // Hide loading and show error message on failure
