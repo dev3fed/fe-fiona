@@ -3,12 +3,60 @@ document.addEventListener("DOMContentLoaded", function () {
   feather.replace();
 });
 
+const getSummaryListNotAvailable = async (draftId) => {
+  try {
+    let selectElement = document.querySelector("#dataSource-rasci");
+    // const payload = {
+    //   dataSource: selectElement ? selectElement.value : null,
+    //   page: 1,
+    //   limit: 10,
+    // };
+    // const queryString = "?" + new URLSearchParams(payload).toString();
+    const resultList = await fetchNotAvailable(selectElement ? selectElement.value : null);
+    console.log("resultList", resultList);
+    const totalRow = resultList.data.totalNoMapping || 0;
+    const warningList = document.getElementById("warning-rascisummary");
+    const tableSummary = document.getElementById("table-rascisummary");
+    if (warningList) {
+      if (totalRow > 0) {
+        warningList.style.display = "inline-block";
+        tableSummary.style.marginTop = "0px";
+        warningList.innerHTML = `There are ${totalRow} positions with RASCI are not available
+          <strong style="font-weight:600; color:#D02138;cursor:pointer;" onclick="handleShowWarning()">[Click here to show]</strong>`;
+      } else {
+        warningList.style.display = "none";
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching summary list:", error);
+  }
+};
+
+const handleShowWarning = async () => {
+  try {
+    document.getElementById("status-summary").value = "not-available";
+    const payloadSummary = getState("payloadSummary");
+    const payload = { ...payloadSummary, searchValue: "", filter: ["not-available"], limit: 10, page: 1 };
+
+    setState("payloadSummary", payload);
+    const result = await fetchSummaryList(payload);
+
+    if (result) {
+      renderTableSummary(result);
+    }
+  } catch (error) {
+    console.error("Error in handleShowWarning:", error);
+  }
+};
+
 const getSummaryList = async (draftId) => {
+  console.log("Fetching summary list with draftId:", draftId);
   try {
     let statusValue = document.getElementById("status-summary").value;
+    let selectElement = document.querySelector("#dataSource-rasci");
+
     const payload = {
-      // dataSource: draftId,
-      dataSource: "master",
+      dataSource: selectElement ? selectElement.value : null,
       keySearch: "",
       searchValue: "",
       filter: statusValue === "all" ? ["available", "not-available", "waiting-approval", "on-progress"] : [statusValue],
@@ -76,82 +124,124 @@ document.getElementById("status-summary").addEventListener("change", async funct
 });
 
 const renderTableSummary = (resultList) => {
-  if (resultList.data.data.length > 0) {
+  console.log("resultList", resultList);
+  if (resultList && resultList.data && Array.isArray(resultList.data.data)) {
     const listData = resultList.data;
-    const bodySummary = listData.data
-      .map((element, i) => {
-        let statusText = element.status || "N/A";
-        let statusClass = (statusText || "").toLowerCase();
-        let isNotAvailable = statusClass === "not-available" || statusClass === "not available";
-        let bgColor = isNotAvailable ? "#FAE9EB" : "#b9fbc0";
-        let textColor = isNotAvailable ? "#D02138" : "#16a34a";
-        let capitalizedStatus = statusText
-          .split("-")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-          .join(" ");
-        let statusHtml = `<span style="
-          display:inline-block;
-          width:120px;
-          text-align:center;
-          background-color:${bgColor};
-          color:${textColor};
-          font-weight:500;
-          padding:8px 0;
-          border-radius:4px;
-          line-height:1;
-          box-sizing:border-box;
-          ">${capitalizedStatus}</span>`;
-        const startIndex = (listData.meta.page - 1) * listData.meta.limit;
-        const valString = JSON.stringify(element).replace(/"/g, "&quot;");
-        return `
-            <tr>
-              <td style="text-align:center">${startIndex + i + 1}</td>
-              <td>${element.positionName || "N/A"}</td>
-              <td style="text-align:center">${element.functionName || "N/A"}</td>
-              <td style="text-align:center">${element.divisionName || "N/A"}</td>
-              <td style="width: 120px;text-align:center">${statusHtml}</td>
-              <td style="text-align:center;width: 100px;">
-               <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
-                 /"/g,
-                 "&quot;",
-               )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
-               <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
-               <span>Detail</span>
-               </button> 
-              </td>
-            </tr>`;
-      })
-      .join("");
-    document.getElementById("body-summary").innerHTML = bodySummary;
-    const itemsPerPage = listData.meta.limit;
-    const totalPages = Math.ceil(listData.meta.count / itemsPerPage);
-    const currentPage = listData.meta.page;
-    const start = (currentPage - 1) * itemsPerPage + 1;
-    renderPaginationSummary(currentPage, totalPages);
-    const totalPage = document.getElementById("total-summary-page");
-    if (totalPage) {
-      totalPage.innerHTML = `
-          <div class="row">
-            <div class="col-2">
-              <select class="form-select digits"  style="width:62%;" id="limitPageSummary" onchange="changeNumberSummaryPage(event)">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+
+    if (listData.data.length > 0) {
+      const bodySummary = listData.data
+        .map((element, i) => {
+          let statusText = element.status || "N/A";
+          let statusClass = (statusText || "").toLowerCase();
+          let isNotAvailable = statusClass === "not-available" || statusClass === "not available";
+          const valString = JSON.stringify(element).replace(/"/g, "&quot;");
+
+          const actionButtons = isNotAvailable
+            ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency">
+                   <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
+                   Add Competency
+                 </button>`
+            : `<button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
+                /"/g,
+                "&quot;",
+              )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
+                   <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
+                   <span>Detail</span>
+                 </button>`;
+
+          let bgColor, textColor;
+          switch (statusClass) {
+            case "on-progress":
+              bgColor = "#FFE7C5";
+              textColor = "#E18400";
+              break;
+            case "waiting approval":
+              bgColor = "#E6F0F6";
+              textColor = "#006CA9";
+              break;
+            case "available":
+              bgColor = "#B5FFC7";
+              textColor = "#009024";
+              break;
+            case "not-available":
+            case "not available":
+              bgColor = "#FAE9EB";
+              textColor = "#D02138";
+              break;
+            default:
+              bgColor = "#F5F5F5";
+              textColor = "#666666";
+          }
+          let capitalizedStatus = statusText
+            .split("-")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(" ");
+          let statusHtml = `<span style="
+            display:inline-block;
+            width:120px;
+            text-align:center;
+            background-color:${bgColor};
+            color:${textColor};
+            font-weight:500;
+            padding:8px 0;
+            border-radius:4px;
+            line-height:1;
+            box-sizing:border-box;
+            ">${capitalizedStatus}</span>`;
+          const startIndex = (listData.meta.page - 1) * listData.meta.limit;
+
+          return `
+              <tr>
+                <td style="text-align:center">${startIndex + i + 1}</td>
+                <td>${element.positionName || "N/A"}</td>
+                <td style="text-align:center">${element.functionName || "N/A"}</td>
+                <td style="text-align:center">${element.divisionName || "N/A"}</td>
+                <td style="width: 120px;text-align:center">${statusHtml}</td>
+                <td style="text-align:center;width:${isNotAvailable ? "200px" : "100px"}">
+                 ${actionButtons}
+                </td>
+              </tr>`;
+        })
+        .join("");
+      document.getElementById("body-summary").innerHTML = bodySummary;
+      const itemsPerPage = listData.meta.limit;
+      const totalPages = Math.ceil(listData.meta.count / itemsPerPage);
+      const currentPage = listData.meta.page;
+      const start = (currentPage - 1) * itemsPerPage + 1;
+      renderPaginationSummary(currentPage, totalPages);
+      const totalPage = document.getElementById("total-summary-page");
+      if (totalPage) {
+        totalPage.innerHTML = `
+            <div class="row">
+              <div class="col-2">
+                <select class="form-select digits"  style="width:62%;" id="limitPageSummary" onchange="changeNumberSummaryPage(event)">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <div class="col-10">
+                <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
+                  listData.meta.count < itemsPerPage * currentPage ? listData.meta.count : itemsPerPage * currentPage
+                } of ${listData.meta.count} records</label>
+              </div>
             </div>
-            <div class="col-10">
-              <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-                listData.meta.count < itemsPerPage * currentPage ? listData.meta.count : itemsPerPage * currentPage
-              } of ${listData.meta.count} records</label>
-            </div>
-          </div>
-        `;
+          `;
+      }
+      let selectElement = document.getElementById("limitPageSummary");
+      selectElement.value = listData.meta.limit;
+    } else {
+      document.getElementById("body-summary").innerHTML =
+        `<tr><td colspan="6" style="text-align:center; padding:20px;">No data found</td></tr>`;
+      const totalPage = document.getElementById("total-summary-page");
+      if (totalPage) {
+        totalPage.innerHTML = `<div class="row"><div class="col-12"><label style="padding-top:7px;">No records to display</label></div></div>`;
+      }
+      renderPaginationSummary(1, 0);
     }
-    let selectElement = document.getElementById("limitPageSummary");
-    selectElement.value = listData.meta.limit;
   }
 };
 
@@ -169,7 +259,7 @@ const onSearchSummary = async () => {
     let searchValue = document.getElementById("inputSearchSummary").value;
     const spinner = document.getElementById("loadingSearchSummary");
     spinner.style.display = "inline-block";
-    let payload = { ...payloadSummary, searchValue: searchValue };
+    let payload = { ...payloadSummary, searchValue: searchValue, page: 1, limit: 10 };
     setState("payloadSummary", payload);
     const result = await fetchSummaryList(payload);
     renderTableSummary(result);

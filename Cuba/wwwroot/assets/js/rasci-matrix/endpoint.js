@@ -359,6 +359,37 @@ async function fetchExportRasciMatrix(payload) {
     };
   }
 }
+
+async function fetchExportDraftrasci(draftId) {
+  const url = `${url_api}/api/rasci-matrix/draft/export?draftId=${draftId}`;
+  try {
+    const response = await $.ajax({
+      url,
+      type: "GET",
+      xhrFields: {
+        responseType: "blob",
+      },
+    });
+
+    // Create a link to download the file
+    const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    link.download = `draft-rasci-${timestamp}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON?.message || "Error exporting file",
+    };
+  }
+}
+
 async function fetchApproved(payload) {
   const url = `${url_api}/api/rasci-matrix/draft/approve/${payload}`;
   try {
@@ -442,7 +473,6 @@ async function fetchApprovalList(payload) {
 }
 
 async function fetchSummaryList(payload) {
-  console.log("payload", payload);
   const url = `${url_api}/api/rasci-matrix/draft/summary-rasci-mapping`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
@@ -466,6 +496,29 @@ async function fetchSummaryList(payload) {
   }
 }
 
+async function fetchNotAvailable(payload) {
+  const url = `${url_api}/api/rasci-matrix/draft/position-status-summary/${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    if (result.status === 400) {
+      return {
+        success: false,
+        error: result.message,
+      };
+    } else {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false,
+      error: error?.responseJSON.message || "Error fetching data from API",
+    };
+  }
+}
 async function fetchData() {
   try {
     const payload = {
