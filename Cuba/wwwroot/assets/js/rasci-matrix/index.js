@@ -20,8 +20,8 @@ document.getElementById("searchButton").addEventListener("click", async function
     selectedText == "RASCI by Pos..."
       ? "job"
       : selectedText == "RASCI by Bus..."
-      ? "businessprocess"
-      : "businessprocess";
+        ? "businessprocess"
+        : "businessprocess";
   const draftSoId = getState("draftSoId");
   const selectedValue = $("#dataSource-rasci").val();
   let resultTblRbp = [];
@@ -485,6 +485,9 @@ const handleExportMatrix = async () => {
     const payloadProsbis = getState("payloadProsbis");
     const payloadPosition = getState("payloadPosition");
     const actionExport = getState("actionExport");
+    // console.log("payloadProsbis", payloadProsbis);
+    // console.log("payloadPosition", payloadPosition);
+    // console.log("actionExport", actionExport);
     const loader = document.getElementById("loader");
     loader.style.display = "flex";
     let payload = {};
@@ -536,12 +539,17 @@ const handleExportMatrix = async () => {
         };
         break;
       default:
-        return;
+        payload = {
+          draftRasciId: payloadProsbis.draftRasciId || null,
+          indexNumber: null,
+          unitCode: payloadProsbis.unitCode || [],
+          prlOrg: payloadProsbis.prlOrg || [],
+          level: payloadProsbis.level || [],
+          rasciNotation: payloadProsbis.rasciNotation || [],
+        };
     }
-
     const result = await fetchExportRasciMatrix(payload);
     if (result.success) {
-      console.log("result", result);
       loader.style.display = "none";
       // File download already handled inside fetchExportRasciMatrix
       // Optionally show a success message here

@@ -220,7 +220,6 @@ async function changeDataSource(dataSource, draftSo) {
       setState("payloadPosition", payloadJob);
       setState("payloadProsbis", payload);
       const resultPosition = await fetchPositionMatrix(payloadJob);
-      // console.log("resultPosition", resultPosition);
       setState("isSearchMatrix", false);
       setState("idSearchProsbis", "");
       setState("actionType", "BP_THEN_JOB");
@@ -788,20 +787,15 @@ async function lastStateTableMatrix(inputValue = "") {
   const dataStoreProsbis = getState("resultProsbis");
   const storageDataPosition = getState("resultJabatan");
   const actionType = getState("actionType");
-
   if (inputValue.draftType === "Add New Business Process") {
     return await oldVersionTableMatrix();
-  }
-
-  if (inputValue.draftType?.includes("Edit Business Process")) {
+  } else if (inputValue.draftType?.includes("Edit Business Process")) {
     return await handleEditBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType);
-  }
-
-  if (inputValue.draftType?.includes("Delete Business Process")) {
+  } else if (inputValue.draftType?.includes("Delete Business Process")) {
     return await handleDeleteBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType);
+  } else {
+    return await handleNotationUpdate(inputValue, dataStoreProsbis, storageDataPosition, actionType);
   }
-
-  return await handleNotationUpdate(inputValue, dataStoreProsbis, storageDataPosition, actionType);
 }
 
 async function handleEditBusinessProcess(inputValue, dataStoreProsbis, storageDataPosition, actionType) {
@@ -851,20 +845,17 @@ async function handleNotationUpdate(inputValue, dataStoreProsbis, storageDataPos
   if (actionType !== "BP_THEN_JOB" && actionType !== "POS_THEN_BP") {
     return true;
   }
-
   const prosbisNumber = dataStoreProsbis.map((val) => val.indexNumber);
   const matchedPosition = storageDataPosition.find(
     (pos) => pos.prlOrg === inputValue.orgPrl && pos.unitCode === inputValue.orgUnitCode,
   );
 
-  if (!matchedPosition) {
-    console.warn("Position data not found for org:", inputValue.orgPrl, inputValue.orgUnitCode);
-    return false;
+  if (matchedPosition) {
+    inputValue.busProsMapped.forEach((busProItem) => {
+      updateResponsibilityForBusinessProcess(busProItem, matchedPosition);
+    });
+    return true;
   }
-
-  inputValue.busProsMapped.forEach((busProItem) => {
-    updateResponsibilityForBusinessProcess(busProItem, matchedPosition);
-  });
 
   loadTableHeader(storageDataPosition);
   loadTableBody(dataStoreProsbis);
