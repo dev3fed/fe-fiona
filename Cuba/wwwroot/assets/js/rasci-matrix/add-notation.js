@@ -736,6 +736,7 @@ async function saveDraftnotation() {
       busProsMapped: dataChangeNotasi.busProsMapped,
     };
     const result = await submitDraftProsbis(inputValue);
+
     if (result.status === 200) {
       const modalAddNotation = document.getElementById("modalAddNotation");
       const modal = bootstrap.Modal.getInstance(modalAddNotation);
