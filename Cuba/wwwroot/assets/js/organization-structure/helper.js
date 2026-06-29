@@ -100,35 +100,48 @@ async function getDetailJob(jobCode) {
 
 async function fillAttributeDirectReport(dataDetail) {
   const data = dataDetail.data;
+  const dataSelf = JSON.parse(localStorage.getItem("dataSelf"));
 
   //  unset disabled from function to section select and switch
   $(directReportAttrIds).prop("disabled", false);
   console.log("inputDirectReport", data.positionName);
-  console.log("inputDirectReport", data.positionCode);
+  console.log("dataSelf", dataSelf);
 
   if (data?.functionCode) {
     $("#selectFunction").val(data?.functionCode).trigger("change");
     $("#selectFunction, #FunctionSwitch").prop("disabled", true);
+  } else if (dataSelf?.functionCode) {
+    $("#selectFunction").val(dataSelf?.functionCode).trigger("change");
   }
   if (data?.unitCode) {
     $("#selectOrgUnitParentName").append(new Option(data?.unitName, data?.unitCode, true, true));
     $("#selectOrgUnitParentName").prop("disabled", true);
+  } else if (dataSelf?.unitCode) {
+    $("#selectOrgUnitParentName").append(new Option(dataSelf?.unitName, dataSelf?.unitCode, true, true));
   }
   if (data?.divisionCode) {
     $("#selectDivision").append(new Option(data?.divisionName, data?.divisionCode, true, true));
     $("#selectDivision, #DivisionSwitch").prop("disabled", true);
+  } else if (dataSelf?.divisionCode) {
+    $("#selectDivision").append(new Option(dataSelf?.divisionName, dataSelf?.divisionCode, true, true));
   }
   if (data?.subDivisionCode) {
     $("#selectSubDivision").append(new Option(data?.subDivisionName, data?.subDivisionCode, true, true));
     $("#selectSubDivision, #SubDivisionSwitch").prop("disabled", true);
+  } else if (dataSelf?.subDivisionCode) {
+    $("#selectSubDivision").append(new Option(dataSelf?.subDivisionName, dataSelf?.subDivisionCode, true, true));
   }
   if (data?.departmentCode) {
     $("#selectDepartment").append(new Option(data?.departmentName, data?.departmentCode, true, true));
     $("#selectDepartment, #DepartmentSwitch").prop("disabled", true);
+  } else if (dataSelf?.departmentCode) {
+    $("#selectDepartment").append(new Option(dataSelf?.departmentName, dataSelf?.departmentCode, true, true));
   }
   if (data?.sectionCode) {
     $("#selectSection").append(new Option(data?.sectionName, data?.sectionCode, true, true));
     $("#selectSection, #SectionSwitch").prop("disabled", true);
+  } else if (dataSelf?.sectionCode) {
+    $("#selectSection").append(new Option(dataSelf?.sectionName, dataSelf?.sectionCode, true, true));
   }
 
   $("#selectDirectReport").append(new Option(`${data?.positionName}`, data?.positionCode, true, true));
@@ -138,6 +151,7 @@ async function fillAttributeDirectReport(dataDetail) {
 
 async function insertFormPosition(paramId) {
   const getDetailPosition = await getDetailJob(paramId);
+  localStorage.setItem("dataSelf", JSON.stringify(getDetailPosition?.data));
   const form = document.querySelectorAll(".form-control[required], .form-select[required]");
   // remove class is-invalid from all form elements
   form.forEach((element) => {
