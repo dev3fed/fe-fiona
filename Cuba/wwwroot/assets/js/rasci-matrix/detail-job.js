@@ -323,7 +323,7 @@ async function handleShowRasci() {
     indexNumber: [],
     draftRasciId: selectedValue === "master" ? null : selectedValue,
     unitCode: [detailJob.unitCode],
-    detailJob: [detailJob.prlOrg],
+    prlOrg: [detailJob.prlOrg],
     draftSoId: draftSoId,
   };
 

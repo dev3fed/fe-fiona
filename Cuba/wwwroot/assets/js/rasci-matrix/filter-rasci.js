@@ -297,19 +297,20 @@ const getCheckedJobAndPrl = () => {
 
   const jobIdFinal = [];
   const prlFinal = [];
-  const seenJobIds = new Set();
+  // const seenJobIds = new Set();
 
   jobList
     .filter((job) => !isDisabledJobLevel.includes(parseInt(job.levelJob || job.level, 10)))
     .filter((item) => selectedJobId.includes(`${item.id}|${item.prl}`))
     .forEach((item) => {
-      if (!seenJobIds.has(item.id)) {
-        seenJobIds.add(item.id);
-        jobIdFinal.push(item.id);
-        prlFinal.push(item.prl);
-      }
+      // if (!seenJobIds.has(item.id)) {
+      // seenJobIds.add(item.id);
+      jobIdFinal.push(item.id);
+      prlFinal.push(item.prl);
     });
-
+  // console.log("jobList", jobList);
+  // console.log("selectedJobId", selectedJobId);
+  // console.log("seenJobIds", seenJobIds);
   return { jobIdFinal, prlFinal };
 };
 
