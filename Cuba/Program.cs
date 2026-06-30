@@ -6,7 +6,7 @@ Env.Load();
 builder.Services.AddControllersWithViews();
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5385); // Replace with your desired port
+    options.ListenAnyIP(5375); // Replace with your desired port
 });
 
 var app = builder.Build();
