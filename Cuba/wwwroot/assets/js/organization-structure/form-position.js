@@ -943,6 +943,7 @@ $(document).ready(async function () {
     let logState = JSON.parse(localStorage.getItem("logState"));
     logState.status = "edit";
     logState.initParams = formattedParams;
+    console.log("logState", logState);
     localStorage.setItem("logState", JSON.stringify(logState));
   }
   loader(false);
