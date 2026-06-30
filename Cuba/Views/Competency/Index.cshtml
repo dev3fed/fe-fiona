@@ -217,9 +217,15 @@
                 <div class="card" style="border-radius:8px">
                     <div style="padding:10px">
                         <ul class="nav nav-tabs nav-primary" id="pills-competency-tabcontent" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" id="pills-kkj-tab" data-bs-toggle="pill"
+
+                            <li class="nav-item"><a class="nav-link active" id="pills-definition-tab"
+                                                    data-bs-toggle="pill" href="#pills-definition" role="tab"
+                                                    aria-controls="pills-definition" aria-selected="true">Definition
+                            </a></li>
+
+                            <li class="nav-item"><a class="nav-link " id="pills-kkj-tab" data-bs-toggle="pill"
                                                         href="#pills-kkj" role="tab" aria-controls="pills-kkj"
-                                                        aria-selected="true">Requirement (KKJ)</a></li>
+                                                        aria-selected="false">Requirement (KKJ)</a></li>
                                 <li class="nav-item"><a class="nav-link" id="pills-compreq-tab" data-bs-toggle="pill"
                                                         href="#pills-compreq" role="tab" aria-controls="pills-compreq"
                                                         aria-selected="false">Summary
@@ -242,8 +248,15 @@
                                 </a></li>
                             </ul>
                             <div class="tab-content" id="pills-competency-tabcontent">
-                                <div class="tab-pane fade show active" id="pills-kkj" role="tabpanel"
-                                     aria-labelledby="pills-kkj-tab">
+                                <div class="tab-pane fade show active" id="pills-definition" role="tabpanel"
+                                     aria-labelledby="pills-definition-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                        <div class="row">
+                                            <partial name="~/Views/Competency/DefinitionPage.cshtml" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade " id="pills-kkj" role="tabpanel" aria-labelledby="pills-kkj-tab">
                                     <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                         <div class="row">
                                             <div class="col-sm-12">
@@ -317,7 +330,7 @@
         <script>
             const url_api = "@Configuration["AppSettings:ApiUrl"]";
             @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
 
         </script>
         <!-- Plugins JS start-->

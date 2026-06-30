@@ -741,8 +741,11 @@ function formattedInputAttribut(type) {
   // abbreviation
 
   if (!isBasket) {
-    payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked");
+    payload.abbrivation.isNew = $("#AbbrvPositionSwitch").prop("checked") ? true : false;
+    console.log("payload.abbrivation.isNew", payload.abbrivation.isNew);
     payload.abbrivation.jobAbbrivationCode = payload.abbrivation.isNew ? "" : $("#selectAbbrvPosition").val();
+    console.log("payload.abbrivation.jobAbbrivationCode", payload.abbrivation.jobAbbrivationCode);
+    console.log("payload.abbrivation.jobAbbrivationName", $("#selectAbbrvPosition option:selected").text());
     if (payload.abbrivation.jobAbbrivationCode == "null" || payload.abbrivation.jobAbbrivationCode == null) {
       payload.abbrivation.jobAbbrivationCode = "";
     }

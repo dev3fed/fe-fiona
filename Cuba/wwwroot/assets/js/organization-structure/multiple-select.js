@@ -18,7 +18,6 @@ function getDataListAsync(data) {
         }
       });
     }
-    console.log("additionalParams", additionalParams);
     $(`#${item.id}`)
       .select2({
         dropdownParent: item.dropdownParent ?? null,
@@ -83,7 +82,7 @@ function getDataListAsync(data) {
 
 function getDataList(data) {
   data.forEach((item) => {
-    item.data = [{ id: "", text: "Select an option" }, ...item.data];
+    item.data = [{ id: "", text: "" }, ...item.data];
     if (item.data && item.data.length > 0) {
       let dropdownParent = item.dropdownParent ?? null;
       $(`#${item.dataId}`).empty();
