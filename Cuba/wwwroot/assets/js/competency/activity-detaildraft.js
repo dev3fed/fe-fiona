@@ -466,20 +466,6 @@ const modalActivityeditCompetency = async () => {
             <label class="circle-option" for="level4">4</label>
           </div>
         </div>
-
-        <div style="margin-left: 30px;">
-          <label>Type</label>
-          <div class="d-flex gap-2">
-            <input type="radio" class="btn-check" name="activityOptType" id="activitytypeMandatory" autocomplete="off" value="mandatory" ${mandatoryDisabled}>
-            <label class="oval-option" for="activitytypeMandatory" style="${mandatoryLabelStyle}">Mandatory</label>
-
-            <input type="radio" class="btn-check" name="activityOptType" id="activitytypeGeneral" autocomplete="off" value="general" ${generalDisabled}>
-            <label class="oval-option" for="activitytypeGeneral" style="${generalLabelStyle}">General</label>
-
-            <input type="radio" class="btn-check" name="activityOptType" id="activitytypeSpecific" autocomplete="off" value="specific" ${specificDisabled}>
-            <label class="oval-option" for="activitytypeSpecific" style="${specificLabelStyle}">Specific</label>
-          </div>
-        </div>
       </div>
       <hr class="mt-4"/>
     </div>
@@ -538,114 +524,17 @@ function selectActivityCompetencyList() {
 }
 async function cardSelectedActivityCompetency(competencyList) {
   try {
-    let mandatoryCompe = [];
-    let generalCompe = [];
     let specificCompe = [];
-    let mandatoryCount = 0;
-    let generalCount = 0;
     let specificCount = 0;
 
     if (competencyList.length > 0) {
-      mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
-      specificCompe = competencyList.filter((item) => item.selectedType === "specific");
-      generalCompe = competencyList.filter((item) => item.selectedType === "general");
-      generalCount = generalCompe.length;
-      mandatoryCount = mandatoryCompe.length;
+      specificCompe = competencyList;
       specificCount = specificCompe.length;
     }
-
-    const mandatoryContent =
-      mandatoryCount > 0
-        ? `
-        <div class="table-responsive " style="max-height: 120px;">
-          <table class="table tbl-border">
-            <thead style="background-color: #006CA9;">
-              <tr>
-                <th scope="col" style="width: 50px; text-align: center;">No</th>
-                <th scope="col">Competency</th>
-                <th scope="col" style="width: 130px;">Proficiency Level</th>
-                <th scope="col" style="width: 60px;">Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${mandatoryCompe
-                .map(
-                  (item, index) => `
-                <tr>
-                  <td style="text-align: center;">${index + 1}</td>
-                  <td>${item.compeName}</td>
-                  <td style="text-align: center;">${item.selectedLvl}</td>
-                  <td style="text-align: center;">
-                     <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeActivityCompetency('${
-                       item.compeId
-                     }')">
-                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
-                      </button>
-                  </td>
-                </tr>
-              `,
-                )
-                .join("")}
-            </tbody>
-          </table>
-        </div>
-      `
-        : `
-        <div class="col-12">
-          <div class="competency-box">
-            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
-            <span class="desc">Selected mandatory competency will appear here</span>
-          </div>
-        </div>
-      `;
-    const generalContent =
-      generalCount > 0
-        ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 110px;">
-          <table class="table tbl-border">
-            <thead style="background-color: #006CA9;">
-              <tr>
-                <th scope="col" style="width: 50px; text-align: center;">No</th>
-                <th scope="col">Competency</th>
-                <th scope="col" style="width: 130px;">Proficiency Level</th>
-                <th scope="col" style="width: 60px;">Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${generalCompe
-                .map(
-                  (item, index) => `
-                <tr>
-                  <td style="text-align: center;">${index + 1}</td>
-                  <td>${item.compeName}</td>
-                  <td style="text-align: center;">${item.selectedLvl}</td>
-                  <td style="text-align: center;">
-                      <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeActivityCompetency('${
-                        item.compeId
-                      }')">
-                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
-                      </button>
-                  </td>
-                </tr>
-              `,
-                )
-                .join("")}
-            </tbody>
-          </table>
-        </div>
-      `
-        : `
-        <div class="col-12">
-          <div class="competency-box">
-            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
-            <span class="desc">Selected general competency will appear here</span>
-          </div>
-        </div>
-      `;
     const specificContent =
       specificCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 140px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 420px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -689,21 +578,6 @@ async function cardSelectedActivityCompetency(competencyList) {
 
     const bodySelectedCompe = `
       <div class="competency-section">
-        <!-- Mandatory -->
-        <div class="row mb-2">
-          <div class="col-12">
-            <label>Mandatory (${mandatoryCount}/3)</label>
-          </div>
-          ${mandatoryContent}
-        </div>
-
-         <!-- Specific -->
-        <div class="row mb-2">
-          <div class="col-12">
-            <label>General (${generalCount}/1)</label>
-          </div>
-          ${generalContent}
-        </div>
 
         <!-- Specific -->
         <div class="row mb-2">
@@ -816,7 +690,7 @@ function updateBtnBySelectsAndCompetency() {
 
   const isAllSelectFilled = activityCompeId && activityCompeId.length > 0;
 
-  const isRadioFilled = selectedLvl && selectedType;
+  const isRadioFilled = selectedLvl;
 
   const isCompeLimitExceeded = mandatoryCompe.length > 2 && generalCompe.length > 0 && specificCompe.length > 8;
 

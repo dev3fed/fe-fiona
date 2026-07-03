@@ -1,113 +1,15 @@
 async function cardSelectedCompesummary(competencyList) {
   try {
-    let mandatoryCompe = [];
-    let generalCompe = [];
     let specificCompe = [];
-    let mandatoryCount = 0;
-    let generalCount = 0;
     let specificCount = 0;
-
     if (competencyList.length > 0) {
-      mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
-      specificCompe = competencyList.filter((item) => item.selectedType === "specific");
-      generalCompe = competencyList.filter((item) => item.selectedType === "general");
-      generalCount = generalCompe.length;
-      mandatoryCount = mandatoryCompe.length;
-      specificCount = specificCompe.length;
+      specificCompe = competencyList;
+      specificCount = competencyList.length;
     }
-
-    const mandatoryContent =
-      mandatoryCount > 0
-        ? `
-        <div class="table-responsive " style="max-height: 120px;">
-          <table class="table tbl-border">
-            <thead style="background-color: #006CA9;">
-              <tr>
-                <th scope="col" style="width: 50px; text-align: center;">No</th>
-                <th scope="col">Competency</th>
-                <th scope="col" style="width: 130px;">Proficiency Level</th>
-                <th scope="col" style="width: 60px;">Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${mandatoryCompe
-                .map(
-                  (item, index) => `
-                <tr>
-                  <td style="text-align: center;">${index + 1}</td>
-                  <td>${item.compeName}</td>
-                  <td style="text-align: center;">${item.selectedLvl}</td>
-                  <td style="text-align: center;">
-                     <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeCompesummary('${
-                       item.compeId
-                     }')">
-                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
-                      </button>
-                  </td>
-                </tr>
-              `,
-                )
-                .join("")}
-            </tbody>
-          </table>
-        </div>
-      `
-        : `
-        <div class="col-12">
-          <div class="competency-box">
-            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
-            <span class="desc">Selected mandatory competency will appear here</span>
-          </div>
-        </div>
-      `;
-    const generalContent =
-      generalCount > 0
-        ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 110px;">
-          <table class="table tbl-border">
-            <thead style="background-color: #006CA9;">
-              <tr>
-                <th scope="col" style="width: 50px; text-align: center;">No</th>
-                <th scope="col">Competency</th>
-                <th scope="col" style="width: 130px;">Proficiency Level</th>
-                <th scope="col" style="width: 60px;">Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${generalCompe
-                .map(
-                  (item, index) => `
-                <tr>
-                  <td style="text-align: center;">${index + 1}</td>
-                  <td>${item.compeName}</td>
-                  <td style="text-align: center;">${item.selectedLvl}</td>
-                  <td style="text-align: center;">
-                      <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeCompesummary('${
-                        item.compeId
-                      }')">
-                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
-                      </button>
-                  </td>
-                </tr>
-              `,
-                )
-                .join("")}
-            </tbody>
-          </table>
-        </div>
-      `
-        : `
-        <div class="col-12">
-          <div class="competency-box">
-            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
-            <span class="desc">Selected general competency will appear here</span>
-          </div>
-        </div>
-      `;
     const specificContent =
       specificCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 140px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 420px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
@@ -151,21 +53,7 @@ async function cardSelectedCompesummary(competencyList) {
 
     const bodySelectedCompe = `
       <div class="competency-section">
-        <!-- Mandatory -->
-        <div class="row mb-2">
-          <div class="col-12">
-            <label>Mandatory (${mandatoryCount}/5)</label>
-          </div>
-          ${mandatoryContent}
-        </div>
 
-         <!-- Specific -->
-        <div class="row mb-2">
-          <div class="col-12">
-            <label>General (${generalCount}/3)</label>
-          </div>
-          ${generalContent}
-        </div>
 
         <!-- Specific -->
         <div class="row mb-2">
@@ -419,7 +307,7 @@ function updateButtonStateBySelectsAndCompesummary() {
 
   const isAllSelectFilled = competencyId && competencyId.length > 0;
 
-  const isRadioFilled = selectedLvl && selectedType;
+  const isRadioFilled = selectedLvl;
 
   const isCompeLimitExceeded = mandatoryCompe.length > 2 && generalCompe.length > 0 && specificCompe.length > 8;
 
@@ -479,7 +367,7 @@ async function triggleCompesummary() {
   const compeId = selectedCompe.val();
   const CompeName = selectedCompe.find(":selected").text();
   const selectedLvl = $('input[name="optLvl"]:checked').val();
-  const selectedType = $('input[name="optType"]:checked').val();
+  // const selectedType = $('input[name="optType"]:checked').val();
   const payloadAddCompetency = getState("payloadAddCompetency");
   const btnSelectedCompe = document.getElementById("btn-selectedCompesummary");
   const jobInformation = getState("jobInformation");
@@ -487,12 +375,13 @@ async function triggleCompesummary() {
     compeId: compeId,
     compeName: CompeName,
     selectedLvl: selectedLvl,
-    selectedType: selectedType,
+    // selectedType: selectedType,
     unitCode: jobInformation.unitCode,
     prlOrg: jobInformation.prlOrg,
   };
   const sentData = [...payloadAddCompetency, dataSelectedCompe];
   setState("payloadAddCompetency", sentData);
+  console.log("sentData", sentData);
   cardSelectedCompesummary(sentData);
   updateRadioBtnCompesummary();
   $("#compesummaryId").val(null).trigger("change");
