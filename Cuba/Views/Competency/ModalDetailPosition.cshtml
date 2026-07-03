@@ -128,7 +128,7 @@
                                         <div class="split-card-row ">
                                             <div>
                                                 <div class="table-responsive m-t-6 scrollable-posdetail">
-                                                    <div id="mandatory-content" style="display: none;">
+                                                    @* <div id="mandatory-content" style="display: none;">
                                                         <h6 id="labelMandatory"></h6>
                                                         <table class="mt-2 mb-3 table tbl-border">
                                                             <thead id="mandatory-competency-header">
@@ -136,44 +136,66 @@
                                                             <tbody id="mandatory-competency-body">
                                                             </tbody>
                                                         </table>
-                                                    </div>
-                                                    <div id="mandatory-no-data" style="display: block;">
+                                                    </div> *@
+                                                    @* <div id="mandatory-no-data" style="display: block;">
                                                         <h6>Mandatory (0/5)</h6>
                                                         <div class="competency-box" style="margin-top:10px">
                                                             <span class="icon"><img
                                                                 src="/assets/images/competency/vector.svg"></span>
                                                                 <span class="desc">There is no data </span>
                                                             </div>
-                                                        </div>
-                                                        <div id="general-competency-content" style="display: none;">
-                                                            <h6 id="labelCore"></h6>
-                                                            <table class="table mb-3 tbl-border mt-2">
-                                                                <thead id="technical-competency-header">
-                                                                </thead>
-                                                                <tbody id="technical-competency-body">
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <div id="general-no-data" style="display: block;margin-top:10px">
-                                                            <h6>General (0/3)</h6>
-                                                            <div class="competency-box" style="margin-top:10px">
-                                                                <span class="icon"><img
-                                                                    src="/assets/images/competency/vector.svg"></span>
-                                                                    <span class="desc">There is no data </span>
-                                                                </div>
+                                                        </div> *@
+                                                    <div id="general-competency-content" style="display: none;">
+                                                        <h6 id="labelGeneric"></h6>
+                                                        <table class="table mb-3 tbl-border mt-2">
+                                                            <thead id="generic-competency-header">
+                                                            </thead>
+                                                            <tbody id="generic-competency-body">
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div id="general-no-data" style="display: block;margin-top:10px">
+                                                        <h6>Generic</h6>
+                                                        <div class="competency-box" style="margin-top:10px">
+                                                            <span class="icon"><img
+                                                                src="/assets/images/competency/vector.svg"></span>
+                                                                <span class="desc">There is no data </span>
                                                             </div>
-                                                            <div id="specific-competency-content" style="display: none;">
-                                                                <h6 id="labelSpecific"> </h6>
-                                                                <table class="table mb-3 tbl-border mt-2">
-                                                                    <thead id="technical-specifit-header">
+                                                        </div>
+                                                    </div>
+                                                    <div id="specific-competency-content" style="display: none;">
+                                                        <h6 id="labelSpecific"> </h6>
+                                                        <table class="table mb-3 tbl-border mt-2">
+                                                            <thead id="technical-specifit-header">
+                                                            </thead>
+                                                            <tbody id="technical-specifit-body">
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div id="specific-no-data" style="display: block; margin-top:10px">
+                                                        <h6>Spesific (0/9)</h6>
+                                                        <div class="competency-box" style="margin-top:10px">
+                                                            <span class="icon"><img
+                                                                src="/assets/images/competency/vector.svg"></span>
+                                                                <span class="desc">There is no data </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="table-responsive m-t-6 scrollable-posdetail">
+                                                            <div id="behavior-content" style="display: none;">
+                                                                <table class="mt-2 mb-3 table tbl-border">
+                                                                    <h6>Behavior</h6>
+                                                                    <thead id="mandatory-behavior-header">
                                                                     </thead>
-                                                                    <tbody id="technical-specifit-body">
+                                                                    <tbody id="mandatory-behavior-body">
                                                                     </tbody>
                                                                 </table>
                                                             </div>
-
-                                                            <div id="specific-no-data" style="display: block; margin-top:10px">
-                                                                <h6>Spesific (0/9)</h6>
+                                                            <div id="behavior-no-data" style="display: block;">
+                                                                <h6>Behavior</h6>
                                                                 <div class="competency-box" style="margin-top:10px">
                                                                     <span class="icon"><img
                                                                         src="/assets/images/competency/vector.svg"></span>
@@ -182,69 +204,48 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div>
-                                                            <div class="table-responsive m-t-6 scrollable-posdetail">
-                                                                <div id="behavior-content" style="display: none;">
-                                                                    <table class="mt-2 mb-3 table tbl-border">
-                                                                        <h6>Behavior</h6>
-                                                                        <thead id="mandatory-behavior-header">
-                                                                        </thead>
-                                                                        <tbody id="mandatory-behavior-body">
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                                <div id="behavior-no-data" style="display: block;">
-                                                                    <h6>Behavior</h6>
-                                                                    <div class="competency-box" style="margin-top:10px">
-                                                                        <span class="icon"><img
-                                                                            src="/assets/images/competency/vector.svg"></span>
-                                                                            <span class="desc">There is no data </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Card job attribut end-->
                                                     </div>
+                                                    <!-- Card job attribut end-->
                                                 </div>
-                                                <div class="tab-pane fade " id="pills-jobinfo" role="tabpanel"
-                                                     aria-labelledby="pills-jobinfo-tab">
-                                                    <div class="mt-1 scrollable-posdetail">
-                                                        <!-- Card job attribut start-->
-                                                        <div class="custom-card-draft">
-                                                            <div class="header-card-draft">
-                                                                Info
-                                                            </div>
-                                                            <div class="row" style="padding-top: 20px;" id="job-info">
-                                                            </div>
+                                            </div>
+                                            <div class="tab-pane fade " id="pills-jobinfo" role="tabpanel"
+                                                 aria-labelledby="pills-jobinfo-tab">
+                                                <div class="mt-1 scrollable-posdetail">
+                                                    <!-- Card job attribut start-->
+                                                    <div class="custom-card-draft">
+                                                        <div class="header-card-draft">
+                                                            Info
                                                         </div>
-                                                        <!-- Card job attribut end-->
-
-                                                        <!-- Card skill Group & subskill start-->
-                                                        <div class="custom-card-draft">
-                                                            <div class="header-card-draft">
-                                                                Skill Group & Sub Skill Group
-                                                            </div>
-                                                            <div class="row" id="skill-group-content">
-
-                                                            </div>
+                                                        <div class="row" style="padding-top: 20px;" id="job-info">
                                                         </div>
-                                                        <!-- Card skill Group & subskill end-->
-
-                                                        <!-- Card Incumbent start-->
-                                                        <div class="custom-card-draft">
-                                                            <div class="header-card-draft">
-                                                                Incumbent
-                                                            </div>
-                                                            <div class="row mt-4" id="incumbent-content">
-
-                                                            </div>
-                                                        </div>
-                                                        <!-- Card Incumbent end-->
-
                                                     </div>
+                                                    <!-- Card job attribut end-->
+
+                                                    <!-- Card skill Group & subskill start-->
+                                                    <div class="custom-card-draft">
+                                                        <div class="header-card-draft">
+                                                            Skill Group & Sub Skill Group
+                                                        </div>
+                                                        <div class="row" id="skill-group-content">
+
+                                                        </div>
+                                                    </div>
+                                                    <!-- Card skill Group & subskill end-->
+
+                                                    <!-- Card Incumbent start-->
+                                                    <div class="custom-card-draft">
+                                                        <div class="header-card-draft">
+                                                            Incumbent
+                                                        </div>
+                                                        <div class="row mt-4" id="incumbent-content">
+
+                                                        </div>
+                                                    </div>
+                                                    <!-- Card Incumbent end-->
+
                                                 </div>
-                                                @* <div class="tab-pane fade" id="pills-mandatorycomp" role="tabpanel"
+                                            </div>
+                                            @* <div class="tab-pane fade" id="pills-mandatorycomp" role="tabpanel"
                             aria-labelledby="pills-mandatorycomp-tab">
                             <div class="table-responsive m-t-15">
                                 <table class="table tbl-border">
@@ -258,7 +259,7 @@
                         <div class="tab-pane fade" id="pills-technicalcomp" role="tabpanel"
                             aria-labelledby="pills-technicalcomp-tab">
                             <div class="table-responsive m-t-15">
-                                <div class="d-flex justify-c    ontent-between align-items-center mb-2">
+                                <div class="d-flex justify-c ontent-between align-items-center mb-2">
                                     <span>Technical Competency Total :
                                         <span id="technical-competency-total"></span>
                                     </span>
@@ -276,21 +277,21 @@
                             <div class="m-t-15" id="behavior-competency-body">
                             </div>
                         </div> *@
-                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer  d-flex justify-content-end">
-                                        <div>
-                                            <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
-                                                class="icon-arrow-left"></i> Back</button>
-                                                <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
-                                                        id="btnAddSpecificCompe">
-                                                    <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
-                                                    Add Technical Competency
-                                                </button>
-                                            </div>
-                                        </div>
-
                                     </div>
                                 </div>
+                                <div class="modal-footer  d-flex justify-content-end">
+                                    <div>
+                                        <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                                            class="icon-arrow-left"></i> Back</button>
+                                            <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
+                                                    id="btnAddSpecificCompe">
+                                                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
+                                                Add Technical Competency
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
+                        </div>

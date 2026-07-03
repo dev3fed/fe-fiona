@@ -247,20 +247,20 @@ const cardTblMandatory = async (code, prl) => {
     const result = await fetchDetailPositionMandatory(payload);
     // console.log("result", result);
     const payloadAddCompetency = getState("payloadAddCompetency");
-    const mandatoryNoData = document.getElementById("mandatory-no-data");
-    const mandatoryContent = document.getElementById("mandatory-content");
-    if (mandatoryContent) {
-      mandatoryContent.style.display = result.data !== undefined ? "block" : "none";
+    const genericNodata = document.getElementById("general-no-data");
+    const genericConten = document.getElementById("general-competency-content");
+    if (genericConten) {
+      genericConten.style.display = result.data !== undefined ? "block" : "none";
     }
-    if (mandatoryNoData) {
-      mandatoryNoData.style.display = result.data !== undefined ? "none" : " block";
+    if (genericNodata) {
+      genericNodata.style.display = result.data !== undefined ? "none" : " block";
     }
     if (result.success === true) {
-      const listMandatory = result?.data.compData || [];
+      const listGeneric = result?.data.compData || [];
 
       const updatedPayload = [
         ...(payloadAddCompetency || []),
-        ...listMandatory.map((element) => ({
+        ...listGeneric.map((element) => ({
           ...element,
           compeId: element.compCode,
           compeName: element.name,
@@ -270,21 +270,20 @@ const cardTblMandatory = async (code, prl) => {
       ];
       setState("payloadAddCompetency", updatedPayload);
 
-      const labelMandatory = document.getElementById("labelMandatory");
+      const labelGeneric = document.getElementById("labelGeneric");
 
-      if (labelMandatory) {
-        labelMandatory.innerHTML = `Mandatory (${listMandatory.length}/5)`;
+      if (labelGeneric) {
+        labelGeneric.innerHTML = `Generic (${listGeneric.length}/5)`;
       }
-      const theadMandatory = `
+      const theadGeneric = `
           <tr>
             <th scope="col" style="width: 40px;text-align:center">No</th>
             <th scope="col" style="width: 400px">Competency</th>
             <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
-            <th scope="col" style="width: 70px;text-align:center">Action</th>
 
           </tr>`;
 
-      const bodyMandatory = listMandatory
+      const bodyGeneric = listGeneric
         .map((element, i) => {
           return `
             <tr>
@@ -293,97 +292,91 @@ const cardTblMandatory = async (code, prl) => {
                 element.compCode
               }')">${element.name}</td>
               <td style="text-align:Center">${element.proficiencyLevel}</td>
-              <td style="text-align:Center">
-                <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
-                  element,
-                ).replace(/"/g, "&quot;")},${code},${prl});">
-
-              </td>
             </tr>`;
         })
         .join("");
 
-      document.getElementById("mandatory-competency-header").innerHTML = theadMandatory;
-      document.getElementById("mandatory-competency-body").innerHTML = bodyMandatory;
+      document.getElementById("generic-competency-header").innerHTML = theadGeneric;
+      document.getElementById("generic-competency-body").innerHTML = bodyGeneric;
     }
   } catch (error) {
     console.error(error);
   }
 };
 
-const cardTblGeneral = async (code, prl) => {
-  const dataSource = $("#dataSource-competency").val();
-  const payload = `${dataSource}/${code}/${prl}`;
+// const cardTblGeneral = async (code, prl) => {
+//   const dataSource = $("#dataSource-competency").val();
+//   const payload = `${dataSource}/${code}/${prl}`;
 
-  try {
-    const result = await fetchDetailPositionTechnical(payload);
-    // console.log("result", result);
-    const payloadAddCompetency = getState("payloadAddCompetency");
-    const generalNoData = document.getElementById("general-no-data");
-    const generalContent = document.getElementById("general-competency-content");
-    if (generalContent) {
-      generalContent.style.display = result.data !== undefined ? "block" : "none";
-    }
-    if (generalNoData) {
-      generalNoData.style.display = result.data !== undefined ? "none" : " block";
-    }
+//   try {
+//     const result = await fetchDetailPositionTechnical(payload);
+//     // console.log("result", result);
+//     const payloadAddCompetency = getState("payloadAddCompetency");
+//     const generalNoData = document.getElementById("general-no-data");
+//     const generalContent = document.getElementById("general-competency-content");
+//     if (generalContent) {
+//       generalContent.style.display = result.data !== undefined ? "block" : "none";
+//     }
+//     if (generalNoData) {
+//       generalNoData.style.display = result.data !== undefined ? "none" : " block";
+//     }
 
-    if (result.success === true) {
-      const listTechnical = result?.data.compData || [];
-      const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
-      const updatedPayload = [
-        ...(payloadAddCompetency || []),
-        ...generalCompetencies.map((element) => ({
-          ...element,
-          compeId: element.compCode,
-          compeName: element.compName,
-          selectedType: element.compType,
-          selectedLvl: element.level,
-        })),
-      ];
-      setState("payloadAddCompetency", updatedPayload);
+//     if (result.success === true) {
+//       const listTechnical = result?.data.compData || [];
+//       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
+//       const updatedPayload = [
+//         ...(payloadAddCompetency || []),
+//         ...generalCompetencies.map((element) => ({
+//           ...element,
+//           compeId: element.compCode,
+//           compeName: element.compName,
+//           selectedType: element.compType,
+//           selectedLvl: element.level,
+//         })),
+//       ];
+//       setState("payloadAddCompetency", updatedPayload);
 
-      const labelCore = document.getElementById("labelCore");
-      if (labelCore) {
-        labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
-      }
+//       const labelCore = document.getElementById("labelCore");
+//       if (labelCore) {
+//         labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
+//       }
 
-      const theadTechnical = `
-            <tr>
-              <th scope="col" style="width: 40px;text-align:center">No</th>
-              <th scope="col" style="width: 300px">Competency</th>
-              <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
-            <th scope="col" style="width: 70px;text-align:center">Action</th>
+//       const theadTechnical = `
+//             <tr>
+//               <th scope="col" style="width: 40px;text-align:center">No</th>
+//               <th scope="col" style="width: 300px">Competency</th>
+//               <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
+//             <th scope="col" style="width: 70px;text-align:center">Action</th>
 
-            </tr>`;
+//             </tr>`;
 
-      const bodyTechnical = listTechnical
-        .filter((element) => element.compType.toLowerCase() === "general")
-        .map((element, i) => {
-          return `
-              <tr>
-                <td  style="text-align:Center">${i + 1}</td>
-                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('General','${
-                  element.compCode
-                }')">
-                ${element.compName}</td>
-                <td style="text-align:Center">${element.level}</td>
-               <td style="text-align:Center">
-                  <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
-                    element,
-                  ).replace(/"/g, "&quot;")},${code},${prl});">
-              </td>
-              </tr>`;
-        })
-        .join("");
+//       const bodyTechnical = listTechnical
+//         .filter((element) => element.compType.toLowerCase() === "general")
+//         .map((element, i) => {
+//           return `
+//               <tr>
+//                 <td  style="text-align:Center">${i + 1}</td>
+//                 <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('General','${
+//                   element.compCode
+//                 }')">
+//                 ${element.compName}</td>
+//                 <td style="text-align:Center">${element.level}</td>
+//                <td style="text-align:Center">
+//                   <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
+//                     element,
+//                   ).replace(/"/g, "&quot;")},${code},${prl});">
+//               </td>
+//               </tr>`;
+//         })
+//         .join("");
 
-      document.getElementById("technical-competency-header").innerHTML = theadTechnical;
-      document.getElementById("technical-competency-body").innerHTML = bodyTechnical;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
+//       document.getElementById("technical-competency-header").innerHTML = theadTechnical;
+//       document.getElementById("technical-competency-body").innerHTML = bodyTechnical;
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const cardTblSpecific = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
@@ -429,8 +422,7 @@ const cardTblSpecific = async (code, prl) => {
             <tr>
               <th scope="col" style="width: 40px;text-align:center">No</th>
               <th scope="col" style="width: 300px">Competency</th>
-              <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
-            <th scope="col" style="width: 70px;text-align:center">Action</th>
+              <th scope="col" style="width: 130px;text-align:center">Proficiency Level</th>
 
             </tr>`;
 
@@ -444,11 +436,7 @@ const cardTblSpecific = async (code, prl) => {
                   element.compCode
                 }')">${element.compName}</td>
                 <td style="text-align:Center">${element.level}</td>
-                <td style="text-align:Center">
-                  <img src="/assets/images/rasci/pencil_rasci.svg" alt="Pencil Icon" style="width: 15px; height: 20px; cursor: pointer;" onclick="openEditDepthLevel(${JSON.stringify(
-                    element,
-                  ).replace(/"/g, "&quot;")},${code},${prl})">
-              </td>
+              
               </tr>`;
         })
         .join("");
