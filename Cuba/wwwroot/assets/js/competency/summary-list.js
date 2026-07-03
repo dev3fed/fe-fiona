@@ -404,7 +404,7 @@ const showDetail = async (data) => {
     setState("payloadDetailJob", { unitCode, prlOrg });
     modalSummaryInfoPosition(unitCode, prlOrg);
     cardTblSummaryMandatory(unitCode, prlOrg);
-    cardTblSummaryGeneral(unitCode, prlOrg);
+    // cardTblSummaryGeneral(unitCode, prlOrg);
     cardTblSummarySpecific(unitCode, prlOrg);
     cardTblSummaryBehavior(unitCode, prlOrg);
   } catch (error) {

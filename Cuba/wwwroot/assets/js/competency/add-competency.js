@@ -9,7 +9,9 @@ const openSpecificCompetency = async () => {
 
   const mandatoryCompe = competencyList.filter((item) => item.selectedType === "mandatory");
   const generalCompe = competencyList.filter((item) => item.selectedType === "general");
-  const specificCompe = competencyList.filter((item) => item.selectedType === "specific");
+  const specificCompe = competencyList.filter(
+    (item) => item.selectedType === "specific" || item.compType === "specific",
+  );
   const modal = new bootstrap.Modal(document.getElementById("modalAddCompetency"));
   closeModal.hide();
 
@@ -110,7 +112,7 @@ const openSpecificCompetency = async () => {
   </div>
   `;
 
-  cardSelectedCompetency(competencyList);
+  cardSelectedCompetency(specificCompe);
   document.getElementById("select-speccompe").innerHTML = bodySelectSpecific;
   document.getElementById("comperef").innerHTML = bodyJobRef;
 
@@ -184,7 +186,7 @@ async function cardSelectedCompetency(competencyList) {
   try {
     let specificCompe = [];
     let specificCount = 0;
-
+    console.log("competencyList", competencyList);
     if (competencyList.length > 0) {
       specificCompe = competencyList;
       specificCount = specificCompe.length;

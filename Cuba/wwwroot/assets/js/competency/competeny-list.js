@@ -218,7 +218,7 @@ function buildHeaderRow1(categoryTotals) {
     </th>`;
 
   if (categoryTotals.mandatory > 0) {
-    row1HTML += `<th class="tg-baqh competency-cell color-mandatory" colspan="${categoryTotals.mandatory}">Mandatory</th>`;
+    row1HTML += `<th class="tg-baqh competency-cell color-mandatory" colspan="${categoryTotals.mandatory}">Generic</th>`;
   }
   if (categoryTotals.general > 0) {
     row1HTML += `<th class="tg-baqh competency-cell color-general" colspan="${categoryTotals.general}">General</th>`;
@@ -346,7 +346,7 @@ function handleClickPosition(unitCode, prlOrg) {
   setState("payloadDetailJob", { unitCode, prlOrg });
   modalInfoPosition(unitCode, prlOrg);
   cardTblMandatory(unitCode, prlOrg);
-  cardTblGeneral(unitCode, prlOrg);
+  // cardTblGeneral(unitCode, prlOrg);
   cardTblSpecific(unitCode, prlOrg);
   cardTblBehavior(unitCode, prlOrg);
 }
