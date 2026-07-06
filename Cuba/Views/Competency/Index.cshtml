@@ -222,18 +222,17 @@
                                                     data-bs-toggle="pill" href="#pills-definition" role="tab"
                                                     aria-controls="pills-definition" aria-selected="true">Definition
                             </a></li>
-
+                            <li class="nav-item"><a class="nav-link" id="pills-dictionary-tab" data-bs-toggle="pill"
+                                                    href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
+                                                    aria-selected="false">Dictionary
+                            </a></li>
+                            <li class="nav-item"><a class="nav-link" id="pills-compreq-tab" data-bs-toggle="pill"
+                                                    href="#pills-compreq" role="tab" aria-controls="pills-compreq"
+                                                    aria-selected="false">Competency Requirement
+                            </a></li>
                             <li class="nav-item"><a class="nav-link " id="pills-kkj-tab" data-bs-toggle="pill"
                                                         href="#pills-kkj" role="tab" aria-controls="pills-kkj"
-                                                        aria-selected="false">Requirement (KKJ)</a></li>
-                                <li class="nav-item"><a class="nav-link" id="pills-compreq-tab" data-bs-toggle="pill"
-                                                        href="#pills-compreq" role="tab" aria-controls="pills-compreq"
-                                                        aria-selected="false">Summary
-                                </a></li>
-                                <li class="nav-item"><a class="nav-link" id="pills-dictionary-tab" data-bs-toggle="pill"
-                                                        href="#pills-dictionary" role="tab" aria-controls="pills-dictionary"
-                                                        aria-selected="false">Dictionary
-                                </a></li>
+                                                        aria-selected="false">Competency Model</a></li>
                                 <li class="nav-item"><a class="nav-link" id="pills-draft-tab" data-bs-toggle="pill"
                                                         href="#pills-draft" role="tab" aria-controls="pills-draft"
                                                         aria-selected="false">Draft
@@ -256,18 +255,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade " id="pills-kkj" role="tabpanel" aria-labelledby="pills-kkj-tab">
-                                    <div class="card-body" style="padding:15px 5px 15px 5px !important">
+                                <div class="tab-pane fade" id="pills-dictionary" role="tabpanel"
+                                     aria-labelledby="pills-dictionary-tab">
+                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
                                         <div class="row">
-                                            <div class="col-sm-12">
-                                                <partial name="~/Views/Competency/ModalEditDepthLevel.cshtml" />
-                                                <partial name="~/Views/Competency/ModalWarning.cshtml" />
-                                                <partial name="~/Views/Competency/ModalSaveDraft.cshtml" />
-                                                <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
-                                                <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
-
-                                            </div>
-                                            <partial name="~/Views/Competency/KkjPage.cshtml" />
+                                            <partial name="~/Views/Competency/DictionaryPage.cshtml" />
                                         </div>
                                     </div>
                                 </div>
@@ -285,11 +277,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="pills-dictionary" role="tabpanel"
-                                     aria-labelledby="pills-dictionary-tab">
-                                    <div class="card-body" style="padding:12px 5px 15px 5px !important">
+                                <div class="tab-pane fade " id="pills-kkj" role="tabpanel" aria-labelledby="pills-kkj-tab">
+                                    <div class="card-body" style="padding:15px 5px 15px 5px !important">
                                         <div class="row">
-                                            <partial name="~/Views/Competency/DictionaryPage.cshtml" />
+                                            <div class="col-sm-12">
+                                                <partial name="~/Views/Competency/ModalEditDepthLevel.cshtml" />
+                                                <partial name="~/Views/Competency/ModalWarning.cshtml" />
+                                                <partial name="~/Views/Competency/ModalSaveDraft.cshtml" />
+                                                <partial name="~/Views/Competency/ModalDetailCompe.cshtml" />
+                                                <partial name="~/Views/Competency/ModalAddDraft.cshtml" />
+
+                                            </div>
+                                            <partial name="~/Views/Competency/KkjPage.cshtml" />
                                         </div>
                                     </div>
                                 </div>
@@ -330,7 +329,7 @@
         <script>
             const url_api = "@Configuration["AppSettings:ApiUrl"]";
             @* const API_URL_COMPE = '@(Environment.GetEnvironmentVariable("API_URL_COMPE"))' *@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const token = localStorage.getItem("token");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const token = localStorage.getItem("token");
 
         </script>
         <!-- Plugins JS start-->
