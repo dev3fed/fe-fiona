@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // const competencyList = getState("competencyList");
   let selectElement = document.querySelector("#dataSource-competency");
 
-  selectedType = document
-    .querySelector(".dropdown-menu .dropdown-item")
-    .textContent.trim();
+  selectedType = document.querySelector(".dropdown-menu .dropdown-item").textContent.trim();
 
   if (selectElement.value === "master") {
     document.getElementById("pills-draft-tab").style.display = "none";
@@ -44,9 +42,7 @@ function fetctDataSourceComp(draftId = null) {
         $select.find("option:not(:first)").remove();
         response.data.result.forEach((item) => {
           let isSelected = draftId && item.id == draftId;
-          $select.append(
-            new Option(item.text, item.id, isSelected, isSelected),
-          );
+          $select.append(new Option(item.text, item.id, isSelected, isSelected));
         });
         if (draftId) {
           let newOption = new Option(`Draft ${draftId}`, draftId, true, true);
@@ -141,11 +137,7 @@ async function handleSearchCompetency() {
       // setState("storageDataMapping", resultCompetency.data.level);
       loadTableHeader(resultCompetency?.data.competency);
       loadTableBody(resultJob.data);
-      mapCompetencyCells(
-        listJobCode,
-        resultCompetency.data.competency,
-        resultCompetency.data.level,
-      );
+      mapCompetencyCells(listJobCode, resultCompetency.data.competency, resultCompetency.data.level);
       tableContainer.scrollTop = 0;
       tableContainer.scrollLeft = 0;
     }
@@ -193,15 +185,9 @@ function renderStaticHeader() {
 }
 
 function appendDynamicHeader(competencyList) {
-  const totalMandatory = competencyList.filter(
-    (item) => item.compType === "mandatory",
-  ).length;
-  const totalGeneral = competencyList.filter(
-    (item) => item.compType === "general",
-  ).length;
-  const totalSpecific = competencyList.filter(
-    (item) => item.compType === "specific",
-  ).length;
+  const totalMandatory = competencyList.filter((item) => item.compType === "mandatory").length;
+  const totalGeneral = competencyList.filter((item) => item.compType === "general").length;
+  const totalSpecific = competencyList.filter((item) => item.compType === "specific").length;
 
   let row1HTML = `
   <tr style="height: 30px;">
@@ -300,12 +286,8 @@ function handleClickPosition(positionCode) {
 }
 // Initialize tooltips after rendering
 function initializeTooltips() {
-  const tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]'),
-  );
-  tooltipTriggerList.map(
-    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
-  );
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
@@ -346,9 +328,7 @@ function mapCompetencyCells(listJobCode, listCompetency, competencyMapping) {
 }
 
 const changeLevel = () => {
-  const selectedValue = document.querySelector(
-    'input[name="radio1"]:checked',
-  ).value;
+  const selectedValue = document.querySelector('input[name="radio1"]:checked').value;
   const btnApproval = document.getElementById("btnSubmitApproval");
   btnApproval.disabled = selectedValue ? false : true;
 };

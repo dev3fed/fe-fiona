@@ -42,7 +42,7 @@
         <div class="col-4">
             <span class="mt-2 mb-2" style="min-width: 130px;">Competency Data Source</span>
             <div class="faq-form">
-                <select class="form-select digits" id="dataSource-summary">
+                <select class="form-select digits" id="dataSource-competency" onchange="changeDataSource(this.value)">
                     <option value="master">Master data KKJ</option>
 
                 </select>
@@ -112,7 +112,7 @@
                 box-sizing: border-box;
                 margin-bottom: 12px;
                 " id="warning-list">
-                
+
             </div>
             <div class="table-responsive" style=" max-height: 350px; margin-top: 10px;" id="table-summary">
                 <table class="table tbl-border-summary">
