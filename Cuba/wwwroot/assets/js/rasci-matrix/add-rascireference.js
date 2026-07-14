@@ -20,6 +20,19 @@ async function handleDeleteProsbis(param) {
     cardSelectedProsbisref();
   } catch (error) {}
 }
+
+async function handleDeleteSummerProsbis(param) {
+  try {
+    const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
+    const deleted = listSelectedProsbisref.filter((item) => item.indexNumber !== param.indexNumber);
+    const checkbox = document.getElementById(`checked-prosbisref-${param.indexNumber}`);
+    if (checkbox) {
+      checkbox.checked = false;
+    }
+    setState("listSelectedProsbisref", deleted);
+    cardSelectedSummerProsbisref();
+  } catch (error) {}
+}
 // end section edit commentar & notation pada modal add rasci reference
 
 async function openModalEditRascinotation(result, dataProsbis) {
@@ -189,6 +202,110 @@ async function cardSelectedProsbisref() {
   }
   initializeTooltips();
 }
+async function cardSelectedSummerProsbisref() {
+  const listSelectedProsbisref = getState("listSelectedProsbisref");
+  const elementSelectedproref = document.getElementById("selectedBisproSummerRef");
+  elementSelectedproref.innerHTML = ` 
+    <label class="form-label">Selected Business Process</label>
+       <div class="card-tblbusiness" style=" max-height: 300px;">
+       </div>`;
+  if (listSelectedProsbisref.length > 0) {
+    const tblProsbisref = `
+      <label class="form-label">Selected Business Process (${listSelectedProsbisref.length})</label>
+       <div class="card-tblbusiness" style=" max-height: 300px;">
+           <div class="table-responsive scrollable mt-2" style=" max-height: 260px;">
+               <table class="table tbl-border-notation">
+                   <thead>
+                   <tr>
+                       <th scope="col" style="width: 50px">Level</th>
+                       <th scope="col" style="width: 80px;text-align:center">Index</th>
+                       <th scope="col" >Business Process</th>
+                       <th scope="col" style="width: 120px;text-align:center">RASCI</th>
+                       <th scope="col" style="width: 100px;text-align:center">Action</th>
+                   </tr>
+                   </thead>
+                   <tbody>
+                 <tr>
+                 ${listSelectedProsbisref
+                   .map((item, index) => {
+                     let rasciIcons = "";
+                     let comments = [];
+                     item.rasciNotation.forEach((value) => {
+                       switch (value.notation) {
+                         case "R":
+                           rasciIcons += `<img src="/assets/images/rasci/r.svg" alt="R Icon" style="padding-right:2px">`;
+                           break;
+                         case "A":
+                           rasciIcons += `<img src="/assets/images/rasci/a.svg" alt="A Icon" style="padding-right:2px">`;
+                           break;
+                         case "S":
+                           rasciIcons += `<img src="/assets/images/rasci/s.svg" alt="S Icon" style="padding-right:2px">`;
+                           break;
+                         case "C":
+                           rasciIcons += `<img src="/assets/images/rasci/c.svg" alt="C Icon" style="padding-right:2px">`;
+                           break;
+                         case "I":
+                           rasciIcons += `<img src="/assets/images/rasci/i.svg" alt="I Icon" style="padding-right:2px">`;
+                           break;
+                       }
+
+                       if (value.comment) {
+                         comments.push(`<li>${value.notation}: ${value.comment}</li>`);
+                       }
+                     });
+
+                     if (comments.length > 0) {
+                       const commentTooltip = `<ul>${comments.join("")}</ul>`;
+                       rasciIcons += `<img src="/assets/images/rasci/comment.svg" alt="Comment Icon" style="padding-right:2px" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="${commentTooltip}">`;
+                     }
+                     return `
+                     <td style="text-align:center">
+                       ${item.level}
+                     </td>
+                     <td style="text-align:center">
+                     ${item.indexNumber}
+                     </td>
+                     <td>
+                     ${item.description}
+                     </td>
+                     <td>
+                         <div class="rasci-container">
+                           <div class="rasci-icons">${rasciIcons}</div>
+                         </div>
+                     </td>
+                      <td style="text-align:center">
+                        <img src="/assets/images/rasci/danger-circle.svg" alt="Filter Icon"
+                            class="example-popover" style="margin-top:-2px;height: 20px;" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Add/Edit Comment" >
+                        <button class="btn btn-outline-light btn-small-icon" type="button" onclick="handleEditComment(${JSON.stringify(
+                          item,
+                        ).replace(/"/g, "&quot;")})">
+                            <img src="/assets/images/rasci/icon_pencil.svg" alt="Edit Icon">
+                        </button>
+                         <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="handleDeleteSummerProsbis(${JSON.stringify(
+                           item,
+                         ).replace(/"/g, "&quot;")})">
+                          <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
+                        </button>
+                     </td>
+                 </tr>
+                   `;
+                   })
+                   .join("")}
+                 </tbody>
+               </table>
+           </div>
+       </div>
+     `;
+    elementSelectedproref.innerHTML = tblProsbisref;
+  } else {
+    elementSelectedproref.innerHTML = ` 
+    <label class="form-label">Selected Business Process</label>
+       <div class="card-tblbusiness" style=" max-height: 300px;">
+       </div>`;
+  }
+  initializeTooltips();
+}
 function tblChangeNotationRef(rasciNotation) {
   const rasciRows = rasciNotation
     .map(
@@ -206,8 +323,8 @@ function tblChangeNotationRef(rasciNotation) {
       </th>
       <td style="text-align:center">
         <img src="/assets/images/rasci/${letter.rasciCode.toLowerCase()}.svg" alt="${
-        letter.rasciCode
-      } Icon" style="padding-right:2px">
+          letter.rasciCode
+        } Icon" style="padding-right:2px">
       </td>
       <td>
         <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"

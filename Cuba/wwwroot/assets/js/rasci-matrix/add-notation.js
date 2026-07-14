@@ -698,7 +698,7 @@ function onCheckNotation(event, rasciCode) {
     return letter;
   });
   setState("rasciNotation", updatedRasciNotation);
-  tblChangeNotationRef(updatedRasciNotation);
+  tblChangeNotation(updatedRasciNotation);
   const checkedCount = updatedRasciNotation.filter((l) => l.isChecked).length;
 
   if (selectedBusinessId && selectedLevel && selectedJobId && checkedCount > 0) {
