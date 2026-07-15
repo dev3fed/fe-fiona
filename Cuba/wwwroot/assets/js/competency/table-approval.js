@@ -16,9 +16,8 @@ const approvalData = async () => {
     payload.Filter = statusApproval;
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    if (result.data && result.data.length > 0) {
-      console.log("result", result);
-      renderTableApproval(result);
+    if (result.data && result.data.data.length > 0) {
+      renderTableApproval(result.data);
     }
   } catch (error) {
     console.error("Error loading approval data:", error);
@@ -48,7 +47,7 @@ $("#compeApprovalDate").datepicker({
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result);
+    renderTableApproval(result.data);
   },
 });
 $("#compeApprovalDate").on("input change", async function () {
@@ -69,7 +68,7 @@ $("#compeApprovalDate").on("input change", async function () {
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result);
+    renderTableApproval(result.data);
   }
 });
 $("#compesubmitedDate").datepicker({
@@ -96,7 +95,7 @@ $("#compesubmitedDate").datepicker({
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result);
+    renderTableApproval(result.data);
   },
 });
 $("#compesubmitedDate").on("input change", async function () {
@@ -114,7 +113,7 @@ $("#compesubmitedDate").on("input change", async function () {
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result);
+    renderTableApproval(result.data);
   }
 });
 document.getElementById("statusApproval").addEventListener("change", async function () {
@@ -141,7 +140,7 @@ document.getElementById("statusApproval").addEventListener("change", async funct
   setState("payloadApproval", payload);
 
   const result = await fetchApprovalList(payload);
-  renderTableApproval(result);
+  renderTableApproval(result.data);
 });
 $("#searchApproval").on("input", async function () {
   const searchValue = $(this).val();
@@ -155,7 +154,7 @@ $("#searchApproval").on("input", async function () {
     Page: 1,
   };
   const result = await fetchApprovalList(payload);
-  renderTableApproval(result);
+  renderTableApproval(result.data);
   setState("payloadApproval", payload);
 });
 
@@ -215,6 +214,7 @@ const renderTableApproval = async (approvalData) => {
             return "#000000";
         }
       }
+      const startIndex = (listData.page - 1) * listData.pageSize;
       const statusText = statusMap[data.statusText] || "-";
       let statusHtml = `<span style="
           display:inline-block;
@@ -230,7 +230,7 @@ const renderTableApproval = async (approvalData) => {
           ">${statusText}</span>`;
       return `
         <tr>
-          <td style="text-align:center">${index + 1}</td>
+          <td style="text-align:center">${startIndex + index + 1}</td>
           <td>${data.requestNumber || "-"}</td>
           <td>${data.draftName || "-"}</td>
           <td>${data.draftSoName || "-"}</td>
@@ -373,7 +373,7 @@ async function changeNumberApprovalPage(event) {
   };
   setState("payloadApproval", payload);
   const result = await fetchApprovalList(payload);
-  renderTableApproval(result);
+  renderTableApproval(result.data);
 }
 
 async function changePageApproval(pageNumber) {
@@ -384,7 +384,7 @@ async function changePageApproval(pageNumber) {
     pageSize: payloadApproval.pageSize,
   };
   const result = await fetchApprovalList(payload);
-  renderTableApproval(result);
+  renderTableApproval(result.data);
   setState("payloadApproval", payload);
 }
 

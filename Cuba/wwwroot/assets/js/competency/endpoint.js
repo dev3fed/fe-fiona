@@ -522,6 +522,13 @@ async function fetchApprovalList(payload) {
   const url = `${url_api}/api/TechnicalCompetency/draft-competency/approval-list`;
   try {
     const result = await ajaxRequest(url, "POST", payload);
+    console.log("result", result);
+    let data = {
+      data: result.data,
+      total: result.count,
+      page: result.page,
+      pageSize: result.limit,
+    };
     if (result.status === 400) {
       return {
         success: false,
@@ -530,7 +537,7 @@ async function fetchApprovalList(payload) {
     } else {
       return {
         success: true,
-        data: result.data,
+        data: data,
       };
     }
   } catch (error) {

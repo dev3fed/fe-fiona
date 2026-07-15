@@ -141,7 +141,7 @@ function loadTableBodyDraft(response) {
     totalPage.innerHTML = `
       <div class="row">
         <div class="col-2">
-          <select class="form-select digits"  style="width:62%;" id="limitPage" onchange="handleChangeItemsPerPage(event)">
+          <select class="form-select digits"  style="width:62%;" id="limitPage" onchange="handleChangeDraftPerPage(event)">
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="15">15</option>
@@ -180,7 +180,7 @@ function renderPagination(currentPage, totalPages) {
       <a 
         class="page-link" 
         href="javascript:void(0)"  
-        ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handlePageChange(${1})"`}
+        ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handleDraftPageChange(${1})"`}
       >
       ←
       </a>
@@ -192,7 +192,7 @@ function renderPagination(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)"  
-          ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handlePageChange(${currentPage - 1})"`}
+          ${currentPage === 1 ? 'tabindex="-1"' : `onclick="handleDraftPageChange(${currentPage - 1})"`}
         >
           «
         </a>
@@ -201,7 +201,7 @@ function renderPagination(currentPage, totalPages) {
   for (let i = startPage; i <= endPage; i++) {
     paginationButtons.push(`
       <li class="page-item ${i === currentPage ? "active" : ""}">
-        <a class="page-link" href="javascript:void(0)" onclick="handlePageChange(${i})">${i}</a>
+        <a class="page-link" href="javascript:void(0)" onclick="handleDraftPageChange(${i})">${i}</a>
       </li>
     `);
   }
@@ -211,7 +211,7 @@ function renderPagination(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)" 
-          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handlePageChange(${currentPage + 1})"`}
+          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handleDraftPageChange(${currentPage + 1})"`}
         >
           » 
         </a>
@@ -222,7 +222,7 @@ function renderPagination(currentPage, totalPages) {
         <a 
           class="page-link" 
           href="javascript:void(0)" 
-          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handlePageChange(${totalPages})"`}
+          ${currentPage === totalPages ? 'tabindex="-1"' : `onclick="handleDraftPageChange(${totalPages})"`}
         >
           →
         </a>
@@ -237,7 +237,7 @@ function renderPagination(currentPage, totalPages) {
     </nav>
   `;
 }
-function handlePageChange(pageNumber) {
+function handleDraftPageChange(pageNumber) {
   const payloadDraftList = getState("payloadDraftList");
   setState("payloadDraftList", { ...payloadDraftList, Page: pageNumber });
   const payload = {
@@ -247,7 +247,7 @@ function handlePageChange(pageNumber) {
   serviceDraftList(payload);
 }
 
-function handleChangeItemsPerPage(event) {
+function handleChangeDraftPerPage(event) {
   const itemsPerPage = parseInt(event.target.value, 10);
   const payloadDraftList = getState("payloadDraftList");
   setState("payloadDraftList", { ...payloadDraftList, PageSize: itemsPerPage });
