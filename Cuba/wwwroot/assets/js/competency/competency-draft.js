@@ -10,12 +10,9 @@ document.addEventListener("dataLoaded", handleDataLoad);
 document.addEventListener("DOMContentLoaded", handleDataLoad);
 
 async function serviceDraftList(payload) {
-  console.log("payload", payload);
   try {
     const queryString = new URLSearchParams(payload).toString();
     const dataDraft = await fetchDraftList(queryString);
-    console.log("payload", payload);
-    console.log("dataDraft", dataDraft.data);
     if (dataDraft && dataDraft.data && Array.isArray(dataDraft?.data.data)) {
       const IsNotEmpty = dataDraft?.data.data.length;
       handleClickCard(IsNotEmpty);
@@ -64,7 +61,6 @@ $("#search-draftcompe").on("input", async function () {
 });
 
 function loadTableBodyDraft(response) {
-  console.log("response", response);
   const { data: dataList, currentPage: page, pageSize, totalRecords: total } = response;
   if (!dataList || dataList.length === 0) {
     document.getElementById("body-draft").innerHTML =
@@ -279,9 +275,12 @@ async function handleSaveDraft() {
   };
   const queryString = "?" + new URLSearchParams(payload).toString();
   try {
+    console.log("queryString", queryString);
     const result = await fetchCreateDraft(queryString);
     const modaldraft = document.getElementById("modalformDraft");
     const modal = bootstrap.Modal.getInstance(modaldraft);
+    const selectedValue = $("#dataSource-competency").val();
+    console.log("selectedValue", selectedValue);
     if (result.success === true) {
       if (modal) {
         modal.hide();
@@ -303,8 +302,14 @@ async function handleSaveDraft() {
           spinner.style.display = "none";
           $("#input-draftname").val("");
           $("#selects0-mainpage").val("");
-          const draftList = await fetchDraftList();
-          fetctDataSourceComp(draftId);
+          const payload = {
+            Page: 1,
+            PageSize: 5,
+          };
+          const queryString = new URLSearchParams(payload).toString();
+          const draftList = await fetchDraftList(queryString);
+          await fetctDataSourceComp(selectedValue);
+          await fetctListDatasource(selectedValue);
           const IsNotEmpty = draftList.data.length;
           handleClickCard(IsNotEmpty);
           loadTableBodyDraft(draftList.data);
@@ -397,6 +402,8 @@ async function handleSubmitDraft() {
     const result = await fetchCreateDraft(queryString);
     const modaldraft = document.getElementById("ModalDraftCompetency");
     const modal = bootstrap.Modal.getInstance(modaldraft);
+    const selectedValue = $("#dataSource-competency").val();
+
     if (result.success === true) {
       if (modal) {
         modal.hide();
@@ -418,7 +425,14 @@ async function handleSubmitDraft() {
           spinner.style.display = "none";
           $("#draftname-competency").val("");
           $("#selectso-draftpage").val("");
-          const draftList = await fetchDraftList();
+          const payload = {
+            Page: 1,
+            PageSize: 5,
+          };
+          const queryString = new URLSearchParams(payload).toString();
+          const draftList = await fetchDraftList(queryString);
+          await fetctDataSourceComp(selectedValue);
+          await fetctListDatasource(selectedValue);
           const IsNotEmpty = draftList.data.length;
           handleClickCard(IsNotEmpty);
           loadTableBodyDraft(draftList.data);
@@ -463,6 +477,7 @@ async function handleSaveEmptyDraft() {
     const result = await fetchCreateDraft(queryString);
     const modaldraft = document.getElementById("ModalCreateEmptydraft");
     const modal = bootstrap.Modal.getInstance(modaldraft);
+    const selectedValue = $("#dataSource-competency").val();
     if (result.success === true) {
       if (modal) {
         modal.hide();
@@ -484,9 +499,15 @@ async function handleSaveEmptyDraft() {
           spinner.style.display = "none";
           $("#input-emptydraftname").val("");
           $("#selectso-emptydraftpage").val("");
-          const draftList = await fetchDraftList();
+          const payload = {
+            Page: 1,
+            PageSize: 5,
+          };
+          const queryString = new URLSearchParams(payload).toString();
+          const draftList = await fetchDraftList(queryString);
+          await fetctDataSourceComp(selectedValue);
+          await fetctListDatasource(selectedValue);
           const IsNotEmpty = draftList.data.length;
-          console.log("draftList", draftList);
           handleClickCard(IsNotEmpty);
           loadTableBodyDraft(draftList.data);
           feather.replace();
@@ -579,7 +600,6 @@ const confirmDeletecompeDraft = async () => {
 };
 
 async function handleOpenDetail(id) {
-  console.log("first", id);
   try {
     const draftDetail = document.getElementById("draft-detail");
     const mainCompetency = document.getElementById("main-competency");

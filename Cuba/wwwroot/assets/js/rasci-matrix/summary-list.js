@@ -137,9 +137,9 @@ const renderTableSummary = (resultList) => {
           const valString = JSON.stringify(element).replace(/"/g, "&quot;");
 
           const actionButtons = isNotAvailable
-            ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency">
+            ? `<button class="btn btn-primary btn-icon" type="button" onclick='handleAddRasciSummary(${valString})' aria-label="Add RASCI">
                    <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
-                   Add Competency
+                   Add RASCI
                  </button>`
             : `<button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
                 /"/g,
@@ -197,7 +197,7 @@ const renderTableSummary = (resultList) => {
                 <td style="text-align:center">${element.functionName || "N/A"}</td>
                 <td style="text-align:center">${element.divisionName || "N/A"}</td>
                 <td style="width: 120px;text-align:center">${statusHtml}</td>
-                <td style="text-align:center;width:${isNotAvailable ? "200px" : "100px"}">
+                <td style="text-align:center;width:${isNotAvailable ? "150px" : "100px"}">
                  ${actionButtons}
                 </td>
               </tr>`;

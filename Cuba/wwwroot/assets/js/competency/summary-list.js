@@ -404,7 +404,7 @@ const showDetail = async (data) => {
     setState("payloadDetailJob", { unitCode, prlOrg });
     modalSummaryInfoPosition(unitCode, prlOrg);
     cardTblSummaryMandatory(unitCode, prlOrg);
-    cardTblSummaryGeneral(unitCode, prlOrg);
+    // cardTblSummaryGeneral(unitCode, prlOrg);
     cardTblSummarySpecific(unitCode, prlOrg);
     cardTblSummaryBehavior(unitCode, prlOrg);
   } catch (error) {
@@ -557,19 +557,7 @@ const openAddCompetencySummary = async (data) => {
         </div>
       </div>
 
-      <div style="margin-left: 30px;">
-        <label>Type</label>
-        <div class="d-flex gap-2">
-          <input type="radio" class="btn-check" name="optType" id="typeMandatory" autocomplete="off" value="mandatory" ${mandatoryDisabled}>
-          <label class="oval-option" for="typeMandatory" style="${mandatoryLabelStyle}">Mandatory</label>
-
-          <input type="radio" class="btn-check" name="optType" id="typeGeneral" autocomplete="off" value="general" ${generalDisabled}>
-          <label class="oval-option" for="typeGeneral" style="${generalLabelStyle}">General</label>
-
-          <input type="radio" class="btn-check" name="optType" id="typeSpecific" autocomplete="off" value="specific" ${specificDisabled}>
-          <label class="oval-option" for="typeSpecific" style="${specificLabelStyle}">Specific</label>
-        </div>
-      </div>
+   
     </div>
     <hr class="mt-4"/>
   </div>

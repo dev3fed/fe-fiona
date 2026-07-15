@@ -119,7 +119,7 @@
                                         <div class="split-card-row ">
                                             <div>
                                                 <div class="table-responsive m-t-6 scrollable-posdetail">
-                                                    <div id="summandatory-content" style="display: none;">
+                                                    @* <div id="summandatory-content" style="display: none;">
                                                         <h6 id="labelSubmandatory"></h6>
                                                         <table class="mt-2 mb-3 table tbl-border">
                                                             <thead id="mandatory-sumcompetency-header">
@@ -127,44 +127,65 @@
                                                             <tbody id="mandatory-sumcompetency-body">
                                                             </tbody>
                                                         </table>
-                                                    </div>
-                                                    <div id="summandatory-no-data" style="display: block;">
+                                                    </div> *@
+                                                    @* <div id="summandatory-no-data" style="display: block;">
                                                         <h6>Mandatory (0/5)</h6>
                                                         <div class="competency-box" style="margin-top:10px">
                                                             <span class="icon"><img
                                                                 src="/assets/images/competency/vector.svg"></span>
                                                                 <span class="desc">There is no data </span>
                                                             </div>
+                                                        </div> *@
+                                                    <div id="general-sumcompetency-content" style="display: none;">
+                                                        <h6 id="labelSumcore"></h6>
+                                                        <table class="table mb-3 tbl-border mt-2">
+                                                            <thead id="technical-sumcompetency-header">
+                                                            </thead>
+                                                            <tbody id="technical-sumcompetency-body">
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div id="sumgeneral-no-data" style="display: block;margin-top:10px">
+                                                        <h6>Generic</h6>
+                                                        <div class="competency-box" style="margin-top:10px">
+                                                            <span class="icon"><img
+                                                                src="/assets/images/competency/vector.svg"></span>
+                                                                <span class="desc">There is no data </span>
+                                                            </div>
                                                         </div>
-                                                        <div id="general-sumcompetency-content" style="display: none;">
-                                                            <h6 id="labelSumcore"></h6>
+                                                        <div id="specific-sumcompetency-content" style="display: none;">
+                                                            <h6 id="labelSumspecific"> </h6>
                                                             <table class="table mb-3 tbl-border mt-2">
-                                                                <thead id="technical-sumcompetency-header">
+                                                                <thead id="technical-sumspecific-header">
                                                                 </thead>
-                                                                <tbody id="technical-sumcompetency-body">
+                                                                <tbody id="technical-sumspecific-body">
                                                                 </tbody>
                                                             </table>
                                                         </div>
-                                                        <div id="sumgeneral-no-data" style="display: block;margin-top:10px">
-                                                            <h6>General (0/3)</h6>
+
+                                                        <div id="sumspecific-no-data" style="display: block; margin-top:10px">
+                                                            <h6>Spesific (0/9)</h6>
                                                             <div class="competency-box" style="margin-top:10px">
                                                                 <span class="icon"><img
                                                                     src="/assets/images/competency/vector.svg"></span>
                                                                     <span class="desc">There is no data </span>
                                                                 </div>
                                                             </div>
-                                                            <div id="specific-sumcompetency-content" style="display: none;">
-                                                                <h6 id="labelSumspecific"> </h6>
-                                                                <table class="table mb-3 tbl-border mt-2">
-                                                                    <thead id="technical-sumspecific-header">
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="table-responsive m-t-6 scrollable-posdetail">
+                                                            <div id="sumbehavior-content" style="display: none;">
+                                                                <table class="mt-2 mb-3 table tbl-border">
+                                                                    <h6>Behavior</h6>
+                                                                    <thead id="mandatory-sumbehavior-header">
                                                                     </thead>
-                                                                    <tbody id="technical-sumspecific-body">
+                                                                    <tbody id="mandatory-sumbehavior-body">
                                                                     </tbody>
                                                                 </table>
                                                             </div>
-
-                                                            <div id="sumspecific-no-data" style="display: block; margin-top:10px">
-                                                                <h6>Spesific (0/9)</h6>
+                                                            <div id="sumbehavior-no-data" style="display: block;">
+                                                                <h6>Behavior</h6>
                                                                 <div class="competency-box" style="margin-top:10px">
                                                                     <span class="icon"><img
                                                                         src="/assets/images/competency/vector.svg"></span>
@@ -173,83 +194,62 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div>
-                                                            <div class="table-responsive m-t-6 scrollable-posdetail">
-                                                                <div id="sumbehavior-content" style="display: none;">
-                                                                    <table class="mt-2 mb-3 table tbl-border">
-                                                                        <h6>Behavior</h6>
-                                                                        <thead id="mandatory-sumbehavior-header">
-                                                                        </thead>
-                                                                        <tbody id="mandatory-sumbehavior-body">
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                                <div id="sumbehavior-no-data" style="display: block;">
-                                                                    <h6>Behavior</h6>
-                                                                    <div class="competency-box" style="margin-top:10px">
-                                                                        <span class="icon"><img
-                                                                            src="/assets/images/competency/vector.svg"></span>
-                                                                            <span class="desc">There is no data </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Card job attribut end-->
                                                     </div>
+                                                    <!-- Card job attribut end-->
                                                 </div>
-                                                <div class="tab-pane fade " id="pills-sumjobinfo" role="tabpanel"
-                                                     aria-labelledby="pills-sumjobinfo-tab">
-                                                    <div class="mt-1 scrollable-posdetail">
-                                                        <!-- Card job attribut start-->
-                                                        <div class="custom-card-draft">
-                                                            <div class="header-card-draft">
-                                                                Info
-                                                            </div>
-                                                            <div class="row" style="padding-top: 20px;" id="sumjob-info">
-                                                            </div>
+                                            </div>
+                                            <div class="tab-pane fade " id="pills-sumjobinfo" role="tabpanel"
+                                                 aria-labelledby="pills-sumjobinfo-tab">
+                                                <div class="mt-1 scrollable-posdetail">
+                                                    <!-- Card job attribut start-->
+                                                    <div class="custom-card-draft">
+                                                        <div class="header-card-draft">
+                                                            Info
                                                         </div>
-                                                        <!-- Card job attribut end-->
-
-                                                        <!-- Card skill Group & subskill start-->
-                                                        <div class="custom-card-draft">
-                                                            <div class="header-card-draft">
-                                                                Skill Group & Sub Skill Group
-                                                            </div>
-                                                            <div class="row" id="sumskill-group-content">
-
-                                                            </div>
+                                                        <div class="row" style="padding-top: 20px;" id="sumjob-info">
                                                         </div>
-                                                        <!-- Card skill Group & subskill end-->
-
-                                                        <!-- Card Incumbent start-->
-                                                        <div class="custom-card-draft">
-                                                            <div class="header-card-draft">
-                                                                Incumbent
-                                                            </div>
-                                                            <div class="row mt-4" id="sumincumbent-content">
-
-                                                            </div>
-                                                        </div>
-                                                        <!-- Card Incumbent end-->
-
                                                     </div>
+                                                    <!-- Card job attribut end-->
+
+                                                    <!-- Card skill Group & subskill start-->
+                                                    <div class="custom-card-draft">
+                                                        <div class="header-card-draft">
+                                                            Skill Group & Sub Skill Group
+                                                        </div>
+                                                        <div class="row" id="sumskill-group-content">
+
+                                                        </div>
+                                                    </div>
+                                                    <!-- Card skill Group & subskill end-->
+
+                                                    <!-- Card Incumbent start-->
+                                                    <div class="custom-card-draft">
+                                                        <div class="header-card-draft">
+                                                            Incumbent
+                                                        </div>
+                                                        <div class="row mt-4" id="sumincumbent-content">
+
+                                                        </div>
+                                                    </div>
+                                                    <!-- Card Incumbent end-->
+
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer  d-flex justify-content-end">
-                                        <div>
-                                            <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
-                                                class="icon-arrow-left"></i> Back</button>
-                                                @* <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
+                                </div>
+                                <div class="modal-footer  d-flex justify-content-end">
+                                    <div>
+                                        <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
+                                            class="icon-arrow-left"></i> Back</button>
+                                            @* <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
                                                         id="btnAddSpecificCompe">
                                                     <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
                                                     Add Technical Competency
                                                 </button> *@
-                                            </div>
                                         </div>
-
                                     </div>
+
                                 </div>
                             </div>
+                        </div>

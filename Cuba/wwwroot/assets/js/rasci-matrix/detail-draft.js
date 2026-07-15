@@ -805,7 +805,7 @@ function deleteDraftFromdetail() {
   const dataDraft = getState("dataDetailDraft");
   const openModal = new bootstrap.Modal(document.getElementById("modalDeleteDraft"));
   openModal.show();
-  setState("deleteDraftProsbis", dataDraft?.draftInfo.id);
+  setState("deleteDraftProsbis", dataDraft?.draftId);
 }
 
 async function confirmDeleteDetailDraft() {

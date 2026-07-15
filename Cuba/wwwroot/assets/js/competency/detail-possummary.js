@@ -245,20 +245,21 @@ const cardTblSummaryMandatory = async (code, prl) => {
 
   try {
     const result = await fetchDetailPositionMandatory(payload);
-    const mandatoryNoData = document.getElementById("summandatory-no-data");
-    const mandatoryContent = document.getElementById("summandatory-content");
-    if (mandatoryContent) {
-      mandatoryContent.style.display = result.data !== undefined ? "block" : "none";
+    const genericNodata = document.getElementById("sumgeneral-no-data");
+    const genericContent = document.getElementById("general-sumcompetency-content");
+    if (genericContent) {
+      genericContent.style.display = result.data !== undefined ? "block" : "none";
     }
-    if (mandatoryNoData) {
-      mandatoryNoData.style.display = result.data !== undefined ? "none" : " block";
+    if (genericNodata) {
+      genericNodata.style.display = result.data !== undefined ? "none" : " block";
     }
+    console.log("result", result);
     if (result.success === true) {
       const listMandatory = result?.data.compData || [];
-      const labelMandatory = document.getElementById("labelSubmandatory");
+      const labelMandatory = document.getElementById("labelSumcore");
 
       if (labelMandatory) {
-        labelMandatory.innerHTML = `Mandatory (${listMandatory.length}/5)`;
+        labelMandatory.innerHTML = `Generic (${listMandatory.length}/5)`;
       }
       const theadMandatory = `
           <tr>
@@ -280,68 +281,67 @@ const cardTblSummaryMandatory = async (code, prl) => {
         })
         .join("");
 
-      document.getElementById("mandatory-sumcompetency-header").innerHTML = theadMandatory;
-      document.getElementById("mandatory-sumcompetency-body").innerHTML = bodyMandatory;
+      document.getElementById("technical-sumcompetency-header").innerHTML = theadMandatory;
+      document.getElementById("technical-sumcompetency-body").innerHTML = bodyMandatory;
     }
   } catch (error) {
     console.error(error);
   }
 };
 
-const cardTblSummaryGeneral = async (code, prl) => {
-  const dataSource = $("#dataSource-competency").val();
-  const payload = `${dataSource}/${code}/${prl}`;
+// const cardTblSummaryGeneral = async (code, prl) => {
+//   const dataSource = $("#dataSource-competency").val();
+//   const payload = `${dataSource}/${code}/${prl}`;
 
-  try {
-    const result = await fetchDetailPositionTechnical(payload);
-    const generalNoData = document.getElementById("sumgeneral-no-data");
-    const generalContent = document.getElementById("general-sumcompetency-content");
-    if (generalContent) {
-      generalContent.style.display = result.data !== undefined ? "block" : "none";
-    }
-    if (generalNoData) {
-      generalNoData.style.display = result.data !== undefined ? "none" : " block";
-    }
+//   try {
+//     const result = await fetchDetailPositionTechnical(payload);
+//     const generalNoData = document.getElementById("sumgeneral-no-data");
+//     const generalContent = document.getElementById("general-sumcompetency-content");
+//     if (generalContent) {
+//       generalContent.style.display = result.data !== undefined ? "block" : "none";
+//     }
+//     if (generalNoData) {
+//       generalNoData.style.display = result.data !== undefined ? "none" : " block";
+//     }
 
-    if (result.success === true) {
-      const listTechnical = result?.data.compData || [];
-      const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
-      const labelCore = document.getElementById("labelSumcore");
-      if (labelCore) {
-        labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
-      }
+//     if (result.success === true) {
+//       const listTechnical = result?.data.compData || [];
+//       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
+//       const labelCore = document.getElementById("labelSumcore");
+//       if (labelCore) {
+//         labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
+//       }
 
-      const theadTechnical = `
-            <tr>
-              <th scope="col" style="width: 40px;text-align:center">No</th>
-              <th scope="col" style="width: 300px">Competency</th>
-              <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
-            </tr>`;
+//       const theadTechnical = `
+//             <tr>
+//               <th scope="col" style="width: 40px;text-align:center">No</th>
+//               <th scope="col" style="width: 300px">Competency</th>
+//               <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
+//             </tr>`;
 
-      const bodyTechnical = listTechnical
-        .filter((element) => element.compType.toLowerCase() === "general")
-        .map((element, i) => {
-          return `
-              <tr>
-                <td  style="text-align:Center">${i + 1}</td>
-                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailSuminfo('General','${
-                  element.compCode
-                }')">
-                ${element.compName}</td>
-                <td style="text-align:Center">${element.level}</td>
-              
+//       const bodyTechnical = listTechnical
+//         .filter((element) => element.compType.toLowerCase() === "general")
+//         .map((element, i) => {
+//           return `
+//               <tr>
+//                 <td  style="text-align:Center">${i + 1}</td>
+//                 <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailSuminfo('General','${
+//                   element.compCode
+//                 }')">
+//                 ${element.compName}</td>
+//                 <td style="text-align:Center">${element.level}</td>
 
-              </tr>`;
-        })
-        .join("");
+//               </tr>`;
+//         })
+//         .join("");
 
-      document.getElementById("technical-sumcompetency-header").innerHTML = theadTechnical;
-      document.getElementById("technical-sumcompetency-body").innerHTML = bodyTechnical;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
+//       document.getElementById("technical-sumcompetency-header").innerHTML = theadTechnical;
+//       document.getElementById("technical-sumcompetency-body").innerHTML = bodyTechnical;
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const cardTblSummarySpecific = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
@@ -623,7 +623,7 @@ const handleCloseSummaryBehavior = async () => {
 
   await modalSummaryInfoPosition(payload.unitCode, payload.prlOrg);
   await cardTblSummaryMandatory(payload.unitCode, payload.prlOrg);
-  await cardTblSummaryGeneral(payload.unitCode, payload.prlOrg);
+  // await cardTblSummaryGeneral(payload.unitCode, payload.prlOrg);
   await cardTblSummarySpecific(payload.unitCode, payload.prlOrg);
   await cardTblSummaryBehavior(payload.unitCode, payload.prlOrg);
 

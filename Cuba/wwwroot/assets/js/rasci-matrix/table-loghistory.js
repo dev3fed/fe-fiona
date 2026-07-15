@@ -64,8 +64,10 @@ const renderTableLoghistory = async (logHistoryData) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.totalRecords < itemsPerPage * listData.page ? listData.totalRecords : itemsPerPage * listData.page
-      } of ${listData.totalRecords} records</label>
+                listData.totalRecords < itemsPerPage * listData.page
+                  ? listData.totalRecords
+                  : itemsPerPage * listData.page
+              } of ${listData.totalRecords} records</label>
             </div>
           </div>
         `;
@@ -153,9 +155,13 @@ function renderPaginationLoghistory(currentPage, totalPages) {
 
 $("#createdDateInput").datepicker({
   onSelect: async function (formattedDate, date, inst) {
-    const [month, day, year] = formattedDate.split("/");
-    const formatted = `${day}-${month}-${year}`;
-    console.log("Formatted date (dd-mm-yyyy):", formatted);
+    let formatted = "";
+    if (formattedDate) {
+      const [month, day, year] = formattedDate.split("/");
+      formatted = `${day}-${month}-${year}`;
+    } else {
+      formatted = "";
+    }
     const payloadLogHistory = getState("payloadLogHistory");
     const payload = {
       ...payloadLogHistory,
