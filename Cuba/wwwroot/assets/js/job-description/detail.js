@@ -763,6 +763,7 @@ $(document).ready(async function () {
       percentage: 50,
     });
     const data = result?.data || [];
+    console.log("getSimilarities result", result);
     if (data.length > 0) {
       const dataCompare = data
         .map((item) => ({
@@ -800,6 +801,11 @@ $(document).ready(async function () {
       const jobSimilaritiesDetails = await Promise.all(detailPromises);
       localStorage.setItem("jobSimilaritiesDetails", JSON.stringify(jobSimilaritiesDetails));
       console.log("jobSimilaritiesDetails", jobSimilaritiesDetails);
+    } else {
+      $(
+        "#addJobReference, #referenceFunction, #referenceTugasHa, #referenceKoordinasi, #referenceRelasi, #referencePk, #addJobReferencePJ, #referenceSTK",
+      ).prop("disabled", false);
+      $(".spinner-border").hide();
     }
 
     return result;
