@@ -1,3 +1,10 @@
+document.addEventListener("DOMContentLoaded", async function () {
+  const payload = getState("payloadLogHistory");
+  const result = await fetchLoghistoryList(payload);
+  const logHistoryData = result.data || [];
+  renderTableLoghistory(logHistoryData);
+  feather.replace();
+});
 document.addEventListener("dataLoaded", async function () {
   try {
     // const logHistoryData = getState("logHistoryData");

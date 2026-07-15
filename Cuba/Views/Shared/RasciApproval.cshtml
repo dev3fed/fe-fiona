@@ -107,68 +107,68 @@
         <div class="col-3">
             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
                 <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
-                        data-feather="calendar" style="width: 20px;"></i></div>
-                <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date"
-                    id="submittedDate">
+                    data-feather="calendar" style="width: 20px;"></i></div>
+                    <input class="datepicker-here form-control digits" type="text" data-language="en"
+                           data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date"
+                           id="submittedDate">
+                </div>
             </div>
-        </div>
-        <div class="col-3">
-            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+            <div class="col-3">
+                <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                    <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
                         data-feather="calendar" style="width: 20px;"></i></div>
-                <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date"
-                    id="approvalDate">
-            </div>
-        </div>
+                        <input class="datepicker-here form-control digits" type="text" data-language="en"
+                               data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date"
+                               id="approvalDate">
+                    </div>
+                </div>
 
-        <div class="col-2">
-            <select class="form-select digits" id="statusApproval">
-                <option value="" selected>All</option>
-                <option value="Status:submitted">On Review</option>
-                <option value="Status:approved">Approval</option>
-                <option value="Status:rejected">Reject</option>
-            </select>
-        </div>
-        <div class="col-4">
-            <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.." id="searchApproval"><i
-                    class="search-icon" data-feather="search"></i>
+                <div class="col-2">
+                    <select class="form-select digits" id="statusApproval">
+                        <option value="" selected>All</option>
+                        <option value="Status:submitted">On Review</option>
+                        <option value="Status:approved">Approval</option>
+                        <option value="Status:rejected">Reject</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <div class="faq-form">
+                        <input class="form-control" type="text" placeholder="Search.." id="searchApproval"><i
+                        class="search-icon" data-feather="search"></i>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="table-responsive" style=" max-height: 450px;">
+                        <table class="table tbl-border-add-prosbis">
+                            <thead id="tbl-approval-header" style="background-color: #006CA9;">
+                                <tr>
+                                    <th scope="col" style="width: 40px;text-align:center">
+                                        No
+                                    </th>
+                                    <th scope="col" style="width: 60px">Request ID</th>
+                                    <th scope="col" style="width: 200px">Draft Name</th>
+                                    <th scope="col" style="width: 210px">Organization Data Source</th>
+                                    <th scope="col" style="width: 120px">Submitted Date</th>
+                                    <th scope="col" style="width: 140px">Approval/Reject Date</th>
+                                    <th scope="col" style="width: 80px;text-align: center;">Status</th>
+                                    <th scope="col" style="width: 80px;text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-approval">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-9 mt-3">
+                    <div id="total-approval-page">
+                    </div>
+                </div>
+                <div class="col-3 mt-3 d-flex justify-content-end">
+                    <div id="list-approval-page">
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-12 mt-3">
-            <div class="table-responsive" style=" max-height: 450px;">
-                <table class="table tbl-border-add-prosbis">
-                    <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
-                        <tr>
-                            <th scope="col" style="width: 40px;text-align:center">
-                                No
-                            </th>
-                            <th scope="col" style="width: 60px">Request ID</th>
-                            <th scope="col" style="width: 200px">Draft Name</th>
-                            <th scope="col" style="width: 210px">Organization Data Source</th>
-                            <th scope="col" style="width: 120px">Submitted Date</th>
-                            <th scope="col" style="width: 140px">Approval/Reject Date</th>
-                            <th scope="col" style="width: 80px;text-align: center;">Status</th>
-                            <th scope="col" style="width: 80px;text-align: center;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="body-approval">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-9 mt-3">
-            <div id="total-approval-page">
-            </div>
-        </div>
-        <div class="col-3 mt-3 d-flex justify-content-end">
-            <div id="list-approval-page">
-            </div>
-        </div>
-    </div>
-</div>
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

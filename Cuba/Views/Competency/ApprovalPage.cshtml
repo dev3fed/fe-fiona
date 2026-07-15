@@ -6,7 +6,7 @@
         margin: 30px auto;
     }
 
-    .tbl-border-add-prosbis {
+    .tbl-border-competency {
         width: 100%;
         border-top: 1px solid #b0d1e4;
         border-right: 1px solid #b0d1e4;
@@ -16,13 +16,13 @@
         font-size: 12px !important;
     }
 
-    .tbl-border-add-prosbis th {
+    .tbl-border-competency th {
         color: #006CA9;
         font-weight: bold;
         height: 40px;
     }
 
-    .tbl-border-add-prosbis thead th {
+    .tbl-border-competency thead th {
         position: sticky;
         top: 0;
         background-color: #E6F0F6;
@@ -30,8 +30,8 @@
         /* To ensure it stays above the content */
     }
 
-    .tbl-border-add-prosbis th,
-    .tbl-border-add-prosbis td {
+    .tbl-border-competency th,
+    .tbl-border-competency td {
         padding: 8px !important;
         border-right: 1px solid #b0d1e4;
         border-bottom: 1px solid #b0d1e4;
@@ -105,68 +105,68 @@
         <div class="col-3">
             <div class="input-group date" id="dt-minimum" data-target-input="nearest">
                 <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
-                        data-feather="calendar" style="width: 20px;"></i></div>
-                <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date"
-                    id="compesubmitedDate">
+                    data-feather="calendar" style="width: 20px;"></i></div>
+                    <input class="datepicker-here form-control digits" type="text" data-language="en"
+                           data-multiple-dates-separator=", " data-position="bottom left" placeholder="Submitted Date"
+                           id="compesubmitedDate">
+                </div>
             </div>
-        </div>
-        <div class="col-3">
-            <div class="input-group date" id="dt-minimum" data-target-input="nearest">
-                <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
+            <div class="col-3">
+                <div class="input-group date" id="dt-minimum" data-target-input="nearest">
+                    <div class="input-group-text" data-target="#dt-minimum" data-toggle="datetimepicker"><i
                         data-feather="calendar" style="width: 20px;"></i></div>
-                <input class="datepicker-here form-control digits" type="text" data-language="en"
-                    data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date"
-                    id="compeApprovalDate">
-            </div>
-        </div>
+                        <input class="datepicker-here form-control digits" type="text" data-language="en"
+                               data-multiple-dates-separator=", " data-position="bottom left" placeholder="Approval/ Reject Date"
+                               id="compeApprovalDate">
+                    </div>
+                </div>
 
-        <div class="col-2">
-            <select class="form-select digits" id="statusApproval">
-                <option value="" selected>All</option>
-                <option value="Status:submitted">On Review</option>
-                <option value="Status:approved">Approval</option>
-                <option value="Status:rejected">Reject</option>
-            </select>
-        </div>
-        <div class="col-4">
-            <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.." id="searchApproval"><i
-                    class="search-icon" data-feather="search"></i>
+                <div class="col-2">
+                    <select class="form-select digits" id="statusApproval">
+                        <option value="" selected>All</option>
+                        <option value="Status:submitted">On Review</option>
+                        <option value="Status:approved">Approval</option>
+                        <option value="Status:rejected">Reject</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <div class="faq-form">
+                        <input class="form-control" type="text" placeholder="Search.." id="searchApproval"><i
+                        class="search-icon" data-feather="search"></i>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="table-responsive" style=" max-height: 450px;">
+                        <table class="table tbl-border-competency">
+                            <thead id="tbl-competency-approval-header" style="background-color: #006CA9;">
+                                <tr>
+                                    <th scope="col" style="width: 40px;text-align:center">
+                                        No
+                                    </th>
+                                    <th scope="col" style="width: 60px">Request ID</th>
+                                    <th scope="col" style="width: 200px">Draft Name</th>
+                                    <th scope="col" style="width: 210px">Organization Data Source</th>
+                                    <th scope="col" style="width: 120px">Submitted Date</th>
+                                    <th scope="col" style="width: 140px">Approval/Reject Date</th>
+                                    <th scope="col" style="width: 80px;text-align: center;">Status</th>
+                                    <th scope="col" style="width: 80px;text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-compeapproval">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-10 mt-3">
+                    <div id="total-compeapproval-page">
+                    </div>
+                </div>
+                <div class="col-2 mt-3">
+                    <div id="list-compeapproval-page">
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-12 mt-3">
-            <div class="table-responsive" style=" max-height: 450px;">
-                <table class="table tbl-border-add-prosbis">
-                    <thead id="tbl-add-prosbis-header" style="background-color: #006CA9;">
-                        <tr>
-                            <th scope="col" style="width: 40px;text-align:center">
-                                No
-                            </th>
-                            <th scope="col" style="width: 60px">Request ID</th>
-                            <th scope="col" style="width: 200px">Draft Name</th>
-                            <th scope="col" style="width: 210px">Organization Data Source</th>
-                            <th scope="col" style="width: 120px">Submitted Date</th>
-                            <th scope="col" style="width: 140px">Approval/Reject Date</th>
-                            <th scope="col" style="width: 80px;text-align: center;">Status</th>
-                            <th scope="col" style="width: 80px;text-align: center;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="body-approval">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-10 mt-3">
-            <div id="total-approval-page">
-            </div>
-        </div>
-        <div class="col-2 mt-3">
-            <div id="list-approval-page">
-            </div>
-        </div>
-    </div>
-</div>
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>

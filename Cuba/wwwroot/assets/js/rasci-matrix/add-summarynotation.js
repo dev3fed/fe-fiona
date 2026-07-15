@@ -8,7 +8,6 @@ async function handleAddRasciSummary() {
     const draftidRasci = $("#dataSource-rasci").val();
     const draftName = $("#dataSource-rasci option:selected").text();
     const resultLevel = await fetchSelectLevel(draftidRasci);
-    console.log("resultLevel", resultLevel);
     const listLevel = resultLevel?.data.result;
     const formContent = `
         <div class="col-12 mb-2">
@@ -145,7 +144,6 @@ function updateSelect2BySummerNot() {
         dataType: "json",
         data: function (params) {
           const summerLevelId = $("#summerLevelId").val();
-          console.log("summerLevelId", summerLevelId);
           return {
             search: params.term || "",
             page: params.page || 1,
@@ -319,7 +317,6 @@ function onSelectSummerProsbisRef(item) {
   const dataChangeNotasi = getState("dataChangeNotasi") || {
     busProsMapped: [],
   };
-  console.log("elementChecked", elementChecked);
   const listSelectedProsbisref = getState("listSelectedProsbisref") || [];
   if (isChecked) {
     const notation = item.rasciNotation.map((notation) => ({
@@ -356,7 +353,6 @@ function onSelectSummerProsbisRef(item) {
 function onSelectSummerLevel(event) {
   const value = event.target.value;
   const parentSelect = document.querySelector("#summerBusid");
-  console.log("parentSelect", value);
   if (value === "Choose" || value == 0) {
     parentSelect.disabled = true;
 
@@ -503,7 +499,6 @@ const handleSummerRadio = (event) => {
     ...dataChangeNotasi,
     busProsMapped: [],
   };
-  console.log("value", value);
   if (value === "summerReference") {
     $("#possummerRef").show();
     $("#summerBispro, #selectedSummerBispro").hide();
@@ -590,7 +585,7 @@ function formValidationSummerNot() {
   const { jobId, busProsMapped } = getState("dataChangeNotasi");
   const listSelectedProsbisref = getState("listSelectedProsbisref");
   const isValid = (jobId && busProsMapped.length > 0) || (jobId && listSelectedProsbisref.length > 0);
-  document.getElementById("btnDraftsummernot").disabled = !isValid;
+document.getElementById("btnDraftsummernot").disabled = !isValid;
 }
 
 document.querySelectorAll("select").forEach((input) => {
@@ -652,7 +647,6 @@ function onCheckSummerNot(event, rasciCode) {
   const isChecked = event.target.checked;
   const commentInput = document.getElementById(`comment${rasciCode}`);
 
-  console.log("commentInput", commentInput.value);
   commentInput.disabled = !isChecked;
   commentInput.value = isChecked ? commentInput.value : "";
   const selectedBusinessId = $("#summerBusid");

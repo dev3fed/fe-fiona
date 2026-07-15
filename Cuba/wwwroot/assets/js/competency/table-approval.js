@@ -15,10 +15,10 @@ const approvalData = async () => {
     const statusApproval = document.getElementById("statusApproval").value;
     payload.Filter = statusApproval;
     setState("payloadApproval", payload);
-
     const result = await fetchApprovalList(payload);
-    if (result.data.data.length > 0) {
-      renderTableApproval(result.data);
+    if (result.data && result.data.length > 0) {
+      console.log("result", result);
+      renderTableApproval(result);
     }
   } catch (error) {
     console.error("Error loading approval data:", error);
@@ -48,7 +48,7 @@ $("#compeApprovalDate").datepicker({
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result.data);
+    renderTableApproval(result);
   },
 });
 $("#compeApprovalDate").on("input change", async function () {
@@ -69,7 +69,7 @@ $("#compeApprovalDate").on("input change", async function () {
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result.data);
+    renderTableApproval(result);
   }
 });
 $("#compesubmitedDate").datepicker({
@@ -96,7 +96,7 @@ $("#compesubmitedDate").datepicker({
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result.data);
+    renderTableApproval(result);
   },
 });
 $("#compesubmitedDate").on("input change", async function () {
@@ -114,7 +114,7 @@ $("#compesubmitedDate").on("input change", async function () {
     };
     setState("payloadApproval", payload);
     const result = await fetchApprovalList(payload);
-    renderTableApproval(result.data);
+    renderTableApproval(result);
   }
 });
 document.getElementById("statusApproval").addEventListener("change", async function () {
@@ -141,7 +141,7 @@ document.getElementById("statusApproval").addEventListener("change", async funct
   setState("payloadApproval", payload);
 
   const result = await fetchApprovalList(payload);
-  renderTableApproval(result.data);
+  renderTableApproval(result);
 });
 $("#searchApproval").on("input", async function () {
   const searchValue = $(this).val();
@@ -155,7 +155,7 @@ $("#searchApproval").on("input", async function () {
     Page: 1,
   };
   const result = await fetchApprovalList(payload);
-  renderTableApproval(result.data);
+  renderTableApproval(result);
   setState("payloadApproval", payload);
 });
 
@@ -181,6 +181,7 @@ const renderTableApproval = async (approvalData) => {
         Approved: "Approval",
         Rejected: "Reject",
         Submitted: "On Review",
+        Draft: "Draft",
       };
       function getStatusColor(status) {
         switch (status) {
@@ -192,6 +193,8 @@ const renderTableApproval = async (approvalData) => {
             return "#F9E9EA";
           case "Submitted":
             return "#FEE9B0";
+          case "Draft":
+            return "#E0E0E0";
           default:
             return "#E4E6EF";
         }
@@ -206,6 +209,8 @@ const renderTableApproval = async (approvalData) => {
             return "#CD2536";
           case "Submitted":
             return "#B08803";
+          case "Draft":
+            return "#000000";
           default:
             return "#000000";
         }
@@ -248,7 +253,7 @@ const renderTableApproval = async (approvalData) => {
     })
     .join("");
 
-  const tableBody = document.getElementById("body-approval");
+  const tableBody = document.getElementById("body-compeapproval");
   if (tableBody) {
     tableBody.innerHTML = tblBody;
   }
@@ -257,7 +262,7 @@ const renderTableApproval = async (approvalData) => {
   const currentPage = listData.page;
   const start = (listData.page - 1) * itemsPerPage + 1;
   renderPaginationApproval(currentPage, totalPages);
-  const totalPage = document.getElementById("total-approval-page");
+  const totalPage = document.getElementById("total-compeapproval-page");
   if (totalPage) {
     totalPage.innerHTML = `
           <div class="row">
@@ -283,7 +288,7 @@ const renderTableApproval = async (approvalData) => {
   selectElement.value = listData.pageSize;
 };
 function renderPaginationApproval(currentPage, totalPages) {
-  const paginationContainer = document.getElementById("list-approval-page");
+  const paginationContainer = document.getElementById("list-compeapproval-page");
   if (!paginationContainer) return;
 
   let pagesToShow = 3;
@@ -367,9 +372,8 @@ async function changeNumberApprovalPage(event) {
     pageSize: itemsPerPage,
   };
   setState("payloadApproval", payload);
-  const queryString = new URLSearchParams(payload).toString();
-  const result = await fetchApprovalList(queryString);
-  renderTableApproval(result.data);
+  const result = await fetchApprovalList(payload);
+  renderTableApproval(result);
 }
 
 async function changePageApproval(pageNumber) {
@@ -379,8 +383,8 @@ async function changePageApproval(pageNumber) {
     Page: pageNumber,
     pageSize: payloadApproval.pageSize,
   };
-  const result = await fetchApprovalList(queryString);
-  renderTableApproval(result.data);
+  const result = await fetchApprovalList(payload);
+  renderTableApproval(result);
   setState("payloadApproval", payload);
 }
 

@@ -186,6 +186,7 @@ const appState = new Proxy(
         updateSelect2ByJob();
         formValidation();
         formValidationNotation();
+        formValidationSummerNot();
         if (property === "dataDetailDraft") {
           if (value && Object.keys(value).length > 0) {
             detailDraft();
