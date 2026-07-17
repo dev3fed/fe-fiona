@@ -170,6 +170,7 @@ const renderTableSummary = (resultList) => {
               <td>${element.positionName || "N/A"}</td>
               <td style="text-align:center">${element.functionName || "N/A"}</td>
               <td style="text-align:center">${element.divisionName || "N/A"}</td>
+              <td style="text-align:center">${element.departmentName || "N/A"}</td>
               <td style="width: 120px;text-align:center">${statusHtml}</td>
               <td style="text-align:center;width:${isNotAvailable ? "200px" : "100px"}">
                ${actionButtons}
