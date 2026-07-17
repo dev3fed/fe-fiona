@@ -762,7 +762,7 @@ $(document).ready(async function () {
       prlOrg: prlOrg,
       percentage: 50,
     });
-    const data = result?.data || [];
+    const data = result?.value?.data || [];
     console.log("getSimilarities result", result);
     if (data.length > 0) {
       const dataCompare = data
