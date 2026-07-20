@@ -286,7 +286,6 @@ async function handleActivityApprovalPageChange(pageNumber) {
   const dataDetailApproval = getState("dataDetailApproval");
   const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
   const detailResult = await fetchDetailDraft(queryString);
-  console.log("detailResult", detailResult);
 
   renderTableActivityApproval(detailResult.data);
 }
@@ -303,16 +302,13 @@ async function changeActivityApprovalItemsPerPage(event) {
   const dataDetailApproval = getState("dataDetailApproval");
   const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
   const detailResult = await fetchDetailDraft(queryString);
-  console.log("detailResult", detailResult);
   renderTableActivityApproval(detailResult.data);
 }
 
 const triggleDetailActivityApproval = async (positionCode) => {
   try {
-    console.log("positionCode", positionCode);
     const dataApproval = getState("dataDetailApproval");
     const result = await fetchEditActivityCompetency(dataApproval.draftId, positionCode);
-    console.log("result", result);
     const modal = new bootstrap.Modal(document.getElementById("modalActivityApproval"));
     modal.show();
     const modalTitle = document.getElementById("modalActivityApprovalTitle");
@@ -329,7 +325,6 @@ const renderTabledetailActivity = async (listData) => {
   try {
     // setState("dataDetailDraft", dataActivity.data);
     const detailInfo = listData;
-    console.log("detailInfo", detailInfo);
     const contentBody = `
       <div class="row">
         <div class="col-12 ">

@@ -773,6 +773,8 @@ function confirmFunction(title, text) {
 }
 
 async function callOtherRecommendations() {
+  // alert("masok");
+  // return;
   loader(true);
   saveReferenceAttribute();
   const getDataJobDesc = JSON.parse(localStorage.getItem("selectedJobDescReference"));
@@ -782,6 +784,20 @@ async function callOtherRecommendations() {
   const codeNotAvailable = [...new Set(getUniqueCode)];
   const notAvailableList = TEST_1[0].notAvailable || [];
   const dataTugasHARecom = TEST_2;
+  console.log("notAvailableList", notAvailableList);
+  const getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc") || "{}");
+  const dataOtherRecommendation = await getAllRecommendationTaskAndResponsibilities({
+    draftId: getDraftExisting.draftId,
+    jobId: jobId,
+    prlOrg: prlOrg,
+    businessProcessCode: codeNotAvailable,
+  });
+
+  console.log("dataTugasHARecom", dataTugasHARecom);
+  console.log("dataOtherRecommendation", dataOtherRecommendation);
+
+  // return;
+
   localStorage.setItem("dataTugasHARecom", JSON.stringify([]));
   const modalBody = document.getElementById("modalRecomendationBody");
   const cleanObjTugasHARecom = dataTugasHARecom
