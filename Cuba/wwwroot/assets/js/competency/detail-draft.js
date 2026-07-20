@@ -493,8 +493,7 @@ async function handleChangeDetailItemsPerPage(event) {
   const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
   const detailResult = await fetchDetailDraft(queryString);
   console.log("detailResult", detailResult);
-
-  // renderTableActivity(listData);
+  renderTableActivity(detailResult.data);
 }
 
 const inputSearchActivity = async (event) => {

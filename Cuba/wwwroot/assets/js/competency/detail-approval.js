@@ -1,6 +1,5 @@
 const detailApproval = () => {
   const detailApproval = getState("dataDetailApproval");
-  console.log("detailApproval", detailApproval);
   const labelStatus = {
     0: "Draft",
     1: "Approved",
@@ -35,7 +34,10 @@ const detailApproval = () => {
         <label style="color:#9F9FA5">Status</label>
         <label style="font-weight: 600;font-size: 14px">${labelStatus[detailApproval.status] || "-"}</label>
     </div>`;
+    const headerActivity = document.getElementById("header-activity-approval");
     if (detailApproval?.data.length > 0) {
+      if (headerActivity) headerActivity.style.display = "block";
+
       renderTableActivityApproval(detailApproval);
     } else {
       const bodyEmpty = `
@@ -54,24 +56,6 @@ const detailApproval = () => {
 const renderTableActivityApproval = (listData) => {
   try {
     const bodyDetail = `
-        <div class="col-12" style="text-align: left;">
-           <span style="font-size:13px">Activity Type :</span>
-           <button class="btn btn-outline-light btn-rounded" style="width:60px" type="button">
-              All
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Upload
-            </button>
-            <button class="btn btn-outline-light btn-rounded" type="button">
-              Add/Edit Competency to Position
-            </button>
-       </div>
-       <div class="col-4  mt-3" style="text-align: left;">
-          <div class="faq-form">
-                <input class="form-control" type="text" placeholder="Search.."><i class="search-icon"
-                    data-feather="search"></i>
-            </div>
-        </div>
         <div class="col-12 mt-3">
           <div class="table-responsive scrollable" style=" max-height: 350px;">
               <table class="table tbl-border-add-prosbis">
@@ -194,10 +178,10 @@ const renderTableActivityApproval = (listData) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.totalPages < itemsPerPage * listData.currentPage
-          ? listData.totalPages
-          : itemsPerPage * listData.currentPage
-      } of ${listData.totalPages} records</label>
+                listData.totalPages < itemsPerPage * listData.currentPage
+                  ? listData.totalPages
+                  : itemsPerPage * listData.currentPage
+              } of ${listData.totalPages} records</label>
             </div>
           </div>
         `;
@@ -293,34 +277,34 @@ function renderPaginationDetailApproval(currentPage, totalPages) {
 
 async function handleActivityApprovalPageChange(pageNumber) {
   const payloadDetailDraftPage = getState("payloadDetailDraftPage");
-  setState("payloadDetailDraftPage", {
-    ...payloadDetailDraftPage,
-    Page: pageNumber,
-  });
   const payload = {
+    ...payloadDetailDraftPage,
     Page: pageNumber,
     PageSize: payloadDetailDraftPage.PageSize,
   };
-  const dataApproval = getState("dataDetailApproval");
-  const queryString = new URLSearchParams(payload).toString();
-  const listData = await fetchDraftListProsbis(dataApproval.draftId, queryString);
-  renderTableActivityApproval(listData);
+  setState("payloadDetailDraftPage", payload);
+  const dataDetailApproval = getState("dataDetailApproval");
+  const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  console.log("detailResult", detailResult);
+
+  renderTableActivityApproval(detailResult.data);
 }
 async function changeActivityApprovalItemsPerPage(event) {
   const itemsPerPage = parseInt(event.target.value, 10);
   const payloadDetailDraftPage = getState("payloadDetailDraftPage");
-  setState("payloadDetailDraftPage", {
-    ...payloadDetailDraftPage,
-    PageSize: itemsPerPage,
-  });
+
   const payload = {
+    ...payloadDetailDraftPage,
     Page: payloadDetailDraftPage.Page,
     PageSize: itemsPerPage,
   };
-  const dataApproval = getState("dataDetailApproval");
-  const queryString = new URLSearchParams(payload).toString();
-  const listData = await fetchDraftListProsbis(dataApproval.draftId, queryString);
-  renderTableActivityApproval(listData);
+  setState("payloadDetailDraftPage", payload);
+  const dataDetailApproval = getState("dataDetailApproval");
+  const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  console.log("detailResult", detailResult);
+  renderTableActivityApproval(detailResult.data);
 }
 
 const triggleDetailActivityApproval = async (positionCode) => {
@@ -516,4 +500,61 @@ const handleReject = async () => {
       });
     }
   } catch (error) {}
+};
+
+const inputSearchAppChange = async (event) => {
+  const searchValue = event.target.value;
+
+  if (searchValue.length === 0) {
+    const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+    const payload = {
+      ...payloadDetailDraftPage,
+      Page: 1,
+      PageSize: payloadDetailDraftPage.PageSize,
+      Search: "",
+    };
+    setState("payloadDetailDraftPage", payload);
+    const dataDetailApproval = getState("dataDetailApproval");
+    const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
+    const detailResult = await fetchDetailDraft(queryString);
+
+    renderTableActivityApproval(detailResult.data);
+    return;
+  }
+
+  if (searchValue.length < 3) {
+    return;
+  }
+
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: 1,
+    PageSize: payloadDetailDraftPage.PageSize,
+    Search: searchValue,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDetailApproval = getState("dataDetailApproval");
+  const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  renderTableActivityApproval(detailResult.data);
+};
+
+const handleAppChange = async (event) => {
+  if (!event?.target?.value) return;
+  const selectedValue = event.target.value;
+  const payloadDetailDraftPage = getState("payloadDetailDraftPage");
+  const payload = {
+    ...payloadDetailDraftPage,
+    Page: 1,
+    PageSize: payloadDetailDraftPage.PageSize,
+    filter: selectedValue,
+  };
+  setState("payloadDetailDraftPage", payload);
+  const dataDetailApproval = getState("dataDetailApproval");
+  const queryString = `${dataDetailApproval.draftId}?` + new URLSearchParams(payload).toString();
+  const detailResult = await fetchDetailDraft(queryString);
+  renderTableActivityApproval(detailResult.data);
 };
