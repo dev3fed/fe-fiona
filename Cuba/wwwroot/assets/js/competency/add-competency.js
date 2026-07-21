@@ -69,17 +69,17 @@ const openSpecificCompetency = async () => {
     </div>
   `;
 
-  const bodyJobRef = `
-  <label class="form-label">Position Reference</label>
-    <select class="form-select digits" name="jobIdRef" id="jobIdRef" onchange="onSelectPositionRefer(event)">
-    </select>
-  `;
-
+  // const bodyJobRef = `
+  // <label class="form-label">Position Reference</label>
+  //   <select class="form-select digits" name="jobIdRef" id="jobIdRef" onchange="onInputPositionName(event)">
+  //   </select>
+  // `;
+  console.log("specificCompe", specificCompe);
   const bodySelectSpecific = `
   <div class="row">
     <div class="col-12 mt-3 mb-3">
       <label>Competency</label>
-      <select class="form-select digits" name="competencyId" id="competencyId" onchange="onSelectCompetency(event)"></select>
+      <select class="form-select digits" name="competencyId" id="competencyId" onchange="onSelectCompetency(event)" ${specificCompe.length >= 9 ? "disabled" : ""}></select>
     </div>
     <div id="sg-ssg-info" class="col-12" style="display:none;">
       <label style="color:#03a9f4; cursor:pointer;" 
@@ -113,8 +113,10 @@ const openSpecificCompetency = async () => {
   `;
 
   cardSelectedCompetency(specificCompe);
+  cardSelectedCompeRef(specificCompe);
+  disabledElementSelect2(specificCompe);
   document.getElementById("select-speccompe").innerHTML = bodySelectSpecific;
-  document.getElementById("comperef").innerHTML = bodyJobRef;
+  // document.getElementById("comperef").innerHTML = bodyJobRef;
 
   const bodyContent = document.getElementById("form-competency");
   if (bodyContent) {
@@ -182,6 +184,78 @@ function updateRadioButtonState() {
   updateButtonStateBySelectsAndCompetency();
 }
 
+async function cardSelectedCompeRef(competencyList) {
+  try {
+    let specificCompe = [];
+    let specificCount = 0;
+    console.log("competencyList", competencyList);
+    if (competencyList.length > 0) {
+      specificCompe = competencyList;
+      specificCount = specificCompe.length;
+    }
+
+    const specificContent =
+      specificCount > 0
+        ? `
+        <div class="table-responsive scrollable-tbl" style="max-height: 275px;">
+          <table class="table tbl-border">
+            <thead style="background-color: #006CA9;">
+              <tr>
+                <th scope="col" style="width: 50px; text-align: center;">No</th>
+                <th scope="col">Competency</th>
+                <th scope="col" style="width: 50px;">Level</th>
+                <th scope="col" style="width: 60px;">Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${specificCompe
+                .map(
+                  (item, index) => `
+                <tr>
+                  <td style="text-align: center;">${index + 1}</td>
+                  <td>${item.compeName}</td>
+                  <td style="text-align: center;">${item.selectedLvl}</td>
+                  <td style="text-align: center;">
+                     <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeCompeRef('${
+                       item.compeId
+                     }')">
+                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
+                      </button>
+                  </td>
+                </tr>
+              `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      `
+        : `
+        <div class="col-12">
+          <div class="competency-box">
+            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
+            <span class="desc">Selected specific competency will appear here</span>
+          </div>
+        </div>
+      `;
+
+    const bodySelectedCompe = `
+      <div class="competency-section ">
+        <!-- Specific -->
+        <div class="row mb-2  ">
+          <div class="col-12">
+            <label style="font-weight: bold;margin-top:8px">Specific (${specificCount}/9)</label>
+          </div>
+          ${specificContent}
+        </div>
+      </div>
+    `;
+
+    document.getElementById("selected-comperef").innerHTML = bodySelectedCompe;
+  } catch (error) {
+    console.error("Error in cardSelectedCompetency:", error);
+  }
+}
 async function cardSelectedCompetency(competencyList) {
   try {
     let specificCompe = [];
@@ -195,13 +269,13 @@ async function cardSelectedCompetency(competencyList) {
     const specificContent =
       specificCount > 0
         ? `
-        <div class="table-responsive scrollable-tbl" style="max-height: 420px;">
+        <div class="table-responsive scrollable-tbl" style="max-height: 320px;">
           <table class="table tbl-border">
             <thead style="background-color: #006CA9;">
               <tr>
                 <th scope="col" style="width: 50px; text-align: center;">No</th>
                 <th scope="col">Competency</th>
-                <th scope="col" style="width: 130px;">Proficiency Level</th>
+                <th scope="col" style="width: 50px;">Level</th>
                 <th scope="col" style="width: 60px;">Remove</th>
               </tr>
             </thead>
@@ -238,9 +312,9 @@ async function cardSelectedCompetency(competencyList) {
       `;
 
     const bodySelectedCompe = `
-      <div class="competency-section">
+      <div class="competency-section ">
         <!-- Specific -->
-        <div class="row mb-2">
+        <div class="row mb-2  ">
           <div class="col-12">
             <label>Specific (${specificCount}/9)</label>
           </div>
@@ -254,6 +328,7 @@ async function cardSelectedCompetency(competencyList) {
     console.error("Error in cardSelectedCompetency:", error);
   }
 }
+
 function updateButtonStateBySelectsAndCompetency() {
   // const sgId = $("#sgId").val();
   // const ssgId = $("#ssgId").val();
@@ -325,13 +400,40 @@ $(document).on("change", 'input[name="optType"]', function () {
   updateButtonStateBySelectsAndCompetency();
 });
 
-async function removeCompetency(compeId) {
+async function removeCompeRef(compeId) {
   const competencyList = getState("payloadAddCompetency") || [];
-  const updatedList = competencyList.filter((item) => item.compeId !== compeId);
+  const updatedList = competencyList
+    .filter((item) => item.selectedType === "specific")
+    .filter((item) => item.compeId !== compeId);
   setState("payloadAddCompetency", updatedList);
-  console.log("compeId", compeId);
+  disabledElementSelect2(updatedList);
+  cardSelectedCompeRef(updatedList);
   cardSelectedCompetency(updatedList);
   updateRadioButtonState();
+}
+async function removeCompetency(compeId) {
+  const competencyList = getState("payloadAddCompetency") || [];
+  const updatedList = competencyList
+    .filter((item) => item.selectedType === "specific")
+    .filter((item) => item.compeId !== compeId);
+  setState("payloadAddCompetency", updatedList);
+  disabledElementSelect2(updatedList);
+  cardSelectedCompeRef(updatedList);
+  cardSelectedCompetency(updatedList);
+  updateRadioButtonState();
+}
+function disabledElementSelect2(updatedList) {
+  const competencyIdElement = document.getElementById("competencyId");
+  const inputSearchref = document.getElementById("search-position-ref");
+  if (competencyIdElement) {
+    if (updatedList.length >= 9) {
+      competencyIdElement.disabled = true;
+      inputSearchref.disabled = true;
+    } else {
+      competencyIdElement.disabled = false;
+      inputSearchref.disabled = false;
+    }
+  }
 }
 function selectJobReference() {
   let $select = $("#dataSource-rasci");
@@ -383,12 +485,13 @@ const handleRadioChange = (event) => {
   // cardSelectedCompetency([]);
   // updateRadioButtonState();
   if (value === "reference") {
-    $("#comperef").show();
+    // $("#comperef").show();
+    $("#card-positionlistref").show();
     $("#specCompe, #selectedcompe").hide();
   } else if (value === "nonReference") {
     jobSelect.val(null).trigger("change");
-    $("#table-comperef").hide();
-    $("#comperef").hide();
+    $("#card-positionlistref").hide();
+    // $("#comperef").hide();
     $("#specCompe, #selectedcompe").show();
   }
 };
@@ -520,155 +623,288 @@ function selectSkillGroup() {
     });
 }
 
-const onSelectPositionRefer = async (event) => {
-  const dataSource = $("#dataSource-competency").val();
-  const idPosition = event.target.value || null;
-  const fullText = event.target?.options[event.target.selectedIndex]?.text;
-  const positionName = fullText?.includes("(")
-    ? fullText.substring(fullText.indexOf("(") + 1, fullText.indexOf(")")).trim()
-    : fullText;
-  console.log("positionName", positionName);
-
-  console.log("idPosition", idPosition);
+const searchPositionRef = async (value) => {
   try {
-    const payload = {
-      dataSource: dataSource,
-      page: 1,
-      pageSize: 999,
-      jobCode: [idPosition],
-    };
-    const result = await fetchCompetencyReference(payload);
-    const competencyList = result?.data?.level || [];
-    console.log("first", competencyList);
-    if (competencyList.length > 0) {
-      const elementComperef = document.getElementById("table-comperef");
-      elementComperef.style.display = "block";
-      console.log("competencyList", competencyList);
-      const dataMandatory = competencyList.filter((item) => item.compType.toLowerCase() === "mandatory");
-      const dataGeneral = competencyList.filter((item) => item.compType.toLowerCase() === "general");
-      const dataSpecific = competencyList.filter((item) => item.compType.toLowerCase() === "specific");
-      console.log("dataMandatory", dataMandatory);
-      console.log("dataGeneral", dataGeneral);
-      console.log("dataSpecific", dataSpecific);
-      const bodyTableCompeRef = `
-      <label class="form-label">Technical Competencies of ${positionName}</label>
-                        <div class="card-tablebusinessreference">
-                            <div class="row">
-                                <div class="col-4">
-                                    <h6 style="font-weight: bold;">Mandatory</h6>
-                                    <table class="mt-2 mb-3 table tbl-border">
-                                        <thead>
-                                         <tr>
-                                         <th scope="col" style="width: 40px;text-align:center">
-                                         <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllMandatory(this)">
-                                         </th>
-                                          <th scope="col" style="width: 40px;text-align:center">No</th>
-                                          <th scope="col" style="width: 200px">Competency</th>
-                                         <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        ${dataMandatory
-                                          .map(
-                                            (item, index) => `
-                                            <tr>
-                                                <td style="text-align:center">
-                                                  <input type="checkbox" class="form-check-input" name="mandatoryCompeRef" value="${
-                                                    item.id || item.compCode
-                                                  }" onclick="singleSelectMandatory(this)">
-                                                </td>
-                                                <td style="text-align:center">${index + 1}</td>
-                                                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
-                                                  item.compName
-                                                }</td>
-                                                <td style="text-align:center">${item.proficiencyLevel}</td>
-                                            </tr>
-                                        `,
-                                          )
-                                          .join("")}
+    const dataSource = $("#dataSource-competency").val();
+    const positionName = value || null;
 
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="col-4">
-                                    <h6 style="font-weight: bold;">General</h6>
-                                    <table class="mt-2 mb-3 table tbl-border">
-                                        <thead>
-                                        <tr>
-                                        <th scope="col" style="width: 40px;text-align:center">
-                                        <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllGeneral(this)">
-                                        </th>
-                                          <th scope="col" style="width: 40px;text-align:center">No</th>
-                                          <th scope="col" style="width: 200px">Competency</th>
-                                          <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        ${dataGeneral
-                                          .map(
-                                            (item, index) => `
-                                            <tr>
-                                                <td style="text-align:center">
-                                                  <input type="checkbox" class="form-check-input" name="generalCompeRef" value="${
-                                                    item.id || item.compCode
-                                                  }" onclick="singleSelectGeneral(this)">
-                                                </td>
-                                                <td style="text-align:center">${index + 1}</td>
-                                                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
-                                                  item.compName
-                                                }</td>
-                                                <td style="text-align:center">${item.proficiencyLevel}</td>
-                                            </tr>
-                                        `,
-                                          )
-                                          .join("")}
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="col-4 ">
-                                    <h6 style="font-weight: bold;">Specific</h6>
-                                    <table class="mt-2 mb-3 table tbl-border">
-                                        <thead>
-                                        <tr>
-                                        <th scope="col" style="width: 40px;text-align:center">
-                                        <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllSpecific(this)">
-                                        </th>
-                                          <th scope="col" style="width: 40px;text-align:center">No</th>
-                                          <th scope="col" style="width: 200px">Competency</th>
-                                          <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        ${dataSpecific
-                                          .map(
-                                            (item, index) => `
-                                            <tr>
-                                                <td style="text-align:center">
-                                                  <input type="checkbox" class="form-check-input" name="specificCompeRef" value="${
-                                                    item.id || item.compCode
-                                                  }" onclick="singleSelectSpecific(this)"> 
-                                                </td>
-                                                <td style="text-align:center">${index + 1}</td>
-                                                <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
-                                                  item.compName
-                                                }</td>
-                                                <td style="text-align:center">${item.proficiencyLevel}</td>
-                                            </tr>
-                                        `,
-                                          )
-                                          .join("")}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>`;
-      elementComperef.innerHTML = bodyTableCompeRef;
+    // Handle when input is cleared
+    if (!positionName || positionName.trim() === "") {
+      $("#position-ref-list").hide();
+      $("#default-position-ref").show();
+      return;
     }
+
+    // Validate minimum length
+    if (positionName.length < 4) return;
+
+    const payload = {
+      draftId: dataSource,
+      search: positionName,
+      type: "position",
+    };
+    const queryString = "?" + new URLSearchParams(payload).toString();
+    const result = await fetchUtilitiesPosition(queryString);
+    $("#position-ref-list").show();
+    $("#default-position-ref").hide();
+    const positionRefList = $("#position-ref-list");
+
+    const positions = result.data.result || [];
+
+    if (positions.length === 0) {
+      positionRefList.html(`
+        <div class="position-ref-item" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <span class="icon" ><img src="/assets/images/competency/magnifer.svg" style="width: 32px; height: 32px;"></span>
+          <div style="font-weight: 600; color: #999; text-align: center; padding: 12px;">
+            Data not found
+          </div>
+        </div>
+      `);
+      return;
+    }
+
+    const positionHTML = positions
+      .map(
+        (item) => `
+      <div class="position-ref-item" onclick="onInputPositionName('${item.id}', '${item.text}')">
+        <div style="font-weight: 600; color: #03A9F4; margin-bottom: 4px;">
+          ${item.text}
+        </div>
+        <div style="font-size: 12px; color: #999;">
+          -
+        </div>
+      </div>
+    `,
+      )
+      .join("");
+
+    positionRefList.html(positionHTML);
+    // const payload = {
+    //   dataSource: dataSource,
+    //   page: 1,
+    //   pageSize: 999,
+    // };
+    // const result = await fetchCompetencyReference(payload);
+    // const competencyList = result?.data?.level || [];
+    // console.log("first", competencyList);
+    // if (competencyList.length > 0) {
+    //   const elementComperef = document.getElementById("table-comperef");
+    //   elementComperef.style.display = "block";
+    //   console.log("competencyList", competencyList);
+    //   const dataMandatory = competencyList.filter((item) => item.compType.toLowerCase() === "mandatory");
+    //   const dataGeneral = competencyList.filter((item) => item.compType.toLowerCase() === "general");
+    //   const dataSpecific = competencyList.filter((item) => item.compType.toLowerCase() === "specific");
+    //   console.log("dataMandatory", dataMandatory);
+    //   console.log("dataGeneral", dataGeneral);
+    //   console.log("dataSpecific", dataSpecific);
+    //   const bodyTableCompeRef = `
+    //   <label class="form-label">Technical Competencies of ${positionName}</label>
+    //                     <div class="card-tablebusinessreference">
+    //                         <div class="row">
+    //                             <div class="col-4">
+    //                                 <h6 style="font-weight: bold;">Mandatory</h6>
+    //                                 <table class="mt-2 mb-3 table tbl-border">
+    //                                     <thead>
+    //                                      <tr>
+    //                                      <th scope="col" style="width: 40px;text-align:center">
+    //                                      <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllMandatory(this)">
+    //                                      </th>
+    //                                       <th scope="col" style="width: 40px;text-align:center">No</th>
+    //                                       <th scope="col" style="width: 200px">Competency</th>
+    //                                      <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+    //                                     </tr>
+    //                                     </thead>
+    //                                     <tbody>
+    //                                     ${dataMandatory
+    //                                       .map(
+    //                                         (item, index) => `
+    //                                         <tr>
+    //                                             <td style="text-align:center">
+    //                                               <input type="checkbox" class="form-check-input" name="mandatoryCompeRef" value="${
+    //                                                 item.id || item.compCode
+    //                                               }" onclick="singleSelectMandatory(this)">
+    //                                             </td>
+    //                                             <td style="text-align:center">${index + 1}</td>
+    //                                             <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
+    //                                               item.compName
+    //                                             }</td>
+    //                                             <td style="text-align:center">${item.proficiencyLevel}</td>
+    //                                         </tr>
+    //                                     `,
+    //                                       )
+    //                                       .join("")}
+    //                                     </tbody>
+    //                                 </table>
+    //                             </div>
+    //                             <div class="col-4">
+    //                                 <h6 style="font-weight: bold;">General</h6>
+    //                                 <table class="mt-2 mb-3 table tbl-border">
+    //                                     <thead>
+    //                                     <tr>
+    //                                     <th scope="col" style="width: 40px;text-align:center">
+    //                                     <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllGeneral(this)">
+    //                                     </th>
+    //                                       <th scope="col" style="width: 40px;text-align:center">No</th>
+    //                                       <th scope="col" style="width: 200px">Competency</th>
+    //                                       <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+    //                                     </tr>
+    //                                     </thead>
+    //                                     <tbody>
+    //                                     ${dataGeneral
+    //                                       .map(
+    //                                         (item, index) => `
+    //                                         <tr>
+    //                                             <td style="text-align:center">
+    //                                               <input type="checkbox" class="form-check-input" name="generalCompeRef" value="${
+    //                                                 item.id || item.compCode
+    //                                               }" onclick="singleSelectGeneral(this)">
+    //                                             </td>
+    //                                             <td style="text-align:center">${index + 1}</td>
+    //                                             <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
+    //                                               item.compName
+    //                                             }</td>
+    //                                             <td style="text-align:center">${item.proficiencyLevel}</td>
+    //                                         </tr>
+    //                                     `,
+    //                                       )
+    //                                       .join("")}
+    //                                     </tbody>
+    //                                 </table>
+    //                             </div>
+    //                             <div class="col-4 ">
+    //                                 <h6 style="font-weight: bold;">Specific</h6>
+    //                                 <table class="mt-2 mb-3 table tbl-border">
+    //                                     <thead>
+    //                                     <tr>
+    //                                     <th scope="col" style="width: 40px;text-align:center">
+    //                                     <input type="checkbox" class="form-check-input"  onclick="toggleSelectAllSpecific(this)">
+    //                                     </th>
+    //                                       <th scope="col" style="width: 40px;text-align:center">No</th>
+    //                                       <th scope="col" style="width: 200px">Competency</th>
+    //                                       <th scope="col" style="width: 150px;text-align:center">Proficiency Level</th>
+    //                                     </tr>
+    //                                     </thead>
+    //                                     <tbody>
+    //                                     ${dataSpecific
+    //                                       .map(
+    //                                         (item, index) => `
+    //                                         <tr>
+    //                                             <td style="text-align:center">
+    //                                               <input type="checkbox" class="form-check-input" name="specificCompeRef" value="${
+    //                                                 item.id || item.compCode
+    //                                               }" onclick="singleSelectSpecific(this)">
+    //                                             </td>
+    //                                             <td style="text-align:center">${index + 1}</td>
+    //                                             <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${
+    //                                               item.compName
+    //                                             }</td>
+    //                                             <td style="text-align:center">${item.proficiencyLevel}</td>
+    //                                         </tr>
+    //                                     `,
+    //                                       )
+    //                                       .join("")}
+    //                                     </tbody>
+    //                                 </table>
+    //                             </div>
+    //                         </div>
+    //                     </div>`;
+    //   elementComperef.innerHTML = bodyTableCompeRef;
+    // }
   } catch (error) {
     console.error("Error fetching competency reference:", error);
   }
 };
+const onInputPositionName = async (id, name) => {
+  const dataSource = $("#dataSource-competency").val();
+  const payload = {
+    dataSource: dataSource,
+    page: 1,
+    pageSize: 999,
+    jobCode: [id],
+  };
+  const result = await fetchCompetencyReference(payload);
+  const competencyList = result?.data?.level || [];
+  const updatedList = competencyList.filter((item) => item.compType === "specific");
+
+  console.log("first", updatedList);
+
+  document.getElementById("position-comperef-default").style.display = "none";
+  document.getElementById("position-comperef").style.display = "block";
+};
+
+async function cardListpositionComperef(competencyList) {
+  try {
+    let specificCompe = [];
+    let specificCount = 0;
+    console.log("competencyList", competencyList);
+    if (competencyList.length > 0) {
+      specificCompe = competencyList;
+      specificCount = specificCompe.length;
+    }
+
+    const specificContent =
+      specificCount > 0
+        ? `
+        <div class="table-responsive scrollable-tbl" style="max-height: 275px;">
+          <table class="table tbl-border">
+            <thead style="background-color: #006CA9;">
+              <tr>
+                <th scope="col" style="width: 50px; text-align: center;">No</th>
+                <th scope="col">Competency</th>
+                <th scope="col" style="width: 50px;">Level</th>
+                <th scope="col" style="width: 60px;">Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${specificCompe
+                .map(
+                  (item, index) => `
+                <tr>
+                  <td style="text-align: center;">${index + 1}</td>
+                  <td>${item.compeName}</td>
+                  <td style="text-align: center;">${item.selectedLvl}</td>
+                  <td style="text-align: center;">
+                     <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeCompeRef('${
+                       item.compeId
+                     }')">
+                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
+                      </button>
+                  </td>
+                </tr>
+              `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      `
+        : `
+        <div class="col-12">
+          <div class="competency-box">
+            <span class="icon"><img src="/assets/images/competency/vector.svg"></span>
+            <span class="desc">Selected specific competency will appear here</span>
+          </div>
+        </div>
+      `;
+
+    const bodyPositionComperef = `
+      <div class="competency-section ">
+        <!-- Specific -->
+        <div class="row mb-2  ">
+          <div class="col-12">
+            <label style="font-weight: bold;margin-top:8px">Specific (${specificCount}/9)</label>
+          </div>
+          ${specificContent}
+        </div>
+      </div>
+    `;
+
+    document.getElementById("position-comperef").innerHTML = bodyPositionComperef;
+  } catch (error) {
+    console.error("Error in cardSelectedCompetency:", error);
+  }
+}
+
 const toggleSelectAllMandatory = (source) => {
   const checkboxes = document.getElementsByName("mandatoryCompeRef");
   const payloadAddCompetency = getState("payloadAddCompetency") || [];
@@ -881,7 +1117,6 @@ async function triggleSelectCompe() {
   const compeId = selectedCompe.val();
   const CompeName = selectedCompe.find(":selected").text();
   const selectedLvl = $('input[name="optLvl"]:checked').val();
-  // const selectedType = $('input[name="optType"]:checked').val();
   const payloadAddCompetency = getState("payloadAddCompetency");
   const btnSelectedCompe = document.getElementById("btn-selectedCompe");
   const jobInformation = getState("jobInformation");
@@ -889,14 +1124,21 @@ async function triggleSelectCompe() {
     compeId: compeId,
     compeName: CompeName,
     selectedLvl: selectedLvl,
-    // selectedType: selectedType,
+    selectedType: "specific",
     unitCode: jobInformation.unitCode,
     prlOrg: jobInformation.prlOrg,
   };
-  const sentData = [...payloadAddCompetency, dataSelectedCompe];
+  const updatedList = payloadAddCompetency
+    .filter((item) => item.selectedType === "specific")
+    .filter((item) => item.compeId !== compeId);
+  console.log("payloadAddCompetency", payloadAddCompetency);
+  console.log("dataSelectedCompe", dataSelectedCompe);
+  const sentData = [...updatedList, dataSelectedCompe];
   setState("payloadAddCompetency", sentData);
+  cardSelectedCompeRef(sentData);
   cardSelectedCompetency(sentData);
   updateRadioButtonState();
+  disabledElementSelect2(sentData);
   $("#competencyId").val(null).trigger("change");
   $('input[name="optLvl"]').prop("checked", false);
   $('input[name="optType"]').prop("checked", false);
@@ -907,11 +1149,13 @@ async function triggleSelectCompe() {
 function closeModalCompetency() {
   const jobSelect = $("#jobIdRef");
   jobSelect.val(null).trigger("change");
-  $("#table-comperef").hide();
-  $("#comperef").hide();
+  $("#card-positionlistref").hide();
+  // $("#comperef").hide();
   $("#specCompe, #selectedcompe").show();
   setState("payloadAddCompetency", []);
+  cardSelectedCompeRef([]);
   cardSelectedCompetency([]);
+  disabledElementSelect2([]);
   updateRadioButtonState();
 }
 
@@ -922,13 +1166,14 @@ const handleSaveDraftCompe = async () => {
     const modalAddCompetency = document.getElementById("modalAddCompetency");
     const modal = bootstrap.Modal.getInstance(modalAddCompetency);
     const jobInformation = getState("jobInformation");
+
     if (spinBtn) spinBtn.style.display = "inline-block";
     const payload = {
       draftId: $("#dataSource-competency").val() || null,
       data: [
         {
-          unitCode: payloadAddCompetency[0]?.unitCode || "",
-          prlOrg: payloadAddCompetency[0]?.prlOrg || "",
+          unitCode: jobInformation.unitCode || "",
+          prlOrg: jobInformation.prlOrg || "",
           competency: payloadAddCompetency.map((item) => ({
             compCode: item.compeId,
             level: item.selectedLvl,
@@ -959,6 +1204,7 @@ const handleSaveDraftCompe = async () => {
       }).then(async () => {
         setTimeout(() => {
           handleSearchCompetency();
+          closeModalCompetency();
           if (modal) modal.hide();
           spinBtn.style.display = "none";
         }, 200);

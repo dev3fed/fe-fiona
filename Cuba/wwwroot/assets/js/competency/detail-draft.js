@@ -493,8 +493,7 @@ async function handleChangeDetailItemsPerPage(event) {
   const queryString = `${dataDraft.draftId}?` + new URLSearchParams(payload).toString();
   const detailResult = await fetchDetailDraft(queryString);
   console.log("detailResult", detailResult);
-
-  // renderTableActivity(listData);
+  renderTableActivity(detailResult.data);
 }
 
 const inputSearchActivity = async (event) => {
@@ -557,4 +556,17 @@ const handleActivityTypeChange = async (event) => {
   const detailResult = await fetchDetailDraft(queryString);
   console.log("detailResult", detailResult);
   renderTableActivity(detailResult.data);
+};
+const exportDraftcompe = async () => {
+  const dataDraft = getState("dataDetailDraft");
+  const loader = document.getElementById("loadingExportDraftcompe");
+  loader.style.display = "flex";
+  try {
+    const result = await fetchExportDraftcompe(dataDraft.draftId);
+    if (result.success) {
+      loader.style.display = "none";
+    } else {
+      loader.style.display = "none";
+    }
+  } catch (error) {}
 };

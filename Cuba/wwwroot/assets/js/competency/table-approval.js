@@ -394,6 +394,8 @@ function handleApprovalBack() {
   const headerCompetency = document.getElementById("header-competency");
   const headerDetail = document.getElementById("header-detail-approval");
   const approvalInfo = document.getElementById("info-approval");
+  const headerActivity = document.getElementById("header-activity-approval");
+  if (headerActivity) headerActivity.style.display = "none";
   setState("detailApproval", {});
   if (approvalInfo) approvalInfo.innerHTML = "";
   const emptyActivity = document.getElementById("empty-activityapproval");

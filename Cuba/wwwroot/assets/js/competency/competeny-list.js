@@ -446,7 +446,9 @@ const handleExportCompetency = async () => {
     const filteredPayload = Object.fromEntries(
       Object.entries(payload).filter(([_, value]) => value !== "" && value !== null && value !== undefined),
     );
+    console.log("filteredPayload", filteredPayload);
     const queryString = "/" + payloadJob.dataSource + "?" + new URLSearchParams(filteredPayload).toString();
+    console.log("queryString", queryString);
     const result = await fetchExportCompetencyMatrix(queryString);
     if (result.success) {
       loader.style.display = "none";

@@ -25,11 +25,11 @@ async function triggleDetailJob(val) {
     const JobName = `${val.positionName}`;
     const cardAttribute = `
        <div class="col-2" style="text-align: left; border-right: 1px solid #BFBFC2;">
-            <label style="color: #9F9FA5; display: block;">ID Org Unit</label>
+            <label style="color: #9F9FA5; display: block;">ID Organization Unit</label>
             <label style="font-weight: 600; font-size: 14px">${unit?.unitCode || "-"}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block">Org Unit</label>
+          <label style="color:#9F9FA5;display: block">Organization Unit</label>
           <label style="font-weight: 600;font-size: 14px">${unit?.unitName || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -44,11 +44,11 @@ async function triggleDetailJob(val) {
             <hr style="margin-right: 10px">
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block;">ID Org Unit Parent</label>
+          <label style="color:#9F9FA5;display: block;">ID Organization Unit Parent</label>
           <label style="font-weight: 600;font-size: 14px">${unit.unitParentCode || "-"}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block">Org Unit Parent</label>
+          <label style="color:#9F9FA5;display: block">Organization Unit Parent</label>
           <label style="font-weight: 600;font-size: 14px">${unit.unitParentName || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -64,7 +64,7 @@ async function triggleDetailJob(val) {
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Directorate</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.directorate.directorateName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${"-"}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Function</label>
