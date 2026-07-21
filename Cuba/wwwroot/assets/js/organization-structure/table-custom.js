@@ -53,7 +53,7 @@ function getTablePositionList(dataSet, status) {
         },
       },
       {
-        title: "PRL Org",
+        title: "Job Grade",
         width: "15%",
         data: null,
         render: function (data) {
@@ -113,7 +113,7 @@ function getTablePositionDetail(dataSet) {
       //   data: "careerLevel",
       // },
       // {
-      //   title: "PRL Org",
+      //   title: "Job Grade",
       //   width: "15%",
       //   data: "prlOrgToSubPos",
       // },
@@ -180,7 +180,7 @@ function getTableSubordinateList(dataSet) {
         data: "positionName",
       },
       {
-        title: "PRL Org",
+        title: "Job Grade",
         width: "10%",
         data: "prlOrg",
       },

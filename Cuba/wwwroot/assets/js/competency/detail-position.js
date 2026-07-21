@@ -16,7 +16,7 @@ const modalInfoPosition = async (code, prl) => {
         const positionName = `
         <span style="font-weight: bold;margin-bottom:5px">${detailInformation.positionName}</span> <br/>
          <small style="color:#9F9FA5">
-            PRL Org: ${detailInformation.prlOrg},Formation Total : ${detailInformation.formation}
+            Job Grade: ${detailInformation.prlOrg},Formation Total : ${detailInformation.formation}
          </small>
         `;
         const bodyInfo = `
@@ -221,7 +221,7 @@ const modalInfoPosition = async (code, prl) => {
             <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.incumbentEmployeeName || "-"}</label><br/>
         </div>
         <div class="col-6">
-            <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
+            <label style="color:#9F9FA5;fonti-size:12px">Person Grade</label><br/>
             <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.prl || "-"}</label><br/>
         </div>
 `;

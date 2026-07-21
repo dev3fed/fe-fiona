@@ -1219,7 +1219,7 @@ async function getRangePrlSubPosition() {
   const prlOrgFrom = $("#selectPrlOrg").val();
   const prlOrgTo = $("#selectPrlOrgTo").val();
   if (!prlOrgFrom || !prlOrgTo) {
-    swal("Error", "Please select PRL Org and PRL Org To 2", "error");
+    swal("Error", "Please select Job Grade and Job Grade To 2", "error");
     return;
   }
 
@@ -1496,7 +1496,8 @@ async function modalJobPopup(params) {
   $("#modalDirectReportId").text(checkValue(data.parentPositionCode));
   $("#modalDirectReportName").text(checkValue(data.parentPositionName));
 
-  $("#modalDirectorate").text(checkValue(data?.directorateName));
+  // $("#modalDirectorate").text(checkValue(data?.directorateName));
+  $("#modalDirectorate").text(checkValue("-"));
   $("#modalFunction").text(checkValue(data?.functionName));
   $("#modalDivision").text(checkValue(data?.divisionName));
   $("#modalSubDivision").text(checkValue(data?.subDivisionName));

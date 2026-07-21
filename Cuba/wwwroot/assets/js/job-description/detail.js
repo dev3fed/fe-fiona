@@ -40,7 +40,7 @@ function refreshDataLocalStorage() {
 /**
  * Prepares job description data from localStorage for saving as draft
  * @param {string} jobId - The job ID
- * @param {string} prlOrg - The PRL organization value
+ * @param {string} prlOrg - The Job Gradeanization value
  * @param {Object} paramsSaveDraft - The base parameters object for saving draft
  * @returns {Object} The prepared parameters object ready for API submission
  */
