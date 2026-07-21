@@ -203,9 +203,14 @@
                             <img src="/assets/images/icon_import.svg" alt="Filter Icon" style="margin-top: -5px;">
                             Import
                         </button>
-                        <button class="btn btn-primary" type="button">
-                            <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
-                            Export
+                        <button id="btnExportDraftcompe" class="btn btn-primary" type="button"
+                                onclick="exportDraftcompe()">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                     id="loadingExportDraftcompe" role="status"></div>
+                                <img src="/assets/images/icon_export.svg" alt="Filter Icon" style="margin-top: -5px;">
+                                <span class="btn-text">Export</span>
+                            </div>
                         </button>
                     </div>
                 </div>

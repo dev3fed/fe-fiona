@@ -16,16 +16,16 @@ const modalInfoPosition = async (code, prl) => {
         const positionName = `
         <span style="font-weight: bold;margin-bottom:5px">${detailInformation.positionName}</span> <br/>
          <small style="color:#9F9FA5">
-            PRL Org: ${detailInformation.prlOrg},Formation Total : ${detailInformation.formation}
+            PRL Organization: ${detailInformation.prlOrg},Formation Total : ${detailInformation.formation}
          </small>
         `;
         const bodyInfo = `
         <div class="col-2" style="text-align: left; border-right: 1px solid #BFBFC2;">
-            <label style="color: #9F9FA5; display: block;">ID Org Unit</label>
+            <label style="color: #9F9FA5; display: block;">ID Organization Unit</label>
             <label style="font-weight: 600; font-size: 14px">${detailInformation.unitCode}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block">Org Unit</label>
+          <label style="color:#9F9FA5;display: block">Organization Unit</label>
           <label style="font-weight: 600;font-size: 14px">${detailInformation.unitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -40,11 +40,11 @@ const modalInfoPosition = async (code, prl) => {
             <hr style="margin-right: 10px">
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block;">ID Org Unit Parent</label>
+          <label style="color:#9F9FA5;display: block;">ID Organization Unit Parent</label>
           <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitCode}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block">Org Unit Parent</label>
+          <label style="color:#9F9FA5;display: block">Organization Unit Parent</label>
           <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -64,7 +64,7 @@ const modalInfoPosition = async (code, prl) => {
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Directorate</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInformation.directorate}</label>
+          <label style="font-weight: 600;font-size: 14px">-</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Function</label>
@@ -221,7 +221,7 @@ const modalInfoPosition = async (code, prl) => {
             <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.incumbentEmployeeName || "-"}</label><br/>
         </div>
         <div class="col-6">
-            <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
+            <label style="color:#9F9FA5;fonti-size:12px">Person Grade</label><br/>
             <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbents[0]?.prl || "-"}</label><br/>
         </div>
 `;

@@ -594,7 +594,6 @@ async function fetchExportCompetencyMatrix(payload) {
     const response = await $.ajax({
       url,
       type: "GET",
-      data: JSON.stringify(payload),
       contentType: "application/json",
       xhrFields: {
         responseType: "blob",
@@ -649,6 +648,47 @@ async function fetchExportSgSsg(payload) {
       success: false,
       error: error?.responseJSON?.message || "Error exporting file",
     };
+  }
+}
+
+async function fetchExportDraftcompe(draftId) {
+  const url = `${url_api}/api/DataCompetency/export-to-excel/${draftId}`;
+  try {
+    const response = await $.ajax({
+      url,
+      type: "GET",
+      xhrFields: {
+        responseType: "blob",
+      },
+    });
+
+    // Create a link to download the file
+    const blob = new Blob([response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    link.download = `draft-competency-${timestamp}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON?.message || "Error exporting file",
+    };
+  }
+}
+
+async function fetchUtilitiesPosition(payload) {
+  const url = `${url_api}/api/Utilities/selection${payload}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching data from API");
+    throw error;
   }
 }
 

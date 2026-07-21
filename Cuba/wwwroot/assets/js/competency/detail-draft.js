@@ -557,3 +557,16 @@ const handleActivityTypeChange = async (event) => {
   console.log("detailResult", detailResult);
   renderTableActivity(detailResult.data);
 };
+const exportDraftcompe = async () => {
+  const dataDraft = getState("dataDetailDraft");
+  const loader = document.getElementById("loadingExportDraftcompe");
+  loader.style.display = "flex";
+  try {
+    const result = await fetchExportDraftcompe(dataDraft.draftId);
+    if (result.success) {
+      loader.style.display = "none";
+    } else {
+      loader.style.display = "none";
+    }
+  } catch (error) {}
+};

@@ -18,24 +18,24 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
   const btnApproval = document.getElementById("btnSubmitApproval");
   btnApproval.disabled = competencyLevel ? false : true;
 
-  // if (compeCategory !== "mandatory") {
-  const modal = new bootstrap.Modal(document.getElementById("modalEditDepthLevel"));
-  modal.show();
+  if (compeCategory !== "mandatory") {
+    const modal = new bootstrap.Modal(document.getElementById("modalEditDepthLevel"));
+    modal.show();
 
-  const selectedLevel = competencyLevel || "";
+    const selectedLevel = competencyLevel || "";
 
-  // Array dinamis untuk level
-  const levels = [1, 2, 3, 4];
+    // Array dinamis untuk level
+    const levels = [1, 2, 3, 4];
 
-  // Fungsi untuk membuat radio button secara dinamis
-  const renderRadioButtons = (levels, selectedLevel, compeCategory) => {
-    console.log("levels", levels);
-    let radioButtons = levels
-      .map((level) => {
-        // Kondisi disabled jika compeCategory === "general" dan level < selectedLevel
-        const isDisabled = compeCategory === "general" && level < selectedLevel;
+    // Fungsi untuk membuat radio button secara dinamis
+    const renderRadioButtons = (levels, selectedLevel, compeCategory) => {
+      console.log("levels", levels);
+      let radioButtons = levels
+        .map((level) => {
+          // Kondisi disabled jika compeCategory === "general" dan level < selectedLevel
+          const isDisabled = compeCategory === "general" && level < selectedLevel;
 
-        return `
+          return `
             <div class="form-check form-check-inline radio radio-primary">
               <input
                 class="form-check-input"
@@ -49,12 +49,12 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
               >
               <label class="form-check-label mb-0" for="radioinline${level}">${level}</label>
             </div>`;
-      })
-      .join("");
+        })
+        .join("");
 
-    // Tambahkan opsi "No Level/Remove" jika compeCategory === "specific"
-    // if (compeCategory === "specific") {
-    radioButtons += `
+      // Tambahkan opsi "No Level/Remove" jika compeCategory === "specific"
+      // if (compeCategory === "specific") {
+      radioButtons += `
             <div class="form-check form-check-inline radio radio-primary">
               <input
                 class="form-check-input"
@@ -67,17 +67,17 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
               >
               <label class="form-check-label mb-0" for="radioinlineNone">Remove</label>
             </div>`;
-    // }
+      // }
 
-    return radioButtons;
-  };
-  // Isi konten form secara dinamis
-  const category = {
-    mandatory: "Mandatory",
-    general: "General",
-    specific: "Specific",
-  };
-  const formContent = `
+      return radioButtons;
+    };
+    // Isi konten form secara dinamis
+    const category = {
+      mandatory: "Mandatory",
+      general: "General",
+      specific: "Specific",
+    };
+    const formContent = `
         <div class="col-12">
           <div class="row mb-2">
             <div class="col-4" style="display: flex; justify-content: space-between; align-items: center;">
@@ -128,38 +128,37 @@ const openModalEditDepth = async (jobCode, compCode, compeType) => {
         </div>
       `;
 
-  const bodyContent = document.getElementById("form-editdepthlevel");
-  if (bodyContent) {
-    bodyContent.innerHTML = formContent;
-  }
-  // }
-  // else {
-  //   const modal = new bootstrap.Modal(document.getElementById("ModalWarning"));
-  //   modal.show();
-  //   const formContent = `
-  //   <div class="col-12">
-  //       <div class="mb-2 m-4" style="text-align: center">
-  //       <img src="/assets/images/competency/close-circle.svg" class="mb-3"
-  //                       alt="Filter Icon" style="margin-right: 8px;margin-top:-10px">
-  //         <h4>CAN'T EDIT</h4>
-  //       </div>
-  //   </div>
-  //   <div class="col-12">
-  //       <div class="mt-2" style="text-align: center">
-  //         <label>Mandatory competency depth level cannot be changed/edited</label>
-  //       </div>
-  //   </div>
-  //   <div class="col-12 mt-3">
-  //     <button class="btn btn-outline-light" type="button" style="width: 100%" data-bs-dismiss="modal">
-  //     OK</button>
-  //   </div>
-  // `;
+    const bodyContent = document.getElementById("form-editdepthlevel");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+  } else {
+    const modal = new bootstrap.Modal(document.getElementById("ModalWarning"));
+    modal.show();
+    const formContent = `
+    <div class="col-12">
+        <div class="mb-2 m-4" style="text-align: center">
+        <img src="/assets/images/competency/close-circle.svg" class="mb-3"
+                        alt="Filter Icon" style="margin-right: 8px;margin-top:-10px">
+          <h4>CAN'T EDIT</h4>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mt-2" style="text-align: center">
+          <label>Generic competency depth level cannot be changed/edited</label>
+        </div>
+    </div>
+    <div class="col-12 mt-3">
+      <button class="btn btn-outline-light" type="button" style="width: 100%" data-bs-dismiss="modal">
+      OK</button>
+    </div>
+  `;
 
-  //   const bodyContent = document.getElementById("form-warning");
-  //   if (bodyContent) {
-  //     bodyContent.innerHTML = formContent;
-  //   }
-  // }
+    const bodyContent = document.getElementById("form-warning");
+    if (bodyContent) {
+      bodyContent.innerHTML = formContent;
+    }
+  }
 };
 
 const openModalApprovalDepthLevel = async () => {

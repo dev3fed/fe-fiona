@@ -3,7 +3,7 @@
 
 <style>
     .modal-dialog.custom-competency {
-        max-width: 80% !important;
+        max-width: 85% !important;
         margin: 30px auto;
     }
 
@@ -74,7 +74,7 @@
     }
 
     .card-tblspesific {
-        height: 520px;
+        height: 400px;
         border: 1px solid #BFBFC2;
         border-radius: 4px;
         padding: 15px;
@@ -82,7 +82,7 @@
     }
 
     .card-tablebusinessreference {
-        height: 420px;
+        height: 370px;
         border: 1px solid #BFBFC2;
         border-radius: 4px;
         padding: 15px;
@@ -147,6 +147,20 @@
     .scrollable-cardbusiness {
         max-height: 520px;
         overflow-y: auto;
+    }
+
+    .position-ref-item {
+        padding: 8px;
+        margin-bottom: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .position-ref-item:hover {
+        background-color: #E9F5FF;
+        border-color: #03A9F4;
     }
 
     .warning-alert {
@@ -232,6 +246,26 @@
         font-size: 13px;
     }
 
+    .compref-box {
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        padding: 30px 10px;
+        text-align: center;
+        position: relative;
+    }
+
+    .compref-box .icon {
+        font-size: 24px;
+        color: #b0b0b0;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .compref-box .desc {
+        color: #999;
+        font-size: 13px;
+    }
+
     /* Custom scrollbar styles */
     .scrollable-tbl::-webkit-scrollbar {
         width: 10px;
@@ -257,6 +291,38 @@
         overflow-y: auto;
         padding-right: 6px;
     }
+
+    .position-item-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: auto;
+    }
+
+    .position-item {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .position-item:hover {
+        background-color: #E9F5FF;
+        border-color: #03A9F4;
+    }
+
+    .position-item-title {
+        font-weight: 600;
+        color: #03A9F4;
+        margin-bottom: 4px;
+    }
+
+    .position-item-code {
+        font-size: 12px;
+        color: #999;
+    }
 </style>
 
 
@@ -266,7 +332,8 @@
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalAddCompetencyTitle">Add Technical Competency</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModalCompetency()"></button>
             </div>
             <div class="modal-body scrollable-competency" id="modal-body-content">
                 <div class="row">
@@ -275,61 +342,114 @@
 
                         </div>
                     </div>
-                    <div class="col-12" style="display: none;" id="comperef">
-
-                    </div>
-                    <div class="col-12" style="display: none;margin-top:15px" id="table-comperef">
-
-                    </div>
-                    @* <div class="col-6" style="display: none;" id="selectedBisproref">
+                    @* <div class="col-12" style="display: none;" id="comperef">
 
                     </div> *@
-                    <div class="col-6 mb-4" style="display: block;" id="specCompe">
-                        <label class="form-label">Choose Competencies</label>
-                        <div class="card-tblspesific">
-                            <div id="select-speccompe">
-                            </div>
-                            <div class="table-responsive  mt-2" style=" max-height: 450px;">
-                                <table class="table tbl-border-competency">
-                                    <thead id="tbl-competency-header">
-                                    </thead>
-                                    <tbody id="tbl-competency-body">
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="d-flex mt-1 justify-content-end">
-                                <button class="btn btn btn-primary" type="button" id="btn-selectedCompe"
-                                        onclick="triggleSelectCompe()" disabled>
-                                    Select Competency</button>
+                    <div class="col-12" style="display: none;" id="card-positionlistref">
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <div class="card-tablebusinessreference">
+                                    <div class="row g-2">
+                                        <div class="col-6 " style="display: flex; flex-direction: column;">
+                                            <div class="faq-form">
+                                                <input class="form-control" type="text" placeholder="Search position"
+                                                       id="search-position-ref" style="margin-bottom: 10px;"
+                                                       oninput="searchPositionRef(this.value)">
+                                            </div>
+                                            <div id="default-position-ref" class="compref-box" style="flex: 1; display: flex; flex-direction: column; justify-content:
+                                                center; align-items: center; text-align: center;">
+                                                <span class="icon"><img
+                                                    src="/assets/images/competency/magnifer.svg"></span>
+                                                    <span class="desc">Search position to show data </span>
+                                                </div>
+                                                <div id="position-ref-list" class="scrollable-tbl"
+                                                     style="display: none; max-height: 290px; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 6px; flex: 1;">
+
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="compref-box " id="position-comperef-default"
+                                                     style="height: 340px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                                                    <span class="icon"><img
+                                                        src="/assets/images/competency/magnifer.svg"></span>
+                                                        <span class="desc">Select position reference to show
+                                                        </span>
+                                                        <br />
+                                                        <span class="desc" style="margin-top: -20px;">its specific
+                                                            competencies</span>
+                                                        </div>
+
+                                                        <div class="card-tablebusinessreference" id="position-comperef"
+                                                             style="display: none;">
+                                                            <label class="form-label">Template</label>
+                                                            <div style="border-top: 1px solid #ddd; margin: 2px 0;"></div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="card-tablebusinessreference">
+                                                <label class="form-label">Selected Specific Competencies</label>
+                                                <div style="border-top: 1px solid #ddd; margin: 2px 0;"></div>
+                                                <div id="selected-comperef">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-6 mb-4" style="display: block;" id="specCompe">
+                                    <label class="form-label">Choose Competencies</label>
+                                    <div class="card-tblspesific">
+                                        <div id="select-speccompe">
+                                        </div>
+                                        <div class="table-responsive  mt-2" style=" max-height: 360px;">
+                                            <table class="table tbl-border-competency">
+                                                <thead id="tbl-competency-header">
+                                                </thead>
+                                                <tbody id="tbl-competency-body">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="d-flex mt-1 justify-content-end">
+                                            <button class="btn btn btn-primary" type="button" id="btn-selectedCompe"
+                                                    onclick="triggleSelectCompe()" disabled>
+                                                Select Competency</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6" style="display: block;" id="selectedcompe">
+                                        <label class="form-label">Selected Technical Competencies</label>
+                                        <div class="card-tblspesific " id="selected-compe">
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-6" style="display: block;" id="selectedcompe">
-                            <label class="form-label">Selected Technical Competencies</label>
-                            <div class="card-tblspesific" id="selected-compe">
+                            <div class="modal-footer  d-flex justify-content-end">
+                                <div>
+                                    <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                                            onclick="closeModalCompetency()"><i class="icon-arrow-left"></i> Back</button>
+                                    <button id="btnDraftcompetency" class="btn btn-primary" type="button"
+                                            onclick="handleSaveDraftCompe()">
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                                 id="spinBtncompetency" role="status"></div>
+                                            <span class="btn-text"> Save</span>
+                                        </div>
+                                    </button>
+                                </div>
 
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer  d-flex justify-content-end">
-                    <div>
-                        <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
-                                onclick="closeModalCompetency()"><i class="icon-arrow-left"></i> Back</button>
-                        <button id="btnDraftcompetency" class="btn btn-primary" type="button"
-                                onclick="handleSaveDraftCompe()">
-                            <div class="d-flex align-items-center">
-                                <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                                     id="spinBtncompetency" role="status"></div>
-                                <span class="btn-text"> Save</span>
-                            </div>
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+
+
+
