@@ -399,7 +399,7 @@ th {
 /* Custom scrollbar styles */
 .scrollable-table {
   overflow: auto;
-  max-height: 430px;
+  max-height: 420px;
 }
 .clusterize-content tr {
   border-bottom: 1px solid #ddd;
@@ -492,7 +492,9 @@ th {
   border: 1px solid #ced4da !important;
   border-radius: 0.25rem;
   box-shadow: inset 0 0 0 transparent;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 .bootstrap-select .dropdown-menu.inner {
