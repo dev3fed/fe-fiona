@@ -367,6 +367,8 @@ function loadTableBody(prosbisList) {
           ? `level-${val.level}`
           : "";
     const bgParent = val.isContextualParent === 1 ? `level-${val.level} prosbisparent` : "";
+    const isNaFound = val.matchReason && val.matchReason === "NA_NO_POSITION_MAPPING" ? `level-${val.level} na` : "";
+    const isRaFound = val.matchReason && val.matchReason === "RA_NO_NOTATION_MAPPING" ? `level-${val.level} nonra` : "";
     const isExpanded = expandedRows.includes(val.indexNumber) ? "chevron-up" : "chevron-down";
 
     const valString = JSON.stringify(val).replace(/"/g, "&quot;");
@@ -378,7 +380,7 @@ function loadTableBody(prosbisList) {
         : ``;
 
     bodyContent += `
-      <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass} ${bgParent}">
+      <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass} ${bgParent} ${isNaFound} ${isRaFound}">
         <td scope="row" class="level-col" style="font-size:13px;font-weight: 500 !important;">
           L${val.level}
         </td>

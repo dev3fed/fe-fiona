@@ -351,8 +351,14 @@ th {
   /* background color green light */
   background-color: #daf4fe !important;
 }
-.rasci-matrix tr.prosbisparent td {
+.rasci-matrix tr.nonra td {
+  background-color: #fff8e6 !important;
+}
+.rasci-matrix tr.na td {
   /* background color green light */
+  background-color: #fae9eb !important;
+}
+.rasci-matrix tr.prosbisparent td {
   background-color: #f6f6f6 !important;
 }
 .jabatan-cell-outer-wrapper {
