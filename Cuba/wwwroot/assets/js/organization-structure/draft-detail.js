@@ -686,7 +686,7 @@ $(document).ready(async function () {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Organization Template");
 
-      // Direktorat	Direktorat Teknis	Fungsi	Divisi	Sub Division	Departemen	Section	cek	ID Org Unit	KBO (Org Unit Abbr)	Org Unit Name	ID Position	PJ	Position	cek2	Stack	Coordination	Coordination to	Jabatan fungsi leher	Position Abbreviation	IS dummy position?	Dummy Description	Person Id	Pers.No.	Name	PRL Plan Comp	ID Job	Job Name	Garis Lapor	Layering	PRL Organisasi	8-9	10-11	12-13	14-15	16-18	19-21	22-24	Career Type	Career Level	Main Skill Group	Main Subskill Group	Second Skill Group	Second Subskill Group	Third Skill Group	Third Subskill Group	Company Code	Company Name	Perusahaan	Personnel Area	Personnel Area Name	Personnel Subarea	Personnel Subarea Name	Group	Personnel Admin	Payscale Area Posisi	Desc. Payscale Area Posisi	Payscale Type Posisi	Desc. Payscale Type Posisi	Cost Center Posisi	Cost Center Description	ID Position Atasan Langsung	Position Atasan Langsung	ID Position Chief	Position Chief	Resource	No SK	PJS Position	helper idou x prl	lookup ke zhroom fadil
+      // Direktorat	Direktorat Teknis	Fungsi	Divisi	Sub Division	Departemen	Section	cek	ID Org Unit	KBO (Org Unit Abbr)	Org Unit Name	ID Position	PJ	Position	cek2	Stack	Coordination	Coordination to	Jabatan fungsi leher	Position Abbreviation	IS dummy position?	Dummy Description	Person Id	Pers.No.	Name	Person Grade	ID Job	Job Name	Garis Lapor	Layering	Job Gradeanisasi	8-9	10-11	12-13	14-15	16-18	19-21	22-24	Career Type	Career Level	Main Skill Group	Main Subskill Group	Second Skill Group	Second Subskill Group	Third Skill Group	Third Subskill Group	Company Code	Company Name	Perusahaan	Personnel Area	Personnel Area Name	Personnel Subarea	Personnel Subarea Name	Group	Personnel Admin	Payscale Area Posisi	Desc. Payscale Area Posisi	Payscale Type Posisi	Desc. Payscale Type Posisi	Cost Center Posisi	Cost Center Description	ID Position Atasan Langsung	Position Atasan Langsung	ID Position Chief	Position Chief	Resource	No SK	PJS Position	helper idou x prl	lookup ke zhroom fadil
       // Add headers
       const headers = [
         "Direktorat",
@@ -714,12 +714,12 @@ $(document).ready(async function () {
         "Person Id",
         "Pers.No.",
         "Name",
-        "PRL Plan Comp",
+        "Person Grade",
         "ID Job",
         "Job Name",
         "Garis Lapor",
         "Layering",
-        "PRL Organisasi",
+        "Job Gradeanisasi",
         "8-9",
         "10-11",
         "12-13",
@@ -821,7 +821,7 @@ $(document).ready(async function () {
         { width: 20 }, // Position Name
         { width: 15 }, // Abbreviation
         { width: 20 }, // Org Unit
-        { width: 12 }, // PRL Org
+        { width: 12 }, // Job Grade
         { width: 12 }, // Formation
         { width: 15 }, // Career Type
         { width: 15 }, // Career Level

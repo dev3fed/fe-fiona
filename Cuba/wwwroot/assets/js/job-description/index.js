@@ -290,6 +290,8 @@ function updateNotifNotAvailable() {
 }
 
 $(document).ready(async function () {
+  // disabled
+  $("#inputDraftName").prop("disabled", true);
   $("#createJobDesc").click(function () {
     window.location.href = "/job-description/detail";
   });
@@ -326,6 +328,18 @@ $(document).ready(async function () {
     } else {
       swal("Failed to save draft", { icon: "error" });
     }
+  });
+
+  $("#selectDraftRacsi").change(function () {
+    const selectedText = $(this).find("option:selected").text();
+    let draftName = selectedText;
+    let counter = 1;
+    while (storeData.listDraft.find((x) => x.draftName == draftName)) {
+      draftName = `${selectedText} ${String(counter++).padStart(3, "0")}`;
+    }
+    $("#inputDraftName").val(draftName);
+
+    // $("#inputDraftName").val(selectedText);
   });
 
   // Define event handlers FIRST before initialization

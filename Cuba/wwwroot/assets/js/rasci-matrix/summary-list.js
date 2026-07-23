@@ -535,7 +535,7 @@ const showDetail = async (val) => {
                 }</label><br/>
             </div>
             <div class="col-6">
-                <label style="color:#9F9FA5;fonti-size:12px">PRL Plan Comp</label><br/>
+                <label style="color:#9F9FA5;fonti-size:12px">Person Grade</label><br/>
                 <label style="font-weight: 600;font-size: 14px">${
                   resultDetail.data.incumbents.length > 0 ? incumbent?.prlPlan : "-"
                 }</label><br/>

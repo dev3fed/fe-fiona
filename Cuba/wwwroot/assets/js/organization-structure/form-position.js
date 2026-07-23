@@ -292,7 +292,7 @@ function addSubPos() {
 
   // remove #modalSelectPrlOrgSubPos and #modalSelectPrlOrgToSubPos
 
-  // Update the first select (PRL Org)
+  // Update the first select (Job Grade)
   const firstSelect = newSubPosDiv.find("select").first();
   newSubPosDiv
     .find("label")
@@ -301,7 +301,7 @@ function addSubPos() {
   firstSelect.attr("id", "modalSelectPrlOrgSubPos" + count);
   firstSelect.val(null).trigger("change");
 
-  // Update the second select (PRL Org To)
+  // Update the second select (Job Grade To)
   // const secondSelect = newSubPosDiv.find("select").last();
   // newSubPosDiv
   //   .find("label")
@@ -635,7 +635,7 @@ $(document).ready(async function () {
     const selectPrlOrgTo = $("#modalSelectPrlOrgTo").val();
     if (!selectPrlOrg || !selectPrlOrgTo) {
       e.preventDefault();
-      swal("Warning", `Please select PRL Org range`, "warning");
+      swal("Warning", `Please select Job Grade range`, "warning");
       return false;
     }
   });
@@ -654,7 +654,7 @@ $(document).ready(async function () {
     // console.log("selectCareerType", selectCareerType);
     if (!selectPrlOrg) {
       e.preventDefault();
-      swal("Warning", `Please select PRL Org first`, "warning");
+      swal("Warning", `Please select Job Grade first`, "warning");
       return false;
     }
   });
@@ -696,8 +696,8 @@ $(document).ready(async function () {
     const requiredFields = [
       { id: "modalSelectCareerLevel", name: "Career Level", value: $("#modalSelectCareerLevel").val() },
       { id: "modalSelectAbbrvPosition", name: "Abbreviation Position", value: $("#modalSelectAbbrvPosition").val() },
-      { id: "modalSelectPrlOrg", name: "PRL Org", value: $("#modalSelectPrlOrg").val() },
-      { id: "modalSelectPrlOrgTo", name: "PRL Org To", value: $("#modalSelectPrlOrgTo").val() },
+      { id: "modalSelectPrlOrg", name: "Job Grade", value: $("#modalSelectPrlOrg").val() },
+      { id: "modalSelectPrlOrgTo", name: "Job Grade To", value: $("#modalSelectPrlOrgTo").val() },
       { id: "modalInputFormation", name: "Formation", value: $("#modalInputFormation").val() },
     ];
 
