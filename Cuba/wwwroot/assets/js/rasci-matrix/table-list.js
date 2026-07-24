@@ -370,6 +370,20 @@ function loadTableBody(prosbisList) {
     const isNaFound = val.matchReason && val.matchReason === "NA_NO_POSITION_MAPPING" ? `level-${val.level} na` : "";
     const isRaFound = val.matchReason && val.matchReason === "RA_NO_NOTATION_MAPPING" ? `level-${val.level} nonra` : "";
     const isExpanded = expandedRows.includes(val.indexNumber) ? "chevron-up" : "chevron-down";
+    const createTooltipImage = (img, title) =>
+      `<img src="${img}" alt="Filter Icon"
+                    class="example-popover" style="margin-top:-2px;" data-bs-toggle="tooltip"
+                    data-bs-placement="top" title="${title}">`;
+
+    const toolTipNa =
+      val.matchReason === "NA_NO_POSITION_MAPPING"
+        ? createTooltipImage("/assets/images/rasci/danger-circle.svg", "Tidak Ada Notasi RASCI (N/A)")
+        : "";
+
+    const toolTipRa =
+      val.matchReason === "RA_NO_NOTATION_MAPPING"
+        ? createTooltipImage("/assets/images/rasci/warning-circle.svg", "Tidak Ada Notasi RASCI (R/A)")
+        : "";
 
     const valString = JSON.stringify(val).replace(/"/g, "&quot;");
     const hierarchyIcon =
@@ -392,6 +406,7 @@ function loadTableBody(prosbisList) {
             <div class="hierarchy-icon-wrapper">${hierarchyIcon}</div>
             <div class="flex-fill prosbis-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
               title="${val.description}" onclick="onModalProsbis(${valString})">${val.description}</div>
+                ${toolTipNa} ${toolTipRa}
             <div class="ellipsis-menu prosbis-row-ellipsis">
               <div class="dropright">
                 <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
