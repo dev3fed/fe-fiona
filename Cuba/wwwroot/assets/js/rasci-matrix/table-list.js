@@ -396,7 +396,7 @@ function loadTableBody(prosbisList) {
     bodyContent += `
       <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass} ${bgParent} ${isNaFound} ${isRaFound}">
         <td scope="row" class="level-col" style="font-size:13px;font-weight: 500 !important;">
-          L${val.level}
+          L${val.level}1
         </td>
         <td class="index-col" style="text-align:left;font-size:13px;font-weight: 500 !important;">
           <span style="padding-left:5px;">${val.indexNumber}</span>
