@@ -827,7 +827,7 @@ const onInputPositionName = async (id, name) => {
   const updatedList = competencyList.filter((item) => item.compType === "specific");
 
   console.log("first", updatedList);
-
+  cardListpositionComperef(updatedList);
   document.getElementById("position-comperef-default").style.display = "none";
   document.getElementById("position-comperef").style.display = "block";
 };
@@ -852,7 +852,6 @@ async function cardListpositionComperef(competencyList) {
                 <th scope="col" style="width: 50px; text-align: center;">No</th>
                 <th scope="col">Competency</th>
                 <th scope="col" style="width: 50px;">Level</th>
-                <th scope="col" style="width: 60px;">Remove</th>
               </tr>
             </thead>
             <tbody>
@@ -861,15 +860,8 @@ async function cardListpositionComperef(competencyList) {
                   (item, index) => `
                 <tr>
                   <td style="text-align: center;">${index + 1}</td>
-                  <td>${item.compeName}</td>
-                  <td style="text-align: center;">${item.selectedLvl}</td>
-                  <td style="text-align: center;">
-                     <button class="btn btn-outline-danger btn-small-icon" type="button" onclick="removeCompeRef('${
-                       item.compeId
-                     }')">
-                        <img src="/assets/images/rasci/icon_delete.svg" alt="Delete Icon" class="icon-svg">
-                      </button>
-                  </td>
+                  <td>${item.compName}</td>
+                  <td style="text-align: center;">${item.level}</td>
                 </tr>
               `,
                 )

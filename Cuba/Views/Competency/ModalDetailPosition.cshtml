@@ -96,7 +96,8 @@
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
                 <h5 class="modal-title" id="ModalDetailPosTitle">Position Detail</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModalCompetency()"></button>
             </div>
             <div class="modal-body">
                 <div>
@@ -282,16 +283,16 @@
                                 </div>
                                 <div class="modal-footer  d-flex justify-content-end">
                                     <div>
-                                        <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"><i
-                                            class="icon-arrow-left"></i> Back</button>
-                                            <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
-                                                    id="btnAddSpecificCompe">
-                                                <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
-                                                Add Technical Competency
-                                            </button>
-                                        </div>
+                                        <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
+                                                onclick="closeModalCompetency()"><i class="icon-arrow-left"></i> Back</button>
+                                        <button class="btn btn-primary btn-icon" type="button" onclick="openSpecificCompetency()"
+                                                id="btnAddSpecificCompe">
+                                            <img src="~/assets/images/rasci/plus.svg" alt="Filter Icon" />
+                                            Add Technical Competency
+                                        </button>
                                     </div>
-
                                 </div>
+
                             </div>
                         </div>
+                    </div>

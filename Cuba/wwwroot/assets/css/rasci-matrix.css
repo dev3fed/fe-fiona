@@ -351,8 +351,14 @@ th {
   /* background color green light */
   background-color: #daf4fe !important;
 }
-.rasci-matrix tr.prosbisparent td {
+.rasci-matrix tr.nonra td {
+  background-color: #fff8e6 !important;
+}
+.rasci-matrix tr.na td {
   /* background color green light */
+  background-color: #fae9eb !important;
+}
+.rasci-matrix tr.prosbisparent td {
   background-color: #f6f6f6 !important;
 }
 .jabatan-cell-outer-wrapper {
@@ -399,7 +405,7 @@ th {
 /* Custom scrollbar styles */
 .scrollable-table {
   overflow: auto;
-  max-height: 430px;
+  max-height: 420px;
 }
 .clusterize-content tr {
   border-bottom: 1px solid #ddd;
@@ -492,7 +498,9 @@ th {
   border: 1px solid #ced4da !important;
   border-radius: 0.25rem;
   box-shadow: inset 0 0 0 transparent;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 .bootstrap-select .dropdown-menu.inner {

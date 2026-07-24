@@ -176,14 +176,15 @@ function selectSingleJob(event) {
   const jobId = checkbox.value;
   const prlOrg = checkbox.getAttribute("prlOrg");
   if (checkbox.checked) {
-    if (jobId !== "on" && !selectedJobIds.includes(jobId)) {
+    if (jobId !== "on") {
       selectedJobIds.push(jobId);
       selectedPrlIds.push(prlOrg);
     }
-  } else {
-    selectedJobIds = selectedJobIds.filter((id) => id !== jobId);
-    selectedPrlIds = selectedPrlIds.filter((id) => id !== prlOrg);
   }
+  // else {
+  //   selectedJobIds = selectedJobIds.filter((id) => id !== jobId);
+  //   selectedPrlIds = selectedPrlIds.filter((id) => id !== prlOrg);
+  // }
   updateHeaderCheckboxJob();
 }
 
@@ -343,7 +344,6 @@ async function applySearch() {
         row: 1,
         rowSize: 15,
       };
-
       const payloadJob = {
         col: 1,
         colSize: 10,
