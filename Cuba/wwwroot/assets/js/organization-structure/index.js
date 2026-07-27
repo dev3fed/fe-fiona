@@ -114,7 +114,7 @@ function handleExportFun(type) {
   } else if (type === "pdf") {
     chartExportPDF(focusNodeId);
   } else if (type === "png") {
-    chartExportPNG(focusNodeId);
+    chartExportIMG(focusNodeId);
   }
 }
 

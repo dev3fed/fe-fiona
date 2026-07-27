@@ -1018,11 +1018,21 @@ async function chartExportPDF(focusNodeId = null) {
       save: false,
       full: true,
       onLoad: (base64) => {
-        const pdf = new jspdf.jsPDF();
+        const JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+        const pdf = new JsPDF("l", "mm", [297, 210]);
+        const pageW = 297;
+        const pageH = 210;
         const img = new Image();
         img.src = base64;
         img.onload = function () {
-          pdf.addImage(img, "JPEG", 5, 5, 595 / 3, ((img.height / img.width) * 595) / 3);
+          const ratio = img.width / img.height;
+          let w = pageW - 10;
+          let h = w / ratio;
+          if (h > pageH - 10) {
+            h = pageH - 10;
+            w = h * ratio;
+          }
+          pdf.addImage(img, "PNG", (pageW - w) / 2, (pageH - h) / 2, w, h);
           pdf.save("chart.pdf");
         };
       },
