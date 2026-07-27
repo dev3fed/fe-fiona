@@ -87,7 +87,7 @@ async function triggleDetailJob(val) {
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Section</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.section || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo?.section || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Career Type</label>
@@ -103,34 +103,34 @@ async function triggleDetailJob(val) {
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Abbrv Position</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.abbrvPosition || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo?.abbrvPosition || "-"}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">KBO</label>
-          <label style="font-weight: 600;font-size: 14px">${unit.kbo || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${unit?.kbo || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Cost Center</label>
-          <label style="font-weight: 600;font-size: 14px">${unit.costCenterDescription || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${unit?.costCenterDescription || "-"}</label>
         </div>
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">Personnel Area</label>
-          <label style="font-weight: 600;font-size: 14px">${personArea.personnelAreaCode || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${personArea?.personnelAreaCode || "-"}</label>
         </div>
         <div class="col-12">
             <hr style="margin-right: 10px">
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Personnel Area Name</label>
-          <label style="font-weight: 600;font-size: 14px">${personArea.personnelAreaName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${personArea?.personnelAreaName || "-"}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Personnel Sub Area</label>
-          <label style="font-weight: 600;font-size: 14px">${personSubArea.personnelSubAreaCode || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${personSubArea?.personnelSubAreaCode || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Personnel Sub Area Name</label>
-          <label style="font-weight: 600;font-size: 14px">${personSubArea.personnelSubAreaName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${personSubArea?.personnelSubAreaName || "-"}</label>
         </div>
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">SK Number</label>
