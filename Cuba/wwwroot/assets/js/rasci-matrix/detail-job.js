@@ -34,30 +34,30 @@ async function triggleDetailJob(val) {
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5; display: block;">ID Position</label>
-          <label style="font-weight: 600;font-size: 14px">${directReportTo.jobPositionCode || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${directReportTo?.jobPositionCode || "-"}</label>
         </div>
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">Position Name</label>
-          <label style="font-weight: 600;font-size: 14px">${directReportTo.jobPositionName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${directReportTo?.jobPositionName || "-"}</label>
         </div>
         <div class="col-12">
             <hr style="margin-right: 10px">
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">ID Organization Unit Parent</label>
-          <label style="font-weight: 600;font-size: 14px">${unit.unitParentCode || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${unit?.unitParentCode || "-"}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Organization Unit Parent</label>
-          <label style="font-weight: 600;font-size: 14px">${unit.unitParentName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${unit?.unitParentName || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">ID Position Direct Report</label>
-          <label style="font-weight: 600;font-size: 14px">${directReportTo.jobPositionParentCode || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${directReportTo?.jobPositionParentCode || "-"}</label>
         </div>
           <div class="col-4 " style="text-align: left">
           <label style="color:#9F9FA5;display: block">Direct Report</label>
-          <label style="font-weight: 600;font-size: 14px">${directReportTo.jobPositionParentName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${directReportTo?.jobPositionParentName || "-"}</label>
         </div>
           <div class="col-12">
             <hr style="margin-right: 10px">
@@ -68,7 +68,7 @@ async function triggleDetailJob(val) {
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Function</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInfo.function.functionName || "-"}</label>
+          <label style="font-weight: 600;font-size: 14px">${detailInfo?.function?.functionName || "-"}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Division</label>
