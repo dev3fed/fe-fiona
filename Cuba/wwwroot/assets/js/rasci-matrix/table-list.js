@@ -359,6 +359,7 @@ function loadTableBody(prosbisList) {
   const isMaster = draftRasciId === "master" || draftRasciId === null;
   if (!tableBody) return;
   let bodyContent = "";
+  console.log("object", visibleProsbis);
   visibleProsbis?.forEach((val) => {
     const levelClass =
       val.level && idProsbisSelected == val.indexNumber
@@ -396,7 +397,7 @@ function loadTableBody(prosbisList) {
     bodyContent += `
       <tr id="row-${val.indexNumber}" class="clusterize-cluster ${levelClass} ${bgParent} ${isNaFound} ${isRaFound}">
         <td scope="row" class="level-col" style="font-size:13px;font-weight: 500 !important;">
-          L${val.level}1
+          L${val.level}
         </td>
         <td class="index-col" style="text-align:left;font-size:13px;font-weight: 500 !important;">
           <span style="padding-left:5px;">${val.indexNumber}</span>
