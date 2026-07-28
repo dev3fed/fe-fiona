@@ -485,9 +485,6 @@ const handleExportMatrix = async () => {
     const payloadProsbis = getState("payloadProsbis");
     const payloadPosition = getState("payloadPosition");
     const actionExport = getState("actionExport");
-    // console.log("payloadProsbis", payloadProsbis);
-    // console.log("payloadPosition", payloadPosition);
-    // console.log("actionExport", actionExport);
     const loader = document.getElementById("loader");
     loader.style.display = "flex";
     let payload = {};
