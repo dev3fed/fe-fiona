@@ -359,7 +359,6 @@ function loadTableBody(prosbisList) {
   const isMaster = draftRasciId === "master" || draftRasciId === null;
   if (!tableBody) return;
   let bodyContent = "";
-  console.log("object", visibleProsbis);
   visibleProsbis?.forEach((val) => {
     const levelClass =
       val.level && idProsbisSelected == val.indexNumber
