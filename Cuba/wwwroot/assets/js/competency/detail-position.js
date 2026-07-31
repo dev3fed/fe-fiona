@@ -16,7 +16,7 @@ const modalInfoPosition = async (code, prl) => {
         const positionName = `
         <span style="font-weight: bold;margin-bottom:5px">${detailInformation.positionName}</span> <br/>
          <small style="color:#9F9FA5">
-            PRL Organization: ${detailInformation.prlOrg},Formation Total : ${detailInformation.formation}
+            Job Grade: ${detailInformation.prlOrg},Formation Total : ${detailInformation.formation}
          </small>
         `;
         const bodyInfo = `
@@ -228,11 +228,13 @@ const modalInfoPosition = async (code, prl) => {
         const jobInfo = document.getElementById("job-info");
         const sgContent = document.getElementById("skill-group-content");
         const incContent = document.getElementById("incumbent-content");
+        const incumbentCard = document.getElementById("incumbent-cardModel");
         const positionLabel = document.getElementById("position-name");
         if (sgContent && jobInfo) {
           sgContent.innerHTML = cardsgContent;
           jobInfo.innerHTML = bodyInfo;
-          incContent.innerHTML = cardIncumbent;
+          incContent.innerHTML = dataSource === "master" ? cardIncumbent : "";
+          incumbentCard.style.display = dataSource === "master" ? "block" : "none";
           positionLabel.innerHTML = positionName;
         }
       }
@@ -288,7 +290,7 @@ const cardTblMandatory = async (code, prl) => {
           return `
             <tr>
               <td  style="text-align:Center">${i + 1}</td>
-              <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Mandatory','${
+              <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailInfo('Generic','${
                 element.compCode
               }')">${element.name}</td>
               <td style="text-align:Center">${element.proficiencyLevel}</td>
@@ -671,14 +673,6 @@ async function handleDetailInfo(type, code) {
 }
 
 const handleCloseBehavior = async () => {
-  const payload = getState("payloadDetailJob");
-
-  await modalInfoPosition(payload.unitCode, payload.prlOrg);
-  await cardTblMandatory(payload.unitCode, payload.prlOrg);
-  await cardTblGeneral(payload.unitCode, payload.prlOrg);
-  await cardTblSpecific(payload.unitCode, payload.prlOrg);
-  await cardTblBehavior(payload.unitCode, payload.prlOrg);
-
   const closeModal = document.getElementById("ModalDetailKkj");
   if (closeModal) {
     const bootstrapModal = bootstrap.Modal.getInstance(closeModal);

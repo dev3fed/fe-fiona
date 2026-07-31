@@ -20,11 +20,11 @@ const modalSummaryInfoPosition = async (code, prl) => {
         `;
         const bodyInfo = `
         <div class="col-2" style="text-align: left; border-right: 1px solid #BFBFC2;">
-            <label style="color: #9F9FA5; display: block;">ID Org Unit</label>
+            <label style="color: #9F9FA5; display: block;">ID Organization Unit</label>
             <label style="font-weight: 600; font-size: 14px">${detailInformation.unitCode}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block">Org Unit</label>
+          <label style="color:#9F9FA5;display: block">Organization Unit</label>
           <label style="font-weight: 600;font-size: 14px">${detailInformation.unitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -39,11 +39,11 @@ const modalSummaryInfoPosition = async (code, prl) => {
             <hr style="margin-right: 10px">
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block;">ID Org Unit Parent</label>
+          <label style="color:#9F9FA5;display: block;">ID Organization Unit Parent</label>
           <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitCode}</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
-          <label style="color:#9F9FA5;display: block">Org Unit Parent</label>
+          <label style="color:#9F9FA5;display: block">Organization Unit Parent</label>
           <label style="font-weight: 600;font-size: 14px">${detailInformation.parentUnitName}</label>
         </div>
           <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
@@ -63,7 +63,7 @@ const modalSummaryInfoPosition = async (code, prl) => {
         </div>
         <div class="col-2 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block;">Directorate</label>
-          <label style="font-weight: 600;font-size: 14px">${detailInformation.directorate}</label>
+          <label style="font-weight: 600;font-size: 14px">-</label>
         </div>
         <div class="col-3 " style="text-align: left;border-right:1px solid #BFBFC2">
           <label style="color:#9F9FA5;display: block">Function</label>
@@ -213,25 +213,28 @@ const modalSummaryInfoPosition = async (code, prl) => {
         const cardIncumbent = `
         <div class="col-3">
             <label style="color:#9F9FA5;fonti-size:12px">Employee ID</label><br/>
-            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeId}</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeId || "-"}</label><br/>
         </div>
         <div class="col-3">
             <label style="color:#9F9FA5;fonti-size:12px">Employee Name</label><br/>
-            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeName}</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.incumbentEmployeeName || "-"}</label><br/>
         </div>
         <div class="col-6">
             <label style="color:#9F9FA5;fonti-size:12px">Person Grade</label><br/>
-            <label style="font-weight: 600;font-size: 14px">${detailInformation.prlPlanComp}</label><br/>
+            <label style="font-weight: 600;font-size: 14px">${detailInformation.prlPlanComp || "-"}</label><br/>
         </div>
 `;
         const jobInfo = document.getElementById("sumjob-info");
         const sgContent = document.getElementById("sumskill-group-content");
         const incContent = document.getElementById("sumincumbent-content");
+        const incumbentCard = document.getElementById("incumbent-cardreq");
         const positionLabel = document.getElementById("sumposition-name");
+        console.log("dataSource", dataSource);
         if (sgContent && jobInfo) {
           sgContent.innerHTML = cardsgContent;
           jobInfo.innerHTML = bodyInfo;
-          incContent.innerHTML = cardIncumbent;
+          incContent.innerHTML = dataSource === "master" ? cardIncumbent : "";
+          incumbentCard.style.display = dataSource === "master" ? "block" : "none";
           positionLabel.innerHTML = positionName;
         }
       }
