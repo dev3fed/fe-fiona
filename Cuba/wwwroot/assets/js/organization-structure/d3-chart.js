@@ -1181,6 +1181,7 @@ function processChartData(rawData) {
     if (totalBAsket > 0) {
       tagCustomMerge = `basket_${totalBAsket}`;
     }
+    console.log("getType:", getType);
     const customMergeLabel = "Z";
     getType.forEach((ita, ida) => {
       if (item[ita.key] == null) {
@@ -1192,24 +1193,38 @@ function processChartData(rawData) {
     // check ada yang value nilai value getType yang sama atu tidak. contoh = [{a:1},{b:2},{c:1}]
     const storeValues = [];
     const uniqueValues = new Set(getType.map((item) => item.value));
+    console.log("uniqueValues:", uniqueValues);
     uniqueValues.forEach((value) => {
       const count = getType.filter((item) => item.value === value).length;
       //  find whic bc_1_flagMergeFormation, bc_2_flagMergeFormation, etc. that matches this value
       const matchingKeys = Object.keys(item).filter((key) => key.includes("flagMergeFormation") && item[key] === value);
+      console.log("matchingKeys:", matchingKeys);
       const arrayKeys = matchingKeys.map((key) => parseInt(key.split("_")[1]));
+      console.log("arrayKeys:", arrayKeys);
       storeValues.push({ value, count, arrayKeys });
     });
     // urutan storeValues berdasarkan dari uturan arrayKeys
     let sorted = [];
-    let count = 0;
+    const addedValues = new Set();
     for (let i = 0; i < totalBAsket; i++) {
       const matching = storeValues.find((itx) => itx.arrayKeys.includes(i + 1));
-      if (count < totalBAsket && matching) {
-        count += matching.count;
+      if (matching && !addedValues.has(matching.value)) {
         sorted.push(matching);
+        addedValues.add(matching.value);
       }
     }
 
+    // logic yang lama
+    // let sorted = [];
+    // let count = 0;
+    // for (let i = 0; i < totalBAsket; i++) {
+    //   const matching = storeValues.find((itx) => itx.arrayKeys.includes(i + 1));
+    //   if (count < totalBAsket && matching) {
+    //     count += matching.count;
+    //     sorted.push(matching);
+    //   }
+    // }
+    console.log("sorted storeValues:", sorted);
     sorted.forEach((itx, index) => {
       const tagFormation = `bc_${index + 1}_jumlah_formasi`;
       // find in item ke includes _flagMergeFormation and value matches itx.value
@@ -1229,6 +1244,9 @@ function processChartData(rawData) {
     tagsCustomMergeArray.push(tagCustomMerge);
   });
 
+  console.log("Final processed data:", rawData);
+  console.log("Processed merged data:", dataMerged);
+  console.log("Custom merge tags array:", tagsCustomMergeArray);
   return {
     processedData: rawData,
     mergedData: dataMerged,

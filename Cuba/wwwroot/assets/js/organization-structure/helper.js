@@ -1468,6 +1468,11 @@ function checkValue(value) {
 }
 
 async function modalJobPopup(params) {
+  console.log("modalJobPopup params", params);
+  // get data from bagannya
+  const dataOrg = JSON.parse(localStorage.getItem("orgChartData"));
+  const orgChartData = dataOrg.processedData.find((item) => item.id == params);
+  console.log("orgChartData", orgChartData);
   let data = await chartJobDetail({
     draftId: organizationAttribute.orgUnitId,
     jobCode: params,
@@ -1580,11 +1585,25 @@ async function modalJobPopup(params) {
     let arrayPrlOrg = [];
     data.positionList = Object.keys(groupedByMergeFormation).map((mergeFormationKey) => {
       const dataPosition = groupedByMergeFormation[mergeFormationKey];
+      console.log("dataPosition:", dataPosition);
       const arrayKeys = dataPosition
         .map((item) => item.prlOrg)
         .map((prl) => {
           // Use global getPrlNumber function
-          return getPrlNumber(prl);
+          // console.log("prl:", prl, "getPrlNumber(prl):", getPrlNumber(prl));
+          // return getPrlNumber(prl);
+
+          // check apakah prl ada "-", kalau ada jadikan array, kalau tidak jadikan array dengan 1 element
+          if (prl.includes("-")) {
+            const [start, end] = prl.split("-").map((num) => parseInt(num));
+            const expanded = [];
+            for (let i = start; i <= end; i++) {
+              expanded.push(i);
+            }
+            return expanded;
+          } else {
+            return [parseInt(prl)];
+          }
         })
         .sort((a, b) => b - a); // Sort descending (besar ke
       arrayPrlOrg.push(...arrayKeys);
@@ -1595,20 +1614,37 @@ async function modalJobPopup(params) {
         prlOrgs: arrayKeys,
       };
     });
-    arrayPrlOrg.sort((a, b) => b - a); // Sort descending (besar ke kecil)
+    arrayPrlOrg.sort((a, b) => b[0] - a[0]); // Sort descending , tapi ada array di dalamnya, jadi harus di flatten dulu
+    // [
+    // [
+    //     12,
+    //     13
+    // ],
+    // [
+    //     14,
+    //     15
+    // ],
+    // [
+    //     13
+    // ]
+    // ]
+    // arrayPrlOrg = [...new Set(arrayPrlOrg.flat())]; // Remove duplicates and flatten
+    console.log("data:", data);
+    console.log("arrayPrlOrg:", arrayPrlOrg);
 
     let sortedPositionList = [];
-    let count = 0;
+    const addedMergeFormations = new Set();
     for (let i = 0; i < arrayPrlOrg.length; i++) {
       const matching = data.positionList.find((itx) => itx.prlOrgs.includes(arrayPrlOrg[i]));
-      if (count < arrayPrlOrg.length && matching) {
-        count += matching.totalRow;
+      console.log("matching:", matching, "addedMergeFormations:", addedMergeFormations);
+      if (matching && !addedMergeFormations.has(matching.mergerFormation)) {
         // Sort matching.dataPosition by prlOrg descending (besar ke kecil)
         matching.dataPosition.sort((a, b) => {
           // Use global getPrlNumber function
           return getPrlNumber(b.prlOrg) - getPrlNumber(a.prlOrg);
         });
         sortedPositionList.push(matching);
+        addedMergeFormations.add(matching.mergerFormation);
       }
     }
     console.log("sortedPositionList:", sortedPositionList);
@@ -1642,8 +1678,8 @@ async function modalJobPopup(params) {
           .map((pos) => expandPrlRange(pos.prlOrg))
           .filter((prl) => prl.includes(String(item.prlPlan)));
         const findPosition = positionList.find((pos) => expandPrlRange(pos.prlOrg).includes(String(item.prlPlan)));
-        console.log("findPosition:", findPosition);
-        console.log("prlOrgCustom:", prlOrgCustom);
+        // console.log("findPosition:", findPosition);
+        // console.log("prlOrgCustom:", prlOrgCustom);
         if (findPosition) {
           item.positionName = findPosition.positionName;
           item.positionCode = findPosition.positionCode;
@@ -1665,9 +1701,23 @@ async function modalJobPopup(params) {
     let arrayAddedPrlOrg = [];
     (sortedPositionList || []).forEach((group, i) => {
       // postionName and link to job Description page
+
       group.dataPosition.forEach((item, j) => {
         arrayAddedPrlOrg.push(item.prlOrg);
-        console.log("item:", item.prlOrg);
+
+        // => temp, sampai be fixed
+        const matchingPrlKey = Object.keys(orgChartData).find((key) => {
+          const regex = /^bc_\d+_prl$/;
+          return regex.test(key) && orgChartData[key] == item.prlOrg;
+        });
+        // now check bc_\\d+_prl pattern with _position, and get the value of _position, and assign it to item.positionName
+        const positionNameOrgChart = matchingPrlKey
+          ? orgChartData[matchingPrlKey.replace("_prl", "_position")]
+          : undefined;
+        if (positionNameOrgChart) {
+          item.positionName = positionNameOrgChart;
+        }
+        // => temp, sampai be fixed
         const positionName =
           item.positionName +
           ` <a href="javascript:void(0)" class="p-l-5" onclick="showJobDesc('` +
@@ -1676,7 +1726,7 @@ async function modalJobPopup(params) {
           item.prlOrg +
           `')"> Jobdesc Page <i class="fas fa-info-circle"></i></a>`;
         globalCount++;
-        console.log("globalCount:", globalCount);
+        // console.log("globalCount:", globalCount);
         if (j == 0) {
           $positionBody.append(`<tr>
             <td>${globalCount}</td>
