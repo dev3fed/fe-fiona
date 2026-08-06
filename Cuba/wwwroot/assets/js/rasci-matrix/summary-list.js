@@ -403,6 +403,7 @@ const showDetail = async (val) => {
     const payload = {
       draftId: draftSoId || null,
       unitCode: val.unitCode,
+      prlOrg: val.prlOrg || null,
     };
     const queryString = new URLSearchParams(payload).toString();
     const resultDetail = await fetchDetailJob(queryString);
