@@ -70,7 +70,8 @@ document.getElementById("searchButton").addEventListener("click", async function
           return `<tr>
             <th scope="row">
              <label class="checkbox-label" for="checked-body-job-${i}">
-              <input class="checkbox_animated checkbox-body-job" id="checked-body-job" type="checkbox" 
+              <input class="checkbox_animated checkbox-body-job" id="checked-body-job-${i}" type="checkbox" 
+              onchange="selectSingleJob(event)"
               value="${item.unitCode || ""}" 
               prlOrg="${item.prlOrg || ""}">
             </label>
@@ -98,8 +99,8 @@ document.getElementById("searchButton").addEventListener("click", async function
         ?.map((item, i) => {
           return `<tr>
             <th scope="row">
-              <label class="checkbox-label" for="checked-body-rbp">
-              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.indexNumber}">
+              <label class="checkbox-label" for="checked-body-rbp-${i}">
+              <input class="checkbox_animated checkbox-body-rbp" id="checked-body-rbp-${i}" type="checkbox" value="${item.indexNumber}" onchange="selectSingleProsbis(event)">
             </label>
             </th>
             <td>${item.level}</td>
@@ -229,7 +230,7 @@ function selectSingleProsbis(event) {
 
 function selectAllProsbis(event) {
   const isChecked = event.target.checked;
-  const allCheckboxes = document.querySelectorAll(".checkbox_animated");
+  const allCheckboxes = document.querySelectorAll(".checkbox-body-rbp");
   const applyButton = document.getElementById("apply-search");
 
   if (isChecked) {
@@ -408,7 +409,7 @@ async function applySearch() {
             col: 1,
             colSize: 10,
             draftRasciId: draftRasciId == "master" ? null : draftRasciId,
-            indexNumber: combineIndex,
+            indexNumber: SelectedProsbisId,
             draftSoId: draftSoId,
           };
           const resultPosition = await fetchPositionMatrix(payloadJob);
