@@ -670,7 +670,7 @@ async function generateAndDownloadWord() {
     console.log("Generating Word document with params:", params);
 
     const wordResult = await downloadWord(params);
-
+    console.log("Word document generation response:", wordResult);
     if (!wordResult || !wordResult.data || !wordResult.data.fileUrl) {
       console.error("Invalid response from downloadWord:", wordResult);
       swal("Warning", "Failed to generate Word document. Invalid server response.", "warning");
