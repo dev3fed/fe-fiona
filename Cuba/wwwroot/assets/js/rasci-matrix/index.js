@@ -3,6 +3,7 @@ let selectedJobIds = [];
 let selectedPrlIds = [];
 let SelectedProsbisId = [];
 let selectedSingleId = [];
+let combinejobIdPrl = [];
 document.addEventListener("dataLoaded", function () {});
 document.addEventListener("DOMContentLoaded", function () {});
 function setSelectedText(text) {
@@ -176,16 +177,18 @@ function selectSingleJob(event) {
   const checkbox = event.target;
   const jobId = checkbox.value;
   const prlOrg = checkbox.getAttribute("prlOrg");
+  const jobPrlKey = `${jobId},${prlOrg}`;
   if (checkbox.checked) {
     if (jobId !== "on") {
-      selectedJobIds.push(jobId);
-      selectedPrlIds.push(prlOrg);
+      if (!combinejobIdPrl.includes(jobPrlKey)) {
+        combinejobIdPrl.push(jobPrlKey);
+      }
     }
+  } else {
+    combinejobIdPrl = combinejobIdPrl.filter((item) => item !== jobPrlKey);
   }
-  // else {
-  //   selectedJobIds = selectedJobIds.filter((id) => id !== jobId);
-  //   selectedPrlIds = selectedPrlIds.filter((id) => id !== prlOrg);
-  // }
+  selectedJobIds = combinejobIdPrl.map((item) => item.split(",")[0]);
+  selectedPrlIds = combinejobIdPrl.map((item) => item.split(",")[1]);
   updateHeaderCheckboxJob();
 }
 
@@ -206,6 +209,10 @@ function selectAllJob(event) {
       selectedJobIds.push(jobId);
       if (prlOrg) {
         selectedPrlIds.push(prlOrg);
+      }
+      const jobPrlKey = `${jobId},${prlOrg}`;
+      if (!combinejobIdPrl.includes(jobPrlKey)) {
+        combinejobIdPrl.push(jobPrlKey);
       }
     }
   });
@@ -244,6 +251,7 @@ function selectAllProsbis(event) {
     });
   } else {
     SelectedProsbisId = [];
+    combinejobIdPrl = [];
     allCheckboxes.forEach((cb) => (cb.checked = false));
   }
   if (applyButton) {
