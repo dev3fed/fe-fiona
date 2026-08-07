@@ -65,8 +65,8 @@ const renderTableBehavior = async (behaviorList) => {
             </div>
             <div class="col-10">
               <label style="padding-top:7px;margin-left:-60px">Showing ${start} to ${
-        listData.count < itemsPerPage * listData.page ? listData.count : itemsPerPage * listData.page
-      } of ${listData.count} records</label>
+                listData.count < itemsPerPage * listData.page ? listData.count : itemsPerPage * listData.page
+              } of ${listData.count} records</label>
             </div>
           </div>
         `;
@@ -182,7 +182,8 @@ async function handleBehavior(type, code) {
           <h6 style="font-weight:bold">${dataDetail.data.behaviour_list} </h6>
         </div>
         ${createCard("Definition", dataDetail?.data.definition, true)}
-    ${createDetailCards(dataDetail.data.detail)}
+         ${createCard("Key Behavior (Perilaku Kunci)", dataDetail?.data?.content?.detail || dataDetail?.data?.detail || [], false)}
+    
     </div>
   `;
 
@@ -193,13 +194,29 @@ async function handleBehavior(type, code) {
   } catch (error) {}
 }
 const createCard = (title, content, isDefinition = false) => {
+  console.log("content", content);
   const cardContent = isDefinition
     ? `<div class="custom-row-full">
          <label>${content}</label>
        </div>`
-    : `<div class="custom-row-full">
+    : Array.isArray(content)
+      ? content
+          .map((item, index) => {
+            const label = String.fromCharCode(65 + index);
+            return `
+            <div class="custom-row-full" style="margin-bottom: 16px;">
+              <label style="font-weight: 600; display: block; margin-bottom: 4px;">${label}. ${item.key}</label>
+              <ul style="list-style-type: disc;  font-size: 13px; margin: 0;">
+                ${item.descriptions
+                  ?.map((description) => `<li style="margin-bottom: 4px;margin-left:15px">${description}</li>`)
+                  .join("")}
+              </ul>
+            </div>`;
+          })
+          .join("")
+      : `<div class="custom-row-full">
          <ul style="list-style-type: disc; margin-left: 20px; font-size: 13px;">
-           ${content.map((item) => `<li>${item}</li>`).join("")}
+           ${content?.detail?.map((item) => `<li>${item}</li>`).join("")}
          </ul>
        </div>`;
 
@@ -213,9 +230,9 @@ const createCard = (title, content, isDefinition = false) => {
       </div>
     </div>`;
 };
-const createDetailCards = (details) => {
-  return details.map((item) => createCard(item.key, item.descriptions)).join("");
-};
+// const createDetailCards = (details) => {
+//   return details.map((item) => createCard(item.key, item.descriptions)).join("");
+// };
 async function handleDetailDictionary(type, code) {
   try {
     const dataDetail = type != "Behavior" ? await fetchCompetencyDetail(code) : await fetchCompeBehaviorDetail(code);
