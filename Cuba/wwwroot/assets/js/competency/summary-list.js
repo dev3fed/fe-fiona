@@ -143,7 +143,7 @@ const renderTableSummary = (resultList) => {
                </button>
           ${
             !isMasterDataSource
-              ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency">
+              ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency" disabled>
                  <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
                  Edit 
                </button>`
