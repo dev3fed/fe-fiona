@@ -646,6 +646,12 @@ function readOnlyPage() {
   $("#handleExportPng , #backToListBtn").show();
   $("#exportImageBtn, #exportSVGBtn, #exportPDFBtn, #fitToScreenBtn, #zoomInBtn, #zoomOutBtn, #chartCompactBtn").show();
 
+  // hide table's right column
+  //  table with id stkTable, tugasHaTable, koordinasiInternalTable, relasiEksternalTable, persyaratanJabatanTable
+  $("#stkTable, #tugasHaTable, #koordinasiTable, #relationTable, #persyaratanKhususTable").each(function () {
+    $(this).find("th:last-child, td:last-child").hide();
+  });
+
   // Delay CKEditor readonly setting to ensure it's fully initialized
   setTimeout(() => {
     const summernoteElement = document.querySelector(".summernote");
@@ -1277,9 +1283,9 @@ $(document).ready(async function () {
     getDataJobDesc.kompetensiPerilaku.data.forEach((item) => {
       $ul.append(`<li><span>${item.namaKompetensi}</span></li>`);
     });
-    divKompetensiPerilaku.append($ul);
+    divKompetensiPerilaku.empty().append($ul);
   } else {
-    divKompetensiPerilaku.append("<div class='text-center'>No data found</div>");
+    divKompetensiPerilaku.empty().append("<div class='text-center'>No data found</div>");
   }
 
   localStorage.setItem("stk", JSON.stringify([]));
