@@ -102,6 +102,8 @@ document.getElementById("status-summary").addEventListener("change", async funct
   } catch (error) {}
 });
 const renderTableSummary = (resultList) => {
+  const dataSourceSelect = document.getElementById("dataSource-summary");
+  const selectedDataSource = dataSourceSelect ? dataSourceSelect.value : null;
   if (resultList && resultList.data && Array.isArray(resultList.data.data) && resultList.data.data.length > 0) {
     const listData = resultList.data;
     const bodySummary = listData.data
@@ -111,19 +113,43 @@ const renderTableSummary = (resultList) => {
         let statusClass = (statusText || "").toLowerCase();
         let isNotAvailable = statusClass === "not-available" || statusClass === "not available";
         const valString = JSON.stringify(element).replace(/"/g, "&quot;");
-
+        console.log("selectedDataSource", selectedDataSource);
+        const isMasterDataSource = selectedDataSource === "master";
         const actionButtons = isNotAvailable
-          ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency">
-                 <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
-                 Add Competency
-               </button>`
-          : `<button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
-              /"/g,
-              "&quot;",
-            )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
+          ? `
+              <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
+                /"/g,
+                "&quot;",
+              )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
                  <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
                  <span>Detail</span>
-               </button>`;
+               </button> 
+               ${
+                 !isMasterDataSource
+                   ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency">
+                 <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
+                 Add 
+               </button>`
+                   : ""
+               }
+               `
+          : `
+          <button onclick="showDetail(${valString})" data-position-name="${(element.positionName || "").replace(
+            /"/g,
+            "&quot;",
+          )}" class="btn btn-outline-light d-inline-flex align-items-center justify-content-center" type="button" aria-label="Detail">
+                 <img src="/assets/images/rasci/icon_detail.svg" alt="Detail Icon" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;">
+                 <span>Detail</span>
+               </button>
+          ${
+            !isMasterDataSource
+              ? `<button class="btn btn-primary btn-icon" type="button" onclick='loadDetailCompeSummary(${valString})' aria-label="Add Competency" disabled>
+                 <img src="/assets/images/rasci/plus.svg" alt="Filter Icon" />
+                 Edit 
+               </button>`
+              : ""
+          }
+          `;
         let bgColor, textColor;
         switch (statusClass) {
           case "on progress":
@@ -168,11 +194,11 @@ const renderTableSummary = (resultList) => {
             <tr>
               <td style="text-align:center">${startIndex + i + 1}</td>
               <td>${element.positionName || "N/A"}</td>
-              <td style="text-align:center">${element.functionName || "N/A"}</td>
-              <td style="text-align:center">${element.divisionName || "N/A"}</td>
-              <td style="text-align:center">${element.departmentName || "N/A"}</td>
+              <td style="text-align:center">${element.functionName || "-"}</td>
+              <td style="text-align:center">${element.divisionName || "-"}</td>
+              <td style="text-align:center">${element.departmentName || "-"}</td>
               <td style="width: 120px;text-align:center">${statusHtml}</td>
-              <td style="text-align:center;width:${isNotAvailable ? "200px" : "100px"}">
+              <td style="text-align:center;width:${selectedDataSource != "master" ? "260px" : "100px"}">
                ${actionButtons}
               </td>
             </tr>`;

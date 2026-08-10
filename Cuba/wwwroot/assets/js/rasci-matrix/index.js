@@ -3,6 +3,7 @@ let selectedJobIds = [];
 let selectedPrlIds = [];
 let SelectedProsbisId = [];
 let selectedSingleId = [];
+let combinejobIdPrl = [];
 document.addEventListener("dataLoaded", function () {});
 document.addEventListener("DOMContentLoaded", function () {});
 function setSelectedText(text) {
@@ -70,7 +71,8 @@ document.getElementById("searchButton").addEventListener("click", async function
           return `<tr>
             <th scope="row">
              <label class="checkbox-label" for="checked-body-job-${i}">
-              <input class="checkbox_animated checkbox-body-job" id="checked-body-job" type="checkbox" 
+              <input class="checkbox_animated checkbox-body-job" id="checked-body-job-${i}" type="checkbox" 
+              onchange="selectSingleJob(event)"
               value="${item.unitCode || ""}" 
               prlOrg="${item.prlOrg || ""}">
             </label>
@@ -98,8 +100,8 @@ document.getElementById("searchButton").addEventListener("click", async function
         ?.map((item, i) => {
           return `<tr>
             <th scope="row">
-              <label class="checkbox-label" for="checked-body-rbp">
-              <input class="checkbox_animated" id="checked-body-rbp" type="checkbox" value="${item.indexNumber}">
+              <label class="checkbox-label" for="checked-body-rbp-${i}">
+              <input class="checkbox_animated checkbox-body-rbp" id="checked-body-rbp-${i}" type="checkbox" value="${item.indexNumber}" onchange="selectSingleProsbis(event)">
             </label>
             </th>
             <td>${item.level}</td>
@@ -175,16 +177,18 @@ function selectSingleJob(event) {
   const checkbox = event.target;
   const jobId = checkbox.value;
   const prlOrg = checkbox.getAttribute("prlOrg");
+  const jobPrlKey = `${jobId},${prlOrg}`;
   if (checkbox.checked) {
     if (jobId !== "on") {
-      selectedJobIds.push(jobId);
-      selectedPrlIds.push(prlOrg);
+      if (!combinejobIdPrl.includes(jobPrlKey)) {
+        combinejobIdPrl.push(jobPrlKey);
+      }
     }
+  } else {
+    combinejobIdPrl = combinejobIdPrl.filter((item) => item !== jobPrlKey);
   }
-  // else {
-  //   selectedJobIds = selectedJobIds.filter((id) => id !== jobId);
-  //   selectedPrlIds = selectedPrlIds.filter((id) => id !== prlOrg);
-  // }
+  selectedJobIds = combinejobIdPrl.map((item) => item.split(",")[0]);
+  selectedPrlIds = combinejobIdPrl.map((item) => item.split(",")[1]);
   updateHeaderCheckboxJob();
 }
 
@@ -205,6 +209,10 @@ function selectAllJob(event) {
       selectedJobIds.push(jobId);
       if (prlOrg) {
         selectedPrlIds.push(prlOrg);
+      }
+      const jobPrlKey = `${jobId},${prlOrg}`;
+      if (!combinejobIdPrl.includes(jobPrlKey)) {
+        combinejobIdPrl.push(jobPrlKey);
       }
     }
   });
@@ -229,7 +237,7 @@ function selectSingleProsbis(event) {
 
 function selectAllProsbis(event) {
   const isChecked = event.target.checked;
-  const allCheckboxes = document.querySelectorAll(".checkbox_animated");
+  const allCheckboxes = document.querySelectorAll(".checkbox-body-rbp");
   const applyButton = document.getElementById("apply-search");
 
   if (isChecked) {
@@ -243,6 +251,7 @@ function selectAllProsbis(event) {
     });
   } else {
     SelectedProsbisId = [];
+    combinejobIdPrl = [];
     allCheckboxes.forEach((cb) => (cb.checked = false));
   }
   if (applyButton) {
@@ -408,7 +417,7 @@ async function applySearch() {
             col: 1,
             colSize: 10,
             draftRasciId: draftRasciId == "master" ? null : draftRasciId,
-            indexNumber: combineIndex,
+            indexNumber: SelectedProsbisId,
             draftSoId: draftSoId,
           };
           const resultPosition = await fetchPositionMatrix(payloadJob);

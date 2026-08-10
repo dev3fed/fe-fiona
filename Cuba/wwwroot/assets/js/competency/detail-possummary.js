@@ -229,7 +229,6 @@ const modalSummaryInfoPosition = async (code, prl) => {
         const incContent = document.getElementById("sumincumbent-content");
         const incumbentCard = document.getElementById("incumbent-cardreq");
         const positionLabel = document.getElementById("sumposition-name");
-        console.log("dataSource", dataSource);
         if (sgContent && jobInfo) {
           sgContent.innerHTML = cardsgContent;
           jobInfo.innerHTML = bodyInfo;
@@ -256,7 +255,6 @@ const cardTblSummaryMandatory = async (code, prl) => {
     if (genericNodata) {
       genericNodata.style.display = result.data !== undefined ? "none" : " block";
     }
-    console.log("result", result);
     if (result.success === true) {
       const listMandatory = result?.data.compData || [];
       const labelMandatory = document.getElementById("labelSumcore");
@@ -291,60 +289,6 @@ const cardTblSummaryMandatory = async (code, prl) => {
     console.error(error);
   }
 };
-
-// const cardTblSummaryGeneral = async (code, prl) => {
-//   const dataSource = $("#dataSource-competency").val();
-//   const payload = `${dataSource}/${code}/${prl}`;
-
-//   try {
-//     const result = await fetchDetailPositionTechnical(payload);
-//     const generalNoData = document.getElementById("sumgeneral-no-data");
-//     const generalContent = document.getElementById("general-sumcompetency-content");
-//     if (generalContent) {
-//       generalContent.style.display = result.data !== undefined ? "block" : "none";
-//     }
-//     if (generalNoData) {
-//       generalNoData.style.display = result.data !== undefined ? "none" : " block";
-//     }
-
-//     if (result.success === true) {
-//       const listTechnical = result?.data.compData || [];
-//       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
-//       const labelCore = document.getElementById("labelSumcore");
-//       if (labelCore) {
-//         labelCore.innerHTML = `General (${generalCompetencies.length}/3)`;
-//       }
-
-//       const theadTechnical = `
-//             <tr>
-//               <th scope="col" style="width: 40px;text-align:center">No</th>
-//               <th scope="col" style="width: 300px">Competency</th>
-//               <th scope="col" style="width: 160px;text-align:center">Proficiency Level</th>
-//             </tr>`;
-
-//       const bodyTechnical = listTechnical
-//         .filter((element) => element.compType.toLowerCase() === "general")
-//         .map((element, i) => {
-//           return `
-//               <tr>
-//                 <td  style="text-align:Center">${i + 1}</td>
-//                 <td style="color:#03a9f4; cursor:pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="handleDetailSuminfo('General','${
-//                   element.compCode
-//                 }')">
-//                 ${element.compName}</td>
-//                 <td style="text-align:Center">${element.level}</td>
-
-//               </tr>`;
-//         })
-//         .join("");
-
-//       document.getElementById("technical-sumcompetency-header").innerHTML = theadTechnical;
-//       document.getElementById("technical-sumcompetency-body").innerHTML = bodyTechnical;
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
 
 const cardTblSummarySpecific = async (code, prl) => {
   const dataSource = $("#dataSource-competency").val();
@@ -446,47 +390,17 @@ const cardTblSummaryBehavior = async (code, prl) => {
   }
 };
 
-// const modalTabBehavior = async (code) => {
-//   const dataSource = $("#dataSource-competency").val();
-//   const payload = {
-//     dataSource: dataSource,
-//     positionCode: code,
-//   };
-//   const queryString = "?" + new URLSearchParams(payload).toString();
-
-//   try {
-//     const result = await fetchDetailPositionBehavior(queryString);
-//     if (result.success === true) {
-//       const listBehavior = result?.data.behaviourList[0].behaviouralDictionary || [];
-//       console.log("listBehavior", listBehavior);
-
-//       let html =
-//         '<div style="display: grid; grid-auto-flow: column; grid-template-rows: repeat(5, auto); gap: 15px 40px; padding-left: 10px;">';
-
-//       listBehavior.forEach((item) => {
-//         html += `<div style="white-space: nowrap; color: #03a9f4; font-size: 12px; cursor: pointer;" onclick="onSumbehaviorClick('Behavior','${item.id}')">${item.behaviourDict}</div>`;
-//       });
-
-//       html += "</div>";
-
-//       document.getElementById("behavior-competency-body").innerHTML = html;
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
 const onSumbehaviorClick = async (type, code) => {
   try {
     const dataDetail = await fetchCompeBehaviorDetail(code);
-    const modalElement = document.getElementById("ModalDetailPos");
+    const modalElement = document.getElementById("ModalSummaryInfo");
     const closeModal = bootstrap.Modal.getInstance(modalElement);
     if (closeModal) {
       closeModal.hide();
     }
-    const modal = new bootstrap.Modal(document.getElementById("ModalDetailKkj"));
+    const modal = new bootstrap.Modal(document.getElementById("ModalDetailComreq"));
     modal.show();
-    const modalTitle = document.getElementById("ModalDetailKkjTitle");
+    const modalTitle = document.getElementById("ModalDetailComreqTitle");
     if (modalTitle) {
       modalTitle.innerHTML = `${type} Competency Detail`;
     }
@@ -500,7 +414,7 @@ const onSumbehaviorClick = async (type, code) => {
     </div>
   `;
 
-    const modalBodyContent = document.getElementById("body-detailKkj");
+    const modalBodyContent = document.getElementById("body-detailComreq");
     if (modalBodyContent) {
       modalBodyContent.innerHTML = formContent;
     }
@@ -533,16 +447,16 @@ const cardDetailSumbehavior = (details) => {
 async function handleDetailSuminfo(type, code) {
   try {
     // close modal ModalDetailPos
-    const modalElement = document.getElementById("ModalDetailPos");
+    const modalElement = document.getElementById("ModalSummaryInfo");
     const closeModal = bootstrap.Modal.getInstance(modalElement);
     if (closeModal) {
       closeModal.hide();
     }
     const dataDetail = type != "Behavior" ? await fetchCompetencyDetail(code) : await fetchCompeBehaviorDetail(code);
-    const modal = new bootstrap.Modal(document.getElementById("ModalDetailKkj"));
+    const modal = new bootstrap.Modal(document.getElementById("ModalDetailComreq"));
 
     modal.show();
-    const modalTitle = document.getElementById("ModalDetailKkjTitle");
+    const modalTitle = document.getElementById("ModalDetailComreqTitle");
     if (modalTitle) {
       modalTitle.innerHTML = `${type} Competency Detail`;
     }
@@ -614,7 +528,7 @@ async function handleDetailSuminfo(type, code) {
     <div class="col-12">
   `;
 
-    const modalBodyContent = document.getElementById("body-detailKkj");
+    const modalBodyContent = document.getElementById("body-detailComreq");
     if (modalBodyContent) {
       modalBodyContent.innerHTML = formContent;
     }
@@ -636,5 +550,15 @@ const handleCloseSummaryBehavior = async () => {
     bootstrapModal.hide();
   }
   const modal = new bootstrap.Modal(document.getElementById("ModalDetailPos"));
+  modal.show();
+};
+
+const handleCloseDetailComreq = async () => {
+  const closeModal = document.getElementById("ModalDetailComreq");
+  if (closeModal) {
+    const bootstrapModal = bootstrap.Modal.getInstance(closeModal);
+    bootstrapModal.hide();
+  }
+  const modal = new bootstrap.Modal(document.getElementById("ModalSummaryInfo"));
   modal.show();
 };

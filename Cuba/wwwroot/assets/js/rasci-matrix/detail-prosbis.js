@@ -280,7 +280,7 @@ const applySeriesProses = async () => {
         col: 1,
         colSize: 10,
         draftRasciId: draftRasciId == "master" ? null : draftRasciId,
-        indexNumber: combineIndex,
+        indexNumber: [dataDetailProsbis.indexNumber],
         prlOrg: [],
         unitCode: [],
         draftSoId: draftSoId || null,
