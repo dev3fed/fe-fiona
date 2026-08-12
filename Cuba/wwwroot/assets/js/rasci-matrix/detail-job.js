@@ -306,6 +306,7 @@ const layoutTabRelatedBispro = async (data) => {
 async function handleShowJobdesc() {
   const detailJob = getState("detailJob");
   const draftSoId = getState("draftSoId");
+
   const isMaster = draftSoId === null || draftSoId === undefined || draftSoId === "";
   const urlJobDesc = `/job-description/detail?master=true&jobId=${detailJob.unitCode}&prlOrg=${detailJob.prlOrg}`;
   window.open(urlJobDesc, "_blank");
