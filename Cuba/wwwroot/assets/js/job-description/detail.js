@@ -367,14 +367,18 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
 
   const lsAvailable = JSON.parse(localStorage.getItem("lsAvailable"));
   const codeNotAvailable = lsAvailable?.codeNotAvailable || [];
+  const codeAvailable = lsAvailable?.codeAvailable || [];
 
   const codeAvailableSelectedArray =
     getDataJobDesc?.tugasTanggungJawabAkhir?.data?.flatMap(
       (item) => item.tanggungJawabProses?.map((proses) => proses.indexNumber) || [],
     ) || [];
 
+  console.log("codeAvailableSelectedArray", codeAvailableSelectedArray);
+
   const codeAvailableSelected = codeAvailableSelectedArray.filter((v, i, a) => a.indexOf(v) === i);
 
+  console.log("codeAvailableSelected", codeAvailableSelected);
   // compare codeAvailableSelected with codeNotAvailable
 
   let arraytugasTanggungJawabAkhir = [];
@@ -392,27 +396,18 @@ async function applySelectedData(id, prlOrgParam, prlOrgTarget) {
   //   item.tanggungJawabProses = uniqueProses;
   // });
 
+  console.log("getDataJobDesc?.tugasTanggungJawabAkhir?.data", getDataJobDesc?.tugasTanggungJawabAkhir?.data);
+  console.log("codeNotAvailable", codeNotAvailable);
+  const codeAll = [...codeAvailableSelected, ...codeNotAvailable];
   getDataJobDesc?.tugasTanggungJawabAkhir?.data?.forEach((item) => {
-    console.log("=====");
+    console.log("item.tanggungJawabProses", item.tanggungJawabProses);
     const arrayProses = item.tanggungJawabProses?.map((proses) => proses.indexNumber) || [];
     console.log("arrayProses", arrayProses);
-    // check arrayProses if includes codeNotAvailable
-
-    console.log("codeNotAvailable", codeNotAvailable);
-    const hasRelevantProcess = arrayProses.some((code) => codeNotAvailable.includes(code));
+    const hasRelevantProcess = arrayProses.some((code) => codeAll.includes(code));
     if (hasRelevantProcess) {
       arraytugasTanggungJawabAkhir.push(item);
     }
-    // item.tanggungJawabProses?.forEach((proses) => {
-    //   if (codeNotAvailable.includes(proses.indexNumber)) {
-    //     // Do something if both conditions are met
-    //     isItemAdded = false;
-    //   }
-    // });
-    // if (isItemAdded) {
-    //   console.log("Adding item to arraytugasTanggungJawabAkhir", item);
-    //   arraytugasTanggungJawabAkhir.push(item);
-    // }
+    // arraytugasTanggungJawabAkhir.push(item);
   });
 
   const selectedJobDescReference = JSON.parse(localStorage.getItem("selectedJobDescReference")) || {};
