@@ -58,6 +58,9 @@ async function openModalNotRow(result) {
           <th scope="col">Comment (Optional)</th>
           </tr>`;
     const output = mergeRasciData(notation, rasciNotation);
+    console.log("notation", notation);
+    console.log("rasciNotation", rasciNotation);
+    console.log("output", output);
     setState("rasciNotation", output);
     setState("dataDetailProsbis", {
       ...dataDetailProsbis,
