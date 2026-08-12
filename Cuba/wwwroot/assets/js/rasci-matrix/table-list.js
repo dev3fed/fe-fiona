@@ -871,7 +871,7 @@ async function handleNotationUpdate(inputValue, dataStoreProsbis, storageDataPos
     inputValue.busProsMapped.forEach((busProItem) => {
       updateResponsibilityForBusinessProcess(busProItem, matchedPosition);
     });
-    return true;
+    // return true;
   }
 
   loadTableHeader(storageDataPosition);

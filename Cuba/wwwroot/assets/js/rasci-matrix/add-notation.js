@@ -663,7 +663,7 @@ function tblChangeNotationRow(rasciNotation) {
         } Icon" style="padding-right:2px">
       </td>
       <td>
-        <input class="form-control" type="text" placeholder="Type Comment" id="comment${letter.rasciCode}"
+        <input class="form-control" type="text" placeholder="Type Comment" id="commentrasci-row${letter.rasciCode}"
           value="${letter.comment || ""}"
           ${!letter.isChecked ? "disabled" : ""}
           oninput="updateComment('${letter.rasciCode}', this.value)">
@@ -678,7 +678,7 @@ function tblChangeNotationRow(rasciNotation) {
 
 function onCheckNotation(event, rasciCode) {
   const isChecked = event.target.checked;
-  const commentInput = document.getElementById(`comment${rasciCode}`);
+  const commentInput = document.getElementById(`commentrasci-row${rasciCode}`);
   commentInput.disabled = !isChecked;
   commentInput.value = isChecked ? commentInput.value : "";
   const selectedBusinessId = $("#businessId");
