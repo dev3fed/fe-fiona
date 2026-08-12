@@ -440,17 +440,16 @@ const showDetail = async (data) => {
 };
 
 const loadDetailCompeSummary = async (data) => {
+  console.log("data", data);
   try {
     let competencyList = getState("payloadAddCompetency");
     const dataSource = $("#dataSource-competency").val();
     const code = data.unitCode || "";
     const prl = data.prlOrg || "";
     const payload = `${dataSource}/${code}/${prl}`;
-
     const resultMandatory = await fetchDetailPositionMandatory(payload);
     const resultTechnical = await fetchDetailPositionTechnical(payload);
-
-    if (resultMandatory.data || resultTechnical.data) {
+    if (resultTechnical.data) {
       const listMandatory = resultMandatory?.data.compData || [];
       const listTechnical = resultTechnical?.data.compData || [];
 
@@ -461,7 +460,6 @@ const loadDetailCompeSummary = async (data) => {
         selectedType: element.compType,
         selectedLvl: isMandatory ? element.proficiencyLevel : element.level,
       });
-
       const generalCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "general");
       const specificCompetencies = listTechnical.filter((element) => element.compType.toLowerCase() === "specific");
 
@@ -471,7 +469,6 @@ const loadDetailCompeSummary = async (data) => {
         ...generalCompetencies.map((element) => transformCompetency(element)),
         ...specificCompetencies.map((element) => transformCompetency(element)),
       ];
-
       setState("jobInformation", data);
       setState("payloadAddCompetency", competencyList);
     } else {
@@ -626,6 +623,5 @@ const handleShowWarning = async () => {
 
 const handleSeeDictsummary = () => {
   const compesummaryId = $("#compesummaryId").val();
-  console.log("Selected competency:", compesummaryId);
   handleDictsummary("Technical", compesummaryId);
 };
