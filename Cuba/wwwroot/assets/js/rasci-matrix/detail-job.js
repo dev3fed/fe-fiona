@@ -303,6 +303,13 @@ const layoutTabRelatedBispro = async (data) => {
   } catch (error) {}
 };
 
+async function handleShowJobdesc() {
+  const detailJob = getState("detailJob");
+  const draftSoId = getState("draftSoId");
+  const isMaster = draftSoId === null || draftSoId === undefined || draftSoId === "";
+  const urlJobDesc = `/job-description/detail?master=true&jobId=${detailJob.unitCode}&prlOrg=${detailJob.prlOrg}`;
+  window.open(urlJobDesc, "_blank");
+}
 async function handleShowRasci() {
   const detailJob = getState("detailJob");
   const draftSoId = getState("draftSoId");
