@@ -1,0 +1,68 @@
+<style>
+    .tbl-border-generic {
+        width: 100%;
+        border-top: 1px solid #b0d1e4;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+        border-collapse: collapse;
+        font-size: 12px !important;
+    }
+
+    .tbl-border-generic th {
+        color: #006CA9;
+        font-weight: bold;
+        height: 40px;
+    }
+
+    .tbl-border-generic thead th {
+        position: sticky;
+        top: 0;
+        background-color: #E6F0F6;
+        z-index: 1;
+        /* To ensure it stays above the content */
+    }
+
+    .tbl-border-generic th,
+    .tbl-border-generic td {
+        padding: 8px !important;
+        border-right: 1px solid #b0d1e4;
+        border-bottom: 1px solid #b0d1e4;
+        border-left: 1px solid #b0d1e4;
+    }
+
+    th,
+    td {
+        vertical-align: middle;
+        padding: 0;
+    }
+</style>
+<div class="col-12">
+    <div class="row">
+        <div class="col-12 mt-3">
+            <div class="table-responsive" style=" max-height: 350px;">
+                <table class="table tbl-border-generic">
+                    <thead id="tbl-generic-header" style="background-color: #006CA9;">
+                        <tr>
+                            <th scope="col" style="width: 50px;text-align:center">
+                                No
+                            </th>
+                            <th scope="col" style="width: 280px;">Generic Competency Name</th>
+                            <th scope="col">Definition</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-generic">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @* <div class="col-9 mt-3">
+            <div id="total-generic-page">
+            </div>
+        </div>
+        <div class="col-3 mt-3 d-flex justify-content-end">
+            <div id="list-generic-page">
+            </div>
+        </div> *@
+    </div>
+</div>
