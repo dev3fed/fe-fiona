@@ -31,6 +31,13 @@ const renderTableGeneric = async (genericList) => {
                 <th scope="row" style="text-align:center">${i + 1}</th>
                 <td>${val.name || "-"}</td>
                 <td>${val.definition || "-"}</td>
+                <td style="width: 120px;text-align:center">
+                  <button class="btn btn-outline-primary" type="button" onclick="handleDetailDictionary('Technical','${
+                    val.compCode
+                  }')">
+                    <i class="icon-eye" style="font-size: 12px;" > Detail</i> 
+                  </button>
+                </td>
               </tr>`;
         })
         .join("");
