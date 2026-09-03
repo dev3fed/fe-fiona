@@ -246,6 +246,35 @@ async function fetchProsbisSumulation(currentPageY, currentPageX) {
     };
   }
 }
+async function fetchBusinessProcessHierarchy(dataSource, search, page = 1, pageSize = 25) {
+  const params = new URLSearchParams();
+  if (dataSource) params.append("dataSource", dataSource);
+  if (search) params.append("search", search);
+  params.append("page", page);
+  params.append("pageSize", pageSize);
+  const url = `${url_api}/api/BusinessProcess/hierarchy?${params.toString()}`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    const payloadData = result.data || {};
+    return {
+      success: true,
+      flatList: payloadData.flatList || payloadData.data || [],
+      treeList: payloadData.treeList || [],
+      totalResult: payloadData.totalCount || (payloadData.flatList ? payloadData.flatList.length : 0),
+      totalPages: payloadData.totalPages || 1,
+      currentPage: payloadData.currentPage || page,
+      pageSize: payloadData.pageSize || pageSize,
+      hasNextPage: payloadData.hasNextPage || false,
+      hasPreviousPage: payloadData.hasPreviousPage || false,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.responseJSON?.message || "Error fetching data from API",
+    };
+  }
+}
+
 async function fetchProsbisMatrix(payload) {
   const url = `${url_api}/api/rasci-matrix/business-process`;
   try {
