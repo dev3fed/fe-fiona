@@ -58,10 +58,21 @@ $(document).ready(function () {
                     'left': targetLeft + 'px',
                     'right': 'auto',
                     'bottom': 'auto',
-                    'z-index': '9999999'
+                    'z-index': '9999995'
                 });
             }
         }, 20);
+    });
+
+    $(document).on('click', '#luckysheet-icon-text-color, #luckysheet-icon-bg-color, div[id*="luckysheet-icon-text-color"], div[id*="luckysheet-icon-bg-color"]', function (e) {
+        setTimeout(function () {
+            $('.sp-container, .luckysheet-color-menu, #luckysheet-icon-text-color-menu, #luckysheet-icon-bg-color-menu, div[id*="color-menu"]').css({
+                'z-index': '99999999',
+                'display': 'block',
+                'visibility': 'visible',
+                'opacity': '1'
+            });
+        }, 30);
     });
 
     window.addEventListener('keydown', function (e) {
@@ -230,6 +241,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
         ];
 
         baseHeaders.forEach((h, cIdx) => {
+            const headerTb = (cIdx === 5) ? 1 : 0;
             celldata.push({
                 r: 0,
                 c: cIdx,
@@ -239,6 +251,9 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                     bg: h.bg,
                     fc: h.fc,
                     bl: h.bl,
+                    tb: headerTb,
+                    ff: 1,
+                    fs: 11,
                     ht: 1,
                     vt: 1
                 }
@@ -251,7 +266,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                 const levelNum = pb.level || (pb.indexNumber ? pb.indexNumber.split('.').length : 1);
                 const desc = pb.description || pb.name || pb.businessProcessName || "";
 
-                celldata.push({ r: r, c: 0, v: { v: pb.indexNumber || "", m: pb.indexNumber || "" } });
+                celldata.push({ r: r, c: 0, v: { v: pb.indexNumber || "", m: pb.indexNumber || "", ff: 1, fs: 11, tb: 0 } });
 
                 const colLevel = Math.min(Math.max(levelNum, 1), 6);
                 let colorHex = "#0f172a";
@@ -263,13 +278,17 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                 else if (colLevel === 4) { colorHex = "#7c3aed"; }
                 else if (colLevel === 5) { colorHex = "#3e4140ff"; }
                 else if (colLevel === 6) { colorHex = "#7c7a7aff"; }
+                else if (colLevel === 7) { colorHex = "#7c7a7aff"; }
+                else if (colLevel === 8) { colorHex = "#7c7a7aff"; }
 
-                celldata.push({ r: r, c: colLevel, v: { v: desc, m: desc, fc: colorHex, bl: isBold } });
+                const textWrapMode = (colLevel === 5) ? 2 : 1;
 
-                celldata.push({ r: r, c: 7, v: { v: pb.notes || "", m: pb.notes || "" } });
-                celldata.push({ r: r, c: 8, v: { v: pb.definisi || pb.definition || pb.processDefinition || "", m: pb.definisi || pb.definition || pb.processDefinition || "" } });
-                celldata.push({ r: r, c: 9, v: { v: pb.input || "", m: pb.input || "" } });
-                celldata.push({ r: r, c: 10, v: { v: pb.output || "", m: pb.output || "" } });
+                celldata.push({ r: r, c: colLevel, v: { v: desc, m: desc, fc: colorHex, bl: isBold, tb: textWrapMode, ff: 1, fs: 11 } });
+
+                celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: 1, fs: 11, tb: 0 } });
+                celldata.push({ r: r, c: 10, v: { v: pb.definisi || pb.definition || pb.processDefinition || "", m: pb.definisi || pb.definition || pb.processDefinition || "", ff: 1, fs: 11, tb: 0 } });
+                celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: 1, fs: 11, tb: 0 } });
+                celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: 1, fs: 11, tb: 0 } });
             });
         }
 
@@ -278,14 +297,53 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
             title: 'Business Process Spreadsheet',
             lang: 'en',
             showinfobar: false,
-            showsheetbar: true,
+            defaultFontFamily: 'Arial',
+            defaultFontSize: 11,
             showtoolbar: true,
             showtoolbarConfig: {
+                paintFormat:false,
+                currencyFormat: false,
+                percentageFormat: false,
+                numberDecrease: false,
+                numberIncrease: false,
+                moreFormats: false,
+                textRotateMode: false,
+                image: false,
+                link: false,
+                chart: false,
+                pivotTable: false,
+                function: false,
+                conditionalFormat: false,
+                dataVerification: false,
+                splitColumn: false,
+                screenshot: false,
+                protection: false,
                 print: false
+            },
+            showsheetbar: true,
+            showsheetbarConfig: {
+                add: false,
+                menu: false
+            },
+            cellRightClickConfig: {
+                matrix: false,
+                chart: false,
+                image: false,
+                link: false,
+                data: false
+            },
+            sheetRightClickConfig: {
+                delete: false,
+                copy: false,
+                rename: false,
+                color: false,
+                hide: false,
+                move: false
             },
             showformulaBar: true,
             showstatisticBar: true,
             allowUpdate: true,
+            defaultRowHeight: 25,
             column: baseHeaders.length,
             row: (prosbisList.length || 15) + 30,
             data: [{
@@ -295,18 +353,26 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                 order: 0,
                 celldata: celldata,
                 config: {
+                    defaultrowlen: 25,
                     columnlen: {
                         0: 75,
-                        1: 140,
-                        2: 140,
-                        3: 140,
-                        4: 140,
-                        5: 140,
-                        6: 140,
-                        7: 160,
-                        8: 200,
+                        1: 34,
+                        2: 34,
+                        3: 34,
+                        4: 34,
+                        5: 579,
+                        6: 34,
+                        7: 34,
+                        8: 34,
                         9: 180,
-                        10: 220
+                        10: 220,
+                        11: 220,
+                        12: 220
+                    },
+                    colhidden: {
+                        6: 0,
+                        7: 0,
+                        8: 0
                     }
                 }
             }]
