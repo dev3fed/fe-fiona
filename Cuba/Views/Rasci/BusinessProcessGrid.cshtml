@@ -32,15 +32,47 @@
         z-index: 9999990 !important;
     }
 
+    #luckysheet-icon-morebtn {
+        position: absolute !important;
+        right: 8px !important;
+        top: 6px !important;
+        z-index: 1000 !important;
+        white-space: nowrap !important;
+        background: #ffffff !important;
+        border: 1px solid #d4d4d4 !important;
+        border-radius: 4px !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+        padding: 2px 8px !important;
+        height: 28px !important;
+        line-height: 24px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
+    }
+
+    .luckysheet-toolbar-button,
+    .luckysheet-toolbar-item,
+    .luckysheet-toolbar-combo-button {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
     #luckysheet-icon-morebtn-div,
-    #luckysheet-icon-morebtn-menu {
+    #luckysheet-icon-morebtn-menu,
+    .luckysheet-toolbar-more-menu {
         z-index: 9999995 !important;
         background: #ffffff !important;
         border: 1px solid #d4d4d4 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         border-radius: 4px !important;
+        white-space: nowrap !important;
+        min-width: 150px !important;
     }
 
+    #luckysheet-icon-text-color-menu-menuButton,
+    #luckysheet-icon-cell-color-menu-menuButton,
     .luckysheet-color-menu,
     .luckysheet-toolbar-colors-menu,
     #luckysheet-icon-text-color-menu,
@@ -49,6 +81,20 @@
     .sp-palette-container,
     .luckysheet-spectrum-container {
         z-index: 99999999 !important;
+        background: #ffffff !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+        border-radius: 6px !important;
+    }
+
+    .sp-container {
+        position: fixed !important;
+        border: none !important;
+        background: #ffffff !important;
+    }
+
+    .sp-palette-container,
+    .sp-picker-container {
+        background: #ffffff !important;
     }
 
     #luckysheet-icon-print,
@@ -63,18 +109,52 @@
         box-sizing: border-box !important;
         position: relative !important;
         font-family: Arial, sans-serif !important;
+        overscroll-behavior: none !important;
+        overscroll-behavior-x: none !important;
+        overscroll-behavior-y: none !important;
+    }
+
+    .luckysheet-wrapper,
+    #luckysheet-business-process-container *,
+    .luckysheet-sheet-area,
+    .luckysheet-grid-window,
+    #luckysheet-cell-main,
+    #luckysheetTableContent {
+        overscroll-behavior: none !important;
+        overscroll-behavior-x: none !important;
+        overscroll-behavior-y: none !important;
+        touch-action: pan-x pan-y !important;
+    }
+
+    #luckysheet-business-process-container #luckysheet-grid-window,
+    #luckysheet-business-process-container .luckysheet-grid-window {
+        top: 0px !important;
+    }
+
+    #luckysheet-business-process-container #luckysheet-cell-main,
+    #luckysheet-business-process-container #luckysheet-grid-window,
+    #luckysheet-business-process-container canvas {
+        pointer-events: auto !important;
     }
 
     #luckysheet-business-process-container .luckysheet-wa-editor {
-        padding-left: 10px;
-        padding-right: 10px;
-        background: #fafafc;
+        padding-left: 10px !important;
+        padding-right: 60px !important;
+        background: #fafafc !important;
+        position: relative !important;
     }
 
-    #luckysheet-business-process-container .luckysheet-wa-calculate {
-        background: #ffffff;
-        min-height: 28px;
-        display: block !important;
+    #luckysheet-business-process-container .luckysheet-wa-calculate,
+    #luckysheet-formula-bar-config {
+        background: #ffffff !important;
+        min-height: 28px !important;
+        height: 28px !important;
+        display: flex !important;
+        align-items: center !important;
+        z-index: 900 !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        position: absolute !important;
+        width: 100% !important;
     }
 
     .btn-prosbis-light {
@@ -147,9 +227,9 @@
             </div>
 
             <div class="luckysheet-wrapper border rounded"
-                 style="position: relative; width: 100%; height: 720px; overflow: hidden;">
+                 style="position: relative; width: 100%; height: 720px; overflow: hidden; overscroll-behavior: none;">
                 <div id="luckysheet-business-process-container"
-                     style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px;">
+                     style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; overflow: hidden; overscroll-behavior: none;">
                 </div>
             </div>
         </div>

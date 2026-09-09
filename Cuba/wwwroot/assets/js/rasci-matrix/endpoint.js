@@ -275,6 +275,37 @@ async function fetchBusinessProcessHierarchy(dataSource, search, page = 1, pageS
   }
 }
 
+async function saveBusinessProcessBatch(payload) {
+  const url = `${url_api}/api/BusinessProcess/save-batch`;
+  try {
+    const result = await ajaxRequest(url, "POST", payload);
+    return {
+      success: true,
+      data: result?.data,
+      message: result?.message || "Data Business Process berhasil disimpan!"
+    };
+  } catch (error) {
+    console.error("Error saving business process batch:", error);
+    return {
+      success: false,
+      error: error?.responseJSON?.message || error?.message || "Gagal menyimpan data ke database."
+    };
+  }
+}
+
+async function fetchSelectDraftRasci() {
+  const url = `${url_api}/api/Utilities/selection?type=draft-rasci&page=1&search=`;
+  try {
+    const result = await ajaxRequest(url, "GET");
+    return result;
+  } catch (error) {
+    console.error("Error fetching draft rasci selection:", error);
+    return null;
+  }
+}
+
+
+
 async function fetchProsbisMatrix(payload) {
   const url = `${url_api}/api/rasci-matrix/business-process`;
   try {
