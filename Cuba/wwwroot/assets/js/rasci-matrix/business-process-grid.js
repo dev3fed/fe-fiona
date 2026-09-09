@@ -4,6 +4,14 @@ let isFullscreenProsbis = false;
 let modifiedRowIndexes = new Set();
 let prosbisIdMapByIdx = new Map();
 let prosbisOriginalIdxMap = new Map();
+let rowOriginalIdMap = new Map();
+
+function getRowDatabaseId(r) {
+  if (typeof rowOriginalIdMap !== "undefined" && rowOriginalIdMap.has(r)) {
+    return rowOriginalIdMap.get(r) || 0;
+  }
+  return 0;
+}
 
 $(document).ready(function () {
   $("#pills-business-process-tab").on("shown.bs.tab", function () {
@@ -131,12 +139,29 @@ $(document).ready(function () {
     },
     true,
   );
+
+  $(document).on(
+    "paste",
+    "#luckysheet-business-process-container, .luckysheet-cell-input, .luckysheet-input-box",
+    function () {
+      setTimeout(function () {
+        processModifiedRange(null, "Clipboard Paste Event");
+      }, 150);
+      setTimeout(function () {
+        processModifiedRange(null, "Clipboard Paste Event (Delayed)");
+      }, 400);
+    },
+  );
 });
 
 function fixLuckysheetLayoutOffsets() {
   const $editor = $("#luckysheet-wa-editor, .luckysheet-wa-editor");
   const $formulaBar = $("#luckysheet-wa-calculate, .luckysheet-wa-calculate, #luckysheet-formula-bar-config");
-  const $sheetArea = $("#luckysheet-sheet-area, .luckysheet-sheet-area, #luckysheet-grid-window");
+  const $sheetArea = $("#luckysheet-sheet-area, .luckysheet-sheet-area");
+  const $gridWindow = $('#luckysheet-grid-window, .luckysheet-grid-window, div[id*="luckysheet-grid-window"]');
+  if ($gridWindow.length > 0) {
+    $gridWindow.css({ top: "0px" });
+  }
 
   if ($editor.length > 0) {
     const editorHeight = $editor.outerHeight() || 40;
@@ -169,6 +194,10 @@ function fixLuckysheetLayoutOffsets() {
         });
       }
     }
+  }
+
+  if (typeof luckysheet !== "undefined" && luckysheet.resize) {
+    luckysheet.resize();
   }
 }
 
@@ -293,6 +322,256 @@ function syncDataSourceDropdown() {
   }
 }
 
+function getLuckysheetCellValue(cell) {
+  if (cell === null || cell === undefined) return "";
+  if (typeof cell === "object") {
+    const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.m;
+    return val !== undefined && val !== null ? String(val).trim() : "";
+  }
+  return String(cell).trim();
+}
+
+function processModifiedRange(rangeInput, source = "Update") {
+  let ranges = [];
+
+  if (typeof rangeInput === "number") {
+    ranges = [{ row: [rangeInput, rangeInput] }];
+  } else if (Array.isArray(rangeInput)) {
+    ranges = rangeInput;
+  } else if (rangeInput && typeof rangeInput === "object") {
+    ranges = [rangeInput];
+  } else if (typeof luckysheet !== "undefined" && luckysheet.getselectrange) {
+    const sel = luckysheet.getselectrange();
+    if (sel && sel.length > 0) {
+      ranges = sel;
+    }
+  }
+
+  const affectedRows = new Set();
+
+  ranges.forEach((rg) => {
+    if (!rg) return;
+    let rStart = null;
+    let rEnd = null;
+
+    if (Array.isArray(rg.row) && rg.row.length >= 2) {
+      rStart = rg.row[0];
+      rEnd = rg.row[1];
+    } else if (typeof rg.row === "number") {
+      rStart = rg.row;
+      rEnd = rg.row;
+    } else if (typeof rg.r === "number") {
+      rStart = rg.r;
+      rEnd = rg.r;
+    } else if (Array.isArray(rg.r) && rg.r.length >= 2) {
+      rStart = rg.r[0];
+      rEnd = rg.r[1];
+    }
+
+    if (rStart !== null && rEnd !== null) {
+      const minR = Math.min(rStart, rEnd);
+      const maxR = Math.max(rStart, rEnd);
+      for (let r = minR; r <= maxR; r++) {
+        if (r > 0) {
+          affectedRows.add(r);
+        }
+      }
+    }
+  });
+
+  if (affectedRows.size === 0 && typeof luckysheet !== "undefined" && luckysheet.getselectrange) {
+    const sel = luckysheet.getselectrange();
+    if (sel && sel.length > 0) {
+      sel.forEach((rg) => {
+        if (rg && Array.isArray(rg.row) && rg.row.length >= 2) {
+          const minR = Math.min(rg.row[0], rg.row[1]);
+          const maxR = Math.max(rg.row[0], rg.row[1]);
+          for (let r = minR; r <= maxR; r++) {
+            if (r > 0) affectedRows.add(r);
+          }
+        }
+      });
+    }
+  }
+
+  if (affectedRows.size > 0) {
+    affectedRows.forEach((r) => {
+      modifiedRowIndexes.add(r);
+      if (typeof luckysheet !== "undefined") {
+        try {
+          const fileData = luckysheet.getluckysheetfile();
+          if (fileData && fileData[0] && fileData[0].data && fileData[0].data[r]) {
+            const gRow = fileData[0].data[r];
+            const targetId = getRowDatabaseId(r);
+            if (gRow[0]) {
+              gRow[0]._id = targetId;
+              if (typeof gRow[0].v === "object" && gRow[0].v !== null) {
+                gRow[0].v._id = targetId;
+              }
+            }
+            gRow._id = targetId;
+          }
+        } catch (e) {
+          console.warn("Failed to sanitize row _id:", e);
+        }
+      }
+    });
+
+    setTimeout(function () {
+      affectedRows.forEach((r) => {
+        const itemPayload = extractLuckysheetRowPayload(r);
+        if (itemPayload) {
+          console.log(`[Luckysheet Change Tracker] ${source} at Row ${r}:`, itemPayload);
+          console.log("JSON Item Payload:\n" + JSON.stringify(itemPayload, null, 2));
+        }
+      });
+    }, 60);
+  }
+}
+
+function extractLuckysheetRowPayload(r) {
+  if (typeof luckysheet === "undefined") return null;
+  const fileData = luckysheet.getluckysheetfile();
+  if (!fileData || !fileData[0] || !fileData[0].data) return null;
+
+  const gridData = fileData[0].data;
+  const row = gridData[r];
+  if (!row) return null;
+
+  const rawIdxVal = getLuckysheetCellValue(row[0]);
+
+  let desc = "";
+  let level = 1;
+  for (let c = 1; c <= 8; c++) {
+    const txt = getLuckysheetCellValue(row[c]);
+    if (txt !== "") {
+      desc = txt;
+      level = c;
+      break;
+    }
+  }
+
+  if (!desc && rawIdxVal) {
+    level = rawIdxVal.split(".").length;
+  }
+
+  const notes = getLuckysheetCellValue(row[9]);
+  const definisi = getLuckysheetCellValue(row[10]);
+  const input = getLuckysheetCellValue(row[11]);
+  const output = getLuckysheetCellValue(row[12]);
+
+  let cellNotes = "";
+  for (let c = 0; c <= 12; c++) {
+    if (row[c]) {
+      const ps = row[c].ps || (row[c].v && typeof row[c].v === "object" ? row[c].v.ps : null);
+      if (ps) {
+        if (typeof ps === "string" && ps.trim()) {
+          cellNotes = ps.trim();
+          break;
+        } else if (typeof ps === "object" && ps.value !== undefined && ps.value !== null && String(ps.value).trim()) {
+          cellNotes = String(ps.value).trim();
+          break;
+        }
+      }
+    }
+  }
+
+  let rowId = getRowDatabaseId(r);
+
+  let parentIdVal = "";
+  if (level > 1) {
+    const parentIndexByLevel = {};
+    for (let i = 1; i <= r; i++) {
+      const curRow = gridData[i];
+      if (!curRow) continue;
+      let curLvl = 1;
+      for (let c = 1; c <= 8; c++) {
+        if (curRow[c] && (curRow[c].v || curRow[c].m)) {
+          curLvl = c;
+          break;
+        }
+      }
+      const curIdx = curRow[0] ? (curRow[0].v || curRow[0].m || "").toString().trim() : "";
+      if (curIdx) {
+        parentIndexByLevel[curLvl] = curIdx;
+      }
+    }
+    for (let k = level - 1; k >= 1; k--) {
+      if (parentIndexByLevel[k]) {
+        parentIdVal = parentIndexByLevel[k];
+        break;
+      }
+    }
+  }
+
+  const cellProperties = [];
+  const colNames = [
+    "indexNumber",
+    "description",
+    "description",
+    "description",
+    "description",
+    "description",
+    "description",
+    "description",
+    "description",
+    "notes",
+    "definisi",
+    "input",
+    "output",
+  ];
+
+  for (let c = 0; c <= 12; c++) {
+    const cObj = row[c];
+    if (!cObj) continue;
+    const cellV = cObj && typeof cObj.v === "object" && cObj.v !== null ? cObj.v : cObj;
+
+    const fc = cellV.fc || cObj.fc;
+    const bg = cellV.bg || cObj.bg;
+    const bl = (cellV.bl !== undefined ? cellV.bl : cObj.bl) === 1;
+    const it = (cellV.it !== undefined ? cellV.it : cObj.it) === 1;
+    const cl = (cellV.cl !== undefined ? cellV.cl : cObj.cl) === 1;
+    const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
+    const fs = cellV.fs || cObj.fs;
+    const rawFf = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
+
+    let ffName = null;
+    if (rawFf === "0" || rawFf === 0 || rawFf === "Times New Roman") ffName = "Times New Roman";
+    else if (rawFf === "1" || rawFf === 1 || rawFf === "Arial") ffName = "Arial";
+    else if (rawFf === "2" || rawFf === 2 || rawFf === "Tahoma") ffName = "Tahoma";
+    else if (rawFf === "3" || rawFf === 3 || rawFf === "Verdana") ffName = "Verdana";
+    else if (rawFf) ffName = rawFf;
+
+    if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ffName) {
+      cellProperties.push({
+        columnName: colNames[c],
+        fontColor: fc || null,
+        bgColor: bg || null,
+        isBold: bl,
+        isItalic: it,
+        isStrike: cl,
+        isUnderline: un,
+        fontSize: fs ? parseInt(fs) : null,
+        fontFamily: ffName || null,
+      });
+    }
+  }
+
+  return {
+    id: rowId,
+    indexNumber: rawIdxVal,
+    parentId: parentIdVal,
+    level: level,
+    description: desc,
+    notes: notes,
+    definisi: definisi,
+    input: input,
+    output: output,
+    cellNotes: cellNotes,
+    cellProperties: cellProperties,
+  };
+}
+
 function toggleFullscreenProsbis() {
   isFullscreenProsbis = !isFullscreenProsbis;
   const $card = $("#luckysheet-business-process-card");
@@ -396,6 +675,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
 
     prosbisIdMapByIdx.clear();
     prosbisOriginalIdxMap.clear();
+    rowOriginalIdMap.clear();
     if (prosbisList && prosbisList.length > 0) {
       prosbisList.forEach((pb, rIdx) => {
         const idxStr = String(pb.indexNumber || pb.IndexNumber || "").trim();
@@ -406,6 +686,9 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
         }
 
         const r = rIdx + 1;
+        if (pbId) {
+          rowOriginalIdMap.set(r, pbId);
+        }
         const levelNum = pb.level || pb.Level || (idxStr ? idxStr.split(".").length : 1);
         const desc = pb.description || pb.Description || pb.name || pb.businessProcessName || "";
 
@@ -563,18 +846,58 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
       row: (prosbisList.length || 15) + 30,
       hook: {
         cellUpdated: function (r, c, oldValue, newValue, isRange) {
-          if (r > 0) {
-            modifiedRowIndexes.add(r);
+          processModifiedRange({ row: [r, r], column: [c, c] }, `Cell Updated at Row ${r}, Col ${c}`);
+        },
+        rangePasteAfter: function (range, pasteCutData) {
+          console.log("[Luckysheet Hook] rangePasteAfter triggered:", range);
+          processModifiedRange(range, "Range Paste");
+        },
+        updated: function (operate) {
+          if (operate) {
+            if (operate.range) {
+              processModifiedRange(operate.range, "Sheet Updated (" + (operate.type || "operate") + ")");
+            } else if (Array.isArray(operate)) {
+              operate.forEach((op) => {
+                if (op && op.range) processModifiedRange(op.range, "Sheet Updated");
+              });
+            } else if (operate.type === "paste" || operate.type === "execCommand") {
+              processModifiedRange(null, "Sheet Updated (" + operate.type + ")");
+            }
           }
         },
         commentUpdated: function (r, c, oldValue, newValue) {
-          if (r > 0) {
-            modifiedRowIndexes.add(r);
-          }
+          processModifiedRange({ row: [r, r], column: [c, c] }, `Comment Updated at Row ${r}, Col ${c}`);
         },
         rowInsertAfter: function (r) {
-          if (r >= 0) {
-            modifiedRowIndexes.add(r + 1);
+          const insertIdx = r + 1;
+          if (insertIdx > 0) {
+            const newMap = new Map();
+            rowOriginalIdMap.forEach((val, k) => {
+              if (k >= insertIdx) {
+                newMap.set(k + 1, val);
+              } else {
+                newMap.set(k, val);
+              }
+            });
+            newMap.set(insertIdx, 0);
+            rowOriginalIdMap = newMap;
+            modifiedRowIndexes.add(insertIdx);
+            console.log(`[Luckysheet Change Tracker] Row Inserted at ${insertIdx}, rowOriginalIdMap updated.`);
+          }
+        },
+        rowDeleteAfter: function (r) {
+          const deleteIdx = r + 1;
+          if (deleteIdx > 0) {
+            const newMap = new Map();
+            rowOriginalIdMap.forEach((val, k) => {
+              if (k < deleteIdx) {
+                newMap.set(k, val);
+              } else if (k > deleteIdx) {
+                newMap.set(k - 1, val);
+              }
+            });
+            rowOriginalIdMap = newMap;
+            console.log(`[Luckysheet Change Tracker] Row Deleted at ${deleteIdx}, rowOriginalIdMap updated.`);
           }
         },
       },
@@ -601,11 +924,6 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
               10: 220,
               11: 220,
               12: 220,
-            },
-            colhidden: {
-              6: 0,
-              7: 0,
-              8: 0,
             },
           },
         },
@@ -664,6 +982,8 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
 
 async function saveLuckysheetProsbisGrid() {
   console.log("saveLuckysheetProsbisGrid triggered");
+  const spinBtn = document.getElementById("loadingSaveSheet");
+  if (spinBtn) spinBtn.style.display = "inline-block";
 
   if (typeof luckysheet === "undefined") {
     console.error("Luckysheet library is not loaded.");
@@ -746,18 +1066,8 @@ async function saveLuckysheetProsbisGrid() {
 
       if (!desc && !rawIdxVal && !notes && !definisi && !input && !output && !cellNotes) continue;
 
-      // Extract row ID strictly from attached _id on cell 0 or row
-      let rowId = 0;
-      if (row[0] && row[0]._id) {
-        rowId = row[0]._id;
-      } else if (row._id) {
-        rowId = row._id;
-      } else if (row[0] && typeof row[0].v === "object" && row[0].v !== null && row[0].v._id) {
-        rowId = row[0].v._id;
-      } else if (rawIdxVal && tempIdMap.has(rawIdxVal)) {
-        rowId = tempIdMap.get(rawIdxVal);
-        tempIdMap.delete(rawIdxVal);
-      }
+      // Extract row ID strictly from original row mapping (or 0 for new/copied rows)
+      let rowId = getRowDatabaseId(r);
 
       // Determine parentId based on current tree hierarchy state
       let parentIdVal = null;
@@ -805,19 +1115,19 @@ async function saveLuckysheetProsbisGrid() {
       // Extract cell properties for formatting
       const cellProperties = [];
       const colNames = [
-        "IndexNumber",
-        "Description",
-        "Description",
-        "Description",
-        "Description",
-        "Description",
-        "Description",
-        "Description",
-        "Description",
-        "Notes",
-        "Definisi",
-        "Input",
-        "Output",
+        "indexNumber",
+        "description",
+        "description",
+        "description",
+        "description",
+        "description",
+        "description",
+        "description",
+        "description",
+        "notes",
+        "definisi",
+        "input",
+        "output",
       ];
 
       for (let c = 0; c <= 12; c++) {
@@ -832,18 +1142,16 @@ async function saveLuckysheetProsbisGrid() {
         const cl = (cellV.cl !== undefined ? cellV.cl : cObj.cl) === 1;
         const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
         const fs = cellV.fs || cObj.fs;
-        const ff = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
+        const rawFf = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
 
-        let styleHtml = "";
-        if (fc) styleHtml += `color:${fc};`;
-        if (bg) styleHtml += `background-color:${bg};`;
-        if (bl) styleHtml += `font-weight:bold;`;
-        if (it) styleHtml += `font-style:italic;`;
-        if (cl) styleHtml += `text-decoration:line-through;`;
-        if (un) styleHtml += `text-decoration:underline;`;
-        if (fs) styleHtml += `font-size:${fs}pt;`;
+        let ffName = null;
+        if (rawFf === "0" || rawFf === 0 || rawFf === "Times New Roman") ffName = "Times New Roman";
+        else if (rawFf === "1" || rawFf === 1 || rawFf === "Arial") ffName = "Arial";
+        else if (rawFf === "2" || rawFf === 2 || rawFf === "Tahoma") ffName = "Tahoma";
+        else if (rawFf === "3" || rawFf === 3 || rawFf === "Verdana") ffName = "Verdana";
+        else if (rawFf) ffName = rawFf;
 
-        if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ff) {
+        if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ffName) {
           cellProperties.push({
             columnName: colNames[c],
             fontColor: fc || null,
@@ -853,9 +1161,7 @@ async function saveLuckysheetProsbisGrid() {
             isStrike: cl,
             isUnderline: un,
             fontSize: fs ? parseInt(fs) : null,
-            fontFamily: ff || null,
-            styleHtml: styleHtml || null,
-            rawJson: JSON.stringify({ fc, bg, bl, it, cl, un, fs, ff }),
+            fontFamily: ffName || null,
           });
         }
       }
@@ -867,7 +1173,7 @@ async function saveLuckysheetProsbisGrid() {
       items.push({
         id: rowId,
         indexNumber: computedIndex,
-        parentId: parentIdVal,
+        parentId: parentIdVal || "",
         level: level,
         description: desc,
         notes: notes,
@@ -880,30 +1186,108 @@ async function saveLuckysheetProsbisGrid() {
       });
     }
 
-    console.log(`Collected ${items.length} items to save.`);
+    const payload = {
+      dataSource: selectedDs,
+      items: items,
+    };
+
+    console.log("=== PAYLOAD SAVE BATCH (POST /api/BusinessProcess/save-batch) ===");
+    console.log(JSON.stringify(payload, null, 2));
 
     if (items.length === 0) {
-      if (typeof Swal !== "undefined") Swal.fire("Info", "Tidak ada baris data Business Process yang diubah.", "info");
-      else alert("Tidak ada baris data Business Process yang diubah.");
+      const warningPromise = swal({
+        title: "Warning",
+        icon: "warning",
+        buttons: false,
+        timer: 2000,
+        content: {
+          element: "div",
+          attributes: {
+            innerHTML: `<span style="text-align: center;">Tidak ada baris data Business Process yang diubah.</span>
+       
+          `,
+          },
+        },
+      });
+      const fullscreenElement =
+        document.fullscreenElement ||
+        document.querySelector("#luckysheet-business-process-card.luckysheet-fullscreen-active");
+      if (fullscreenElement) {
+        const moveOverlay = () => {
+          const overlay = document.querySelector(".swal-overlay, .swal2-container");
+          if (!overlay) return false;
+
+          if (!fullscreenElement.contains(overlay)) {
+            fullscreenElement.appendChild(overlay);
+          }
+          overlay.style.setProperty("z-index", "2147483647");
+          return true;
+        };
+
+        const observer = new MutationObserver(() => {
+          if (moveOverlay()) observer.disconnect();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        requestAnimationFrame(moveOverlay);
+        setTimeout(() => {
+          moveOverlay();
+          observer.disconnect();
+        }, 1000);
+      }
+
+      warningPromise.then(async () => {
+        spinBtn.style.display = "none";
+      });
       return;
     }
 
     const dsLabel = selectedDs === "master" ? "Master Data Prosbis" : "Draft Prosbis";
 
     const confirmSave = async () => {
-      if (typeof Swal !== "undefined") {
-        const res = await Swal.fire({
-          title: "Save Changes",
-          text: `Apakah Anda yakin ingin menyimpan ${items.length} baris data ke ${dsLabel}?`,
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Ya, Simpan",
-          cancelButtonText: "Batal",
+      const warningPromise = swal({
+        title: "Save Changes?",
+        text: "Are you sure you want to save the changes to this business process data?",
+        icon: "info",
+        className: "save-changes-swal",
+        buttons: {
+          cancel: {
+            text: "Back",
+            visible: true,
+            className: "swal-button--cancel",
+          },
+          confirm: {
+            text: "Save Changes",
+            className: "swal-button--confirm",
+          },
+        },
+      });
+      const fullscreenElement =
+        document.fullscreenElement ||
+        document.querySelector("#luckysheet-business-process-card.luckysheet-fullscreen-active");
+      if (fullscreenElement) {
+        const moveOverlay = () => {
+          const overlay = document.querySelector(".swal-overlay, .swal2-container");
+          if (!overlay) return false;
+
+          if (!fullscreenElement.contains(overlay)) {
+            fullscreenElement.appendChild(overlay);
+          }
+          overlay.style.setProperty("z-index", "2147483647");
+          return true;
+        };
+
+        const observer = new MutationObserver(() => {
+          if (moveOverlay()) observer.disconnect();
         });
-        return res.isConfirmed;
-      } else {
-        return confirm(`Apakah Anda yakin ingin menyimpan ${items.length} baris data ke ${dsLabel}?`);
+        observer.observe(document.body, { childList: true, subtree: true });
+        requestAnimationFrame(moveOverlay);
+        setTimeout(() => {
+          moveOverlay();
+          observer.disconnect();
+        }, 1000);
       }
+
+      return warningPromise;
     };
 
     const isConfirmed = await confirmSave();
@@ -912,25 +1296,41 @@ async function saveLuckysheetProsbisGrid() {
         Swal.fire({ title: "Menyimpan...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       }
 
-      const response = await saveBusinessProcessBatch({
-        dataSource: selectedDs,
-        items: items,
-      });
+      const response = await saveBusinessProcessBatch(payload);
 
-      console.log("Save response:", response);
+      console.log("Save response from backend:", response);
+
+      if (typeof Swal !== "undefined") Swal.close();
 
       if (response && response.success) {
         modifiedRowIndexes.clear();
         if (typeof Swal !== "undefined") {
           Swal.fire("Berhasil", response.message || "Data Business Process berhasil disimpan!", "success");
-        } else {
-          alert(response.message || "Data Business Process berhasil disimpan!");
+        } else if (typeof swal !== "undefined") {
+          swal({
+            title: "SUCCESS",
+            text: "Changes saved successfully.",
+            icon: "success",
+            buttons: false,
+            timer: 2200,
+            className: "rasci-success-alert",
+          }).then(() => {
+            if (spinBtn) spinBtn.style.display = "none";
+          });
         }
         initLuckysheetProsbisGrid(true);
       } else {
         const errMsg = response && response.error ? response.error : "Gagal menyimpan data ke database.";
         if (typeof Swal !== "undefined") {
           Swal.fire("Error", errMsg, "error");
+        } else if (typeof swal !== "undefined") {
+          swal({
+            title: "Error",
+            text: errMsg,
+            icon: "error",
+          }).then(() => {
+            if (spinBtn) spinBtn.style.display = "none";
+          });
         } else {
           alert("Error: " + errMsg);
         }
