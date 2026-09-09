@@ -31,10 +31,10 @@ COPY --from=build /app/Cuba/out .
 
 COPY --from=build /app/Cuba/appsettings.Development.json ./appsettings.Development.json
 
-EXPOSE 5385
+EXPOSE 5475
 EXPOSE 443
 
-ENV ASPNETCORE_URLS=http://+:5385
+ENV ASPNETCORE_URLS=http://+:5475
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 ENV ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=false
