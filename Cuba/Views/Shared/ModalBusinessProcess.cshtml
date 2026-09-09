@@ -50,7 +50,7 @@
 </style>
 
 <div class="modal fade" id="modalBusinessPro" tabindex="-1" role="dialog" aria-labelledby="modalBusinessProLabel"
-    aria-hidden="true">
+     aria-hidden="true">
     <div class="modal-dialog custom-modal-detail bounceInDown animated" role="document">
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header">
@@ -63,71 +63,81 @@
                 </div>
                 <div>
                     <ul class="nav nav-tabs nav-primary" id="pills-business-tab" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" id="pills-related-tab" data-bs-toggle="pill"
-                                href="#pills-related" role="tab" aria-controls="pills-related"
-                                aria-selected="true">Related Position</a></li>
-                        <li class="nav-item"><a class="nav-link" id="pills-hierarchy-tab" data-bs-toggle="pill"
-                                href="#pills-hierarchy" role="tab" aria-controls="pills-hierarchy"
-                                aria-selected="false">Business Process Hierarchy</a></li>
-                    </ul>
-                    <div class="tab-content" id="pills-businessContent">
-                        <div class="tab-pane fade show active" id="pills-related" role="tabpanel"
-                            aria-labelledby="pills-related-tab">
-                            <div class="mb-0 m-t-10" id="total-job">
+                        <li class="nav-item"><a class="nav-link" id="pills-definition-tab" data-bs-toggle="pill"
+                                                    href="#pills-related" role="tab" aria-controls="pills-related"
+                                                    aria-selected="true">Definition, Input & Output</a></li>
+                            <li class="nav-item"><a class="nav-link active" id="pills-related-tab" data-bs-toggle="pill"
+                                                        href="#pills-related" role="tab" aria-controls="pills-related"
+                                                        aria-selected="true">Related Position</a></li>
+                                <li class="nav-item"><a class="nav-link" id="pills-hierarchy-tab" data-bs-toggle="pill"
+                                                            href="#pills-hierarchy" role="tab" aria-controls="pills-hierarchy"
+                                                            aria-selected="false">Business Process Hierarchy</a></li>
+                                </ul>
+                                <div class="tab-content" id="pills-businessContent">
+                                    <div class="tab-pane fade" id="pills-definition" role="tabpanel"
+                                         aria-labelledby="pills-definition-tab">
+                                        <div class="table-responsive m-t-15">
+                                            Definition, Input & Output
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade show active" id="pills-related" role="tabpanel"
+                                         aria-labelledby="pills-related-tab">
+                                        <div class="mb-0 m-t-10" id="total-job">
+                                        </div>
+                                        <div class="table-responsive scrollable" style=" max-height: 300px;">
+                                            <table class="table tbl-border ">
+                                                <thead id="job-details-header">
+                                                </thead>
+                                                <tbody id="job-details-body">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-hierarchy" role="tabpanel"
+                                         aria-labelledby="pills-hierarchy-tab">
+                                        <div class="table-responsive m-t-15">
+                                            <table class="table tbl-border rasci-matrix">
+                                                <thead id="prosbis-hierarchy-header">
+                                                </thead>
+                                                <tbody id="prosbis-hierarchy-body">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="table-responsive scrollable" style=" max-height: 300px;">
-                                <table class="table tbl-border ">
-                                    <thead id="job-details-header">
-                                    </thead>
-                                    <tbody id="job-details-body">
-                                    </tbody>
-                                </table>
-                            </div>
+
                         </div>
-                        <div class="tab-pane fade" id="pills-hierarchy" role="tabpanel"
-                            aria-labelledby="pills-hierarchy-tab">
-                            <div class="table-responsive m-t-15">
-                                <table class="table tbl-border rasci-matrix">
-                                    <thead id="prosbis-hierarchy-header">
-                                    </thead>
-                                    <tbody id="prosbis-hierarchy-body">
-                                    </tbody>
-                                </table>
+                        <div class="modal-footer ">
+                            <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
+                                <i class="icon-arrow-left"></i> Back
+                            </button>
+                            <div>
+                                <button id="btnDeleteDetail" class="btn btn-outline-danger" type="button"
+                                        onclick="handleDetailDeletebp()"><i class="icon-trash"></i>
+                                    Delete</button>
+                                    <button id="btnEditDetail" class="btn btn-outline-light" type="button"
+                                            onclick="handleDetailEditbp()">
+                                        <i class="icon-marker-alt"></i>
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-primary" type="button" onclick="openSeiesOfProcess()">
+                                        Series of Process
+                                        <i class="icon-arrow-right icon-small"></i>
+                                    </button>
+                                    <button id="btnShowRasci" class="btn btn-primary" type="button" onclick="showRasciMatrixBybp()">
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
+                                                 id="showRasci" role="status"></div>
+                                            <span class="btn-text">Show RASCI<i class="icon-arrow-right icon-small"></i></span>
+                                        </div>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <div class="modal-footer ">
-                <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal">
-                    <i class="icon-arrow-left"></i> Back
-                </button>
-                <div>
-                    <button id="btnDeleteDetail" class="btn btn-outline-danger" type="button"
-                        onclick="handleDetailDeletebp()"><i class="icon-trash"></i>
-                        Delete</button>
-                    <button id="btnEditDetail" class="btn btn-outline-light" type="button"
-                        onclick="handleDetailEditbp()">
-                        <i class="icon-marker-alt"></i>
-                        Edit
-                    </button>
-                    <button class="btn btn-primary" type="button" onclick="openSeiesOfProcess()">
-                        Series of Process
-                        <i class="icon-arrow-right icon-small"></i>
-                    </button>
-                    <button id="btnShowRasci" class="btn btn-primary" type="button" onclick="showRasciMatrixBybp()">
-                        <div class="d-flex align-items-center">
-                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                                id="showRasci" role="status"></div>
-                            <span class="btn-text">Show RASCI<i class="icon-arrow-right icon-small"></i></span>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <!-- Bootstrap JS and Popper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
