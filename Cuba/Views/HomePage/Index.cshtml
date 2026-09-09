@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -257,18 +257,21 @@
             feather.replace();
             new WOW().init();
             document.addEventListener('DOMContentLoaded', function () {
-            const profileNav = document.querySelector('.profile-nav');
-            const dropdown = profileNav.querySelector('.profile-dropdown');
+                const profileNav = document.querySelector('.profile-nav');
+                const dropdown = profileNav ? profileNav.querySelector('.profile-dropdown') : null;
 
-            profileNav.addEventListener('click', function () {
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            });
+                if (profileNav && dropdown) {
+                    profileNav.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                    });
 
-            document.addEventListener('click', function (event) {
-            if (!profileNav.contains(event.target)) {
-            dropdown.style.display = 'none';
-            }
-            });
+                    document.addEventListener('click', function (event) {
+                        if (profileNav && !profileNav.contains(event.target)) {
+                            dropdown.style.display = 'none';
+                        }
+                    });
+                }
             });
 
         </script>

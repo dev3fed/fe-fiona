@@ -1,6 +1,9 @@
 let luckysheetInitialized = false;
 let luckysheetLoading = false;
 let isFullscreenProsbis = false;
+let modifiedRowIndexes = new Set();
+let prosbisIdMapByIdx = new Map();
+let prosbisOriginalIdxMap = new Map();
 
 $(document).ready(function () {
     $('#pills-business-process-tab').on('shown.bs.tab', function () {
@@ -16,25 +19,33 @@ $(document).ready(function () {
         });
     });
 
-    $('#btn-refresh-prosbis-grid').on('click', function () {
+    $(document).on('click', '#btn-refresh-prosbis-grid', function (e) {
+        e.preventDefault();
         initLuckysheetProsbisGrid(true);
     });
 
-    $('#btn-save-prosbis-grid').on('click', function () {
+    $(document).on('click', '#btn-save-prosbis-grid', function (e) {
+        e.preventDefault();
         saveLuckysheetProsbisGrid();
     });
 
-    $('#dataSource-prosbis').on('change', function () {
+    $(document).on('change', '#dataSource-prosbis', function () {
         initLuckysheetProsbisGrid(true);
     });
 
-    $('#btn-fullscreen-prosbis-grid').on('click', function () {
+    $(document).on('change', '#dataSource-rasci', function () {
+        syncDataSourceDropdown();
+    });
+
+    $(document).on('click', '#btn-fullscreen-prosbis-grid', function (e) {
+        e.preventDefault();
         toggleFullscreenProsbis();
     });
 
     $(window).on('resize', function () {
         if (luckysheetInitialized && typeof luckysheet !== 'undefined') {
             luckysheet.resize();
+            fixLuckysheetLayoutOffsets();
         }
     });
 
@@ -42,13 +53,13 @@ $(document).ready(function () {
         syncDataSourceDropdown();
     });
 
-    $(document).on('click', '#luckysheet-icon-morebtn', function () {
+    $(document).on('click', '#luckysheet-icon-morebtn, .luckysheet-toolbar-more-btn', function () {
         setTimeout(function () {
             const $btn = $('#luckysheet-icon-morebtn');
-            const $menu = $('#luckysheet-icon-morebtn-div');
-            if ($btn.length > 0 && $menu.length > 0 && $menu.is(':visible')) {
+            const $menu = $('#luckysheet-icon-morebtn-div, #luckysheet-icon-morebtn-menu, .luckysheet-toolbar-more-menu');
+            if ($btn.length > 0 && $menu.length > 0) {
                 const btnRect = $btn[0].getBoundingClientRect();
-                const menuWidth = $menu.outerWidth() || 300;
+                const menuWidth = $menu.outerWidth() || 200;
                 let targetLeft = btnRect.right - menuWidth;
                 if (targetLeft < 10) targetLeft = 10;
 
@@ -58,19 +69,45 @@ $(document).ready(function () {
                     'left': targetLeft + 'px',
                     'right': 'auto',
                     'bottom': 'auto',
-                    'z-index': '9999995'
+                    'z-index': '9999995',
+                    'display': 'block',
+                    'visibility': 'visible',
+                    'opacity': '1'
                 });
             }
-        }, 20);
+        }, 30);
     });
 
-    $(document).on('click', '#luckysheet-icon-text-color, #luckysheet-icon-bg-color, div[id*="luckysheet-icon-text-color"], div[id*="luckysheet-icon-bg-color"]', function (e) {
+    $(document).on('click', '#luckysheet-icon-text-color, #luckysheet-icon-bg-color, #luckysheet-icon-cell-color, div[id*="luckysheet-icon-text-color"], div[id*="luckysheet-icon-cell-color"], div[id*="luckysheet-icon-bg-color"], .sp-replacer, .luckysheet-toolbar-combo-button, .luckysheet-toolbar-menu-button-arrow', function (e) {
+        const $clicked = $(this);
+        const $targetBtn = $clicked.closest('.luckysheet-toolbar-button, .luckysheet-toolbar-combo-button, div[id*="luckysheet-icon-"]');
+        const targetElement = $targetBtn.length > 0 ? $targetBtn[0] : this;
+
         setTimeout(function () {
-            $('.sp-container, .luckysheet-color-menu, #luckysheet-icon-text-color-menu, #luckysheet-icon-bg-color-menu, div[id*="color-menu"]').css({
-                'z-index': '99999999',
-                'display': 'block',
-                'visibility': 'visible',
-                'opacity': '1'
+            const $colorMenus = $('#luckysheet-icon-text-color-menu-menuButton, #luckysheet-icon-cell-color-menu-menuButton, .sp-container, .luckysheet-color-menu, #luckysheet-icon-text-color-menu, #luckysheet-icon-bg-color-menu, div[id*="color-menu"], .luckysheet-spectrum-container');
+            $colorMenus.each(function () {
+                const $menu = $(this);
+                if ($menu.length > 0) {
+                    const btnRect = targetElement.getBoundingClientRect();
+                    const menuWidth = $menu.outerWidth() || 240;
+                    let targetLeft = btnRect.left;
+                    if (targetLeft + menuWidth > window.innerWidth - 10) {
+                        targetLeft = window.innerWidth - menuWidth - 10;
+                    }
+                    if (targetLeft < 10) targetLeft = 10;
+
+                    $menu.css({
+                        'position': 'fixed',
+                        'top': (btnRect.bottom + 4) + 'px',
+                        'left': targetLeft + 'px',
+                        'right': 'auto',
+                        'bottom': 'auto',
+                        'z-index': '99999999',
+                        'display': 'block',
+                        'visibility': 'visible',
+                        'opacity': '1'
+                    }).removeClass('sp-hidden');
+                }
             });
         }, 30);
     });
@@ -81,6 +118,45 @@ $(document).ready(function () {
         }
     }, true);
 });
+
+function fixLuckysheetLayoutOffsets() {
+    const $editor = $('#luckysheet-wa-editor, .luckysheet-wa-editor');
+    const $formulaBar = $('#luckysheet-wa-calculate, .luckysheet-wa-calculate, #luckysheet-formula-bar-config');
+    const $sheetArea = $('#luckysheet-sheet-area, .luckysheet-sheet-area, #luckysheet-grid-window');
+
+    if ($editor.length > 0) {
+        const editorHeight = $editor.outerHeight() || 40;
+
+        if ($formulaBar.length > 0) {
+            $formulaBar.css({
+                'position': 'absolute',
+                'top': editorHeight + 'px',
+                'left': '0px',
+                'right': '0px',
+                'width': '100%',
+                'height': '28px',
+                'z-index': '900',
+                'background': '#ffffff',
+                'display': 'flex',
+                'align-items': 'center'
+            });
+
+            const formulaHeight = $formulaBar.is(':visible') ? ($formulaBar.outerHeight() || 28) : 0;
+            const totalTop = editorHeight + formulaHeight;
+
+            if ($sheetArea.length > 0) {
+                $sheetArea.css({
+                    'position': 'absolute',
+                    'top': totalTop + 'px',
+                    'left': '0px',
+                    'right': '0px',
+                    'width': '100%',
+                    'height': `calc(100% - ${totalTop}px)`
+                });
+            }
+        }
+    }
+}
 
 function ensureLuckysheetResourcesLoaded(callback) {
     if (typeof luckysheet !== 'undefined') {
@@ -139,29 +215,59 @@ function ensureLuckysheetResourcesLoaded(callback) {
 }
 
 function syncDataSourceDropdown() {
-    const $mainDropdown = $('#select-draft');
     const $gridDropdown = $('#dataSource-prosbis');
+    if ($gridDropdown.length === 0) return;
 
-    if ($mainDropdown.length > 0 && $gridDropdown.length > 0) {
-        const currentVal = $gridDropdown.val();
-        $gridDropdown.empty();
-        $gridDropdown.append('<option value="master">Master data Prosbis</option>');
+    const currentVal = $gridDropdown.val();
 
+    let $mainDropdown = $('#dataSource-rasci');
+    if ($mainDropdown.length === 0 || $mainDropdown.find('option').length <= 1) {
+        $mainDropdown = $('#select-draft');
+    }
+
+    $gridDropdown.empty();
+    $gridDropdown.append('<option value="master">Master data Prosbis</option>');
+
+    if ($mainDropdown.length > 0 && $mainDropdown.find('option').length > 1) {
         $mainDropdown.find('option').each(function () {
             const val = $(this).val();
             const text = $(this).text();
-            if (val && val !== 'master' && val !== 'Select Draft') {
-                $gridDropdown.append(`<option value="${val}">${text}</option>`);
+            if (val && val !== 'master' && val !== 'Select Draft' && val !== 'Choose' && val !== '') {
+                if ($gridDropdown.find(`option[value="${val}"]`).length === 0) {
+                    $gridDropdown.append(`<option value="${val}">${text}</option>`);
+                }
             }
         });
+    }
 
-        if (currentVal && $gridDropdown.find(`option[value="${currentVal}"]`).length > 0) {
-            $gridDropdown.val(currentVal);
-        } else if (typeof selectedValue !== 'undefined' && selectedValue && $gridDropdown.find(`option[value="${selectedValue}"]`).length > 0) {
-            $gridDropdown.val(selectedValue);
-        } else {
-            $gridDropdown.val('master');
-        }
+    if ($gridDropdown.find('option').length <= 1 && typeof fetchSelectDraftRasci === 'function') {
+        fetchSelectDraftRasci().then((response) => {
+            if (response && response.data && response.data.result) {
+                const excludedIds = new Set(["1", "00000000-0000-0000-0000-000000000001"]);
+                const result = Array.isArray(response.data.result)
+                    ? response.data.result.filter((item) => !excludedIds.has(String(item?.id)))
+                    : [];
+                result.forEach((item) => {
+                    if ($gridDropdown.find(`option[value="${item.id}"]`).length === 0) {
+                        $gridDropdown.append(`<option value="${item.id}">${item.text || item.id}</option>`);
+                    }
+                });
+
+                if (currentVal && $gridDropdown.find(`option[value="${currentVal}"]`).length > 0) {
+                    $gridDropdown.val(currentVal);
+                } else if (typeof selectedValue !== 'undefined' && selectedValue && $gridDropdown.find(`option[value="${selectedValue}"]`).length > 0) {
+                    $gridDropdown.val(selectedValue);
+                }
+            }
+        });
+    }
+
+    if (currentVal && $gridDropdown.find(`option[value="${currentVal}"]`).length > 0) {
+        $gridDropdown.val(currentVal);
+    } else if (typeof selectedValue !== 'undefined' && selectedValue && $gridDropdown.find(`option[value="${selectedValue}"]`).length > 0) {
+        $gridDropdown.val(selectedValue);
+    } else {
+        $gridDropdown.val('master');
     }
 }
 
@@ -181,9 +287,11 @@ function toggleFullscreenProsbis() {
     if (typeof luckysheet !== 'undefined') {
         setTimeout(function () {
             luckysheet.resize();
+            fixLuckysheetLayoutOffsets();
         }, 150);
         setTimeout(function () {
             luckysheet.resize();
+            fixLuckysheetLayoutOffsets();
         }, 350);
     }
 }
@@ -234,6 +342,8 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
             { text: "L4", bg: "#f8fafc", fc: "#7c3aed", bl: 1 },
             { text: "L5", bg: "#f8fafc", fc: "#3e4140ff", bl: 1 },
             { text: "L6", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1 },
+            { text: "L7", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1 },
+            { text: "L8", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1 },
             { text: "Notes", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
             { text: "Definisi", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
             { text: "Input", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
@@ -260,15 +370,24 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
             });
         });
 
+        prosbisIdMapByIdx.clear();
+        prosbisOriginalIdxMap.clear();
         if (prosbisList && prosbisList.length > 0) {
             prosbisList.forEach((pb, rIdx) => {
+                const idxStr = String(pb.indexNumber || pb.IndexNumber || "").trim();
+                const pbId = pb.id || pb.Id || pb.businessProcessId || pb.BusinessProcessId || 0;
+                if (idxStr && pbId) {
+                    prosbisIdMapByIdx.set(idxStr, pbId);
+                    prosbisOriginalIdxMap.set(String(pbId), idxStr);
+                }
+
                 const r = rIdx + 1;
-                const levelNum = pb.level || (pb.indexNumber ? pb.indexNumber.split('.').length : 1);
-                const desc = pb.description || pb.name || pb.businessProcessName || "";
+                const levelNum = pb.level || pb.Level || (idxStr ? idxStr.split('.').length : 1);
+                const desc = pb.description || pb.Description || pb.name || pb.businessProcessName || "";
 
-                celldata.push({ r: r, c: 0, v: { v: pb.indexNumber || "", m: pb.indexNumber || "", ff: 1, fs: 11, tb: 0 } });
+                celldata.push({ r: r, c: 0, v: { v: idxStr, m: idxStr, _id: pbId, ff: 1, fs: 11, tb: 0 } });
 
-                const colLevel = Math.min(Math.max(levelNum, 1), 6);
+                const colLevel = Math.min(Math.max(levelNum, 1), 8);
                 let colorHex = "#0f172a";
                 let isBold = 0;
 
@@ -282,13 +401,64 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                 else if (colLevel === 8) { colorHex = "#7c7a7aff"; }
 
                 const textWrapMode = (colLevel === 5) ? 2 : 1;
+                const cellNotesVal = pb.cellNotes || pb.CellNotes || "";
 
-                celldata.push({ r: r, c: colLevel, v: { v: desc, m: desc, fc: colorHex, bl: isBold, tb: textWrapMode, ff: 1, fs: 11 } });
+                const descCellObj = { v: desc, m: desc, fc: colorHex, bl: isBold, tb: textWrapMode, ff: 1, fs: 11 };
+                if (cellNotesVal) {
+                    descCellObj.ps = { value: cellNotesVal, isShow: false };
+                }
+
+                celldata.push({ r: r, c: colLevel, v: descCellObj });
 
                 celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: 1, fs: 11, tb: 0 } });
                 celldata.push({ r: r, c: 10, v: { v: pb.definisi || pb.definition || pb.processDefinition || "", m: pb.definisi || pb.definition || pb.processDefinition || "", ff: 1, fs: 11, tb: 0 } });
                 celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: 1, fs: 11, tb: 0 } });
                 celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: 1, fs: 11, tb: 0 } });
+
+                const cellPropsList = pb.cellProperties || pb.CellProperties || [];
+                if (Array.isArray(cellPropsList) && cellPropsList.length > 0) {
+                    cellPropsList.forEach(cp => {
+                        let cIdx = -1;
+                        const colNameNorm = (cp.columnName || cp.ColumnName || "").toLowerCase().trim();
+                        if (colNameNorm === "indexnumber") cIdx = 0;
+                        else if (colNameNorm === "description") cIdx = colLevel;
+                        else if (colNameNorm === "notes") cIdx = 9;
+                        else if (colNameNorm === "definisi" || colNameNorm === "definition") cIdx = 10;
+                        else if (colNameNorm === "input") cIdx = 11;
+                        else if (colNameNorm === "output") cIdx = 12;
+
+                        if (cIdx >= 0) {
+                            let target = celldata.find(cd => cd.r === r && cd.c === cIdx);
+                            if (target && target.v) {
+                                const fc = cp.fontColor || cp.FontColor;
+                                const bg = cp.bgColor || cp.BgColor;
+                                const bl = cp.isBold !== undefined ? cp.isBold : cp.IsBold;
+                                const it = cp.isItalic !== undefined ? cp.isItalic : cp.IsItalic;
+                                const cl = cp.isStrike !== undefined ? cp.isStrike : cp.IsStrike;
+                                const un = cp.isUnderline !== undefined ? cp.isUnderline : cp.IsUnderline;
+                                const fs = cp.fontSize || cp.FontSize;
+                                let ff = cp.fontFamily || cp.FontFamily;
+
+                                if (fc) target.v.fc = fc;
+                                if (bg) target.v.bg = bg;
+                                if (bl !== null && bl !== undefined) target.v.bl = bl ? 1 : 0;
+                                if (it !== null && it !== undefined) target.v.it = it ? 1 : 0;
+                                if (cl !== null && cl !== undefined) target.v.cl = cl ? 1 : 0;
+                                if (un !== null && un !== undefined) target.v.un = un ? 1 : 0;
+                                if (fs) target.v.fs = parseInt(fs);
+                                if (ff !== null && ff !== undefined && ff !== "") {
+                                    const ffStr = String(ff).toLowerCase().trim();
+                                    if (ffStr === "arial" || ffStr === "1") ff = 1;
+                                    else if (ffStr === "times new roman" || ffStr === "0") ff = 0;
+                                    else if (ffStr === "tahoma" || ffStr === "2") ff = 2;
+                                    else if (ffStr === "verdana" || ffStr === "3") ff = 3;
+                                    else if (!isNaN(parseInt(ffStr))) ff = parseInt(ffStr);
+                                    target.v.ff = ff;
+                                }
+                            }
+                        }
+                    });
+                }
             });
         }
 
@@ -346,6 +516,23 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
             defaultRowHeight: 25,
             column: baseHeaders.length,
             row: (prosbisList.length || 15) + 30,
+            hook: {
+                cellUpdated: function (r, c, oldValue, newValue, isRange) {
+                    if (r > 0) {
+                        modifiedRowIndexes.add(r);
+                    }
+                },
+                commentUpdated: function (r, c, oldValue, newValue) {
+                    if (r > 0) {
+                        modifiedRowIndexes.add(r);
+                    }
+                },
+                rowInsertAfter: function (r) {
+                    if (r >= 0) {
+                        modifiedRowIndexes.add(r + 1);
+                    }
+                }
+            },
             data: [{
                 name: "Sheet1",
                 color: "",
@@ -360,7 +547,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                         2: 34,
                         3: 34,
                         4: 34,
-                        5: 579,
+                        5: 350,
                         6: 34,
                         7: 34,
                         8: 34,
@@ -385,11 +572,43 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
         setTimeout(function () {
             luckysheet.create(options);
             luckysheetInitialized = true;
+            modifiedRowIndexes.clear();
+
+            try {
+                const fileData = luckysheet.getluckysheetfile();
+                if (fileData && fileData[0] && fileData[0].data && prosbisList && prosbisList.length > 0) {
+                    const gData = fileData[0].data;
+                    prosbisList.forEach((pb, idx) => {
+                        const r = idx + 1;
+                        if (gData[r]) {
+                            const idxVal = pb.indexNumber || pb.IndexNumber || "";
+                            if (!gData[r][0]) gData[r][0] = { v: idxVal, m: idxVal };
+                            const dbId = pb.id || pb.Id || pb.businessProcessId || pb.BusinessProcessId || 0;
+                            gData[r][0]._id = dbId;
+                            gData[r]._id = dbId;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn("Failed to attach _id to grid rows:", e);
+            }
+
             setTimeout(function () {
                 if (typeof luckysheet !== 'undefined') {
                     luckysheet.resize();
+                    fixLuckysheetLayoutOffsets();
                 }
             }, 150);
+            setTimeout(function () {
+                fixLuckysheetLayoutOffsets();
+            }, 400);
+
+            let fixCount = 0;
+            const fixTimer = setInterval(function () {
+                fixLuckysheetLayoutOffsets();
+                fixCount++;
+                if (fixCount > 15) clearInterval(fixTimer);
+            }, 200);
         }, 50);
 
     } catch (err) {
@@ -398,34 +617,263 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
 }
 
 async function saveLuckysheetProsbisGrid() {
-    if (!luckysheetInitialized) return;
+    console.log("saveLuckysheetProsbisGrid triggered");
+
+    if (typeof luckysheet === 'undefined') {
+        console.error("Luckysheet library is not loaded.");
+        if (typeof Swal !== 'undefined') Swal.fire("Error", "Luckysheet belum dimuat.", "error");
+        else alert("Luckysheet belum dimuat.");
+        return;
+    }
 
     try {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: "Save Change",
-                text: "Apakah Anda yakin ingin menyimpan perubahan data Business Process?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Ya, Simpan",
-                cancelButtonText: "Batal"
-            }).then(async (res) => {
-                if (res.isConfirmed) {
-                    Swal.fire({ title: "Menyimpan...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    setTimeout(() => {
-                        Swal.fire("Berhasil", "Data Business Process berhasil disimpan!", "success");
-                    }, 800);
+        if (luckysheet.exitEditMode) {
+            luckysheet.exitEditMode();
+        }
+
+        const fileData = luckysheet.getluckysheetfile();
+        if (!fileData || !fileData[0] || !fileData[0].data) {
+            console.warn("No grid data found in Luckysheet.");
+            if (typeof Swal !== 'undefined') Swal.fire("Info", "Tidak ada data pada grid.", "info");
+            else alert("Tidak ada data pada grid.");
+            return;
+        }
+
+        const gridData = fileData[0].data;
+        const selectedDs = $('#dataSource-prosbis').val() || (typeof selectedValue !== 'undefined' ? selectedValue : 'master');
+
+        const items = [];
+        const parentIndexByLevel = {};
+        const seqByLevel = {};
+        const tempIdMap = new Map(prosbisIdMapByIdx);
+
+        for (let r = 1; r < gridData.length; r++) {
+            const row = gridData[r];
+            if (!row) continue;
+
+            const rawIdxVal = row[0] ? (row[0].v || row[0].m || "").toString().trim() : "";
+
+            let desc = "";
+            let level = 1;
+            for (let c = 1; c <= 8; c++) {
+                if (row[c] && (row[c].v !== undefined && row[c].v !== null && String(row[c].v).trim() !== "" || row[c].m !== undefined && row[c].m !== null && String(row[c].m).trim() !== "")) {
+                    desc = String(row[c].v !== undefined && row[c].v !== null ? row[c].v : row[c].m).trim();
+                    level = c;
+                    break;
                 }
+            }
+
+            if (!desc && rawIdxVal) {
+                level = rawIdxVal.split('.').length;
+            }
+
+            const notes = row[9] ? (row[9].v || row[9].m || "").toString().trim() : "";
+            const definisi = row[10] ? (row[10].v || row[10].m || "").toString().trim() : "";
+            const input = row[11] ? (row[11].v || row[11].m || "").toString().trim() : "";
+            const output = row[12] ? (row[12].v || row[12].m || "").toString().trim() : "";
+
+            let cellNotes = "";
+            for (let c = 0; c <= 12; c++) {
+                if (row[c]) {
+                    const ps = row[c].ps || (row[c].v && typeof row[c].v === 'object' ? row[c].v.ps : null);
+                    if (ps) {
+                        if (typeof ps === 'string' && ps.trim()) {
+                            cellNotes = ps.trim();
+                            break;
+                        } else if (typeof ps === 'object' && ps.value !== undefined && ps.value !== null && String(ps.value).trim()) {
+                            cellNotes = String(ps.value).trim();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!desc && !rawIdxVal && !notes && !definisi && !input && !output && !cellNotes) continue;
+
+            // Extract row ID strictly from attached _id on cell 0 or row
+            let rowId = 0;
+            if (row[0] && row[0]._id) {
+                rowId = row[0]._id;
+            } else if (row._id) {
+                rowId = row._id;
+            } else if (row[0] && typeof row[0].v === 'object' && row[0].v !== null && row[0].v._id) {
+                rowId = row[0].v._id;
+            } else if (rawIdxVal && tempIdMap.has(rawIdxVal)) {
+                rowId = tempIdMap.get(rawIdxVal);
+                tempIdMap.delete(rawIdxVal);
+            }
+
+            // Determine parentId based on current tree hierarchy state
+            let parentIdVal = null;
+            if (level > 1) {
+                for (let k = level - 1; k >= 1; k--) {
+                    if (parentIndexByLevel[k]) {
+                        parentIdVal = parentIndexByLevel[k];
+                        break;
+                    }
+                }
+            }
+
+            // Increment sequence for this level under active parent
+            seqByLevel[level] = (seqByLevel[level] || 0) + 1;
+
+            // Reset sequence counters and parent references for deeper levels
+            for (let k = level + 1; k <= 8; k++) {
+                seqByLevel[k] = 0;
+                delete parentIndexByLevel[k];
+            }
+
+            // Calculate computed index number
+            let computedIndex = "";
+            if (level === 1) {
+                computedIndex = String(seqByLevel[1]);
+            } else {
+                computedIndex = parentIdVal ? `${parentIdVal}.${seqByLevel[level]}` : String(seqByLevel[level]);
+            }
+
+            parentIndexByLevel[level] = computedIndex;
+
+            // Dynamically update visual display in Luckysheet Cell 0 in memory if changed
+            if (rawIdxVal !== computedIndex) {
+                if (row[0] && typeof row[0].v === 'object' && row[0].v !== null) {
+                    row[0].v.v = computedIndex;
+                    row[0].v.m = computedIndex;
+                } else if (row[0]) {
+                    row[0].v = computedIndex;
+                    row[0].m = computedIndex;
+                } else {
+                    row[0] = { v: computedIndex, m: computedIndex, ff: 1, fs: 11, tb: 0 };
+                }
+            }
+
+            // Extract cell properties for formatting
+            const cellProperties = [];
+            const colNames = ["IndexNumber", "Description", "Description", "Description", "Description", "Description", "Description", "Description", "Description", "Notes", "Definisi", "Input", "Output"];
+
+            for (let c = 0; c <= 12; c++) {
+                const cObj = row[c];
+                if (!cObj) continue;
+                const cellV = (cObj && typeof cObj.v === 'object' && cObj.v !== null) ? cObj.v : cObj;
+
+                const fc = cellV.fc || cObj.fc;
+                const bg = cellV.bg || cObj.bg;
+                const bl = (cellV.bl !== undefined ? cellV.bl : cObj.bl) === 1;
+                const it = (cellV.it !== undefined ? cellV.it : cObj.it) === 1;
+                const cl = (cellV.cl !== undefined ? cellV.cl : cObj.cl) === 1;
+                const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
+                const fs = cellV.fs || cObj.fs;
+                const ff = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
+
+                let styleHtml = "";
+                if (fc) styleHtml += `color:${fc};`;
+                if (bg) styleHtml += `background-color:${bg};`;
+                if (bl) styleHtml += `font-weight:bold;`;
+                if (it) styleHtml += `font-style:italic;`;
+                if (cl) styleHtml += `text-decoration:line-through;`;
+                if (un) styleHtml += `text-decoration:underline;`;
+                if (fs) styleHtml += `font-size:${fs}pt;`;
+
+                if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ff) {
+                    cellProperties.push({
+                        columnName: colNames[c],
+                        fontColor: fc || null,
+                        bgColor: bg || null,
+                        isBold: bl,
+                        isItalic: it,
+                        isStrike: cl,
+                        isUnderline: un,
+                        fontSize: fs ? parseInt(fs) : null,
+                        fontFamily: ff || null,
+                        styleHtml: styleHtml || null,
+                        rawJson: JSON.stringify({ fc, bg, bl, it, cl, un, fs, ff })
+                    });
+                }
+            }
+
+            // Only collect items that are newly inserted (rowId === 0) or explicitly edited by user in Luckysheet
+            const isDirty = (rowId === 0) || modifiedRowIndexes.has(r);
+            if (!isDirty) continue;
+
+            items.push({
+                id: rowId,
+                indexNumber: computedIndex,
+                parentId: parentIdVal,
+                level: level,
+                description: desc,
+                notes: notes,
+                definisi: definisi,
+                input: input,
+                output: output,
+                cellNotes: cellNotes,
+                indexSequence: seqByLevel[level],
+                cellProperties: cellProperties
             });
+        }
+
+        console.log(`Collected ${items.length} items to save.`);
+
+        if (items.length === 0) {
+            if (typeof Swal !== 'undefined') Swal.fire("Info", "Tidak ada baris data Business Process yang diubah.", "info");
+            else alert("Tidak ada baris data Business Process yang diubah.");
+            return;
+        }
+
+        const dsLabel = (selectedDs === 'master') ? 'Master Data Prosbis' : 'Draft Prosbis';
+
+        const confirmSave = async () => {
+            if (typeof Swal !== 'undefined') {
+                const res = await Swal.fire({
+                    title: "Save Changes",
+                    text: `Apakah Anda yakin ingin menyimpan ${items.length} baris data ke ${dsLabel}?`,
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    cancelButtonText: "Batal"
+                });
+                return res.isConfirmed;
+            } else {
+                return confirm(`Apakah Anda yakin ingin menyimpan ${items.length} baris data ke ${dsLabel}?`);
+            }
+        };
+
+        const isConfirmed = await confirmSave();
+        if (isConfirmed) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ title: "Menyimpan...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            }
+
+            const response = await saveBusinessProcessBatch({
+                dataSource: selectedDs,
+                items: items
+            });
+
+            console.log("Save response:", response);
+
+            if (response && response.success) {
+                modifiedRowIndexes.clear();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire("Berhasil", response.message || "Data Business Process berhasil disimpan!", "success");
+                } else {
+                    alert(response.message || "Data Business Process berhasil disimpan!");
+                }
+                initLuckysheetProsbisGrid(true);
+            } else {
+                const errMsg = (response && response.error) ? response.error : "Gagal menyimpan data ke database.";
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire("Error", errMsg, "error");
+                } else {
+                    alert("Error: " + errMsg);
+                }
+            }
         }
     } catch (err) {
         console.error("Save error:", err);
-        if (typeof Swal !== 'undefined') {
-            Swal.fire("Error", "Gagal menyimpan data.", "error");
-        }
+        if (typeof Swal !== 'undefined') Swal.fire("Error", "Gagal menyimpan data: " + err.message, "error");
+        else alert("Gagal menyimpan data: " + err.message);
     }
 }
 
 window.initLuckysheetProsbisGrid = initLuckysheetProsbisGrid;
 window.saveLuckysheetProsbisGrid = saveLuckysheetProsbisGrid;
 window.toggleFullscreenProsbis = toggleFullscreenProsbis;
+window.fixLuckysheetLayoutOffsets = fixLuckysheetLayoutOffsets;
