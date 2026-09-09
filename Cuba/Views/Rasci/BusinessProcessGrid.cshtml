@@ -108,6 +108,46 @@
         box-sizing: border-box !important;
         position: relative !important;
         font-family: Arial, sans-serif !important;
+        overscroll-behavior: none !important;
+        overscroll-behavior-x: none !important;
+        overscroll-behavior-y: none !important;
+    }
+
+    #luckysheet-business-process-container canvas {
+        display: block !important;
+        vertical-align: top !important;
+        max-width: none !important;
+        max-height: none !important;
+        box-sizing: content-box !important;
+        pointer-events: auto !important;
+    }
+
+    #luckysheet-business-process-container table {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .luckysheet-wrapper,
+    #luckysheet-business-process-container *,
+    .luckysheet-sheet-area,
+    .luckysheet-grid-window,
+    #luckysheet-cell-main {
+        overscroll-behavior: none !important;
+        overscroll-behavior-x: none !important;
+        overscroll-behavior-y: none !important;
+        touch-action: pan-x pan-y !important;
+    }
+
+    #luckysheet-business-process-container #luckysheet-grid-window,
+    #luckysheet-business-process-container .luckysheet-grid-window {
+        top: 0px !important;
+    }
+
+    #luckysheet-business-process-container #luckysheet-cell-main,
+    #luckysheet-business-process-container #luckysheet-grid-window {
+        pointer-events: auto !important;
     }
 
     #luckysheet-business-process-container .luckysheet-wa-editor {
@@ -191,8 +231,8 @@
                 </div>
             </div>
 
-            <div class="luckysheet-wrapper border rounded" style="position: relative; width: 100%; height: 720px; overflow: hidden;">
-                <div id="luckysheet-business-process-container" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px;"></div>
+            <div class="luckysheet-wrapper border rounded" style="position: relative; width: 100%; height: 720px; overflow: hidden; overscroll-behavior: none;">
+                <div id="luckysheet-business-process-container" style="margin: 0px; padding: 0px; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; overscroll-behavior: none;"></div>
             </div>
         </div>
     </div>

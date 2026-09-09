@@ -122,7 +122,11 @@ $(document).ready(function () {
 function fixLuckysheetLayoutOffsets() {
     const $editor = $('#luckysheet-wa-editor, .luckysheet-wa-editor');
     const $formulaBar = $('#luckysheet-wa-calculate, .luckysheet-wa-calculate, #luckysheet-formula-bar-config');
-    const $sheetArea = $('#luckysheet-sheet-area, .luckysheet-sheet-area, #luckysheet-grid-window');
+    const $sheetArea = $('#luckysheet-sheet-area, .luckysheet-sheet-area');
+    const $gridWindow = $('#luckysheet-grid-window, .luckysheet-grid-window, div[id*="luckysheet-grid-window"]');
+    if ($gridWindow.length > 0) {
+        $gridWindow.css({ 'top': '0px' });
+    }
 
     if ($editor.length > 0) {
         const editorHeight = $editor.outerHeight() || 40;
@@ -155,6 +159,10 @@ function fixLuckysheetLayoutOffsets() {
                 });
             }
         }
+    }
+
+    if (typeof luckysheet !== 'undefined' && luckysheet.resize) {
+        luckysheet.resize();
     }
 }
 
@@ -269,6 +277,140 @@ function syncDataSourceDropdown() {
     } else {
         $gridDropdown.val('master');
     }
+}
+
+function extractLuckysheetRowPayload(r) {
+    if (typeof luckysheet === 'undefined') return null;
+    const fileData = luckysheet.getluckysheetfile();
+    if (!fileData || !fileData[0] || !fileData[0].data) return null;
+
+    const gridData = fileData[0].data;
+    const row = gridData[r];
+    if (!row) return null;
+
+    const rawIdxVal = row[0] ? (row[0].v || row[0].m || "").toString().trim() : "";
+
+    let desc = "";
+    let level = 1;
+    for (let c = 1; c <= 8; c++) {
+        if (row[c] && (row[c].v !== undefined && row[c].v !== null && String(row[c].v).trim() !== "" || row[c].m !== undefined && row[c].m !== null && String(row[c].m).trim() !== "")) {
+            desc = String(row[c].v !== undefined && row[c].v !== null ? row[c].v : row[c].m).trim();
+            level = c;
+            break;
+        }
+    }
+
+    if (!desc && rawIdxVal) {
+        level = rawIdxVal.split('.').length;
+    }
+
+    const notes = row[9] ? (row[9].v || row[9].m || "").toString().trim() : "";
+    const definisi = row[10] ? (row[10].v || row[10].m || "").toString().trim() : "";
+    const input = row[11] ? (row[11].v || row[11].m || "").toString().trim() : "";
+    const output = row[12] ? (row[12].v || row[12].m || "").toString().trim() : "";
+
+    let cellNotes = "";
+    for (let c = 0; c <= 12; c++) {
+        if (row[c]) {
+            const ps = row[c].ps || (row[c].v && typeof row[c].v === 'object' ? row[c].v.ps : null);
+            if (ps) {
+                if (typeof ps === 'string' && ps.trim()) {
+                    cellNotes = ps.trim();
+                    break;
+                } else if (typeof ps === 'object' && ps.value !== undefined && ps.value !== null && String(ps.value).trim()) {
+                    cellNotes = String(ps.value).trim();
+                    break;
+                }
+            }
+        }
+    }
+
+    let rowId = 0;
+    if (row[0] && row[0]._id) rowId = row[0]._id;
+    else if (row._id) rowId = row._id;
+    else if (row[0] && typeof row[0].v === 'object' && row[0].v !== null && row[0].v._id) rowId = row[0].v._id;
+    else if (rawIdxVal && typeof prosbisIdMapByIdx !== 'undefined' && prosbisIdMapByIdx.has(rawIdxVal)) {
+        rowId = prosbisIdMapByIdx.get(rawIdxVal);
+    }
+
+    let parentIdVal = "";
+    if (level > 1) {
+        const parentIndexByLevel = {};
+        for (let i = 1; i <= r; i++) {
+            const curRow = gridData[i];
+            if (!curRow) continue;
+            let curLvl = 1;
+            for (let c = 1; c <= 8; c++) {
+                if (curRow[c] && (curRow[c].v || curRow[c].m)) {
+                    curLvl = c;
+                    break;
+                }
+            }
+            const curIdx = curRow[0] ? (curRow[0].v || curRow[0].m || "").toString().trim() : "";
+            if (curIdx) {
+                parentIndexByLevel[curLvl] = curIdx;
+            }
+        }
+        for (let k = level - 1; k >= 1; k--) {
+            if (parentIndexByLevel[k]) {
+                parentIdVal = parentIndexByLevel[k];
+                break;
+            }
+        }
+    }
+
+    const cellProperties = [];
+    const colNames = ["indexNumber", "description", "description", "description", "description", "description", "description", "description", "description", "notes", "definisi", "input", "output"];
+
+    for (let c = 0; c <= 12; c++) {
+        const cObj = row[c];
+        if (!cObj) continue;
+        const cellV = (cObj && typeof cObj.v === 'object' && cObj.v !== null) ? cObj.v : cObj;
+
+        const fc = cellV.fc || cObj.fc;
+        const bg = cellV.bg || cObj.bg;
+        const bl = (cellV.bl !== undefined ? cellV.bl : cObj.bl) === 1;
+        const it = (cellV.it !== undefined ? cellV.it : cObj.it) === 1;
+        const cl = (cellV.cl !== undefined ? cellV.cl : cObj.cl) === 1;
+        const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
+        const fs = cellV.fs || cObj.fs;
+        const rawFf = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
+
+        let ffName = null;
+        if (rawFf === "0" || rawFf === 0 || rawFf === "Times New Roman") ffName = "Times New Roman";
+        else if (rawFf === "1" || rawFf === 1 || rawFf === "Arial") ffName = "Arial";
+        else if (rawFf === "2" || rawFf === 2 || rawFf === "Tahoma") ffName = "Tahoma";
+        else if (rawFf === "3" || rawFf === 3 || rawFf === "Verdana") ffName = "Verdana";
+        else if (rawFf) ffName = rawFf;
+
+        if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ffName) {
+            cellProperties.push({
+                columnName: colNames[c],
+                fontColor: fc || null,
+                bgColor: bg || null,
+                isBold: bl,
+                isItalic: it,
+                isStrike: cl,
+                isUnderline: un,
+                fontSize: fs ? parseInt(fs) : null,
+                fontFamily: ffName || null
+            });
+        }
+    }
+
+    return {
+        id: rowId,
+        indexNumber: rawIdxVal,
+        parentId: parentIdVal,
+        level: level,
+        description: desc,
+        notes: notes,
+        definisi: definisi,
+        input: input,
+        output: output,
+        cellNotes: cellNotes,
+        cellProperties: cellProperties
+    };
 }
 
 function toggleFullscreenProsbis() {
@@ -520,16 +662,31 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                 cellUpdated: function (r, c, oldValue, newValue, isRange) {
                     if (r > 0) {
                         modifiedRowIndexes.add(r);
+                        setTimeout(function () {
+                            const itemPayload = extractLuckysheetRowPayload(r);
+                            if (itemPayload) {
+                                console.log(`[Luckysheet Change Tracker] Cell Updated at Row ${r}, Col ${c}:`, itemPayload);
+                                console.log("JSON Item Payload:\n" + JSON.stringify(itemPayload, null, 2));
+                            }
+                        }, 50);
                     }
                 },
                 commentUpdated: function (r, c, oldValue, newValue) {
                     if (r > 0) {
                         modifiedRowIndexes.add(r);
+                        setTimeout(function () {
+                            const itemPayload = extractLuckysheetRowPayload(r);
+                            if (itemPayload) {
+                                console.log(`[Luckysheet Change Tracker] Comment Updated at Row ${r}, Col ${c}:`, itemPayload);
+                                console.log("JSON Item Payload:\n" + JSON.stringify(itemPayload, null, 2));
+                            }
+                        }, 50);
                     }
                 },
                 rowInsertAfter: function (r) {
                     if (r >= 0) {
                         modifiedRowIndexes.add(r + 1);
+                        console.log(`[Luckysheet Change Tracker] Row Inserted after Row ${r}`);
                     }
                 }
             },
@@ -555,11 +712,6 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
                         10: 220,
                         11: 220,
                         12: 220
-                    },
-                    colhidden: {
-                        6: 0,
-                        7: 0,
-                        8: 0
                     }
                 }
             }]
@@ -748,7 +900,7 @@ async function saveLuckysheetProsbisGrid() {
 
             // Extract cell properties for formatting
             const cellProperties = [];
-            const colNames = ["IndexNumber", "Description", "Description", "Description", "Description", "Description", "Description", "Description", "Description", "Notes", "Definisi", "Input", "Output"];
+            const colNames = ["indexNumber", "description", "description", "description", "description", "description", "description", "description", "description", "notes", "definisi", "input", "output"];
 
             for (let c = 0; c <= 12; c++) {
                 const cObj = row[c];
@@ -762,18 +914,16 @@ async function saveLuckysheetProsbisGrid() {
                 const cl = (cellV.cl !== undefined ? cellV.cl : cObj.cl) === 1;
                 const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
                 const fs = cellV.fs || cObj.fs;
-                const ff = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
+                const rawFf = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
 
-                let styleHtml = "";
-                if (fc) styleHtml += `color:${fc};`;
-                if (bg) styleHtml += `background-color:${bg};`;
-                if (bl) styleHtml += `font-weight:bold;`;
-                if (it) styleHtml += `font-style:italic;`;
-                if (cl) styleHtml += `text-decoration:line-through;`;
-                if (un) styleHtml += `text-decoration:underline;`;
-                if (fs) styleHtml += `font-size:${fs}pt;`;
+                let ffName = null;
+                if (rawFf === "0" || rawFf === 0 || rawFf === "Times New Roman") ffName = "Times New Roman";
+                else if (rawFf === "1" || rawFf === 1 || rawFf === "Arial") ffName = "Arial";
+                else if (rawFf === "2" || rawFf === 2 || rawFf === "Tahoma") ffName = "Tahoma";
+                else if (rawFf === "3" || rawFf === 3 || rawFf === "Verdana") ffName = "Verdana";
+                else if (rawFf) ffName = rawFf;
 
-                if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ff) {
+                if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ffName) {
                     cellProperties.push({
                         columnName: colNames[c],
                         fontColor: fc || null,
@@ -783,9 +933,7 @@ async function saveLuckysheetProsbisGrid() {
                         isStrike: cl,
                         isUnderline: un,
                         fontSize: fs ? parseInt(fs) : null,
-                        fontFamily: ff || null,
-                        styleHtml: styleHtml || null,
-                        rawJson: JSON.stringify({ fc, bg, bl, it, cl, un, fs, ff })
+                        fontFamily: ffName || null
                     });
                 }
             }
@@ -797,7 +945,7 @@ async function saveLuckysheetProsbisGrid() {
             items.push({
                 id: rowId,
                 indexNumber: computedIndex,
-                parentId: parentIdVal,
+                parentId: parentIdVal || "",
                 level: level,
                 description: desc,
                 notes: notes,
@@ -810,7 +958,13 @@ async function saveLuckysheetProsbisGrid() {
             });
         }
 
-        console.log(`Collected ${items.length} items to save.`);
+        const payload = {
+            dataSource: selectedDs,
+            items: items
+        };
+
+        console.log("=== PAYLOAD SAVE BATCH (POST /api/BusinessProcess/save-batch) ===");
+        console.log(JSON.stringify(payload, null, 2));
 
         if (items.length === 0) {
             if (typeof Swal !== 'undefined') Swal.fire("Info", "Tidak ada baris data Business Process yang diubah.", "info");
@@ -842,12 +996,9 @@ async function saveLuckysheetProsbisGrid() {
                 Swal.fire({ title: "Menyimpan...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             }
 
-            const response = await saveBusinessProcessBatch({
-                dataSource: selectedDs,
-                items: items
-            });
+            const response = await saveBusinessProcessBatch(payload);
 
-            console.log("Save response:", response);
+            console.log("Save response from backend:", response);
 
             if (response && response.success) {
                 modifiedRowIndexes.clear();
