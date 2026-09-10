@@ -9,8 +9,10 @@ const detailsProsbis = async () => {
     };
     const queryString = new URLSearchParams(payload).toString();
     const result = await fetchRelatedJob(dataDetailProsbis.indexNumber, queryString);
+    console.log("result", result);
     const dataJob = result.data.relatedPosition;
     const dataHierarchy = result.data.businessProcess;
+    const dataDefinition = result.data.definitionInputOutput;
     const bodyTitle = `
     <div class="mb-2" id="prosbis-title">
                     <h6 class="mb-2" style="font-weight: bold;">${dataDetailProsbis.description}</h6>
@@ -19,11 +21,59 @@ const detailsProsbis = async () => {
     `;
     document.getElementById("prosbis-title").innerHTML = bodyTitle;
     layoutTabProsbis(dataJob);
+    layoutTabDefinition(dataDefinition);
     layoutTabHierarchy(dataHierarchy, dataDetailProsbis.indexNumber);
     layoutTabCompetency();
   } catch (error) {}
 };
 
+const layoutTabDefinition = (data) => {
+  console.log("data");
+  const formContent = `
+    <div class="col-12 scrollable-content"  style="max-height: 300px; overflow-y: auto;">
+        <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Definition
+            </div>
+            <div>
+                <div class=" custom-row-full">
+                    <label>${data?.definition || "-"}</label>
+                </div>
+            </div>
+        </div>
+         <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Input
+            </div>
+           <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
+                   ${Array.isArray(data?.input) ? data.input.map((item) => `<li> ${item}</li>`).join("") || "-" : "-"}
+                    </ul>
+                </div>
+            </div>
+        </div>
+          <div class="custom-card-approval">
+            <div class="header-card-approval">
+                Output/Product/Deliverables
+            </div>
+            <div style="padding-top: 10px;">
+                <div class=" custom-row-full">
+                    <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
+                    ${Array.isArray(data?.output) ? data.output.map((item) => `<li> ${item}</li>`).join("") || "-" : "-"}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+  `;
+
+  const bodyDefinition = document.getElementById("body-definition");
+  if (bodyDefinition) {
+    bodyDefinition.innerHTML = formContent;
+  }
+};
 const layoutTabProsbis = (data) => {
   let countR = 0;
   let countA = 0;
