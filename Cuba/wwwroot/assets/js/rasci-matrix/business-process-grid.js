@@ -981,7 +981,6 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
 }
 
 async function saveLuckysheetProsbisGrid() {
-  console.log("saveLuckysheetProsbisGrid triggered");
   const spinBtn = document.getElementById("loadingSaveSheet");
   if (spinBtn) spinBtn.style.display = "inline-block";
 
