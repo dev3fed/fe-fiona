@@ -13,7 +13,7 @@
     }
 
     .luckysheet-fullscreen-active .luckysheet-wrapper {
-        height: calc(100vh - 80px) !important;
+        height: calc(100vh - 75px) !important;
     }
 
     .luckysheet-rightclick-menu,
@@ -28,8 +28,14 @@
     .luckysheet-toolbar-menu-button-menu,
     .luckysheet-toolbar-combo-button-menu,
     .luckysheet-toolbar-select-menu,
-    .luckysheet-menu {
+    .luckysheet-menu,
+    .luckysheet-cell-input,
+    #luckysheet-input-box,
+    #luckysheet-rich-text-editor,
+    .luckysheet-input-box,
+    .luckysheet-input-box-inner {
         z-index: 9999990 !important;
+        pointer-events: auto !important;
     }
 
     #luckysheet-icon-morebtn {
@@ -48,15 +54,20 @@
         display: inline-flex !important;
         align-items: center !important;
         flex-shrink: 0 !important;
+        pointer-events: auto !important;
     }
 
     .luckysheet-toolbar-button,
     .luckysheet-toolbar-item,
-    .luckysheet-toolbar-combo-button {
+    .luckysheet-toolbar-combo-button,
+    .luckysheet-toolbar-menu-button,
+    .luckysheet-toolbar-menu-button-arrow {
         white-space: nowrap !important;
         flex-shrink: 0 !important;
         display: inline-flex !important;
         align-items: center !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
     }
 
     #luckysheet-icon-morebtn-div,
@@ -69,32 +80,36 @@
         border-radius: 4px !important;
         white-space: nowrap !important;
         min-width: 150px !important;
+        pointer-events: auto !important;
     }
 
     #luckysheet-icon-text-color-menu-menuButton,
+    #luckysheet-icon-bg-color-menu-menuButton,
     #luckysheet-icon-cell-color-menu-menuButton,
     .luckysheet-color-menu,
     .luckysheet-toolbar-colors-menu,
     #luckysheet-icon-text-color-menu,
     #luckysheet-icon-bg-color-menu,
+    div[id*="color-menu"],
     .sp-container,
     .sp-palette-container,
     .luckysheet-spectrum-container {
         z-index: 99999999 !important;
         background: #ffffff !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
         border-radius: 6px !important;
+        border: 1px solid #d4d4d4 !important;
+        pointer-events: auto !important;
     }
 
-    .sp-container {
-        position: fixed !important;
-        border: none !important;
-        background: #ffffff !important;
+    .sp-container.sp-hidden {
+        display: none !important;
     }
 
-    .sp-palette-container,
-    .sp-picker-container {
-        background: #ffffff !important;
+    .sp-container *,
+    .luckysheet-color-menu *,
+    div[id*="color-menu"] * {
+        pointer-events: auto !important;
     }
 
     #luckysheet-icon-print,
@@ -156,19 +171,21 @@
         padding-right: 60px !important;
         background: #fafafc !important;
         position: relative !important;
+        z-index: 950 !important;
+        pointer-events: auto !important;
     }
 
     #luckysheet-business-process-container .luckysheet-wa-calculate,
     #luckysheet-formula-bar-config {
         background: #ffffff !important;
         min-height: 28px !important;
-        height: 28px !important;
         display: flex !important;
         align-items: center !important;
         z-index: 900 !important;
         border-bottom: 1px solid #e5e7eb !important;
         position: absolute !important;
         width: 100% !important;
+        pointer-events: auto !important;
     }
 </style>
 
