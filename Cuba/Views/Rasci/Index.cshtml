@@ -61,6 +61,19 @@
         /* Atur nilai sesuai keinginan Anda */
         transform: translate(-50%, -10%) !important;
     }
+
+    .empty-bodyrasci {
+        background-color: #EAEAEB;
+        height: 400px;
+        background-image: url("/assets/images/competency/empty_competency.svg");
+        background-position: center 150px;
+        background-repeat: no-repeat;
+        background-size: 180px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 235px;
+    }
 </style>
 <div class="page-body">
     <div class="container-fluid">
@@ -133,9 +146,9 @@
                                                     href="#pills-chain" role="tab" aria-controls="pills-chain"
                                                     aria-selected="true">Value Chain
                             </a></li>
-                            <li class="nav-item"><a class="nav-link" id="pills-business-process-tab" data-bs-toggle="pill"
-                                                    href="#pills-business-process" role="tab" aria-controls="pills-business-process"
-                                                    aria-selected="false">Business Process
+                            <li class="nav-item"><a class="nav-link" id="pills-business-process-tab"
+                                                    data-bs-toggle="pill" href="#pills-business-process" role="tab"
+                                                    aria-controls="pills-business-process" aria-selected="false">Business Process
                             </a></li>
                             <li class="nav-item"><a class="nav-link active" id="pills-matrix-tab" data-bs-toggle="pill"
                                                         href="#pills-matrix" role="tab" aria-controls="pills-matrix"
@@ -357,7 +370,13 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class=" mt-2">
+                                                            <div class="col-12 mt-3" id="empty-rasci" style="display: none;">
+
+                                                                <div class="empty-bodyrasci">
+
+                                                                </div>
+                                                            </div>
+                                                            <div class=" mt-2" style="display:none" id="table-rasci">
                                                                 <div id="table-container" class="scrollable-table table-wrapper">
                                                                     <!-- begin :: List RASCI Matrix Table -->
                                                                     <table class="table  custom-border-table rasci-matrix"

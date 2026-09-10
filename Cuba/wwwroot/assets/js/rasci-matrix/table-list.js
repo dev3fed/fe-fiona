@@ -15,6 +15,31 @@ document.addEventListener("dataLoaded", async function () {
     // }
   } catch (error) {}
 });
+document.addEventListener("DOMContentLoaded", async function () {
+  let selectElement = document.querySelector("#dataSource-rasci");
+  showLoading();
+  infoValueChain(selectElement.value);
+  if (selectElement.value === "master" || selectElement.value === "" || selectElement.value === null) {
+    document.getElementById("pills-draft-tab").style.display = "none";
+    document.getElementById("pills-approval-tab").style.display = "none";
+    document.getElementById("pills-log-history-tab").style.display = "none";
+    document.getElementById("pills-summary-tab").style.display = "none";
+
+    document.getElementById("btnAddBp").style.display = "none";
+    document.getElementById("btnAddNotation").style.display = "none";
+    document.getElementById("btnDeleteDetail").style.display = "none";
+    document.getElementById("btnEditDetail").style.display = "none";
+  }
+
+  // loadTableHeader(appState.resultJabatan);
+  const loader = document.getElementById("loader");
+  loader.style.display = "none";
+  // loadTableBody(appState.resultProsbis);
+  await defaultLoadMatrix();
+  hideLoading();
+  fetchDatasource();
+  feather.replace();
+});
 function getUrlOrgParams(search = window.location.search) {
   const params = new URLSearchParams(search);
   const ouId = params.get("ouId");
@@ -35,44 +60,31 @@ async function defaultLoadMatrix() {
     };
     const payloadPosition = getState("payloadPosition");
     const resultMatrix = await fetchProsbisMatrix(payload);
-    const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
-    if (combineIndex.length > 0) {
-      const resultPosition = await fetchPositionMatrix({
-        ...payloadPosition,
-        indexNumber: combineIndex,
-      });
-      setState("payloadPosition", {
-        ...payloadPosition,
-        indexNumber: combineIndex,
-      });
-      loadTableBody(resultMatrix.data);
-      loadTableHeader(resultPosition.data);
-      mapRasciCells(combineIndex, resultPosition.data);
+    console.log("resultMatrix", resultMatrix);
+    if (resultMatrix.data.length === 0) {
+      document.getElementById("empty-rasci").style.display = "block";
+      document.getElementById("table-rasci").style.display = "none";
+    } else {
+      const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+      //
+      if (combineIndex.length > 0) {
+        document.getElementById("empty-rasci").style.display = "none";
+        document.getElementById("table-rasci").style.display = "block";
+        const resultPosition = await fetchPositionMatrix({
+          ...payloadPosition,
+          indexNumber: combineIndex,
+        });
+        setState("payloadPosition", {
+          ...payloadPosition,
+          indexNumber: combineIndex,
+        });
+        loadTableBody(resultMatrix.data);
+        loadTableHeader(resultPosition.data);
+        mapRasciCells(combineIndex, resultPosition.data);
+      }
     }
   } catch (error) {}
 }
-document.addEventListener("DOMContentLoaded", async function () {
-  let selectElement = document.querySelector("#dataSource-rasci");
-  infoValueChain(selectElement.value);
-  if (selectElement.value === "master" || selectElement.value === "" || selectElement.value === null) {
-    document.getElementById("pills-draft-tab").style.display = "none";
-    document.getElementById("pills-approval-tab").style.display = "none";
-    document.getElementById("pills-log-history-tab").style.display = "none";
-    document.getElementById("pills-summary-tab").style.display = "none";
-
-    document.getElementById("btnAddBp").style.display = "none";
-    document.getElementById("btnAddNotation").style.display = "none";
-    document.getElementById("btnDeleteDetail").style.display = "none";
-    document.getElementById("btnEditDetail").style.display = "none";
-  }
-  showLoading();
-  // loadTableHeader(appState.resultJabatan);
-  const loader = document.getElementById("loader");
-  loader.style.display = "none";
-  // loadTableBody(appState.resultProsbis);
-  fetchDatasource();
-  feather.replace();
-});
 
 $("#dataSource-rasci").on("select2:select", async function (e) {
   try {
