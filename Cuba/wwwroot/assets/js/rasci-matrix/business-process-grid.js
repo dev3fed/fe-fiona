@@ -86,55 +86,74 @@ $(document).ready(function () {
     }, 30);
   });
 
-  $(document).on(
-    "click",
-    '#luckysheet-icon-text-color, #luckysheet-icon-bg-color, #luckysheet-icon-cell-color, div[id*="luckysheet-icon-text-color"], div[id*="luckysheet-icon-cell-color"], div[id*="luckysheet-icon-bg-color"], .sp-replacer, .luckysheet-toolbar-combo-button, .luckysheet-toolbar-menu-button-arrow',
-    function (e) {
-      const $clicked = $(this);
-      const $targetBtn = $clicked.closest(
-        '.luckysheet-toolbar-button, .luckysheet-toolbar-combo-button, div[id*="luckysheet-icon-"]',
-      );
-      const targetElement = $targetBtn.length > 0 ? $targetBtn[0] : this;
-
-      setTimeout(function () {
-        const $colorMenus = $(
-          '#luckysheet-icon-text-color-menu-menuButton, #luckysheet-icon-cell-color-menu-menuButton, .sp-container, .luckysheet-color-menu, #luckysheet-icon-text-color-menu, #luckysheet-icon-bg-color-menu, div[id*="color-menu"], .luckysheet-spectrum-container',
-        );
-        $colorMenus.each(function () {
-          const $menu = $(this);
-          if ($menu.length > 0) {
-            const btnRect = targetElement.getBoundingClientRect();
-            const menuWidth = $menu.outerWidth() || 240;
-            let targetLeft = btnRect.left;
-            if (targetLeft + menuWidth > window.innerWidth - 10) {
-              targetLeft = window.innerWidth - menuWidth - 10;
-            }
-            if (targetLeft < 10) targetLeft = 10;
-
-            $menu
-              .css({
-                position: "fixed",
-                top: btnRect.bottom + 4 + "px",
-                left: targetLeft + "px",
-                right: "auto",
-                bottom: "auto",
-                "z-index": "99999999",
-                display: "block",
-                visibility: "visible",
-                opacity: "1",
-              })
-              .removeClass("sp-hidden");
-          }
+  // Cell double click focus trigger for fullscreen edit
+  $(document).on("dblclick", "#luckysheet-business-process-container, #luckysheet-cell-main, canvas", function () {
+    setTimeout(function () {
+      const $inputBox = $("#luckysheet-input-box, .luckysheet-cell-input, #luckysheet-rich-text-editor");
+      if ($inputBox.length > 0) {
+        $inputBox.css({
+          "z-index": "99999990",
+          "pointer-events": "auto",
         });
-      }, 30);
-    },
-  );
+        const $editorInput = $inputBox.find("input, textarea, div[contenteditable]");
+        if ($editorInput.length > 0) {
+          $editorInput.focus();
+        }
+      }
+    }, 40);
+  });
 
   window.addEventListener(
     "keydown",
     function (e) {
       if (e.keyCode === 116 || (e.ctrlKey && (e.keyCode === 82 || e.key === "r" || e.key === "R"))) {
         window.location.reload();
+      }
+    },
+    true,
+  );
+
+  // Capture phase copy handler to prevent Luckysheet from inserting <table data-type="luckysheet_copy_action_table"> into system clipboard
+  document.addEventListener(
+    "copy",
+    function (e) {
+      if (typeof luckysheet === "undefined" || !luckysheet.getselectrange) return;
+
+      const $container = $("#luckysheet-business-process-container");
+      if ($container.length === 0) return;
+
+      const sel = luckysheet.getselectrange();
+      if (!sel || sel.length === 0) return;
+
+      try {
+        const fileData = luckysheet.getluckysheetfile();
+        if (!fileData || !fileData[0] || !fileData[0].data) return;
+
+        const gridData = fileData[0].data;
+        const r1 = Math.min(sel[0].row[0], sel[0].row[1]);
+        const r2 = Math.max(sel[0].row[0], sel[0].row[1]);
+        const c1 = Math.min(sel[0].column[0], sel[0].column[1]);
+        const c2 = Math.max(sel[0].column[0], sel[0].column[1]);
+
+        const textRows = [];
+        for (let r = r1; r <= r2; r++) {
+          const rowCells = [];
+          for (let c = c1; c <= c2; c++) {
+            const cell = gridData[r] ? gridData[r][c] : null;
+            const textVal = getLuckysheetCellValue(cell);
+            rowCells.push(textVal);
+          }
+          textRows.push(rowCells.join("\t"));
+        }
+
+        const plainText = textRows.join("\n");
+        if (plainText !== "" && e.clipboardData) {
+          e.clipboardData.setData("text/plain", plainText);
+          e.clipboardData.setData("text/html", plainText);
+          e.preventDefault();
+        }
+      } catch (err) {
+        console.warn("Custom copy handler error:", err);
       }
     },
     true,
@@ -167,20 +186,20 @@ function fixLuckysheetLayoutOffsets() {
     const editorHeight = $editor.outerHeight() || 40;
 
     if ($formulaBar.length > 0) {
+      const formulaHeight = $formulaBar.is(":visible") ? ($formulaBar.outerHeight() || 28) : 0;
+
       $formulaBar.css({
         position: "absolute",
         top: editorHeight + "px",
         left: "0px",
         right: "0px",
         width: "100%",
-        height: "28px",
         "z-index": "900",
         background: "#ffffff",
         display: "flex",
         "align-items": "center",
       });
 
-      const formulaHeight = $formulaBar.is(":visible") ? $formulaBar.outerHeight() || 28 : 0;
       const totalTop = editorHeight + formulaHeight;
 
       if ($sheetArea.length > 0) {
@@ -322,13 +341,29 @@ function syncDataSourceDropdown() {
   }
 }
 
+function cleanLuckysheetText(rawVal) {
+  if (rawVal === null || rawVal === undefined) return "";
+  let str = String(rawVal).trim();
+  if (str.includes("<table") || str.includes("luckysheet_copy_action_table") || str.includes("<tr") || str.includes("<td")) {
+    try {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = str;
+      str = (tempDiv.textContent || tempDiv.innerText || "").trim();
+    } catch (e) {
+      str = str.replace(/<[^>]*>/g, "").trim();
+    }
+  }
+  return str;
+}
+
 function getLuckysheetCellValue(cell) {
   if (cell === null || cell === undefined) return "";
   if (typeof cell === "object") {
     const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.m;
-    return val !== undefined && val !== null ? String(val).trim() : "";
+    const extracted = val !== undefined && val !== null ? String(val).trim() : "";
+    return cleanLuckysheetText(extracted);
   }
-  return String(cell).trim();
+  return cleanLuckysheetText(String(cell).trim());
 }
 
 function processModifiedRange(rangeInput, source = "Update") {
@@ -410,9 +445,29 @@ function processModifiedRange(rangeInput, source = "Update") {
               }
             }
             gRow._id = targetId;
+
+            // Clean HTML table tags from copied cells in memory
+            for (let c = 0; c < gRow.length; c++) {
+              const cObj = gRow[c];
+              if (!cObj) continue;
+              if (typeof cObj.v === "string" && (cObj.v.includes("<table") || cObj.v.includes("luckysheet_copy_action_table"))) {
+                const cleaned = cleanLuckysheetText(cObj.v);
+                cObj.v = cleaned;
+                cObj.m = cleaned;
+              } else if (typeof cObj.v === "object" && cObj.v !== null) {
+                if (typeof cObj.v.v === "string" && (cObj.v.v.includes("<table") || cObj.v.v.includes("luckysheet_copy_action_table"))) {
+                  const cleaned = cleanLuckysheetText(cObj.v.v);
+                  cObj.v.v = cleaned;
+                  cObj.v.m = cleaned;
+                }
+              }
+              if (typeof cObj.m === "string" && (cObj.m.includes("<table") || cObj.m.includes("luckysheet_copy_action_table"))) {
+                cObj.m = cleanLuckysheetText(cObj.m);
+              }
+            }
           }
         } catch (e) {
-          console.warn("Failed to sanitize row _id:", e);
+          console.warn("Failed to sanitize row _id / HTML table content:", e);
         }
       }
     });
