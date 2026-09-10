@@ -291,6 +291,7 @@ function renderStaticHeader() {
       <th scope="col" class="level-col head-cell">Level</th>
       <th scope="col" class="index-col head-cell">Index</th>
       <th scope="col" class="headcol head-cell"><span style="padding:10px">Proses Bisnis</span></th>
+      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;">R/A</th>
     </tr>
   `;
 }
@@ -375,6 +376,11 @@ function loadTableBody(prosbisList) {
                     class="example-popover" style="margin-top:-2px;" data-bs-toggle="tooltip"
                     data-bs-placement="top" title="${title}">`;
 
+    const toolTipCellNotes =
+      val.cellNotes && val.cellNotes.trim() !== ""
+        ? `<img src="/assets/images/rasci/comment.svg" alt="Notes Icon" class="example-popover" style="margin-top:-2px;margin-right:3px;cursor:pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="${val.cellNotes.replace(/"/g, "&quot;")}">`
+        : "";
+
     const toolTipNa =
       val.matchReason === "NA_NO_POSITION_MAPPING"
         ? createTooltipImage("/assets/images/rasci/danger-circle.svg", "Tidak Ada Notasi RASCI (N/A)")
@@ -406,7 +412,7 @@ function loadTableBody(prosbisList) {
             <div class="hierarchy-icon-wrapper">${hierarchyIcon}</div>
             <div class="flex-fill prosbis-name" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-custom-class="custom-tooltip"
               title="${val.description}" onclick="onModalProsbis(${valString})">${val.description}</div>
-                ${toolTipNa} ${toolTipRa}
+                ${toolTipCellNotes} ${toolTipNa} ${toolTipRa}
             <div class="ellipsis-menu prosbis-row-ellipsis">
               <div class="dropright">
                 <button type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
@@ -429,6 +435,9 @@ function loadTableBody(prosbisList) {
               </div>
             </div>
           </div>
+        </td>
+        <td class="ra-col" style="text-align:center;font-size:12px;font-weight: 500 !important;">
+          ${val.totalRA !== undefined && val.totalRA !== null ? val.totalRA : 0}
         </td>
       </tr>`;
   });

@@ -145,6 +145,14 @@
 .ellipsis-menu.prosbis-row-ellipsis .dropdown-menu {
   left: 12px !important;
   top: -8px !important;
+  z-index: 9999 !important;
+}
+
+.rasci-matrix tr:has(.show),
+.rasci-matrix td.headcol:has(.show),
+.rasci-matrix tr:focus-within,
+.rasci-matrix td.headcol:focus-within {
+  z-index: 20 !important;
 }
 
 .prosbis-cell-wrapper {
@@ -337,6 +345,18 @@ th {
   z-index: 1;
   font-size: 12px;
   font-weight: 500 !important;
+  background: #fff;
+}
+
+.rasci-matrix .ra-col {
+  width: 55px;
+  position: sticky;
+  text-align: center;
+  left: 480px;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 500 !important;
+  border-right: 1px solid #b0d1e4;
   background: #fff;
 }
 
