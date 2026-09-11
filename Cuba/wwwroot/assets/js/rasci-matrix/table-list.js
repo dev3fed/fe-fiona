@@ -216,9 +216,15 @@ async function changeDataSource(dataSource, draftSo) {
       row: 1,
       rowSize: 15,
     };
-    // console.log("payload", payload);
     const resultProsbis = await fetchProsbisMatrix(payload);
-    // console.log("resultProsbis", resultProsbis);
+    if (resultProsbis.data.length === 0) {
+      console.log("Cek");
+      document.getElementById("empty-rasci").style.display = "block";
+      document.getElementById("table-rasci").style.display = "none";
+      return;
+    }
+    document.getElementById("empty-rasci").style.display = "none";
+    document.getElementById("table-rasci").style.display = "block";
     const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
     if (prosbisNumber.length > 0 && resultProsbis.success === true) {
       const payloadJob = {
@@ -302,8 +308,29 @@ function renderStaticHeader() {
     <tr style="height:30px">
       <th scope="col" class="level-col head-cell">Level</th>
       <th scope="col" class="index-col head-cell">Index</th>
-      <th scope="col" class="headcol head-cell"><span style="padding:10px">Proses Bisnis</span></th>
-      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;">R/A</th>
+      <th scope="col" class="headcol head-cell" style="min-width:260px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; padding-right:4px;">
+          <span style="padding:10px">Proses Bisnis</span>
+          <div class="ellipsis-menu prosbis-row-ellipsis">
+            <div class="dropright">
+              <button type="button" id="prosesBisnisDropdown" data-bs-toggle="dropdown"
+                aria-expanded="false" aria-label="Menu Proses Bisnis"
+                style="border:none; background:transparent; cursor:pointer;">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="prosesBisnisDropdown"
+                style="z-index:1050;">
+                <li>
+                  <a href="#" class="dropdown-item">
+                    <img src="/assets/images/rasci/eye.svg" alt="Filter Icon">View in spreadsheet
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </th>
+      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;z-index:1;" >R/A</th>
     </tr>
   `;
 }
