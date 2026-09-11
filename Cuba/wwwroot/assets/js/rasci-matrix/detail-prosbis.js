@@ -9,10 +9,10 @@ const detailsProsbis = async () => {
     };
     const queryString = new URLSearchParams(payload).toString();
     const result = await fetchRelatedJob(dataDetailProsbis.indexNumber, queryString);
-    console.log("result", result);
     const dataJob = result.data.relatedPosition;
     const dataHierarchy = result.data.businessProcess;
     const dataDefinition = result.data.definitionInputOutput;
+    console.log("dataDefinition", dataDefinition);
     const bodyTitle = `
     <div class="mb-2" id="prosbis-title">
                     <h6 class="mb-2" style="font-weight: bold;">${dataDetailProsbis.description}</h6>
@@ -28,7 +28,20 @@ const detailsProsbis = async () => {
 };
 
 const layoutTabDefinition = (data) => {
-  console.log("data");
+  const definition = Array.isArray(data) ? data[0] || {} : data || {};
+  const valueOf = (item) => {
+    if (item === null || item === undefined) return "";
+    if (typeof item === "object") {
+      return item.value ?? item.name ?? item.label ?? item.description ?? "";
+    }
+    return String(item);
+  };
+  const renderList = (items) => {
+    const values = Array.isArray(items) ? items : [items];
+    const result = values.map(valueOf).filter(Boolean);
+    return result.length ? result.map((item) => `<li>${item}</li>`).join("") : "-";
+  };
+  const renderText = (value) => valueOf(value) || "-";
   const formContent = `
     <div class="col-12 scrollable-content"  style="max-height: 300px; overflow-y: auto;">
         <div class="custom-card-approval">
@@ -37,7 +50,9 @@ const layoutTabDefinition = (data) => {
             </div>
             <div>
                 <div class=" custom-row-full">
-                    <label>${data?.definition || "-"}</label>
+                    <label>${renderText(
+                      definition.definition ?? definition.Definition ?? definition.definisi ?? definition.Definisi,
+                    )}</label>
                 </div>
             </div>
         </div>
@@ -48,7 +63,7 @@ const layoutTabDefinition = (data) => {
            <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                   ${Array.isArray(data?.input) ? data.input.map((item) => `<li> ${item}</li>`).join("") || "-" : "-"}
+                   ${renderList(definition.input ?? definition.Input)}
                     </ul>
                 </div>
             </div>
@@ -60,7 +75,7 @@ const layoutTabDefinition = (data) => {
             <div style="padding-top: 10px;">
                 <div class=" custom-row-full">
                     <ul style="list-style-type: disc; margin-left: 20px;font-size: 13px;">
-                    ${Array.isArray(data?.output) ? data.output.map((item) => `<li> ${item}</li>`).join("") || "-" : "-"}
+                    ${renderList(definition.output ?? definition.Output)}
                     </ul>
                 </div>
             </div>
