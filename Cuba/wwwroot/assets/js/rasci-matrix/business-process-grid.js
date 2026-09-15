@@ -101,7 +101,6 @@ $(document).ready(function () {
 
   $(window).on("resize", function () {
     if (fortunesheetInitialized) {
-      updateColumnWidthsForCurrentLayout();
       fixFortuneSheetLayoutOffsets();
     }
   });
@@ -260,31 +259,12 @@ function hideFortuneSheetAddAndMenuButtons() {
   ).attr(
     "style",
     "display: none !important; visibility: hidden !important; opacity: 0 !important; width: 0 !important; height: 0 !important; pointer-events: none !important; margin: 0 !important; padding: 0 !important;"
-  );  
+  );
 }
 
-function calculateProsbisColumnLen() {
-  let $container = $("#luckysheet-business-process-container, #fortunesheet-business-process-container");
-  let containerWidth = $container.length > 0 ? $container.width() : 0;
-  if (!containerWidth || containerWidth < 400) {
-    containerWidth = $(window).width() || 1200;
-  }
-
-  const availW = containerWidth - 61;
-  const fixedColWidthsSum = 75 + 8 * 34; // Col 0 (75) + Col 1..8 (272) = 347px
-
-  let col9 = 180;
-  let col10 = 220;
-  let col11 = 220;
-  let col12 = 220;
-
-  if (availW - fixedColWidthsSum > 840) {
-    const remW = availW - fixedColWidthsSum;
-    col9 = Math.floor(remW * 0.18);
-    col10 = Math.floor(remW * 0.27);
-    col11 = Math.floor(remW * 0.27);
-    col12 = remW - col9 - col10 - col11;
-  }
+function getResponsiveColumnWidths(containerWidth) {
+  const baseFixed = 75 + 34 * 8; // 347px for Index + L1..L8
+  const avail = Math.max(containerWidth - baseFixed - 35, 840);
 
   return {
     0: 75,
@@ -296,29 +276,32 @@ function calculateProsbisColumnLen() {
     6: 34,
     7: 34,
     8: 34,
-    9: col9,
-    10: col10,
-    11: col11,
-    12: col12,
+    9: Math.max(Math.floor(avail * 0.18), 180),
+    10: Math.max(Math.floor(avail * 0.28), 220),
+    11: Math.max(Math.floor(avail * 0.27), 220),
+    12: Math.max(Math.floor(avail * 0.27), 220),
   };
 }
 
-let fortunesheetWorkbookProps = null;
-function updateColumnWidthsForCurrentLayout() {
-  if (!currentWorkbookData || !currentWorkbookData[0]) return;
-  const newColLen = calculateProsbisColumnLen();
-  if (!currentWorkbookData[0].config) currentWorkbookData[0].config = {};
-  currentWorkbookData[0].config.columnlen = newColLen;
+function updateFortuneSheetResponsiveColumns() {
+  const $container = $("#luckysheet-business-process-container, #fortunesheet-business-process-container");
+  if ($container.length === 0) return;
 
-  if (fortunesheetRoot && window.react && window.react.Workbook && fortunesheetWorkbookProps) {
-    const { Workbook } = window.react;
-    const selectedDs = $("#dataSource-prosbis").val() || "master";
-    const wbKey = "wb_" + String(selectedDs) + "_" + (isFullscreenProsbis ? "fs" : "norm") + "_" + Date.now();
-    const props = Object.assign({ key: wbKey }, fortunesheetWorkbookProps, { data: currentWorkbookData });
+  const w = $container.width() || window.innerWidth;
+  if (!w || w <= 0) return;
+
+  const newColLens = getResponsiveColumnWidths(w);
+
+  if (currentWorkbookData && currentWorkbookData[0]) {
+    if (!currentWorkbookData[0].config) currentWorkbookData[0].config = {};
+    currentWorkbookData[0].config.columnlen = Object.assign({}, currentWorkbookData[0].config.columnlen, newColLens);
+  }
+
+  if (fortunesheetRef.current && typeof fortunesheetRef.current.setColumnWidth === "function") {
     try {
-      fortunesheetRoot.render(React.createElement(Workbook, props));
+      fortunesheetRef.current.setColumnWidth(newColLens);
     } catch (e) {
-      console.warn("Failed to re-render FortuneSheet with updated column widths:", e);
+      console.warn("setColumnWidth warning:", e);
     }
   }
 }
@@ -329,6 +312,7 @@ function fixFortuneSheetLayoutOffsets() {
   isFixingLayoutOffsets = true;
   try {
     hideFortuneSheetAddAndMenuButtons();
+    updateFortuneSheetResponsiveColumns();
     if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
       try {
         fortunesheetRef.current.resize();
@@ -607,22 +591,17 @@ function toggleFullscreenProsbis() {
     $("body").removeClass("luckysheet-fullscreen-body-lock");
   }
 
-  updateColumnWidthsForCurrentLayout();
   fixFortuneSheetLayoutOffsets();
   setTimeout(function () {
-    updateColumnWidthsForCurrentLayout();
     fixFortuneSheetLayoutOffsets();
   }, 50);
   setTimeout(function () {
-    updateColumnWidthsForCurrentLayout();
     fixFortuneSheetLayoutOffsets();
   }, 150);
   setTimeout(function () {
-    updateColumnWidthsForCurrentLayout();
     fixFortuneSheetLayoutOffsets();
   }, 350);
   setTimeout(function () {
-    updateColumnWidthsForCurrentLayout();
     fixFortuneSheetLayoutOffsets();
   }, 600);
 }
@@ -881,7 +860,7 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         },
         config: {
           defaultrowlen: 25,
-          columnlen: calculateProsbisColumnLen(),
+          columnlen: getResponsiveColumnWidths($container.width() || window.innerWidth),
         },
       },
     ];
@@ -1079,7 +1058,6 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
       }
     }
 
-    fortunesheetWorkbookProps = workbookProps;
     const { Workbook } = window.react;
     // Use unique key so React unmounts old FortuneSheet instance and re-renders new sheetData on dataSource change
     const wbKey = "wb_" + String(selectedDs) + "_" + String(prosbisList.length) + "_" + Date.now();
