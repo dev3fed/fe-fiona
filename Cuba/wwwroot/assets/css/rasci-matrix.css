@@ -353,7 +353,6 @@ th {
   position: sticky;
   text-align: center;
   left: 480px;
-  z-index: 1;
   font-size: 12px;
   font-weight: 500 !important;
   border-right: 1px solid #b0d1e4;

@@ -125,8 +125,6 @@ $("#dataSource-rasci").on("select2:select", async function (e) {
     setState("filterJobList", combinedData);
     ChangeSourceDraft();
     infoValueChain(selectedValue);
-    // console.log("selectedDraftSo", selectedDraftSo);
-    // console.log("selectedValue", selectedValue);
     changeDataSource(selectedValue, selectedDraftSo);
   } catch (error) {}
 });
@@ -223,6 +221,7 @@ async function changeDataSource(dataSource, draftSo) {
       document.getElementById("table-rasci").style.display = "none";
       return;
     }
+
     document.getElementById("empty-rasci").style.display = "none";
     document.getElementById("table-rasci").style.display = "block";
     const prosbisNumber = resultProsbis.data.map((val) => val.indexNumber);
@@ -330,7 +329,7 @@ function renderStaticHeader() {
           </div>
         </div>
       </th>
-      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;z-index:1;" >R/A</th>
+      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;z-index: 1;" >R/A</th>
     </tr>
   `;
 }

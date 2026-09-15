@@ -44,7 +44,19 @@ const layoutTabDefinition = (data) => {
   const renderText = (value) => valueOf(value) || "-";
   const formContent = `
     <div class="col-12 scrollable-content"  style="max-height: 300px; overflow-y: auto;">
-        <div class="custom-card-approval">
+          <div class="custom-card-approval">
+                  <div class="header-card-approval">
+                      Notes
+                  </div>
+                  <div>
+                      <div class=" custom-row-full">
+                          <label>${renderText(
+                            definition.notes ?? definition.notes ?? definition.notes ?? definition.notes,
+                          )}</label>
+                      </div>
+                  </div>
+              </div>    
+          <div class="custom-card-approval">
             <div class="header-card-approval">
                 Definition
             </div>
