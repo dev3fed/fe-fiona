@@ -262,90 +262,20 @@ function hideFortuneSheetAddAndMenuButtons() {
   );
 }
 
-let isFormulaResizing = false;
-let formulaStartY = 0;
-let formulaStartHeight = 0;
-let $formulaTargetBar = null;
-
-const formulaBarSelectors =
-  ".fortune-formula-bar, #fortune-formula-bar, .luckysheet-wa-calculate, .fortune-wa-calculate, #luckysheet-wa-calculate, #fortune-wa-calculate, [class*='formula-bar'], [class*='wa-calculate']";
-
-$(document).on("mousemove", formulaBarSelectors, function (e) {
-  if (isFormulaResizing) return;
-  const rect = this.getBoundingClientRect();
-  if (e.clientY >= rect.bottom - 10 && e.clientY <= rect.bottom + 6) {
-    $(this).css("cursor", "ns-resize");
-  } else {
-    $(this).css("cursor", "");
-  }
-});
-
-$(document).on("mousedown", formulaBarSelectors, function (e) {
-  const rect = this.getBoundingClientRect();
-  if (e.clientY >= rect.bottom - 10 && e.clientY <= rect.bottom + 6) {
-    e.preventDefault();
-    e.stopPropagation();
-    isFormulaResizing = true;
-    $formulaTargetBar = $(this);
-    $formulaTargetBar.addClass("formula-resizing-active");
-    formulaStartY = e.clientY;
-    formulaStartHeight = $formulaTargetBar.height() || 28;
-    $("body").css({ cursor: "ns-resize", "user-select": "none" });
-  }
-});
-
-$(document).on("mousemove.formulaDragDoc", function (e) {
-  if (!isFormulaResizing || !$formulaTargetBar || $formulaTargetBar.length === 0) return;
-  e.preventDefault();
-  const dy = e.clientY - formulaStartY;
-  const newHeight = Math.max(28, Math.min(300, formulaStartHeight + dy));
-
-  $formulaTargetBar.css({
-    height: newHeight + "px",
-    "max-height": newHeight + "px",
-    "min-height": newHeight + "px",
-  });
-
-  $formulaTargetBar
-    .find(
-      "#luckysheet-functionbox-cell, .fortune-fx-input, [class*='fx-input'], [class*='rich-text'], [class*='formula-input'], [contenteditable='true'], input, textarea, .luckysheet-formula-text-editor"
-    )
-    .css({
-      height: Math.max(22, newHeight - 6) + "px",
-      "max-height": Math.max(22, newHeight - 6) + "px",
-    });
-
-  if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
-    try {
-      fortunesheetRef.current.resize();
-    } catch (err) {}
-  }
-});
-
-$(document).on("mouseup.formulaDragDoc", function () {
-  if (isFormulaResizing) {
-    isFormulaResizing = false;
-    if ($formulaTargetBar) $formulaTargetBar.removeClass("formula-resizing-active");
-    $formulaTargetBar = null;
-    $("body").css({ cursor: "", "user-select": "" });
+let isFixingLayoutOffsets = false;
+function fixFortuneSheetLayoutOffsets() {
+  if (isFixingLayoutOffsets) return;
+  isFixingLayoutOffsets = true;
+  try {
+    hideFortuneSheetAddAndMenuButtons();
     if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
       try {
         fortunesheetRef.current.resize();
-      } catch (err) {}
+      } catch (e) {}
     }
+  } finally {
+    isFixingLayoutOffsets = false;
   }
-});
-
-function fixFortuneSheetLayoutOffsets() {
-  hideFortuneSheetAddAndMenuButtons();
-  if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
-    try {
-      fortunesheetRef.current.resize();
-    } catch (e) {}
-  }
-  try {
-    window.dispatchEvent(new Event("resize"));
-  } catch (e) {}
 }
 
 function ensureFortuneSheetResourcesLoaded(callback) {
@@ -690,14 +620,14 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
 
     const baseHeaders = [
       { text: "Index", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
-      { text: "L1", bg: "#f8fafc", fc: "#dc2626", bl: 1 },
-      { text: "L2", bg: "#f8fafc", fc: "#2563eb", bl: 1 },
-      { text: "L3", bg: "#f8fafc", fc: "#0284c7", bl: 1 },
-      { text: "L4", bg: "#f8fafc", fc: "#7c3aed", bl: 1 },
-      { text: "L5", bg: "#f8fafc", fc: "#3e4140ff", bl: 1 },
-      { text: "L6", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1 },
-      { text: "L7", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1 },
-      { text: "L8", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1 },
+      { text: "L1", bg: "#f8fafc", fc: "#dc2626", bl: 1, tb: 1 },
+      { text: "L2", bg: "#f8fafc", fc: "#2563eb", bl: 1, tb: 1 },
+      { text: "L3", bg: "#f8fafc", fc: "#0284c7", bl: 1, tb: 1 },
+      { text: "L4", bg: "#f8fafc", fc: "#7c3aed", bl: 1, tb: 1 },
+      { text: "L5", bg: "#f8fafc", fc: "#3e4140ff", bl: 1, tb: 1 },
+      { text: "L6", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1, tb: 1 },
+      { text: "L7", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1, tb: 1 },
+      { text: "L8", bg: "#f8fafc", fc: "#7c7a7aff", bl: 1, tb: 1 },
       { text: "Notes", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
       { text: "Definisi", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
       { text: "Input", bg: "#f8fafc", fc: "#0f172a", bl: 1 },
@@ -705,22 +635,22 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
     ];
 
     baseHeaders.forEach((h, cIdx) => {
-      const headerTb = 1;
+      const vObj = {
+        v: h.text,
+        m: h.text,
+        bg: h.bg,
+        fc: h.fc,
+        bl: h.bl,
+        ff: "Arial",
+        fs: 11,
+        ht: 1,
+        vt: 1,
+        tb: cIdx >= 1 && cIdx <= 8 ? 1 : h.tb !== undefined ? h.tb : 1,
+      };
       celldata.push({
         r: 0,
         c: cIdx,
-        v: {
-          v: h.text,
-          m: h.text,
-          bg: h.bg,
-          fc: h.fc,
-          bl: h.bl,
-          tb: headerTb,
-          ff: 1,
-          fs: 11,
-          ht: 1,
-          vt: 1,
-        },
+        v: vObj,
       });
     });
 
@@ -744,7 +674,7 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         const levelNum = pb.level || pb.Level || (idxStr ? idxStr.split(".").length : 1);
         const desc = pb.description || pb.Description || pb.name || pb.businessProcessName || "";
 
-        celldata.push({ r: r, c: 0, v: { v: idxStr, m: idxStr, _id: pbId, ff: 1, fs: 11, tb: 1 } });
+        celldata.push({ r: r, c: 0, v: { v: idxStr, m: idxStr, _id: pbId, ff: "Arial", fs: 11, tb: 1 } });
 
         const colLevel = Math.min(Math.max(levelNum, 1), 8);
         let colorHex = "#0f172a";
@@ -759,7 +689,7 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         } else if (colLevel === 3) {
           colorHex = "#0284c7";
         } else if (colLevel === 4) {
-          colorHex = "#7c3aed";
+          colorHex = "#7c7a7a";
         } else if (colLevel === 5) {
           colorHex = "#3e4140ff";
         } else if (colLevel === 6) {
@@ -770,30 +700,29 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
           colorHex = "#7c7a7aff";
         }
 
-        const textWrapMode = 1;
         const cellNotesVal = pb.cellNotes || pb.CellNotes || "";
 
-        const descCellObj = { v: desc, m: desc, fc: colorHex, bl: isBold, tb: textWrapMode, ff: 1, fs: 11 };
+        const descCellObj = { v: desc, m: desc, fc: colorHex, bl: isBold, ff: "Arial", fs: 11, tb: 1 };
         if (cellNotesVal) {
           descCellObj.ps = { value: cellNotesVal, isShow: false };
         }
 
         celldata.push({ r: r, c: colLevel, v: descCellObj });
 
-        celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: 1, fs: 11, tb: 1 } });
+        celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: "Arial", fs: 11, tb: 1 } });
         celldata.push({
           r: r,
           c: 10,
           v: {
             v: pb.definisi || pb.definition || pb.processDefinition || "",
             m: pb.definisi || pb.definition || pb.processDefinition || "",
-            ff: 1,
+            ff: "Arial",
             fs: 11,
             tb: 1,
           },
         });
-        celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: 1, fs: 11, tb: 1 } });
-        celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: 1, fs: 11, tb: 1 } });
+        celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: "Arial", fs: 11, tb: 1 } });
+        celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: "Arial", fs: 11, tb: 1 } });
 
         const cellPropsList = pb.cellProperties || pb.CellProperties || [];
         if (Array.isArray(cellPropsList) && cellPropsList.length > 0) {
@@ -818,6 +747,14 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
                 const un = cp.isUnderline !== undefined ? cp.isUnderline : cp.IsUnderline;
                 const fs = cp.fontSize || cp.FontSize;
                 let ff = cp.fontFamily || cp.FontFamily;
+                const rawTb =
+                  cp.textWrap !== undefined
+                    ? cp.textWrap
+                    : cp.tb !== undefined
+                    ? cp.tb
+                    : cp.textBreak !== undefined
+                    ? cp.textBreak
+                    : cp.TextBreak;
 
                 if (fc) target.v.fc = fc;
                 if (bg) target.v.bg = bg;
@@ -828,12 +765,18 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
                 if (fs) target.v.fs = parseInt(fs);
                 if (ff !== null && ff !== undefined && ff !== "") {
                   const ffStr = String(ff).toLowerCase().trim();
-                  if (ffStr === "arial" || ffStr === "1") ff = 1;
-                  else if (ffStr === "times new roman" || ffStr === "0") ff = 0;
-                  else if (ffStr === "tahoma" || ffStr === "2") ff = 2;
-                  else if (ffStr === "verdana" || ffStr === "3") ff = 3;
-                  else if (!isNaN(parseInt(ffStr))) ff = parseInt(ffStr);
+                  if (ffStr === "times new roman") ff = "Times New Roman";
+                  else if (ffStr === "tahoma" || ffStr === "2") ff = "Tahoma";
+                  else if (ffStr === "verdana" || ffStr === "3") ff = "Verdana";
+                  else ff = "Arial";
                   target.v.ff = ff;
+                } else {
+                  target.v.ff = "Arial";
+                }
+                if (rawTb !== null && rawTb !== undefined && rawTb !== "" && parseInt(rawTb) === 2) {
+                  target.v.tb = 2;
+                } else {
+                  target.v.tb = 1;
                 }
               }
             }
@@ -849,6 +792,20 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         status: 1,
         order: 0,
         celldata: celldata,
+        defaultRowHeight: 25,
+        defaultColWidth: 73,
+        defaultFontFamily: "Arial",
+        defaultFontSize: 11,
+        defaultTextWrapMode: 1,
+        defaultStyle: {
+          ff: "Arial",
+          fs: 11,
+          tb: 1,
+        },
+        frozen: {
+          type: "row",
+          range: { row_focus: 0, column_focus: 0 },
+        },
         config: {
           defaultrowlen: 25,
           columnlen: {
@@ -857,7 +814,7 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
             2: 34,
             3: 34,
             4: 34,
-            5: 350,
+            5: 34,
             6: 34,
             7: 34,
             8: 34,
@@ -1075,7 +1032,9 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
     hideFortuneSheetAddAndMenuButtons();
     setTimeout(function () {
       hideFortuneSheetAddAndMenuButtons();
-      initFormulaBarDraggableResize();
+      if (typeof initFormulaBarDraggableResize === "function") {
+        initFormulaBarDraggableResize();
+      }
       fixFortuneSheetLayoutOffsets();
       $(document).off("contextmenu.fortunesheettab").on("contextmenu.fortunesheettab", ".fortune-sheet-tab, .fortune-sheet-area-bottom, .fortune-sheet-tab-node, .fortune-sheet-sheet-area", function (e) {
         e.preventDefault();
@@ -1208,7 +1167,7 @@ async function saveFortuneSheetProsbisGrid() {
           row[0].v = computedIndex;
           row[0].m = computedIndex;
         } else {
-          row[0] = { v: computedIndex, m: computedIndex, ff: 1, fs: 11, tb: 1 };
+          row[0] = { v: computedIndex, m: computedIndex, ff: "Arial", fs: 11 };
         }
       }
 
@@ -1242,7 +1201,6 @@ async function saveFortuneSheetProsbisGrid() {
         const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
         const fs = cellV.fs || cObj.fs;
         const rawFf = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
-
         let ffName = null;
         if (rawFf === "0" || rawFf === 0 || rawFf === "Times New Roman") ffName = "Times New Roman";
         else if (rawFf === "1" || rawFf === 1 || rawFf === "Arial") ffName = "Arial";
@@ -1261,6 +1219,7 @@ async function saveFortuneSheetProsbisGrid() {
             isUnderline: un,
             fontSize: fs ? parseInt(fs) : null,
             fontFamily: ffName || null,
+            textBreak: null,
           });
         }
       }
