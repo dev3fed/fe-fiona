@@ -334,6 +334,7 @@ function renderStaticHeader() {
   `;
 }
 function appendDynamicHeader(jobTitleList) {
+  console.log("object");
   const headerRow = document.querySelector("#table-header tr");
   if (!headerRow) {
     console.error("Element #table-header tr tidak ditemukan!");
