@@ -1,10 +1,39 @@
-let luckysheetInitialized = false;
-let luckysheetLoading = false;
+// Polyfill for window.crypto.randomFillSync required by FortuneSheet UMD bundle in browser environments
+(function () {
+  if (typeof window !== "undefined") {
+    if (!window.crypto) window.crypto = {};
+    if (!window.crypto.randomFillSync) {
+      window.crypto.randomFillSync = function (buffer, offset, size) {
+        if (!buffer) return buffer;
+        const start = offset || 0;
+        const len = size !== undefined ? size : buffer.length ? buffer.length - start : 0;
+        const temp = new Uint8Array(len);
+        if (typeof window.crypto.getRandomValues === "function") {
+          window.crypto.getRandomValues(temp);
+        } else {
+          for (let i = 0; i < len; i++) temp[i] = Math.floor(Math.random() * 256);
+        }
+        for (let i = 0; i < len; i++) buffer[start + i] = temp[i];
+        return buffer;
+      };
+    }
+  }
+})();
+
+let fortunesheetInitialized = false;
+let fortunesheetLoading = false;
 let isFullscreenProsbis = false;
 let modifiedRowIndexes = new Set();
 let prosbisIdMapByIdx = new Map();
 let prosbisOriginalIdxMap = new Map();
 let rowOriginalIdMap = new Map();
+let fortunesheetRoot = null;
+let fortunesheetRef = { current: null };
+let currentWorkbookData = null;
+
+// Backward compatibility flag
+let luckysheetInitialized = false;
+let luckysheetLoading = false;
 
 function getRowDatabaseId(r) {
   if (typeof rowOriginalIdMap !== "undefined" && rowOriginalIdMap.has(r)) {
@@ -13,32 +42,52 @@ function getRowDatabaseId(r) {
   return 0;
 }
 
+function getGridDataMatrix() {
+  if (currentWorkbookData && currentWorkbookData[0]) {
+    if (currentWorkbookData[0].data) return currentWorkbookData[0].data;
+    if (currentWorkbookData[0].celldata) {
+      const celldata = currentWorkbookData[0].celldata;
+      const matrix = [];
+      celldata.forEach((item) => {
+        if (!matrix[item.r]) matrix[item.r] = [];
+        matrix[item.r][item.c] = item.v;
+      });
+      return matrix;
+    }
+  }
+  if (fortunesheetRef.current && typeof fortunesheetRef.current.getSheetData === "function") {
+    try {
+      const sData = fortunesheetRef.current.getSheetData();
+      if (sData) return sData;
+    } catch (e) {
+      console.warn("Error calling getSheetData:", e);
+    }
+  }
+  return null;
+}
+
 $(document).ready(function () {
   $("#pills-business-process-tab").on("shown.bs.tab", function () {
     syncDataSourceDropdown();
-    ensureLuckysheetResourcesLoaded(function () {
-      if (!luckysheetInitialized) {
-        initLuckysheetProsbisGrid(true);
-      } else if (typeof luckysheet !== "undefined") {
-        setTimeout(function () {
-          luckysheet.resize();
-        }, 150);
+    ensureFortuneSheetResourcesLoaded(function () {
+      if (!fortunesheetInitialized) {
+        initFortuneSheetProsbisGrid(true);
       }
     });
   });
 
   $(document).on("click", "#btn-refresh-prosbis-grid", function (e) {
     e.preventDefault();
-    initLuckysheetProsbisGrid(true);
+    initFortuneSheetProsbisGrid(true);
   });
 
   $(document).on("click", "#btn-save-prosbis-grid", function (e) {
     e.preventDefault();
-    saveLuckysheetProsbisGrid();
+    saveFortuneSheetProsbisGrid();
   });
 
   $(document).on("change", "#dataSource-prosbis", function () {
-    initLuckysheetProsbisGrid(true);
+    initFortuneSheetProsbisGrid(true);
   });
 
   $(document).on("change", "#dataSource-rasci", function () {
@@ -51,56 +100,13 @@ $(document).ready(function () {
   });
 
   $(window).on("resize", function () {
-    if (luckysheetInitialized && typeof luckysheet !== "undefined") {
-      luckysheet.resize();
-      fixLuckysheetLayoutOffsets();
+    if (fortunesheetInitialized) {
+      fixFortuneSheetLayoutOffsets();
     }
   });
 
   document.addEventListener("dataLoaded", function () {
     syncDataSourceDropdown();
-  });
-
-  $(document).on("click", "#luckysheet-icon-morebtn, .luckysheet-toolbar-more-btn", function () {
-    setTimeout(function () {
-      const $btn = $("#luckysheet-icon-morebtn");
-      const $menu = $("#luckysheet-icon-morebtn-div, #luckysheet-icon-morebtn-menu, .luckysheet-toolbar-more-menu");
-      if ($btn.length > 0 && $menu.length > 0) {
-        const btnRect = $btn[0].getBoundingClientRect();
-        const menuWidth = $menu.outerWidth() || 200;
-        let targetLeft = btnRect.right - menuWidth;
-        if (targetLeft < 10) targetLeft = 10;
-
-        $menu.css({
-          position: "fixed",
-          top: btnRect.bottom + 4 + "px",
-          left: targetLeft + "px",
-          right: "auto",
-          bottom: "auto",
-          "z-index": "9999995",
-          display: "block",
-          visibility: "visible",
-          opacity: "1",
-        });
-      }
-    }, 30);
-  });
-
-  // Cell double click focus trigger for fullscreen edit
-  $(document).on("dblclick", "#luckysheet-business-process-container, #luckysheet-cell-main, canvas", function () {
-    setTimeout(function () {
-      const $inputBox = $("#luckysheet-input-box, .luckysheet-cell-input, #luckysheet-rich-text-editor");
-      if ($inputBox.length > 0) {
-        $inputBox.css({
-          "z-index": "99999990",
-          "pointer-events": "auto",
-        });
-        const $editorInput = $inputBox.find("input, textarea, div[contenteditable]");
-        if ($editorInput.length > 0) {
-          $editorInput.focus();
-        }
-      }
-    }, 40);
   });
 
   window.addEventListener(
@@ -110,26 +116,31 @@ $(document).ready(function () {
         window.location.reload();
       }
     },
-    true,
+    true
   );
 
-  // Capture phase copy handler to prevent Luckysheet from inserting <table data-type="luckysheet_copy_action_table"> into system clipboard
+  // Clipboard copy handler
   document.addEventListener(
     "copy",
     function (e) {
-      if (typeof luckysheet === "undefined" || !luckysheet.getselectrange) return;
-
-      const $container = $("#luckysheet-business-process-container");
+      const $container = $("#luckysheet-business-process-container, #fortunesheet-business-process-container");
       if ($container.length === 0) return;
 
-      const sel = luckysheet.getselectrange();
+      let sel = null;
+      if (fortunesheetRef.current && typeof fortunesheetRef.current.getSelectRange === "function") {
+        try {
+          sel = fortunesheetRef.current.getSelectRange();
+        } catch (err) {
+          console.warn("getSelectRange error:", err);
+        }
+      }
+
       if (!sel || sel.length === 0) return;
 
       try {
-        const fileData = luckysheet.getluckysheetfile();
-        if (!fileData || !fileData[0] || !fileData[0].data) return;
+        const gridData = getGridDataMatrix();
+        if (!gridData) return;
 
-        const gridData = fileData[0].data;
         const r1 = Math.min(sel[0].row[0], sel[0].row[1]);
         const r2 = Math.max(sel[0].row[0], sel[0].row[1]);
         const c1 = Math.min(sel[0].column[0], sel[0].column[1]);
@@ -140,7 +151,7 @@ $(document).ready(function () {
           const rowCells = [];
           for (let c = c1; c <= c2; c++) {
             const cell = gridData[r] ? gridData[r][c] : null;
-            const textVal = getLuckysheetCellValue(cell);
+            const textVal = getFortuneSheetCellValue(cell);
             rowCells.push(textVal);
           }
           textRows.push(rowCells.join("\t"));
@@ -156,79 +167,196 @@ $(document).ready(function () {
         console.warn("Custom copy handler error:", err);
       }
     },
-    true,
+    true
   );
 
   $(document).on(
     "paste",
-    "#luckysheet-business-process-container, .luckysheet-cell-input, .luckysheet-input-box",
+    "#luckysheet-business-process-container, #fortunesheet-business-process-container, .luckysheet-cell-input, .fortune-cell-input",
     function () {
       setTimeout(function () {
         processModifiedRange(null, "Clipboard Paste Event");
       }, 150);
-      setTimeout(function () {
-        processModifiedRange(null, "Clipboard Paste Event (Delayed)");
-      }, 400);
-    },
+    }
   );
+
+  // Disable right-click context menu on sheet tabs in bottom bar
+  $(document).on(
+    "contextmenu",
+    ".fortune-sheet-tab, .fortune-sheet-tab-item, .fortune-sheet-tab-name, .fortune-sheet-area-bottom, #luckysheet-sheets-item, .luckysheet-sheets-item",
+    function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  );
+
+  // Hide insert image & insert link in cell right click menu when opened
+  $(document).on("contextmenu mousedown mouseup click", function () {
+    setTimeout(hideContextMenuItems, 0);
+    setTimeout(hideContextMenuItems, 20);
+    setTimeout(hideContextMenuItems, 100);
+  });
 });
 
-function fixLuckysheetLayoutOffsets() {
-  const $editor = $("#luckysheet-wa-editor, .luckysheet-wa-editor");
-  const $formulaBar = $("#luckysheet-wa-calculate, .luckysheet-wa-calculate, #luckysheet-formula-bar-config");
-  const $sheetArea = $("#luckysheet-sheet-area, .luckysheet-sheet-area");
-  const $gridWindow = $('#luckysheet-grid-window, .luckysheet-grid-window, div[id*="luckysheet-grid-window"]');
-  if ($gridWindow.length > 0) {
-    $gridWindow.css({ top: "0px" });
-  }
+function hideContextMenuItems() {
+  $(
+    ".fortune-sheet-cols-menu-item, .luckysheet-cols-menu-item, .fortune-context-menu-item, " +
+      ".fortune-cols-menu-item, [class*='cols-menu-item'], [class*='context-menu-item']"
+  ).each(function () {
+    const $item = $(this);
 
-  if ($editor.length > 0) {
-    const editorHeight = $editor.outerHeight() || 40;
-
-    if ($formulaBar.length > 0) {
-      const formulaHeight = $formulaBar.is(":visible") ? ($formulaBar.outerHeight() || 28) : 0;
-
-      $formulaBar.css({
-        position: "absolute",
-        top: editorHeight + "px",
-        left: "0px",
-        right: "0px",
-        width: "100%",
-        "z-index": "900",
-        background: "#ffffff",
-        display: "flex",
-        "align-items": "center",
-      });
-
-      const totalTop = editorHeight + formulaHeight;
-
-      if ($sheetArea.length > 0) {
-        $sheetArea.css({
-          position: "absolute",
-          top: totalTop + "px",
-          left: "0px",
-          right: "0px",
-          width: "100%",
-          height: `calc(100% - ${totalTop}px)`,
-        });
-      }
+    // Skip parent popup containers
+    if (
+      $item.hasClass("fortune-context-menu") ||
+      $item.hasClass("luckysheet-cols-menu") ||
+      $item.hasClass("fortune-context-menu-container")
+    ) {
+      return;
     }
-  }
 
-  if (typeof luckysheet !== "undefined" && luckysheet.resize) {
-    luckysheet.resize();
-  }
+    const text = $item.text().toLowerCase().trim();
+    const action = ($item.attr("data-action") || "").toLowerCase();
+    if (
+      action === "image" ||
+      action === "link" ||
+      action === "insertimage" ||
+      action === "insertlink" ||
+      action === "chart" ||
+      text === "insert image" ||
+      text === "insert link" ||
+      text.startsWith("insert image") ||
+      text.startsWith("insert link") ||
+      text.includes("sisipkan gambar") ||
+      text.includes("sisipkan link")
+    ) {
+      $item.attr(
+        "style",
+        "display: none !important; visibility: hidden !important; height: 0 !important; max-height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; border: none !important;"
+      );
+    }
+  });
 }
 
-function ensureLuckysheetResourcesLoaded(callback) {
-  if (typeof luckysheet !== "undefined") {
+if (typeof MutationObserver !== "undefined") {
+  const contextMenuObserver = new MutationObserver(function () {
+    hideContextMenuItems();
+  });
+  $(document).ready(function () {
+    contextMenuObserver.observe(document.body, { childList: true, subtree: true });
+  });
+}
+
+function hideFortuneSheetAddAndMenuButtons() {
+  $(
+    ".fortune-sheet-area-bottom, .fortune-sheetbar, .fortune-sheets-bottom, #luckysheet-sheet-area, .luckysheet-sheet-area, " +
+      "#luckysheet-sheets-add, #fortune-sheets-add, #fortune-sheet-sheets-add, " +
+      ".luckysheet-sheets-add, .fortune-sheets-add, .fortune-sheet-add, .fortune-sheet-tab-add, " +
+      "[class*='sheet-add'], [class*='sheets-add'], [class*='add-sheet'], " +
+      "#luckysheet-sheets-m, #fortune-sheets-m, #fortune-sheet-sheets-m, " +
+      ".luckysheet-sheets-m, .fortune-sheets-m, .fortune-sheet-sheets-m, " +
+      "[class*='sheets-m'], [class*='sheet-menu'], [class*='all-sheet'], [class*='list-btn'], [class*='sheet-area-bottom'], [class*='sheetbar']"
+  ).attr(
+    "style",
+    "display: none !important; visibility: hidden !important; opacity: 0 !important; width: 0 !important; height: 0 !important; pointer-events: none !important; margin: 0 !important; padding: 0 !important;"
+  );
+}
+
+let isFormulaResizing = false;
+let formulaStartY = 0;
+let formulaStartHeight = 0;
+let $formulaTargetBar = null;
+
+const formulaBarSelectors =
+  ".fortune-formula-bar, #fortune-formula-bar, .luckysheet-wa-calculate, .fortune-wa-calculate, #luckysheet-wa-calculate, #fortune-wa-calculate, [class*='formula-bar'], [class*='wa-calculate']";
+
+$(document).on("mousemove", formulaBarSelectors, function (e) {
+  if (isFormulaResizing) return;
+  const rect = this.getBoundingClientRect();
+  if (e.clientY >= rect.bottom - 10 && e.clientY <= rect.bottom + 6) {
+    $(this).css("cursor", "ns-resize");
+  } else {
+    $(this).css("cursor", "");
+  }
+});
+
+$(document).on("mousedown", formulaBarSelectors, function (e) {
+  const rect = this.getBoundingClientRect();
+  if (e.clientY >= rect.bottom - 10 && e.clientY <= rect.bottom + 6) {
+    e.preventDefault();
+    e.stopPropagation();
+    isFormulaResizing = true;
+    $formulaTargetBar = $(this);
+    $formulaTargetBar.addClass("formula-resizing-active");
+    formulaStartY = e.clientY;
+    formulaStartHeight = $formulaTargetBar.height() || 28;
+    $("body").css({ cursor: "ns-resize", "user-select": "none" });
+  }
+});
+
+$(document).on("mousemove.formulaDragDoc", function (e) {
+  if (!isFormulaResizing || !$formulaTargetBar || $formulaTargetBar.length === 0) return;
+  e.preventDefault();
+  const dy = e.clientY - formulaStartY;
+  const newHeight = Math.max(28, Math.min(300, formulaStartHeight + dy));
+
+  $formulaTargetBar.css({
+    height: newHeight + "px",
+    "max-height": newHeight + "px",
+    "min-height": newHeight + "px",
+  });
+
+  $formulaTargetBar
+    .find(
+      "#luckysheet-functionbox-cell, .fortune-fx-input, [class*='fx-input'], [class*='rich-text'], [class*='formula-input'], [contenteditable='true'], input, textarea, .luckysheet-formula-text-editor"
+    )
+    .css({
+      height: Math.max(22, newHeight - 6) + "px",
+      "max-height": Math.max(22, newHeight - 6) + "px",
+    });
+
+  if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
+    try {
+      fortunesheetRef.current.resize();
+    } catch (err) {}
+  }
+});
+
+$(document).on("mouseup.formulaDragDoc", function () {
+  if (isFormulaResizing) {
+    isFormulaResizing = false;
+    if ($formulaTargetBar) $formulaTargetBar.removeClass("formula-resizing-active");
+    $formulaTargetBar = null;
+    $("body").css({ cursor: "", "user-select": "" });
+    if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
+      try {
+        fortunesheetRef.current.resize();
+      } catch (err) {}
+    }
+  }
+});
+
+function fixFortuneSheetLayoutOffsets() {
+  hideFortuneSheetAddAndMenuButtons();
+  if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
+    try {
+      fortunesheetRef.current.resize();
+    } catch (e) {}
+  }
+  try {
+    window.dispatchEvent(new Event("resize"));
+  } catch (e) {}
+}
+
+function ensureFortuneSheetResourcesLoaded(callback) {
+  if (typeof window.react !== "undefined" && typeof window.react.Workbook !== "undefined") {
     if (callback) callback();
     return;
   }
 
-  if (luckysheetLoading) {
+  if (fortunesheetLoading) {
     let checkInt = setInterval(function () {
-      if (typeof luckysheet !== "undefined") {
+      if (typeof window.react !== "undefined" && typeof window.react.Workbook !== "undefined") {
         clearInterval(checkInt);
         if (callback) callback();
       }
@@ -236,44 +364,52 @@ function ensureLuckysheetResourcesLoaded(callback) {
     return;
   }
 
+  fortunesheetLoading = true;
   luckysheetLoading = true;
 
-  if (!document.getElementById("luckysheet-css-core")) {
-    const cssFiles = [
-      "https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/css/pluginsCss.css",
-      "https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/plugins.css",
-      "https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/css/luckysheet.css",
-      "https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/assets/iconfont/iconfont.css",
-    ];
-
-    cssFiles.forEach((href, idx) => {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = href;
-      if (idx === 0) link.id = "luckysheet-css-core";
-      document.head.appendChild(link);
-    });
+  if (!document.getElementById("fortunesheet-css-core")) {
+    const link = document.createElement("link");
+    link.id = "fortunesheet-css-core";
+    link.rel = "stylesheet";
+    link.href = "https://cdn.jsdelivr.net/npm/@fortune-sheet/react@1.0.4/dist/index.css";
+    document.head.appendChild(link);
   }
 
-  const _mainJQuery = window.jQuery;
-  const _mainDollar = window.$;
+  function loadScript(url, cb) {
+    const script = document.createElement("script");
+    script.src = url;
+    script.onload = cb;
+    script.onerror = function () {
+      console.error("Failed to load script:", url);
+    };
+    document.body.appendChild(script);
+  }
 
-  const script = document.createElement("script");
-  script.src = "https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/js/plugin.js";
-  script.onload = function () {
-    const script2 = document.createElement("script");
-    script2.src = "https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/luckysheet.umd.js";
-    script2.onload = function () {
-      if (_mainJQuery && window.jQuery !== _mainJQuery) {
-        window.jQuery = _mainJQuery;
-        window.$ = _mainDollar;
-      }
+  const loadFortuneSheetBundle = function () {
+    loadScript("https://cdn.jsdelivr.net/npm/@fortune-sheet/react@1.0.4/dist/index.umd.js", function () {
+      fortunesheetLoading = false;
       luckysheetLoading = false;
       if (callback) callback();
-    };
-    document.body.appendChild(script2);
+    });
   };
-  document.body.appendChild(script);
+
+  if (typeof window.React === "undefined") {
+    loadScript("https://unpkg.com/react@18/umd/react.production.min.js", function () {
+      if (typeof window.ReactDOM === "undefined") {
+        loadScript("https://unpkg.com/react-dom@18/umd/react-dom.production.min.js", function () {
+          loadFortuneSheetBundle();
+        });
+      } else {
+        loadFortuneSheetBundle();
+      }
+    });
+  } else if (typeof window.ReactDOM === "undefined") {
+    loadScript("https://unpkg.com/react-dom@18/umd/react-dom.production.min.js", function () {
+      loadFortuneSheetBundle();
+    });
+  } else {
+    loadFortuneSheetBundle();
+  }
 }
 
 function syncDataSourceDropdown() {
@@ -341,10 +477,15 @@ function syncDataSourceDropdown() {
   }
 }
 
-function cleanLuckysheetText(rawVal) {
+function cleanFortuneSheetText(rawVal) {
   if (rawVal === null || rawVal === undefined) return "";
   let str = String(rawVal).trim();
-  if (str.includes("<table") || str.includes("luckysheet_copy_action_table") || str.includes("<tr") || str.includes("<td")) {
+  if (
+    str.includes("<table") ||
+    str.includes("luckysheet_copy_action_table") ||
+    str.includes("<tr") ||
+    str.includes("<td")
+  ) {
     try {
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = str;
@@ -356,39 +497,36 @@ function cleanLuckysheetText(rawVal) {
   return str;
 }
 
-function getLuckysheetCellValue(cell) {
+function getFortuneSheetCellValue(cell) {
   if (cell === null || cell === undefined) return "";
   if (typeof cell === "object") {
     const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.m;
     const extracted = val !== undefined && val !== null ? String(val).trim() : "";
-    return cleanLuckysheetText(extracted);
+    return cleanFortuneSheetText(extracted);
   }
-  return cleanLuckysheetText(String(cell).trim());
+  return cleanFortuneSheetText(String(cell).trim());
 }
 
 function processModifiedRange(rangeInput, source = "Update") {
   let ranges = [];
-
   if (typeof rangeInput === "number") {
     ranges = [{ row: [rangeInput, rangeInput] }];
   } else if (Array.isArray(rangeInput)) {
     ranges = rangeInput;
   } else if (rangeInput && typeof rangeInput === "object") {
     ranges = [rangeInput];
-  } else if (typeof luckysheet !== "undefined" && luckysheet.getselectrange) {
-    const sel = luckysheet.getselectrange();
-    if (sel && sel.length > 0) {
-      ranges = sel;
-    }
+  } else if (fortunesheetRef.current && typeof fortunesheetRef.current.getSelectRange === "function") {
+    try {
+      const sel = fortunesheetRef.current.getSelectRange();
+      if (sel && sel.length > 0) ranges = sel;
+    } catch (e) {}
   }
 
   const affectedRows = new Set();
-
   ranges.forEach((rg) => {
     if (!rg) return;
     let rStart = null;
     let rEnd = null;
-
     if (Array.isArray(rg.row) && rg.row.length >= 2) {
       rStart = rg.row[0];
       rEnd = rg.row[1];
@@ -407,224 +545,58 @@ function processModifiedRange(rangeInput, source = "Update") {
       const minR = Math.min(rStart, rEnd);
       const maxR = Math.max(rStart, rEnd);
       for (let r = minR; r <= maxR; r++) {
-        if (r > 0) {
-          affectedRows.add(r);
-        }
+        if (r > 0) affectedRows.add(r);
       }
     }
   });
 
-  if (affectedRows.size === 0 && typeof luckysheet !== "undefined" && luckysheet.getselectrange) {
-    const sel = luckysheet.getselectrange();
-    if (sel && sel.length > 0) {
-      sel.forEach((rg) => {
-        if (rg && Array.isArray(rg.row) && rg.row.length >= 2) {
-          const minR = Math.min(rg.row[0], rg.row[1]);
-          const maxR = Math.max(rg.row[0], rg.row[1]);
-          for (let r = minR; r <= maxR; r++) {
-            if (r > 0) affectedRows.add(r);
-          }
-        }
-      });
-    }
-  }
-
-  if (affectedRows.size > 0) {
+  const gridData = getGridDataMatrix();
+  if (affectedRows.size > 0 && gridData) {
     affectedRows.forEach((r) => {
       modifiedRowIndexes.add(r);
-      if (typeof luckysheet !== "undefined") {
-        try {
-          const fileData = luckysheet.getluckysheetfile();
-          if (fileData && fileData[0] && fileData[0].data && fileData[0].data[r]) {
-            const gRow = fileData[0].data[r];
-            const targetId = getRowDatabaseId(r);
-            if (gRow[0]) {
-              gRow[0]._id = targetId;
-              if (typeof gRow[0].v === "object" && gRow[0].v !== null) {
-                gRow[0].v._id = targetId;
+      try {
+        if (gridData[r]) {
+          const gRow = gridData[r];
+          const targetId = getRowDatabaseId(r);
+          if (gRow[0]) {
+            gRow[0]._id = targetId;
+            if (typeof gRow[0].v === "object" && gRow[0].v !== null) gRow[0].v._id = targetId;
+          }
+          gRow._id = targetId;
+
+          for (let c = 0; c < gRow.length; c++) {
+            const cObj = gRow[c];
+            if (!cObj) continue;
+            if (
+              typeof cObj.v === "string" &&
+              (cObj.v.includes("<table") || cObj.v.includes("luckysheet_copy_action_table"))
+            ) {
+              const cleaned = cleanFortuneSheetText(cObj.v);
+              cObj.v = cleaned;
+              cObj.m = cleaned;
+            } else if (typeof cObj.v === "object" && cObj.v !== null) {
+              if (
+                typeof cObj.v.v === "string" &&
+                (cObj.v.v.includes("<table") || cObj.v.v.includes("luckysheet_copy_action_table"))
+              ) {
+                const cleaned = cleanFortuneSheetText(cObj.v.v);
+                cObj.v.v = cleaned;
+                cObj.v.m = cleaned;
               }
             }
-            gRow._id = targetId;
-
-            // Clean HTML table tags from copied cells in memory
-            for (let c = 0; c < gRow.length; c++) {
-              const cObj = gRow[c];
-              if (!cObj) continue;
-              if (typeof cObj.v === "string" && (cObj.v.includes("<table") || cObj.v.includes("luckysheet_copy_action_table"))) {
-                const cleaned = cleanLuckysheetText(cObj.v);
-                cObj.v = cleaned;
-                cObj.m = cleaned;
-              } else if (typeof cObj.v === "object" && cObj.v !== null) {
-                if (typeof cObj.v.v === "string" && (cObj.v.v.includes("<table") || cObj.v.v.includes("luckysheet_copy_action_table"))) {
-                  const cleaned = cleanLuckysheetText(cObj.v.v);
-                  cObj.v.v = cleaned;
-                  cObj.v.m = cleaned;
-                }
-              }
-              if (typeof cObj.m === "string" && (cObj.m.includes("<table") || cObj.m.includes("luckysheet_copy_action_table"))) {
-                cObj.m = cleanLuckysheetText(cObj.m);
-              }
+            if (
+              typeof cObj.m === "string" &&
+              (cObj.m.includes("<table") || cObj.m.includes("luckysheet_copy_action_table"))
+            ) {
+              cObj.m = cleanFortuneSheetText(cObj.m);
             }
           }
-        } catch (e) {
-          console.warn("Failed to sanitize row _id / HTML table content:", e);
         }
+      } catch (e) {
+        console.warn("Failed to sanitize row _id / HTML table content:", e);
       }
     });
-
-    setTimeout(function () {
-      affectedRows.forEach((r) => {
-        const itemPayload = extractLuckysheetRowPayload(r);
-        if (itemPayload) {
-          console.log(`[Luckysheet Change Tracker] ${source} at Row ${r}:`, itemPayload);
-          console.log("JSON Item Payload:\n" + JSON.stringify(itemPayload, null, 2));
-        }
-      });
-    }, 60);
   }
-}
-
-function extractLuckysheetRowPayload(r) {
-  if (typeof luckysheet === "undefined") return null;
-  const fileData = luckysheet.getluckysheetfile();
-  if (!fileData || !fileData[0] || !fileData[0].data) return null;
-
-  const gridData = fileData[0].data;
-  const row = gridData[r];
-  if (!row) return null;
-
-  const rawIdxVal = getLuckysheetCellValue(row[0]);
-
-  let desc = "";
-  let level = 1;
-  for (let c = 1; c <= 8; c++) {
-    const txt = getLuckysheetCellValue(row[c]);
-    if (txt !== "") {
-      desc = txt;
-      level = c;
-      break;
-    }
-  }
-
-  if (!desc && rawIdxVal) {
-    level = rawIdxVal.split(".").length;
-  }
-
-  const notes = getLuckysheetCellValue(row[9]);
-  const definisi = getLuckysheetCellValue(row[10]);
-  const input = getLuckysheetCellValue(row[11]);
-  const output = getLuckysheetCellValue(row[12]);
-
-  let cellNotes = "";
-  for (let c = 0; c <= 12; c++) {
-    if (row[c]) {
-      const ps = row[c].ps || (row[c].v && typeof row[c].v === "object" ? row[c].v.ps : null);
-      if (ps) {
-        if (typeof ps === "string" && ps.trim()) {
-          cellNotes = ps.trim();
-          break;
-        } else if (typeof ps === "object" && ps.value !== undefined && ps.value !== null && String(ps.value).trim()) {
-          cellNotes = String(ps.value).trim();
-          break;
-        }
-      }
-    }
-  }
-
-  let rowId = getRowDatabaseId(r);
-
-  let parentIdVal = "";
-  if (level > 1) {
-    const parentIndexByLevel = {};
-    for (let i = 1; i <= r; i++) {
-      const curRow = gridData[i];
-      if (!curRow) continue;
-      let curLvl = 1;
-      for (let c = 1; c <= 8; c++) {
-        if (curRow[c] && (curRow[c].v || curRow[c].m)) {
-          curLvl = c;
-          break;
-        }
-      }
-      const curIdx = curRow[0] ? (curRow[0].v || curRow[0].m || "").toString().trim() : "";
-      if (curIdx) {
-        parentIndexByLevel[curLvl] = curIdx;
-      }
-    }
-    for (let k = level - 1; k >= 1; k--) {
-      if (parentIndexByLevel[k]) {
-        parentIdVal = parentIndexByLevel[k];
-        break;
-      }
-    }
-  }
-
-  const cellProperties = [];
-  const colNames = [
-    "indexNumber",
-    "description",
-    "description",
-    "description",
-    "description",
-    "description",
-    "description",
-    "description",
-    "description",
-    "notes",
-    "definisi",
-    "input",
-    "output",
-  ];
-
-  for (let c = 0; c <= 12; c++) {
-    const cObj = row[c];
-    if (!cObj) continue;
-    const cellV = cObj && typeof cObj.v === "object" && cObj.v !== null ? cObj.v : cObj;
-
-    const fc = cellV.fc || cObj.fc;
-    const bg = cellV.bg || cObj.bg;
-    const bl = (cellV.bl !== undefined ? cellV.bl : cObj.bl) === 1;
-    const it = (cellV.it !== undefined ? cellV.it : cObj.it) === 1;
-    const cl = (cellV.cl !== undefined ? cellV.cl : cObj.cl) === 1;
-    const un = (cellV.un !== undefined ? cellV.un : cObj.un) === 1;
-    const fs = cellV.fs || cObj.fs;
-    const rawFf = cellV.ff || cObj.ff ? String(cellV.ff || cObj.ff) : null;
-
-    let ffName = null;
-    if (rawFf === "0" || rawFf === 0 || rawFf === "Times New Roman") ffName = "Times New Roman";
-    else if (rawFf === "1" || rawFf === 1 || rawFf === "Arial") ffName = "Arial";
-    else if (rawFf === "2" || rawFf === 2 || rawFf === "Tahoma") ffName = "Tahoma";
-    else if (rawFf === "3" || rawFf === 3 || rawFf === "Verdana") ffName = "Verdana";
-    else if (rawFf) ffName = rawFf;
-
-    if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ffName) {
-      cellProperties.push({
-        columnName: colNames[c],
-        fontColor: fc || null,
-        bgColor: bg || null,
-        isBold: bl,
-        isItalic: it,
-        isStrike: cl,
-        isUnderline: un,
-        fontSize: fs ? parseInt(fs) : null,
-        fontFamily: ffName || null,
-      });
-    }
-  }
-
-  return {
-    id: rowId,
-    indexNumber: rawIdxVal,
-    parentId: parentIdVal,
-    level: level,
-    description: desc,
-    notes: notes,
-    definisi: definisi,
-    input: input,
-    output: output,
-    cellNotes: cellNotes,
-    cellProperties: cellProperties,
-  };
 }
 
 function toggleFullscreenProsbis() {
@@ -633,32 +605,56 @@ function toggleFullscreenProsbis() {
   const $icon = $("#fullscreen-icon");
 
   if (isFullscreenProsbis) {
-    $card.addClass("luckysheet-fullscreen-active");
+    $card.addClass("luckysheet-fullscreen-active fortune-fullscreen-active");
     $icon.removeClass("fa-expand").addClass("fa-compress");
   } else {
-    $card.removeClass("luckysheet-fullscreen-active");
+    $card.removeClass("luckysheet-fullscreen-active fortune-fullscreen-active");
     $icon.removeClass("fa-compress").addClass("fa-expand");
   }
 
-  if (typeof luckysheet !== "undefined") {
-    setTimeout(function () {
-      luckysheet.resize();
-      fixLuckysheetLayoutOffsets();
-    }, 150);
-    setTimeout(function () {
-      luckysheet.resize();
-      fixLuckysheetLayoutOffsets();
-    }, 350);
+  fixFortuneSheetLayoutOffsets();
+  setTimeout(function () {
+    fixFortuneSheetLayoutOffsets();
+  }, 50);
+  setTimeout(function () {
+    fixFortuneSheetLayoutOffsets();
+  }, 150);
+  setTimeout(function () {
+    fixFortuneSheetLayoutOffsets();
+  }, 350);
+}
+
+function processModifiedRange(range, source) {
+  console.log("[FortuneSheet Change]", source, range);
+  if (!range) return;
+  if (typeof range === "object") {
+    let rowRange = range.row || (Array.isArray(range) && range[0] ? range[0].row : null);
+    if (rowRange && Array.isArray(rowRange) && rowRange.length >= 2) {
+      let minR = Math.min(rowRange[0], rowRange[1]);
+      let maxR = Math.max(rowRange[0], rowRange[1]);
+      for (let r = minR; r <= maxR; r++) {
+        if (r > 0) {
+          modifiedRowIndexes.add(r);
+          console.log(`[FortuneSheet] Row ${r} marked as modified. Modified rows list:`, Array.from(modifiedRowIndexes));
+        }
+      }
+    } else if (typeof range.r === "number" && range.r > 0) {
+      modifiedRowIndexes.add(range.r);
+      console.log(`[FortuneSheet] Row ${range.r} marked as modified. Modified rows list:`, Array.from(modifiedRowIndexes));
+    }
   }
 }
 
-async function initLuckysheetProsbisGrid(forceReload = false) {
-  const $container = $("#luckysheet-business-process-container");
+async function initFortuneSheetProsbisGrid(forceReload = false) {
+  let $container = $("#luckysheet-business-process-container");
+  if ($container.length === 0) {
+    $container = $("#fortunesheet-business-process-container");
+  }
   if ($container.length === 0) return;
 
   try {
-    if (typeof luckysheet === "undefined") {
-      console.error("Luckysheet library is not loaded.");
+    if (typeof window.react === "undefined" || typeof window.react.Workbook === "undefined") {
+      console.error("FortuneSheet library is not loaded.");
       return;
     }
 
@@ -709,7 +705,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
     ];
 
     baseHeaders.forEach((h, cIdx) => {
-      const headerTb = cIdx === 5 ? 1 : 0;
+      const headerTb = 1;
       celldata.push({
         r: 0,
         c: cIdx,
@@ -731,10 +727,11 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
     prosbisIdMapByIdx.clear();
     prosbisOriginalIdxMap.clear();
     rowOriginalIdMap.clear();
+
     if (prosbisList && prosbisList.length > 0) {
       prosbisList.forEach((pb, rIdx) => {
         const idxStr = String(pb.indexNumber || pb.IndexNumber || "").trim();
-        const pbId = pb.id || pb.Id || pb.businessProcessId || pb.BusinessProcessId || 0;
+        const pbId = pb.id || pb.BusinessProcessId || pb.businessProcessId || 0;
         if (idxStr && pbId) {
           prosbisIdMapByIdx.set(idxStr, pbId);
           prosbisOriginalIdxMap.set(String(pbId), idxStr);
@@ -747,7 +744,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
         const levelNum = pb.level || pb.Level || (idxStr ? idxStr.split(".").length : 1);
         const desc = pb.description || pb.Description || pb.name || pb.businessProcessName || "";
 
-        celldata.push({ r: r, c: 0, v: { v: idxStr, m: idxStr, _id: pbId, ff: 1, fs: 11, tb: 0 } });
+        celldata.push({ r: r, c: 0, v: { v: idxStr, m: idxStr, _id: pbId, ff: 1, fs: 11, tb: 1 } });
 
         const colLevel = Math.min(Math.max(levelNum, 1), 8);
         let colorHex = "#0f172a";
@@ -773,7 +770,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
           colorHex = "#7c7a7aff";
         }
 
-        const textWrapMode = colLevel === 5 ? 2 : 1;
+        const textWrapMode = 1;
         const cellNotesVal = pb.cellNotes || pb.CellNotes || "";
 
         const descCellObj = { v: desc, m: desc, fc: colorHex, bl: isBold, tb: textWrapMode, ff: 1, fs: 11 };
@@ -783,7 +780,7 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
 
         celldata.push({ r: r, c: colLevel, v: descCellObj });
 
-        celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: 1, fs: 11, tb: 0 } });
+        celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: 1, fs: 11, tb: 1 } });
         celldata.push({
           r: r,
           c: 10,
@@ -792,11 +789,11 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
             m: pb.definisi || pb.definition || pb.processDefinition || "",
             ff: 1,
             fs: 11,
-            tb: 0,
+            tb: 1,
           },
         });
-        celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: 1, fs: 11, tb: 0 } });
-        celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: 1, fs: 11, tb: 0 } });
+        celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: 1, fs: 11, tb: 1 } });
+        celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: 1, fs: 11, tb: 1 } });
 
         const cellPropsList = pb.cellProperties || pb.CellProperties || [];
         if (Array.isArray(cellPropsList) && cellPropsList.length > 0) {
@@ -845,14 +842,74 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
       });
     }
 
-    const options = {
-      container: "luckysheet-business-process-container",
-      title: "Business Process Spreadsheet",
-      lang: "en",
+    const sheetData = [
+      {
+        name: "Sheet1",
+        color: "",
+        status: 1,
+        order: 0,
+        celldata: celldata,
+        config: {
+          defaultrowlen: 25,
+          columnlen: {
+            0: 75,
+            1: 34,
+            2: 34,
+            3: 34,
+            4: 34,
+            5: 350,
+            6: 34,
+            7: 34,
+            8: 34,
+            9: 180,
+            10: 220,
+            11: 220,
+            12: 220,
+          },
+        },
+      },
+    ];
+
+    currentWorkbookData = sheetData;
+
+    const workbookProps = {
+      ref: fortunesheetRef,
+      data: sheetData,
       showinfobar: false,
       defaultFontFamily: "Arial",
       defaultFontSize: 11,
+      defaultTextWrapMode: 1,
       showtoolbar: true,
+      toolbarItems: [
+        "undo",
+        "redo",
+        "format-painter",
+        "clear-format",
+        "|",
+        "font",
+        "font-size",
+        "|",
+        "bold",
+        "italic",
+        "strike-through",
+        "underline",
+        "|",
+        "font-color",
+        "background",
+        "border",
+        "merge-cell",
+        "|",
+        "horizontal-align",
+        "vertical-align",
+        "text-wrap",
+        "text-rotation",
+        "|",
+        "freeze",
+        "conditionFormat",
+        "filter",
+        "comment",
+        "search",
+      ],
       showtoolbarConfig: {
         paintFormat: false,
         currencyFormat: false,
@@ -873,16 +930,19 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
         protection: false,
         print: false,
       },
-      showsheetbar: true,
+      showsheetbar: false,
       showsheetbarConfig: {
         add: false,
         menu: false,
+        sheet: false,
       },
       cellRightClickConfig: {
         matrix: false,
         chart: false,
         image: false,
         link: false,
+        insertImage: false,
+        insertLink: false,
         data: false,
       },
       sheetRightClickConfig: {
@@ -893,21 +953,54 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
         hide: false,
         move: false,
       },
+      sheetTabContextMenu: [],
       showformulaBar: true,
       showstatisticBar: true,
       allowUpdate: true,
       defaultRowHeight: 25,
       column: baseHeaders.length,
-      row: (prosbisList.length || 15) + 30,
-      hook: {
-        cellUpdated: function (r, c, oldValue, newValue, isRange) {
+      row: Math.max((prosbisList.length || 15) + 30, 50),
+      onChange: function (newData) {
+        currentWorkbookData = newData;
+        console.log("[FortuneSheet] Grid data changed via onChange");
+      },
+      onCellUpdated: function (r, c, oldValue, newValue) {
+        console.log(`[FortuneSheet] onCellUpdated top-level prop fired at Row ${r}, Col ${c}`, { oldValue, newValue });
+        if (r > 0) modifiedRowIndexes.add(r);
+      },
+      onOp: function (ops) {
+        console.log("[FortuneSheet] onOp top-level prop fired:", ops);
+        if (Array.isArray(ops)) {
+          ops.forEach(function (op) {
+            if (op && typeof op.r === "number" && op.r > 0) {
+              modifiedRowIndexes.add(op.r);
+            } else if (op && Array.isArray(op.path)) {
+              let rIdx = op.path[1];
+              if (typeof rIdx === "number" && rIdx > 0) modifiedRowIndexes.add(rIdx);
+            }
+          });
+        }
+      },
+      onAfterChange: function (changes) {
+        console.log("[FortuneSheet] onAfterChange top-level prop fired:", changes);
+      },
+      hooks: {
+        cellUpdated: function (r, c, oldValue, newValue) {
+          console.log(`[FortuneSheet] Cell updated at Row ${r}, Col ${c}`, { oldValue, newValue });
+          if (r > 0) modifiedRowIndexes.add(r);
           processModifiedRange({ row: [r, r], column: [c, c] }, `Cell Updated at Row ${r}, Col ${c}`);
         },
-        rangePasteAfter: function (range, pasteCutData) {
-          console.log("[Luckysheet Hook] rangePasteAfter triggered:", range);
+        rangePasteAfter: function (range) {
+          console.log("[FortuneSheet] Range pasted:", range);
+          if (range && range.row) {
+            for (let r = Math.min(range.row[0], range.row[1]); r <= Math.max(range.row[0], range.row[1]); r++) {
+              if (r > 0) modifiedRowIndexes.add(r);
+            }
+          }
           processModifiedRange(range, "Range Paste");
         },
         updated: function (operate) {
+          console.log("[FortuneSheet] Sheet updated hook:", operate);
           if (operate) {
             if (operate.range) {
               processModifiedRange(operate.range, "Sheet Updated (" + (operate.type || "operate") + ")");
@@ -921,6 +1014,8 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
           }
         },
         commentUpdated: function (r, c, oldValue, newValue) {
+          console.log(`[FortuneSheet] Comment updated at Row ${r}, Col ${c}`, { oldValue, newValue });
+          if (r > 0) modifiedRowIndexes.add(r);
           processModifiedRange({ row: [r, r], column: [c, c] }, `Comment Updated at Row ${r}, Col ${c}`);
         },
         rowInsertAfter: function (r) {
@@ -937,7 +1032,6 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
             newMap.set(insertIdx, 0);
             rowOriginalIdMap = newMap;
             modifiedRowIndexes.add(insertIdx);
-            console.log(`[Luckysheet Change Tracker] Row Inserted at ${insertIdx}, rowOriginalIdMap updated.`);
           }
         },
         rowDeleteAfter: function (r) {
@@ -952,121 +1046,80 @@ async function initLuckysheetProsbisGrid(forceReload = false) {
               }
             });
             rowOriginalIdMap = newMap;
-            console.log(`[Luckysheet Change Tracker] Row Deleted at ${deleteIdx}, rowOriginalIdMap updated.`);
           }
         },
       },
-      data: [
-        {
-          name: "Sheet1",
-          color: "",
-          status: 1,
-          order: 0,
-          celldata: celldata,
-          config: {
-            defaultrowlen: 25,
-            columnlen: {
-              0: 75,
-              1: 34,
-              2: 34,
-              3: 34,
-              4: 34,
-              5: 350,
-              6: 34,
-              7: 34,
-              8: 34,
-              9: 180,
-              10: 220,
-              11: 220,
-              12: 220,
-            },
-          },
-        },
-      ],
     };
 
-    if (forceReload && luckysheetInitialized) {
-      luckysheet.destroy();
+    if (!fortunesheetRoot) {
+      if (ReactDOM.createRoot) {
+        fortunesheetRoot = ReactDOM.createRoot($container[0]);
+      } else {
+        fortunesheetRoot = {
+          render: function (element) {
+            ReactDOM.render(element, $container[0]);
+          },
+        };
+      }
     }
 
+    const { Workbook } = window.react;
+    // Use unique key so React unmounts old FortuneSheet instance and re-renders new sheetData on dataSource change
+    const wbKey = "wb_" + String(selectedDs) + "_" + String(prosbisList.length) + "_" + Date.now();
+    fortunesheetRoot.render(React.createElement(Workbook, Object.assign({ key: wbKey }, workbookProps)));
+
+    fortunesheetInitialized = true;
+    luckysheetInitialized = true;
+    modifiedRowIndexes.clear();
+
+    hideFortuneSheetAddAndMenuButtons();
     setTimeout(function () {
-      luckysheet.create(options);
-      luckysheetInitialized = true;
-      modifiedRowIndexes.clear();
-
-      try {
-        const fileData = luckysheet.getluckysheetfile();
-        if (fileData && fileData[0] && fileData[0].data && prosbisList && prosbisList.length > 0) {
-          const gData = fileData[0].data;
-          prosbisList.forEach((pb, idx) => {
-            const r = idx + 1;
-            if (gData[r]) {
-              const idxVal = pb.indexNumber || pb.IndexNumber || "";
-              if (!gData[r][0]) gData[r][0] = { v: idxVal, m: idxVal };
-              const dbId = pb.id || pb.Id || pb.businessProcessId || pb.BusinessProcessId || 0;
-              gData[r][0]._id = dbId;
-              gData[r]._id = dbId;
-            }
-          });
-        }
-      } catch (e) {
-        console.warn("Failed to attach _id to grid rows:", e);
-      }
-
-      setTimeout(function () {
-        if (typeof luckysheet !== "undefined") {
-          luckysheet.resize();
-          fixLuckysheetLayoutOffsets();
-        }
-      }, 150);
-      setTimeout(function () {
-        fixLuckysheetLayoutOffsets();
-      }, 400);
-
-      let fixCount = 0;
-      const fixTimer = setInterval(function () {
-        fixLuckysheetLayoutOffsets();
-        fixCount++;
-        if (fixCount > 15) clearInterval(fixTimer);
-      }, 200);
-    }, 50);
+      hideFortuneSheetAddAndMenuButtons();
+      initFormulaBarDraggableResize();
+      fixFortuneSheetLayoutOffsets();
+      $(document).off("contextmenu.fortunesheettab").on("contextmenu.fortunesheettab", ".fortune-sheet-tab, .fortune-sheet-area-bottom, .fortune-sheet-tab-node, .fortune-sheet-sheet-area", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+    }, 150);
+    setTimeout(function () {
+      hideFortuneSheetAddAndMenuButtons();
+    }, 500);
   } catch (err) {
-    console.error("Failed to initialize Luckysheet:", err);
+    console.error("Failed to initialize FortuneSheet:", err);
   }
 }
 
-async function saveLuckysheetProsbisGrid() {
+async function saveFortuneSheetProsbisGrid() {
+  console.log("[FortuneSheet Save] Save triggered. Current modifiedRowIndexes:", Array.from(modifiedRowIndexes));
   const spinBtn = document.getElementById("loadingSaveSheet");
   if (spinBtn) spinBtn.style.display = "inline-block";
 
-  if (typeof luckysheet === "undefined") {
-    console.error("Luckysheet library is not loaded.");
-    if (typeof Swal !== "undefined") Swal.fire("Error", "Luckysheet belum dimuat.", "error");
-    else alert("Luckysheet belum dimuat.");
+  if (typeof window.react === "undefined" || typeof window.react.Workbook === "undefined") {
+    console.error("FortuneSheet library is not loaded.");
+    if (typeof Swal !== "undefined") Swal.fire("Error", "FortuneSheet belum dimuat.", "error");
+    else alert("FortuneSheet belum dimuat.");
+    if (spinBtn) spinBtn.style.display = "none";
     return;
   }
 
   try {
-    if (luckysheet.exitEditMode) {
-      luckysheet.exitEditMode();
-    }
-
-    const fileData = luckysheet.getluckysheetfile();
-    if (!fileData || !fileData[0] || !fileData[0].data) {
-      console.warn("No grid data found in Luckysheet.");
+    const gridData = getGridDataMatrix();
+    if (!gridData) {
+      console.warn("No grid data found in FortuneSheet.");
       if (typeof Swal !== "undefined") Swal.fire("Info", "Tidak ada data pada grid.", "info");
       else alert("Tidak ada data pada grid.");
+      if (spinBtn) spinBtn.style.display = "none";
       return;
     }
 
-    const gridData = fileData[0].data;
     const selectedDs =
       $("#dataSource-prosbis").val() || (typeof selectedValue !== "undefined" ? selectedValue : "master");
 
     const items = [];
     const parentIndexByLevel = {};
     const seqByLevel = {};
-    const tempIdMap = new Map(prosbisIdMapByIdx);
 
     for (let r = 1; r < gridData.length; r++) {
       const row = gridData[r];
@@ -1120,10 +1173,8 @@ async function saveLuckysheetProsbisGrid() {
 
       if (!desc && !rawIdxVal && !notes && !definisi && !input && !output && !cellNotes) continue;
 
-      // Extract row ID strictly from original row mapping (or 0 for new/copied rows)
       let rowId = getRowDatabaseId(r);
 
-      // Determine parentId based on current tree hierarchy state
       let parentIdVal = null;
       if (level > 1) {
         for (let k = level - 1; k >= 1; k--) {
@@ -1134,16 +1185,12 @@ async function saveLuckysheetProsbisGrid() {
         }
       }
 
-      // Increment sequence for this level under active parent
       seqByLevel[level] = (seqByLevel[level] || 0) + 1;
-
-      // Reset sequence counters and parent references for deeper levels
       for (let k = level + 1; k <= 8; k++) {
         seqByLevel[k] = 0;
         delete parentIndexByLevel[k];
       }
 
-      // Calculate computed index number
       let computedIndex = "";
       if (level === 1) {
         computedIndex = String(seqByLevel[1]);
@@ -1153,7 +1200,6 @@ async function saveLuckysheetProsbisGrid() {
 
       parentIndexByLevel[level] = computedIndex;
 
-      // Dynamically update visual display in Luckysheet Cell 0 in memory if changed
       if (rawIdxVal !== computedIndex) {
         if (row[0] && typeof row[0].v === "object" && row[0].v !== null) {
           row[0].v.v = computedIndex;
@@ -1162,11 +1208,10 @@ async function saveLuckysheetProsbisGrid() {
           row[0].v = computedIndex;
           row[0].m = computedIndex;
         } else {
-          row[0] = { v: computedIndex, m: computedIndex, ff: 1, fs: 11, tb: 0 };
+          row[0] = { v: computedIndex, m: computedIndex, ff: 1, fs: 11, tb: 1 };
         }
       }
 
-      // Extract cell properties for formatting
       const cellProperties = [];
       const colNames = [
         "indexNumber",
@@ -1220,8 +1265,7 @@ async function saveLuckysheetProsbisGrid() {
         }
       }
 
-      // Only collect items that are newly inserted (rowId === 0) or explicitly edited by user in Luckysheet
-      const isDirty = rowId === 0 || modifiedRowIndexes.has(r);
+      const isDirty = rowId === 0 || modifiedRowIndexes.size === 0 || modifiedRowIndexes.has(r);
       if (!isDirty) continue;
 
       items.push({
@@ -1240,13 +1284,12 @@ async function saveLuckysheetProsbisGrid() {
       });
     }
 
+    console.log("[FortuneSheet Save] Collected items to save count:", items.length, items);
+
     const payload = {
       dataSource: selectedDs,
       items: items,
     };
-
-    console.log("=== PAYLOAD SAVE BATCH (POST /api/BusinessProcess/save-batch) ===");
-    console.log(JSON.stringify(payload, null, 2));
 
     if (items.length === 0) {
       const warningPromise = swal({
@@ -1257,27 +1300,25 @@ async function saveLuckysheetProsbisGrid() {
         content: {
           element: "div",
           attributes: {
-            innerHTML: `<span style="text-align: center;">Tidak ada baris data Business Process yang diubah.</span>
-       
-          `,
+            innerHTML: `<span style="text-align: center;">Tidak ada baris data Business Process yang diubah.</span>`,
           },
         },
       });
       const fullscreenElement =
         document.fullscreenElement ||
-        document.querySelector("#luckysheet-business-process-card.luckysheet-fullscreen-active");
+        document.querySelector(
+          "#luckysheet-business-process-card.luckysheet-fullscreen-active, #luckysheet-business-process-card.fortune-fullscreen-active"
+        );
       if (fullscreenElement) {
         const moveOverlay = () => {
           const overlay = document.querySelector(".swal-overlay, .swal2-container");
           if (!overlay) return false;
-
           if (!fullscreenElement.contains(overlay)) {
             fullscreenElement.appendChild(overlay);
           }
           overlay.style.setProperty("z-index", "2147483647");
           return true;
         };
-
         const observer = new MutationObserver(() => {
           if (moveOverlay()) observer.disconnect();
         });
@@ -1295,8 +1336,6 @@ async function saveLuckysheetProsbisGrid() {
       return;
     }
 
-    const dsLabel = selectedDs === "master" ? "Master Data Prosbis" : "Draft Prosbis";
-
     const confirmSave = async () => {
       const warningPromise = swal({
         title: "Save Changes?",
@@ -1304,32 +1343,25 @@ async function saveLuckysheetProsbisGrid() {
         icon: "info",
         className: "save-changes-swal",
         buttons: {
-          cancel: {
-            text: "Back",
-            visible: true,
-            className: "swal-button--cancel",
-          },
-          confirm: {
-            text: "Save Changes",
-            className: "swal-button--confirm",
-          },
+          cancel: { text: "Back", visible: true, className: "swal-button--cancel" },
+          confirm: { text: "Save Changes", className: "swal-button--confirm" },
         },
       });
       const fullscreenElement =
         document.fullscreenElement ||
-        document.querySelector("#luckysheet-business-process-card.luckysheet-fullscreen-active");
+        document.querySelector(
+          "#luckysheet-business-process-card.luckysheet-fullscreen-active, #luckysheet-business-process-card.fortune-fullscreen-active"
+        );
       if (fullscreenElement) {
         const moveOverlay = () => {
           const overlay = document.querySelector(".swal-overlay, .swal2-container");
           if (!overlay) return false;
-
           if (!fullscreenElement.contains(overlay)) {
             fullscreenElement.appendChild(overlay);
           }
           overlay.style.setProperty("z-index", "2147483647");
           return true;
         };
-
         const observer = new MutationObserver(() => {
           if (moveOverlay()) observer.disconnect();
         });
@@ -1352,8 +1384,6 @@ async function saveLuckysheetProsbisGrid() {
 
       const response = await saveBusinessProcessBatch(payload);
 
-      console.log("Save response from backend:", response);
-
       if (typeof Swal !== "undefined") Swal.close();
 
       if (response && response.success) {
@@ -1372,32 +1402,41 @@ async function saveLuckysheetProsbisGrid() {
             if (spinBtn) spinBtn.style.display = "none";
           });
         }
-        initLuckysheetProsbisGrid(true);
+        initFortuneSheetProsbisGrid(true);
       } else {
         const errMsg = response && response.error ? response.error : "Gagal menyimpan data ke database.";
         if (typeof Swal !== "undefined") {
           Swal.fire("Error", errMsg, "error");
         } else if (typeof swal !== "undefined") {
-          swal({
-            title: "Error",
-            text: errMsg,
-            icon: "error",
-          }).then(() => {
+          swal({ title: "Error", text: errMsg, icon: "error" }).then(() => {
             if (spinBtn) spinBtn.style.display = "none";
           });
         } else {
           alert("Error: " + errMsg);
         }
       }
+    } else {
+      if (spinBtn) spinBtn.style.display = "none";
     }
   } catch (err) {
     console.error("Save error:", err);
+    if (spinBtn) spinBtn.style.display = "none";
     if (typeof Swal !== "undefined") Swal.fire("Error", "Gagal menyimpan data: " + err.message, "error");
     else alert("Gagal menyimpan data: " + err.message);
   }
 }
 
-window.initLuckysheetProsbisGrid = initLuckysheetProsbisGrid;
-window.saveLuckysheetProsbisGrid = saveLuckysheetProsbisGrid;
+// Global Exports & Aliases
+window.initFortuneSheetProsbisGrid = initFortuneSheetProsbisGrid;
+window.initLuckysheetProsbisGrid = initFortuneSheetProsbisGrid;
+window.saveFortuneSheetProsbisGrid = saveFortuneSheetProsbisGrid;
+window.saveLuckysheetProsbisGrid = saveFortuneSheetProsbisGrid;
 window.toggleFullscreenProsbis = toggleFullscreenProsbis;
-window.fixLuckysheetLayoutOffsets = fixLuckysheetLayoutOffsets;
+window.fixFortuneSheetLayoutOffsets = fixFortuneSheetLayoutOffsets;
+window.fixLuckysheetLayoutOffsets = fixFortuneSheetLayoutOffsets;
+window.ensureFortuneSheetResourcesLoaded = ensureFortuneSheetResourcesLoaded;
+window.ensureLuckysheetResourcesLoaded = ensureFortuneSheetResourcesLoaded;
+window.cleanFortuneSheetText = cleanFortuneSheetText;
+window.cleanLuckysheetText = cleanFortuneSheetText;
+window.getFortuneSheetCellValue = getFortuneSheetCellValue;
+window.getLuckysheetCellValue = getFortuneSheetCellValue;

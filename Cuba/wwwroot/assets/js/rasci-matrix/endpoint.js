@@ -77,7 +77,7 @@ async function fetchJoblistCard(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -146,7 +146,7 @@ async function createDraftRasci(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -162,7 +162,7 @@ async function endpointRenameDraft(params, payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -178,7 +178,7 @@ async function fetchDetailDraftActivity(param) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -194,7 +194,7 @@ async function endpointDeleteDraftActivity(param) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -210,7 +210,7 @@ async function fetchRelatedJob(id, param) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -226,7 +226,7 @@ async function fetchProsbisByJob(param) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -242,7 +242,7 @@ async function fetchProsbisSumulation(currentPageY, currentPageX) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -318,7 +318,7 @@ async function fetchProsbisMatrix(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -335,7 +335,7 @@ async function fetchPositionMatrix(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -351,7 +351,7 @@ async function fetchDetailNotationRow(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -367,7 +367,7 @@ async function fetchDetailJob(param) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -383,7 +383,7 @@ async function fetchLoghistoryList(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -469,7 +469,7 @@ async function fetchApproved(payload) {
     console.log("error", error);
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -492,7 +492,7 @@ async function fetchReject(payload) {
     console.log("error", error);
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -511,7 +511,7 @@ async function fetchAllValueChain(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -527,7 +527,7 @@ async function fetchApprovalList(payload) {
   } catch (error) {
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -551,7 +551,7 @@ async function fetchSummaryList(payload) {
     console.log("error", error);
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
@@ -575,7 +575,7 @@ async function fetchNotAvailable(payload) {
     console.log("error", error);
     return {
       success: false,
-      error: error?.responseJSON.message || "Error fetching data from API",
+      error: error?.responseJSON?.message || error?.message || "Error fetching data from API",
     };
   }
 }
