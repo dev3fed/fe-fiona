@@ -273,6 +273,8 @@ function fixFortuneSheetLayoutOffsets() {
         fortunesheetRef.current.resize();
       } catch (e) {}
     }
+    // Dispatch window resize event so FortuneSheet recalculates container and canvas bounds
+    window.dispatchEvent(new Event("resize"));
   } finally {
     isFixingLayoutOffsets = false;
   }
@@ -537,9 +539,11 @@ function toggleFullscreenProsbis() {
   if (isFullscreenProsbis) {
     $card.addClass("luckysheet-fullscreen-active fortune-fullscreen-active");
     $icon.removeClass("fa-expand").addClass("fa-compress");
+    $("body").addClass("luckysheet-fullscreen-body-lock");
   } else {
     $card.removeClass("luckysheet-fullscreen-active fortune-fullscreen-active");
     $icon.removeClass("fa-compress").addClass("fa-expand");
+    $("body").removeClass("luckysheet-fullscreen-body-lock");
   }
 
   fixFortuneSheetLayoutOffsets();
@@ -552,6 +556,9 @@ function toggleFullscreenProsbis() {
   setTimeout(function () {
     fixFortuneSheetLayoutOffsets();
   }, 350);
+  setTimeout(function () {
+    fixFortuneSheetLayoutOffsets();
+  }, 600);
 }
 
 function processModifiedRange(range, source) {
