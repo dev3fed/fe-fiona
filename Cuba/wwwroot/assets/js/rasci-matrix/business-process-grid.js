@@ -35,7 +35,19 @@ let currentWorkbookData = null;
 let luckysheetInitialized = false;
 let luckysheetLoading = false;
 
-function getRowDatabaseId(r) {
+function getRowDatabaseId(r, row, rawIdxVal) {
+  if (row) {
+    if (row._id && typeof row._id === "number" && row._id > 0) return row._id;
+    if (row[0]) {
+      if (row[0]._id && typeof row[0]._id === "number" && row[0]._id > 0) return row[0]._id;
+      if (typeof row[0].v === "object" && row[0].v !== null && row[0].v._id && typeof row[0].v._id === "number" && row[0].v._id > 0) {
+        return row[0].v._id;
+      }
+    }
+  }
+  if (rawIdxVal && typeof prosbisIdMapByIdx !== "undefined" && prosbisIdMapByIdx.has(String(rawIdxVal).trim())) {
+    return prosbisIdMapByIdx.get(String(rawIdxVal).trim()) || 0;
+  }
   if (typeof rowOriginalIdMap !== "undefined" && rowOriginalIdMap.has(r)) {
     return rowOriginalIdMap.get(r) || 0;
   }
@@ -534,7 +546,8 @@ function processModifiedRange(rangeInput, source = "Update") {
       try {
         if (gridData[r]) {
           const gRow = gridData[r];
-          const targetId = getRowDatabaseId(r);
+          const rawIdx = gRow && gRow[0] ? (typeof gRow[0].v === "object" && gRow[0].v !== null ? gRow[0].v.v || gRow[0].v.m : gRow[0].v || gRow[0].m || "") : "";
+          const targetId = getRowDatabaseId(r, gRow, rawIdx);
           if (gRow[0]) {
             gRow[0]._id = targetId;
             if (typeof gRow[0].v === "object" && gRow[0].v !== null) gRow[0].v._id = targetId;
@@ -726,7 +739,11 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         const levelNum = pb.level || pb.Level || (idxStr ? idxStr.split(".").length : 1);
         const desc = pb.description || pb.Description || pb.name || pb.businessProcessName || "";
 
-        celldata.push({ r: r, c: 0, v: { v: idxStr, m: idxStr, _id: pbId, ff: "Arial", fs: 11, tb: 1 } });
+        const rowCellMap = {};
+
+        const idxCell = { v: idxStr, m: idxStr, _id: pbId, ff: "Arial", fs: 11, tb: 1 };
+        rowCellMap[0] = idxCell;
+        celldata.push({ r: r, c: 0, v: idxCell });
 
         const colLevel = Math.min(Math.max(levelNum, 1), 8);
         let colorHex = "#0f172a";
@@ -759,22 +776,30 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
           descCellObj.ps = { value: cellNotesVal, isShow: false };
         }
 
+        rowCellMap[colLevel] = descCellObj;
         celldata.push({ r: r, c: colLevel, v: descCellObj });
 
-        celldata.push({ r: r, c: 9, v: { v: pb.notes || "", m: pb.notes || "", ff: "Arial", fs: 11, tb: 1 } });
-        celldata.push({
-          r: r,
-          c: 10,
-          v: {
-            v: pb.definisi || pb.definition || pb.processDefinition || "",
-            m: pb.definisi || pb.definition || pb.processDefinition || "",
-            ff: "Arial",
-            fs: 11,
-            tb: 1,
-          },
-        });
-        celldata.push({ r: r, c: 11, v: { v: pb.input || "", m: pb.input || "", ff: "Arial", fs: 11, tb: 1 } });
-        celldata.push({ r: r, c: 12, v: { v: pb.output || "", m: pb.output || "", ff: "Arial", fs: 11, tb: 1 } });
+        const notesCell = { v: pb.notes || "", m: pb.notes || "", ff: "Arial", fs: 11, tb: 1 };
+        rowCellMap[9] = notesCell;
+        celldata.push({ r: r, c: 9, v: notesCell });
+
+        const defCell = {
+          v: pb.definisi || pb.definition || pb.processDefinition || "",
+          m: pb.definisi || pb.definition || pb.processDefinition || "",
+          ff: "Arial",
+          fs: 11,
+          tb: 1,
+        };
+        rowCellMap[10] = defCell;
+        celldata.push({ r: r, c: 10, v: defCell });
+
+        const inputCell = { v: pb.input || "", m: pb.input || "", ff: "Arial", fs: 11, tb: 1 };
+        rowCellMap[11] = inputCell;
+        celldata.push({ r: r, c: 11, v: inputCell });
+
+        const outputCell = { v: pb.output || "", m: pb.output || "", ff: "Arial", fs: 11, tb: 1 };
+        rowCellMap[12] = outputCell;
+        celldata.push({ r: r, c: 12, v: outputCell });
 
         const cellPropsList = pb.cellProperties || pb.CellProperties || [];
         if (Array.isArray(cellPropsList) && cellPropsList.length > 0) {
@@ -788,48 +813,46 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
             else if (colNameNorm === "input") cIdx = 11;
             else if (colNameNorm === "output") cIdx = 12;
 
-            if (cIdx >= 0) {
-              let target = celldata.find((cd) => cd.r === r && cd.c === cIdx);
-              if (target && target.v) {
-                const fc = cp.fontColor || cp.FontColor;
-                const bg = cp.bgColor || cp.BgColor;
-                const bl = cp.isBold !== undefined ? cp.isBold : cp.IsBold;
-                const it = cp.isItalic !== undefined ? cp.isItalic : cp.IsItalic;
-                const cl = cp.isStrike !== undefined ? cp.isStrike : cp.IsStrike;
-                const un = cp.isUnderline !== undefined ? cp.isUnderline : cp.IsUnderline;
-                const fs = cp.fontSize || cp.FontSize;
-                let ff = cp.fontFamily || cp.FontFamily;
-                const rawTb =
-                  cp.textWrap !== undefined
-                    ? cp.textWrap
-                    : cp.tb !== undefined
-                    ? cp.tb
-                    : cp.textBreak !== undefined
-                    ? cp.textBreak
-                    : cp.TextBreak;
+            if (cIdx >= 0 && rowCellMap[cIdx]) {
+              const targetV = rowCellMap[cIdx];
+              const fc = cp.fontColor || cp.FontColor;
+              const bg = cp.bgColor || cp.BgColor;
+              const bl = cp.isBold !== undefined ? cp.isBold : cp.IsBold;
+              const it = cp.isItalic !== undefined ? cp.isItalic : cp.IsItalic;
+              const cl = cp.isStrike !== undefined ? cp.isStrike : cp.IsStrike;
+              const un = cp.isUnderline !== undefined ? cp.isUnderline : cp.IsUnderline;
+              const fs = cp.fontSize || cp.FontSize;
+              let ff = cp.fontFamily || cp.FontFamily;
+              const rawTb =
+                cp.textWrap !== undefined
+                  ? cp.textWrap
+                  : cp.tb !== undefined
+                  ? cp.tb
+                  : cp.textBreak !== undefined
+                  ? cp.textBreak
+                  : cp.TextBreak;
 
-                if (fc) target.v.fc = fc;
-                if (bg) target.v.bg = bg;
-                if (bl !== null && bl !== undefined) target.v.bl = bl ? 1 : 0;
-                if (it !== null && it !== undefined) target.v.it = it ? 1 : 0;
-                if (cl !== null && cl !== undefined) target.v.cl = cl ? 1 : 0;
-                if (un !== null && un !== undefined) target.v.un = un ? 1 : 0;
-                if (fs) target.v.fs = parseInt(fs);
-                if (ff !== null && ff !== undefined && ff !== "") {
-                  const ffStr = String(ff).toLowerCase().trim();
-                  if (ffStr === "times new roman") ff = "Times New Roman";
-                  else if (ffStr === "tahoma" || ffStr === "2") ff = "Tahoma";
-                  else if (ffStr === "verdana" || ffStr === "3") ff = "Verdana";
-                  else ff = "Arial";
-                  target.v.ff = ff;
-                } else {
-                  target.v.ff = "Arial";
-                }
-                if (rawTb !== null && rawTb !== undefined && rawTb !== "" && parseInt(rawTb) === 2) {
-                  target.v.tb = 2;
-                } else {
-                  target.v.tb = 1;
-                }
+              if (fc) targetV.fc = fc;
+              if (bg) targetV.bg = bg;
+              if (bl !== null && bl !== undefined) targetV.bl = bl ? 1 : 0;
+              if (it !== null && it !== undefined) targetV.it = it ? 1 : 0;
+              if (cl !== null && cl !== undefined) targetV.cl = cl ? 1 : 0;
+              if (un !== null && un !== undefined) targetV.un = un ? 1 : 0;
+              if (fs) targetV.fs = parseInt(fs);
+              if (ff !== null && ff !== undefined && ff !== "") {
+                const ffStr = String(ff).toLowerCase().trim();
+                if (ffStr === "times new roman") ff = "Times New Roman";
+                else if (ffStr === "tahoma" || ffStr === "2") ff = "Tahoma";
+                else if (ffStr === "verdana" || ffStr === "3") ff = "Verdana";
+                else ff = "Arial";
+                targetV.ff = ff;
+              } else {
+                targetV.ff = "Arial";
+              }
+              if (rawTb !== null && rawTb !== undefined && rawTb !== "" && parseInt(rawTb) === 2) {
+                targetV.tb = 2;
+              } else {
+                targetV.tb = 1;
               }
             }
           });
@@ -843,6 +866,8 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         color: "",
         status: 1,
         order: 0,
+        row: prosbisList ? prosbisList.length + 20 : 100,
+        column: 13,
         celldata: celldata,
         defaultRowHeight: 25,
         defaultColWidth: 73,
@@ -1170,7 +1195,7 @@ async function saveFortuneSheetProsbisGrid() {
 
       if (!desc && !rawIdxVal && !notes && !definisi && !input && !output && !cellNotes) continue;
 
-      let rowId = getRowDatabaseId(r);
+      let rowId = getRowDatabaseId(r, row, rawIdxVal);
 
       let parentIdVal = null;
       if (level > 1) {
@@ -1246,7 +1271,7 @@ async function saveFortuneSheetProsbisGrid() {
         else if (rawFf === "3" || rawFf === 3 || rawFf === "Verdana") ffName = "Verdana";
         else if (rawFf) ffName = rawFf;
 
-        if (fc || bg || bl || it || cl || un || (fs && fs !== 11) || ffName) {
+        if (fc || bg || bl || it || cl || un || (fs && parseInt(fs) !== 11) || (ffName && ffName !== "Arial")) {
           cellProperties.push({
             columnName: colNames[c],
             fontColor: fc || null,
@@ -1261,9 +1286,6 @@ async function saveFortuneSheetProsbisGrid() {
           });
         }
       }
-
-      const isDirty = rowId === 0 || modifiedRowIndexes.size === 0 || modifiedRowIndexes.has(r);
-      if (!isDirty) continue;
 
       items.push({
         id: rowId,
