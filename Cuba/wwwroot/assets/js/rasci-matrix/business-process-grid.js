@@ -111,6 +111,31 @@ $(document).ready(function () {
     toggleFullscreenProsbis();
   });
 
+  // Fix mousewheel / trackpad scrolling upwards in fullscreen mode
+  document.addEventListener(
+    "wheel",
+    function (e) {
+      const container = e.target
+        ? e.target.closest(
+            "#luckysheet-business-process-container, #fortunesheet-business-process-container, .luckysheet-wrapper, .fortune-workbook-container"
+          )
+        : null;
+      if (!container) return;
+
+      const scrollbarY = container.querySelector(
+        ".fortune-scrollbar-y, .luckysheet-scrollbar-y, [class*='scrollbar-y']"
+      );
+      if (scrollbarY) {
+        const prevScrollTop = scrollbarY.scrollTop;
+        scrollbarY.scrollTop += e.deltaY;
+        if (scrollbarY.scrollTop !== prevScrollTop) {
+          e.preventDefault();
+        }
+      }
+    },
+    { passive: false }
+  );
+
   $(window).on("resize", function () {
     if (fortunesheetInitialized) {
       fixFortuneSheetLayoutOffsets();
