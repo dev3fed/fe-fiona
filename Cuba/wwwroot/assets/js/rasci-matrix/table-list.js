@@ -308,7 +308,7 @@ function renderStaticHeader() {
       <th scope="col" class="level-col head-cell">Level</th>
       <th scope="col" class="index-col head-cell">Index</th>
       <th scope="col" class="headcol head-cell" style="min-width:260px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; padding-right:4px;">
+        <div class="prosbis-cell-wrapper" style="display:flex; align-items:center; justify-content:space-between; width:100%; padding-right:4px;">
           <span style="padding:10px">Proses Bisnis</span>
           <div class="ellipsis-menu prosbis-row-ellipsis">
             <div class="dropright">
@@ -318,7 +318,7 @@ function renderStaticHeader() {
                 <i class="fas fa-ellipsis-v"></i>
               </button>
               <ul class="dropdown-menu" aria-labelledby="prosesBisnisDropdown"
-                style="z-index:1050;">
+                >
                 <li>
                   <a href="#" class="dropdown-item">
                     <img src="/assets/images/rasci/eye.svg" alt="Filter Icon">View in spreadsheet
@@ -329,7 +329,7 @@ function renderStaticHeader() {
           </div>
         </div>
       </th>
-      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;z-index: 1;" >R/A</th>
+      <th scope="col" class="ra-col head-cell" style="width:55px;text-align:center;z-index: 2;" >R/A</th>
     </tr>
   `;
 }
