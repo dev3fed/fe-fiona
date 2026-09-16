@@ -262,17 +262,64 @@ function hideFortuneSheetAddAndMenuButtons() {
   );
 }
 
+function getResponsiveColumnWidths(containerWidth) {
+  const baseFixed = 75 + 34 * 8; // 347px for Index + L1..L8
+  const avail = Math.max(containerWidth - baseFixed - 35, 840);
+
+  return {
+    0: 75,
+    1: 34,
+    2: 34,
+    3: 34,
+    4: 34,
+    5: 34,
+    6: 34,
+    7: 34,
+    8: 34,
+    9: Math.max(Math.floor(avail * 0.18), 180),
+    10: Math.max(Math.floor(avail * 0.28), 220),
+    11: Math.max(Math.floor(avail * 0.27), 220),
+    12: Math.max(Math.floor(avail * 0.27), 220),
+  };
+}
+
+function updateFortuneSheetResponsiveColumns() {
+  const $container = $("#luckysheet-business-process-container, #fortunesheet-business-process-container");
+  if ($container.length === 0) return;
+
+  const w = $container.width() || window.innerWidth;
+  if (!w || w <= 0) return;
+
+  const newColLens = getResponsiveColumnWidths(w);
+
+  if (currentWorkbookData && currentWorkbookData[0]) {
+    if (!currentWorkbookData[0].config) currentWorkbookData[0].config = {};
+    currentWorkbookData[0].config.columnlen = Object.assign({}, currentWorkbookData[0].config.columnlen, newColLens);
+  }
+
+  if (fortunesheetRef.current && typeof fortunesheetRef.current.setColumnWidth === "function") {
+    try {
+      fortunesheetRef.current.setColumnWidth(newColLens);
+    } catch (e) {
+      console.warn("setColumnWidth warning:", e);
+    }
+  }
+}
+
 let isFixingLayoutOffsets = false;
 function fixFortuneSheetLayoutOffsets() {
   if (isFixingLayoutOffsets) return;
   isFixingLayoutOffsets = true;
   try {
     hideFortuneSheetAddAndMenuButtons();
+    updateFortuneSheetResponsiveColumns();
     if (fortunesheetRef.current && typeof fortunesheetRef.current.resize === "function") {
       try {
         fortunesheetRef.current.resize();
       } catch (e) {}
     }
+    // Dispatch window resize event so FortuneSheet recalculates container and canvas bounds
+    window.dispatchEvent(new Event("resize"));
   } finally {
     isFixingLayoutOffsets = false;
   }
@@ -537,9 +584,11 @@ function toggleFullscreenProsbis() {
   if (isFullscreenProsbis) {
     $card.addClass("luckysheet-fullscreen-active fortune-fullscreen-active");
     $icon.removeClass("fa-expand").addClass("fa-compress");
+    $("body").addClass("luckysheet-fullscreen-body-lock");
   } else {
     $card.removeClass("luckysheet-fullscreen-active fortune-fullscreen-active");
     $icon.removeClass("fa-compress").addClass("fa-expand");
+    $("body").removeClass("luckysheet-fullscreen-body-lock");
   }
 
   fixFortuneSheetLayoutOffsets();
@@ -552,6 +601,9 @@ function toggleFullscreenProsbis() {
   setTimeout(function () {
     fixFortuneSheetLayoutOffsets();
   }, 350);
+  setTimeout(function () {
+    fixFortuneSheetLayoutOffsets();
+  }, 600);
 }
 
 function processModifiedRange(range, source) {
@@ -808,21 +860,7 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
         },
         config: {
           defaultrowlen: 25,
-          columnlen: {
-            0: 75,
-            1: 34,
-            2: 34,
-            3: 34,
-            4: 34,
-            5: 34,
-            6: 34,
-            7: 34,
-            8: 34,
-            9: 180,
-            10: 220,
-            11: 220,
-            12: 220,
-          },
+          columnlen: getResponsiveColumnWidths($container.width() || window.innerWidth),
         },
       },
     ];

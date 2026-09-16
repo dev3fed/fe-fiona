@@ -1,5 +1,9 @@
 <style>
     /* Fullscreen mode styles */
+    body.luckysheet-fullscreen-body-lock {
+        overflow: hidden !important;
+    }
+
     #luckysheet-business-process-card.luckysheet-fullscreen-active,
     #luckysheet-business-process-card.fortune-fullscreen-active {
         position: fixed !important;
@@ -13,28 +17,51 @@
         max-height: 100vh !important;
         z-index: 999999 !important;
         background: #ffffff !important;
-        padding: 15px !important;
+        padding: 10px !important;
         margin: 0 !important;
         box-sizing: border-box !important;
     }
 
     #luckysheet-business-process-card.luckysheet-fullscreen-active .card,
-    #luckysheet-business-process-card.fortune-fullscreen-active .card,
+    #luckysheet-business-process-card.fortune-fullscreen-active .card {
+        height: 100% !important;
+        width: 100% !important;
+        max-height: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
     #luckysheet-business-process-card.luckysheet-fullscreen-active .card-body,
     #luckysheet-business-process-card.fortune-fullscreen-active .card-body {
         height: 100% !important;
+        width: 100% !important;
         max-height: 100% !important;
+        max-width: 100% !important;
         display: flex !important;
         flex-direction: column !important;
-        padding: 10px !important;
+        padding: 0 !important;
         margin: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
     }
 
     #luckysheet-business-process-card.luckysheet-fullscreen-active .luckysheet-wrapper,
     #luckysheet-business-process-card.fortune-fullscreen-active .luckysheet-wrapper {
-        height: calc(100vh - 80px) !important;
-        max-height: calc(100vh - 80px) !important;
-        flex: 1 1 auto !important;
+        position: relative !important;
+        flex: 1 1 0% !important;
+        height: 100% !important;
+        width: 100% !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
     }
 
     #luckysheet-business-process-card.luckysheet-fullscreen-active #luckysheet-business-process-container,
@@ -43,7 +70,13 @@
     #luckysheet-business-process-card.fortune-fullscreen-active .fortune-workbook-container,
     #luckysheet-business-process-card.luckysheet-fullscreen-active [class*="fortune-container"],
     #luckysheet-business-process-card.fortune-fullscreen-active [class*="fortune-container"] {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         height: 100% !important;
+        width: 100% !important;
     }
 
     /* Hide entire bottom sheetbar container, add sheet (+) button, and menu sheet (㗊) button */
@@ -144,12 +177,9 @@
                             class="btn btn-prosbis-light btn-sm d-flex align-items-center gap-1">
                         <i class="fa fa-download"></i> Export
                     </button>
-                    <button id="btn-save-prosbis-grid" class="btn btn-primary me-2" type="button" style="width: 100px;">
-                        <div class="d-flex align-items-center justify-content-center w-100">
-                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"
-                                 id="loadingSaveSheet" role="status"></div>
-                            <span class="btn-text"> Save Change</span>
-                        </div>
+                    <button id="btn-save-prosbis-grid" class="btn btn-primary btn-sm d-flex align-items-center gap-1" type="button" style="white-space: nowrap;">
+                        <div class="spinner-border spinner-border-sm text-light" style="display: none;" id="loadingSaveSheet" role="status"></div>
+                        <span class="btn-text">Save Changes</span>
                     </button>
                     <button id="btn-fullscreen-prosbis-grid"
                             class="btn btn-prosbis-light btn-sm d-flex align-items-center gap-1" title="Toggle Fullscreen">
