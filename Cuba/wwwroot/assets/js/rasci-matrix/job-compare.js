@@ -212,7 +212,7 @@ async function applySmartCompareAi() {
       smartCompareLastSharedIndexes = res.data.sharedProcessIndexNumbers || [];
       const sharedCount = res.data.sharedProcessesCount || 0;
       document.getElementById("smartCompareSharedCountInfo").innerText = `Terdapat ${sharedCount} proses bisnis bersama (joint responsibility)`;
-      document.getElementById("btnFilterSharedMatrix").disabled = sharedCount === 0;
+      document.getElementById("btnFilterSharedMatrix").disabled = false;
 
       // Render side-by-side metric cards
       const metricsRow = document.getElementById("smartCompareMetricsRow");
@@ -254,6 +254,15 @@ async function applySmartCompareAi() {
       swal("Gagal", "Terjadi kesalahan saat memproses perbandingan posisi Fiona AI.", "error");
     }
   }
+}
+
+async function applyCompareFromSmartResult() {
+  const modalElement = document.getElementById("modalSmartCompareResult");
+  if (modalElement) {
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) modal.hide();
+  }
+  await applyCompare();
 }
 
 async function filterSharedProcessesToMatrix() {
