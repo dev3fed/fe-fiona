@@ -984,11 +984,17 @@ async function applyAuditAnomaliesToMatrix() {
 
 // ==================== Auto-Generate Job Description & Competency Functions ====================
 let lastGeneratedJobdescData = null;
+let searchGenJobdescTimeout = null;
 
 function onModalGenerateJobdesc() {
   document.getElementById("inputGenJobdescPosition").value = "";
   document.getElementById("genJobdescResultContainer").style.display = "none";
-  document.getElementById("genJobdescStatusInfo").innerText = "Silakan pilih posisi jabatan untuk memulai.";
+  const searchResultsDiv = document.getElementById("genJobdescPositionSearchResults");
+  if (searchResultsDiv) {
+    searchResultsDiv.style.display = "none";
+    searchResultsDiv.innerHTML = "";
+  }
+  document.getElementById("genJobdescStatusInfo").innerText = "Silakan cari atau pilih posisi jabatan untuk memulai.";
   document.getElementById("btnCopyJobdesc").disabled = true;
   lastGeneratedJobdescData = null;
 
@@ -996,9 +1002,65 @@ function onModalGenerateJobdesc() {
   modal.show();
 }
 
+async function searchGenJobdescPositions(event) {
+  const keyword = event.target.value.trim();
+  const searchResultsDiv = document.getElementById("genJobdescPositionSearchResults");
+  if (!searchResultsDiv) return;
+
+  if (keyword.length < 2) {
+    searchResultsDiv.style.display = "none";
+    searchResultsDiv.innerHTML = "";
+    return;
+  }
+
+  clearTimeout(searchGenJobdescTimeout);
+  searchGenJobdescTimeout = setTimeout(async () => {
+    const draftSoId = getState("draftSoId");
+    const selectedValue = $("#dataSource-rasci").val();
+    const draftRasciId = selectedValue === "master" ? null : selectedValue;
+
+    const payload = {
+      Type: "job",
+      Search: keyword,
+      DraftSoId: draftSoId || null,
+      DraftRasciId: draftRasciId,
+    };
+    const queryString = new URLSearchParams(payload).toString();
+
+    try {
+      const res = await SearchMatrix(queryString);
+      if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
+        searchResultsDiv.innerHTML = res.data.map(item => `
+          <a href="javascript:void(0)" class="list-group-item list-group-item-action py-2 px-3 small" onclick="selectGenJobdescPosition('${item.positionName.replace(/'/g, "\\'")}')">
+            <img src="/assets/images/rasci/document.svg" style="width: 14px; margin-right: 6px;"> <strong>${item.positionName}</strong>
+          </a>
+        `).join("");
+        searchResultsDiv.style.display = "block";
+      } else {
+        searchResultsDiv.innerHTML = `<div class="list-group-item text-muted small py-2 px-3">Tidak ada posisi yang cocok.</div>`;
+        searchResultsDiv.style.display = "block";
+      }
+    } catch (err) {
+      console.error("Error searching job positions for jobdesc:", err);
+    }
+  }, 300);
+}
+
+function selectGenJobdescPosition(positionName) {
+  const input = document.getElementById("inputGenJobdescPosition");
+  if (input) input.value = positionName;
+
+  const searchResultsDiv = document.getElementById("genJobdescPositionSearchResults");
+  if (searchResultsDiv) searchResultsDiv.style.display = "none";
+
+  submitGenerateJobdesc();
+}
+
 function handleGenJobdescKeyPress(event) {
   if (event.key === "Enter") {
     event.preventDefault();
+    const searchResultsDiv = document.getElementById("genJobdescPositionSearchResults");
+    if (searchResultsDiv) searchResultsDiv.style.display = "none";
     submitGenerateJobdesc();
   }
 }

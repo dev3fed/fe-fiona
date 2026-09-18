@@ -3,24 +3,26 @@
         <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header d-flex align-items-center justify-content-between" style="background-color: #006CA9; color: #ffffff;">
                 <h5 class="modal-title text-white" id="modalGenerateJobdescLabel">
-                    <i class="icofont icofont-file-document me-2"></i> Auto-Generate Job Description & Rekomendasi Kompetensi (Fiona AI)
+                    <img src="~/assets/images/rasci/document.svg" alt="Jobdesc" style="width: 20px; margin-right: 8px; filter: brightness(0) invert(1);"> Auto-Generate Job Description & Rekomendasi Kompetensi (Fiona AI)
                 </h5>
                 <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4" id="modalGenerateJobdescBody">
                 
-                <!-- Position Selection / Input Group -->
-                <div class="mb-4">
-                    <label for="inputGenJobdescPosition" class="form-label font-weight-bold">Pilih / Ketik Nama Posisi Jabatan</label>
+                <!-- Position Selection / Input Group with Autocomplete Search -->
+                <div class="mb-4 position-relative">
+                    <label for="inputGenJobdescPosition" class="form-label font-weight-bold">Pilih / Cari Nama Posisi Jabatan</label>
                     <div class="input-group">
-                        <input type="text" id="inputGenJobdescPosition" class="form-control" placeholder="Contoh: Manager Procurement..." onkeypress="handleGenJobdescKeyPress(event)">
+                        <input type="text" id="inputGenJobdescPosition" class="form-control" placeholder="Cari posisi jabatan (contoh: Manager Procurement...)" oninput="searchGenJobdescPositions(event)" onkeypress="handleGenJobdescKeyPress(event)" autocomplete="off">
                         <button class="btn btn-primary" type="button" id="btnSubmitGenJobdesc" onclick="submitGenerateJobdesc()">
                             <div class="d-flex align-items-center">
                                 <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;" id="spinnerGenJobdesc" role="status"></div>
-                                <span><i class="icofont icofont-magic me-1"></i> Generate Draf</span>
+                                <span><img src="~/assets/images/rasci/icon_filter.svg" alt="Generate" style="width: 16px; margin-right: 6px; filter: brightness(0) invert(1);"> Generate Draf</span>
                             </div>
                         </button>
                     </div>
+                    <!-- Dropdown Results Container for Position Search -->
+                    <div id="genJobdescPositionSearchResults" class="list-group shadow-lg position-absolute w-100 mt-1" style="display: none; z-index: 1055; max-height: 240px; overflow-y: auto; background: #ffffff;"></div>
                 </div>
 
                 <div id="genJobdescResultContainer" style="display: none;">
@@ -28,7 +30,7 @@
                     <!-- Job Title Header & Objective Banner -->
                     <div class="card border-0 shadow-sm bg-light-primary text-primary p-3 rounded mb-4" style="border-left: 4px solid #006CA9 !important;">
                         <div class="d-flex align-items-start">
-                            <i class="icofont icofont-badge fs-2 me-3 mt-1 text-primary"></i>
+                            <img src="~/assets/images/rasci/clipboard.svg" alt="Clipboard" style="width: 28px; margin-right: 12px; margin-top: 2px;">
                             <div>
                                 <h5 class="fw-bold mb-1 text-dark" id="resGenJobdescTitle">-</h5>
                                 <p class="mb-0 small text-muted" id="resGenJobdescObjective">Memuat tujuan utama jabatan...</p>
@@ -41,7 +43,7 @@
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm p-3 bg-white rounded border-top border-3 border-danger h-100">
                                 <h6 class="fw-bold text-danger mb-2">
-                                    <i class="icofont icofont-star me-2"></i>Wewenang & Akuntabilitas Utama ('A')
+                                    <img src="~/assets/images/rasci/a.svg" alt="A" style="width: 18px; margin-right: 8px;">Wewenang & Akuntabilitas Utama ('A')
                                 </h6>
                                 <ul class="list-group list-group-flush small" id="listGenJobdescAccountabilities">
                                     <!-- Populated via JS -->
@@ -51,7 +53,7 @@
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm p-3 bg-white rounded border-top border-3 border-primary h-100">
                                 <h6 class="fw-bold text-primary mb-2">
-                                    <i class="icofont icofont-tasks-alt me-2"></i>Uraian Tugas Operasional Utama ('R')
+                                    <img src="~/assets/images/rasci/r.svg" alt="R" style="width: 18px; margin-right: 8px;">Uraian Tugas Operasional Utama ('R')
                                 </h6>
                                 <ul class="list-group list-group-flush small" id="listGenJobdescResponsibilities">
                                     <!-- Populated via JS -->
@@ -62,7 +64,9 @@
 
                     <!-- Competency Recommendations Section -->
                     <div class="card border-0 shadow-sm p-3 bg-light rounded mb-3">
-                        <h6 class="fw-bold text-dark mb-3"><i class="icofont icofont-certificate me-2 text-success"></i>Rekomendasi Standar Kompetensi</h6>
+                        <h6 class="fw-bold text-dark mb-3">
+                            <img src="~/assets/images/rasci/document.svg" alt="Competency" style="width: 18px; margin-right: 8px;">Rekomendasi Standar Kompetensi
+                        </h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <span class="small font-weight-bold text-secondary d-block mb-2">Kompetensi Teknis (Technical Competencies):</span>
@@ -87,7 +91,7 @@
                 <div>
                     <button class="btn btn-outline-light me-2 text-dark" type="button" data-bs-dismiss="modal">Tutup</button>
                     <button id="btnCopyJobdesc" class="btn btn-success" type="button" disabled onclick="copyJobdescToClipboard()">
-                        <i class="icofont icofont-ui-copy me-1"></i> Salin Draf ke Clipboard
+                        <img src="~/assets/images/rasci/clipboard.svg" alt="Copy" style="width: 16px; margin-right: 6px; filter: brightness(0) invert(1);"> Salin Draf ke Clipboard
                     </button>
                 </div>
             </div>
