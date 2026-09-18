@@ -611,6 +611,14 @@ function onModalAskAi() {
   modal.show();
 }
 
+function fillAskAiPrompt(promptText) {
+  const input = document.getElementById("askAiInput");
+  if (input) {
+    input.value = promptText;
+    submitAskAiPrompt();
+  }
+}
+
 function handleAskAiKeyPress(event) {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -790,5 +798,330 @@ async function applyAskAiToMatrix() {
       swal("Gagal", "Terjadi kesalahan saat menerapkan hasil Fiona ke matrix.", "error");
     }
   }
+}
+
+// ==================== Audit Quality & Anomali RASCI Functions ====================
+let auditQualityGlobalData = null;
+let currentAuditFilterCategory = "ALL";
+
+function onModalAuditQuality() {
+  const modal = new bootstrap.Modal(document.getElementById("modalAuditQuality"));
+  modal.show();
+  loadAuditQualityData();
+}
+
+async function loadAuditQualityData() {
+  const tbody = document.getElementById("tblAuditQualityBody");
+  tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>Sedang meng-audit aturan RASCI Matrix...</td></tr>`;
+  
+  document.getElementById("statMultipleA").innerText = "0";
+  document.getElementById("statNoA").innerText = "0";
+  document.getElementById("statOverloaded").innerText = "0";
+  document.getElementById("statTotalAnomalies").innerText = "0";
+  document.getElementById("auditExecutiveSummary").innerText = "Memuat analisis audit matriks RASCI...";
+  document.getElementById("btnApplyAuditAnomalies").disabled = true;
+
+  const draftSoId = getState("draftSoId");
+  const selectedValue = $("#dataSource-rasci").val();
+  const draftRasciId = selectedValue === "master" ? null : selectedValue;
+
+  const payload = {
+    Type: "audit-quality",
+    DraftSoId: draftSoId || null,
+    DraftRasciId: draftRasciId,
+  };
+  const queryString = new URLSearchParams(payload).toString();
+
+  try {
+    const res = await SearchMatrix(queryString);
+    if (res.status == 200 && res.data) {
+      auditQualityGlobalData = res.data;
+      
+      document.getElementById("statMultipleA").innerText = res.data.totalMultipleAccountable || 0;
+      document.getElementById("statNoA").innerText = res.data.totalNoAccountable || 0;
+      document.getElementById("statOverloaded").innerText = res.data.totalOverloadedPositions || 0;
+      document.getElementById("statTotalAnomalies").innerText = res.data.totalAnomalies || 0;
+      document.getElementById("auditExecutiveSummary").innerText = res.data.executiveSummary || "Audit selesai.";
+
+      const items = res.data.anomalyItems || [];
+      document.getElementById("countTabAll").innerText = items.length;
+      document.getElementById("countTabMultipleA").innerText = items.filter(x => x.category === "MULTIPLE_A").length;
+      document.getElementById("countTabNoA").innerText = items.filter(x => x.category === "NO_A").length;
+      document.getElementById("countTabOverload").innerText = items.filter(x => x.category === "OVERLOADED_POSITION").length;
+
+      renderAuditTable(items);
+      document.getElementById("btnApplyAuditAnomalies").disabled = items.length === 0;
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal mengambil data audit dari server.</td></tr>`;
+    }
+  } catch (error) {
+    console.error("Error loading Audit Quality data:", error);
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Terjadi kesalahan saat meng-audit matrix.</td></tr>`;
+  }
+}
+
+function filterAuditTab(category, btnElement) {
+  currentAuditFilterCategory = category;
+  
+  const buttons = document.querySelectorAll("#auditFilterTabs .nav-link");
+  buttons.forEach(b => b.classList.remove("active"));
+  if (btnElement) btnElement.classList.add("active");
+
+  if (!auditQualityGlobalData || !Array.isArray(auditQualityGlobalData.anomalyItems)) return;
+
+  let filtered = auditQualityGlobalData.anomalyItems;
+  if (category !== "ALL") {
+    filtered = auditQualityGlobalData.anomalyItems.filter(x => x.category === category);
+  }
+
+  renderAuditTable(filtered);
+}
+
+function renderAuditTable(items) {
+  const tbody = document.getElementById("tblAuditQualityBody");
+  const countInfo = document.getElementById("auditItemCountInfo");
+  if (countInfo) countInfo.innerText = `Menampilkan ${items.length} item`;
+
+  if (!items || items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada anomali yang ditemukan untuk kategori ini.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(item => {
+    let badgeClass = "bg-secondary";
+    if (item.category === "MULTIPLE_A") badgeClass = "bg-danger";
+    else if (item.category === "NO_A") badgeClass = "bg-warning text-dark";
+    else if (item.category === "OVERLOADED_POSITION") badgeClass = "bg-primary";
+    else if (item.category === "NO_R") badgeClass = "bg-info text-dark";
+
+    return `<tr>
+      <td><span class="badge ${badgeClass}">${item.categoryLabel || item.category}</span></td>
+      <td class="fw-bold">${item.indexNumber || "-"}</td>
+      <td><strong>${item.title || ""}</strong></td>
+      <td class="small">${item.description || ""}</td>
+      <td class="small text-success font-weight-bold"><i class="icofont icofont-check-circled me-1"></i>${item.recommendation || "-"}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function applyAuditAnomaliesToMatrix() {
+  if (!auditQualityGlobalData || !Array.isArray(auditQualityGlobalData.anomalyItems)) return;
+
+  const validIndexes = auditQualityGlobalData.anomalyItems
+    .map(x => x.indexNumber)
+    .filter(idx => idx && idx !== "-");
+
+  const uniqueIndexes = [...new Set(validIndexes)];
+  if (uniqueIndexes.length === 0) {
+    if (typeof swal !== "undefined") {
+      swal("Informasi", "Tidak ada index proses bisnis spesifik yang dapat difilter ke matrix.", "info");
+    }
+    return;
+  }
+
+  const draftSoId = getState("draftSoId");
+  const selectedValue = $("#dataSource-rasci").val();
+  const draftRasciId = selectedValue === "master" ? null : selectedValue;
+
+  const payloadByBusiness = {
+    draftRasciId: draftRasciId,
+    level: [],
+    indexNumber: uniqueIndexes,
+    expandNumber: [],
+    prlOrg: [],
+    unitCode: [],
+    row: 1,
+    rowSize: 15,
+  };
+
+  try {
+    const resultMatrix = await fetchProsbisMatrix(payloadByBusiness);
+    if (resultMatrix.success === true) {
+      const payloadJob = {
+        col: 1,
+        colSize: 10,
+        draftRasciId: draftRasciId,
+        indexNumber: uniqueIndexes,
+        draftSoId: draftSoId,
+      };
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+      const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+
+      SelectedProsbisId = [];
+      const modalElement = document.getElementById("modalAuditQuality");
+      const modal = bootstrap.Modal.getInstance(modalElement);
+
+      setState("idSearchProsbis", "");
+      setState("isSearchMatrix", true);
+      setState("payloadProsbis", payloadByBusiness);
+      setState("payloadPosition", payloadJob);
+      setState("actionType", "BP_THEN_JOB");
+      setState("actionExport", "searchByBusiness");
+      setState("resultProsbis", resultMatrix.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultMatrix.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      loadTableBody(resultMatrix.data);
+      loadTableHeader(resultPosition.data);
+      mapRasciCells(combineIndex, resultPosition.data);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+
+      if (modal) {
+        modal.hide();
+      }
+      if (typeof swal !== "undefined") {
+        swal("Berhasil", `Grid RASCI Matrix berhasil di-filter ke ${uniqueIndexes.length} proses bisnis hasil audit anomali.`, "success");
+      }
+    }
+  } catch (error) {
+    console.error("Error applying audit anomalies to matrix:", error);
+    if (typeof swal !== "undefined") {
+      swal("Gagal", "Terjadi kesalahan saat menerapkan filter audit ke matrix.", "error");
+    }
+  }
+}
+
+// ==================== Auto-Generate Job Description & Competency Functions ====================
+let lastGeneratedJobdescData = null;
+
+function onModalGenerateJobdesc() {
+  document.getElementById("inputGenJobdescPosition").value = "";
+  document.getElementById("genJobdescResultContainer").style.display = "none";
+  document.getElementById("genJobdescStatusInfo").innerText = "Silakan pilih posisi jabatan untuk memulai.";
+  document.getElementById("btnCopyJobdesc").disabled = true;
+  lastGeneratedJobdescData = null;
+
+  const modal = new bootstrap.Modal(document.getElementById("modalGenerateJobdesc"));
+  modal.show();
+}
+
+function handleGenJobdescKeyPress(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    submitGenerateJobdesc();
+  }
+}
+
+async function submitGenerateJobdesc() {
+  const posName = document.getElementById("inputGenJobdescPosition").value.trim();
+  if (!posName) {
+    if (typeof swal !== "undefined") {
+      swal("Peringatan", "Silakan masukkan nama posisi jabatan terlebih dahulu.", "warning");
+    }
+    return;
+  }
+
+  const spinner = document.getElementById("spinnerGenJobdesc");
+  if (spinner) spinner.style.display = "inline-block";
+  document.getElementById("genJobdescStatusInfo").innerText = "Sedang menghasilkan draf Uraian Tugas & Rekomendasi Kompetensi oleh Fiona AI...";
+
+  const selectedValue = $("#dataSource-rasci").val();
+  const draftRasciId = selectedValue === "master" ? null : selectedValue;
+
+  const payload = {
+    Type: "generate-jobdesc",
+    Search: posName,
+    DraftRasciId: draftRasciId,
+  };
+  const queryString = new URLSearchParams(payload).toString();
+
+  try {
+    const res = await SearchMatrix(queryString);
+    if (spinner) spinner.style.display = "none";
+
+    if (res.status === 200 && res.data) {
+      lastGeneratedJobdescData = res.data;
+      document.getElementById("genJobdescResultContainer").style.display = "block";
+      document.getElementById("resGenJobdescTitle").innerText = res.data.positionName || posName;
+      document.getElementById("resGenJobdescObjective").innerText = res.data.jobObjective || "-";
+
+      // Render Accountabilities ('A')
+      const accList = document.getElementById("listGenJobdescAccountabilities");
+      const accs = res.data.mainAccountabilities || [];
+      if (accList) {
+        accList.innerHTML = accs.length > 0
+          ? accs.map(a => `<li class="list-group-item bg-transparent px-0 py-2 border-bottom-0"><i class="icofont icofont-star text-danger me-2"></i>${a}</li>`).join("")
+          : `<li class="list-group-item bg-transparent px-0 text-muted">Tidak ada akuntabilitas utama ('A') khusus yang terpetakan.</li>`;
+      }
+
+      // Render Key Responsibilities ('R')
+      const respList = document.getElementById("listGenJobdescResponsibilities");
+      const resps = res.data.keyResponsibilities || [];
+      if (respList) {
+        respList.innerHTML = resps.length > 0
+          ? resps.map(r => `<li class="list-group-item bg-transparent px-0 py-2 border-bottom-0"><i class="icofont icofont-check-circled text-primary me-2"></i>${r}</li>`).join("")
+          : `<li class="list-group-item bg-transparent px-0 text-muted">Tidak ada tugas operasional ('R') khusus yang terpetakan.</li>`;
+      }
+
+      // Render Technical Competency Badges
+      const techBox = document.getElementById("badgesTechnicalCompetencies");
+      const techs = res.data.technicalCompetencies || [];
+      if (techBox) {
+        techBox.innerHTML = techs.length > 0
+          ? techs.map(t => `<span class="badge bg-light-success text-success border border-success p-2 rounded">${t}</span>`).join(" ")
+          : `<span class="text-muted small">Standard Functional Competency</span>`;
+      }
+
+      // Render Behavioural Competency Badges
+      const behBox = document.getElementById("badgesBehaviouralCompetencies");
+      const behs = res.data.behaviouralCompetencies || [];
+      if (behBox) {
+        behBox.innerHTML = behs.length > 0
+          ? behs.map(b => `<span class="badge bg-light-info text-info border border-info p-2 rounded">${b}</span>`).join(" ")
+          : `<span class="text-muted small">Standard Core Behavioral Competency</span>`;
+      }
+
+      document.getElementById("genJobdescStatusInfo").innerText = `Berhasil menghasilkan draf untuk posisi ${res.data.positionName}. Total ${res.data.totalMappedProcesses || 0} prosbis terpetakan.`;
+      document.getElementById("btnCopyJobdesc").disabled = false;
+    } else {
+      document.getElementById("genJobdescStatusInfo").innerText = "Gagal menghasilkan draf Uraian Tugas.";
+    }
+  } catch (error) {
+    console.error("Error generating Job Description AI:", error);
+    if (spinner) spinner.style.display = "none";
+    document.getElementById("genJobdescStatusInfo").innerText = "Terjadi kesalahan saat menghubungi layanan Fiona AI.";
+  }
+}
+
+function copyJobdescToClipboard() {
+  if (!lastGeneratedJobdescData) return;
+
+  const d = lastGeneratedJobdescData;
+  let text = `=========================================\n`;
+  text += `DRAF URAIAN JABATAN & KOMPETENSI (FIONA AI)\n`;
+  text += `Posisi: ${d.positionName}\n`;
+  text += `=========================================\n\n`;
+  text += `1. TUJUAN UTAMA JABATAN:\n${d.jobObjective}\n\n`;
+  text += `2. WEWENANG & AKUNTABILITAS UTAMA ('A'):\n`;
+  if (d.mainAccountabilities && d.mainAccountabilities.length) {
+    d.mainAccountabilities.forEach((a, i) => text += `   ${i + 1}. ${a}\n`);
+  } else {
+    text += `   - Tidak ada.\n`;
+  }
+  text += `\n3. URAIAN TUGAS OPERASIONAL UTAMA ('R'):\n`;
+  if (d.keyResponsibilities && d.keyResponsibilities.length) {
+    d.keyResponsibilities.forEach((r, i) => text += `   ${i + 1}. ${r}\n`);
+  } else {
+    text += `   - Tidak ada.\n`;
+  }
+  text += `\n4. REKOMENDASI KOMPETENSI TEKNIS:\n`;
+  if (d.technicalCompetencies && d.technicalCompetencies.length) {
+    d.technicalCompetencies.forEach(t => text += `   - ${t}\n`);
+  }
+  text += `\n5. REKOMENDASI KOMPETENSI PERILAKU:\n`;
+  if (d.behaviouralCompetencies && d.behaviouralCompetencies.length) {
+    d.behaviouralCompetencies.forEach(b => text += `   - ${b}\n`);
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    if (typeof swal !== "undefined") {
+      swal("Berhasil", "Draf Uraian Tugas & Rekomendasi Kompetensi berhasil disalin ke clipboard!", "success");
+    } else {
+      alert("Draf berhasil disalin ke clipboard!");
+    }
+  }).catch(err => {
+    console.error("Failed to copy text: ", err);
+  });
 }
 

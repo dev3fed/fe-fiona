@@ -264,6 +264,18 @@
                                                 <partial name="ModalAskAi" />
                                                 <!-- End Modal Ask AI -->
 
+                                                <!-- Start Modal Audit Quality -->
+                                                <partial name="ModalAuditQuality" />
+                                                <!-- End Modal Audit Quality -->
+
+                                                <!-- Start Modal Smart Compare Result -->
+                                                <partial name="ModalSmartCompareResult" />
+                                                <!-- End Modal Smart Compare Result -->
+
+                                                <!-- Start Modal Generate Jobdesc -->
+                                                <partial name="ModalGenerateJobdesc" />
+                                                <!-- End Modal Generate Jobdesc -->
+
                                             </div>
                                             <div class="col-12 d-flex align-items-center mb-2">
                                                 <span class="me-3" style="min-width: 130px;">RASCI Data Source</span>
@@ -335,10 +347,16 @@
                                                                         src="~/assets/images/rasci/icon_menudots.svg" alt="Filter Icon"
                                                                         style="margin-top: -1px;">Option</button>
                                                                         <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                                                                            @* <a class="dropdown-item" onclick="onModalAskAi()">
+                                                                            <a class="dropdown-item" onclick="onModalAskAi()">
                                                                                 <img src="~/assets/images/rasci/icon_filter.svg"
                                                                                      alt="Ask Fiona Icon" style="margin-top: -1px; filter: invert(34%) sepia(85%) saturate(1900%) hue-rotate(186deg) brightness(92%) contrast(101%);"> Ask Fiona
-                                                                            </a> *@
+                                                                            </a>
+                                                                            <a class="dropdown-item" onclick="onModalAuditQuality()">
+                                                                                <i class="icofont icofont-shield-alt text-primary me-2"></i> Audit Quality RASCI
+                                                                            </a>
+                                                                            <a class="dropdown-item" onclick="onModalGenerateJobdesc()">
+                                                                                <i class="icofont icofont-file-document text-success me-2"></i> Generate Jobdesc AI
+                                                                            </a>
                                                                             <a class="dropdown-item" onclick="onModalFilter()">
                                                                                 <img src="~/assets/images/rasci/icon_filter.svg"
                                                                                      alt="Filter Icon">Filter

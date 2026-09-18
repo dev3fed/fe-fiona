@@ -152,6 +152,12 @@
                 <div>
                     <button class="btn btn-outline-light" type="button" data-bs-dismiss="modal"
                         onclick="handleCloseModal()"><i class="icon-arrow-left"></i> Back</button>
+                    <button id="apply-compare-ai" class="btn btn-info text-white me-2" type="button" onclick="applySmartCompareAi()" disabled>
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;" id="spinnerCompareAi" role="status"></div>
+                            <span class="btn-text"><img src="~/assets/images/rasci/icon_filter.svg" alt="Fiona Icon" style="width: 16px; margin-right: 6px; filter: brightness(0) invert(1);"> Analisis Fiona AI</span>
+                        </div>
+                    </button>
                     <button id="apply-compare" class="btn btn-primary" type="button" onclick="applyCompare()" disabled>
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm text-light me-2" style="display: none;"

@@ -1,0 +1,126 @@
+<div class="modal fade" id="modalAuditQuality" tabindex="-1" role="dialog" aria-labelledby="modalAuditQualityLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl custom-modal-search bounceInDown animated" role="document">
+        <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header d-flex align-items-center justify-content-between" style="background-color: #006CA9; color: #ffffff;">
+                <h5 class="modal-title text-white" id="modalAuditQualityLabel">
+                    <i class="icofont icofont-shield-alt me-2"></i> Audit Quality & Deteksi Anomali RASCI Matrix
+                </h5>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="modalAuditQualityBody">
+                
+                <!-- Summary Stat Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm bg-light-danger text-danger p-3 rounded" style="border-left: 4px solid #dc3545 !important;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-uppercase small fw-bold">Multiple Accountable</span>
+                                    <h3 class="mb-0 mt-1 font-weight-bold" id="statMultipleA">0</h3>
+                                </div>
+                                <div class="fs-1 text-danger"><i class="icofont icofont-warning-alt"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm bg-light-warning text-warning p-3 rounded" style="border-left: 4px solid #ffc107 !important;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-uppercase small fw-bold">Tanpa Accountable</span>
+                                    <h3 class="mb-0 mt-1 font-weight-bold" id="statNoA">0</h3>
+                                </div>
+                                <div class="fs-1 text-warning"><i class="icofont icofont-question-circle"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm bg-light-primary text-primary p-3 rounded" style="border-left: 4px solid #006CA9 !important;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-uppercase small fw-bold">Posisi Overload ('R')</span>
+                                    <h3 class="mb-0 mt-1 font-weight-bold" id="statOverloaded">0</h3>
+                                </div>
+                                <div class="fs-1 text-primary"><i class="icofont icofont-user-suited"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm bg-light-secondary text-secondary p-3 rounded" style="border-left: 4px solid #6c757d !important;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-uppercase small fw-bold">Total Anomali</span>
+                                    <h3 class="mb-0 mt-1 font-weight-bold" id="statTotalAnomalies">0</h3>
+                                </div>
+                                <div class="fs-1 text-secondary"><i class="icofont icofont-chart-pie"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fiona AI Executive Recommendation Banner -->
+                <div class="alert alert-primary bg-light-primary text-primary border-primary p-3 rounded mb-4" role="alert">
+                    <div class="d-flex align-items-start">
+                        <img src="~/assets/images/rasci/icon_filter.svg" alt="Fiona" style="width: 22px; margin-top: 2px; margin-right: 12px; filter: invert(34%) sepia(85%) saturate(1900%) hue-rotate(186deg) brightness(92%) contrast(101%);">
+                        <div>
+                            <h6 class="alert-heading fw-bold mb-1">Rekomendasi Fiona AI</h6>
+                            <p class="mb-0 small" id="auditExecutiveSummary">Memuat analisis audit matriks RASCI...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Tabs & Anomaly List Table -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <ul class="nav nav-pills" id="auditFilterTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active btn-sm" type="button" onclick="filterAuditTab('ALL', this)">Semua (<span id="countTabAll">0</span>)</button>
+                        </li>
+                        <li class="nav-item ms-1">
+                            <button class="nav-link btn-sm text-danger" type="button" onclick="filterAuditTab('MULTIPLE_A', this)">Multiple 'A' (<span id="countTabMultipleA">0</span>)</button>
+                        </li>
+                        <li class="nav-item ms-1">
+                            <button class="nav-link btn-sm text-warning" type="button" onclick="filterAuditTab('NO_A', this)">Tanpa 'A' (<span id="countTabNoA">0</span>)</button>
+                        </li>
+                        <li class="nav-item ms-1">
+                            <button class="nav-link btn-sm text-primary" type="button" onclick="filterAuditTab('OVERLOADED_POSITION', this)">Posisi Overload (<span id="countTabOverload">0</span>)</button>
+                        </li>
+                    </ul>
+                    <span class="text-muted small" id="auditItemCountInfo">Menampilkan 0 item</span>
+                </div>
+
+                <div class="table-responsive scrollable-tbl-search" style="max-height: 380px;">
+                    <table class="table tbl-border align-middle">
+                        <thead style="background-color: #006CA9;" class="text-white">
+                            <tr>
+                                <th scope="col" style="width: 140px;">Kategori Anomali</th>
+                                <th scope="col" style="width: 90px;">Index</th>
+                                <th scope="col" style="width: 220px;">Proses Bisnis / Posisi</th>
+                                <th scope="col">Deskripsi Temuan Audit</th>
+                                <th scope="col">Rekomendasi Perbaikan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblAuditQualityBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
+                                    Sedang meng-audit aturan RASCI Matrix...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" onclick="loadAuditQualityData()">
+                    <i class="icofont icofont-refresh me-1"></i> Muat Ulang Audit
+                </button>
+                <div>
+                    <button class="btn btn-outline-light me-2 text-dark" type="button" data-bs-dismiss="modal">Batal</button>
+                    <button id="btnApplyAuditAnomalies" class="btn btn-primary" type="button" disabled onclick="applyAuditAnomaliesToMatrix()">
+                        <i class="icofont icofont-filter me-1"></i> Terapkan Anomali ke Matrix
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
