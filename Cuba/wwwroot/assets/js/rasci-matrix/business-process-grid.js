@@ -27,6 +27,8 @@ let modifiedRowIndexes = new Set();
 let prosbisIdMapByIdx = new Map();
 let prosbisOriginalIdxMap = new Map();
 let rowOriginalIdMap = new Map();
+let prosbisIdMapByDesc = new Map();
+let prosbisDescMapById = new Map();
 let fortunesheetRoot = null;
 let fortunesheetRef = { current: null };
 let currentWorkbookData = null;
@@ -45,9 +47,6 @@ function getRowDatabaseId(r, row, rawIdxVal) {
       }
     }
   }
-  if (rawIdxVal && typeof prosbisIdMapByIdx !== "undefined" && prosbisIdMapByIdx.has(String(rawIdxVal).trim())) {
-    return prosbisIdMapByIdx.get(String(rawIdxVal).trim()) || 0;
-  }
   if (typeof rowOriginalIdMap !== "undefined" && rowOriginalIdMap.has(r)) {
     return rowOriginalIdMap.get(r) || 0;
   }
@@ -55,8 +54,18 @@ function getRowDatabaseId(r, row, rawIdxVal) {
 }
 
 function getGridDataMatrix() {
+  if (fortunesheetRef.current && typeof fortunesheetRef.current.getSheetData === "function") {
+    try {
+      const sData = fortunesheetRef.current.getSheetData();
+      if (sData && Array.isArray(sData) && sData.length > 0) return sData;
+    } catch (e) {
+      console.warn("Error calling getSheetData from ref:", e);
+    }
+  }
   if (currentWorkbookData && currentWorkbookData[0]) {
-    if (currentWorkbookData[0].data) return currentWorkbookData[0].data;
+    if (currentWorkbookData[0].data && Array.isArray(currentWorkbookData[0].data) && currentWorkbookData[0].data.length > 0) {
+      return currentWorkbookData[0].data;
+    }
     if (currentWorkbookData[0].celldata) {
       const celldata = currentWorkbookData[0].celldata;
       const matrix = [];
@@ -65,14 +74,6 @@ function getGridDataMatrix() {
         matrix[item.r][item.c] = item.v;
       });
       return matrix;
-    }
-  }
-  if (fortunesheetRef.current && typeof fortunesheetRef.current.getSheetData === "function") {
-    try {
-      const sData = fortunesheetRef.current.getSheetData();
-      if (sData) return sData;
-    } catch (e) {
-      console.warn("Error calling getSheetData:", e);
     }
   }
   return null;
@@ -747,14 +748,21 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
     prosbisIdMapByIdx.clear();
     prosbisOriginalIdxMap.clear();
     rowOriginalIdMap.clear();
+    prosbisIdMapByDesc.clear();
+    prosbisDescMapById.clear();
 
     if (prosbisList && prosbisList.length > 0) {
       prosbisList.forEach((pb, rIdx) => {
         const idxStr = String(pb.indexNumber || pb.IndexNumber || "").trim();
         const pbId = pb.id || pb.BusinessProcessId || pb.businessProcessId || 0;
+        const desc = (pb.description || pb.Description || pb.name || pb.businessProcessName || "").trim();
         if (idxStr && pbId) {
           prosbisIdMapByIdx.set(idxStr, pbId);
           prosbisOriginalIdxMap.set(String(pbId), idxStr);
+        }
+        if (pbId > 0 && desc) {
+          prosbisIdMapByDesc.set(desc.toLowerCase(), pbId);
+          prosbisDescMapById.set(pbId, desc.toLowerCase());
         }
 
         const r = rIdx + 1;
@@ -762,7 +770,6 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
           rowOriginalIdMap.set(r, pbId);
         }
         const levelNum = pb.level || pb.Level || (idxStr ? idxStr.split(".").length : 1);
-        const desc = pb.description || pb.Description || pb.name || pb.businessProcessName || "";
 
         const rowCellMap = {};
 
@@ -1140,6 +1147,9 @@ async function initFortuneSheetProsbisGrid(forceReload = false) {
 
 async function saveFortuneSheetProsbisGrid() {
   console.log("[FortuneSheet Save] Save triggered. Current modifiedRowIndexes:", Array.from(modifiedRowIndexes));
+  if (document.activeElement && typeof document.activeElement.blur === "function") {
+    document.activeElement.blur();
+  }
   const spinBtn = document.getElementById("loadingSaveSheet");
   if (spinBtn) spinBtn.style.display = "inline-block";
 
@@ -1167,6 +1177,25 @@ async function saveFortuneSheetProsbisGrid() {
     const items = [];
     const parentIndexByLevel = {};
     const seqByLevel = {};
+    const usedIds = new Set();
+
+    // Pre-scan all descriptions in grid to detect which original process descriptions still exist in current sheet
+    const currentGridDescsSet = new Set();
+    for (let r = 1; r < gridData.length; r++) {
+      const row = gridData[r];
+      if (!row) continue;
+      for (let c = 1; c <= 8; c++) {
+        if (
+          row[c] &&
+          ((row[c].v !== undefined && row[c].v !== null && String(row[c].v).trim() !== "") ||
+            (row[c].m !== undefined && row[c].m !== null && String(row[c].m).trim() !== ""))
+        ) {
+          const dStr = String(row[c].v !== undefined && row[c].v !== null ? row[c].v : row[c].m).trim().toLowerCase();
+          if (dStr) currentGridDescsSet.add(dStr);
+          break;
+        }
+      }
+    }
 
     for (let r = 1; r < gridData.length; r++) {
       const row = gridData[r];
@@ -1220,7 +1249,31 @@ async function saveFortuneSheetProsbisGrid() {
 
       if (!desc && !rawIdxVal && !notes && !definisi && !input && !output && !cellNotes) continue;
 
-      let rowId = getRowDatabaseId(r, row, rawIdxVal);
+      const descNorm = desc.toLowerCase().trim();
+      let candidateId = getRowDatabaseId(r, row, rawIdxVal);
+      let rowId = 0;
+
+      if (descNorm && prosbisIdMapByDesc.has(descNorm)) {
+        rowId = prosbisIdMapByDesc.get(descNorm);
+      } else if (candidateId > 0) {
+        const origDesc = prosbisDescMapById.get(candidateId);
+        if (origDesc && currentGridDescsSet.has(origDesc)) {
+          // The entity originally assigned to candidateId still exists elsewhere in the grid (shifted position).
+          // Thus, THIS row is a NEW insertion.
+          rowId = 0;
+        } else {
+          // The original entity description is no longer in the grid, meaning the user edited text in-place.
+          rowId = candidateId;
+        }
+      }
+
+      if (rowId > 0) {
+        if (usedIds.has(rowId)) {
+          rowId = 0; // Reset duplicate ID to 0 so it inserts as new item
+        } else {
+          usedIds.add(rowId);
+        }
+      }
 
       let parentIdVal = null;
       if (level > 1) {
@@ -1245,17 +1298,19 @@ async function saveFortuneSheetProsbisGrid() {
         computedIndex = parentIdVal ? `${parentIdVal}.${seqByLevel[level]}` : String(seqByLevel[level]);
       }
 
-      parentIndexByLevel[level] = computedIndex;
+      // Always use computedIndex to ensure exact visual tree hierarchy from spreadsheet is saved
+      const finalIndex = computedIndex;
+      parentIndexByLevel[level] = finalIndex;
 
-      if (rawIdxVal !== computedIndex) {
+      if (rawIdxVal !== finalIndex) {
         if (row[0] && typeof row[0].v === "object" && row[0].v !== null) {
-          row[0].v.v = computedIndex;
-          row[0].v.m = computedIndex;
+          row[0].v.v = finalIndex;
+          row[0].v.m = finalIndex;
         } else if (row[0]) {
-          row[0].v = computedIndex;
-          row[0].m = computedIndex;
+          row[0].v = finalIndex;
+          row[0].m = finalIndex;
         } else {
-          row[0] = { v: computedIndex, m: computedIndex, ff: "Arial", fs: 11 };
+          row[0] = { v: finalIndex, m: finalIndex, ff: "Arial", fs: 11 };
         }
       }
 
@@ -1312,10 +1367,15 @@ async function saveFortuneSheetProsbisGrid() {
         }
       }
 
+      let derivedParentId = parentIdVal || "";
+      if (!derivedParentId && finalIndex.includes(".")) {
+        derivedParentId = finalIndex.substring(0, finalIndex.lastIndexOf("."));
+      }
+
       items.push({
         id: rowId,
-        indexNumber: computedIndex,
-        parentId: parentIdVal || "",
+        indexNumber: finalIndex,
+        parentId: derivedParentId,
         level: level,
         description: desc,
         notes: notes,

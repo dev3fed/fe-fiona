@@ -22,13 +22,16 @@ document.getElementById("searchButton").addEventListener("click", async function
       ? "job"
       : selectedText == "RASCI by Bus..."
         ? "businessprocess"
-        : "businessprocess";
+        : selectedText == "AI Filter"
+          ? "ai"
+          : "businessprocess";
   const draftSoId = getState("draftSoId");
   const selectedValue = $("#dataSource-rasci").val();
   let resultTblRbp = [];
   let resultTblJob = [];
-
   let resultTblBp = [];
+  let resultTblAi = [];
+
   const payload = {
     Type: searchType,
     Search: inputText,
@@ -45,6 +48,9 @@ document.getElementById("searchButton").addEventListener("click", async function
         break;
       case "RASCI by Bus...":
         resultTblRbp = dataTbl.data;
+        break;
+      case "AI Filter":
+        resultTblAi = dataTbl.data;
         break;
       default:
         resultTblBp = dataTbl.data;
@@ -133,6 +139,32 @@ document.getElementById("searchButton").addEventListener("click", async function
                <td>${item.level}</td>
             <td>${item.indexNumber}</td>
             <td>${item.description}</td>
+        </tr>`;
+        })
+        .join("");
+      break;
+    case "AI Filter":
+      modalSearchTitle = "AI Search";
+      searchLabel = `AI Search results for <b>"${inputText}"</b> (${resultTblAi?.length || 0} result)`;
+      theadContent = `<tr>
+          <th scope="col" style="width: 50px">Choose</th>
+          <th scope="col" style="width: 50px">Level</th>
+          <th scope="col" style="width: 80px">Index</th>
+          <th scope="col">Business Process</th>
+          <th scope="col">AI Reason</th>
+        </tr>`;
+      bodyContent = resultTblAi
+        ?.map((item, i) => {
+          return `<tr>
+            <th scope="row">
+              <label class="radio-label" for="checked-body-ai-${i}">
+                <input class="radio_animated" id="checked-body-ai-${i}" type="radio" name="rdo-ani" onchange="selectProsbisId(event)" value="${item.indexNumber}">
+              </label>
+            </th>
+            <td>${item.level}</td>
+            <td>${item.indexNumber}</td>
+            <td>${item.description}</td>
+            <td><span class="badge bg-light-primary text-primary" style="white-space: normal; text-align: left;">${item.reason || "-"}</span></td>
         </tr>`;
         })
         .join("");
@@ -566,3 +598,197 @@ const handleExportMatrix = async () => {
     console.error("Export failed:", error);
   }
 };
+
+// ==================== Ask AI Modal Functions ====================
+let askAiResultsData = [];
+
+function onModalAskAi() {
+  document.getElementById("askAiInput").value = "";
+  document.getElementById("askAiResultsContainer").style.display = "none";
+  document.getElementById("btnApplyAskAi").disabled = true;
+  askAiResultsData = [];
+  const modal = new bootstrap.Modal(document.getElementById("modalAskAi"));
+  modal.show();
+}
+
+function handleAskAiKeyPress(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    submitAskAiPrompt();
+  }
+}
+
+async function submitAskAiPrompt() {
+  const inputText = document.getElementById("askAiInput").value.trim();
+  if (!inputText) {
+    if (typeof swal !== "undefined") {
+      swal("Peringatan", "Silakan masukkan pertanyaan atau kata kunci Fiona terlebih dahulu.", "warning");
+    } else {
+      alert("Silakan masukkan pertanyaan atau kata kunci Fiona terlebih dahulu.");
+    }
+    return;
+  }
+
+  const spinner = document.getElementById("spinnerAskAi");
+  const btnText = document.getElementById("textSubmitAskAi");
+  spinner.style.display = "inline-block";
+  if (btnText) btnText.innerText = "Mencari...";
+
+  const draftSoId = getState("draftSoId");
+  const selectedValue = $("#dataSource-rasci").val();
+  const draftRasciId = selectedValue === "master" ? null : selectedValue;
+
+  const payload = {
+    Type: "ai",
+    Search: inputText,
+    DraftSoId: draftSoId || null,
+    DraftRasciId: draftRasciId,
+  };
+  const queryString = new URLSearchParams(payload).toString();
+
+  try {
+    const dataTbl = await SearchMatrix(queryString);
+    spinner.style.display = "none";
+    if (btnText) btnText.innerText = "Ask Fiona";
+
+    if (dataTbl.status == 200 && Array.isArray(dataTbl.data)) {
+      askAiResultsData = dataTbl.data;
+      const resultsContainer = document.getElementById("askAiResultsContainer");
+      resultsContainer.style.display = "block";
+
+      const label = document.getElementById("askAiResultLabel");
+      label.innerHTML = `Hasil Fiona (${askAiResultsData.length} hasil ditemukan)`;
+
+      const tbody = document.getElementById("tblAskAiBody");
+      if (askAiResultsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Tidak ada proses bisnis yang cocok dengan pertanyaan Fiona.</td></tr>`;
+        document.getElementById("btnApplyAskAi").disabled = true;
+      } else {
+        tbody.innerHTML = askAiResultsData
+          .map(
+            (item, i) => `<tr>
+            <td style="text-align: center;">
+              <label class="checkbox-label" for="chk-ask-ai-${i}">
+                <input class="checkbox_animated chk-ask-ai-item" id="chk-ask-ai-${i}" type="checkbox" value="${item.indexNumber}" checked onchange="updateAskAiApplyButton()">
+              </label>
+            </td>
+            <td>${item.level || ""}</td>
+            <td>${item.indexNumber || ""}</td>
+            <td>${item.description || ""}</td>
+            <td><span class="badge bg-light-primary text-primary" style="white-space: normal; text-align: left; font-size: 11px;">${item.reason || "-"}</span></td>
+          </tr>`
+          )
+          .join("");
+
+        document.getElementById("chkSelectAllAskAi").checked = true;
+        document.getElementById("btnApplyAskAi").disabled = false;
+      }
+    } else {
+      askAiResultsData = [];
+      document.getElementById("askAiResultsContainer").style.display = "block";
+      document.getElementById("tblAskAiBody").innerHTML = `<tr><td colspan="5" class="text-center text-danger py-3">Gagal mengambil data dari server Fiona.</td></tr>`;
+      document.getElementById("btnApplyAskAi").disabled = true;
+    }
+  } catch (error) {
+    console.error("Error asking Fiona:", error);
+    spinner.style.display = "none";
+    if (btnText) btnText.innerText = "Ask Fiona";
+    askAiResultsData = [];
+    document.getElementById("askAiResultsContainer").style.display = "block";
+    document.getElementById("tblAskAiBody").innerHTML = `<tr><td colspan="5" class="text-center text-danger py-3">Terjadi kesalahan saat memproses permintaan Fiona.</td></tr>`;
+    document.getElementById("btnApplyAskAi").disabled = true;
+  }
+}
+
+function toggleSelectAllAskAi(event) {
+  const isChecked = event.target.checked;
+  const checkboxes = document.querySelectorAll(".chk-ask-ai-item");
+  checkboxes.forEach((cb) => {
+    cb.checked = isChecked;
+  });
+  updateAskAiApplyButton();
+}
+
+function updateAskAiApplyButton() {
+  const checkedCount = document.querySelectorAll(".chk-ask-ai-item:checked").length;
+  const totalCount = document.querySelectorAll(".chk-ask-ai-item").length;
+  document.getElementById("chkSelectAllAskAi").checked = checkedCount === totalCount && totalCount > 0;
+  document.getElementById("btnApplyAskAi").disabled = checkedCount === 0;
+}
+
+async function applyAskAiToMatrix() {
+  const selectedCheckboxes = document.querySelectorAll(".chk-ask-ai-item:checked");
+  const selectedIndexNumbers = Array.from(selectedCheckboxes).map((cb) => cb.value);
+
+  if (selectedIndexNumbers.length === 0) return;
+
+  const spinner = document.getElementById("spinnerApplyAskAi");
+  spinner.style.display = "inline-block";
+
+  const draftSoId = getState("draftSoId");
+  const selectedValue = $("#dataSource-rasci").val();
+  const draftRasciId = selectedValue === "master" ? null : selectedValue;
+
+  const payloadByBusiness = {
+    draftRasciId: draftRasciId,
+    level: [],
+    indexNumber: selectedIndexNumbers,
+    expandNumber: [],
+    prlOrg: [],
+    unitCode: [],
+    row: 1,
+    rowSize: 15,
+  };
+
+  try {
+    const resultMatrix = await fetchProsbisMatrix(payloadByBusiness);
+    if (resultMatrix.success === true) {
+      const payloadJob = {
+        col: 1,
+        colSize: 10,
+        draftRasciId: draftRasciId,
+        indexNumber: selectedIndexNumbers,
+        draftSoId: draftSoId,
+      };
+      const resultPosition = await fetchPositionMatrix(payloadJob);
+      const combineIndex = resultMatrix.data.map((val) => val.indexNumber);
+
+      SelectedProsbisId = [];
+      const modalElement = document.getElementById("modalAskAi");
+      const modal = bootstrap.Modal.getInstance(modalElement);
+
+      setState("idSearchProsbis", "");
+      setState("isSearchMatrix", true);
+      setState("payloadProsbis", payloadByBusiness);
+      setState("payloadPosition", payloadJob);
+      setState("actionType", "BP_THEN_JOB");
+      setState("actionExport", "searchByBusiness");
+      setState("resultProsbis", resultMatrix.data);
+      setState("resultJabatan", resultPosition.data);
+      setState("totalProsbis", resultMatrix.totalResult);
+      setState("totalJob", resultPosition.totalResult);
+      loadTableBody(resultMatrix.data);
+      loadTableHeader(resultPosition.data);
+      mapRasciCells(combineIndex, resultPosition.data);
+      setState("currentPageY", 1);
+      setState("currentPageX", 1);
+
+      spinner.style.display = "none";
+      if (modal) {
+        modal.hide();
+      }
+    } else {
+      spinner.style.display = "none";
+      if (typeof swal !== "undefined") {
+        swal("Gagal", resultMatrix.error || "Gagal menerapkan data ke matrix", "error");
+      }
+    }
+  } catch (error) {
+    console.error("Error applying Ask Fiona results to matrix:", error);
+    spinner.style.display = "none";
+    if (typeof swal !== "undefined") {
+      swal("Gagal", "Terjadi kesalahan saat menerapkan hasil Fiona ke matrix.", "error");
+    }
+  }
+}
+
