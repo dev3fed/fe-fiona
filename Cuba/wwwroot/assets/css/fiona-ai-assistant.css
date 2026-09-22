@@ -1,0 +1,528 @@
+:root{--fiona-blue:#056ac8;--fiona-ink:#172033;--fiona-border:#dfe5ee}
+.fiona-ai-launcher{position:fixed;right:24px;bottom:24px;z-index:1040;border:0;border-radius:28px;background:var(--fiona-blue);color:#fff;box-shadow:0 8px 30px rgba(0,59,120,.28);display:flex;align-items:center;gap:8px;padding:10px 16px;font-weight:600}.fiona-ai-launcher img{width:28px;height:28px;filter:brightness(0) invert(1)}
+.fiona-ai-panel{position:fixed;top:50%;right:auto;left:50%;z-index:1060;width:calc(100vw - 24px);max-width:calc(100vw - 24px);height:calc(100vh - 24px);max-height:calc(100vh - 24px);border-radius:12px;background:#fff;box-shadow:0 20px 60px rgba(15,23,42,.28);display:flex;flex-direction:row;overflow:hidden;opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.99);transition:opacity .2s ease,transform .2s ease;color:var(--fiona-ink)}.fiona-ai-panel.is-open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}.fiona-ai-header{min-height:68px;padding:14px 24px;border-bottom:1px solid var(--fiona-border);display:flex;align-items:center;justify-content:space-between}.fiona-ai-header strong,.fiona-ai-header small{display:block}.fiona-ai-header small{color:#6c7687;margin-top:2px}.fiona-ai-data-source{display:inline-flex;align-items:center;max-width:420px;margin-top:6px;padding:3px 8px;border:1px solid #cfe0f1;border-radius:999px;background:#f3f8fd;color:#2d6598;font-size:11px;font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fiona-ai-data-source::before{width:6px;height:6px;margin-right:5px;border-radius:50%;background:#2f8bd9;content:""}.fiona-ai-data-source[hidden]{display:none}.fiona-ai-header-actions{display:flex;gap:8px}.fiona-ai-header button{border:0;background:#f0f4f8;border-radius:8px;width:34px;height:34px;font-size:20px;color:#344054}.fiona-ai-messages{flex:1;overflow:auto;padding:24px 36px;background:#fff}.fiona-ai-message{display:block;margin-bottom:22px;overflow-wrap:anywhere}.fiona-ai-message.user{display:flex;justify-content:flex-end}.fiona-ai-bubble{width:100%;max-width:none;padding:0;background:transparent;border:0;border-radius:0;overflow-wrap:anywhere}.fiona-ai-message.user .fiona-ai-bubble{width:auto;max-width:72%;padding:11px 13px;border:1px solid var(--fiona-blue);border-radius:16px;background:var(--fiona-blue);color:#fff}.fiona-ai-bubble p:last-child{margin-bottom:0}.fiona-ai-bubble pre{white-space:pre-wrap}.fiona-ai-table-wrap{overflow:auto;margin-top:10px}.fiona-ai-table{font-size:12px;width:100%;border-collapse:collapse}.fiona-ai-table th,.fiona-ai-table td{border:1px solid var(--fiona-border);padding:6px;text-align:left}.fiona-ai-citations{margin-top:10px;font-size:12px;color:#667085}.fiona-ai-trace{font-size:12px;color:#667085;margin-top:8px}.fiona-ai-chart{min-height:220px;margin-top:10px}.fiona-ai-confirm{display:flex;gap:8px;margin-top:12px}.fiona-ai-confirm button{border:0;border-radius:7px;padding:7px 12px}.fiona-ai-confirm .approve{background:var(--fiona-blue);color:#fff}.fiona-ai-status{padding:8px 24px;font-size:12px;color:#667085;border-top:1px solid var(--fiona-border)}.fiona-ai-composer{display:flex;align-items:flex-end;gap:8px;padding:12px 14px;border-top:1px solid var(--fiona-border)}.fiona-ai-composer textarea{flex:1;resize:none;border:1px solid #cfd7e3;border-radius:10px;padding:10px;outline:none}.fiona-ai-composer textarea:focus{border-color:var(--fiona-blue);box-shadow:0 0 0 3px rgba(5,106,200,.1)}.fiona-ai-composer button{border:0;border-radius:10px;background:var(--fiona-blue);color:#fff;width:42px;height:42px}.fiona-ai-disclaimer{padding:0 14px 10px;text-align:center;color:#8992a3;font-size:10px}.fiona-ai-unavailable{margin:18px;padding:16px;border-radius:10px;background:#f0f6fc;display:flex;flex-direction:column;gap:5px}.fiona-ai-unavailable[hidden]{display:none}.fiona-ai-backdrop{position:fixed;inset:0;z-index:1055;background:rgba(15,23,42,.25)}
+.fiona-ai-empty-state{display:none}.fiona-ai-panel.is-empty .fiona-ai-empty-state{display:block;position:absolute;top:calc(50% - 150px);left:50%;width:min(840px,calc(100% - 48px));transform:translateX(-50%);text-align:center}.fiona-ai-empty-eyebrow{display:block;margin-bottom:10px;color:#397ab7;font-size:11px;font-weight:700;letter-spacing:.09em}.fiona-ai-empty-state h2{margin:0;color:#172b4d;font-size:27px;line-height:1.25}.fiona-ai-empty-state p{max-width:680px;margin:10px auto 20px;color:#607087;font-size:14px;line-height:1.55}.fiona-ai-suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.fiona-ai-suggestions button{padding:7px 10px;border:1px solid #d5e2f0;border-radius:999px;background:#f7fbff;color:#28649d;font-size:12px;transition:border-color .15s ease,background .15s ease}.fiona-ai-suggestions button:hover{border-color:#8fb9df;background:#edf6ff}.fiona-ai-panel.is-empty .fiona-ai-composer-area{position:absolute;top:calc(50% + 92px);left:50%;width:min(840px,calc(100% - 48px));transform:translateX(-50%);padding:0;border:0}.fiona-ai-panel.is-empty .fiona-ai-composer textarea{min-height:50px;padding:13px 14px;border-radius:12px;box-shadow:0 3px 12px rgba(23,43,77,.08)}.fiona-ai-panel.is-empty .fiona-ai-composer button{width:50px;height:50px;border-radius:12px}.fiona-ai-panel.is-empty .fiona-ai-disclaimer{position:absolute;bottom:12px;left:0;right:0}.fiona-ai-panel.is-empty .fiona-ai-messages{overflow:hidden}
+.fiona-ai-composer-area{padding:8px 24px 12px;border-top:1px solid var(--fiona-border);background:#fff}.fiona-ai-composer-area .fiona-ai-data-source{margin:0 0 6px;max-width:100%}.fiona-ai-composer-area .fiona-ai-composer{padding:0;border:0}
+.fiona-ai-cache-status{display:flex;align-items:center;gap:7px;padding:7px 24px;border-top:1px solid var(--fiona-border);background:#f7fbff;color:#477398;font-size:12px}.fiona-ai-cache-status.is-error{background:#fff8ed;color:#98651f}.fiona-ai-cache-spinner{width:12px;height:12px;flex:0 0 12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:fiona-ai-cache-spin .8s linear infinite}@keyframes fiona-ai-cache-spin{to{transform:rotate(360deg)}}@media (prefers-reduced-motion:reduce){.fiona-ai-cache-spinner{animation:none}}
+/* Markdown / AI response typography styling (equivalent to Tailwind Typography / Prose) */
+.fiona-ai-message.assistant .fiona-ai-bubble {
+  color: #27364d;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+/* Headings */
+.fiona-ai-message.assistant .fiona-ai-bubble :is(h1, h2, h3, h4, h5, h6) {
+  color: #0f172a;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble :is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0 !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble h1 {
+  font-size: 1.625rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.3em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble h2 {
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.25em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble h3 {
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble h4 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble h5 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble h6 {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Paragraphs */
+.fiona-ai-message.assistant .fiona-ai-bubble p {
+  margin-top: 0;
+  margin-bottom: 0.85em;
+  line-height: 1.7;
+  color: #27364d;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+/* Lists - Complete Tailwind Prose Styling */
+.fiona-ai-message.assistant .fiona-ai-bubble ul {
+  list-style-type: disc !important;
+  list-style-position: outside !important;
+  padding-left: 1.6rem !important;
+  margin: 0.6em 0 0.85em !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble ol {
+  list-style-type: decimal !important;
+  list-style-position: outside !important;
+  padding-left: 1.6rem !important;
+  margin: 0.6em 0 0.85em !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble li {
+  display: list-item !important;
+  margin: 0.3em 0 !important;
+  padding-left: 0.25em !important;
+  line-height: 1.65 !important;
+  color: inherit !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble li::marker {
+  color: #64748b;
+  font-weight: 500;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble li > p {
+  margin: 0.2em 0 !important;
+}
+/* Nested lists */
+.fiona-ai-message.assistant .fiona-ai-bubble ul ul {
+  list-style-type: circle !important;
+  margin: 0.25em 0 !important;
+  padding-left: 1.35rem !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble ul ul ul {
+  list-style-type: square !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble ol ol {
+  list-style-type: lower-alpha !important;
+  margin: 0.25em 0 !important;
+  padding-left: 1.35rem !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble ol ol ol {
+  list-style-type: lower-roman !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble ol ul {
+  list-style-type: disc !important;
+  margin: 0.25em 0 !important;
+  padding-left: 1.35rem !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble ul ol {
+  list-style-type: decimal !important;
+  margin: 0.25em 0 !important;
+  padding-left: 1.35rem !important;
+}
+/* Task lists / Checklists */
+.fiona-ai-message.assistant .fiona-ai-bubble ul:has(> li > input[type="checkbox"]),
+.fiona-ai-message.assistant .fiona-ai-bubble ul.contains-task-list {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble li.task-list-item,
+.fiona-ai-message.assistant .fiona-ai-bubble li:has(> input[type="checkbox"]) {
+  list-style-type: none !important;
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 8px !important;
+  padding-left: 0 !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble li.task-list-item input[type="checkbox"],
+.fiona-ai-message.assistant .fiona-ai-bubble li > input[type="checkbox"] {
+  margin: 0 4px 0 0 !important;
+  accent-color: var(--fiona-blue);
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  cursor: default;
+}
+
+/* Definition Lists */
+.fiona-ai-message.assistant .fiona-ai-bubble dl {
+  margin: 0.85em 0 !important;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble dt {
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 0.6em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble dd {
+  padding-left: 1.25rem;
+  margin-bottom: 0.4em;
+  color: #475569;
+}
+
+/* Inline Typography Formatting */
+.fiona-ai-message.assistant .fiona-ai-bubble strong,
+.fiona-ai-message.assistant .fiona-ai-bubble b {
+  font-weight: 700;
+  color: #0f172a;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble em,
+.fiona-ai-message.assistant .fiona-ai-bubble i {
+  font-style: italic;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble del,
+.fiona-ai-message.assistant .fiona-ai-bubble s,
+.fiona-ai-message.assistant .fiona-ai-bubble strike {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble mark {
+  background-color: #fef08a;
+  color: #713f12;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble small {
+  font-size: 0.85em;
+  color: #64748b;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble sub,
+.fiona-ai-message.assistant .fiona-ai-bubble sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble sup {
+  top: -0.5em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble sub {
+  bottom: -0.25em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #1e293b;
+  padding: 0.15em 0.45em;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  border-bottom: 2px solid #94a3b8;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  display: inline-block;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble a {
+  color: #056ac8;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: rgba(5, 106, 200, 0.35);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble a:hover {
+  color: #034b8c;
+  text-decoration-color: #034b8c;
+}
+
+/* Blockquotes */
+.fiona-ai-message.assistant .fiona-ai-bubble blockquote {
+  border-left: 4px solid #3b82f6;
+  background: #f8fafc;
+  padding: 0.75rem 1.15rem;
+  margin: 1em 0;
+  border-radius: 0 8px 8px 0;
+  color: #475569;
+  font-style: italic;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble blockquote p {
+  margin: 0;
+  font-style: inherit;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble blockquote p + p {
+  margin-top: 0.5em;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble blockquote cite {
+  display: block;
+  font-size: 0.85em;
+  font-style: normal;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 0.5em;
+}
+
+/* Code & Pre */
+.fiona-ai-message.assistant .fiona-ai-bubble :is(code, pre) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble code:not(pre code) {
+  font-size: 0.875em;
+  padding: 0.2em 0.45em;
+  border-radius: 5px;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+  word-break: break-word;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble pre {
+  margin: 1.1em 0;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #f8fafc;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  border: 1px solid #1e293b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0f172a;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble pre code {
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  font-weight: normal !important;
+  white-space: pre !important;
+}
+
+/* Horizontal Rule */
+.fiona-ai-message.assistant .fiona-ai-bubble hr {
+  margin: 1.75em 0 !important;
+  border: 0 !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+/* Details & Summary */
+.fiona-ai-message.assistant .fiona-ai-bubble details:not(.fiona-ai-activity):not(.fiona-ai-thought-box) {
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin: 0.85em 0;
+  background: #f8fbff;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble details:not(.fiona-ai-activity):not(.fiona-ai-thought-box) summary {
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  padding: 4px 0;
+  outline: none;
+  user-select: none;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble details:not(.fiona-ai-activity):not(.fiona-ai-thought-box)[open] summary {
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+/* Images & Figures */
+.fiona-ai-message.assistant .fiona-ai-bubble img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.85em 0;
+  border: 1px solid #e2e8f0;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble figure {
+  margin: 1em 0;
+  text-align: center;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble figcaption {
+  font-size: 0.85em;
+  color: #64748b;
+  margin-top: 0.5em;
+}
+
+/* Tables (Markdown & Structured Tables) */
+.fiona-ai-bubble .fiona-ai-table-wrap {
+  max-width: 100%;
+  margin: 1.2em 0;
+  border: 1px solid #d9e2ef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  scrollbar-color: #b7c5d8 transparent;
+  scrollbar-width: thin;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) {
+  width: max-content !important;
+  min-width: 100% !important;
+  table-layout: auto !important;
+  margin: 1.2em 0;
+  border: 1px solid #d9e2ef;
+  border-radius: 10px;
+  border-spacing: 0;
+  border-collapse: separate;
+  overflow: hidden;
+  background: #fff;
+  color: #24324a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.fiona-ai-bubble .fiona-ai-table-wrap :is(table, .fiona-ai-table) {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) :is(th, td) {
+  min-width: 86px;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #e6ebf2 !important;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap !important;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) td:last-child {
+  min-width: 160px;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) th {
+  background: #f1f6fc;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) tbody tr:nth-child(even) td {
+  background: #fafcff;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) tbody tr:hover td {
+  background: #f0f7ff;
+}
+.fiona-ai-bubble :is(table, .fiona-ai-table) tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.fiona-ai-bubble .fiona-ai-table-wrap.fiona-ai-rasci-wrap {
+  margin: 1.2em 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+  padding: 0;
+}
+.fiona-ai-rasci-wrap { background: transparent; }
+.fiona-ai-rasci-table :is(th, td) { min-width: 76px; }
+.fiona-ai-rasci-table :is(th:nth-child(1), td:nth-child(1)) { min-width: 58px; }
+.fiona-ai-rasci-table :is(th:nth-child(2), td:nth-child(2)) { min-width: 54px; text-align: center; }
+.fiona-ai-rasci-table :is(th:nth-child(3), td:nth-child(3)) { min-width: 220px; }
+.fiona-ai-rasci-badge {
+  display: inline-flex;
+  align-items: center;
+  margin: 2px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e8f2ff;
+  color: #075aa8;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.fiona-ai-activity-message{max-width:720px}.fiona-ai-activity{border:1px solid #d7e3f0;border-radius:12px;background:#f8fbff;box-shadow:0 2px 8px rgba(23,43,77,.05);overflow:hidden}.fiona-ai-activity summary{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;color:#29435f;font-size:13px;font-weight:650;list-style:none}.fiona-ai-activity summary::-webkit-details-marker{display:none}.fiona-ai-activity-title{flex:1}.fiona-ai-activity-time{color:#7b899a;font-size:11px;font-variant-numeric:tabular-nums}.fiona-ai-activity-spinner{width:13px;height:13px;border:2px solid #b9d4eb;border-top-color:var(--fiona-blue);border-radius:50%}.fiona-ai-activity.is-running .fiona-ai-activity-spinner{animation:fiona-spin .8s linear infinite}.fiona-ai-activity.is-complete .fiona-ai-activity-spinner{border:0;background:#268a58}.fiona-ai-activity.is-complete .fiona-ai-activity-spinner::after{display:block;color:#fff;content:'✓';font-size:10px;line-height:13px;text-align:center}.fiona-ai-activity.is-stopped .fiona-ai-activity-spinner,.fiona-ai-activity.is-error .fiona-ai-activity-spinner{border:0;background:#9b6670}.fiona-ai-activity.is-stopped .fiona-ai-activity-spinner::after{display:block;color:#fff;content:'■';font-size:7px;line-height:13px;text-align:center}.fiona-ai-activity.is-error .fiona-ai-activity-spinner::after{display:block;color:#fff;content:'!';font-size:10px;line-height:13px;text-align:center}.fiona-ai-activity-agent{margin:-3px 13px 8px 35px;color:#66798f;font-size:11px}.fiona-ai-activity-steps{margin:0;padding:0 14px 10px 35px;list-style:none}.fiona-ai-activity-steps li{position:relative;display:flex;gap:9px;padding:5px 0;color:#40536a;font-size:12px}.fiona-ai-activity-steps li>span:last-child{display:flex;min-width:0;flex-direction:column}.fiona-ai-activity-steps small{margin-top:1px;color:#7a8796;font-size:10px}.fiona-ai-step-icon{position:absolute;top:9px;left:-20px;width:8px;height:8px;border:2px solid #a9bacb;border-radius:50%;background:#fff}.fiona-ai-activity-steps .is-running .fiona-ai-step-icon{border-color:var(--fiona-blue);box-shadow:0 0 0 3px rgba(5,106,200,.12)}.fiona-ai-activity-steps .is-success .fiona-ai-step-icon{border-color:#268a58;background:#268a58}.fiona-ai-activity-steps .is-error .fiona-ai-step-icon,.fiona-ai-activity-steps .is-stopped .fiona-ai-step-icon{border-color:#b44755;background:#b44755}.fiona-ai-activity-notice{margin:0;padding:8px 13px;border-top:1px solid #e3ebf4;color:#6b7888;font-size:11px}.fiona-ai-activity-retry{margin:0 13px 12px;padding:6px 10px;border:1px solid #a9c8e5;border-radius:7px;background:#fff;color:#1764a5;font-size:11px}.fiona-ai-composer button.is-stop{background:#6d7785;font-size:13px}.fiona-ai-header button:disabled{cursor:not-allowed;opacity:.5}@keyframes fiona-spin{to{transform:rotate(360deg)}}
+.fiona-ai-thought-box{margin:4px 14px 10px 35px;border:1px solid #d4e2f0;border-radius:8px;background:#f3f7fc;font-size:12px;overflow:hidden}.fiona-ai-thought-box[hidden]{display:none}.fiona-ai-thought-box summary{display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;color:#395472;font-size:11px;font-weight:600;list-style:none;user-select:none}.fiona-ai-thought-box summary::-webkit-details-marker{display:none}.fiona-ai-thought-title{flex:1}.fiona-ai-thought-badge{display:inline-flex;align-items:center;padding:1px 6px;margin-right:6px;border-radius:999px;background:#e3f0fc;color:#1868a8;font-size:10px;font-weight:600;animation:fiona-pulse 1.5s ease-in-out infinite}.fiona-ai-thought-badge[hidden]{display:none}.fiona-ai-thought-time{color:#788b9e;font-size:10px;font-variant-numeric:tabular-nums}.fiona-ai-thought-content{padding:8px 10px;border-top:1px solid #e2edf7;background:#fff;color:#43586e;font-size:11.5px;line-height:1.55;white-space:pre-wrap;max-height:240px;overflow-y:auto;overscroll-behavior-y:auto;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.fiona-ai-thought-step{margin-bottom:10px;border-left:2px solid #b8d3ec;padding-left:8px}.fiona-ai-thought-step:last-child{margin-bottom:0}.fiona-ai-thought-step-header{color:#1a66a8;font-weight:700;font-size:10.5px;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em}.fiona-ai-thought-step-body{color:#3f5166;font-size:11px}.fiona-ai-thought-cursor{display:inline-block;width:5px;height:12px;margin-left:2px;vertical-align:-1px;background:#1a73e8;border-radius:1px;animation:fiona-blink .8s infinite}.fiona-ai-streaming-cursor{display:inline-block;width:6px;height:14px;margin-left:2px;vertical-align:-1px;background:var(--fiona-blue);border-radius:2px;animation:fiona-blink .8s infinite}@keyframes fiona-blink{0%,100%{opacity:1}50%{opacity:0}}@keyframes fiona-pulse{0%,100%{opacity:1}50%{opacity:0.5}}.fiona-ai-stream-stopped{margin-top:8px;color:#8592a3;font-size:12px}
+@media(prefers-reduced-motion:reduce){.fiona-ai-activity.is-running .fiona-ai-activity-spinner{animation:none}.fiona-ai-panel{transition:none}}
+@media(max-width:600px){.fiona-ai-launcher span{display:none}.fiona-ai-launcher{padding:10px}.fiona-ai-panel{width:100vw;height:100vh;border-radius:0}.fiona-ai-messages{padding:18px}.fiona-ai-message.user .fiona-ai-bubble{max-width:86%}.fiona-ai-header,.fiona-ai-composer{padding-left:14px;padding-right:14px}.fiona-ai-composer-area{padding-left:14px;padding-right:14px}.fiona-ai-panel.is-empty .fiona-ai-empty-state{top:calc(50% - 154px);width:calc(100% - 32px)}.fiona-ai-empty-state h2{font-size:23px}.fiona-ai-panel.is-empty .fiona-ai-composer-area{top:calc(50% + 88px);width:calc(100% - 32px)}}
+
+/* Memory management view */
+.fiona-ai-header-actions #fionaAiMemories{width:auto;padding:0 9px;font-size:11px;font-weight:600}
+.fiona-ai-memory-panel{display:flex;min-height:0;flex:1;flex-direction:column;overflow:auto;background:#f7f9fc;color:var(--fiona-ink)}
+.fiona-ai-memory-panel[hidden]{display:none}
+.fiona-ai-memory-toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--fiona-border);background:#fff}
+.fiona-ai-memory-back,.fiona-ai-memory-refresh{border:0;background:transparent;color:#28649d;font-size:12px;font-weight:600}
+.fiona-ai-memory-refresh{width:32px;height:32px;border-radius:8px;font-size:20px}
+.fiona-ai-memory-back:hover,.fiona-ai-memory-refresh:hover{background:#eef6fd}
+.fiona-ai-memory-refresh:disabled{cursor:wait;opacity:.55}
+.fiona-ai-memory-heading{padding:22px 24px 12px;background:#fff}
+.fiona-ai-memory-heading h2{margin:0;color:#172b4d;font-size:24px}
+.fiona-ai-memory-heading p{max-width:720px;margin:8px 0 0;color:#607087;font-size:13px;line-height:1.55}
+.fiona-ai-memory-filters{display:grid;grid-template-columns:minmax(180px,1fr) 150px 170px;gap:10px;padding:12px 24px;border-bottom:1px solid var(--fiona-border);background:#fff}
+.fiona-ai-memory-filters label,.fiona-ai-memory-field{display:flex;flex-direction:column;gap:5px;color:#44556b;font-size:12px;font-weight:600}
+.fiona-ai-memory-filters input,.fiona-ai-memory-filters select,.fiona-ai-memory-field input,.fiona-ai-memory-field select,.fiona-ai-memory-field textarea{width:100%;border:1px solid #cfd7e3;border-radius:8px;background:#fff;color:#26364d;font:inherit;font-weight:400;padding:8px 10px;outline:none}
+.fiona-ai-memory-filters input:focus,.fiona-ai-memory-filters select:focus,.fiona-ai-memory-field input:focus,.fiona-ai-memory-field select:focus,.fiona-ai-memory-field textarea:focus{border-color:var(--fiona-blue);box-shadow:0 0 0 3px rgba(5,106,200,.1)}
+.fiona-ai-memory-status{display:flex;align-items:center;gap:10px;margin:14px 24px 0;padding:9px 11px;border:1px solid #cfe0f1;border-radius:8px;background:#f0f7fd;color:#32628e;font-size:12px}
+.fiona-ai-memory-status.is-error{border-color:#edc6c6;background:#fff5f5;color:#a13b45}
+.fiona-ai-memory-status[hidden]{display:none}
+.fiona-ai-memory-retry{margin-left:auto;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;padding:4px 8px;font-size:11px;font-weight:600}
+.fiona-ai-memory-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;padding:14px 24px 24px;overflow:auto}
+.fiona-ai-memory-card{display:flex;min-width:0;flex-direction:column;padding:15px;border:1px solid #dfe5ee;border-radius:12px;background:#fff;box-shadow:0 2px 7px rgba(23,43,77,.05)}
+.fiona-ai-memory-fact{margin:0 0 12px;overflow-wrap:anywhere;color:#1f3048;font-size:14px;line-height:1.55;white-space:pre-wrap}
+.fiona-ai-memory-badges{display:flex;flex-wrap:wrap;gap:5px}
+.fiona-ai-memory-badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:700;line-height:1.2}
+.fiona-ai-memory-badge.scope{background:#edf5fc;color:#2c6597}.fiona-ai-memory-badge.active{background:#eaf7ef;color:#267047}.fiona-ai-memory-badge.review{background:#fff4dc;color:#8a5a09}.fiona-ai-memory-badge.confidence{background:#f1effd;color:#5c4b9d}.fiona-ai-memory-badge.origin{background:#f2f4f7;color:#59687b}
+.fiona-ai-memory-card-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding-top:10px;border-top:1px solid #edf0f4;color:#7a8796;font-size:11px}
+.fiona-ai-memory-card-footer small{font-size:inherit}.fiona-ai-memory-source{color:#1764a5;font-size:11px;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.fiona-ai-memory-actions{display:flex;gap:7px;margin-top:12px}.fiona-ai-memory-action{border:1px solid #c7d9eb;border-radius:7px;background:#fff;color:#1764a5;padding:6px 10px;font-size:11px;font-weight:600}.fiona-ai-memory-action:hover{background:#f1f7fd}.fiona-ai-memory-action.danger{border-color:#e5c4c7;color:#a13b45}
+.fiona-ai-memory-empty{padding:40px 24px;text-align:center;color:#607087}.fiona-ai-memory-empty[hidden]{display:none}.fiona-ai-memory-empty strong{display:block;color:#263b58;font-size:16px}.fiona-ai-memory-empty p{max-width:430px;margin:7px auto;font-size:13px;line-height:1.55}
+.fiona-ai-memory-add{align-self:center;margin:0 24px 24px;border:0;border-radius:9px;background:var(--fiona-blue);color:#fff;padding:10px 15px;font-size:12px;font-weight:700}.fiona-ai-memory-add:hover{background:#045ba9}
+.fiona-ai-memory-editor{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);padding:0;border:0;border-radius:14px;background:#fff;color:var(--fiona-ink);box-shadow:0 20px 60px rgba(15,23,42,.3)}.fiona-ai-memory-editor::backdrop{background:rgba(15,23,42,.42)}.fiona-ai-memory-editor[hidden]{display:none}
+.fiona-ai-memory-editor form{max-height:calc(100vh - 32px);overflow:auto;padding:22px}.fiona-ai-memory-editor-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}.fiona-ai-memory-editor h2{margin:0;color:#172b4d;font-size:21px}.fiona-ai-memory-close{border:0;background:#f0f4f8;border-radius:8px;color:#344054;font-size:20px;width:32px;height:32px}.fiona-ai-memory-form-error{display:flex;align-items:center;gap:10px;margin-bottom:13px;padding:9px 11px;border:1px solid #edc6c6;border-radius:8px;background:#fff5f5;color:#a13b45;font-size:12px}.fiona-ai-memory-form-error[hidden]{display:none}.fiona-ai-memory-field{margin:0 0 14px}.fiona-ai-memory-field em{color:#a13b45;font-style:normal}.fiona-ai-memory-field small{color:#7a8796;font-size:11px;font-weight:400;line-height:1.45}.fiona-ai-memory-field textarea{resize:vertical;min-height:86px}.fiona-ai-memory-fieldset{display:grid;gap:8px;margin:0 0 14px;padding:12px;border:1px solid #dfe5ee;border-radius:8px;color:#44556b;font-size:12px}.fiona-ai-memory-fieldset legend{width:auto;margin:0;padding:0 5px;color:#44556b;font-size:12px;font-weight:700}.fiona-ai-memory-fieldset label{font-weight:400}.fiona-ai-memory-fieldset input{accent-color:var(--fiona-blue);margin-right:6px}.fiona-ai-memory-source-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fiona-ai-memory-source-fields[hidden],.fiona-ai-memory-field[hidden]{display:none}.fiona-ai-memory-editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.fiona-ai-memory-button{border:1px solid #c7d9eb;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:700}.fiona-ai-memory-button.secondary{background:#fff;color:#4b5c72}.fiona-ai-memory-button.primary{border-color:var(--fiona-blue);background:var(--fiona-blue);color:#fff}.fiona-ai-memory-button:disabled{cursor:not-allowed;opacity:.55}
+.fiona-ai-continuation{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px;padding:12px;border:1px solid #cfe0f1;border-radius:9px;background:#f3f8fd;color:#35516e}.fiona-ai-continuation p{flex:1;min-width:180px;margin:0;font-size:12px;line-height:1.45}.fiona-ai-continuation button{border:0;border-radius:7px;background:var(--fiona-blue);color:#fff;padding:7px 11px;font-size:11px;font-weight:700}.fiona-ai-continuation button:disabled{cursor:wait;opacity:.55}
+@media(max-width:700px){.fiona-ai-memory-filters{grid-template-columns:1fr 1fr}.fiona-ai-memory-filters label:first-child{grid-column:1/-1}.fiona-ai-memory-list{grid-template-columns:1fr;padding-left:14px;padding-right:14px}.fiona-ai-memory-toolbar,.fiona-ai-memory-heading,.fiona-ai-memory-filters{padding-left:14px;padding-right:14px}.fiona-ai-memory-status{margin-left:14px;margin-right:14px}.fiona-ai-memory-source-fields{grid-template-columns:1fr}}
+
+/* Model selection */
+.fiona-ai-model-picker{display:grid;grid-template-columns:auto minmax(150px,260px) 1fr auto;align-items:center;gap:8px;padding:8px 24px;border-bottom:1px solid var(--fiona-border);background:#fbfdff;color:#52647a;font-size:11px}
+.fiona-ai-model-picker label{font-weight:700;color:#344054}
+.fiona-ai-model-picker select{min-width:0;border:1px solid #cfd7e3;border-radius:7px;background:#fff;color:#26364d;padding:6px 9px;font:inherit;outline:none}
+.fiona-ai-model-picker select:focus{border-color:var(--fiona-blue);box-shadow:0 0 0 3px rgba(5,106,200,.1)}
+.fiona-ai-model-picker select:disabled{cursor:not-allowed;background:#f3f6f9;color:#718096;opacity:.9}
+.fiona-ai-model-help{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#728197}
+.fiona-ai-model-help.is-error{color:#a13b45}
+.fiona-ai-model-help.is-locked{color:#607087}
+.fiona-ai-model-retry{border:1px solid #c7d9eb;border-radius:6px;background:#fff;color:#1764a5;padding:4px 8px;font:inherit;font-weight:700;white-space:nowrap}
+.fiona-ai-model-retry:hover{background:#f1f7fd}
+.fiona-ai-model-retry[hidden]{display:none}
+@media(max-width:600px){.fiona-ai-model-picker{grid-template-columns:auto 1fr auto;padding-left:14px;padding-right:14px}.fiona-ai-model-help{grid-column:1/-1;margin-top:-2px;white-space:normal}}
+
+/* Chat History Sidebar & Two-Pane Layout */
+.fiona-ai-sidebar{width:270px;min-width:270px;max-width:270px;height:100%;background:#f8fafc;border-right:1px solid var(--fiona-border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:2;transition:transform .2s ease,width .2s ease,min-width .2s ease,max-width .2s ease,opacity .2s ease}
+.fiona-ai-sidebar.is-collapsed{width:0;min-width:0;max-width:0;border-right:0;opacity:0;pointer-events:none;padding:0}
+.fiona-ai-sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 12px;border-bottom:1px solid var(--fiona-border);background:#fff;gap:8px}
+.fiona-ai-sidebar-title{font-size:13px;font-weight:700;color:#172b4d;white-space:nowrap}
+.fiona-ai-history-new{border:0;border-radius:7px;background:var(--fiona-blue);color:#fff;padding:6px 10px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s ease;display:flex;align-items:center;gap:4px}
+.fiona-ai-history-new:hover{background:#045ba9}
+.fiona-ai-history-search-wrap{padding:10px 14px;border-bottom:1px solid var(--fiona-border);background:#fff}
+.fiona-ai-history-search-wrap input{width:100%;border:1px solid #cfd7e3;border-radius:7px;padding:6px 10px;font-size:12px;outline:none;background:#fdfdfd}
+.fiona-ai-history-search-wrap input:focus{border-color:var(--fiona-blue);box-shadow:0 0 0 2px rgba(5,106,200,.1)}
+.fiona-ai-history-list{flex:1;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.fiona-ai-history-group{margin-top:10px;margin-bottom:4px}
+.fiona-ai-history-group:first-child{margin-top:2px}
+.fiona-ai-history-group-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#8392a5;padding:4px 8px}
+.fiona-ai-history-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;color:#2b3b4f;font-size:12.5px;cursor:pointer;text-decoration:none;border:1px solid transparent;transition:background .15s ease,border-color .15s ease;position:relative}
+.fiona-ai-history-item:hover{background:#edf3fa}
+.fiona-ai-history-item.is-active{background:#e6f1fc;border-color:#bad8f5;color:#03529c;font-weight:600}
+.fiona-ai-history-item-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fiona-ai-history-item-actions{display:none;align-items:center;gap:2px;margin-left:6px}
+.fiona-ai-history-item:hover .fiona-ai-history-item-actions,.fiona-ai-history-item.is-active .fiona-ai-history-item-actions{display:flex}
+.fiona-ai-history-action-btn{border:0;background:transparent;border-radius:4px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b;cursor:pointer;padding:0}
+.fiona-ai-history-action-btn:hover{background:rgba(0,0,0,.08);color:#0f172a}
+.fiona-ai-history-action-btn.delete:hover{color:#b42318;background:#fee4e2}
+.fiona-ai-history-loading,.fiona-ai-history-empty{padding:24px 14px;text-align:center;color:#64748b;font-size:12px}
+.fiona-ai-history-loading{display:flex;align-items:center;justify-content:center;gap:8px}
+.fiona-ai-history-loading[hidden],.fiona-ai-history-empty[hidden]{display:none}
+.fiona-ai-history-empty strong{display:block;color:#334155;font-size:13px;margin-bottom:4px}
+.fiona-ai-history-empty p{margin:0;font-size:11.5px;line-height:1.4}
+
+/* Main Pane */
+.fiona-ai-main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;height:100%;background:#fff}
+.fiona-ai-header-info{display:flex;align-items:center;gap:10px}
+.fiona-ai-toggle-sidebar{border:0;background:#f0f4f8;border-radius:8px;width:34px;height:34px;font-size:16px;color:#344054;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fiona-ai-toggle-sidebar:hover{background:#e2e8f0}
+
+@media(max-width:768px){
+  .fiona-ai-sidebar{position:absolute;top:0;bottom:0;left:0;z-index:10;box-shadow:6px 0 20px rgba(0,0,0,.15);transform:translateX(-100%)}
+  .fiona-ai-sidebar.is-open{transform:translateX(0)}
+}

@@ -1,0 +1,175 @@
+@inject IConfiguration Configuration
+<button type="button" id="fionaAiLauncher" class="fiona-ai-launcher" aria-label="Open Fiona AI assistant" title="Ask Fiona">
+    <img src="~/assets/images/icon_AI.svg" alt="" />
+    <span>Ask Fiona</span>
+</button>
+<aside id="fionaAiPanel" class="fiona-ai-panel is-empty" aria-label="Fiona AI assistant" aria-hidden="true"
+       data-api-url="@Configuration["AppSettings:ApiUrl"]">
+    <!-- Left Sidebar: Chat History -->
+    <div id="fionaAiSidebar" class="fiona-ai-sidebar" aria-label="Chat History">
+        <div class="fiona-ai-sidebar-header">
+            <span class="fiona-ai-sidebar-title">Chat History</span>
+            <button type="button" id="fionaAiHistoryNew" class="fiona-ai-history-new" aria-label="New conversation" title="New conversation">＋ New Chat</button>
+        </div>
+        <div class="fiona-ai-history-search-wrap">
+            <input id="fionaAiHistorySearch" type="search" maxlength="200" autocomplete="off" placeholder="Search conversations..." aria-label="Search conversations" />
+        </div>
+        <div id="fionaAiHistoryLoading" class="fiona-ai-history-loading" hidden>
+            <span class="fiona-ai-activity-spinner" aria-hidden="true"></span>
+            <span>Loading history...</span>
+        </div>
+        <div id="fionaAiHistoryList" class="fiona-ai-history-list" aria-live="polite" aria-busy="false"></div>
+        <div id="fionaAiHistoryEmpty" class="fiona-ai-history-empty" hidden>
+            <strong>No conversations yet</strong>
+            <p>Your previous chats will appear here.</p>
+        </div>
+    </div>
+
+    <!-- Right Main Pane: Active Chat / Memories -->
+    <div id="fionaAiMain" class="fiona-ai-main">
+        <header class="fiona-ai-header">
+            <div class="fiona-ai-header-info">
+                <button type="button" id="fionaAiToggleSidebar" class="fiona-ai-toggle-sidebar" aria-label="Toggle chat history" title="Toggle chat history">☰</button>
+                <div>
+                    <strong>Fiona AI</strong>
+                    <small id="fionaAiContext">RASCI assistant</small>
+                </div>
+            </div>
+            <div class="fiona-ai-header-actions">
+                <button type="button" id="fionaAiMemories" aria-label="Open Fiona memories" title="Memories">Memories</button>
+                <button type="button" id="fionaAiNew" aria-label="New conversation" title="New conversation">＋</button>
+                <button type="button" id="fionaAiClose" aria-label="Close assistant">×</button>
+            </div>
+        </header>
+        <div id="fionaAiModelPicker" class="fiona-ai-model-picker" aria-live="polite">
+            <label for="fionaAiModelSelect">Model</label>
+            <select id="fionaAiModelSelect" disabled aria-describedby="fionaAiModelHelp">
+                <option value="">Loading models…</option>
+            </select>
+            <span id="fionaAiModelHelp" class="fiona-ai-model-help" role="status">Loading models…</span>
+            <button type="button" id="fionaAiModelRetry" class="fiona-ai-model-retry" hidden>Retry</button>
+        </div>
+        <section id="fionaAiMemoryPanel" class="fiona-ai-memory-panel" hidden aria-labelledby="fionaAiMemoryTitle">
+            <div class="fiona-ai-memory-toolbar">
+                <button type="button" id="fionaAiMemoryBack" class="fiona-ai-memory-back">← <span>Back to chat</span></button>
+                <button type="button" id="fionaAiMemoryRefresh" class="fiona-ai-memory-refresh" aria-label="Refresh memories" title="Refresh memories">↻</button>
+            </div>
+            <div class="fiona-ai-memory-heading">
+                <span class="fiona-ai-empty-eyebrow">FIONA AI · MEMORY</span>
+                <h2 id="fionaAiMemoryTitle">Your memories</h2>
+                <p>These user-scoped memories help Fiona personalize your experience. Memories marked “Needs review” are not treated as trusted context.</p>
+            </div>
+            <div class="fiona-ai-memory-filters" aria-label="Memory filters">
+                <label>
+                    <span>Search memories</span>
+                    <input id="fionaAiMemorySearch" type="search" maxlength="200" autocomplete="off" placeholder="Search your memories" />
+                </label>
+                <label>
+                    <span>Scope</span>
+                    <select id="fionaAiMemoryScope">
+                        <option value="">All scopes</option>
+                        <option value="user">Global</option>
+                        <option value="source">Domain/source</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Domain</span>
+                    <select id="fionaAiMemoryDomain">
+                        <option value="">All domains</option>
+                        <option value="organization">Organization</option>
+                        <option value="rasci">RASCI</option>
+                        <option value="jobdesc">Job description</option>
+                        <option value="competency">Competency</option>
+                    </select>
+                </label>
+            </div>
+            <div id="fionaAiMemoryStatus" class="fiona-ai-memory-status" role="status" aria-live="polite" hidden></div>
+            <div id="fionaAiMemoryList" class="fiona-ai-memory-list" aria-live="polite" aria-busy="false"></div>
+            <div id="fionaAiMemoryEmpty" class="fiona-ai-memory-empty" hidden>
+                <strong>No memories saved yet</strong>
+                <p>Fiona has not saved any memories for you. Add a global preference or a memory for a specific domain.</p>
+            </div>
+            <button type="button" id="fionaAiMemoryAdd" class="fiona-ai-memory-add">＋ Add memory</button>
+        </section>
+        <div id="fionaAiUnavailable" class="fiona-ai-unavailable" hidden>
+            <strong>Fiona is learning this page.</strong>
+            <span>The agent tracer is currently available on the RASCI Matrix page.</span>
+        </div>
+        <div id="fionaAiMessages" class="fiona-ai-messages" role="log" aria-live="polite"></div>
+        <section id="fionaAiEmptyState" class="fiona-ai-empty-state" aria-labelledby="fionaAiWelcomeTitle">
+            <span class="fiona-ai-empty-eyebrow">FIONA AI · RASCI MATRIX</span>
+            <h2 id="fionaAiWelcomeTitle">Apa yang ingin Anda ketahui?</h2>
+            <p>Ajukan pertanyaan untuk meninjau peran, tanggung jawab, dan keterkaitan proses bisnis.</p>
+            <div class="fiona-ai-suggestions" aria-label="Suggested questions">
+                <button type="button" data-prompt="Siapa yang bertanggung jawab untuk proses bisnis ini?">Siapa yang bertanggung jawab?</button>
+                <button type="button" data-prompt="Tampilkan peran RASCI untuk unit yang dipilih.">Tampilkan peran RASCI unit ini</button>
+                <button type="button" data-prompt="Ringkas temuan penting dari RASCI matrix ini.">Ringkas temuan penting</button>
+            </div>
+        </section>
+        <div id="fionaAiStatus" class="fiona-ai-status" hidden></div>
+        <div id="fionaAiCacheStatus" class="fiona-ai-cache-status" role="status" aria-live="polite" aria-busy="false" hidden></div>
+        <div id="fionaAiComposerArea" class="fiona-ai-composer-area">
+            <span id="fionaAiDataSource" class="fiona-ai-data-source" hidden></span>
+            <form id="fionaAiForm" class="fiona-ai-composer">
+                <textarea id="fionaAiInput" rows="2" maxlength="4000" placeholder="Ask about this RASCI matrix…" aria-label="Message Fiona"></textarea>
+                <button type="submit" id="fionaAiSend" aria-label="Send message">➤</button>
+            </form>
+        </div>
+        <div class="fiona-ai-disclaimer">AI can make mistakes. Confirm data-changing actions carefully.</div>
+    </div>
+    <dialog id="fionaAiMemoryEditor" class="fiona-ai-memory-editor" aria-labelledby="fionaAiMemoryEditorTitle">
+        <form id="fionaAiMemoryForm" method="dialog" novalidate>
+            <div class="fiona-ai-memory-editor-header">
+                <div>
+                    <span class="fiona-ai-empty-eyebrow">FIONA AI · MEMORY</span>
+                    <h2 id="fionaAiMemoryEditorTitle">Add memory</h2>
+                </div>
+                <button type="button" id="fionaAiMemoryCancel" class="fiona-ai-memory-close" aria-label="Close memory editor">×</button>
+            </div>
+            <div id="fionaAiMemoryFormError" class="fiona-ai-memory-form-error" role="alert" hidden></div>
+            <label class="fiona-ai-memory-field">
+                <span>Fact <em aria-hidden="true">*</em></span>
+                <textarea id="fionaAiMemoryFact" name="fact" rows="4" maxlength="2000" required aria-describedby="fionaAiMemoryFactHelp"></textarea>
+                <small id="fionaAiMemoryFactHelp">Keep this to a useful preference or working fact. Do not store sensitive information.</small>
+            </label>
+            <fieldset class="fiona-ai-memory-fieldset">
+                <legend>Scope</legend>
+                <label><input type="radio" name="scopeKind" value="user" checked /> Global preference</label>
+                <label><input type="radio" name="scopeKind" value="source" /> Specific domain/source</label>
+            </fieldset>
+            <div id="fionaAiMemorySourceFields" class="fiona-ai-memory-source-fields" hidden>
+                <label class="fiona-ai-memory-field">
+                    <span>Domain</span>
+                    <select id="fionaAiMemoryFormDomain" name="domain">
+                        <option value="">Choose a domain</option>
+                        <option value="organization">Organization</option>
+                        <option value="rasci">RASCI</option>
+                        <option value="jobdesc">Job description</option>
+                        <option value="competency">Competency</option>
+                    </select>
+                </label>
+                <label class="fiona-ai-memory-field">
+                    <span>Source or draft key</span>
+                    <input id="fionaAiMemoryScopeKey" name="scopeKey" type="text" maxlength="200" autocomplete="off" />
+                </label>
+            </div>
+            <label id="fionaAiMemoryConfidenceField" class="fiona-ai-memory-field" hidden>
+                <span>Confidence</span>
+                <input id="fionaAiMemoryConfidence" name="confidence" type="number" min="0" max="100" step="1" />
+                <small>Use the confidence Fiona currently shows for this memory.</small>
+            </label>
+            <label id="fionaAiMemoryReviewStateField" class="fiona-ai-memory-field" hidden>
+                <span>Review state</span>
+                <select id="fionaAiMemoryReviewState" name="reviewState">
+                    <option value="active">Active</option>
+                    <option value="needs_review">Needs review</option>
+                </select>
+            </label>
+            <div class="fiona-ai-memory-editor-actions">
+                <button type="button" id="fionaAiMemoryCancelSecondary" class="fiona-ai-memory-button secondary">Cancel</button>
+                <button type="submit" id="fionaAiMemorySave" class="fiona-ai-memory-button primary">Save memory</button>
+            </div>
+        </form>
+    </dialog>
+</aside>
+<div id="fionaAiBackdrop" class="fiona-ai-backdrop" hidden></div>

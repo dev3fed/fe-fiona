@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test:frontend": "node --test tests/*.test.js"
+  },
   "dependencies": {
     "docx": "^9.1.0"
   }
