@@ -904,13 +904,13 @@
     if (data.citations?.length) {
       const citations = document.createElement('div');
       citations.className = 'fiona-ai-citations';
-      citations.innerHTML = '<strong>Sources</strong><br>' + data.citations.map((item, index) => `${index + 1}. ${esc(item.title)} <small>(${esc(item.sourceType)}:${esc(item.sourceId)})</small>`).join('<br>');
+      citations.innerHTML = '<strong>Sumber Referensi</strong><br>' + data.citations.map((item, index) => `${index + 1}. ${esc(item.title)} <small>(${esc(item.sourceType)}:${esc(item.sourceId)})</small>`).join('<br>');
       bubble.appendChild(citations);
     }
     if (!options?.skipTrace && data.trace?.length) {
       const trace = document.createElement('div');
       trace.className = 'fiona-ai-trace';
-      trace.textContent = data.trace.map(item => `${item.tool}: ${item.summary}`).join(' · ');
+      trace.textContent = data.trace.map(item => `${sanitizeFriendlyLabel(item.tool, item.tool, 'complete', 'id')}: ${sanitizeFriendlySummary(item.summary, item.tool, 'complete', 'id')}`).join(' · ');
       bubble.appendChild(trace);
     }
     for (const spec of data.charts || []) {
@@ -922,7 +922,7 @@
     if (data.pendingAction) {
       const row = document.createElement('div');
       row.className = 'fiona-ai-confirm';
-      row.innerHTML = '<button type="button" class="approve">Confirm</button><button type="button" class="reject">Cancel</button>';
+      row.innerHTML = '<button type="button" class="approve">Konfirmasi</button><button type="button" class="reject">Batal</button>';
       bubble.appendChild(row);
       row.querySelector('.approve').onclick = () => confirmAction(data.pendingAction.confirmationToken, true, row);
       row.querySelector('.reject').onclick = () => confirmAction(data.pendingAction.confirmationToken, false, row);
@@ -931,15 +931,15 @@
       const row = document.createElement('div');
       row.className = 'fiona-ai-continuation';
       const question = document.createElement('p');
-      question.textContent = data.continuation.question || 'Would you like Fiona to continue?';
+      question.textContent = data.continuation.question || 'Apakah Anda ingin Fiona melanjutkan?';
       const continueButton = document.createElement('button');
       continueButton.type = 'button';
       continueButton.className = 'continue';
-      continueButton.textContent = data.continuation.continueMessage || 'Continue';
+      continueButton.textContent = data.continuation.continueMessage || 'Lanjutkan';
       continueButton.addEventListener('click', () => {
         if (busy) return;
         continueButton.disabled = true;
-        sendMessage(data.continuation.continueMessage || 'Continue', true);
+        sendMessage(data.continuation.continueMessage || 'Lanjutkan', true);
       });
       row.append(question, continueButton);
       bubble.appendChild(row);
@@ -1115,7 +1115,7 @@
     syncEmpty();
     setChatBusy(true, false);
     status.hidden = false;
-    status.textContent = 'Loading conversation…';
+    status.textContent = 'Memuat percakapan…';
 
     try {
       const { data } = await requestJson(`/api/agent/conversations/${encodeURIComponent(id)}/messages?limit=50`, { method: 'GET' });
@@ -1140,7 +1140,7 @@
             if (artifactData?.citations?.length) {
               const citations = document.createElement('div');
               citations.className = 'fiona-ai-citations';
-              citations.innerHTML = '<strong>Sources</strong><br>' + artifactData.citations.map((item, index) => `${index + 1}. ${esc(item.title)} <small>(${esc(item.sourceType)}:${esc(item.sourceId)})</small>`).join('<br>');
+              citations.innerHTML = '<strong>Sumber Referensi</strong><br>' + artifactData.citations.map((item, index) => `${index + 1}. ${esc(item.title)} <small>(${esc(item.sourceType)}:${esc(item.sourceId)})</small>`).join('<br>');
               bubble.appendChild(citations);
             }
             const charts = msg.charts || artifactData?.charts || [];
@@ -1160,9 +1160,9 @@
         sessionStorage.removeItem('fiona.ai.conversation');
         conversationItems = conversationItems.filter(c => c.id !== id);
         renderHistoryList();
-        add('assistant', 'This conversation is no longer available.');
+        add('assistant', 'Percakapan ini sudah tidak tersedia.');
       } else if (err.status !== 401) {
-        add('assistant', 'Unable to load messages for this conversation.');
+        add('assistant', 'Tidak dapat memuat pesan untuk percakapan ini.');
       }
     } finally {
       if (version === conversationLoadVersion) {
@@ -1222,41 +1222,178 @@
     }, 300);
   });
 
+  const toolNameTranslations = {
+    'get_rasci_business_process': {
+      label: { id: 'Memeriksa proses bisnis', en: 'Checking business processes' },
+      runningSummary: { id: 'Mencari data proses bisnis yang sesuai…', en: 'Searching business process records…' },
+      completeSummary: { id: 'Data proses bisnis berhasil diperoleh', en: 'Business process records retrieved' }
+    },
+    'get_rasci_positions': {
+      label: { id: 'Memeriksa posisi & jabatan', en: 'Checking positions & roles' },
+      runningSummary: { id: 'Mencari posisi dan unit kerja terkait…', en: 'Searching positions and organization units…' },
+      completeSummary: { id: 'Data posisi berhasil diperoleh', en: 'Positions retrieved' }
+    },
+    'get_rasci_mappings': {
+      label: { id: 'Memeriksa matriks tanggung jawab RASCI', en: 'Checking RASCI responsibilities' },
+      runningSummary: { id: 'Mencari penetapan peran (R/A/S/C/I)…', en: 'Looking up responsibility assignments…' },
+      completeSummary: { id: 'Matriks tanggung jawab berhasil diperiksa', en: 'Responsibility mappings retrieved' }
+    },
+    'display_rasci_table': {
+      label: { id: 'Menyiapkan tampilan tabel RASCI', en: 'Preparing RASCI table view' },
+      runningSummary: { id: 'Menyusun tabel interaktif…', en: 'Building interactive table…' },
+      completeSummary: { id: 'Tabel RASCI siap ditampilkan', en: 'RASCI table ready' }
+    },
+    'get_rasci_table': {
+      label: { id: 'Mengambil data tabel RASCI', en: 'Fetching RASCI table data' },
+      runningSummary: { id: 'Memuat data tabel…', en: 'Loading table slice…' },
+      completeSummary: { id: 'Data tabel siap', en: 'Table data ready' }
+    },
+    'get_duckdb_schema': {
+      label: { id: 'Menyiapkan struktur data', en: 'Preparing data structure' },
+      runningSummary: { id: 'Membaca katalog struktur data…', en: 'Reading data schemas…' },
+      completeSummary: { id: 'Struktur data siap', en: 'Data structure ready' }
+    },
+    'get_sql_server_schema': {
+      label: { id: 'Menyiapkan struktur data', en: 'Preparing data structure' },
+      runningSummary: { id: 'Membaca skema basis data…', en: 'Reading database schema…' },
+      completeSummary: { id: 'Struktur data siap', en: 'Data structure ready' }
+    },
+    'duckdb_query': {
+      label: { id: 'Menganalisis & menghitung data', en: 'Analyzing & computing data' },
+      runningSummary: { id: 'Memproses data dan perhitungan…', en: 'Processing data query…' },
+      completeSummary: { id: 'Analisis data selesai', en: 'Data analysis completed' }
+    },
+    'sql_server_query': {
+      label: { id: 'Menganalisis & mencari data', en: 'Analyzing & retrieving data' },
+      runningSummary: { id: 'Memproses penarikan data…', en: 'Processing data query…' },
+      completeSummary: { id: 'Penarikan data selesai', en: 'Data retrieval completed' }
+    },
+    'scratchpad_query': {
+      label: { id: 'Mengolah data analisis', en: 'Processing analysis data' },
+      runningSummary: { id: 'Menjalankan analisis data…', en: 'Running query analysis…' },
+      completeSummary: { id: 'Pengolahan data selesai', en: 'Data processing completed' }
+    },
+    'duckdb_query_to_scratchpad': {
+      label: { id: 'Mengorganisasi data kerja', en: 'Organizing workspace data' },
+      runningSummary: { id: 'Menata data ke ruang kerja sementara…', en: 'Preparing workspace tables…' },
+      completeSummary: { id: 'Data kerja berhasil diorganisasi', en: 'Workspace data organized' }
+    },
+    'sql_server_query_to_scratchpad': {
+      label: { id: 'Mengorganisasi data kerja', en: 'Organizing workspace data' },
+      runningSummary: { id: 'Menata data ke ruang kerja sementara…', en: 'Preparing workspace tables…' },
+      completeSummary: { id: 'Data kerja berhasil diorganisasi', en: 'Workspace data organized' }
+    },
+    'scratchpad_exec': {
+      label: { id: 'Menata ruang kerja analisis', en: 'Managing analysis workspace' },
+      runningSummary: { id: 'Menyiapkan tabel kerja…', en: 'Updating workspace tables…' },
+      completeSummary: { id: 'Ruang kerja siap', en: 'Workspace updated' }
+    },
+    'scratchpad_tables': {
+      label: { id: 'Memeriksa ruang kerja analisis', en: 'Checking analysis workspace' },
+      runningSummary: { id: 'Melihat status tabel kerja…', en: 'Checking workspace tables…' },
+      completeSummary: { id: 'Ruang kerja siap', en: 'Workspace ready' }
+    },
+    'create_rasci_draft': {
+      label: { id: 'Membuat draft RASCI baru', en: 'Creating new RASCI draft' },
+      runningSummary: { id: 'Menyiapkan draft baru di sistem…', en: 'Initializing new draft…' },
+      completeSummary: { id: 'Draft RASCI baru berhasil dibuat', en: 'New RASCI draft created' }
+    },
+    'rename_rasci_draft': {
+      label: { id: 'Mengubah nama draft RASCI', en: 'Renaming RASCI draft' },
+      runningSummary: { id: 'Memperbarui nama draft…', en: 'Updating draft title…' },
+      completeSummary: { id: 'Nama draft berhasil diubah', en: 'Draft renamed successfully' }
+    },
+    'save_rasci_mapping': {
+      label: { id: 'Menyimpan pemetaan RASCI', en: 'Saving RASCI mapping' },
+      runningSummary: { id: 'Menyimpan perubahan ke draft…', en: 'Saving changes to draft…' },
+      completeSummary: { id: 'Pemetaan RASCI berhasil disimpan', en: 'RASCI mapping saved successfully' }
+    },
+    'maf-native': {
+      label: { id: 'Fiona sedang menganalisis', en: 'Fiona is analyzing' },
+      runningSummary: { id: 'Menganalisis pertanyaan dan mengumpulkan data…', en: 'Analyzing question and gathering data…' },
+      completeSummary: { id: 'Analisis & pengumpulan data selesai', en: 'Analysis completed' }
+    },
+    'maf-native-limit': {
+      label: { id: 'Batas langkah tercapai', en: 'Action limit reached' },
+      runningSummary: { id: 'Lanjutkan percakapan untuk memproses lebih lanjut', en: 'Continue the conversation to proceed further' },
+      completeSummary: { id: 'Batas langkah tercapai', en: 'Action limit reached' }
+    }
+  };
+
+  function sanitizeFriendlyLabel(rawLabel, category, status, lang = 'id') {
+    const l = lang === 'en' ? 'en' : 'id';
+    const cleanCategory = String(category || '').trim();
+    if (toolNameTranslations[cleanCategory]) {
+      return toolNameTranslations[cleanCategory].label[l];
+    }
+    let text = String(rawLabel || '').trim();
+    if (!text || text.toLowerCase().startsWith('executing ') || text.toLowerCase().startsWith('executed ')) {
+      const toolMatch = text.replace(/^(executing|executed)\s+/i, '').trim();
+      if (toolNameTranslations[toolMatch]) {
+        return toolNameTranslations[toolMatch].label[l];
+      }
+    }
+    text = text.replace(/^executing\s+/i, l === 'en' ? 'Processing ' : 'Memproses ')
+               .replace(/^executed\s+/i, l === 'en' ? 'Processed ' : 'Selesai memproses ')
+               .replace(/native tool loop/i, l === 'en' ? 'analysis' : 'analisis')
+               .replace(/fiona native maf/i, l === 'en' ? 'Fiona is analyzing' : 'Fiona sedang menganalisis')
+               .replace(/mathematical runtime/i, l === 'en' ? 'data calculation' : 'perhitungan data')
+               .replace(/native tool invocation started/i, l === 'en' ? 'Step in progress…' : 'Langkah sedang berjalan…')
+               .replace(/native tool invocation completed/i, l === 'en' ? 'Step completed' : 'Langkah selesai')
+               .replace(/get_rasci_business_process/i, l === 'en' ? 'business processes' : 'proses bisnis')
+               .replace(/get_rasci_positions/i, l === 'en' ? 'positions' : 'posisi & jabatan')
+               .replace(/get_rasci_mappings/i, l === 'en' ? 'RASCI mappings' : 'pemetaan RASCI')
+               .replace(/display_rasci_table/i, l === 'en' ? 'RASCI table' : 'tabel RASCI')
+               .replace(/duckdb_query/i, l === 'en' ? 'data calculation' : 'analisis data')
+               .replace(/sql_server_query/i, l === 'en' ? 'database query' : 'pencarian data')
+               .replace(/scratchpad_\w+/i, l === 'en' ? 'workspace' : 'ruang kerja analisis');
+    return text || (l === 'en' ? 'Processing step' : 'Memproses langkah');
+  }
+
+  function sanitizeFriendlySummary(rawSummary, category, status, lang = 'id') {
+    const l = lang === 'en' ? 'en' : 'id';
+    const cleanCategory = String(category || '').trim();
+    if (toolNameTranslations[cleanCategory]) {
+      return status === 'running'
+        ? toolNameTranslations[cleanCategory].runningSummary[l]
+        : toolNameTranslations[cleanCategory].completeSummary[l];
+    }
+    let text = String(rawSummary || '').trim();
+    text = text.replace(/native tool invocation started/i, l === 'en' ? 'Working…' : 'Sedang memproses…')
+               .replace(/native tool invocation completed/i, l === 'en' ? 'Finished' : 'Selesai')
+               .replace(/executing the native tool loop/i, l === 'en' ? 'Analyzing and gathering information…' : 'Menganalisis pertanyaan dan mengumpulkan informasi…')
+               .replace(/native tool loop completed/i, l === 'en' ? 'All information gathered' : 'Semua informasi berhasil diproses');
+    return text;
+  }
+
   function createActivityCard() {
     const wrap = document.createElement('div');
     wrap.className = 'fiona-ai-message assistant fiona-ai-activity-message';
     const details = document.createElement('details');
-    details.className = 'fiona-ai-activity';
+    details.className = 'fiona-ai-activity is-running';
     details.open = true;
-    details.innerHTML = '<summary><span class="fiona-ai-activity-spinner" aria-hidden="true"></span><span class="fiona-ai-activity-title">Fiona is working</span><span class="fiona-ai-activity-time">0s</span></summary><div class="fiona-ai-activity-agent" hidden></div><ol class="fiona-ai-activity-steps"></ol><details class="fiona-ai-thought-box" open hidden><summary><span class="fiona-ai-thought-icon" aria-hidden="true">💡</span><span class="fiona-ai-thought-title">Proses Berpikir</span><span class="fiona-ai-thought-badge" hidden>Sedang berpikir…</span><span class="fiona-ai-thought-time">0s</span></summary><div class="fiona-ai-thought-content"></div></details><p class="fiona-ai-activity-notice" hidden></p><button type="button" class="fiona-ai-activity-retry" hidden>Try again</button>';
+    details.innerHTML = '<summary class="fiona-ai-activity-summary"><span class="fiona-ai-activity-spinner" aria-hidden="true"></span><span class="fiona-ai-activity-title">Fiona sedang menganalisis…</span><span class="fiona-ai-activity-time">0s</span></summary><div class="fiona-ai-activity-agent" hidden></div><ol class="fiona-ai-activity-steps"></ol><p class="fiona-ai-activity-notice" hidden></p><button type="button" class="fiona-ai-activity-retry" hidden>Coba lagi</button>';
     wrap.appendChild(details);
     messages.appendChild(wrap);
     syncEmpty();
     scrollToLatest();
     const title = details.querySelector('.fiona-ai-activity-title');
     const time = details.querySelector('.fiona-ai-activity-time');
-    const steps = details.querySelector('.fiona-ai-activity-steps');
+    const stepsList = details.querySelector('.fiona-ai-activity-steps');
     const agent = details.querySelector('.fiona-ai-activity-agent');
-    const thoughtBox = details.querySelector('.fiona-ai-thought-box');
-    const thoughtContent = details.querySelector('.fiona-ai-thought-content');
-    const thoughtTitle = details.querySelector('.fiona-ai-thought-title');
-    const thoughtBadge = details.querySelector('.fiona-ai-thought-badge');
-    const thoughtTime = details.querySelector('.fiona-ai-thought-time');
     const notice = details.querySelector('.fiona-ai-activity-notice');
     const retry = details.querySelector('.fiona-ai-activity-retry');
-    const activities = new Map();
     const started = performance.now();
-    let thoughtStarted = null;
     let language = 'id';
     let finished = false;
-    let currentThoughtStep = null;
-    let currentStepTextNode = null;
+    let currentStepNum = 0;
+    const stepMap = new Map();
+    const activityMap = new Map();
     let thoughtCursor = null;
 
     const timer = setInterval(() => {
       if (!finished) {
         time.textContent = formatDuration(performance.now() - started);
-        if (thoughtStarted) thoughtTime.textContent = formatDuration(performance.now() - thoughtStarted);
       }
     }, 250);
     const stalled = setTimeout(() => {
@@ -1274,73 +1411,126 @@
       return thoughtCursor;
     }
 
+    function getOrCreateStep(stepNum, phaseTitle) {
+      const num = stepNum || 1;
+      let stepItem = stepMap.get(num);
+      if (!stepItem) {
+        // Mark previous step as finished if moving to a new step
+        if (currentStepNum && currentStepNum !== num) {
+          const prevStep = stepMap.get(currentStepNum);
+          if (prevStep) {
+            prevStep.element.classList.remove('is-running');
+            prevStep.element.classList.add('is-success');
+            if (prevStep.reasoningDetails) {
+              prevStep.reasoningDetails.open = false;
+              if (prevStep.reasoningBadge) prevStep.reasoningBadge.hidden = true;
+            }
+          }
+        }
+        currentStepNum = num;
+
+        const li = document.createElement('li');
+        li.className = 'fiona-ai-step-item is-running';
+        li.dataset.step = String(num);
+
+        const defaultLabel = phaseTitle || (language === 'en' ? `Step ${num}: Analyzing` : `Langkah ${num}: Menganalisis`);
+        li.innerHTML = `
+          <div class="fiona-ai-step-header">
+            <div class="fiona-ai-step-header-left">
+              <span class="fiona-ai-step-icon" aria-hidden="true"></span>
+              <strong class="fiona-ai-step-label">${esc(defaultLabel)}</strong>
+            </div>
+            <span class="fiona-ai-step-time"></span>
+          </div>
+          <small class="fiona-ai-step-detail" hidden></small>
+          <details class="fiona-ai-step-reasoning" hidden>
+            <summary>
+              <span class="fiona-ai-step-reasoning-summary-left">
+                <span class="fiona-ai-step-reasoning-chevron" aria-hidden="true">›</span>
+                <span class="fiona-ai-step-reasoning-title">${language === 'en' ? 'Reasoning' : 'Alasan'}</span>
+                <span class="fiona-ai-step-reasoning-badge" hidden>${language === 'en' ? 'Thinking…' : 'Sedang berpikir…'}</span>
+              </span>
+            </summary>
+            <div class="fiona-ai-step-reasoning-content"></div>
+          </details>
+        `;
+        stepsList.appendChild(li);
+
+        stepItem = {
+          stepNum: num,
+          element: li,
+          label: li.querySelector('.fiona-ai-step-label'),
+          detail: li.querySelector('.fiona-ai-step-detail'),
+          time: li.querySelector('.fiona-ai-step-time'),
+          reasoningDetails: li.querySelector('.fiona-ai-step-reasoning'),
+          reasoningTitle: li.querySelector('.fiona-ai-step-reasoning-title'),
+          reasoningBadge: li.querySelector('.fiona-ai-step-reasoning-badge'),
+          reasoningContent: li.querySelector('.fiona-ai-step-reasoning-content'),
+          startedAt: performance.now(),
+          hasThought: false
+        };
+        stepMap.set(num, stepItem);
+      }
+      return stepItem;
+    }
+
     function appendThought(chunk, step, phase) {
       if (!chunk) return;
-      if (!thoughtStarted) {
-        thoughtStarted = performance.now();
-        thoughtBox.hidden = false;
-        thoughtBox.open = true;
-        thoughtTitle.textContent = language === 'en' ? 'Thought Process' : 'Proses Berpikir';
-        if (thoughtBadge) {
-          thoughtBadge.hidden = false;
-          thoughtBadge.textContent = language === 'en' ? 'Thinking…' : 'Sedang berpikir…';
-        }
-      }
-
       const stepNum = step || 1;
-      if (currentThoughtStep !== stepNum) {
-        currentThoughtStep = stepNum;
-        const stepContainer = document.createElement('div');
-        stepContainer.className = 'fiona-ai-thought-step';
+      const stepItem = getOrCreateStep(stepNum, phase);
+      stepItem.hasThought = true;
+      stepItem.reasoningDetails.hidden = false;
 
-        const stepHeader = document.createElement('div');
-        stepHeader.className = 'fiona-ai-thought-step-header';
-        stepHeader.textContent = phase || (language === 'en' ? `Turn ${stepNum}` : `Langkah ${stepNum}`);
-        stepContainer.appendChild(stepHeader);
+      const cursor = ensureThoughtCursor();
+      if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+      stepItem.reasoningContent.textContent += chunk;
+      stepItem.reasoningContent.appendChild(cursor);
 
-        const stepBody = document.createElement('div');
-        stepBody.className = 'fiona-ai-thought-step-body';
-        stepContainer.appendChild(stepBody);
-
-        thoughtContent.appendChild(stepContainer);
-        currentStepTextNode = stepBody;
-      }
-
-      if (currentStepTextNode) {
-        const cursor = ensureThoughtCursor();
-        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-        currentStepTextNode.textContent += chunk;
-        currentStepTextNode.appendChild(cursor);
-      } else {
-        thoughtContent.textContent += chunk;
-      }
-
-      thoughtContent.scrollTop = thoughtContent.scrollHeight;
+      stepItem.reasoningContent.scrollTop = stepItem.reasoningContent.scrollHeight;
       scrollToLatest();
     }
 
     function upsert(activity) {
       if (!activity?.id) return;
-      let row = activities.get(activity.id);
-      if (!row) {
-        row = document.createElement('li');
-        row.innerHTML = '<span class="fiona-ai-step-icon" aria-hidden="true"></span><span><strong></strong><small></small></span>';
-        activities.set(activity.id, row);
-        steps.appendChild(row);
+      const friendlyLabel = sanitizeFriendlyLabel(activity.label, activity.category, activity.status, language);
+      const friendlySummary = sanitizeFriendlySummary(activity.summary, activity.category, activity.status, language);
+
+      if (activity.category === 'maf-native' || activity.id === 'maf-native') {
+        if (activity.status === 'running') {
+          title.textContent = friendlyLabel || (language === 'en' ? 'Fiona is analyzing…' : 'Fiona sedang menganalisis…');
+        }
+        return;
       }
-      row.className = 'is-' + activity.status;
-      row.querySelector('strong').textContent = activity.label || '';
-      const detail = [activity.summary, activity.durationMs != null ? formatDuration(activity.durationMs) : null].filter(Boolean).join(' · ');
-      const small = row.querySelector('small');
-      small.textContent = detail;
-      small.hidden = !detail;
-      if (activity.agent) {
-        agent.hidden = false;
-        agent.textContent = activity.agent;
+
+      // Associate activity with a step item
+      let stepItem = activityMap.get(activity.id);
+      if (!stepItem) {
+        stepItem = getOrCreateStep(currentStepNum || stepMap.size || 1, friendlyLabel);
+        activityMap.set(activity.id, stepItem);
       }
-      title.textContent = activity.label || (language === 'en' ? 'Fiona is working' : 'Fiona sedang bekerja');
+
+      stepItem.label.textContent = friendlyLabel;
+      const durationStr = activity.durationMs != null ? formatDuration(activity.durationMs) : null;
+      const detailStr = [friendlySummary, durationStr].filter(Boolean).join(' · ');
+      if (detailStr) {
+        stepItem.detail.textContent = detailStr;
+        stepItem.detail.hidden = false;
+      }
+      if (activity.status === 'success' || activity.status === 'complete') {
+        stepItem.element.classList.remove('is-running');
+        stepItem.element.classList.add('is-success');
+        if (stepItem.reasoningBadge) stepItem.reasoningBadge.hidden = true;
+        if (stepItem.reasoningDetails) stepItem.reasoningDetails.open = false;
+      } else if (activity.status === 'error') {
+        stepItem.element.classList.remove('is-running');
+        stepItem.element.classList.add('is-error');
+        if (stepItem.reasoningBadge) stepItem.reasoningBadge.hidden = true;
+      }
+
+      title.textContent = friendlyLabel || (language === 'en' ? 'Fiona is working' : 'Fiona sedang bekerja');
       scrollToLatest();
     }
+
     function finish(kind, message) {
       if (finished) return;
       finished = true;
@@ -1349,24 +1539,37 @@
       if (thoughtCursor && thoughtCursor.parentNode) {
         thoughtCursor.parentNode.removeChild(thoughtCursor);
       }
-      if (thoughtBadge) thoughtBadge.hidden = true;
       details.classList.remove('is-running');
       details.classList.add('is-' + kind);
       const elapsed = performance.now() - started;
       time.textContent = formatDuration(elapsed);
-      const count = activities.size;
+
+      // Close all reasoning details and clean up steps
+      for (const [, stepItem] of stepMap) {
+        stepItem.element.classList.remove('is-running');
+        if (kind === 'complete') {
+          stepItem.element.classList.add('is-success');
+        }
+        if (stepItem.reasoningDetails) {
+          stepItem.reasoningDetails.open = false;
+          if (stepItem.reasoningBadge) stepItem.reasoningBadge.hidden = true;
+          // If a step had no thoughts, hide reasoning box
+          if (!stepItem.hasThought || !stepItem.reasoningContent.textContent.trim()) {
+            stepItem.reasoningDetails.hidden = true;
+          }
+        }
+      }
+
+      const count = stepMap.size || 1;
       if (kind === 'complete') {
         title.textContent = language === 'en' ? `Completed · ${count} ${count === 1 ? 'step' : 'steps'}` : `Selesai · ${count} langkah`;
-        if (thoughtBox && !thoughtBox.hidden) {
-          thoughtTitle.textContent = language === 'en' ? 'Thought Process' : 'Proses Berpikir';
-          thoughtBox.open = false;
-        }
       } else {
-        title.textContent = message;
+        title.textContent = message || (language === 'en' ? 'Finished' : 'Selesai');
       }
       notice.hidden = true;
       details.open = kind !== 'complete';
     }
+
     retry.addEventListener('click', () => {
       if (!lastRequest || busy) return;
       sendMessage(lastRequest.message, Boolean(lastRequest.continue), lastRequest);
@@ -1375,8 +1578,14 @@
     return {
       setLanguage(value) {
         language = value === 'en' ? 'en' : 'id';
-        if (thoughtTitle) thoughtTitle.textContent = language === 'en' ? 'Thought Process' : 'Proses Berpikir';
-        if (thoughtBadge && !thoughtBadge.hidden) thoughtBadge.textContent = language === 'en' ? 'Thinking…' : 'Sedang berpikir…';
+        for (const [, stepItem] of stepMap) {
+          if (stepItem.reasoningTitle) {
+            stepItem.reasoningTitle.textContent = language === 'en' ? 'Reasoning' : 'Alasan';
+          }
+          if (stepItem.reasoningBadge && !stepItem.reasoningBadge.hidden) {
+            stepItem.reasoningBadge.textContent = language === 'en' ? 'Thinking…' : 'Sedang berpikir…';
+          }
+        }
       },
       upsert,
       appendThought,
@@ -1412,9 +1621,9 @@
     row.querySelectorAll('button').forEach(button => button.disabled = true);
     setChatBusy(true, false);
     status.hidden = false;
-    status.textContent = approved ? 'Executing confirmed action…' : 'Cancelling…';
+    status.textContent = approved ? 'Menjalankan tindakan terkonfirmasi…' : 'Membatalkan…';
     try { await renderResult(await call('/api/agent/confirm', { confirmationToken, approved })); }
-    catch (error) { add('assistant', 'Unable to process confirmation: ' + error.message); }
+    catch (error) { add('assistant', 'Gagal memproses konfirmasi: ' + error.message); }
     finally { status.hidden = true; setChatBusy(false, false); }
   }
 
@@ -1461,14 +1670,14 @@
           id: event.toolCallId || ('tool-' + (event.sequence || Date.now())),
           category: event.toolName,
           status: 'running',
-          label: event.label || ('Executing ' + event.toolName)
+          label: event.label
         });
       } else if (type === 'TOOL_CALL_RESULT') {
         card.upsert({
           id: event.toolCallId || ('tool-' + (event.sequence || Date.now())),
           category: event.toolName,
           status: event.status || 'complete',
-          label: event.label || ('Executed ' + event.toolName),
+          label: event.label,
           durationMs: event.durationMs,
           summary: event.summary
         });
