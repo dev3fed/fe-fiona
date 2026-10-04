@@ -53,6 +53,19 @@
   const modelSelect = document.getElementById('fionaAiModelSelect');
   const modelHelp = document.getElementById('fionaAiModelHelp');
   const modelRetry = document.getElementById('fionaAiModelRetry');
+  const mentionPopup = document.getElementById('fionaAiMentionPopup');
+  const mentionList = document.getElementById('fionaAiMentionList');
+  const mentionTags = document.getElementById('fionaAiMentionTags');
+  const contextAddBtn = document.getElementById('fionaAiContextAdd');
+  const contextModal = document.getElementById('fionaAiContextModal');
+  const contextModalClose = document.getElementById('fionaAiContextModalClose');
+  const contextCancel = document.getElementById('fionaAiContextCancel');
+  const tabPosition = document.getElementById('fionaAiTabPosition');
+  const tabProcess = document.getElementById('fionaAiTabProcess');
+  const contextSearch = document.getElementById('fionaAiContextSearch');
+  const contextLoading = document.getElementById('fionaAiContextLoading');
+  const contextList = document.getElementById('fionaAiContextList');
+  const contextEmpty = document.getElementById('fionaAiContextEmpty');
   const api = (panel.dataset.apiUrl || '').replace(/\/$/, '');
   const rasci = /\/rasci(\/|$)/i.test(location.pathname);
   const queryConversationId = new URLSearchParams(location.search).get('conversationId');
@@ -62,6 +75,12 @@
   let lastRequest = null;
   let currentView = 'chat';
   let conversationItems = [];
+  let attachedContextEntities = [];
+  let mentionSearchTimer = 0;
+  let mentionSelectedIndex = -1;
+  let mentionCurrentItems = [];
+  let contextModalActiveTab = 'position';
+  let contextModalSearchTimer = 0;
   let historyLoadingState = false;
   let historyLoadVersion = 0;
   let conversationLoadVersion = 0;
@@ -786,7 +805,10 @@
 
   function markdown(text) {
     if (window.marked && window.DOMPurify) {
-      return DOMPurify.sanitize(marked.parse(text || ''));
+      return DOMPurify.sanitize(marked.parse(text || ''), {
+        ADD_TAGS: ['rasci-table-viewer', 'fiona-rasci-matrix', 'ui-comparison-toolbar', 'ui-action-chips', 'ui-single-select', 'ui-multi-select', 'button'],
+        ADD_ATTR: ['data-prompt', 'data-action-chip', 'data', 'mode', 'title', 'data-index', 'data-key', 'data-type', 'target', 'disabled']
+      });
     }
     return '<p>' + esc(text || '').replace(/\n/g, '<br>') + '</p>';
   }
@@ -1724,30 +1746,303 @@
     return result;
   }
 
+  function renderMentionTags() {
+    if (!mentionTags) return;
+    mentionTags.replaceChildren();
+    if (!attachedContextEntities.length) {
+      mentionTags.hidden = true;
+      return;
+    }
+    mentionTags.hidden = false;
+    attachedContextEntities.forEach((entity, index) => {
+      const tag = document.createElement('span');
+      tag.className = `fiona-ai-mention-tag is-${entity.type}`;
+      tag.textContent = `@${entity.type === 'position' ? 'Posisi' : 'Prosbis'}: ${entity.label} `;
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'remove-tag';
+      removeBtn.textContent = '×';
+      removeBtn.title = 'Hapus konteks';
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeContextEntity(index);
+      });
+      tag.appendChild(removeBtn);
+      mentionTags.appendChild(tag);
+    });
+  }
+
+  function addContextEntity(entity) {
+    if (!entity || !entity.label) return;
+    const exists = attachedContextEntities.some(e => e.type === entity.type && ((entity.key && e.key === entity.key) || (entity.id && e.id === entity.id) || e.label === entity.label));
+    if (!exists) {
+      attachedContextEntities.push(entity);
+      renderMentionTags();
+    }
+  }
+
+  function removeContextEntity(index) {
+    if (index >= 0 && index < attachedContextEntities.length) {
+      attachedContextEntities.splice(index, 1);
+      renderMentionTags();
+    }
+  }
+
+  async function searchEntities(query, type) {
+    query = String(query || '').trim();
+    const sourceContext = context();
+    const source = rasciCacheSource(sourceContext);
+    const sourceId = source.id || 'master';
+    const results = [];
+    try {
+      const promises = [];
+      if (type === 'position' || type === 'all') {
+        promises.push(
+          requestJson(`/api/agent/rasci-tables/${encodeURIComponent(sourceId)}?jobSearch=${encodeURIComponent(query)}&limit=25`, { method: 'GET' })
+            .then(({ data }) => {
+              if (Array.isArray(data?.columns)) {
+                for (const col of data.columns) {
+                  results.push({
+                    type: 'position',
+                    id: col.key,
+                    key: col.key,
+                    label: col.label || col.name,
+                    positionCode: col.positionCode,
+                    unitCodeOrg: col.unitCodeOrg,
+                    level: col.level
+                  });
+                }
+              }
+            })
+            .catch(() => {})
+        );
+      }
+      if (type === 'process' || type === 'all') {
+        promises.push(
+          requestJson(`/api/agent/rasci-tables/${encodeURIComponent(sourceId)}?processSearch=${encodeURIComponent(query)}&limit=25`, { method: 'GET' })
+            .then(({ data }) => {
+              if (Array.isArray(data?.rows)) {
+                for (const row of data.rows) {
+                  results.push({
+                    type: 'process',
+                    id: row.businessProcessId || row.id,
+                    key: String(row.businessProcessId || row.id),
+                    label: row.businessProcess || row.process,
+                    index: row.index,
+                    level: row.level
+                  });
+                }
+              }
+            })
+            .catch(() => {})
+        );
+      }
+      await Promise.all(promises);
+    } catch (_) { }
+    return results;
+  }
+
+  function renderMentionPopup(items) {
+    if (!mentionList || !mentionPopup) return;
+    mentionCurrentItems = items;
+    mentionSelectedIndex = items.length ? 0 : -1;
+    mentionList.replaceChildren();
+    if (!items.length) {
+      mentionPopup.hidden = true;
+      return;
+    }
+    items.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = `fiona-ai-mention-item${index === 0 ? ' is-selected' : ''}`;
+      div.setAttribute('role', 'option');
+      div.setAttribute('tabindex', '-1');
+      const label = document.createElement('span');
+      label.className = 'fiona-ai-mention-item-label';
+      label.textContent = item.type === 'position' ? item.label : `${item.index ? item.index + ' ' : ''}${item.label}`;
+      const badge = document.createElement('span');
+      badge.className = `fiona-ai-mention-item-badge ${item.type === 'position' ? 'pos' : 'proc'}`;
+      badge.textContent = item.type === 'position' ? 'Jabatan' : 'Prosbis';
+      div.append(label, badge);
+      div.addEventListener('click', () => {
+        selectMentionItem(item);
+      });
+      mentionList.appendChild(div);
+    });
+    mentionPopup.hidden = false;
+  }
+
+  function selectMentionItem(item) {
+    if (!item) return;
+    addContextEntity(item);
+    const val = input.value;
+    const cursorPos = input.selectionStart || val.length;
+    const textBefore = val.slice(0, cursorPos);
+    const atIndex = textBefore.lastIndexOf('@');
+    if (atIndex !== -1) {
+      input.value = (val.slice(0, atIndex) + val.slice(cursorPos)).trimStart();
+      input.setSelectionRange(atIndex, atIndex);
+    }
+    mentionPopup.hidden = true;
+    input.focus();
+  }
+
+  function openContextModal(tab = 'position') {
+    if (!contextModal) return;
+    contextModalActiveTab = tab;
+    if (tabPosition && tabProcess) {
+      tabPosition.classList.toggle('is-active', tab === 'position');
+      tabPosition.setAttribute('aria-selected', tab === 'position' ? 'true' : 'false');
+      tabProcess.classList.toggle('is-active', tab === 'process');
+      tabProcess.setAttribute('aria-selected', tab === 'process' ? 'true' : 'false');
+    }
+    if (contextSearch) contextSearch.value = '';
+    if (contextModal.showModal) contextModal.showModal();
+    else contextModal.hidden = false;
+    loadContextModalResults('');
+    if (contextSearch) contextSearch.focus();
+  }
+
+  function closeContextModal() {
+    if (!contextModal) return;
+    if (contextModal.close) contextModal.close();
+    else contextModal.hidden = true;
+    input?.focus();
+  }
+
+  async function loadContextModalResults(query) {
+    if (!contextList) return;
+    if (contextLoading) contextLoading.hidden = false;
+    if (contextEmpty) contextEmpty.hidden = true;
+    contextList.replaceChildren();
+    const items = await searchEntities(query, contextModalActiveTab);
+    if (contextLoading) contextLoading.hidden = true;
+    if (!items.length) {
+      if (contextEmpty) contextEmpty.hidden = false;
+      return;
+    }
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'fiona-ai-context-card';
+      const info = document.createElement('div');
+      info.className = 'fiona-ai-context-card-info';
+      const title = document.createElement('div');
+      title.className = 'fiona-ai-context-card-title';
+      title.textContent = item.label;
+      const meta = document.createElement('div');
+      meta.className = 'fiona-ai-context-card-meta';
+      if (item.type === 'position') {
+        meta.textContent = [item.positionCode ? `Kode: ${item.positionCode}` : null, item.unitCodeOrg ? `Unit: ${item.unitCodeOrg}` : null, item.level != null ? `Layer: ${item.level}` : null].filter(Boolean).join(' · ');
+      } else {
+        meta.textContent = [item.index ? `Index: ${item.index}` : null, item.level ? `Level: ${item.level}` : null].filter(Boolean).join(' · ');
+      }
+      info.append(title, meta);
+      const selectBtn = document.createElement('button');
+      selectBtn.type = 'button';
+      selectBtn.className = 'fiona-ai-context-card-btn';
+      selectBtn.textContent = '＋ Pilih';
+      selectBtn.addEventListener('click', () => {
+        addContextEntity(item);
+        closeContextModal();
+      });
+      card.append(info, selectBtn);
+      contextList.appendChild(card);
+    });
+  }
+
+  // Bind Context Modal Events
+  contextAddBtn?.addEventListener('click', () => openContextModal('position'));
+  contextModalClose?.addEventListener('click', closeContextModal);
+  contextCancel?.addEventListener('click', closeContextModal);
+  tabPosition?.addEventListener('click', () => {
+    if (contextModalActiveTab === 'position') return;
+    contextModalActiveTab = 'position';
+    tabPosition.classList.add('is-active');
+    tabPosition.setAttribute('aria-selected', 'true');
+    tabProcess?.classList.remove('is-active');
+    tabProcess?.setAttribute('aria-selected', 'false');
+    loadContextModalResults(contextSearch?.value || '');
+  });
+  tabProcess?.addEventListener('click', () => {
+    if (contextModalActiveTab === 'process') return;
+    contextModalActiveTab = 'process';
+    tabProcess.classList.add('is-active');
+    tabProcess.setAttribute('aria-selected', 'true');
+    tabPosition?.classList.remove('is-active');
+    tabPosition?.setAttribute('aria-selected', 'false');
+    loadContextModalResults(contextSearch?.value || '');
+  });
+  contextSearch?.addEventListener('input', () => {
+    clearTimeout(contextModalSearchTimer);
+    contextModalSearchTimer = setTimeout(() => {
+      loadContextModalResults(contextSearch.value);
+    }, 200);
+  });
+
+  // Bind Generative UI and Comparison Events
+  document.addEventListener('fiona-action-click', (e) => {
+    const prompt = e.detail?.prompt;
+    if (prompt && !busy) sendMessage(prompt);
+  });
+  document.addEventListener('fiona-comparison-remove', (e) => {
+    const detail = e.detail || {};
+    const label = detail.label || detail.item?.label || 'item';
+    const prompt = detail.type === 'position' || detail.mode === 'by_position'
+      ? `Hapus jabatan "${label}" dari perbandingan tabel RASCI`
+      : `Hapus proses bisnis "${label}" dari perbandingan tabel RASCI`;
+    if (!busy) sendMessage(prompt);
+  });
+  document.addEventListener('fiona-comparison-add', (e) => {
+    const tab = e.detail?.type === 'process' || e.detail?.mode === 'by_business_process' ? 'process' : 'position';
+    openContextModal(tab);
+  });
+  messages?.addEventListener('click', (e) => {
+    const chip = e.target.closest('.action-chip, [data-action-chip], [data-prompt]');
+    if (chip && !busy) {
+      const prompt = chip.getAttribute('data-prompt') || chip.textContent.trim();
+      if (prompt) sendMessage(prompt);
+    }
+  });
+
   async function sendMessage(text, continuePrevious = false, requestSnapshot = null) {
     if (busy) {
       if (activeController) activeController.abort();
       return;
     }
     text = String(text || '').trim();
-    if (!text) return;
-    const requestContext = context();
+    if (!text && !attachedContextEntities.length) return;
+
+    let messageToSend = text;
+    if (attachedContextEntities.length > 0) {
+      const canonicalTags = attachedContextEntities.map(e => (e.type === 'position' ? `@Jabatan:"${e.label}"` : `@Prosbis:"${e.label}"`)).join(' ');
+      if (!messageToSend.includes(canonicalTags)) {
+        messageToSend = `${canonicalTags} ${messageToSend}`.trim();
+      }
+    }
+
+    const requestContext = {
+      ...context(),
+      mentionedEntities: attachedContextEntities.length ? [...attachedContextEntities] : undefined
+    };
     const requestModelKey = requestSnapshot?.modelKey || conversationModelKey || selectedModelKey;
     if (!requestModelKey || !enabledModel(requestModelKey)) {
       status.hidden = false;
       status.textContent = modelsLoadState === 'failed' ? 'Models could not be loaded. Retry.' : 'Choose an available model before sending.';
       return;
     }
-    const body = requestSnapshot ? { ...requestSnapshot } : { message: text, conversationId, context: requestContext, modelKey: requestModelKey };
-    body.message = text;
+    const body = requestSnapshot ? { ...requestSnapshot } : { message: messageToSend, conversationId, context: requestContext, modelKey: requestModelKey };
+    body.message = messageToSend;
     body.modelKey = requestModelKey;
     body.conversationId = requestSnapshot ? requestSnapshot.conversationId : conversationId;
     if (!requestSnapshot) body.context = requestContext;
     if (continuePrevious) body.continue = true;
     lastRequest = body;
     setDataSource(requestContext.dataSourceName);
-    add('user', text);
+    add('user', messageToSend);
     input.value = '';
+    attachedContextEntities = [];
+    renderMentionTags();
+    if (mentionPopup) mentionPopup.hidden = true;
+
     const card = createActivityCard();
     activeController = new AbortController();
     setChatBusy(true, true);
@@ -1789,6 +2084,7 @@
       setChatBusy(false, false);
     }
   }
+
   form.addEventListener('submit', async event => {
     event.preventDefault();
     if (busy) {
@@ -1797,7 +2093,72 @@
     }
     await sendMessage(input.value, false);
   });
+
   input.addEventListener('keydown', event => {
-    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); }
+    if (mentionPopup && !mentionPopup.hidden && mentionCurrentItems.length > 0) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        mentionSelectedIndex = (mentionSelectedIndex + 1) % mentionCurrentItems.length;
+        Array.from(mentionList.children).forEach((child, i) => {
+          child.classList.toggle('is-selected', i === mentionSelectedIndex);
+        });
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        mentionSelectedIndex = (mentionSelectedIndex - 1 + mentionCurrentItems.length) % mentionCurrentItems.length;
+        Array.from(mentionList.children).forEach((child, i) => {
+          child.classList.toggle('is-selected', i === mentionSelectedIndex);
+        });
+        return;
+      }
+      if ((event.key === 'Enter' || event.key === 'Tab') && mentionSelectedIndex >= 0) {
+        event.preventDefault();
+        selectMentionItem(mentionCurrentItems[mentionSelectedIndex]);
+        return;
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        mentionPopup.hidden = true;
+        return;
+      }
+    }
+
+    if (event.key === 'Backspace' && !input.value && attachedContextEntities.length > 0) {
+      event.preventDefault();
+      removeContextEntity(attachedContextEntities.length - 1);
+      return;
+    }
+
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  input.addEventListener('input', () => {
+    const val = input.value;
+    const cursorPos = input.selectionStart || val.length;
+    const textBefore = val.slice(0, cursorPos);
+    const atMatch = textBefore.match(/@([a-zA-Z0-9_\s-]{0,30})$/);
+    if (atMatch) {
+      const query = atMatch[1].trim();
+      clearTimeout(mentionSearchTimer);
+      mentionSearchTimer = setTimeout(async () => {
+        const items = await searchEntities(query, 'all');
+        renderMentionPopup(items);
+      }, 150);
+    } else if (mentionPopup && !mentionPopup.hidden) {
+      mentionPopup.hidden = true;
+    }
+  });
+
+  document.addEventListener('pointerdown', (event) => {
+    if (mentionPopup && !mentionPopup.hidden) {
+      const composerArea = document.getElementById('fionaAiComposerArea');
+      if (composerArea && !composerArea.contains(event.target) && !mentionPopup.contains(event.target)) {
+        mentionPopup.hidden = true;
+      }
+    }
   });
 })();

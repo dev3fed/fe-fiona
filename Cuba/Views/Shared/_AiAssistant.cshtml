@@ -108,15 +108,55 @@
         </section>
         <div id="fionaAiStatus" class="fiona-ai-status" hidden></div>
         <div id="fionaAiCacheStatus" class="fiona-ai-cache-status" role="status" aria-live="polite" aria-busy="false" hidden></div>
+        <div id="fionaAiMentionPopup" class="fiona-ai-mention-popup" hidden role="listbox" aria-label="Mention entities">
+            <div class="fiona-ai-mention-header">
+                <span>Pilih Jabatan atau Proses Bisnis (@@)</span>
+            </div>
+            <div id="fionaAiMentionList" class="fiona-ai-mention-list"></div>
+        </div>
         <div id="fionaAiComposerArea" class="fiona-ai-composer-area">
-            <span id="fionaAiDataSource" class="fiona-ai-data-source" hidden></span>
+            <div class="fiona-ai-composer-meta">
+                <span id="fionaAiDataSource" class="fiona-ai-data-source" hidden></span>
+                <button type="button" id="fionaAiContextAdd" class="fiona-ai-context-add-btn" title="Tambah konteks jabatan/prosbis" aria-label="Tambah konteks">＋ Konteks</button>
+            </div>
+            <div id="fionaAiMentionTags" class="fiona-ai-mention-tags" aria-label="Tag Konteks Terpilih" hidden></div>
             <form id="fionaAiForm" class="fiona-ai-composer">
-                <textarea id="fionaAiInput" rows="2" maxlength="4000" placeholder="Tanyakan seputar matriks RASCI ini…" aria-label="Kirim pesan ke Fiona"></textarea>
+                <textarea id="fionaAiInput" rows="2" maxlength="4000" placeholder="Tanyakan seputar matriks RASCI ini… (ketik @@ untuk mention)" aria-label="Kirim pesan ke Fiona"></textarea>
                 <button type="submit" id="fionaAiSend" aria-label="Kirim pesan">➤</button>
             </form>
         </div>
         <div class="fiona-ai-disclaimer">Fiona dapat membuat kekeliruan. Harap periksa kembali tindakan yang mengubah data.</div>
     </div>
+    <dialog id="fionaAiContextModal" class="fiona-ai-context-modal" aria-labelledby="fionaAiContextModalTitle">
+        <div class="fiona-ai-context-modal-content">
+            <div class="fiona-ai-context-modal-header">
+                <div>
+                    <span class="fiona-ai-empty-eyebrow">FIONA AI · KONTEKS RASCI</span>
+                    <h2 id="fionaAiContextModalTitle">Pilih Entitas Konteks</h2>
+                </div>
+                <button type="button" id="fionaAiContextModalClose" class="fiona-ai-memory-close" aria-label="Tutup pencarian konteks">×</button>
+            </div>
+            <div class="fiona-ai-context-tabs" role="tablist">
+                <button type="button" id="fionaAiTabPosition" class="fiona-ai-context-tab is-active" role="tab" aria-selected="true">Jabatan / Posisi</button>
+                <button type="button" id="fionaAiTabProcess" class="fiona-ai-context-tab" role="tab" aria-selected="false">Proses Bisnis</button>
+            </div>
+            <div class="fiona-ai-context-search-wrap">
+                <input type="search" id="fionaAiContextSearch" placeholder="Ketik kata kunci pencarian..." autocomplete="off" />
+            </div>
+            <div id="fionaAiContextLoading" class="fiona-ai-context-loading" hidden>
+                <span class="fiona-ai-activity-spinner" aria-hidden="true"></span>
+                <span>Mencari entitas...</span>
+            </div>
+            <div id="fionaAiContextList" class="fiona-ai-context-list" role="listbox"></div>
+            <div id="fionaAiContextEmpty" class="fiona-ai-context-empty" hidden>
+                <strong>Tidak ada hasil ditemukan</strong>
+                <p>Coba kata kunci pencarian lain.</p>
+            </div>
+            <div class="fiona-ai-context-modal-footer">
+                <button type="button" id="fionaAiContextCancel" class="fiona-ai-memory-button secondary">Batal</button>
+            </div>
+        </div>
+    </dialog>
     <dialog id="fionaAiMemoryEditor" class="fiona-ai-memory-editor" aria-labelledby="fionaAiMemoryEditorTitle">
         <form id="fionaAiMemoryForm" method="dialog" novalidate>
             <div class="fiona-ai-memory-editor-header">

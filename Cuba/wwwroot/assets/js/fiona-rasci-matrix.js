@@ -1,26 +1,22 @@
 /*
- * Fiona RASCI matrix web component.
+ * Fiona RASCI matrix web component & Generative UI components.
  *
- * The element consumes the AgentRasciTableDto shape directly:
+ * Supports 3 operational modes:
+ * - full_matrix: complete matrix with 200-row threshold rule
+ * - by_position: filtered by positions, ancestor context L1 styling, auto-expanded
+ * - by_business_process: filtered by business processes, ancestor context L1, auto-expanded
  *
- * <fiona-rasci-matrix data='{"columns":[],"rows":[]}'></fiona-rasci-matrix>
- *
- * Prefer assigning a JavaScript object for large payloads:
- *   element.data = response.rasciTables[0];
- *
- * For a remote/virtual view, pass:
- * {
- *   mode: "remote",
- *   columns: [...], rows: [...],
- *   remote: { endpoint: "/api/agent/rasci-tables/view", viewId: "...", pageSize: 100 }
- * }
- * The endpoint is same-origin and receives `viewId`, bounded `limit`, and
- * either `rootOnly=true` or `parentId` for lazy child loading.
+ * Web Components registered:
+ * - <fiona-rasci-matrix data='{"columns":[],"rows":[]}'></fiona-rasci-matrix>
+ * - <rasci-table-viewer data='{"columns":[],"rows":[]}'></rasci-table-viewer>
+ * - <ui-comparison-toolbar></ui-comparison-toolbar>
+ * - <ui-action-chips></ui-action-chips>
  */
-(function () {
+(function (global) {
   "use strict";
 
   const TAG_NAME = "fiona-rasci-matrix";
+  const ALIAS_TAG_NAME = "rasci-table-viewer";
   const NOTATION_ORDER = ["R", "A", "S", "C", "I"];
   const IDENTITY_WIDTH = [44, 72, 300];
   const DEFAULT_JOB_WIDTH = 140;
@@ -60,9 +56,20 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     .frame { min-width: 0; border: 1px solid var(--rasci-border); border-radius: 4px; background: var(--rasci-surface); overflow: hidden; }
-    .toolbar { display:flex; align-items:center; gap:10px; min-height:34px; padding:4px 8px; border-bottom:1px solid var(--rasci-border); background: #fbfdff; }
+    .toolbar { display:flex; align-items:center; gap:10px; min-height:34px; padding:4px 8px; border-bottom:1px solid var(--rasci-border); background: #fbfdff; flex-wrap:wrap; }
     .toolbar-title { margin-right:auto; font-weight:700; font-size:11.5px; color:#0f3866; white-space:nowrap; }
     .toolbar-status { color:var(--rasci-muted); font-size:10.5px; white-space:nowrap; }
+    
+    /* Comparison Bar */
+    .comparison-bar { display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:4px 8px; border-bottom:1px solid var(--rasci-border); background:#f8fafc; font-size:11px; }
+    .comparison-mode-tag { font-weight:700; color:var(--rasci-accent); padding:2px 6px; border-radius:4px; background:#e0f2fe; font-size:10px; text-transform:uppercase; letter-spacing:0.03em; }
+    .comparison-chips { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+    .comparison-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:#eef4fb; border:1px solid #bfdbfe; border-radius:999px; color:#1e40af; font-size:11px; font-weight:500; }
+    .comparison-chip-remove { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; padding:0; border:0; border-radius:50%; background:#dbeafe; color:#1e3a8a; cursor:pointer; font-size:10px; line-height:1; }
+    .comparison-chip-remove:hover { background:#fee2e2; color:#991b1b; }
+    .comparison-btn-add { display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border:1px dashed var(--rasci-accent); border-radius:999px; background:#fff; color:var(--rasci-accent); cursor:pointer; font-size:10.5px; font-weight:600; }
+    .comparison-btn-add:hover { background:#f0f9ff; border-style:solid; }
+
     [tabindex]:focus-visible, button:focus-visible { outline:2px solid var(--rasci-focus); outline-offset:-1px; }
     .viewport { position:relative; max-height: min(60vh, 520px); min-height:0; overflow:auto; overscroll-behavior-x:contain; overscroll-behavior-y:auto; isolation:isolate; font-size:11.5px; }
     .header { position:sticky; top:0; z-index:20; min-width:100%; height:var(--rasci-header-height); background:var(--rasci-header-surface); }
@@ -71,6 +78,36 @@
     .header .grid-row { height:var(--rasci-header-height); border-bottom:2px solid var(--rasci-border); background:var(--rasci-header-surface); }
     .body-row { position:absolute; left:0; height:var(--rasci-row-height); min-height:var(--rasci-row-height); border-bottom:1px solid var(--rasci-border); background:var(--rasci-surface); }
     .body-row:hover { background:var(--rasci-hover); }
+
+    /* Ancestor Context L1 Styling (Gray / Dimmed Header Container) */
+    .body-row.is-ancestor-context {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .body-row.is-ancestor-context:hover {
+      background: #e2e8f0;
+    }
+    .body-row.is-ancestor-context .cell {
+      color: #475569;
+    }
+    .body-row.is-ancestor-context .notation {
+      opacity: 0.55;
+    }
+    .ancestor-context-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 6px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
     .cell { min-width:0; min-height:0; padding:3px 6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-right:1px solid var(--rasci-border); display:flex; align-items:center; }
     .header-cell { font-weight:600; font-size:11px; color:#103866; white-space:normal; line-height:1.2; border-right:1px solid var(--rasci-border); border-top:4px solid transparent; }
     .sticky { position:sticky; z-index:5; background:inherit; border-right:1px solid var(--rasci-border); }
@@ -183,18 +220,30 @@
       this._rowById.clear();
       this._children.clear();
       this._roots = [];
+
+      const mode = String(this._data.mode || this._data.renderMode || '').toLowerCase();
+      const isFilteredMode = mode === 'by_position' || mode === 'by_business_process';
       const hasExplicitExpanded = Array.isArray(this._data.expandedRowIds);
       this._expanded = new Set(hasExplicitExpanded ? this._data.expandedRowIds.map(String) : []);
+
       this._mergeRows(Array.isArray(this._data.rows) ? this._data.rows : [], null);
-      if (!hasExplicitExpanded && !this._isRemote() && this._rows.length <= 200) {
+
+      // Auto-expand rule:
+      // Modes by_position & by_business_process: default autoExpandAll = true
+      // Full matrix: if rows <= 200, expand all; if > 200, L1 only (not expanded)
+      const shouldAutoExpand = isFilteredMode || this._data.autoExpandAll === true || (!hasExplicitExpanded && !this._isRemote() && this._rows.length <= 200);
+
+      if (!hasExplicitExpanded && shouldAutoExpand && !this._isRemote()) {
         this._rowById.forEach((row) => {
           if (this._children.get(row.id)?.length) this._expanded.add(row.id);
         });
       }
+
       this._ensureFrame();
+      this._renderComparisonToolbar();
       this._scheduleRender();
       if (this.isConnected && this._isRemote() && this._rows.length === 0) this._loadRemoteChildren(null);
-      this.dispatchEvent(new CustomEvent("fiona-rasci-ready", { bubbles: true, detail: { rows: this._rows.length, columns: this._columns.length } }));
+      this.dispatchEvent(new CustomEvent("fiona-rasci-ready", { bubbles: true, composed: true, detail: { rows: this._rows.length, columns: this._columns.length, mode } }));
     }
 
     _normalizeColumn(column, index) {
@@ -213,18 +262,22 @@
 
     _normalizeRow(row, index, parentHint) {
       const item = row && typeof row === "object" ? row : {};
-      const id = String(item.id ?? item.businessProcessId ?? `${item.index ?? "row"}-${index}`);
+      const id = String(item.id ?? item.businessProcessId ?? item.BusinessProcessId ?? `${item.index ?? item.Index ?? "row"}-${index}`);
+      const rawDepth = item.depth ?? item.Depth;
       return {
         ...item,
         id,
-        businessProcessId: item.businessProcessId ?? item.id ?? null,
-        level: item.level == null ? "" : String(item.level),
-        index: item.index == null ? "" : String(item.index),
-        businessProcess: String(item.businessProcess ?? item.process ?? "Proses bisnis"),
-        parentId: item.parentId ?? item.parentBusinessProcessId ?? parentHint ?? null,
-        depth: Number.isFinite(Number(item.depth)) ? Number(item.depth) : null,
-        hasChildren: Boolean(item.hasChildren),
-        assignments: item.assignments && typeof item.assignments === "object" ? item.assignments : {},
+        businessProcessId: item.businessProcessId ?? item.BusinessProcessId ?? item.id ?? null,
+        level: item.level == null ? (item.Level == null ? "" : String(item.Level)) : String(item.level),
+        index: item.index == null ? (item.Index == null ? "" : String(item.Index)) : String(item.index),
+        businessProcess: String(item.businessProcess ?? item.BusinessProcess ?? item.process ?? "Proses bisnis"),
+        parentId: item.parentId ?? item.parentBusinessProcessId ?? item.ParentBusinessProcessId ?? parentHint ?? null,
+        depth: Number.isFinite(Number(rawDepth)) ? Number(rawDepth) : null,
+        hasChildren: Boolean(item.hasChildren ?? item.HasChildren),
+        assignments: item.assignments && typeof item.assignments === "object" ? item.assignments : (item.Assignments && typeof item.Assignments === "object" ? item.Assignments : {}),
+        isAncestor: Boolean(item.isAncestor ?? item.IsAncestor),
+        isAncestorContext: Boolean(item.isAncestorContext ?? item.IsAncestorContext),
+        originalLevel: item.originalLevel ?? item.OriginalLevel ?? null,
         childrenLoaded: Boolean(item.childrenLoaded || Array.isArray(item.children)),
         loading: false
       };
@@ -265,8 +318,6 @@
         }
         parentById.set(row.id, parentId && this._rowById.has(parentId) && parentId !== row.id ? parentId : null);
       }
-      // Never let malformed data create a hierarchy with no root. Break a
-      // cycle at the row where traversal first repeats, promoting that row.
       for (const row of this._rows) {
         let current = row.id;
         const seen = new Set();
@@ -299,7 +350,7 @@
     _flattenRows() {
       const visible = [];
       const visit = (row, depth, ancestors) => {
-        row._renderDepth = row.depth == null ? depth : row.depth;
+        row._renderDepth = row.depth != null ? row.depth : depth;
         row._ancestors = ancestors;
         visible.push(row);
         const children = this._children.get(row.id) || [];
@@ -314,9 +365,10 @@
       this.shadowRoot.innerHTML = `<style>${CSS}</style>
         <div class="frame">
           <div class="toolbar" role="toolbar">
-            <span class="toolbar-title">RASCI matrix</span>
+            <span class="toolbar-title">RASCI Matrix</span>
             <span class="toolbar-status" aria-live="polite"></span>
           </div>
+          <div class="comparison-bar" hidden></div>
           <div class="viewport" role="grid" aria-label="RASCI matrix">
             <div class="header"></div><div class="body"></div>
           </div>
@@ -325,9 +377,92 @@
       this._header = this.shadowRoot.querySelector(".header");
       this._body = this.shadowRoot.querySelector(".body");
       this._status = this.shadowRoot.querySelector(".toolbar-status");
+      this._title = this.shadowRoot.querySelector(".toolbar-title");
+      this._comparisonBar = this.shadowRoot.querySelector(".comparison-bar");
       this._viewport.addEventListener("scroll", this._onScroll, { passive: true });
       this._viewport.addEventListener("keydown", this._onKeyDown);
       this._frameReady = true;
+    }
+
+    _renderComparisonToolbar() {
+      if (!this._comparisonBar) return;
+      const mode = String(this._data?.mode || '').toLowerCase();
+      const isPositionMode = mode === 'by_position';
+      const isProcessMode = mode === 'by_business_process';
+
+      if (!isPositionMode && !isProcessMode) {
+        this._comparisonBar.hidden = true;
+        this._comparisonBar.replaceChildren();
+        return;
+      }
+
+      this._comparisonBar.hidden = false;
+      this._comparisonBar.replaceChildren();
+
+      const tag = document.createElement("span");
+      tag.className = "comparison-mode-tag";
+      tag.textContent = isPositionMode ? "Perbandingan Jabatan" : "Perbandingan Proses";
+      this._comparisonBar.appendChild(tag);
+
+      const chipsWrap = document.createElement("div");
+      chipsWrap.className = "comparison-chips";
+
+      if (isPositionMode) {
+        for (const col of this._columns) {
+          const chip = document.createElement("span");
+          chip.className = "comparison-chip";
+          chip.textContent = col.label;
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "comparison-chip-remove";
+          removeBtn.textContent = "×";
+          removeBtn.title = `Hapus ${col.label} dari perbandingan`;
+          removeBtn.addEventListener("click", () => {
+            this.dispatchEvent(new CustomEvent("fiona-comparison-remove", {
+              bubbles: true,
+              composed: true,
+              detail: { mode: "by_position", type: "position", key: col.key, label: col.label, column: col }
+            }));
+          });
+          chip.appendChild(removeBtn);
+          chipsWrap.appendChild(chip);
+        }
+      } else if (isProcessMode) {
+        const nonAncestorRows = this._rows.filter(r => !r.isAncestorContext);
+        for (const row of nonAncestorRows) {
+          const chip = document.createElement("span");
+          chip.className = "comparison-chip";
+          chip.textContent = `${row.index ? row.index + ' ' : ''}${row.businessProcess}`;
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "comparison-chip-remove";
+          removeBtn.textContent = "×";
+          removeBtn.title = `Hapus ${row.businessProcess} dari perbandingan`;
+          removeBtn.addEventListener("click", () => {
+            this.dispatchEvent(new CustomEvent("fiona-comparison-remove", {
+              bubbles: true,
+              composed: true,
+              detail: { mode: "by_business_process", type: "process", id: row.businessProcessId || row.id, label: row.businessProcess, row }
+            }));
+          });
+          chip.appendChild(removeBtn);
+          chipsWrap.appendChild(chip);
+        }
+      }
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "comparison-btn-add";
+      addBtn.textContent = isPositionMode ? "＋ Tambah Jabatan" : "＋ Tambah Prosbis";
+      addBtn.addEventListener("click", () => {
+        this.dispatchEvent(new CustomEvent("fiona-comparison-add", {
+          bubbles: true,
+          composed: true,
+          detail: { mode, type: isPositionMode ? "position" : "process" }
+        }));
+      });
+
+      this._comparisonBar.append(chipsWrap, addBtn);
     }
 
     _scheduleRender() {
@@ -405,17 +540,21 @@
 
     _renderRow(rowData, rowIndex, contentWidth, identityWidth, jobWidth, columnStart, columnEnd) {
       const row = document.createElement("div");
-      row.className = "grid-row body-row";
+      const isAncestor = rowData.isAncestorContext === true;
+      row.className = `grid-row body-row${isAncestor ? " is-ancestor-context" : ""}`;
       row.setAttribute("role", "row");
       row.setAttribute("aria-rowindex", String(rowIndex + 2));
-      row.setAttribute("aria-level", String((rowData._renderDepth ?? 0) + 1));
+      const visualDepth = rowData.depth != null ? rowData.depth : (rowData._renderDepth ?? 0);
+      row.setAttribute("aria-level", String(visualDepth + 1));
+      if (isAncestor) row.setAttribute("data-ancestor-context", "true");
+
       row.style.top = `${rowIndex * this._rowHeight()}px`;
       row.style.width = `${contentWidth}px`;
       row.style.gridTemplateColumns = this._gridTemplate(identityWidth, jobWidth, columnStart, columnEnd);
       row.append(this._cell(rowData.level, "level-cell", 1), this._cell(rowData.index, "index-cell", 2));
       const process = this._cell("", "process-cell", 3);
       process.title = rowData.businessProcess;
-      process.style.paddingLeft = `${6 + Math.min(12, Number(rowData._renderDepth ?? 0)) * 12}px`;
+      process.style.paddingLeft = `${6 + Math.min(12, Number(visualDepth)) * 14}px`;
       const label = document.createElement("div");
       label.className = "process-label";
       const toggle = document.createElement("button");
@@ -428,7 +567,14 @@
       toggle.addEventListener("click", () => this._toggleRow(rowData));
       const text = document.createElement("span");
       text.textContent = rowData.businessProcess;
-      label.append(toggle, text);
+      if (isAncestor) {
+        const badge = document.createElement("span");
+        badge.className = "ancestor-context-badge";
+        badge.textContent = "Konteks L1";
+        label.append(toggle, text, badge);
+      } else {
+        label.append(toggle, text);
+      }
       process.appendChild(label);
       row.appendChild(process);
       if (columnStart > 0) row.appendChild(this._spacer(columnStart * jobWidth));
@@ -488,7 +634,7 @@
       else this._expanded.add(row.id);
       if (this._isRemote() && !row.childrenLoaded && this._expanded.has(row.id)) this._loadRemoteChildren(row);
       this._scheduleRender();
-      this.dispatchEvent(new CustomEvent("fiona-rasci-toggle", { bubbles: true, detail: { rowId: row.id, expanded: this._expanded.has(row.id) } }));
+      this.dispatchEvent(new CustomEvent("fiona-rasci-toggle", { bubbles: true, composed: true, detail: { rowId: row.id, expanded: this._expanded.has(row.id) } }));
     }
 
     _onGridKeyDown(event) {
@@ -526,7 +672,7 @@
         if (error.name !== "AbortError") {
           if (parent) parent.loading = false;
           this._renderError = error;
-          this.dispatchEvent(new CustomEvent("fiona-rasci-error", { bubbles: true, detail: { error, parentId: parent?.id ?? null } }));
+          this.dispatchEvent(new CustomEvent("fiona-rasci-error", { bubbles: true, composed: true, detail: { error, parentId: parent?.id ?? null } }));
         }
       } finally {
         this._remoteLoading = false;
@@ -548,6 +694,250 @@
     _escape(value) { return String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character])); }
   }
 
-  if (!customElements.get(TAG_NAME)) customElements.define(TAG_NAME, FionaRasciMatrix);
-})();
+  /*
+   * Standalone Comparison Toolbar Web Component: <ui-comparison-toolbar>
+   */
+  class UiComparisonToolbar extends HTMLElement {
+    static get observedAttributes() { return ["mode", "title"]; }
 
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" });
+      this._items = [];
+    }
+
+    connectedCallback() {
+      this._render();
+    }
+
+    get items() { return this._items; }
+    set items(val) { this._items = Array.isArray(val) ? val : []; this._render(); }
+
+    _render() {
+      const mode = this.getAttribute("mode") || "by_position";
+      const title = this.getAttribute("title") || (mode === "by_position" ? "Perbandingan Jabatan" : "Perbandingan Proses Bisnis");
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host { display: block; margin: 4px 0 8px; font-family: system-ui, sans-serif; font-size: 11.5px; }
+          .bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 10px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; }
+          .tag { font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 7px; border-radius: 4px; font-size: 10.5px; }
+          .chips { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+          .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: #eef4fb; border: 1px solid #bfdbfe; border-radius: 999px; color: #1e40af; font-size: 11px; }
+          .remove { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; padding: 0; border: 0; border-radius: 50%; background: #dbeafe; color: #1e3a8a; cursor: pointer; font-size: 10px; }
+          .remove:hover { background: #fee2e2; color: #991b1b; }
+          .add-btn { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border: 1px dashed #0284c7; border-radius: 999px; background: #fff; color: #0284c7; cursor: pointer; font-size: 10.5px; font-weight: 600; }
+          .add-btn:hover { background: #f0f9ff; border-style: solid; }
+        </style>
+        <div class="bar">
+          <span class="tag">${title}</span>
+          <div class="chips">
+            ${this._items.map((item, i) => `
+              <span class="chip">${typeof item === "object" ? (item.label || item.name || item.key) : item}
+                <button type="button" class="remove" data-index="${i}" title="Hapus">×</button>
+              </span>
+            `).join("")}
+          </div>
+          <button type="button" class="add-btn">＋ Tambah</button>
+        </div>
+      `;
+
+      this.shadowRoot.querySelectorAll(".remove").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.index);
+          const item = this._items[idx];
+          this.dispatchEvent(new CustomEvent("fiona-comparison-remove", { bubbles: true, composed: true, detail: { item, index: idx, mode } }));
+        });
+      });
+
+      this.shadowRoot.querySelector(".add-btn")?.addEventListener("click", () => {
+        this.dispatchEvent(new CustomEvent("fiona-comparison-add", { bubbles: true, composed: true, detail: { mode } }));
+      });
+    }
+  }
+
+  /*
+   * Generative UI Action Chips Web Component: <ui-action-chips>
+   */
+  class UiActionChips extends HTMLElement {
+    constructor() {
+      super();
+      this._observer = null;
+    }
+
+    connectedCallback() {
+      this._bindChips();
+      if (typeof MutationObserver !== "undefined") {
+        this._observer = new MutationObserver(() => this._bindChips());
+        this._observer.observe(this, { childList: true, subtree: true });
+      }
+    }
+
+    disconnectedCallback() {
+      if (this._observer) {
+        this._observer.disconnect();
+        this._observer = null;
+      }
+    }
+
+    _bindChips() {
+      this.querySelectorAll("button, .action-chip, [data-prompt]").forEach(btn => {
+        if (btn._bound) return;
+        btn._bound = true;
+        btn.addEventListener("click", (e) => {
+          const prompt = btn.getAttribute("data-prompt") || btn.textContent.trim();
+          this.dispatchEvent(new CustomEvent("fiona-action-click", { bubbles: true, composed: true, detail: { prompt, button: btn } }));
+        });
+      });
+    }
+  }
+
+  /*
+   * Generative UI Single-Select Web Component: <ui-single-select>
+   */
+  class UiSingleSelect extends HTMLElement {
+    static get observedAttributes() { return ["title", "prompt-prefix"]; }
+
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" });
+      this._options = [];
+    }
+
+    connectedCallback() {
+      this._render();
+    }
+
+    get options() { return this._options; }
+    set options(val) { this._options = Array.isArray(val) ? val : []; this._render(); }
+
+    _render() {
+      const title = this.getAttribute("title") || "Pilih satu opsi:";
+      const prefix = this.getAttribute("prompt-prefix") || "";
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host { display: block; margin: 8px 0; font-family: system-ui, sans-serif; font-size: 12px; }
+          .card { border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; padding: 10px 12px; }
+          .title { font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 12px; }
+          .options { display: flex; flex-direction: column; gap: 6px; }
+          .opt-btn { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border: 1px solid #bfdbfe; border-radius: 6px; background: #fff; color: #1e40af; cursor: pointer; text-align: left; font-size: 11.5px; transition: all .15s ease; }
+          .opt-btn:hover { background: #e0f2fe; border-color: #0284c7; }
+        </style>
+        <div class="card">
+          <div class="title">${title}</div>
+          <div class="options">
+            ${this._options.map((opt, i) => {
+              const label = typeof opt === "object" ? (opt.label || opt.name || opt.text) : opt;
+              const prompt = typeof opt === "object" ? (opt.prompt || opt.value || `${prefix} ${label}`.trim()) : `${prefix} ${opt}`.trim();
+              return `<button type="button" class="opt-btn" data-index="${i}" data-prompt="${prompt}">${label} <span>→</span></button>`;
+            }).join("")}
+          </div>
+        </div>
+      `;
+
+      this.shadowRoot.querySelectorAll(".opt-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.index);
+          const opt = this._options[idx];
+          const prompt = btn.getAttribute("data-prompt");
+          this.dispatchEvent(new CustomEvent("fiona-action-click", { bubbles: true, composed: true, detail: { prompt, option: opt, index: idx } }));
+        });
+      });
+    }
+  }
+
+  /*
+   * Generative UI Multi-Select Web Component: <ui-multi-select>
+   */
+  class UiMultiSelect extends HTMLElement {
+    static get observedAttributes() { return ["title", "action-type"]; }
+
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" });
+      this._options = [];
+      this._selected = new Set();
+    }
+
+    connectedCallback() {
+      this._render();
+    }
+
+    get options() { return this._options; }
+    set options(val) { this._options = Array.isArray(val) ? val : []; this._selected.clear(); this._render(); }
+
+    _render() {
+      const title = this.getAttribute("title") || "Pilih beberapa opsi:";
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host { display: block; margin: 8px 0; font-family: system-ui, sans-serif; font-size: 12px; }
+          .card { border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; padding: 10px 12px; }
+          .title { font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 12px; }
+          .options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+          .opt-label { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 11.5px; }
+          .opt-label:hover { background: #e2e8f0; }
+          .actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; pt-2; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+          .apply-btn { padding: 4px 12px; border: 0; border-radius: 6px; background: #0284c7; color: #fff; font-weight: 600; cursor: pointer; font-size: 11.5px; }
+          .apply-btn:hover { background: #0369a1; }
+          .apply-btn:disabled { opacity: .5; cursor: not-allowed; }
+          .mode-select { font-size: 11px; padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; }
+        </style>
+        <div class="card">
+          <div class="title">${title}</div>
+          <div class="options">
+            ${this._options.map((opt, i) => {
+              const label = typeof opt === "object" ? (opt.label || opt.name || opt.text) : opt;
+              const isChecked = this._selected.has(i);
+              return `<label class="opt-label"><input type="checkbox" class="opt-check" data-index="${i}" ${isChecked ? "checked" : ""}> ${label}</label>`;
+            }).join("")}
+          </div>
+          <div class="actions">
+            <select class="mode-select">
+              <option value="append">Tambah ke Tabel</option>
+              <option value="replace">Ganti Pilihan Baru</option>
+            </select>
+            <button type="button" class="apply-btn" ${this._selected.size === 0 ? "disabled" : ""}>Terapkan (${this._selected.size})</button>
+          </div>
+        </div>
+      `;
+
+      const applyBtn = this.shadowRoot.querySelector(".apply-btn");
+      const modeSelect = this.shadowRoot.querySelector(".mode-select");
+
+      this.shadowRoot.querySelectorAll(".opt-check").forEach(chk => {
+        chk.addEventListener("change", () => {
+          const idx = Number(chk.dataset.index);
+          if (chk.checked) this._selected.add(idx);
+          else this._selected.delete(idx);
+          if (applyBtn) {
+            applyBtn.disabled = this._selected.size === 0;
+            applyBtn.textContent = `Terapkan (${this._selected.size})`;
+          }
+        });
+      });
+
+      applyBtn?.addEventListener("click", () => {
+        const selectedItems = Array.from(this._selected).map(i => this._options[i]);
+        const mode = modeSelect?.value || "append";
+        const labels = selectedItems.map(item => (typeof item === "object" ? (item.label || item.name || item.text) : item)).join(", ");
+        const prompt = mode === "append"
+          ? `Tambahkan ke tabel perbandingan: ${labels}`
+          : `Ganti perbandingan tabel dengan: ${labels}`;
+        this.dispatchEvent(new CustomEvent("fiona-action-click", { bubbles: true, composed: true, detail: { prompt, selectedItems, mode } }));
+      });
+    }
+  }
+
+  // Register Custom Elements
+  if (typeof customElements !== "undefined") {
+    if (!customElements.get(TAG_NAME)) customElements.define(TAG_NAME, FionaRasciMatrix);
+    if (!customElements.get(ALIAS_TAG_NAME)) customElements.define(ALIAS_TAG_NAME, FionaRasciMatrix);
+    if (!customElements.get("ui-comparison-toolbar")) customElements.define("ui-comparison-toolbar", UiComparisonToolbar);
+    if (!customElements.get("ui-action-chips")) customElements.define("ui-action-chips", UiActionChips);
+    if (!customElements.get("ui-single-select")) customElements.define("ui-single-select", UiSingleSelect);
+    if (!customElements.get("ui-multi-select")) customElements.define("ui-multi-select", UiMultiSelect);
+  }
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = { FionaRasciMatrix, UiComparisonToolbar, UiActionChips, UiSingleSelect, UiMultiSelect };
+  }
+})(typeof window !== "undefined" ? window : globalThis);
