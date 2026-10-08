@@ -3,10 +3,38 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const rasciScript = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'js', 'fiona-rasci-matrix.js'), 'utf8');
-const assistantScript = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'js', 'fiona-ai-assistant.js'), 'utf8');
+const jsDir = path.join(__dirname, '..', 'wwwroot', 'assets', 'js');
+const rasciScript = fs.readFileSync(path.join(jsDir, 'fiona-rasci-matrix.js'), 'utf8');
+const assistantScript = [
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-models.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-activity.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-history.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-memory.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-context.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'fiona-ai-assistant.js'), 'utf8')
+].join('\n');
 const partial = fs.readFileSync(path.join(__dirname, '..', 'Views', 'Shared', '_AiAssistant.cshtml'), 'utf8');
 const css = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'css', 'fiona-ai-assistant.css'), 'utf8');
+
+function createMatrixForHierarchyTest(rows) {
+  const scriptPath = path.join(jsDir, 'fiona-rasci-matrix.js');
+  const originalHTMLElement = global.HTMLElement;
+  const originalCustomElements = global.customElements;
+
+  global.HTMLElement = class {
+    attachShadow() { return {}; }
+  };
+  global.customElements = { get: () => undefined, define: () => {} };
+  delete require.cache[require.resolve(scriptPath)];
+  const { FionaRasciMatrix } = require(scriptPath);
+  const matrix = new FionaRasciMatrix();
+  matrix._mergeRows(rows, null);
+
+  global.HTMLElement = originalHTMLElement;
+  global.customElements = originalCustomElements;
+  delete require.cache[require.resolve(scriptPath)];
+  return matrix;
+}
 
 test('rasci matrix script registers fiona-rasci-matrix, rasci-table-viewer and all Generative UI web components', () => {
   assert.match(rasciScript, /customElements\.define\(TAG_NAME,\s*FionaRasciMatrix\)/);
@@ -26,10 +54,28 @@ test('rasci matrix script normalizes and handles isAncestorContext flag and dept
   assert.match(rasciScript, /process\.style\.paddingLeft\s*=\s*`\$\{6\s*\+\s*Math\.min\(12,\s*Number\(visualDepth\)\)\s*\*\s*14\}px`/);
 });
 
+test('RASCI tree keeps L1 branches independent and orders hierarchical indices naturally', () => {
+  const matrix = createMatrixForHierarchyTest([
+    { businessProcessId: 10, index: '1.10', businessProcess: 'L1 ten', depth: 0, hasChildren: true },
+    { businessProcessId: 2, index: '1.2', businessProcess: 'L1 two', depth: 0, parentBusinessProcessId: 10, hasChildren: true },
+    { businessProcessId: 21, index: '1.2.1', businessProcess: 'L2 under two', depth: 1, parentBusinessProcessId: 2 }
+  ]);
+
+  assert.deepEqual(matrix._roots.map(row => row.id), ['2', '10']);
+  assert.deepEqual(matrix._children.get('2').map(row => row.id), ['21']);
+  assert.equal(matrix._children.has('10'), false);
+});
+
 test('rasci matrix script supports 3 operational modes with auto-expand rules', () => {
   assert.match(rasciScript, /mode\s*===\s*['"]by_position['"]\s*\|\|\s*mode\s*===\s*['"]by_business_process['"]/);
   assert.match(rasciScript, /const\s+shouldAutoExpand\s*=\s*isFilteredMode\s*\|\|\s*this\._data\.autoExpandAll\s*===\s*true/);
   assert.match(rasciScript, /this\._rows\.length\s*<=\s*200/);
+});
+
+test('remote by_position descriptors use their logical mode and auto-expand loaded processes', () => {
+  assert.match(rasciScript, /const\s+remoteMode\s*=\s*this\._isRemote\(\)\s*\?\s*this\._data\?\.remote\?\.mode\s*:\s*null/);
+  assert.match(rasciScript, /return\s+String\(remoteMode\s*\|\|\s*this\._data\?\.mode/);
+  assert.match(rasciScript, /this\._applyAutomaticExpansion\(hasExplicitExpanded,\s*shouldAutoExpand\);/);
 });
 
 test('rasci matrix comparison toolbar renders chips and dispatches comparison events', () => {
@@ -40,6 +86,17 @@ test('rasci matrix comparison toolbar renders chips and dispatches comparison ev
   assert.match(rasciScript, /Perbandingan Proses/);
   assert.match(rasciScript, /comparison-chip-remove/);
   assert.match(rasciScript, /comparison-btn-add/);
+});
+
+test('remote RASCI rendering forwards compact descriptor selectors to the current-data endpoint', () => {
+  assert.match(rasciScript, /remote\.positionKeys/);
+  assert.match(rasciScript, /url\.searchParams\.append\("positionKey"/);
+  assert.match(rasciScript, /remote\.processIds/);
+  assert.match(rasciScript, /url\.searchParams\.append\("processId"/);
+  assert.match(rasciScript, /remote\.jobIds/);
+  assert.match(rasciScript, /url\.searchParams\.append\("jobId"/);
+  assert.match(assistantScript, /const isDescriptor = Boolean\(table\.renderTarget \|\| table\.sourceId/);
+  assert.match(assistantScript, /artifactData\?\.rasciTables/);
 });
 
 test('assistant markup contains contextual input system, mention popup, tags, and context search modal', () => {
@@ -64,7 +121,7 @@ test('assistant markup contains contextual input system, mention popup, tags, an
   }
 });
 
-test('css contains styling for ancestor context, mention popup, context tags, and Generative UI components', () => {
+test('css contains styling for ancestor context, assignment comments, mention popup, context tags, and Generative UI components', () => {
   assert.match(css, /\.fiona-ai-mention-popup\s*\{/);
   assert.match(css, /\.fiona-ai-mention-tags\s*\{/);
   assert.match(css, /\.fiona-ai-mention-tag\.is-position\s*\{/);
@@ -75,7 +132,10 @@ test('css contains styling for ancestor context, mention popup, context tags, an
   assert.match(css, /\.action-chip/);
   assert.match(css, /ui-single-select,\s*ui-multi-select/);
   assert.match(rasciScript, /\.body-row\.is-ancestor-context\s*\{/);
-  assert.match(rasciScript, /\.ancestor-context-badge\s*\{/);
+  assert.match(rasciScript, /\.assignment-comment\s*\{/);
+  assert.match(rasciScript, /comment\.svg/);
+  assert.doesNotMatch(rasciScript, /Konteks L1/);
+  assert.doesNotMatch(rasciScript, /notation-r\s*\{/);
 });
 
 test('assistant script contains DOMPurify configuration allowing custom Generative UI tags and attributes', () => {

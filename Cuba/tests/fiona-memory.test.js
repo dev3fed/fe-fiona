@@ -3,8 +3,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
+const jsDir = path.join(__dirname, '..', 'wwwroot', 'assets', 'js');
 const contract = require('../wwwroot/assets/js/fiona-memory-contract.js');
-const assistant = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'js', 'fiona-ai-assistant.js'), 'utf8');
+const assistant = [
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-models.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-activity.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-history.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-memory.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-context.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'fiona-ai-assistant.js'), 'utf8')
+].join('\n');
 const partial = fs.readFileSync(path.join(__dirname, '..', 'Views', 'Shared', '_AiAssistant.cshtml'), 'utf8');
 
 test('global memory scope rejects domain and non-global source keys', () => {

@@ -108,20 +108,21 @@
         </section>
         <div id="fionaAiStatus" class="fiona-ai-status" hidden></div>
         <div id="fionaAiCacheStatus" class="fiona-ai-cache-status" role="status" aria-live="polite" aria-busy="false" hidden></div>
-        <div id="fionaAiMentionPopup" class="fiona-ai-mention-popup" hidden role="listbox" aria-label="Mention entities">
-            <div class="fiona-ai-mention-header">
-                <span>Pilih Jabatan atau Proses Bisnis (@@)</span>
-            </div>
-            <div id="fionaAiMentionList" class="fiona-ai-mention-list"></div>
-        </div>
         <div id="fionaAiComposerArea" class="fiona-ai-composer-area">
+            <div id="fionaAiMentionPopup" class="fiona-ai-mention-popup" hidden role="listbox" aria-label="Mention entities">
+                <div class="fiona-ai-mention-header">
+                    <span class="fiona-ai-mention-header-badge is-position">Jabatan (@@)</span>
+                    <span class="fiona-ai-mention-header-title">Pilih Jabatan</span>
+                </div>
+                <div id="fionaAiMentionList" class="fiona-ai-mention-list"></div>
+            </div>
             <div class="fiona-ai-composer-meta">
                 <span id="fionaAiDataSource" class="fiona-ai-data-source" hidden></span>
                 <button type="button" id="fionaAiContextAdd" class="fiona-ai-context-add-btn" title="Tambah konteks jabatan/prosbis" aria-label="Tambah konteks">＋ Konteks</button>
             </div>
-            <div id="fionaAiMentionTags" class="fiona-ai-mention-tags" aria-label="Tag Konteks Terpilih" hidden></div>
+            <div id="fionaAiMentionTags" class="fiona-ai-mention-tags" hidden></div>
             <form id="fionaAiForm" class="fiona-ai-composer">
-                <textarea id="fionaAiInput" rows="2" maxlength="4000" placeholder="Tanyakan seputar matriks RASCI ini… (ketik @@ untuk mention)" aria-label="Kirim pesan ke Fiona"></textarea>
+                <div id="fionaAiInput" class="fiona-ai-input" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Tanyakan seputar matriks RASCI ini… (ketik @@ untuk Jabatan, # untuk Proses Bisnis)" aria-label="Kirim pesan ke Fiona" spellcheck="false"></div>
                 <button type="submit" id="fionaAiSend" aria-label="Kirim pesan">➤</button>
             </form>
         </div>

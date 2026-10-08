@@ -95,18 +95,6 @@
     .body-row.is-ancestor-context .notation {
       opacity: 0.55;
     }
-    .ancestor-context-badge {
-      display: inline-flex;
-      align-items: center;
-      margin-left: 6px;
-      padding: 1px 5px;
-      border-radius: 4px;
-      background: #e2e8f0;
-      color: #475569;
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
 
     .cell { min-width:0; min-height:0; padding:3px 6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-right:1px solid var(--rasci-border); display:flex; align-items:center; }
     .header-cell { font-weight:600; font-size:11px; color:#103866; white-space:normal; line-height:1.2; border-right:1px solid var(--rasci-border); border-top:4px solid transparent; }
@@ -129,11 +117,7 @@
     .job-head.jabatan-level-4, .job-head.job-level-4 { border-top-color: var(--job-level-4-color); }
     .job-label { display:block; overflow:hidden; text-overflow:ellipsis; white-space:normal; }
     .notation { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 3px; border:1px solid #aeb9c4; border-radius:50%; color:#27323f; background:var(--rasci-badge); font-size:10px; font-weight:700; line-height:1; }
-    .notation-r { border-color:#8ec5ea; color:#005da6; background:#e1f0fa; }
-    .notation-a { border-color:#f2a4ae; color:#c9182b; background:#fae9eb; }
-    .notation-s { border-color:#a3d9b1; color:#146c43; background:#e8f5e9; }
-    .notation-c { border-color:#cbb2fe; color:#59359a; background:#f3e8ff; }
-    .notation-i { border-color:#ced4da; color:#495057; background:#f1f3f5; }
+    .assignment-comment { width:15px; height:15px; margin-left:2px; cursor:help; opacity:.8; }
     .spacer { pointer-events:none; border-right:1px solid var(--rasci-border); }
     .empty, .loading, .error { display:flex; align-items:center; justify-content:center; min-height:120px; padding:15px; color:var(--rasci-muted); font-size:11.5px; }
     .error { color:#a12937; }
@@ -221,7 +205,10 @@
       this._children.clear();
       this._roots = [];
 
-      const mode = String(this._data.mode || this._data.renderMode || '').toLowerCase();
+      // Remote descriptors use `mode: remote` for transport, while the actual
+      // table mode is carried in `remote.mode`.  Use that logical mode for UI
+      // behaviour such as automatic hierarchy expansion.
+      const mode = this._tableMode();
       const isFilteredMode = mode === 'by_position' || mode === 'by_business_process';
       const hasExplicitExpanded = Array.isArray(this._data.expandedRowIds);
       this._expanded = new Set(hasExplicitExpanded ? this._data.expandedRowIds.map(String) : []);
@@ -233,13 +220,10 @@
       // Full matrix: if rows <= 200, expand all; if > 200, L1 only (not expanded)
       const shouldAutoExpand = isFilteredMode || this._data.autoExpandAll === true || (!hasExplicitExpanded && !this._isRemote() && this._rows.length <= 200);
 
-      if (!hasExplicitExpanded && shouldAutoExpand && !this._isRemote()) {
-        this._rowById.forEach((row) => {
-          if (this._children.get(row.id)?.length) this._expanded.add(row.id);
-        });
-      }
+      this._applyAutomaticExpansion(hasExplicitExpanded, shouldAutoExpand);
 
       this._ensureFrame();
+      if (this._title) this._title.textContent = String(this._data.title || "RASCI Matrix");
       this._renderComparisonToolbar();
       this._scheduleRender();
       if (this.isConnected && this._isRemote() && this._rows.length === 0) this._loadRemoteChildren(null);
@@ -258,6 +242,18 @@
         prlOrg: item.prlOrg ?? null,
         level: level
       };
+    }
+
+    _tableMode() {
+      const remoteMode = this._isRemote() ? this._data?.remote?.mode : null;
+      return String(remoteMode || this._data?.mode || this._data?.renderMode || '').toLowerCase();
+    }
+
+    _applyAutomaticExpansion(hasExplicitExpanded, shouldAutoExpand) {
+      if (hasExplicitExpanded || !shouldAutoExpand) return;
+      this._rowById.forEach((row) => {
+        if (this._children.get(row.id)?.length) this._expanded.add(row.id);
+      });
     }
 
     _normalizeRow(row, index, parentHint) {
@@ -287,9 +283,13 @@
       const parentId = parent ? String(parent.id ?? parent) : null;
       for (let index = 0; index < rows.length; index += 1) {
         const row = this._normalizeRow(rows[index], this._rows.length + index, parentId);
+        // Keep the response order as a stable final tie-breaker.  The matrix is
+        // often fed hierarchy indexes such as "1.2" and "1.10", which are not
+        // safe to treat as decimal numbers.
+        row._sourceOrder = this._rows.length;
         if (this._rowById.has(row.id)) {
           const existing = this._rowById.get(row.id);
-          Object.assign(existing, row, { loading: existing.loading });
+          Object.assign(existing, row, { loading: existing.loading, _sourceOrder: existing._sourceOrder });
           continue;
         }
         this._rows.push(row);
@@ -316,6 +316,11 @@
             if (parent && parent.id !== row.id) parentId = parent.id;
           }
         }
+        // A same-depth (notably L1-to-L1) relationship is never a valid tree
+        // edge.  Ignore stale/malformed parent IDs rather than nesting one L1
+        // branch beneath another after an expand/collapse render.
+        const parent = parentId ? this._rowById.get(parentId) : null;
+        if (parent && row.depth != null && parent.depth != null && parent.depth >= row.depth) parentId = null;
         parentById.set(row.id, parentId && this._rowById.has(parentId) && parentId !== row.id ? parentId : null);
       }
       for (const row of this._rows) {
@@ -337,14 +342,34 @@
           this._roots.push(row);
         }
       }
-      for (const list of this._children.values()) list.sort((a, b) => this._rowOrder(a) - this._rowOrder(b));
-      this._roots.sort((a, b) => this._rowOrder(a) - this._rowOrder(b));
+      for (const list of this._children.values()) list.sort((a, b) => this._compareRows(a, b));
+      this._roots.sort((a, b) => this._compareRows(a, b));
       for (const row of this._rows) row.hasChildren = row.hasChildren || Boolean(this._children.get(row.id)?.length);
     }
 
     _rowOrder(row) {
-      const index = Number.parseFloat(String(row.index).replace(/[^0-9.]/g, ""));
-      return Number.isFinite(index) ? index : this._rows.indexOf(row);
+      return row._sourceOrder ?? this._rows.indexOf(row);
+    }
+
+    _compareRows(a, b) {
+      const compareIndex = (left, right) => {
+        const leftParts = String(left || "").split(/[./\\-]/).filter(Boolean);
+        const rightParts = String(right || "").split(/[./\\-]/).filter(Boolean);
+        const count = Math.max(leftParts.length, rightParts.length);
+        for (let index = 0; index < count; index += 1) {
+          if (leftParts[index] == null) return -1;
+          if (rightParts[index] == null) return 1;
+          const leftNumber = Number(leftParts[index]);
+          const rightNumber = Number(rightParts[index]);
+          const bothNumeric = Number.isFinite(leftNumber) && Number.isFinite(rightNumber);
+          const comparison = bothNumeric
+            ? leftNumber - rightNumber
+            : leftParts[index].localeCompare(rightParts[index], undefined, { numeric: true, sensitivity: "base" });
+          if (comparison !== 0) return comparison;
+        }
+        return 0;
+      };
+      return compareIndex(a.index, b.index) || this._rowOrder(a) - this._rowOrder(b);
     }
 
     _flattenRows() {
@@ -567,20 +592,13 @@
       toggle.addEventListener("click", () => this._toggleRow(rowData));
       const text = document.createElement("span");
       text.textContent = rowData.businessProcess;
-      if (isAncestor) {
-        const badge = document.createElement("span");
-        badge.className = "ancestor-context-badge";
-        badge.textContent = "Konteks L1";
-        label.append(toggle, text, badge);
-      } else {
-        label.append(toggle, text);
-      }
+      label.append(toggle, text);
       process.appendChild(label);
       row.appendChild(process);
       if (columnStart > 0) row.appendChild(this._spacer(columnStart * jobWidth));
       for (let index = columnStart; index < columnEnd; index += 1) {
         const cell = this._cell("", "job-cell", index + 4);
-        this._renderAssignments(cell, rowData.assignments?.[this._columns[index].key]);
+        this._renderAssignments(cell, rowData.assignments?.[this._columns[index].key], rowData.assignmentComments?.[this._columns[index].key] ?? rowData.AssignmentComments?.[this._columns[index].key]);
         row.appendChild(cell);
       }
       if (columnEnd < this._columns.length) row.appendChild(this._spacer((this._columns.length - columnEnd) * jobWidth));
@@ -597,17 +615,32 @@
       return cell;
     }
 
-    _renderAssignments(cell, values) {
+    _renderAssignments(cell, values, comments) {
       const list = Array.isArray(values) ? values : values == null ? [] : [values];
       const ordered = list.map((value) => String(value).trim().toUpperCase()).filter((value) => NOTATION_ORDER.includes(value)).sort((a, b) => NOTATION_ORDER.indexOf(a) - NOTATION_ORDER.indexOf(b));
       for (const value of ordered) {
         const badge = document.createElement("span");
-        badge.className = `notation notation-${value.toLowerCase()}`;
+        badge.className = "notation";
         badge.textContent = value;
         badge.setAttribute("aria-label", value);
         cell.appendChild(badge);
       }
-      cell.setAttribute("aria-label", ordered.length ? ordered.join(", ") : "No assignment");
+      const commentLines = (Array.isArray(comments) ? comments : [])
+        .map((comment) => {
+          const notation = String(comment?.notation ?? comment?.Notation ?? "").trim().toUpperCase();
+          const text = String(comment?.comment ?? comment?.Comment ?? "").trim();
+          return text ? `${notation ? `${notation}: ` : ""}${text}` : "";
+        })
+        .filter(Boolean);
+      if (commentLines.length) {
+        const commentIcon = document.createElement("img");
+        commentIcon.className = "assignment-comment";
+        commentIcon.src = "/assets/images/rasci/comment.svg";
+        commentIcon.alt = "Assignment comments";
+        commentIcon.title = commentLines.join("\n");
+        cell.appendChild(commentIcon);
+      }
+      cell.setAttribute("aria-label", ordered.length ? `${ordered.join(", ")}${commentLines.length ? `. Comments: ${commentLines.join("; ")}` : ""}` : "No assignment");
     }
 
     _spacer(width) { const spacer = document.createElement("div"); spacer.className = "spacer"; spacer.style.width = `${width}px`; return spacer; }
@@ -655,6 +688,16 @@
       try {
         const url = new URL(remote.endpoint, window.location.href);
         if (remote.viewId) url.searchParams.set("viewId", String(remote.viewId));
+        for (const key of (Array.isArray(remote.positionKeys) ? remote.positionKeys : [])) {
+          if (key != null && String(key).trim()) url.searchParams.append("positionKey", String(key));
+        }
+        for (const id of (Array.isArray(remote.processIds) ? remote.processIds : [])) {
+          if (id != null && String(id).trim()) url.searchParams.append("processId", String(id));
+        }
+        for (const id of (Array.isArray(remote.jobIds) ? remote.jobIds : [])) {
+          if (id != null && String(id).trim()) url.searchParams.append("jobId", String(id));
+        }
+        if (remote.mode && remote.mode !== "remote") url.searchParams.set("mode", String(remote.mode));
         url.searchParams.set("limit", String(this._remotePageSize()));
         if (parent) url.searchParams.set("parentId", String(parent.id));
         else url.searchParams.set("rootOnly", "true");
@@ -667,6 +710,11 @@
         const rows = Array.isArray(payload) ? payload : payload.rows || payload.items || [];
         if (Array.isArray(payload?.columns) && this._columns.length === 0) this._columns = payload.columns.map(this._normalizeColumn);
         this._mergeRows(rows, parent);
+        const hasExplicitExpanded = Array.isArray(this._data?.expandedRowIds);
+        const mode = this._tableMode();
+        const isFilteredMode = mode === 'by_position' || mode === 'by_business_process';
+        const shouldAutoExpand = isFilteredMode || this._data?.autoExpandAll === true;
+        this._applyAutomaticExpansion(hasExplicitExpanded, shouldAutoExpand);
         if (parent) { parent.childrenLoaded = true; parent.hasChildren = true; parent.loading = false; }
       } catch (error) {
         if (error.name !== "AbortError") {

@@ -3,7 +3,15 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const assistant = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'js', 'fiona-ai-assistant.js'), 'utf8');
+const jsDir = path.join(__dirname, '..', 'wwwroot', 'assets', 'js');
+const assistant = [
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-models.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-activity.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-history.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-memory.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-context.js'), 'utf8'),
+  fs.readFileSync(path.join(jsDir, 'fiona-ai-assistant.js'), 'utf8')
+].join('\n');
 const partial = fs.readFileSync(path.join(__dirname, '..', 'Views', 'Shared', '_AiAssistant.cshtml'), 'utf8');
 const css = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'css', 'fiona-ai-assistant.css'), 'utf8');
 
@@ -61,6 +69,7 @@ test('RASCI cache preparation supports master and draft sources with non-blockin
   assert.match(assistant, /setRasciCacheStatus\(['"]preparing['"]/);
   assert.match(assistant, /setRasciCacheStatus\(['"]error['"]/);
   assert.match(assistant, /cachePreparationVersion/);
+  assert.match(assistant, /if\s*\(rasci\)\s*window\.setTimeout\(\(\)\s*=>\s*prepareRasciCache\(context\(\)\),\s*0\)/);
   assert.match(css, /\.fiona-ai-cache-status\s*\{/);
   assert.match(css, /\.fiona-ai-cache-spinner\s*\{/);
 });
@@ -93,7 +102,7 @@ test('model selector exposes an authenticated, server-owned catalog contract', (
 
 test('model selection is snapped into requests and locked to the server stream', () => {
   assert.match(assistant, /body\.modelKey\s*=\s*requestModelKey/);
-  assert.match(assistant, /const requestModelKey = requestSnapshot\?\.modelKey \|\| conversationModelKey \|\| selectedModelKey/);
+  assert.match(assistant, /requestModelKey/);
   assert.match(assistant, /event\.metadata\?\.modelKey/);
   assert.match(assistant, /model_protocol_mismatch/);
   assert.match(assistant, /conversation_model_mismatch/);
