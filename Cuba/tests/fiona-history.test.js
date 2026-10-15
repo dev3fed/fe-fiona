@@ -59,6 +59,18 @@ test('assistant script contains history lifecycle and interaction functions', ()
   assert.match(assistant, /function\s+startNewChat\s*\(/);
 });
 
+test('job description preview uses deterministic row headers, bullets, and muted guidance', () => {
+  assert.match(assistant, /section\.kind === ['"]table['"] \|\| section\.kind === ['"]rowHeaderTable['"]/);
+  assert.match(assistant, /section\.kind !== ['"]rowHeaderTable['"] && section\.hideHeader !== true/);
+  assert.match(assistant, /cell\.setAttribute\(['"]scope['"], ['"]row['"]\)/);
+  assert.match(assistant, /section\.mutedText/);
+  assert.match(assistant, /Array\.isArray\(value\)/);
+  assert.match(assistant, /value\.subheader/);
+  assert.match(css, /\.fiona-ai-jd-muted/);
+  assert.match(css, /th\[scope="row"\]/);
+  assert.match(css, /th\[scope="row"\][^{]*\{[^}]*color:\s*#fff[^}]*background:\s*#1769aa/s);
+});
+
 test('RASCI cache preparation supports master and draft sources with non-blocking status', () => {
   assert.match(partial, /id="fionaAiCacheStatus"/);
   assert.match(partial, /aria-live="polite"/);

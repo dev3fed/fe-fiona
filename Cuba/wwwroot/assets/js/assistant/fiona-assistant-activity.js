@@ -188,11 +188,6 @@
         time.textContent = formatDuration(performance.now() - started);
       }
     }, 250);
-    const stalled = setTimeout(() => {
-      if (finished) return;
-      notice.hidden = false;
-      notice.textContent = language === 'en' ? 'Still working—some data requests take longer.' : 'Masih bekerja—beberapa permintaan data memerlukan waktu lebih lama.';
-    }, 15000);
 
     function ensureThoughtCursor() {
       if (!thoughtCursor) {
@@ -326,7 +321,6 @@
       if (finished) return;
       finished = true;
       clearInterval(timer);
-      clearTimeout(stalled);
       if (thoughtCursor && thoughtCursor.parentNode) {
         thoughtCursor.parentNode.removeChild(thoughtCursor);
       }

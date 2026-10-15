@@ -5,6 +5,7 @@ const test = require('node:test');
 
 const jsDir = path.join(__dirname, '..', 'wwwroot', 'assets', 'js');
 const rasciScript = fs.readFileSync(path.join(jsDir, 'fiona-rasci-matrix.js'), 'utf8');
+const hierarchyScript = fs.readFileSync(path.join(jsDir, 'fiona-prosbis-hierarchy.js'), 'utf8');
 const assistantScript = [
   fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-models.js'), 'utf8'),
   fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-activity.js'), 'utf8'),
@@ -44,6 +45,21 @@ test('rasci matrix script registers fiona-rasci-matrix, rasci-table-viewer and a
   assert.match(rasciScript, /customElements\.define\(['"]ui-action-chips['"]/);
   assert.match(rasciScript, /customElements\.define\(['"]ui-single-select['"]/);
   assert.match(rasciScript, /customElements\.define\(['"]ui-multi-select['"]/);
+});
+
+test('Prosbis hierarchy component and persisted assistant card use a canonical process ID', () => {
+  assert.match(hierarchyScript, /const TAG_NAME = 'fiona-prosbis-hierarchy'/);
+  assert.match(hierarchyScript, /prosbis-hierarchy/);
+  assert.match(hierarchyScript, /<th>Level<\/th><th>Index<\/th><th>Prosbis<\/th>/);
+  assert.match(hierarchyScript, /paddingLeft/);
+  assert.match(hierarchyScript, /max-height:420px;overflow:auto/);
+  assert.match(hierarchyScript, /response\.status !== 502/);
+  assert.match(hierarchyScript, /Coba lagi/);
+  assert.match(assistantScript, /function renderProsbisHierarchy/);
+  assert.match(assistantScript, /prosbis-hierarchy-viewer/);
+  assert.match(assistantScript, /\/api\/agent\/prosbis-hierarchy/);
+  assert.match(assistantScript, /defer: true/);
+  assert.match(assistantScript, /fiona-prosbis-hierarchy/);
 });
 
 test('rasci matrix script normalizes and handles isAncestorContext flag and depth padding', () => {
@@ -95,8 +111,38 @@ test('remote RASCI rendering forwards compact descriptor selectors to the curren
   assert.match(rasciScript, /url\.searchParams\.append\("processId"/);
   assert.match(rasciScript, /remote\.jobIds/);
   assert.match(rasciScript, /url\.searchParams\.append\("jobId"/);
+  assert.match(rasciScript, /url\.searchParams\.set\("parentProcessId",\s*String\(parent\.id\)\)/);
+  assert.doesNotMatch(rasciScript, /url\.searchParams\.set\("parentId",\s*String\(parent\.id\)\)/);
   assert.match(assistantScript, /const isDescriptor = Boolean\(table\.renderTarget \|\| table\.sourceId/);
   assert.match(assistantScript, /artifactData\?\.rasciTables/);
+});
+
+test('RASCI cards start collapsed, preload roots before mounting the matrix, and keep child loading remote', () => {
+  assert.match(assistantScript, /document\.createElement\(['"]details['"]\)/);
+  assert.match(assistantScript, /className\s*=\s*['"]fiona-ai-rasci-card['"]/);
+  assert.match(assistantScript, /function\s+preloadRasciRoot\s*\(/);
+  assert.match(assistantScript, /url\.searchParams\.set\(['"]rootOnly['"],\s*['"]true['"]\)/);
+  assert.match(assistantScript, /body\.appendChild\(loading\)/);
+  assert.match(assistantScript, /summaryLoading/);
+  assert.match(assistantScript, /summaryLoading\.hidden\s*=\s*true/);
+  assert.match(assistantScript, /body\.replaceChildren\(matrix\)/);
+  assert.match(assistantScript, /hideToolbarTitle:\s*true/);
+  assert.match(assistantScript, /hideToolbar:\s*true/);
+  assert.match(assistantScript, /function\s+rasciSummaryCounts\s*\(/);
+  assert.match(assistantScript, /fiona-ai-rasci-counts/);
+  assert.match(assistantScript, /payload\.remote\s*=\s*\{\s*\.\.\.remote/);
+  assert.match(assistantScript, /rootPreloaded/);
+  assert.match(assistantScript, /fiona-ai-rasci-open/);
+  assert.match(assistantScript, /card\.open\s*=\s*true/);
+  assert.match(assistantScript, /fiona-ai-rasci-main-action/);
+  assert.match(assistantScript, /if\s*\(bearer\)\s*headers\.Authorization/);
+  assert.match(rasciScript, /rootPreloaded/);
+  assert.match(rasciScript, /this\._title\.hidden\s*=\s*this\._data\.hideToolbarTitle\s*===\s*true/);
+  assert.match(rasciScript, /this\._toolbar\.style\.display\s*=\s*hideToolbar\s*\?\s*["']none["']/);
+  assert.match(rasciScript, /this\._data\?\.hideToolbar\s*===\s*true/);
+  assert.match(rasciScript, /this\._comparisonBar\.remove\(\)/);
+  assert.match(css, /details\.fiona-ai-rasci-card/);
+  assert.match(css, /fiona-ai-rasci-loading/);
 });
 
 test('assistant markup contains contextual input system, mention popup, tags, and context search modal', () => {

@@ -96,8 +96,7 @@ Fitur **Generate Jobdesc AI** menyusun dokumen Deskripsi Jabatan (*Job Descripti
 
 ### Komponen Deskripsi Jabatan yang Dihasilkan
 1. **Job Objective (Tujuan Jabatan Utama)**: Ringkasan naratif alasan keberadaan jabatan tersebut dalam organisasi.
-2. **Main Accountabilities (Tanggung Jawab Utama)**: Daftar tugas & wewenang yang bersumber dari notasi **Accountable ('A')**.
-3. **Key Responsibilities (Tugas Pelaksana Utama)**: Daftar aktivitas operasional yang bersumber dari notasi **Responsible ('R')**.
+2. **Key Responsibilities (Tugas Pelaksana Utama)**: Daftar aktivitas operasional yang bersumber hanya dari notasi **Responsible ('R')**.
 4. **Technical Competencies (Kompetensi Teknis)**: Daftar keahlian teknis yang dibutuhkan untuk menjalankan tugas tersebut.
 5. **Behavioural Competencies (Kompetensi Perilaku)**: Soft skills dan kompetensi perilaku yang relevan.
 

@@ -354,11 +354,15 @@ function appendDynamicHeader(jobTitleList) {
 
   let dynamicHeaders = "";
   jobTitleList.forEach((val) => {
-    const uniqueClass = `jabatan-level-${val.level}`;
+    const isDirut =
+      String(val.unitCode || val.positionCode || "").trim() === "10132405" ||
+      String(val.positionName || "").trim().toLowerCase().includes("direktur utama");
+    const levelVal = isDirut ? 0 : val.level;
+    const uniqueClass = `jabatan-level-${levelVal}`;
     const valString = JSON.stringify(val).replace(/"/g, "&quot;");
     const headerHTML = `
       <th scope="col" class="jabatan-cell ${uniqueClass}" style="width:170px"
-        data-level="${val.level}"
+        data-level="${levelVal}"
         data-position-name="${val.positionName}"
         data-position-name-nk="${val.positionNameNk}"
         data-prl-org="${val.prlOrg}"

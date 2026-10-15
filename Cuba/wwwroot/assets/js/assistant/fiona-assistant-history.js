@@ -167,7 +167,7 @@
       getConversationId, setConversationId, getBusy, getActiveController,
       messages, status, setChatBusy, showChatView, sidebar, syncEmpty,
       syncModelControl, setConversationModel, conversationModelFrom,
-      add, renderRasciTable, esc, vegaEmbed, scrollToLatest, rasci, input,
+    add, renderRasciTable, renderJobDescriptionPreview, esc, vegaEmbed, scrollToLatest, rasci, input,
       requestJson
     } = deps;
 
@@ -219,7 +219,14 @@
             }
             const bubble = typeof add === 'function' ? add('assistant', msg.markdown) : null;
             if (bubble && artifactData?.rasciTables?.length && typeof renderRasciTable === 'function') {
-              artifactData.rasciTables.forEach(t => renderRasciTable(bubble, t));
+              artifactData.rasciTables.forEach(t => {
+                if ((t.renderTarget === 'prosbis-hierarchy-viewer' || t.mode === 'prosbis_hierarchy') && typeof deps.renderProsbisHierarchy === 'function')
+                  deps.renderProsbisHierarchy(bubble, t);
+                else renderRasciTable(bubble, t);
+              });
+            }
+            if (bubble && artifactData?.artifact?.type === 'jobDescriptionPreview' && typeof renderJobDescriptionPreview === 'function') {
+              renderJobDescriptionPreview(bubble, artifactData.artifact);
             }
             if (bubble && artifactData?.citations?.length) {
               const citations = document.createElement('div');

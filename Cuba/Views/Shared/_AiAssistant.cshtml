@@ -118,7 +118,21 @@
             </div>
             <div class="fiona-ai-composer-meta">
                 <span id="fionaAiDataSource" class="fiona-ai-data-source" hidden></span>
-                <button type="button" id="fionaAiContextAdd" class="fiona-ai-context-add-btn" title="Tambah konteks jabatan/prosbis" aria-label="Tambah konteks">＋ Konteks</button>
+                <div class="fiona-ai-context-add-wrap">
+                    <button type="button" id="fionaAiContextAdd" class="fiona-ai-context-add-btn" title="Katalog dan pencarian proses bisnis" aria-label="Katalog proses bisnis" aria-haspopup="menu" aria-expanded="false">＋ Konteks</button>
+                    <div id="fionaAiContextMenu" class="fiona-ai-context-menu" role="menu" hidden>
+                        <button type="button" role="menuitem" data-context-type="process">
+                            <span class="menu-item-icon proc">#</span>
+                            <span class="menu-item-text">Proses Bisnis</span>
+                            <span class="menu-item-badge">Buka Katalog</span>
+                        </button>
+                        <button type="button" role="menuitem" data-context-type="position" disabled class="is-disabled" title="Pencarian lanjutan jabatan belum tersedia. Gunakan @@ pada pesan.">
+                            <span class="menu-item-icon pos">@@</span>
+                            <span class="menu-item-text">Jabatan</span>
+                            <small class="menu-item-tag">Segera hadir</small>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div id="fionaAiMentionTags" class="fiona-ai-mention-tags" hidden></div>
             <form id="fionaAiForm" class="fiona-ai-composer">
@@ -128,33 +142,86 @@
         </div>
         <div class="fiona-ai-disclaimer">Fiona dapat membuat kekeliruan. Harap periksa kembali tindakan yang mengubah data.</div>
     </div>
-    <dialog id="fionaAiContextModal" class="fiona-ai-context-modal" aria-labelledby="fionaAiContextModalTitle">
+    <dialog id="fionaAiContextModal" class="fiona-ai-context-modal fiona-prosbis-advanced-modal" aria-labelledby="fionaAiContextModalTitle">
         <div class="fiona-ai-context-modal-content">
             <div class="fiona-ai-context-modal-header">
                 <div>
-                    <span class="fiona-ai-empty-eyebrow">FIONA AI · KONTEKS RASCI</span>
-                    <h2 id="fionaAiContextModalTitle">Pilih Entitas Konteks</h2>
+                    <span class="fiona-ai-empty-eyebrow">FIONA AI · KATALOG &amp; PENCARIAN PROSBIS</span>
+                    <h2 id="fionaAiContextModalTitle">Katalog &amp; Pencarian Lanjutan Proses Bisnis</h2>
                 </div>
                 <button type="button" id="fionaAiContextModalClose" class="fiona-ai-memory-close" aria-label="Tutup pencarian konteks">×</button>
             </div>
-            <div class="fiona-ai-context-tabs" role="tablist">
-                <button type="button" id="fionaAiTabPosition" class="fiona-ai-context-tab is-active" role="tab" aria-selected="true">Jabatan / Posisi</button>
-                <button type="button" id="fionaAiTabProcess" class="fiona-ai-context-tab" role="tab" aria-selected="false">Proses Bisnis</button>
+            <div class="fiona-ai-context-tabs" role="tablist" hidden>
+                <button type="button" id="fionaAiTabPosition" class="fiona-ai-context-tab" role="tab" aria-selected="false" hidden disabled>Jabatan / Posisi</button>
+                <button type="button" id="fionaAiTabProcess" class="fiona-ai-context-tab is-active" role="tab" aria-selected="true">Proses Bisnis</button>
             </div>
-            <div class="fiona-ai-context-search-wrap">
-                <input type="search" id="fionaAiContextSearch" placeholder="Ketik kata kunci pencarian..." autocomplete="off" />
+            <div class="fiona-ai-context-search-bar">
+                <div class="fiona-ai-context-search-wrap">
+                    <svg class="fiona-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="search" id="fionaAiContextSearch" placeholder="Cari nama proses, kode, nomor indeks, input, atau output..." autocomplete="off" />
+                    <button type="button" id="fionaAiContextSearchClear" class="fiona-ai-context-search-clear" title="Hapus pencarian" hidden>×</button>
+                </div>
+                <button type="button" id="fionaAiContextSearchButton" class="fiona-ai-context-search-button">Cari</button>
             </div>
-            <div id="fionaAiContextLoading" class="fiona-ai-context-loading" hidden>
-                <span class="fiona-ai-activity-spinner" aria-hidden="true"></span>
-                <span>Mencari entitas...</span>
+            <div class="fiona-ai-context-filters-bar" role="toolbar" aria-label="Filter Level Proses">
+                <span class="filter-label">Filter Level:</span>
+                <div class="filter-pills" id="fionaAiContextLevelFilters">
+                    <button type="button" class="fiona-filter-pill is-active" data-level="all">Semua Level</button>
+                    <button type="button" class="fiona-filter-pill" data-level="1">L1 Enterprise</button>
+                    <button type="button" class="fiona-filter-pill" data-level="2">L2 Utama</button>
+                    <button type="button" class="fiona-filter-pill" data-level="3">L3 Sub-proses</button>
+                    <button type="button" class="fiona-filter-pill" data-level="4">L4 Aktivitas</button>
+                </div>
             </div>
-            <div id="fionaAiContextList" class="fiona-ai-context-list" role="listbox"></div>
-            <div id="fionaAiContextEmpty" class="fiona-ai-context-empty" hidden>
-                <strong>Tidak ada hasil ditemukan</strong>
-                <p>Coba kata kunci pencarian lain.</p>
+            <div id="fionaAiContextSuggestions" class="fiona-ai-context-suggestions" hidden></div>
+            <div id="fionaAiContextDidYouMean" class="fiona-ai-context-did-you-mean" hidden></div>
+            <div id="fionaAiContextOverview" class="fiona-ai-context-overview" hidden></div>
+
+            <div class="fiona-ai-context-body-grid">
+                <!-- Left Pane: Catalog & Results List with Multi-Select -->
+                <div class="fiona-ai-context-list-pane">
+                    <div class="fiona-ai-context-pane-header">
+                        <span id="fionaAiContextResultCount" class="result-count">Memuat proses bisnis...</span>
+                        <div class="pane-header-actions">
+                            <button type="button" id="fionaAiContextSelectAllVisible" class="select-all-btn">Pilih Semua di Layar</button>
+                        </div>
+                    </div>
+                    <div id="fionaAiContextLoading" class="fiona-ai-context-loading" hidden>
+                        <span class="fiona-ai-activity-spinner" aria-hidden="true"></span>
+                        <span>Mencari proses bisnis...</span>
+                    </div>
+                    <div id="fionaAiContextList" class="fiona-ai-context-list" role="listbox" aria-multiselectable="true"></div>
+                    <div id="fionaAiContextEmpty" class="fiona-ai-context-empty" hidden>
+                        <strong>Tidak ada proses bisnis ditemukan</strong>
+                        <p>Coba kata kunci pencarian lain atau sesuaikan filter level.</p>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Live Inspector Details -->
+                <div class="fiona-ai-context-inspector-pane" id="fionaAiContextInspector">
+                    <div class="fiona-ai-inspector-empty" id="fionaAiInspectorEmpty">
+                        <div class="inspector-empty-icon">📁</div>
+                        <strong>Pratinjau Proses Bisnis</strong>
+                        <p>Pilih salah satu proses di sebelah kiri untuk melihat deskripsi lengkap, dokumen input, dan output.</p>
+                    </div>
+                    <div class="fiona-ai-inspector-content" id="fionaAiInspectorContent" hidden></div>
+                </div>
             </div>
+
+            <!-- Sticky Selection Footer -->
+            <div id="fionaAiContextSelectionBar" class="fiona-ai-context-selection-bar" hidden>
+                <div class="selection-meta">
+                    <span class="selection-badge" id="fionaAiSelectedCountBadge">0</span>
+                    <span class="selection-text">proses bisnis dipilih</span>
+                </div>
+                <div class="selection-actions">
+                    <button type="button" id="fionaAiContextClearSelection" class="fiona-ai-memory-button secondary">Kosongkan Pilihan</button>
+                    <button type="button" id="fionaAiContextInsertBatch" class="fiona-ai-memory-button primary">＋ Masukkan Konteks Terpilih</button>
+                </div>
+            </div>
+
             <div class="fiona-ai-context-modal-footer">
-                <button type="button" id="fionaAiContextCancel" class="fiona-ai-memory-button secondary">Batal</button>
+                <button type="button" id="fionaAiContextCancel" class="fiona-ai-memory-button secondary">Tutup</button>
             </div>
         </div>
     </dialog>

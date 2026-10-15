@@ -20,7 +20,7 @@
   const NOTATION_ORDER = ["R", "A", "S", "C", "I"];
   const IDENTITY_WIDTH = [44, 72, 300];
   const DEFAULT_JOB_WIDTH = 140;
-  const DEFAULT_ROW_HEIGHT = 32;
+  const DEFAULT_ROW_HEIGHT = 44;
   const DEFAULT_REMOTE_PAGE_SIZE = 100;
   const MAX_REMOTE_PAGE_SIZE = 500;
   const OVERSCAN_ROWS = 10;
@@ -32,8 +32,8 @@
       --rasci-index-width: 72px;
       --rasci-process-width: 300px;
       --rasci-job-width: 140px;
-      --rasci-row-height: 32px;
-      --rasci-header-height: 36px;
+      --rasci-row-height: 44px;
+      --rasci-header-height: 48px;
       --rasci-border: #b8d4ea;
       --rasci-text: #102e59;
       --rasci-muted: #5b738e;
@@ -104,12 +104,36 @@
     .index-cell { left:var(--rasci-level-width); justify-content:flex-start; text-align:left; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-weight:500; }
     .process-cell { left:calc(var(--rasci-level-width) + var(--rasci-index-width)); justify-content:flex-start; }
     .process-label { display:flex; align-items:center; min-width:0; gap:4px; width:100%; }
-    .process-label > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11.5px; }
+    .process-label > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-height: 1.3;
+      max-height: 2.6em;
+      font-size: 11.5px;
+      word-break: break-word;
+    }
     .tree-toggle { flex:0 0 16px; width:16px; height:16px; padding:0; border:0; color:var(--rasci-accent); background:transparent; cursor:pointer; font-size:13px; line-height:1; display:flex; align-items:center; justify-content:center; }
     .tree-toggle[aria-expanded="true"] { transform:rotate(90deg); }
     .tree-toggle:disabled { visibility:hidden; cursor:default; }
     .job-cell { justify-content:center; gap:2px; padding:2px 4px; text-align:center; border-right:1px solid var(--rasci-border); }
-    .job-head { justify-content:flex-start; text-align:left; overflow:hidden; border-top:4px solid var(--job-level-default-color); }
+    .job-head {
+      justify-content: flex-start;
+      align-items: center;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      white-space: normal;
+      line-height: 1.25;
+      word-break: break-word;
+      border-top: 4px solid var(--job-level-default-color);
+    }
     .job-head.jabatan-level-0, .job-head.job-level-0 { border-top-color: var(--job-level-0-color); }
     .job-head.jabatan-level-1, .job-head.job-level-1 { border-top-color: var(--job-level-1-color); }
     .job-head.jabatan-level-2, .job-head.job-level-2 { border-top-color: var(--job-level-2-color); }
@@ -155,7 +179,7 @@
       this._ensureFrame();
       if (this.hasAttribute("data") && !this._data) this._setDataFromAttribute();
       this._scheduleRender();
-      if (this._isRemote() && this._rows.length === 0) this._loadRemoteChildren(null);
+      if (this._isRemote() && this._rows.length === 0 && !this._data?.remote?.rootPreloaded) this._loadRemoteChildren(null);
     }
 
     disconnectedCallback() {
@@ -223,20 +247,41 @@
       this._applyAutomaticExpansion(hasExplicitExpanded, shouldAutoExpand);
 
       this._ensureFrame();
-      if (this._title) this._title.textContent = String(this._data.title || "RASCI Matrix");
+      if (this._title) {
+        this._title.textContent = String(this._data.title || "RASCI Matrix");
+        this._title.hidden = this._data.hideToolbarTitle === true;
+      }
+      if (this._toolbar) {
+        const hideToolbar = this._data.hideToolbar === true;
+        this._toolbar.hidden = hideToolbar;
+        this._toolbar.style.display = hideToolbar ? "none" : "";
+        if (hideToolbar && this._comparisonBar) {
+          this._comparisonBar.remove();
+          this._comparisonBar = null;
+        }
+      }
       this._renderComparisonToolbar();
       this._scheduleRender();
-      if (this.isConnected && this._isRemote() && this._rows.length === 0) this._loadRemoteChildren(null);
+      if (this.isConnected && this._isRemote() && this._rows.length === 0 && !this._data?.remote?.rootPreloaded) this._loadRemoteChildren(null);
       this.dispatchEvent(new CustomEvent("fiona-rasci-ready", { bubbles: true, composed: true, detail: { rows: this._rows.length, columns: this._columns.length, mode } }));
     }
 
     _normalizeColumn(column, index) {
       const item = column && typeof column === "object" ? column : {};
       const rawLevel = item.level ?? item.layer ?? item.jobLevel;
-      const level = rawLevel != null && !Number.isNaN(Number(rawLevel)) ? Number(rawLevel) : null;
+      let level = rawLevel != null && !Number.isNaN(Number(rawLevel)) ? Number(rawLevel) : null;
+      const label = String(item.label ?? item.name ?? "Jabatan");
+      const positionCode = item.positionCode ?? item.unitCode ?? item.id ?? null;
+      if (
+        String(positionCode).trim() === "10132405" ||
+        label.trim().toLowerCase() === "direktur utama" ||
+        label.trim().toLowerCase().includes("direktur utama")
+      ) {
+        level = 0;
+      }
       return {
         key: String(item.key ?? `job-${index + 1}`),
-        label: String(item.label ?? item.name ?? "Jabatan"),
+        label: label,
         positionCode: item.positionCode ?? null,
         unitCodeOrg: item.unitCodeOrg ?? null,
         prlOrg: item.prlOrg ?? null,
@@ -403,6 +448,7 @@
       this._body = this.shadowRoot.querySelector(".body");
       this._status = this.shadowRoot.querySelector(".toolbar-status");
       this._title = this.shadowRoot.querySelector(".toolbar-title");
+      this._toolbar = this.shadowRoot.querySelector(".toolbar");
       this._comparisonBar = this.shadowRoot.querySelector(".comparison-bar");
       this._viewport.addEventListener("scroll", this._onScroll, { passive: true });
       this._viewport.addEventListener("keydown", this._onKeyDown);
@@ -411,6 +457,11 @@
 
     _renderComparisonToolbar() {
       if (!this._comparisonBar) return;
+      if (this._data?.hideToolbar === true) {
+        this._comparisonBar.hidden = true;
+        this._comparisonBar.replaceChildren();
+        return;
+      }
       const mode = String(this._data?.mode || '').toLowerCase();
       const isPositionMode = mode === 'by_position';
       const isProcessMode = mode === 'by_business_process';
@@ -699,7 +750,10 @@
         }
         if (remote.mode && remote.mode !== "remote") url.searchParams.set("mode", String(remote.mode));
         url.searchParams.set("limit", String(this._remotePageSize()));
-        if (parent) url.searchParams.set("parentId", String(parent.id));
+        // The API contract uses `parentProcessId`.  Sending `parentId` caused
+        // every nested expansion to be interpreted as a root request, so only
+        // L1 rows ever received their children.
+        if (parent) url.searchParams.set("parentProcessId", String(parent.id));
         else url.searchParams.set("rootOnly", "true");
         const headers = { Accept: "application/json" };
         const bearer = window.localStorage?.getItem("token");

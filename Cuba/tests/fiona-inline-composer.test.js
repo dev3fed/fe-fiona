@@ -175,15 +175,38 @@ test('mention search debounces briefly and cancels obsolete in-flight requests',
   assert.match(contextScript, /\}, 60\);/);
 });
 
-test('business-process mentions preserve server result order and show level without indentation', () => {
-  assert.doesNotMatch(contextScript, /sortProcessResultsByHierarchy/);
-  assert.doesNotMatch(contextScript, /--fiona-process-indent/);
-  assert.match(contextScript, /levelBadge\.textContent = `Level \$\{displayLevel \|\| '-'\}`;/);
+test('position mention searches opt into mention mode without changing process searches', () => {
+  assert.match(contextScript, /if \(targetType === 'position'\) params\.set\('mode', 'mention'\);/);
+});
+
+test('business-process mentions format hierarchy with parent in header, children before siblings, and indentation in hierarchy mode', () => {
+  assert.match(contextScript, /fiona-ai-mention-header-parent/);
+  assert.match(contextScript, /descSpan\.style\.paddingLeft\s*=\s*`\$\{indentPadding\}px`/);
+  assert.match(css, /\.fiona-ai-mention-header-parent\s*\{/);
   assert.match(css, /\.fiona-ai-mention-item-level\s*\{/);
-  assert.doesNotMatch(css, /\.fiona-ai-mention-item\.is-process\s*\{\s*padding-left:/);
+  assert.match(css, /\.fiona-ai-mention-item-desc\s*\{/);
 });
 
 test('mention UI copy Razor-escapes the single-character @ trigger', () => {
   assert.match(partial, /Jabatan \(@@\)/);
   assert.match(partial, /ketik @@ untuk Jabatan, # untuk Proses Bisnis/);
+});
+
+test('prosbis advanced search provides 2-pane modal, multi-select batch insertion, and disabled jabatan trigger', () => {
+  // Disabled Jabatan in context menu
+  assert.match(partial, /<button\s+type="button"\s+role="menuitem"\s+data-context-type="position"\s+disabled\s+class="is-disabled"/);
+  // 2-pane modal structure & level filter pills
+  assert.match(partial, /class="fiona-ai-context-modal fiona-prosbis-advanced-modal"/);
+  assert.match(partial, /id="fionaAiContextLevelFilters"/);
+  assert.match(partial, /id="fionaAiContextInspector"/);
+  assert.match(partial, /id="fionaAiContextSelectionBar"/);
+  assert.match(partial, /id="fionaAiContextInsertBatch"/);
+  // Context script multi-select and inspector rendering
+  assert.match(contextScript, /updateContextSelectionBar/);
+  assert.match(contextScript, /renderInspector/);
+  assert.match(contextScript, /fiona-ai-context-checkbox/);
+  // CSS contains 2-pane and selection bar styles
+  assert.match(css, /\.fiona-ai-context-body-grid\s*\{/);
+  assert.match(css, /\.fiona-ai-context-inspector-pane\s*\{/);
+  assert.match(css, /\.fiona-ai-context-selection-bar\s*\{/);
 });

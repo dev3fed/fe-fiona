@@ -57,12 +57,17 @@
   const mentionList = document.getElementById('fionaAiMentionList');
   const mentionTags = document.getElementById('fionaAiMentionTags');
   const contextAddBtn = document.getElementById('fionaAiContextAdd');
+  const contextMenu = document.getElementById('fionaAiContextMenu');
   const contextModal = document.getElementById('fionaAiContextModal');
   const contextModalClose = document.getElementById('fionaAiContextModalClose');
   const contextCancel = document.getElementById('fionaAiContextCancel');
   const tabPosition = document.getElementById('fionaAiTabPosition');
   const tabProcess = document.getElementById('fionaAiTabProcess');
   const contextSearch = document.getElementById('fionaAiContextSearch');
+  const contextSearchButton = document.getElementById('fionaAiContextSearchButton');
+  const contextSuggestions = document.getElementById('fionaAiContextSuggestions');
+  const contextDidYouMean = document.getElementById('fionaAiContextDidYouMean');
+  const contextOverview = document.getElementById('fionaAiContextOverview');
   const contextLoading = document.getElementById('fionaAiContextLoading');
   const contextList = document.getElementById('fionaAiContextList');
   const contextEmpty = document.getElementById('fionaAiContextEmpty');
@@ -357,35 +362,209 @@
     dataSourcePill.textContent = value ? 'Sumber data: ' + value : '';
   }
 
-  function renderRasciTable(parent, table) {
-    const box = document.createElement('div');
-    box.className = 'fiona-ai-table-wrap fiona-ai-rasci-wrap';
-    const matrix = document.createElement('fiona-rasci-matrix');
-    const sourceId = table.sourceId || table.draftRasciId || '';
+  const rasciRootPreloads = new Map();
+
+  function remoteTablePayload(table, sourceId) {
     const isDescriptor = Boolean(table.renderTarget || table.sourceId || table.positionKeys || table.processIds);
     const isRemote = isDescriptor || table.renderMode === 'virtual' || table.renderMode === 'remote' || table.mode === 'remote' || Boolean(table.remote);
     const payload = { ...table, draftRasciId: sourceId, sourceId };
-    if (isRemote) {
-      payload.mode = 'remote';
-      payload.renderMode = 'remote';
-      payload.rows = isDescriptor ? [] : (table.rows || []).filter(row => row.parentId == null && row.parentBusinessProcessId == null);
-      payload.columns = isDescriptor ? [] : (table.columns || []);
-      payload.remote = {
-        ...(table.remote || {}),
-        endpoint: table.remote?.endpoint || `${api}/api/agent/rasci-tables/${encodeURIComponent(sourceId)}`,
-        positionKeys: table.positionKeys || [],
-        processIds: table.processIds || [],
-        jobIds: table.jobIds || [],
-        mode: table.mode || null,
-        pageSize: table.remote?.pageSize || 100
-      };
+    if (!isRemote) return { payload, remote: null, isDescriptor: false };
+
+    const remote = {
+      ...(table.remote || {}),
+      endpoint: table.remote?.endpoint || `${api}/api/agent/rasci-tables/${encodeURIComponent(sourceId)}`,
+      positionKeys: table.positionKeys || [],
+      processIds: table.processIds || [],
+      jobIds: table.jobIds || [],
+      mode: table.mode || null,
+      pageSize: table.remote?.pageSize || 100
+    };
+    payload.mode = 'remote';
+    payload.renderMode = 'remote';
+    payload.remote = { ...remote, rootPreloaded: false };
+    payload.rows = isDescriptor
+      ? []
+      : (table.rows || []).filter(row => row.parentId == null && row.parentBusinessProcessId == null);
+    payload.columns = isDescriptor ? [] : (table.columns || []);
+    return { payload, remote, isDescriptor };
+  }
+
+  function rasciRootUrl(remote) {
+    const url = new URL(remote.endpoint, window.location.href);
+    for (const key of (Array.isArray(remote.positionKeys) ? remote.positionKeys : [])) {
+      if (key != null && String(key).trim()) url.searchParams.append('positionKey', String(key));
     }
-    matrix.data = payload;
-    matrix.addEventListener('fiona-rasci-error', event => {
-      box.dataset.error = event.detail?.error?.message || 'Unable to load RASCI matrix';
+    for (const id of (Array.isArray(remote.processIds) ? remote.processIds : [])) {
+      if (id != null && String(id).trim()) url.searchParams.append('processId', String(id));
+    }
+    for (const id of (Array.isArray(remote.jobIds) ? remote.jobIds : [])) {
+      if (id != null && String(id).trim()) url.searchParams.append('jobId', String(id));
+    }
+    if (remote.mode && remote.mode !== 'remote') url.searchParams.set('mode', String(remote.mode));
+    url.searchParams.set('limit', String(remote.pageSize || 100));
+    url.searchParams.set('rootOnly', 'true');
+    return url;
+  }
+
+  function preloadRasciRoot(payload, remote) {
+    if (!remote) return Promise.resolve({ rows: payload.rows || [], columns: payload.columns || [] });
+    const url = rasciRootUrl(remote);
+    const cacheKey = url.toString();
+    if (rasciRootPreloads.has(cacheKey)) return rasciRootPreloads.get(cacheKey);
+    const headers = { Accept: 'application/json' };
+    const bearer = token();
+    if (bearer) headers.Authorization = `Bearer ${bearer}`;
+    const request = fetch(url, {
+      credentials: 'same-origin',
+      headers
+    }).then(async response => {
+      if (!response.ok) throw new Error(`Unable to load RASCI rows (${response.status})`);
+      const result = await response.json();
+      if (Array.isArray(result)) return { rows: result, columns: [] };
+      return {
+        ...result,
+        rows: Array.isArray(result?.rows) ? result.rows : (Array.isArray(result?.items) ? result.items : []),
+        columns: Array.isArray(result?.columns) ? result.columns : []
+      };
+    }).catch(error => {
+      rasciRootPreloads.delete(cacheKey);
+      throw error;
     });
-    box.appendChild(matrix);
-    parent.appendChild(box);
+    rasciRootPreloads.set(cacheKey, request);
+    return request;
+  }
+
+  function rasciCardAction(label, className, handler, title) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `fiona-ai-rasci-action ${className}`;
+    button.textContent = label;
+    button.title = title || label;
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      handler?.(event);
+    });
+    return button;
+  }
+
+  function rasciSummaryCounts(table) {
+    const processCount = Number(table?.totalRows ?? table?.totalrows ?? table?.rows?.length ?? 0);
+    const jobCount = Number(table?.totalColumns ?? table?.totalcolumns ?? table?.columns?.length ?? 0);
+    return `${Number.isFinite(processCount) ? processCount : 0} processes · ${Number.isFinite(jobCount) ? jobCount : 0} jobs`;
+  }
+
+  function renderRasciTable(parent, table) {
+    const sourceId = table.sourceId || table.draftRasciId || '';
+    const descriptor = remoteTablePayload(table, sourceId);
+    const card = document.createElement('details');
+    card.className = 'fiona-ai-rasci-card';
+    const summary = document.createElement('summary');
+    summary.className = 'fiona-ai-rasci-summary';
+    const title = document.createElement('span');
+    title.className = 'fiona-ai-rasci-title';
+    title.textContent = table.title || 'RASCI matrix';
+    const counts = document.createElement('span');
+    counts.className = 'fiona-ai-rasci-counts';
+    counts.hidden = true;
+    const summaryLoading = document.createElement('span');
+    summaryLoading.className = 'fiona-ai-rasci-summary-loading';
+    summaryLoading.setAttribute('role', 'status');
+    summaryLoading.setAttribute('aria-live', 'polite');
+    const summarySpinner = document.createElement('span');
+    summarySpinner.className = 'fiona-ai-rasci-spinner';
+    summarySpinner.setAttribute('aria-hidden', 'true');
+    summaryLoading.append(summarySpinner, document.createTextNode('Memuat…'));
+    const actions = document.createElement('span');
+    actions.className = 'fiona-ai-rasci-actions';
+    actions.append(
+      rasciCardAction('Buka', 'fiona-ai-rasci-open', () => { card.open = true; }, 'Buka tabel RASCI'),
+      // This action is intentionally enabled but has no navigation yet.
+      rasciCardAction('Buka di tabel RASCI Utama', 'fiona-ai-rasci-main-action', () => {}, 'Buka di tabel RASCI utama')
+    );
+    summary.append(title, counts, summaryLoading, actions);
+    const body = document.createElement('div');
+    body.className = 'fiona-ai-table-wrap fiona-ai-rasci-wrap';
+    card.append(summary, body);
+    parent.appendChild(card);
+
+    const loading = document.createElement('div');
+    loading.className = 'fiona-ai-rasci-loading';
+    loading.setAttribute('role', 'status');
+    loading.setAttribute('aria-live', 'polite');
+    loading.setAttribute('aria-busy', 'true');
+    const spinner = document.createElement('span');
+    spinner.className = 'fiona-ai-rasci-spinner';
+    spinner.setAttribute('aria-hidden', 'true');
+    loading.append(spinner, document.createTextNode('Memuat matriks RASCI…'));
+    body.appendChild(loading);
+
+    const mount = root => {
+      const matrix = document.createElement('fiona-rasci-matrix');
+      const matrixPayload = {
+        ...descriptor.payload,
+        // The surrounding collapsed card already presents the table title.
+        hideToolbarTitle: true,
+        hideToolbar: true,
+        rows: root.rows || descriptor.payload.rows || [],
+        columns: root.columns?.length ? root.columns : (descriptor.payload.columns || [])
+      };
+      counts.textContent = rasciSummaryCounts(root);
+      counts.hidden = false;
+      if (matrixPayload.remote) matrixPayload.remote = { ...matrixPayload.remote, rootPreloaded: Boolean(descriptor.remote) };
+      matrix.data = matrixPayload;
+      matrix.addEventListener('fiona-rasci-error', event => {
+        body.dataset.error = event.detail?.error?.message || 'Unable to load RASCI matrix';
+      });
+      body.replaceChildren(matrix);
+      summaryLoading.hidden = true;
+    };
+
+    const hasRootPayload = !descriptor.remote || (!descriptor.isDescriptor && descriptor.payload.rows.length > 0);
+    if (hasRootPayload) {
+      mount({ rows: descriptor.payload.rows || [], columns: descriptor.payload.columns || [] });
+      return card;
+    }
+    preloadRasciRoot(descriptor.payload, descriptor.remote).then(mount).catch(error => {
+      summaryLoading.replaceChildren();
+      summaryLoading.classList.add('is-error');
+      summaryLoading.textContent = 'Gagal memuat';
+      loading.replaceChildren();
+      loading.classList.add('is-error');
+      loading.setAttribute('aria-busy', 'false');
+      loading.textContent = error?.message || 'Unable to load RASCI matrix';
+      body.dataset.error = loading.textContent;
+    });
+    return card;
+  }
+
+  function renderProsbisHierarchy(parent, descriptor) {
+    const processId = Number(descriptor?.processIds?.[0]);
+    const sourceId = String(descriptor?.sourceId || descriptor?.draftRasciId || '').trim();
+    if (!sourceId || !Number.isInteger(processId) || processId <= 0) return null;
+    const card = document.createElement('details');
+    card.className = 'fiona-ai-rasci-card fiona-ai-prosbis-hierarchy-card';
+    const summary = document.createElement('summary');
+    summary.className = 'fiona-ai-rasci-summary';
+    const title = document.createElement('span');
+    title.className = 'fiona-ai-rasci-title';
+    title.textContent = descriptor.title || 'Hierarki Prosbis';
+    const actions = document.createElement('span');
+    actions.className = 'fiona-ai-rasci-actions';
+    actions.append(rasciCardAction('Buka', 'fiona-ai-rasci-open', () => { card.open = true; }, 'Buka hierarki Prosbis'));
+    summary.append(title, actions);
+    const body = document.createElement('div');
+    body.className = 'fiona-ai-table-wrap fiona-ai-prosbis-hierarchy-wrap';
+    const hierarchy = document.createElement('fiona-prosbis-hierarchy');
+    hierarchy.data = { sourceId, processId, endpoint: `${api}/api/agent/prosbis-hierarchy/${encodeURIComponent(sourceId)}/${processId}`, token: token(), defer: true };
+    hierarchy.addEventListener('fiona-prosbis-hierarchy-error', event => {
+      body.dataset.error = event.detail?.error?.message || 'Unable to load business-process hierarchy';
+    });
+    body.appendChild(hierarchy);
+    card.append(summary, body);
+    parent.appendChild(card);
+    card.addEventListener('toggle', () => { if (card.open) hierarchy.load(); });
+    return card;
   }
 
   async function renderResult(data, options) {
@@ -397,7 +576,11 @@
     } else {
       bubble.innerHTML = markdown(data.markdown);
     }
-    (data.rasciTables || []).forEach(table => renderRasciTable(bubble, table));
+    (data.rasciTables || []).forEach(table => {
+      if (table.renderTarget === 'prosbis-hierarchy-viewer' || table.mode === 'prosbis_hierarchy') renderProsbisHierarchy(bubble, table);
+      else renderRasciTable(bubble, table);
+    });
+    if (data.artifact?.type === 'jobDescriptionPreview') renderJobDescriptionPreview(bubble, data.artifact);
     if (data.citations?.length) {
       const citations = document.createElement('div');
       citations.className = 'fiona-ai-citations';
@@ -442,6 +625,149 @@
       bubble.appendChild(row);
     }
     scrollToLatest();
+  }
+
+  function renderJobDescriptionPreview(parent, preview) {
+    if (!parent || !preview) return null;
+    const card = document.createElement('section');
+    card.className = 'fiona-ai-jd-preview';
+    card.setAttribute('aria-label', 'Pratinjau Job Description');
+    const title = document.createElement('h3');
+    title.textContent = 'Pratinjau Job Description';
+    card.appendChild(title);
+    if (preview.target) {
+      const target = document.createElement('p');
+      target.className = 'fiona-ai-jd-preview-target';
+      target.textContent = `${preview.target.jobName || 'N/A'} · ${preview.target.organization || 'N/A'}`;
+      card.appendChild(target);
+    }
+    (Array.isArray(preview.sections) ? preview.sections : []).forEach(section => {
+      const block = document.createElement('section');
+      block.className = 'fiona-ai-jd-section';
+      const heading = document.createElement('h4');
+      heading.textContent = `${section.number || ''}. ${section.title || ''}`.trim();
+      block.appendChild(heading);
+      if (section.mutedText) {
+        const muted = document.createElement('p');
+        muted.className = 'fiona-ai-jd-muted';
+        muted.textContent = String(section.mutedText);
+        block.appendChild(muted);
+      }
+      if (section.kind === 'table' || section.kind === 'rowHeaderTable') appendJdTable(block, section);
+      else if (section.kind === 'text') appendJdText(block, section.text);
+      else if (section.kind === 'segregatedList') {
+        (Array.isArray(section.groups) ? section.groups : []).forEach(group => {
+          const groupTitle = document.createElement('h5');
+          groupTitle.textContent = group.title || '';
+          block.appendChild(groupTitle);
+          if (group.kind === 'table') appendJdTable(block, group);
+          else appendJdList(block, group.items);
+        });
+      } else appendJdList(block, section.items);
+      card.appendChild(block);
+    });
+    appendJdNumberedNotes(card, 'Catatan', preview.footnotes);
+    appendJdNumberedNotes(card, 'Referensi', preview.references || preview.citations, true);
+    parent.appendChild(card);
+    return card;
+  }
+
+  function appendJdList(parent, values) {
+    const list = document.createElement('ul');
+    (Array.isArray(values) ? values : []).forEach(value => {
+      const item = document.createElement('li');
+      item.textContent = String(value ?? '');
+      list.appendChild(item);
+    });
+    if (!list.children.length) {
+      const item = document.createElement('li');
+      item.textContent = 'N/A';
+      list.appendChild(item);
+    }
+    parent.appendChild(list);
+  }
+
+  function appendJdText(parent, value) {
+    const text = document.createElement('p');
+    text.className = 'fiona-ai-jd-text';
+    text.textContent = String(value || 'N/A');
+    parent.appendChild(text);
+  }
+
+  function appendJdTable(parent, section) {
+    const table = document.createElement('table');
+    table.className = 'fiona-ai-jd-table';
+    if (section.kind === 'rowHeaderTable') table.classList.add('fiona-ai-jd-row-header-table');
+    const columns = Array.isArray(section.columns) ? section.columns : [];
+    const hasNumberAndIndexColumns = columns.some(column => String(column).trim().toLowerCase() === 'no')
+      && columns.some(column => String(column).trim().toLowerCase() === 'index');
+    if (hasNumberAndIndexColumns) table.classList.add('fiona-ai-jd-numbered-table');
+    if (section.kind !== 'rowHeaderTable' && section.hideHeader !== true) {
+      const head = document.createElement('thead');
+      const headRow = document.createElement('tr');
+      columns.forEach(column => {
+        const cell = document.createElement('th');
+        cell.textContent = String(column ?? '');
+        headRow.appendChild(cell);
+      });
+      head.appendChild(headRow);
+      table.appendChild(head);
+    }
+    const body = document.createElement('tbody');
+    (Array.isArray(section.rows) ? section.rows : []).forEach(row => {
+      const tr = document.createElement('tr');
+      const values = row && typeof row === 'object'
+        ? (Array.isArray(row.cells) ? row.cells : (row.label != null ? [row.label, row.value] : [row.no, row.index, row.first, row.second, row.third]))
+        : [row];
+      (columns.length ? columns : values).forEach((_, index) => {
+        const cell = document.createElement(section.kind === 'rowHeaderTable' && index === 0 ? 'th' : 'td');
+        if (section.kind === 'rowHeaderTable' && index === 0) cell.setAttribute('scope', 'row');
+        appendJdCell(cell, values[index]);
+        tr.appendChild(cell);
+      });
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+    parent.appendChild(table);
+  }
+
+  function appendJdCell(cell, value) {
+    if (Array.isArray(value)) {
+      const list = document.createElement('ul');
+      value.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = String(item ?? '');
+        list.appendChild(li);
+      });
+      if (!list.children.length) list.appendChild(document.createElement('li'));
+      cell.appendChild(list);
+      return;
+    }
+    if (value && typeof value === 'object' && ('subheader' in value || 'description' in value)) {
+      const subheader = document.createElement('strong');
+      subheader.textContent = String(value.subheader ?? '');
+      const description = document.createElement('span');
+      description.textContent = value.description ? ` ${String(value.description)}` : '';
+      cell.append(subheader, description);
+      return;
+    }
+    cell.textContent = String(value ?? 'N/A');
+  }
+
+  function appendJdNumberedNotes(parent, titleText, values, references) {
+    if (!Array.isArray(values) || !values.length) return;
+    const heading = document.createElement('h4');
+    heading.textContent = titleText;
+    parent.appendChild(heading);
+    const list = document.createElement('ol');
+    values.forEach(value => {
+      const item = document.createElement('li');
+      if (references && value && typeof value === 'object') {
+        item.textContent = `${value.title || 'Referensi'} (${value.sourceType || 'Data'}: ${value.sourceId || 'N/A'})`;
+      } else item.textContent = String(value?.text ?? value ?? '');
+      list.appendChild(item);
+    });
+    parent.appendChild(list);
   }
 
   function setChatBusy(value, cancellable) {
@@ -618,6 +944,8 @@
     conversationModelFrom: Models?.conversationModelFrom,
     add,
     renderRasciTable,
+    renderProsbisHierarchy,
+    renderJobDescriptionPreview,
     esc,
     scrollToLatest,
     startNewChat
@@ -665,11 +993,16 @@
     mentionTags,
     contextAddBtn,
     contextModal,
+    contextMenu,
     contextModalClose,
     contextCancel,
     tabPosition,
     tabProcess,
     contextSearch,
+    contextSearchButton,
+    contextSuggestions,
+    contextDidYouMean,
+    contextOverview,
     contextLoading,
     contextList,
     contextEmpty,
