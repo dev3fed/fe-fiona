@@ -123,8 +123,8 @@
                .replace(/native tool loop/i, l === 'en' ? 'analysis' : 'analisis')
                .replace(/fiona native maf/i, l === 'en' ? 'Fiona is analyzing' : 'Fiona sedang menganalisis')
                .replace(/mathematical runtime/i, l === 'en' ? 'data calculation' : 'perhitungan data')
-               .replace(/native tool invocation started/i, l === 'en' ? 'Step in progress…' : 'Langkah sedang berjalan…')
-               .replace(/native tool invocation completed/i, l === 'en' ? 'Step completed' : 'Langkah selesai')
+               .replace(/native tool invocation started/i, l === 'en' ? 'Processing…' : 'Sedang diproses…')
+               .replace(/native tool invocation completed/i, l === 'en' ? 'Completed' : 'Selesai')
                .replace(/get_rasci_business_process/i, l === 'en' ? 'business processes' : 'proses bisnis')
                .replace(/get_rasci_positions/i, l === 'en' ? 'positions' : 'posisi & jabatan')
                .replace(/get_rasci_mappings/i, l === 'en' ? 'RASCI mappings' : 'pemetaan RASCI')
@@ -132,7 +132,8 @@
                .replace(/duckdb_query/i, l === 'en' ? 'data calculation' : 'analisis data')
                .replace(/sql_server_query/i, l === 'en' ? 'database query' : 'pencarian data')
                .replace(/scratchpad_\w+/i, l === 'en' ? 'workspace' : 'ruang kerja analisis');
-    return text || (l === 'en' ? 'Processing step' : 'Memproses langkah');
+    text = text.replace(/^(?:step|langkah)\s+\d+\s*[:.-]?\s*/i, '');
+    return text || (l === 'en' ? 'Processing' : 'Memproses');
   }
 
   function sanitizeFriendlySummary(rawSummary, category, status, lang = 'id') {
@@ -219,7 +220,7 @@
         li.className = 'fiona-ai-step-item is-running';
         li.dataset.step = String(num);
 
-        const defaultLabel = phaseTitle || (language === 'en' ? `Step ${num}: Analyzing` : `Langkah ${num}: Menganalisis`);
+        const defaultLabel = phaseTitle || (language === 'en' ? 'Analyzing' : 'Menganalisis');
         const safeEsc = typeof esc === 'function' ? esc : (v => v == null ? '' : String(v));
         li.innerHTML = `
           <div class="fiona-ai-step-header">
@@ -343,9 +344,8 @@
         }
       }
 
-      const count = stepMap.size || 1;
       if (kind === 'complete') {
-        title.textContent = language === 'en' ? `Completed · ${count} ${count === 1 ? 'step' : 'steps'}` : `Selesai · ${count} langkah`;
+        title.textContent = language === 'en' ? 'Completed' : 'Selesai';
       } else {
         title.textContent = message || (language === 'en' ? 'Finished' : 'Selesai');
       }

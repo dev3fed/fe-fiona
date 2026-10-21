@@ -376,7 +376,7 @@
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   overscroll-behavior-y: auto;
@@ -384,9 +384,10 @@
   scrollbar-width: thin;
 }
 .fiona-ai-bubble :is(table, .fiona-ai-table) {
-  width: max-content !important;
-  min-width: 100% !important;
-  table-layout: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
   margin: 1.2em 0;
   border: 1px solid #d9e2ef;
   border-radius: 10px;
@@ -404,16 +405,18 @@
   border-radius: 0;
 }
 .fiona-ai-bubble :is(table, .fiona-ai-table) :is(th, td) {
-  min-width: 86px;
+  min-width: 0;
   padding: 10px 14px !important;
   border: 0 !important;
   border-bottom: 1px solid #e6ebf2 !important;
   text-align: left;
   vertical-align: top;
-  white-space: nowrap !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .fiona-ai-bubble :is(table, .fiona-ai-table) td:last-child {
-  min-width: 160px;
+  min-width: 0;
 }
 .fiona-ai-bubble :is(table, .fiona-ai-table) th {
   background: #f1f6fc;
@@ -422,7 +425,16 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble table :is(th:nth-child(1), td:nth-child(1)) {
+  width: 16%;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble table :is(th:nth-child(2), td:nth-child(2)) {
+  width: 38%;
+}
+.fiona-ai-message.assistant .fiona-ai-bubble table :is(th:nth-child(3), td:nth-child(3)) {
+  width: 46%;
 }
 .fiona-ai-bubble :is(table, .fiona-ai-table) tbody tr:nth-child(even) td {
   background: #fafcff;
@@ -1768,6 +1780,13 @@ ui-single-select, ui-multi-select {
 .fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-numbered-table thead th:nth-child(2),
 .fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-numbered-table tbody td:nth-child(2) {
   width: 12%;
+}
+.fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-numbered-table :is(th, td):nth-child(3) {
+  width: 25%;
+}
+.fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-numbered-table :is(th, td):nth-child(4),
+.fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-numbered-table :is(th, td):nth-child(5) {
+  width: 28%;
 }
 .fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-table strong { font-size: inherit; }
 .fiona-ai-jd-preview ol, .fiona-ai-jd-preview ul { margin: 5px 0 0 20px; padding: 0; }
