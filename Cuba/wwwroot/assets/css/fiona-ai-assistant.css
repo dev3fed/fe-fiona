@@ -1791,4 +1791,63 @@ ui-single-select, ui-multi-select {
 .fiona-ai-bubble .fiona-ai-jd-preview .fiona-ai-jd-table strong { font-size: inherit; }
 .fiona-ai-jd-preview ol, .fiona-ai-jd-preview ul { margin: 5px 0 0 20px; padding: 0; }
 
+.fiona-ai-jd-grouping-review {
+  container-type: inline-size;
+  container-name: fiona-jd-review;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--fiona-border);
+  border-radius: 10px;
+  background: #fff;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.fiona-ai-jd-grouping-review h3 { margin: 0 0 4px; font-size: 16px; }
+.fiona-ai-jd-grouping-meta { margin: 0 0 12px; color: #444; font-size: 12px; }
+.fiona-ai-jd-grouping-error { margin: 8px 0; padding: 8px 10px; border: 1px solid #777; border-left-width: 4px; color: #111; background: #f2f2f2; }
+.fiona-ai-jd-grouping-desktop { display: none; min-width: 0; }
+.fiona-ai-jd-grouping-mobile { display: block; min-width: 0; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table,
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-mobile-table {
+  width: 100%; max-width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; box-sizing: border-box;
+  color: #111; font-size: 12px;
+}
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table { border: 1px solid #555; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table th,
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table td,
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-mobile-table th,
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-mobile-table td {
+  min-width: 0; padding: 7px; border: 1px solid #777; text-align: left; vertical-align: top;
+  white-space: normal; overflow-wrap: anywhere; word-break: break-word; background: transparent;
+}
+.fiona-ai-jd-grouping-table th:nth-child(1), .fiona-ai-jd-grouping-table td:nth-child(1) { width: 15%; }
+.fiona-ai-jd-grouping-table th:nth-child(2), .fiona-ai-jd-grouping-table td:nth-child(2) { width: 40%; }
+.fiona-ai-jd-grouping-table th:nth-child(3), .fiona-ai-jd-grouping-table td:nth-child(3) { width: 45%; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table thead th { background: #e8e8e8; font-weight: 700; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody.is-unshaded > tr > :is(td, th.fiona-ai-jd-grouping-duty),
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody.is-unshaded > tr:hover > :is(td, th.fiona-ai-jd-grouping-duty) { background-color: #fff; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody.is-shaded > tr > :is(td, th.fiona-ai-jd-grouping-duty),
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody.is-shaded > tr:hover > :is(td, th.fiona-ai-jd-grouping-duty) { background-color: #f0f0f0; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody > tr.fiona-ai-jd-grouping-inner-row > :is(td, th.fiona-ai-jd-grouping-duty) { border-top-color: #c8c8c8; border-bottom-color: #c8c8c8; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody > tr.fiona-ai-jd-grouping-first-row > :is(td, th.fiona-ai-jd-grouping-duty) { border-top: 2px solid #333; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody > tr:last-child > :is(td, th.fiona-ai-jd-grouping-duty) { border-bottom: 2px solid #333; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table th.fiona-ai-jd-grouping-duty { border-bottom: 2px solid #333; }
+.fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody > tr > th.fiona-ai-jd-grouping-duty {
+  color: #111 !important; font: inherit; font-weight: 400; text-align: left; text-transform: none !important; letter-spacing: normal;
+}
+.fiona-ai-jd-grouping-duty { vertical-align: top !important; }
+.fiona-ai-jd-grouping-duty strong, .fiona-ai-jd-grouping-duty-label { display: block; }
+.fiona-ai-jd-grouping-duty-label { margin-top: 6px; }
+.fiona-ai-jd-grouping-card { padding: 9px; border: 1px solid #555; border-top-width: 2px; min-width: 0; }
+.fiona-ai-jd-grouping-card:last-child { border-bottom-width: 2px; }
+.fiona-ai-jd-grouping-card.is-unshaded { background: #fff; }
+.fiona-ai-jd-grouping-card.is-shaded { background: #f0f0f0; }
+.fiona-ai-jd-grouping-card-duty { margin-bottom: 8px; overflow-wrap: anywhere; word-break: break-word; }
+.fiona-ai-jd-grouping-card-duty p { margin: 4px 0 0; }
+.fiona-ai-jd-grouping-mobile-table th { background: #e8e8e8 !important; }
+@container fiona-jd-review (min-width: 640px) {
+  .fiona-ai-jd-grouping-desktop { display: block; }
+  .fiona-ai-jd-grouping-mobile { display: none; }
+}
+
 

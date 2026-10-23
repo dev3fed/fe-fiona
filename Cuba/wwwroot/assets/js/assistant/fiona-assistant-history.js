@@ -228,6 +228,9 @@
             if (bubble && artifactData?.artifact?.type === 'jobDescriptionPreview' && typeof renderJobDescriptionPreview === 'function') {
               renderJobDescriptionPreview(bubble, artifactData.artifact);
             }
+            if (bubble && artifactData?.artifact?.type === 'jobDescriptionGroupingReview' && typeof deps.renderJobDescriptionGroupingReview === 'function') {
+              deps.renderJobDescriptionGroupingReview(bubble, artifactData.artifact);
+            }
             if (bubble && artifactData?.citations?.length) {
               const citations = document.createElement('div');
               citations.className = 'fiona-ai-citations';

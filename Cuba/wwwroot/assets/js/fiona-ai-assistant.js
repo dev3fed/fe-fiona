@@ -84,6 +84,7 @@
   let cachePreparationVersion = 0;
   let cacheStatusKind = 'idle';
   let cacheStatusLabel = '';
+  let jdGroupingReviewSequence = 0;
 
   if (queryConversationId) sessionStorage.setItem('fiona.ai.conversation', queryConversationId);
 
@@ -581,6 +582,7 @@
       else renderRasciTable(bubble, table);
     });
     if (data.artifact?.type === 'jobDescriptionPreview') renderJobDescriptionPreview(bubble, data.artifact);
+    else if (data.artifact?.type === 'jobDescriptionGroupingReview') renderJobDescriptionGroupingReview(bubble, data.artifact);
     if (data.citations?.length) {
       const citations = document.createElement('div');
       citations.className = 'fiona-ai-citations';
@@ -670,6 +672,162 @@
     appendJdNumberedNotes(card, 'Referensi', preview.references || preview.citations, true);
     parent.appendChild(card);
     return card;
+  }
+
+  function renderJobDescriptionGroupingReview(parent, artifact) {
+    if (!parent || !artifact) return null;
+    const card = document.createElement('section');
+    card.className = 'fiona-ai-jd-grouping-review';
+    card.setAttribute('aria-label', 'Review pengelompokan Job Description');
+    const heading = document.createElement('h3');
+    heading.textContent = 'Review Pengelompokan Job Description';
+    const meta = document.createElement('p');
+    meta.className = 'fiona-ai-jd-grouping-meta';
+    const revision = Number.isFinite(Number(artifact.revision)) ? Number(artifact.revision) : 0;
+    meta.textContent = `Revisi ${revision} · ${artifact.confirmed ? 'Disetujui' : 'Menunggu persetujuan'}`;
+    card.append(heading, meta);
+    if (artifact.error?.message) {
+      const error = document.createElement('p');
+      error.className = 'fiona-ai-jd-grouping-error';
+      error.setAttribute('role', 'alert');
+      error.textContent = `${artifact.error.message} Versi tersimpan tetap ditampilkan bila tersedia.`;
+      card.appendChild(error);
+    }
+
+    const groups = Array.isArray(artifact.groups) ? artifact.groups : [];
+    const items = Array.isArray(artifact.items) ? artifact.items : [];
+    const itemKey = (groupId, code) => `${String(groupId).toLowerCase()}\u0000${String(code).toLowerCase()}`;
+    const itemMap = new Map();
+    for (const item of items) {
+      const key = itemKey(item?.groupId, item?.processCode);
+      if (itemMap.has(key)) return malformed();
+      itemMap.set(key, item);
+    }
+    const normalized = [];
+    const groupIds = new Set();
+    const reviewCodes = new Set();
+    const usedItems = new Set();
+    for (let index = 0; index < groups.length; index++) {
+      const group = groups[index];
+      const id = String(group?.groupId ?? '').trim();
+      const label = String(group?.label ?? '').trim();
+      const codes = Array.isArray(group?.sourceCodes) ? group.sourceCodes : [];
+      if (!id || !label || !codes.length || groupIds.has(id.toLowerCase())) return malformed();
+      groupIds.add(id.toLowerCase());
+      const rows = [];
+      for (const rawCode of codes) {
+        const code = String(rawCode ?? '').trim();
+        const key = itemKey(id, code);
+        const normalizedCode = code.toLowerCase();
+        if (!code || reviewCodes.has(normalizedCode) || !itemMap.has(key)) return malformed();
+        reviewCodes.add(normalizedCode);
+        usedItems.add(key);
+        const item = itemMap.get(key);
+        const suppliedName = typeof item.processName === 'string' ? item.processName.trim() : '';
+        rows.push({ code, name: suppliedName || `Nama proses tidak tersedia (${code})` });
+      }
+      normalized.push({ label, rows, number: index + 1 });
+    }
+    if (!normalized.length || usedItems.size !== items.length) return malformed();
+
+    const desktop = document.createElement('div');
+    desktop.className = 'fiona-ai-jd-grouping-desktop';
+    const table = document.createElement('table');
+    table.className = 'fiona-ai-jd-grouping-table';
+    const head = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const reviewId = ++jdGroupingReviewSequence;
+    const headerIds = ['index', 'name', 'duty'].map((part, i) => `fiona-jd-group-${reviewId}-${part}-${i}`);
+    ['Index proses', 'Nama proses bisnis', 'Usulan Tugas & Tanggung Jawab'].forEach((title, i) => {
+      const th = document.createElement('th');
+      th.id = headerIds[i];
+      th.scope = 'col';
+      th.textContent = title;
+      headerRow.appendChild(th);
+    });
+    head.appendChild(headerRow);
+    normalized.forEach((group, index) => {
+      const groupBody = document.createElement('tbody');
+      groupBody.className = `fiona-ai-jd-grouping-tbody ${index % 2 ? 'is-shaded' : 'is-unshaded'}`;
+      group.rows.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        tr.className = rowIndex === 0 ? 'fiona-ai-jd-grouping-first-row' : 'fiona-ai-jd-grouping-inner-row';
+        const code = document.createElement('td');
+        code.textContent = row.code;
+        const name = document.createElement('td');
+        name.textContent = row.name;
+        const groupHeaderId = `fiona-jd-group-${reviewId}-rowgroup-${group.number}`;
+        code.setAttribute('headers', `${headerIds[0]} ${groupHeaderId}`);
+        name.setAttribute('headers', `${headerIds[1]} ${groupHeaderId}`);
+        tr.append(code, name);
+        if (rowIndex === 0) {
+          const duty = document.createElement('th');
+          duty.className = 'fiona-ai-jd-grouping-duty';
+          duty.id = groupHeaderId;
+          duty.scope = 'rowgroup';
+          duty.setAttribute('headers', headerIds[2]);
+          duty.rowSpan = group.rows.length;
+          const label = document.createElement('span');
+          label.className = 'fiona-ai-jd-grouping-duty-label';
+          label.textContent = group.label;
+          const caption = document.createElement('strong');
+          caption.textContent = `Kelompok ${group.number} · ${group.rows.length} proses`;
+          duty.append(caption, label);
+          tr.appendChild(duty);
+        }
+        groupBody.appendChild(tr);
+      });
+      table.appendChild(groupBody);
+    });
+    table.insertBefore(head, table.firstChild);
+    desktop.appendChild(table);
+
+    const mobile = document.createElement('div');
+    mobile.className = 'fiona-ai-jd-grouping-mobile';
+    normalized.forEach((group, index) => {
+      const groupCard = document.createElement('section');
+      groupCard.className = `fiona-ai-jd-grouping-card ${index % 2 ? 'is-shaded' : 'is-unshaded'}`;
+      const responsibility = document.createElement('div');
+      responsibility.className = 'fiona-ai-jd-grouping-card-duty';
+      const caption = document.createElement('strong');
+      caption.textContent = `Kelompok ${group.number} · ${group.rows.length} proses`;
+      const label = document.createElement('p');
+      label.textContent = group.label;
+      responsibility.append(caption, label);
+      const mobileTable = document.createElement('table');
+      mobileTable.className = 'fiona-ai-jd-grouping-mobile-table';
+      const mobileHead = document.createElement('thead');
+      const mobileHeaderRow = document.createElement('tr');
+      ['Index proses', 'Nama proses bisnis'].forEach((title, index) => {
+        const th = document.createElement('th');
+        th.id = `fiona-jd-group-${reviewId}-mobile-${group.number}-${index}`;
+        th.scope = 'col'; th.textContent = title; mobileHeaderRow.appendChild(th);
+      });
+      mobileHead.appendChild(mobileHeaderRow);
+      const mobileBody = document.createElement('tbody');
+      group.rows.forEach(row => {
+        const tr = document.createElement('tr');
+        const code = document.createElement('td'); code.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-0`); code.textContent = row.code;
+        const name = document.createElement('td'); name.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-1`); name.textContent = row.name;
+        tr.append(code, name); mobileBody.appendChild(tr);
+      });
+      mobileTable.append(mobileHead, mobileBody);
+      groupCard.append(responsibility, mobileTable);
+      mobile.appendChild(groupCard);
+    });
+    card.append(desktop, mobile);
+    parent.appendChild(card);
+    return card;
+
+    function malformed() {
+      const message = document.createElement('p');
+      message.className = 'fiona-ai-jd-grouping-error';
+      message.setAttribute('role', 'alert');
+      message.textContent = 'Data pengelompokan tidak lengkap atau tidak konsisten. Silakan minta Fiona memuat ulang review.';
+      card.appendChild(message);
+      parent.appendChild(card);
+      return card;
+    }
   }
 
   function appendJdList(parent, values) {
@@ -947,6 +1105,7 @@
     renderRasciTable,
     renderProsbisHierarchy,
     renderJobDescriptionPreview,
+    renderJobDescriptionGroupingReview,
     esc,
     scrollToLatest,
     startNewChat
