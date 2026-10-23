@@ -717,7 +717,7 @@
     (Array.isArray(section.rows) ? section.rows : []).forEach(row => {
       const tr = document.createElement('tr');
       const values = row && typeof row === 'object'
-        ? (Array.isArray(row.cells) ? row.cells : (row.label != null ? [row.label, row.value] : [row.no, row.index, row.first, row.second, row.third]))
+        ? (Array.isArray(row.cells) ? row.cells : (row.label != null ? [row.label, row.value] : (hasNumberAndIndexColumns ? [row.no, row.index, row.first, row.second, row.third] : [row.no, row.first, row.second, row.third])))
         : [row];
       (columns.length ? columns : values).forEach((_, index) => {
         const cell = document.createElement(section.kind === 'rowHeaderTable' && index === 0 ? 'th' : 'td');
@@ -747,8 +747,9 @@
       const subheader = document.createElement('strong');
       subheader.textContent = String(value.subheader ?? '');
       const description = document.createElement('span');
+      description.style.whiteSpace = 'pre-line';
       description.textContent = value.description ? ` ${String(value.description)}` : '';
-      cell.append(subheader, description);
+      cell.append(subheader, document.createElement('br'), description);
       return;
     }
     cell.textContent = String(value ?? 'N/A');
