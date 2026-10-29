@@ -218,6 +218,13 @@ async function chartShow(params) {
   }
 }
 
+// Resolve the saved or proposed JD chart from its captured organization
+// source and the exact JobId + PrlOrg target.
+async function resolveJobDescriptionOrganizationChart(params) {
+  const api = `${url.baseUrl}/${url["organization-structure"]}/chart/job-description`;
+  return ajaxRequest(api, "POST", params);
+}
+
 // http://localhost:5075/api/job-description/get-similarities/10132470/0?draftId=078f449f-a016-44ee-a09c-71326225aed1&prlOrg=26
 async function getSimilarities(params) {
   const api = `${url.baseUrl}/${url["job-description"]}/get-similarities/${params.jobId}/${params.percentage}?draftId=${params.draftId}&prlOrg=${params.prlOrg}`;
@@ -258,8 +265,9 @@ async function getAllTanggungJawabJobToJob(params) {
 //
 
 // /api/job-description/draft/detail/{draftId}
-async function draftDetailById(draftId) {
-  const api = `${url.baseUrl}/${url["job-description"]}/draft/detail/${draftId}`;
+async function draftDetailById(draftId, target = null) {
+  const query = target ? `?${new URLSearchParams({jobId: target.jobId, prlOrg: target.prlOrg || ''})}` : '';
+  const api = `${url.baseUrl}/${url["job-description"]}/draft/detail/${draftId}${query}`;
   try {
     const result = await ajaxRequest(api, "GET"); // Menggunakan ajaxRequest
     return result;

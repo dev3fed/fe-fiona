@@ -1,4 +1,39 @@
-let getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc"));
+let getDraftExisting = null;
+try { getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc")); } catch (_) { }
+
+async function loadExplicitJdDraftContext() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("draftId")) return true;
+  // Never fall back to a previously visited draft when a direct link is invalid.
+  getDraftExisting = null;
+  const draftId = params.get("draftId");
+  try {
+    if (!draftId || !params.get("jobId")) throw new Error("Invalid JD link");
+    const response = await draftDetailById(encodeURIComponent(draftId), {
+      jobId: params.get("jobId"), prlOrg: params.get("prlOrg")
+    });
+    const data = response?.data;
+    if (!data || data.draftId !== draftId || data.isActive === false) throw new Error("Draft not found");
+    getDraftExisting = {
+      draftId: data.draftId,
+      draftName: data.draftName,
+      draftOrganizationId: data.draftOrganizationId,
+      organizationDraftId: data.organizationDraftId,
+      draftRasciId: data.rasciDraftId || data.draftRasciId || null,
+      organizationChartSource: data.organizationDraftId
+        ? {kind: 'draft', draftId: data.organizationDraftId}
+        : {kind: 'master', draftId: null},
+    };
+    refreshDataLocalStorage();
+    localStorage.setItem("draftExistingJobDesc", JSON.stringify(getDraftExisting));
+    return true;
+  } catch (_) {
+    loader(false);
+    $("#saveDraft").prop("disabled", true);
+    swal("JD unavailable", "This JD link is invalid or the saved draft is no longer available.", "error");
+    return false;
+  }
+}
 
 // Debounce function untuk search
 let searchTimeout;
@@ -668,6 +703,10 @@ async function generateAndDownloadWord() {
   try {
     console.log("🚀 Starting Word document generation...");
     const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
+    if (typeof prepareAndUploadSVG === "function") {
+      const chartBlob = await prepareAndUploadSVG();
+      if (chartBlob) params.organizationChartSvg = await chartBlob.text();
+    }
     console.log("Generating Word document with params:", params);
 
     const wordResult = await downloadWord(params);
@@ -699,14 +738,18 @@ async function generateAndDownloadWord() {
 
 async function getDetailJob(jobCode) {
   console.log("getDraftExisting", getDraftExisting);
-  const detailJob = await chartJobDetail({
-    draftId: getDraftExisting.organizationDraftId,
-    jobCode: jobCode,
-  });
-  return detailJob;
+  // A JD created from master evidence can have no organization draft. Its
+  // saved sections still load even when optional chart information is absent.
+  if (!getDraftExisting.organizationDraftId) return { data: {} };
+  try {
+    return await chartJobDetail({ draftId: getDraftExisting.organizationDraftId, jobCode });
+  } catch (_) {
+    return { data: {} };
+  }
 }
 
 $(document).ready(async function () {
+  if (!await loadExplicitJdDraftContext()) return;
   // $("#modalRecomendation").modal("show");
   // modalRecomendationBody
   // make list in modalRecomendationBody with codeNotAvailable
@@ -741,6 +784,12 @@ $(document).ready(async function () {
       );
     }
     readOnlyPage();
+  }
+  if (!getDraftExisting.organizationChartSource) {
+    getDraftExisting.organizationChartSource = getDraftExisting.organizationDraftId
+      ? {kind: 'draft', draftId: getDraftExisting.organizationDraftId}
+      : {kind: 'master', draftId: null};
+    try { localStorage.setItem("draftExistingJobDesc", JSON.stringify(getDraftExisting)); } catch (_) { }
   }
   const detailJobSO = await getDetailJob(jobId);
   getDataListAsync([

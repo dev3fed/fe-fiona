@@ -1020,7 +1020,7 @@ function processChartData(rawData) {
 }
 
 // Function to initialize the organizational chart
-function initializeChart(processedDataResult, focusNodeId, forceCompact = false) {
+function initializeChart(processedDataResult, focusNodeId, forceCompact = false, chartContainer = ".chart-container-custom", options = {}) {
   console.log("Initializing chart with data:", processedDataResult);
   let isCompact = true;
   if (focusNodeId) {
@@ -1028,7 +1028,15 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
     const parentObject = processedDataResult.processedData.find((item) => item.id == selfObject?.parentId);
     const childrenObjects = processedDataResult.processedData.filter((item) => item.parentId === selfObject?.id);
     const siblingsObjects = processedDataResult.processedData.filter((item) => item.parentId === selfObject?.parentId);
-    processedDataResult.processedData = [parentObject, ...siblingsObjects, ...childrenObjects];
+    if (parentObject) {
+      parentObject.parentId = null;
+      parentObject.pid = null;
+    }
+    processedDataResult.processedData = [
+      ...(parentObject ? [parentObject] : []),
+      ...siblingsObjects.filter(item => item !== parentObject),
+      ...childrenObjects
+    ];
     // // More efficient approach: find index and move to front
     if (selfObject) {
       if (!selfObject.tags.includes("pointed")) {
@@ -1054,7 +1062,11 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
     isCompact = true;
   }
 
-  chart = new d3.OrgChart()
+  const containerElement = typeof chartContainer === "string" ? document.querySelector(chartContainer) : chartContainer;
+  if (!containerElement) return null;
+  if (!containerElement.id) containerElement.id = `fiona-org-chart-${Math.random().toString(36).slice(2)}`;
+  const containerSelector = `#${containerElement.id}`;
+  const chartInstance = new d3.OrgChart()
     .nodeHeight(function (d) {
       const isBasket = d.data.tags.some((tag) => tag.includes("basket_"));
       if (isBasket) {
@@ -1219,34 +1231,32 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false)
               `;
       }
     })
-    .container(".chart-container-custom")
+    .container(containerSelector)
     .data(processedDataResult.processedData)
     .compact(isCompact)
     .render()
     .fit();
 
   // Auto-expand node if focusNodeId is provided
-  if (focusNodeId) {
+  if (focusNodeId && options.autoExpand !== false) {
     const findChildren = processedDataResult.processedData.find((item) => item.parentId == focusNodeId);
-    console.log(`Auto-expanding node with ID ${findChildren}`);
-    setTimeout(() => handleNodeExpansion(findChildren.id), 500); // Wait 2 seconds for chart to fully render
     if (findChildren) {
+      setTimeout(() => chartInstance.setExpanded(findChildren.id).render().fit(), 500);
     }
   } else {
-    console.log("No focusNodeId provided, skipping auto-expand");
+    if (!focusNodeId) console.log("No focusNodeId provided, skipping auto-expand");
   }
 
-  const chartContainer = document.querySelector(".chart-container-custom");
-  if (chartContainer) {
-    const chartGroup = chartContainer.querySelector("g.chart");
+  if (options.staticPosition !== false) {
+    const chartGroup = containerElement.querySelector("g.chart");
     if (chartGroup) {
-      // Wait 3 seconds before applying static centering
       setTimeout(() => {
         chartGroup.classList.remove("transform");
         chartGroup.setAttribute("transform", "translate(450,-100) scale(0.6)");
       }, 1000);
     }
   }
+  return chartInstance;
 }
 
 // Function to setup continuous monitoring of chart positioning
@@ -1326,6 +1336,34 @@ function renderOrgChart(dataChart, focusNodeId, isAutoExpand = true) {
   localStorage.setItem("focusNodeId", JSON.stringify(focusNodeId));
   localStorage.setItem("orgChartData", JSON.stringify(processed));
   localStorage.setItem("isAutoExpand", JSON.stringify(isAutoExpand));
-  initializeChart(processed, isAutoExpand ? focusNodeId : null);
+  chart = initializeChart(processed, isAutoExpand ? focusNodeId : null);
   if (chart) chart.fit();
+}
+
+// Render an approved JD chart into its own container with the same node
+// templates, hierarchy relationships, and pointed-node highlight as the
+// interactive organization chart. This path has no shared chart state and
+// does not use localStorage.
+function renderJdOrganizationChart(container, chartData, selected) {
+  if (!container || !Array.isArray(chartData) || !chartData.length) return null;
+  const rows = chartData.map(row => ({...row}));
+  const matches = row => {
+    if (String(row.id_position || "") === String(selected?.jobId || "") &&
+        String(row.prl || "") === String(selected?.prlOrg || "")) return true;
+    for (let index = 1; index <= 20; index++) {
+      if (String(row[`bc_${index}_id_position`] || "") === String(selected?.jobId || "") &&
+          String(row[`bc_${index}_prl`] || "") === String(selected?.prlOrg || "")) return true;
+    }
+    return false;
+  };
+  const target = rows.find(matches);
+  if (!target) return null;
+  rows.forEach(row => {
+    row.id = row.id_org_unit || row.id;
+    row.parentId = row.pid || null;
+    row.tags = Array.isArray(row.tags) ? row.tags.slice() : [];
+    if (row === target && !row.tags.includes("pointed")) row.tags.push("pointed");
+  });
+  const processed = processChartData(rows);
+  return initializeChart(processed, target.id, false, container, {autoExpand: false, staticPosition: false});
 }

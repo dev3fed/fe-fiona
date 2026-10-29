@@ -1248,6 +1248,31 @@ function getallChildrenNode(parentNode) {
 // helper bagan org
 // ======================
 async function focusNode(nodeId) {
+  const chartContainer = document.querySelector(".chart-container-custom");
+  if (!chartContainer) return;
+  try {
+    const savedContext = JSON.parse(localStorage.getItem("draftExistingJobDesc") || "{}");
+    const source = savedContext.organizationChartSource || (savedContext.organizationDraftId
+      ? {kind: "draft", draftId: savedContext.organizationDraftId}
+      : {kind: "master", draftId: null});
+    const response = await resolveJobDescriptionOrganizationChart({
+      sourceKind: source.kind,
+      sourceDraftId: source.draftId || null,
+      jobId: String(nodeId),
+      prlOrg: String(prlOrg || "")
+    });
+    const contract = response?.data || response;
+    if (contract?.available && Array.isArray(contract.nodes) &&
+        typeof renderJdOrganizationChart === "function") {
+      chart = renderJdOrganizationChart(chartContainer, contract.nodes, contract.selected);
+      if (chart) return;
+    }
+    chartContainer.textContent = "Data struktur organisasi belum tersedia.";
+  } catch (error) {
+    console.warn("Unable to load the JD organization chart", error);
+    chartContainer.textContent = "Data struktur organisasi belum tersedia.";
+  }
+  return;
   // Show loading with proper container detection
   showChartLoading("chart-container-custom");
   // console.log("Focusing on node:", organizationAttribute);

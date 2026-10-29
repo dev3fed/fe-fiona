@@ -635,8 +635,16 @@
     card.className = 'fiona-ai-jd-preview';
     card.setAttribute('aria-label', 'Pratinjau Job Description');
     const title = document.createElement('h3');
-    title.textContent = 'Pratinjau Job Description';
+    title.textContent = preview.status === 'applied' ? 'Job Description tersimpan' : 'Pratinjau Job Description';
     card.appendChild(title);
+    if (preview.status === 'applied' && typeof preview.openUrl === 'string' &&
+        preview.openUrl.startsWith('/job-description/detail?')) {
+      const link = document.createElement('a');
+      link.className = 'btn btn-primary fiona-ai-open-jd';
+      link.href = preview.openUrl;
+      link.textContent = 'Open JD';
+      card.appendChild(link);
+    }
     if (preview.target) {
       const target = document.createElement('p');
       target.className = 'fiona-ai-jd-preview-target';
@@ -657,6 +665,7 @@
       }
       if (section.kind === 'table' || section.kind === 'rowHeaderTable') appendJdTable(block, section);
       else if (section.kind === 'text') appendJdText(block, section.text);
+      else if (section.kind === 'organizationChart') appendJdOrganizationChart(block, section.chart, section.emptyMessage || 'Data struktur organisasi belum tersedia.');
       else if (section.kind === 'segregatedList') {
         (Array.isArray(section.groups) ? section.groups : []).forEach(group => {
           const groupTitle = document.createElement('h5');
@@ -672,6 +681,76 @@
     appendJdNumberedNotes(card, 'Referensi', preview.references || preview.citations, true);
     parent.appendChild(card);
     return card;
+  }
+
+  async function resolveJdOrganizationChart(request) {
+    if (typeof ajaxRequest !== 'function' || typeof url_api === 'undefined' || !url_api) return null;
+    return ajaxRequest(`${url_api}/api/organization-structure/chart/job-description`, 'POST', request);
+  }
+
+  function appendJdOrganizationChart(parent, chartData, emptyMessage) {
+    const container = document.createElement('div');
+    container.className = 'fiona-ai-jd-org-chart';
+    container.setAttribute('role', 'img');
+    container.setAttribute('aria-label', 'Struktur organisasi');
+    parent.appendChild(container);
+
+    const showUnavailable = () => {
+      container.textContent = emptyMessage;
+      container.classList.add('fiona-ai-jd-org-chart-empty');
+    };
+    const nodes = Array.isArray(chartData?.nodes) ? chartData.nodes : [];
+    if (nodes.length) {
+      renderJdOrganizationNodes(container, nodes, chartData.selected || {});
+      return;
+    }
+
+    // Chart data is fetched from the exact source captured in the approved
+    // proposal. A missing position in a linked draft stays missing; it never
+    // silently switches to master or another draft.
+    if (!chartData?.source || !chartData?.selected?.jobId || !chartData?.selected?.prlOrg ||
+        typeof resolveJdOrganizationChart !== 'function') {
+      showUnavailable();
+      return;
+    }
+    Promise.resolve(resolveJdOrganizationChart({
+      sourceKind: chartData.source.kind,
+      sourceDraftId: chartData.source.draftId,
+      jobId: chartData.selected.jobId,
+      prlOrg: chartData.selected.prlOrg
+    })).then(response => {
+        const result = response?.data || response;
+        const rows = Array.isArray(result?.nodes) ? result.nodes : [];
+        if (result?.available !== true || !rows.length) { showUnavailable(); return; }
+        chartData.nodes = rows;
+        chartData.selected = result.selected || chartData.selected;
+        chartData.source = result.source || chartData.source;
+        renderJdOrganizationNodes(container, rows, chartData.selected);
+      })
+      .catch(showUnavailable);
+  }
+
+  function renderJdOrganizationNodes(container, nodes, selected) {
+    const list = Array.isArray(nodes) ? nodes : [];
+    const matched = list.find(node => {
+      if (String(node?.id_position || '') === String(selected.jobId || '') &&
+          String(node?.prl || '') === String(selected.prlOrg || '')) return true;
+      for (let index = 1; index <= 20; index++) {
+        if (String(node?.[`bc_${index}_id_position`] || '') === String(selected.jobId || '') &&
+            String(node?.[`bc_${index}_prl`] || '') === String(selected.prlOrg || '')) return true;
+      }
+      return false;
+    });
+    if (!matched || typeof renderJdOrganizationChart !== 'function') {
+      container.textContent = 'Data struktur organisasi belum tersedia.';
+      container.classList.add('fiona-ai-jd-org-chart-empty');
+      return;
+    }
+    if (!renderJdOrganizationChart(container, list, selected)) {
+      container.textContent = 'Data struktur organisasi belum tersedia.';
+      container.classList.add('fiona-ai-jd-org-chart-empty');
+      return;
+    }
   }
 
   function renderJobDescriptionGroupingReview(parent, artifact) {
