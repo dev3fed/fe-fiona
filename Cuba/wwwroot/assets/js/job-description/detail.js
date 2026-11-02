@@ -1,4 +1,5 @@
 let getDraftExisting = null;
+let organizationChartLoadPromise = Promise.resolve();
 try { getDraftExisting = JSON.parse(localStorage.getItem("draftExistingJobDesc")); } catch (_) { }
 
 async function loadExplicitJdDraftContext() {
@@ -703,6 +704,7 @@ async function generateAndDownloadWord() {
   try {
     console.log("🚀 Starting Word document generation...");
     const params = prepareJobDescriptionData(jobId, prlOrg, paramsSaveDraft);
+    await organizationChartLoadPromise;
     if (typeof prepareAndUploadSVG === "function") {
       const chartBlob = await prepareAndUploadSVG();
       if (chartBlob) params.organizationChartSvg = await chartBlob.text();
@@ -1345,7 +1347,7 @@ $(document).ready(async function () {
   if (master) {
     readOnlyPage();
   }
-  focusNode(jobId);
+  organizationChartLoadPromise = focusNode(jobId);
 
   // $(".summernote").summernote("disable");
 

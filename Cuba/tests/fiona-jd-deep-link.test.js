@@ -21,15 +21,29 @@ function setup(storageValue, response, search = '?draft=true&draftId=saved&jobId
 }
 test('explicit JD links load exact draft with empty, stale, or malformed browser storage and on refresh', async () => {
   for (const storage of [null, '{broken', JSON.stringify({draftId:'wrong-draft'})]) {
-    const {sandbox, stored, calls} = setup(storage, {data: {draftId:'saved', draftName:'Saved JD', rasciDraftId:'reviewed', isActive:true}});
+    const {sandbox, stored, calls} = setup(storage, {data: {draftId:'saved', draftName:'Saved JD', rasciDraftId:'reviewed', organizationDraftId:'linked-so', isActive:true}});
     assert.equal(await sandbox.loadExplicitJdDraftContext(), true);
     assert.equal(JSON.parse(stored.get('draftExistingJobDesc')).draftId, 'saved');
     assert.equal(JSON.parse(stored.get('draftExistingJobDesc')).draftRasciId, 'reviewed');
+    assert.equal(JSON.parse(stored.get('draftExistingJobDesc')).organizationChartSource.kind, 'draft');
+    assert.equal(JSON.parse(stored.get('draftExistingJobDesc')).organizationChartSource.draftId, 'linked-so');
     assert.equal(calls[0][0], 'saved');
     assert.equal(calls[0][1].jobId, 'T &1');
     assert.equal(calls[0][1].prlOrg, '1');
     assert.equal(await sandbox.loadExplicitJdDraftContext(), true);
   }
+});
+test('explicit existing JD with a null SO link keeps master as its chart source', async () => {
+  const {sandbox, stored, calls} = setup(null, {data: {
+    draftId:'saved', draftName:'Master sourced JD', rasciDraftId:'unrelated-rasci',
+    organizationDraftId:null, isActive:true
+  }});
+  assert.equal(await sandbox.loadExplicitJdDraftContext(), true);
+  const saved = JSON.parse(stored.get('draftExistingJobDesc'));
+  assert.equal(saved.organizationChartSource.kind, 'master');
+  assert.equal(saved.organizationChartSource.draftId, null);
+  assert.equal(saved.draftRasciId, 'unrelated-rasci');
+  assert.equal(calls.length, 2); // detail lookup and local section refresh
 });
 test('invalid or removed JD links stop loading instead of falling back to stale context', async () => {
   for (const response of [null, {data:null}, {data:{draftId:'other'}}, {data:{draftId:'saved', isActive:false}}]) {

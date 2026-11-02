@@ -652,9 +652,13 @@ function convertForeignObjectToSVGText(svgElement) {
 }
 
 function getChartExportData() {
-  const orgChartData = JSON.parse(localStorage.getItem("orgChartData") || "[]");
-  const focusNodeId = JSON.parse(localStorage.getItem("focusNodeId") || "null");
-  const isAutoExpand = JSON.parse(localStorage.getItem("isAutoExpand") || "false");
+  const savedJdChart = chart?.jdOrganizationChartData;
+  const orgChartData = savedJdChart || JSON.parse(localStorage.getItem("orgChartData") || "null");
+  const focusNodeId = savedJdChart ? chart.jdFocusNodeId : JSON.parse(localStorage.getItem("focusNodeId") || "null");
+  const isAutoExpand = savedJdChart ? true : JSON.parse(localStorage.getItem("isAutoExpand") || "false");
+  if (!Array.isArray(orgChartData?.processedData)) {
+    throw new Error("Organization chart data is unavailable for export");
+  }
   const selfNode = orgChartData.processedData.find((node) => node.id === focusNodeId);
   const parentNode = orgChartData.processedData.find((node) => node.id === selfNode?.parentId);
   const childrenNodes = orgChartData.processedData.filter((node) => node.parentId === selfNode?.id);
@@ -674,12 +678,22 @@ function getChartExportData() {
     cloneOrgChartData,
     focusNodeId,
     isAutoExpand,
+    savedJdChart: Boolean(savedJdChart),
   };
+}
+
+function initializeExportChart(data, chartData = data.orgChartData, focusNodeId = data.isAutoExpand ? data.focusNodeId : null, forceCompact = false) {
+  chart = initializeChart(chartData, focusNodeId, forceCompact);
+  if (chart && data.savedJdChart) {
+    chart.jdOrganizationChartData = data.orgChartData;
+    chart.jdFocusNodeId = data.focusNodeId;
+  }
+  return chart;
 }
 
 function chartExportSVG() {
   const data = getChartExportData();
-  initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+  initializeExportChart(data);
   showChartLoading("chart-container-custom");
   setTimeout(() => {
     chart.expandAll();
@@ -691,7 +705,7 @@ function chartExportSVG() {
     prepareAndExportSVG();
   }, 4000);
   setTimeout(() => {
-    initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+    initializeExportChart(data);
     if (chart) chart.fit();
     hideChartLoading("chart-container-custom");
   }, 5000);
@@ -703,7 +717,7 @@ async function chartUploadSVG() {
 
   return new Promise((resolve, reject) => {
     try {
-      initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+      initializeExportChart(data);
       showChartLoading("chart-container-custom");
 
       setTimeout(() => {
@@ -733,7 +747,7 @@ async function chartUploadSVG() {
       }, 4000);
 
       setTimeout(() => {
-        initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+        initializeExportChart(data);
         if (chart) chart.fit();
         hideChartLoading("chart-container-custom");
       }, 5000);
@@ -748,7 +762,7 @@ async function chartUploadSVG() {
 
 function chartExportPDF() {
   const data = getChartExportData();
-  initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+  initializeExportChart(data);
   showChartLoading("chart-container-custom");
   setTimeout(() => {
     chart.expandAll();
@@ -773,7 +787,7 @@ function chartExportPDF() {
     hideChartLoading("chart-container-custom");
   }, 4000);
   setTimeout(() => {
-    initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+    initializeExportChart(data);
     if (chart) chart.fit();
   }, 5000);
   applyStaticChartPositioning();
@@ -782,7 +796,7 @@ function chartExportIMG() {
   const data = getChartExportData();
   console.log("Exporting chart as PDF:", data);
   console.log("Exporting chart as PDF:", data.cloneOrgChartData);
-  initializeChart(data.cloneOrgChartData, null, true);
+  initializeExportChart(data, data.cloneOrgChartData, null, true);
   showChartLoading("chart-container-custom");
   setTimeout(() => {
     chart.expandAll();
@@ -795,7 +809,7 @@ function chartExportIMG() {
     hideChartLoading("chart-container-custom");
   }, 4000);
   setTimeout(() => {
-    initializeChart(data.orgChartData, data.isAutoExpand ? data.focusNodeId : null);
+    initializeExportChart(data);
     if (chart) chart.fit();
   }, 5000);
   applyStaticChartPositioning();
@@ -1241,7 +1255,8 @@ function initializeChart(processedDataResult, focusNodeId, forceCompact = false,
   if (focusNodeId && options.autoExpand !== false) {
     const findChildren = processedDataResult.processedData.find((item) => item.parentId == focusNodeId);
     if (findChildren) {
-      setTimeout(() => chartInstance.setExpanded(findChildren.id).render().fit(), 500);
+      if (options.expandImmediately) chartInstance.setExpanded(findChildren.id).render().fit();
+      else setTimeout(() => chartInstance.setExpanded(findChildren.id).render().fit(), 500);
     }
   } else {
     if (!focusNodeId) console.log("No focusNodeId provided, skipping auto-expand");
@@ -1365,5 +1380,14 @@ function renderJdOrganizationChart(container, chartData, selected) {
     if (row === target && !row.tags.includes("pointed")) row.tags.push("pointed");
   });
   const processed = processChartData(rows);
-  return initializeChart(processed, target.id, false, container, {autoExpand: false, staticPosition: false});
+  const instance = initializeChart(processed, target.id, false, container, {
+    autoExpand: true,
+    expandImmediately: true,
+    staticPosition: false
+  });
+  if (instance) {
+    instance.jdOrganizationChartData = processed;
+    instance.jdFocusNodeId = target.id;
+  }
+  return instance;
 }

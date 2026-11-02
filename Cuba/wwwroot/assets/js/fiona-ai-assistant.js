@@ -683,9 +683,27 @@
     return card;
   }
 
-  async function resolveJdOrganizationChart(request) {
-    if (typeof ajaxRequest !== 'function' || typeof url_api === 'undefined' || !url_api) return null;
-    return ajaxRequest(`${url_api}/api/organization-structure/chart/job-description`, 'POST', request);
+  let jdOrgChartRendererPromise = null;
+  function ensureJdOrganizationChartRenderer() {
+    if (typeof renderJdOrganizationChart === 'function') return Promise.resolve(true);
+    if (jdOrgChartRendererPromise) return jdOrgChartRendererPromise;
+    const assistantScript = Array.from(document.scripts).find(script => /fiona-ai-assistant\.js/.test(script.src));
+    if (!assistantScript) return Promise.resolve(false);
+    const asset = path => new URL(path, assistantScript.src).toString();
+    const scripts = [
+      asset('organization-structure/js-d3-chart/d3.v7.min.js'),
+      asset('organization-structure/js-d3-chart/d3-org-chart.js'),
+      asset('organization-structure/js-d3-chart/d3-flextree.js'),
+      asset('job-description/d3-chart.js')
+    ];
+    jdOrgChartRendererPromise = scripts.reduce((chain, src) => chain.then(() => new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Unable to load organization chart renderer'));
+      document.head.appendChild(script);
+    })), Promise.resolve()).then(() => typeof renderJdOrganizationChart === 'function');
+    return jdOrgChartRendererPromise;
   }
 
   function appendJdOrganizationChart(parent, chartData, emptyMessage) {
@@ -695,37 +713,61 @@
     container.setAttribute('aria-label', 'Struktur organisasi');
     parent.appendChild(container);
 
+    container.setAttribute('aria-busy', 'true');
+    container.setAttribute('role', 'group');
+    const loading = document.createElement('div');
+    loading.className = 'fiona-ai-rasci-loading';
+    loading.setAttribute('role', 'status');
+    loading.setAttribute('aria-live', 'polite');
+    const spinner = document.createElement('span');
+    spinner.className = 'fiona-ai-rasci-spinner';
+    spinner.setAttribute('aria-hidden', 'true');
+    loading.append(spinner, 'Memuat struktur organisasi…');
+    container.appendChild(loading);
+
+    const finishLoading = () => {
+      container.replaceChildren();
+      container.setAttribute('aria-busy', 'false');
+      container.setAttribute('role', 'img');
+    };
     const showUnavailable = () => {
+      finishLoading();
       container.textContent = emptyMessage;
       container.classList.add('fiona-ai-jd-org-chart-empty');
     };
     const nodes = Array.isArray(chartData?.nodes) ? chartData.nodes : [];
     if (nodes.length) {
-      renderJdOrganizationNodes(container, nodes, chartData.selected || {});
+      Promise.resolve().then(async () => {
+        try {
+          if (!await ensureJdOrganizationChartRenderer()) { showUnavailable(); return; }
+          finishLoading();
+          renderJdOrganizationNodes(container, nodes, chartData.selected || {});
+        } catch (_) { showUnavailable(); }
+      });
       return;
     }
 
     // Chart data is fetched from the exact source captured in the approved
     // proposal. A missing position in a linked draft stays missing; it never
     // silently switches to master or another draft.
-    if (!chartData?.source || !chartData?.selected?.jobId || !chartData?.selected?.prlOrg ||
-        typeof resolveJdOrganizationChart !== 'function') {
+    if (!chartData?.source || !chartData?.selected?.jobId || !chartData?.selected?.prlOrg) {
       showUnavailable();
       return;
     }
-    Promise.resolve(resolveJdOrganizationChart({
+    Promise.resolve(requestJson('/api/organization-structure/chart/job-description', {
+      method: 'POST', body: JSON.stringify({
       sourceKind: chartData.source.kind,
       sourceDraftId: chartData.source.draftId,
       jobId: chartData.selected.jobId,
       prlOrg: chartData.selected.prlOrg
-    })).then(response => {
-        const result = response?.data || response;
+      })
+    })).then(async envelope => {
+        const result = envelope?.data;
         const rows = Array.isArray(result?.nodes) ? result.nodes : [];
         if (result?.available !== true || !rows.length) { showUnavailable(); return; }
-        chartData.nodes = rows;
-        chartData.selected = result.selected || chartData.selected;
-        chartData.source = result.source || chartData.source;
-        renderJdOrganizationNodes(container, rows, chartData.selected);
+        if (!await ensureJdOrganizationChartRenderer()) { showUnavailable(); return; }
+        finishLoading();
+        renderJdOrganizationNodes(container, rows, result.selected || chartData.selected);
       })
       .catch(showUnavailable);
   }

@@ -39,7 +39,12 @@ test('indexed duties preserve their five columns and authority uses its second c
 
 const previewStart = script.indexOf('  function renderJobDescriptionPreview(');
 const previewEnd = script.indexOf('  function renderJobDescriptionGroupingReview(', previewStart);
-const previewSandbox = {document: {createElement: element}, appendJdNumberedNotes() {}};
+const previewSandbox = {
+  document: {createElement: element},
+  appendJdNumberedNotes() {},
+  appendJdText(parent, value) { const text = element('p'); text.textContent = value; parent.appendChild(text); },
+  requestJson: async () => ({data:null})
+};
 vm.createContext(previewSandbox);
 vm.runInContext(script.slice(previewStart, previewEnd), previewSandbox);
 test('saved JD receipt renders an Open JD link, including after history JSON round-trip', () => {
@@ -72,25 +77,52 @@ test('organization chart keeps section heading and clear fallback when no exact 
 });
 test('organization chart fetch uses its captured draft and requires exact job and PRL match', async () => {
   const calls = [];
-  previewSandbox.resolveJdOrganizationChart = async request => {
-    calls.push(request);
-    return {nodes:[
+  let rendered = null;
+  previewSandbox.renderJdOrganizationChart = (container, nodes, selected) => {
+    rendered = {container, nodes, selected};
+    return {};
+  };
+  previewSandbox.requestJson = async (path, options) => {
+    calls.push(JSON.parse(options.body));
+    return {data:{nodes:[
       {id:'unit-parent', id_org_unit:'unit-parent', pid:null, position:'Parent', id_position:'PARENT', prl:'2'},
       {id:'unit-target', id_org_unit:'unit-target', pid:'unit-parent', position:'Target', org_unit_name:'Unit', id_position:'T1', prl:'1'}
-    ], selected:{jobId:'T1',prlOrg:'1'}, source:{kind:'draft',draftId:'linked-so'}, available:true};
+    ], selected:{jobId:'T1',prlOrg:'1'}, source:{kind:'draft',draftId:'linked-so'}, available:true}};
   };
   const host = element('div');
   const contract = {nodes:[], selected:{jobId:'T1', prlOrg:'1', unitCode:'U1'}, source:{kind:'draft', draftId:'linked-so'}};
   previewSandbox.appendJdOrganizationChart(host, contract, 'Data struktur organisasi belum tersedia.');
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(JSON.stringify(calls), JSON.stringify([{sourceKind:'draft', sourceDraftId:'linked-so', jobId:'T1', prlOrg:'1'}]));
-  assert.equal(contract.nodes.length, 2);
-  assert.equal(host.children[0].textContent, 'Data struktur organisasi belum tersedia.');
+  assert.equal(contract.nodes.length, 0);
+  assert.ok(rendered);
+  assert.equal(rendered.container, host.children[0]);
+  assert.equal(rendered.selected.jobId, 'T1');
+  assert.equal(rendered.selected.prlOrg, '1');
+  assert.equal(rendered.nodes.length, 2);
+  assert.notEqual(rendered.nodes, contract.nodes);
 
-  previewSandbox.resolveJdOrganizationChart = async () => ({nodes:[{id_org_unit:'unit-target', position:'Wrong PRL', id_position:'T1', prl:'99'}], available:false});
+  previewSandbox.renderJdOrganizationChart = () => ({});
+  previewSandbox.requestJson = async () => ({data:{nodes:[{id_org_unit:'unit-target', position:'Wrong PRL', id_position:'T1', prl:'99'}], available:false}});
   const missing = element('div');
   const missingContract = {...contract, nodes:[], source:{kind:'draft', draftId:'linked-so'}};
   previewSandbox.appendJdOrganizationChart(missing, missingContract, 'Data struktur organisasi belum tersedia.');
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(missing.children[0].textContent, 'Data struktur organisasi belum tersedia.');
+});
+test('chart loading failure stays inside section 10 and later sections still render', async () => {
+  previewSandbox.requestJson = async () => { throw new Error('chart endpoint unavailable'); };
+  const parent = element('div');
+  const preview = JSON.parse(JSON.stringify({sections:[
+    {number:10, title:'POSISI DALAM STRUKTUR ORGANISASI', kind:'organizationChart',
+      chart:{nodes:[], selected:{jobId:'T1', prlOrg:'1'}, source:{kind:'draft', draftId:'linked-so'}},
+      emptyMessage:'Data struktur organisasi belum tersedia.'},
+    {number:11, title:'NEXT SECTION', kind:'text', text:'Masih dirender'}
+  ]}));
+  previewSandbox.renderJobDescriptionPreview(parent, preview);
+  await new Promise(resolve => setTimeout(resolve, 0));
+  const sections = parent.children[0].children.filter(child => child.className === 'fiona-ai-jd-section');
+  assert.equal(sections[0].children[1].textContent, 'Data struktur organisasi belum tersedia.');
+  assert.equal(sections[1].children[1].textContent, 'Masih dirender');
+  assert.deepEqual(JSON.parse(JSON.stringify(preview.sections[0].chart.nodes)), []);
 });

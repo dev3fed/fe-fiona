@@ -1851,10 +1851,5 @@ ui-single-select, ui-multi-select {
 }
 
 
-.fiona-ai-jd-org-chart { overflow: auto; padding: 1rem .5rem; text-align: center; }
+.fiona-ai-jd-org-chart { height: 480px; min-height: 360px; overflow: auto; padding: 1rem .5rem; text-align: center; }
 .fiona-ai-jd-org-chart-empty { color: #6c757d; text-align: left; }
-.fiona-ai-jd-org-tree { display: flex; justify-content: center; min-width: max-content; }
-.fiona-ai-jd-org-node { display: flex; flex-direction: column; align-items: center; gap: .25rem; min-width: 150px; max-width: 220px; margin: .5rem; padding: .65rem .8rem; border: 1px solid #adb5bd; border-radius: .35rem; background: #fff; color: #343a40; font-size: .9rem; }
-.fiona-ai-jd-org-node small { color: #6c757d; }
-.fiona-ai-jd-org-node.is-selected { border: 2px solid #0d6efd; background: #e7f1ff; }
-.fiona-ai-jd-org-children { display: flex; justify-content: center; align-items: flex-start; border-top: 1px solid #adb5bd; margin-top: .35rem; padding-top: .35rem; }
