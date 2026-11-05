@@ -844,10 +844,31 @@
         reviewCodes.add(normalizedCode);
         usedItems.add(key);
         const item = itemMap.get(key);
-        const suppliedName = typeof item.processName === 'string' ? item.processName.trim() : '';
-        rows.push({ code, name: suppliedName || `Nama proses tidak tersedia (${code})` });
+        // Older artifacts embedded parent and assignment notes in processName.
+        const rawName = typeof item.processName === 'string' ? item.processName.trim() : '';
+        const cleanedName = rawName.replace(/ \| Hierarchy: .*?(?= \| Assignment note: |$)/i, '');
+        const noteMarker = ' | Assignment note: ';
+        const noteIndex = cleanedName.indexOf(noteMarker);
+        const suppliedName = noteIndex < 0 ? cleanedName : cleanedName.slice(0, noteIndex);
+        const legacyNotes = noteIndex < 0 ? [] : [cleanedName.slice(noteIndex + noteMarker.length)];
+        rows.push({ code, name: suppliedName || `Nama proses tidak tersedia (${code})`,
+          notations: Array.isArray(item.notations) ? item.notations.filter(x => x === 'R' || x === 'A') : [],
+          notes: Array.isArray(item.notes) ? item.notes.filter(x => typeof x === 'string' && x.trim()) : legacyNotes });
       }
-      normalized.push({ label, rows, number: index + 1 });
+      // Use only assigned R ancestors in this group. Segment boundaries prevent 1.1 matching 1.10.
+      for (const row of rows) {
+        const candidates = row.notations.includes('A') ? rows.filter(parent => parent !== row && parent.notations.includes('R') &&
+          row.code.toLowerCase().startsWith(parent.code.toLowerCase() + '.')) : [];
+        row.parent = candidates.sort((a, b) => b.code.length - a.code.length)[0] || null;
+      }
+      const ordered = [];
+      const appendChildren = (parent, depth) => rows.filter(row => row.parent === parent).forEach(row => {
+        row.depth = depth; ordered.push(row); appendChildren(row, depth + 1);
+      });
+      appendChildren(null, 0);
+      normalized.push({ label, rows: ordered, number: index + 1,
+        rationale: typeof group.rationale === 'string' ? group.rationale.trim() : '',
+        wordingRationale: typeof group.wordingRationale === 'string' ? group.wordingRationale.trim() : '' });
     }
     if (!normalized.length || usedItems.size !== items.length) return malformed();
 
@@ -858,8 +879,35 @@
     const head = document.createElement('thead');
     const headerRow = document.createElement('tr');
     const reviewId = ++jdGroupingReviewSequence;
-    const headerIds = ['index', 'name', 'duty'].map((part, i) => `fiona-jd-group-${reviewId}-${part}-${i}`);
-    ['Index proses', 'Nama proses bisnis', 'Usulan Tugas & Tanggung Jawab'].forEach((title, i) => {
+    const dialogs = normalized.map(group => {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'fiona-ai-jd-grouping-dialog';
+      const title = document.createElement('h3');
+      title.id = `fiona-jd-group-${reviewId}-explanation-${group.number}`;
+      title.textContent = `Alasan kelompok ${group.number}`;
+      dialog.setAttribute('aria-labelledby', title.id);
+      const groupingHeading = document.createElement('h4'); groupingHeading.textContent = 'Logika pengelompokan';
+      const groupingText = document.createElement('p'); groupingText.textContent = group.rationale || 'Penjelasan pengelompokan belum tersedia.';
+      const wordingHeading = document.createElement('h4'); wordingHeading.textContent = 'Logika penulisan tugas';
+      const wordingText = document.createElement('p'); wordingText.textContent = group.wordingRationale || 'Penjelasan penulisan belum tersedia untuk pengelompokan ini.';
+      const close = document.createElement('button'); close.type = 'button'; close.textContent = 'Tutup';
+      close.onclick = () => { if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open'); };
+      dialog.append(title, groupingHeading, groupingText, wordingHeading, wordingText, close);
+      return dialog;
+    });
+    function explanationButton(group) {
+      const button = document.createElement('button'); button.type = 'button';
+      button.className = 'fiona-ai-jd-grouping-explanation-button';
+      button.textContent = 'Lihat alasan';
+      button.setAttribute('aria-label', `Lihat alasan pengelompokan dan penulisan kelompok ${group.number}`);
+      button.onclick = () => {
+        const dialog = dialogs[group.number - 1];
+        if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+      };
+      return button;
+    }
+    const headerIds = ['index', 'name', 'notation', 'notes', 'duty'].map((part, i) => `fiona-jd-group-${reviewId}-${part}-${i}`);
+    ['Index proses', 'Nama proses bisnis', 'RASCI', 'Notes', 'Usulan Tugas & Tanggung Jawab'].forEach((title, i) => {
       const th = document.createElement('th');
       th.id = headerIds[i];
       th.scope = 'col';
@@ -874,26 +922,31 @@
         const tr = document.createElement('tr');
         tr.className = rowIndex === 0 ? 'fiona-ai-jd-grouping-first-row' : 'fiona-ai-jd-grouping-inner-row';
         const code = document.createElement('td');
-        code.textContent = row.code;
+        code.textContent = row.depth ? `↳ ${row.code}` : row.code;
+        if (row.depth) { code.className = 'fiona-ai-jd-grouping-descendant'; code.setAttribute('aria-label', `${row.code}, turunan dari ${row.parent.code}`); }
         const name = document.createElement('td');
         name.textContent = row.name;
         const groupHeaderId = `fiona-jd-group-${reviewId}-rowgroup-${group.number}`;
         code.setAttribute('headers', `${headerIds[0]} ${groupHeaderId}`);
         name.setAttribute('headers', `${headerIds[1]} ${groupHeaderId}`);
-        tr.append(code, name);
+        const notation = document.createElement('td'); notation.textContent = row.notations.join(', ') || '—';
+        const notes = document.createElement('td'); notes.textContent = row.notes.join(' | ') || '—';
+        notation.setAttribute('headers', `${headerIds[2]} ${groupHeaderId}`);
+        notes.setAttribute('headers', `${headerIds[3]} ${groupHeaderId}`);
+        tr.append(code, name, notation, notes);
         if (rowIndex === 0) {
           const duty = document.createElement('th');
           duty.className = 'fiona-ai-jd-grouping-duty';
           duty.id = groupHeaderId;
           duty.scope = 'rowgroup';
-          duty.setAttribute('headers', headerIds[2]);
+          duty.setAttribute('headers', headerIds[4]);
           duty.rowSpan = group.rows.length;
           const label = document.createElement('span');
           label.className = 'fiona-ai-jd-grouping-duty-label';
           label.textContent = group.label;
           const caption = document.createElement('strong');
           caption.textContent = `Kelompok ${group.number} · ${group.rows.length} proses`;
-          duty.append(caption, label);
+          duty.append(caption, label, explanationButton(group));
           tr.appendChild(duty);
         }
         groupBody.appendChild(tr);
@@ -914,12 +967,12 @@
       caption.textContent = `Kelompok ${group.number} · ${group.rows.length} proses`;
       const label = document.createElement('p');
       label.textContent = group.label;
-      responsibility.append(caption, label);
+      responsibility.append(caption, label, explanationButton(group));
       const mobileTable = document.createElement('table');
       mobileTable.className = 'fiona-ai-jd-grouping-mobile-table';
       const mobileHead = document.createElement('thead');
       const mobileHeaderRow = document.createElement('tr');
-      ['Index proses', 'Nama proses bisnis'].forEach((title, index) => {
+      ['Index proses', 'Nama proses bisnis', 'RASCI', 'Notes'].forEach((title, index) => {
         const th = document.createElement('th');
         th.id = `fiona-jd-group-${reviewId}-mobile-${group.number}-${index}`;
         th.scope = 'col'; th.textContent = title; mobileHeaderRow.appendChild(th);
@@ -928,15 +981,18 @@
       const mobileBody = document.createElement('tbody');
       group.rows.forEach(row => {
         const tr = document.createElement('tr');
-        const code = document.createElement('td'); code.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-0`); code.textContent = row.code;
+        const code = document.createElement('td'); code.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-0`); code.textContent = row.depth ? `↳ ${row.code}` : row.code;
+        if (row.depth) { code.className = 'fiona-ai-jd-grouping-descendant'; code.setAttribute('aria-label', `${row.code}, turunan dari ${row.parent.code}`); }
         const name = document.createElement('td'); name.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-1`); name.textContent = row.name;
-        tr.append(code, name); mobileBody.appendChild(tr);
+        const notation = document.createElement('td'); notation.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-2`); notation.textContent = row.notations.join(', ') || '—';
+        const notes = document.createElement('td'); notes.setAttribute('headers', `fiona-jd-group-${reviewId}-mobile-${group.number}-3`); notes.textContent = row.notes.join(' | ') || '—';
+        tr.append(code, name, notation, notes); mobileBody.appendChild(tr);
       });
       mobileTable.append(mobileHead, mobileBody);
       groupCard.append(responsibility, mobileTable);
       mobile.appendChild(groupCard);
     });
-    card.append(desktop, mobile);
+    card.append(desktop, mobile, ...dialogs);
     parent.appendChild(card);
     return card;
 

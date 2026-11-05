@@ -1820,9 +1820,16 @@ ui-single-select, ui-multi-select {
   min-width: 0; padding: 7px; border: 1px solid #777; text-align: left; vertical-align: top;
   white-space: normal; overflow-wrap: anywhere; word-break: break-word; background: transparent;
 }
-.fiona-ai-jd-grouping-table th:nth-child(1), .fiona-ai-jd-grouping-table td:nth-child(1) { width: 15%; }
-.fiona-ai-jd-grouping-table th:nth-child(2), .fiona-ai-jd-grouping-table td:nth-child(2) { width: 40%; }
-.fiona-ai-jd-grouping-table th:nth-child(3), .fiona-ai-jd-grouping-table td:nth-child(3) { width: 45%; }
+.fiona-ai-jd-grouping-table thead th:nth-child(1) { width: 11%; }
+.fiona-ai-jd-grouping-table thead th:nth-child(2) { width: 23%; }
+.fiona-ai-jd-grouping-table thead th:nth-child(3) { width: 9%; }
+.fiona-ai-jd-grouping-table thead th:nth-child(4) { width: 20%; }
+.fiona-ai-jd-grouping-table thead th:nth-child(5) { width: 37%; }
+.fiona-ai-jd-grouping-mobile-table thead th:nth-child(1) { width: 20%; }
+.fiona-ai-jd-grouping-mobile-table thead th:nth-child(2) { width: 32%; }
+.fiona-ai-jd-grouping-mobile-table thead th:nth-child(3) { width: 15%; }
+.fiona-ai-jd-grouping-mobile-table thead th:nth-child(4) { width: 33%; }
+.fiona-ai-jd-grouping-descendant { padding-left: 14px !important; }
 .fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table thead th { background: #e8e8e8; font-weight: 700; }
 .fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody.is-unshaded > tr > :is(td, th.fiona-ai-jd-grouping-duty),
 .fiona-ai-jd-grouping-review .fiona-ai-jd-grouping-table tbody.is-unshaded > tr:hover > :is(td, th.fiona-ai-jd-grouping-duty) { background-color: #fff; }
@@ -1838,6 +1845,12 @@ ui-single-select, ui-multi-select {
 .fiona-ai-jd-grouping-duty { vertical-align: top !important; }
 .fiona-ai-jd-grouping-duty strong, .fiona-ai-jd-grouping-duty-label { display: block; }
 .fiona-ai-jd-grouping-duty-label { margin-top: 6px; }
+.fiona-ai-jd-grouping-explanation-button { display: block; margin-top: 8px; padding: 4px 8px; cursor: pointer; }
+.fiona-ai-jd-grouping-dialog { max-width: min(560px, 90vw); max-height: 85vh; overflow: auto; padding: 20px; border: 1px solid #777; border-radius: 6px; color: #111; background: #fff; }
+.fiona-ai-jd-grouping-dialog::backdrop { background: rgba(0, 0, 0, .45); }
+.fiona-ai-jd-grouping-dialog h3 { margin: 0 0 12px; }
+.fiona-ai-jd-grouping-dialog h4 { margin: 14px 0 4px; font-size: 14px; }
+.fiona-ai-jd-grouping-dialog p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .fiona-ai-jd-grouping-card { padding: 9px; border: 1px solid #555; border-top-width: 2px; min-width: 0; }
 .fiona-ai-jd-grouping-card:last-child { border-bottom-width: 2px; }
 .fiona-ai-jd-grouping-card.is-unshaded { background: #fff; }

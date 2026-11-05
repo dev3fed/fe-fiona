@@ -61,7 +61,7 @@ test('DOM preserves group and process order, duplicate labels, rowspans, counts 
   for (const groupBody of groups) {
     const groupHeaderId = walk(groupBody, hasClass('fiona-ai-jd-grouping-duty'))[0].id;
     const processCells = walk(groupBody, node => node.tag === 'td');
-    assert.equal(processCells.length, groupBody.children.length * 2);
+    assert.equal(processCells.length, groupBody.children.length * 4);
     assert.ok(processCells.every(cell => cell.getAttribute('headers').split(/\s+/).includes(groupHeaderId)));
   }
   assert.match(card.textContent, /Kelompok 1 · 2 proses/);
@@ -112,4 +112,44 @@ test('live and history render the saved artifact through the same renderer and c
   assert.match(css, /:is\(td, th\.fiona-ai-jd-grouping-duty\)/);
   assert.match(css, /th\.fiona-ai-jd-grouping-duty[\s\S]*text-transform: none !important/);
   assert.match(css, /\.fiona-ai-jd-grouping-review \.fiona-ai-jd-grouping-table th\.fiona-ai-jd-grouping-duty\s*\{\s*border-bottom:\s*2px solid #333;/);
+});
+
+
+test('assigned R and A descendants display hierarchy, notes and safe text in both layouts', () => {
+  const parent = element('div');
+  const data = { type: 'jobDescriptionGroupingReview', groups: [{groupId:'g', label:'Tugas', sourceCodes:['1.1.2.3','1.10','1.1']}], items: [
+    {groupId:'g', processCode:'1.1.2.3', processName:'Anak A', notations:['A'], notes:['terkait <gate>']},
+    {groupId:'g', processCode:'1.10', processName:'Proses lain', notations:['A'], notes:[]},
+    {groupId:'g', processCode:'1.1', processName:'Induk R', notations:['R','A'], notes:[]}
+  ] };
+  const card = render(parent, data);
+  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === '↳ 1.1.2.3').length, 2);
+  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === '1.10').length, 2);
+  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === 'R, A').length, 2);
+  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === 'terkait <gate>').length, 2);
+  assert.equal(walk(card, n => n.tag === 'gate').length, 0);
+  assert.ok(walk(card, n => n.getAttribute?.('aria-label') === '1.1.2.3, turunan dari 1.1').length === 2);
+});
+
+test('legacy artifact omits unassigned parent while retaining the assignment note', () => {
+  const parent = element('div');
+  const card = render(parent, {type:'jobDescriptionGroupingReview', groups:[{groupId:'g',label:'Tugas',sourceCodes:['1.1']}], items:[
+    {groupId:'g',processCode:'1.1',processName:'Strategi | Hierarchy: L2; parent 1: Induk | Assignment note: terkait X'}]});
+  assert.doesNotMatch(card.textContent, /parent 1: Induk/);
+  assert.match(card.textContent, /terkait X/);
+});
+
+test('explanation popup shows separate grouping and wording reasons on request', () => {
+  const parent = element('div');
+  const card = render(parent, { type:'jobDescriptionGroupingReview', groups:[{groupId:'g',label:'Tugas',sourceCodes:['1.1'],rationale:'Proses saling terkait.',wordingRationale:'R membatasi gate review.'}], items:[{groupId:'g',processCode:'1.1',processName:'Proses',notations:['R'],notes:[]}] });
+  const dialog = walk(card, n => n.tag === 'dialog')[0];
+  dialog.showModal = () => { dialog.shown = true; };
+  const button = walk(card, hasClass('fiona-ai-jd-grouping-explanation-button'))[0];
+  assert.equal(dialog.shown, undefined);
+  button.onclick();
+  assert.equal(dialog.shown, true);
+  assert.match(dialog.textContent, /Logika pengelompokanProses saling terkait/);
+  assert.match(dialog.textContent, /Logika penulisan tugasR membatasi gate review/);
+  const oldCard = render(element('div'), artifact);
+  assert.match(walk(oldCard, n => n.tag === 'dialog')[0].textContent, /Penjelasan penulisan belum tersedia/);
 });

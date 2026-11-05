@@ -183,10 +183,17 @@
     const stepMap = new Map();
     const activityMap = new Map();
     let thoughtCursor = null;
+    let groupingStarted = null;
 
     const timer = setInterval(() => {
       if (!finished) {
         time.textContent = formatDuration(performance.now() - started);
+        if (groupingStarted !== null && performance.now() - groupingStarted >= 30000) {
+          notice.textContent = language === 'en'
+            ? 'Still working on the responsibility groups. You can continue to wait or stop the request.'
+            : 'Pengelompokan tanggung jawab masih berjalan. Anda dapat menunggu atau menghentikan permintaan.';
+          notice.hidden = false;
+        }
       }
     }, 250);
 
@@ -230,7 +237,7 @@
             </div>
             <span class="fiona-ai-step-time"></span>
           </div>
-          <small class="fiona-ai-step-detail" hidden></small>
+          <small class="fiona-ai-step-detail" role="status" aria-live="polite" hidden></small>
           <details class="fiona-ai-step-reasoning" hidden>
             <summary>
               <span class="fiona-ai-step-reasoning-summary-left">
@@ -280,6 +287,12 @@
 
     function upsert(activity) {
       if (!activity?.id) return;
+      if (activity.category === 'jd_grouping_progress' && activity.status === 'running') {
+        if (groupingStarted === null) groupingStarted = performance.now();
+      } else if ((activity.category === 'prepare_job_description_grouping' || activity.category === 'revise_job_description_grouping') && activity.status !== 'running') {
+        groupingStarted = null;
+        notice.hidden = true;
+      }
       const friendlyLabel = sanitizeFriendlyLabel(activity.label, activity.category, activity.status, language);
       const friendlySummary = sanitizeFriendlySummary(activity.summary, activity.category, activity.status, language);
 
@@ -428,7 +441,8 @@
           id: event.toolCallId || ('tool-' + (event.sequence || Date.now())),
           category: event.toolName,
           status: 'running',
-          label: event.label
+          label: event.label,
+          summary: event.summary
         });
       } else if (type === 'TOOL_CALL_RESULT') {
         card.upsert({
