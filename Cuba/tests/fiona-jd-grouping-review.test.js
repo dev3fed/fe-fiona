@@ -3,153 +3,33 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const test = require('node:test');
-
-const jsDir = path.join(__dirname, '..', 'wwwroot', 'assets', 'js');
-const live = fs.readFileSync(path.join(jsDir, 'fiona-ai-assistant.js'), 'utf8');
-const history = fs.readFileSync(path.join(jsDir, 'assistant', 'fiona-assistant-history.js'), 'utf8');
-const css = fs.readFileSync(path.join(__dirname, '..', 'wwwroot', 'assets', 'css', 'fiona-ai-assistant.css'), 'utf8');
-const start = live.indexOf('  function renderJobDescriptionGroupingReview(');
-const end = live.indexOf('  function appendJdList(', start);
-assert.ok(start >= 0 && end > start);
-
-function element(tag) {
-  return {
-    tag, children: [], attributes: {}, className: '', rowSpan: 1, _text: '',
-    append(...nodes) { this.children.push(...nodes); },
-    appendChild(node) { this.children.push(node); return node; },
-    insertBefore(node, before) { const i = this.children.indexOf(before); this.children.splice(i < 0 ? 0 : i, 0, node); },
-    setAttribute(name, value) { this.attributes[name] = String(value); },
-    getAttribute(name) { return this.attributes[name] ?? null; },
-    set textContent(value) { this._text = String(value); this.children = []; },
-    get textContent() { return this._text + this.children.map(x => x.textContent || '').join(''); }
-  };
-}
-const sandbox = { document: { createElement: element }, jdGroupingReviewSequence: 0 };
+const live = fs.readFileSync(path.join(__dirname, '../wwwroot/assets/js/fiona-ai-assistant.js'), 'utf8');
+const history = fs.readFileSync(path.join(__dirname, '../wwwroot/assets/js/assistant/fiona-assistant-history.js'), 'utf8');
+function element(tag) { return { tag, children: [], attributes: {}, className: '', rowSpan: 1, hidden: false, _text: '', append(...x) { this.children.push(...x); }, appendChild(x) { this.children.push(x); return x; }, setAttribute(k,v) { this.attributes[k] = String(v); }, getAttribute(k) { return this.attributes[k]; }, set textContent(v) { this._text = String(v); this.children = []; }, get textContent() { return this._text + this.children.map(x => x.textContent || '').join(''); } }; }
+const doc = {createElement: element};
+const sandbox = {document: doc, conversationId: 's1', openGroupingMarkdownArtifact() {}};
 vm.createContext(sandbox);
+const start = live.indexOf('  function groupingMarkdown('), end = live.indexOf('  function appendJdList(', start);
 vm.runInContext(live.slice(start, end), sandbox);
-const render = sandbox.renderJobDescriptionGroupingReview;
-
-const artifact = {
-  type: 'jobDescriptionGroupingReview', revision: 4, confirmed: false,
-  groups: [
-    { groupId: 'a', label: 'Sama <img src=x onerror=alert(1)>', sourceCodes: ['2.2', '1.1'] },
-    { groupId: 'b', label: 'Sama <img src=x onerror=alert(1)>', sourceCodes: ['3.1'] }
-  ],
-  items: [
-    { groupId: 'a', processCode: '2.2', processName: 'Nama panjang proses kedua' },
-    { groupId: 'a', processCode: '1.1', processName: null },
-    { groupId: 'b', processCode: '3.1', processName: 'Proses ketiga' }
-  ]
-};
-
-function walk(node, predicate, found = []) {
-  if (predicate(node)) found.push(node);
-  for (const child of node.children || []) walk(child, predicate, found);
-  return found;
-}
-const hasClass = name => node => String(node.className || '').split(/\s+/).includes(name);
-
-test('DOM preserves group and process order, duplicate labels, rowspans, counts and source names', () => {
-  const parent = element('div');
-  const card = render(parent, artifact);
-  const groups = walk(card, hasClass('fiona-ai-jd-grouping-tbody'));
-  assert.equal(groups.length, 2, 'one desktop tbody per group');
-  const desktopDutyCells = walk(card, hasClass('fiona-ai-jd-grouping-duty'));
-  assert.equal(desktopDutyCells.length, 2);
-  assert.deepEqual(desktopDutyCells.map(x => x.rowSpan), [2, 1]);
-  assert.ok(desktopDutyCells.every(x => x.tag === 'th' && x.scope === 'rowgroup' && x.id));
-  for (const groupBody of groups) {
-    const groupHeaderId = walk(groupBody, hasClass('fiona-ai-jd-grouping-duty'))[0].id;
-    const processCells = walk(groupBody, node => node.tag === 'td');
-    assert.equal(processCells.length, groupBody.children.length * 4);
-    assert.ok(processCells.every(cell => cell.getAttribute('headers').split(/\s+/).includes(groupHeaderId)));
-  }
-  assert.match(card.textContent, /Kelompok 1 · 2 proses/);
-  assert.match(card.textContent, /Kelompok 2 · 1 proses/);
-  assert.match(card.textContent, /Nama panjang proses kedua/);
-  assert.match(card.textContent, /Nama proses tidak tersedia \(1\.1\)/);
-  assert.equal(walk(card, node => node.tag === 'td' && node.textContent === '2.2').length, 2, 'same order appears in both views');
-  assert.equal(walk(card, node => node.tag === 'td' && node.textContent === '1.1').length, 2);
-  assert.equal(walk(card, node => node.tag === 'td' && node.textContent === '3.1').length, 2);
-  assert.match(card.textContent, /Sama <img src=x onerror=alert\(1\)>/);
-  assert.equal(walk(card, node => node.tag === 'img').length, 0, 'all user supplied strings stay text');
-  assert.match(card.textContent, /Menunggu persetujuan/);
+const artifact = { type:'jobDescriptionGroupingReview', contextToken:'ctx', revision:2, groups:[{groupId:'g1',label:'Tugas A',sourceCodes:['1.1','1.1.2','1.10'],rationale:'Bukti terkait',wordingRationale:'Batas tugas'}],items:[{groupId:'g1',processCode:'1.1',notations:['R'],processName:'Induk'},{groupId:'g1',processCode:'1.1.2',notations:['A'],processName:'Anak'},{groupId:'g1',processCode:'1.10',notations:['A'],processName:'Lain'}] };
+function makeRow(id, code, label) { const cells = [id,code,'Nama','R','','Tugas A'].map(v => {const x = element('td'); x.textContent = v; return x;}); cells[5].textContent = label; return {cells, deleteCell(i) { this.cells.splice(i,1); }}; }
+test('chat shows a link to the document without rendering a review table', () => { const parent=element('div'), card=sandbox.renderJobDescriptionGroupingReview(parent,artifact); assert.equal(card.children.filter(x=>x.tag==='a').length,1); assert.equal(card.children.some(x=>x.tag==='table'),false); assert.match(card.textContent,/Buka dokumen/); assert.match(history,/renderJobDescriptionGroupingReview\(bubble, artifactData\.artifact\)/); });
+test('markdown is complete and escapes table separators', () => { const copy=structuredClone(artifact); copy.items[1].processName='Anak | penjelasan'; const md=sandbox.groupingMarkdown(copy); assert.match(md,/Anak \\\| penjelasan/); assert.equal((md.match(/\| g1 \|/g)||[]).length,3); assert.doesNotMatch(md,/rowspan/i); });
+test('document numbers groups, merges rows, marks actual descendants and shows both reasons', () => { const rows=artifact.groups[0].sourceCodes.map(code=>makeRow('g1',code,'Tugas A')); const header=element('th'); const page={querySelectorAll:()=>rows,querySelector:()=>header}; assert.equal(sandbox.decorateGroupingMarkdownTable(doc,page,artifact),true); assert.equal(header.textContent,'No.'); assert.equal(rows[0].cells[0].textContent,'1'); assert.equal(rows[0].cells[0].rowSpan,3); assert.equal(rows[0].cells[5].rowSpan,3); assert.equal(rows[1].cells[0].textContent,'↳ 1.1.2'); assert.equal(rows[2].cells[0].textContent,'1.10'); const button=rows[0].cells[5].children[0], details=rows[0].cells[5].children[1]; assert.equal(button.textContent,'Lihat alasan'); assert.equal(details.hidden,true); button.onclick(); assert.equal(details.hidden,false); assert.match(details.textContent,/Bukti terkait/); assert.match(details.textContent,/Batas tugas/); });
+test('inconsistent document is not merged or altered', () => { const rows=artifact.groups[0].sourceCodes.map(code=>makeRow('g1',code,'Tugas A')); rows[1].cells[1].textContent='wrong'; assert.equal(sandbox.decorateGroupingMarkdownTable(doc,{querySelectorAll:()=>rows,querySelector:()=>null},artifact),false); assert.equal(rows[0].cells[0].rowSpan,1); assert.equal(rows[1].cells.length,6); });
+test('legacy markdown generation rejects missing or repeated memberships', () => { const copy=structuredClone(artifact); copy.groups[0].sourceCodes=['1.1','1.1']; assert.equal(sandbox.groupingMarkdown(copy),null); });
+test('documents share the same shell and comment controller, with grouping notes retained', () => {
+  const scope=live.slice(live.indexOf('  function renderJobDescriptionScopeReview('),live.indexOf('  function groupingMarkdown('));
+  const grouping=live.slice(live.indexOf('  function openGroupingMarkdownArtifact('),live.indexOf('  function renderJobDescriptionGroupingReview('));
+  for (const source of [scope,grouping]) { assert.match(source,/createFionaReviewDocument\(/); assert.match(source,/attachFionaReviewComments\(/); }
+  assert.match(grouping,/note\.unanchored = true/);
+  assert.match(live,/\.grouping-descendant\{white-space:nowrap/);
 });
-
-test('malformed membership produces an explicit retry error with no partial table', () => {
-  const parent = element('div');
-  const card = render(parent, { ...artifact, groups: [{ groupId: 'a', label: 'Tugas', sourceCodes: ['missing'] }] });
-  assert.equal(walk(card, hasClass('fiona-ai-jd-grouping-table')).length, 0);
-  assert.match(card.textContent, /Data pengelompokan tidak lengkap/);
-  assert.equal(walk(card, node => node.getAttribute?.('role') === 'alert').length, 1);
-});
-
-test('duplicate process codes across groups are rejected case insensitively', () => {
-  const parent = element('div');
-  const duplicate = {
-    ...artifact,
-    groups: [
-      { groupId: 'a', label: 'Tugas A', sourceCodes: ['1.1'] },
-      { groupId: 'b', label: 'Tugas B', sourceCodes: ['1.1'] }
-    ],
-    items: [
-      { groupId: 'a', processCode: '1.1', processName: 'Proses' },
-      { groupId: 'b', processCode: '1.1', processName: 'Proses' }
-    ]
-  };
-  const card = render(parent, duplicate);
-  assert.equal(walk(card, hasClass('fiona-ai-jd-grouping-table')).length, 0);
-  assert.match(card.textContent, /Data pengelompokan tidak lengkap/);
-});
-
-test('live and history render the saved artifact through the same renderer and container width selects one view', () => {
-  assert.match(live, /else if \(data\.artifact\?\.type === 'jobDescriptionGroupingReview'\) renderJobDescriptionGroupingReview\(bubble, data\.artifact\)/);
-  assert.match(history, /deps\.renderJobDescriptionGroupingReview\(bubble, artifactData\.artifact\)/);
-  assert.match(live, /renderJobDescriptionGroupingReview,\s*esc,/);
-  assert.match(css, /@container fiona-jd-review \(min-width: 640px\)/);
-  assert.match(css, /\.fiona-ai-jd-grouping-desktop \{ display: none/);
-  assert.match(css, /\.fiona-ai-jd-grouping-mobile \{ display: block/);
-  assert.match(css, /:is\(td, th\.fiona-ai-jd-grouping-duty\)/);
-  assert.match(css, /th\.fiona-ai-jd-grouping-duty[\s\S]*text-transform: none !important/);
-  assert.match(css, /\.fiona-ai-jd-grouping-review \.fiona-ai-jd-grouping-table th\.fiona-ai-jd-grouping-duty\s*\{\s*border-bottom:\s*2px solid #333;/);
-});
-
-
-test('assigned R and A descendants display hierarchy, notes and safe text in both layouts', () => {
-  const parent = element('div');
-  const data = { type: 'jobDescriptionGroupingReview', groups: [{groupId:'g', label:'Tugas', sourceCodes:['1.1.2.3','1.10','1.1']}], items: [
-    {groupId:'g', processCode:'1.1.2.3', processName:'Anak A', notations:['A'], notes:['terkait <gate>']},
-    {groupId:'g', processCode:'1.10', processName:'Proses lain', notations:['A'], notes:[]},
-    {groupId:'g', processCode:'1.1', processName:'Induk R', notations:['R','A'], notes:[]}
-  ] };
-  const card = render(parent, data);
-  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === '↳ 1.1.2.3').length, 2);
-  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === '1.10').length, 2);
-  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === 'R, A').length, 2);
-  assert.equal(walk(card, n => n.tag === 'td' && n.textContent === 'terkait <gate>').length, 2);
-  assert.equal(walk(card, n => n.tag === 'gate').length, 0);
-  assert.ok(walk(card, n => n.getAttribute?.('aria-label') === '1.1.2.3, turunan dari 1.1').length === 2);
-});
-
-test('legacy artifact omits unassigned parent while retaining the assignment note', () => {
-  const parent = element('div');
-  const card = render(parent, {type:'jobDescriptionGroupingReview', groups:[{groupId:'g',label:'Tugas',sourceCodes:['1.1']}], items:[
-    {groupId:'g',processCode:'1.1',processName:'Strategi | Hierarchy: L2; parent 1: Induk | Assignment note: terkait X'}]});
-  assert.doesNotMatch(card.textContent, /parent 1: Induk/);
-  assert.match(card.textContent, /terkait X/);
-});
-
-test('explanation popup shows separate grouping and wording reasons on request', () => {
-  const parent = element('div');
-  const card = render(parent, { type:'jobDescriptionGroupingReview', groups:[{groupId:'g',label:'Tugas',sourceCodes:['1.1'],rationale:'Proses saling terkait.',wordingRationale:'R membatasi gate review.'}], items:[{groupId:'g',processCode:'1.1',processName:'Proses',notations:['R'],notes:[]}] });
-  const dialog = walk(card, n => n.tag === 'dialog')[0];
-  dialog.showModal = () => { dialog.shown = true; };
-  const button = walk(card, hasClass('fiona-ai-jd-grouping-explanation-button'))[0];
-  assert.equal(dialog.shown, undefined);
-  button.onclick();
-  assert.equal(dialog.shown, true);
-  assert.match(dialog.textContent, /Logika pengelompokanProses saling terkait/);
-  assert.match(dialog.textContent, /Logika penulisan tugasR membatasi gate review/);
-  const oldCard = render(element('div'), artifact);
-  assert.match(walk(oldCard, n => n.tag === 'dialog')[0].textContent, /Penjelasan penulisan belum tersedia/);
+test('group numbers follow document order rather than internal IDs', () => {
+  const data=structuredClone(artifact); data.groups.push({groupId:'g17',label:'Tugas B',sourceCodes:['2.1']}); data.items.push({groupId:'g17',processCode:'2.1',notations:['R']});
+  const rows=[...artifact.groups[0].sourceCodes.map(code=>makeRow('g1',code,'Tugas A')),makeRow('g17','2.1','Tugas B')];
+  assert.equal(sandbox.decorateGroupingMarkdownTable(doc,{querySelectorAll:()=>rows,querySelector:()=>element('th')},data),true);
+  assert.equal(rows[0].cells[0].textContent,'1'); assert.equal(rows[3].cells[0].textContent,'2');
+  assert.deepEqual(rows.map(row => row.className), ['grouping-unshaded', 'grouping-unshaded', 'grouping-unshaded', 'grouping-shaded']);
+  assert.match(live, /tr\.grouping-shaded > td\{background:#f2f6fc\}/);
 });

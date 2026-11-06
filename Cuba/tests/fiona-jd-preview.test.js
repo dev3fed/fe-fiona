@@ -63,6 +63,24 @@ test('unsaved previews and unsafe URLs never render a saved JD link', () => {
     assert.equal(parent.children[0].children.some(x => x.tag === 'a'), false);
   }
 });
+test('partial preview and saved draft visibly retain the confirmation status', () => {
+  for (const status of ['pending', 'applied']) {
+    const parent = element('div');
+    previewSandbox.renderJobDescriptionPreview(parent, {status, reviewStatus:'needs_confirmation', sections:[]});
+    assert.ok(parent.children[0].children.some(x => x.textContent?.includes('Perlu konfirmasi')));
+  }
+});
+test('preview shows scope decisions and separates source comments from user clarification', () => {
+  const parent = element('div');
+  previewSandbox.renderJobDescriptionPreview(parent, { status:'pending', sections:[], scopeReviewItems:[
+    { processCode:'1.1', notation:'R', decision:'main', summary:'Aplikasi | Assignment note: sumber', clarification:'khusus pengadaan' },
+    { processCode:'1.2', notation:'A', decision:'unresolved', summary:'Audit' }
+  ] });
+  const details = parent.children[0].children.find(x => x.tag === 'details');
+  assert.ok(details);
+  assert.match(details.children[1].textContent, /Komentar sumber: sumber\. Klarifikasi pengguna: khusus pengadaan/);
+  assert.match(details.children[2].textContent, /Belum diputuskan/);
+});
 test('organization chart keeps section heading and clear fallback when no exact source is available', async () => {
   const parent = element('div');
   previewSandbox.renderJobDescriptionPreview(parent, {sections:[{
