@@ -284,3 +284,8 @@
     </dialog>
 </aside>
 <div id="fionaAiBackdrop" class="fiona-ai-backdrop" hidden></div>
+
+<!-- Standalone Fiona AI Web Component Mount -->
+<fiona-ai-assistant id="fionaWcAssistant" api-url="@Configuration["AppSettings:ApiUrl"]"></fiona-ai-assistant>
+<script type="module" src="~/assets/js/fiona-ai-assistant.wc.js" asp-append-version="true"></script>
+<script src="~/assets/js/fiona-wc-bridge.js" asp-append-version="true"></script>
