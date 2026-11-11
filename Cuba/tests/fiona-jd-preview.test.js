@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const test = require('node:test');
 const script = fs.readFileSync(path.join(__dirname, '..', 'wwwroot/assets/js/fiona-ai-assistant.js'), 'utf8');
 function element(tag) {
-  return {tag, children: [], style: {}, classList: {add() {}}, append(...items) {this.children.push(...items);}, appendChild(item) {this.children.push(item);}, replaceChildren(...items) {this.children = items;}, get childElementCount() {return this.children.length;}, setAttribute() {}};
+  return {tag, children: [], dataset: {}, style: {}, classList: {add() {}}, append(...items) {this.children.push(...items);}, appendChild(item) {this.children.push(item);}, replaceChildren(...items) {this.children = items;}, get childElementCount() {return this.children.length;}, setAttribute() {}};
 }
 const start = script.indexOf('  function appendJdTable(');
 assert.ok(start >= 0);
@@ -37,7 +37,7 @@ test('indexed duties preserve their five columns and authority uses its second c
  assert.equal(authority.children[0].children[1].children[0].children[1].textContent,'N/A');
 });
 
-const previewStart = script.indexOf('  function renderJobDescriptionPreview(');
+const previewStart = script.indexOf('  function renderJobDescriptionPreviewContent(');
 const previewEnd = script.indexOf('  function renderJobDescriptionGroupingReview(', previewStart);
 const previewSandbox = {
   document: {createElement: element},
@@ -50,7 +50,7 @@ vm.runInContext(script.slice(previewStart, previewEnd), previewSandbox);
 test('saved JD receipt renders an Open JD link, including after history JSON round-trip', () => {
   const artifact = JSON.parse(JSON.stringify({type:'jobDescriptionPreview', status:'applied', openUrl:'/job-description/detail?draftId=saved&jobId=T1', sections:[]}));
   const parent = element('div');
-  previewSandbox.renderJobDescriptionPreview(parent, artifact);
+  previewSandbox.renderJobDescriptionPreviewContent(parent, artifact);
   const card = parent.children[0];
   assert.equal(card.children[0].textContent, 'Job Description tersimpan');
   assert.equal(card.children[1].textContent, 'Open JD');
@@ -59,20 +59,20 @@ test('saved JD receipt renders an Open JD link, including after history JSON rou
 test('unsaved previews and unsafe URLs never render a saved JD link', () => {
   for (const artifact of [{status:'pending', openUrl:'/job-description/detail?draftId=d'}, {status:'applied', openUrl:'javascript:alert(1)'}, {status:'applied'}]) {
     const parent = element('div');
-    previewSandbox.renderJobDescriptionPreview(parent, {...artifact, sections:[]});
+    previewSandbox.renderJobDescriptionPreviewContent(parent, {...artifact, sections:[]});
     assert.equal(parent.children[0].children.some(x => x.tag === 'a'), false);
   }
 });
 test('partial preview and saved draft visibly retain the confirmation status', () => {
   for (const status of ['pending', 'applied']) {
     const parent = element('div');
-    previewSandbox.renderJobDescriptionPreview(parent, {status, reviewStatus:'needs_confirmation', sections:[]});
+    previewSandbox.renderJobDescriptionPreviewContent(parent, {status, reviewStatus:'needs_confirmation', sections:[]});
     assert.ok(parent.children[0].children.some(x => x.textContent?.includes('Perlu konfirmasi')));
   }
 });
 test('preview shows scope decisions and separates source comments from user clarification', () => {
   const parent = element('div');
-  previewSandbox.renderJobDescriptionPreview(parent, { status:'pending', sections:[], scopeReviewItems:[
+  previewSandbox.renderJobDescriptionPreviewContent(parent, { status:'pending', sections:[], scopeReviewItems:[
     { processCode:'1.1', notation:'R', decision:'main', summary:'Aplikasi | Assignment note: sumber', clarification:'khusus pengadaan' },
     { processCode:'1.2', notation:'A', decision:'unresolved', summary:'Audit' }
   ] });
@@ -83,7 +83,7 @@ test('preview shows scope decisions and separates source comments from user clar
 });
 test('organization chart keeps section heading and clear fallback when no exact source is available', async () => {
   const parent = element('div');
-  previewSandbox.renderJobDescriptionPreview(parent, {sections:[{
+  previewSandbox.renderJobDescriptionPreviewContent(parent, {sections:[{
     number:10, title:'POSISI DALAM STRUKTUR ORGANISASI', kind:'organizationChart',
     chart:{nodes:[], selected:{jobId:'T1', prlOrg:'1'}, source:{kind:'master', draftId:null}},
     emptyMessage:'Data struktur organisasi belum tersedia.'
@@ -137,7 +137,7 @@ test('chart loading failure stays inside section 10 and later sections still ren
       emptyMessage:'Data struktur organisasi belum tersedia.'},
     {number:11, title:'NEXT SECTION', kind:'text', text:'Masih dirender'}
   ]}));
-  previewSandbox.renderJobDescriptionPreview(parent, preview);
+  previewSandbox.renderJobDescriptionPreviewContent(parent, preview);
   await new Promise(resolve => setTimeout(resolve, 0));
   const sections = parent.children[0].children.filter(child => child.className === 'fiona-ai-jd-section');
   assert.equal(sections[0].children[1].textContent, 'Data struktur organisasi belum tersedia.');

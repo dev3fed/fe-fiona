@@ -53,8 +53,9 @@
   const modelSelect = document.getElementById('fionaAiModelSelect');
   const modelHelp = document.getElementById('fionaAiModelHelp');
   const modelRetry = document.getElementById('fionaAiModelRetry');
-  const workTabs = document.getElementById('fionaAiWorkTabs');
-  const chatTab = document.getElementById('fionaAiChatTab');
+  const artifactDialog = document.getElementById('fionaAiArtifactDialog');
+  const artifactTitle = document.getElementById('fionaAiArtifactTitle');
+  const artifactClose = document.getElementById('fionaAiArtifactClose');
   const artifactViews = document.getElementById('fionaAiArtifactViews');
   const artifactTabs = new Map();
   const mentionPopup = document.getElementById('fionaAiMentionPopup');
@@ -184,10 +185,6 @@
 
   function showChatView() {
     currentView = 'chat';
-    panel.classList.remove('is-artifact-view');
-    if (artifactViews) artifactViews.hidden = true;
-    artifactTabs.forEach(tab => { tab.frame.hidden = true; tab.button.classList.remove('is-active'); tab.button.setAttribute('aria-pressed', 'false'); });
-    if (chatTab) { chatTab.classList.add('is-active'); chatTab.setAttribute('aria-pressed', 'true'); }
     memoryPanel.hidden = true;
     chatContent.forEach(element => { if (element) element.hidden = false; });
     unavailable.hidden = rasci;
@@ -199,9 +196,6 @@
   }
 
   function showMemoryView() {
-    panel.classList.remove('is-artifact-view');
-    if (artifactViews) artifactViews.hidden = true;
-    artifactTabs.forEach(tab => { tab.frame.hidden = true; tab.button.classList.remove('is-active'); tab.button.setAttribute('aria-pressed', 'false'); });
     currentView = 'memory';
     chatContent.forEach(element => { if (element) element.hidden = true; });
     memoryPanel.hidden = false;
@@ -232,6 +226,7 @@
   }
 
   function shut() {
+    closeArtifactDialog();
     showChatView();
     Memory?.closeMemoryEditor();
     if (sidebar) sidebar.classList.remove('is-open');
@@ -256,42 +251,52 @@
     if (rasci && !busy) Context?.focusComposer();
   }
 
-  if (chatTab) chatTab.addEventListener('click', showChatView);
+  function closeArtifactDialog() {
+    if (artifactDialog?.open) artifactDialog.close();
+    artifactTabs.forEach(tab => tab.frame.remove());
+    artifactTabs.clear();
+  }
 
-  function openScopeArtifactTab(artifact, originConversation) {
-    if (!workTabs || !artifactViews) return null;
-    const key = JSON.stringify([originConversation, artifact.type, artifact.contextToken, artifact.revision]);
+  artifactClose?.addEventListener('click', closeArtifactDialog);
+  artifactDialog?.addEventListener('close', () => { if (!artifactDialog.open) closeArtifactDialog(); });
+
+  function openScopeArtifactTab(artifact, originConversation, refresh = false) {
+    if (!artifactDialog || !artifactViews) return null;
+    const key = jdArtifactKey(artifact, originConversation);
     let tab = artifactTabs.get(key);
     let created = false;
     if (!tab) {
-      const wrapper = document.createElement('div'); wrapper.className = 'fiona-ai-work-tab-wrap';
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'fiona-ai-work-tab';
-      button.textContent = `Cakupan RASCI${artifact.jobName ? ` · ${artifact.jobName}` : ''} · r${artifact.revision}`;
-      if (artifact.type === 'jobDescriptionGroupingReview') button.textContent = `Pengelompokan JD - r${artifact.revision}`;
-      const closeTab = document.createElement('button'); closeTab.type = 'button'; closeTab.className = 'fiona-ai-work-tab-close';
-      closeTab.textContent = '×'; closeTab.setAttribute('aria-label', `Tutup ${button.textContent}`);
-      const frame = document.createElement('iframe'); frame.className = 'fiona-ai-artifact-frame'; frame.title = button.textContent;
-      wrapper.append(button, closeTab); workTabs.appendChild(wrapper); artifactViews.appendChild(frame);
-      tab = { wrapper, button, frame }; artifactTabs.set(key, tab); created = true;
-      button.onclick = () => activateScopeArtifactTab(tab);
-      closeTab.onclick = () => { const wasActive = !frame.hidden && currentView === 'artifact'; frame.remove(); wrapper.remove(); artifactTabs.delete(key); if (wasActive) showChatView(); };
+      if (refresh) return null;
+      closeArtifactDialog();
+      const frame = document.createElement('iframe');
+      frame.className = 'fiona-ai-artifact-frame';
+      artifactViews.appendChild(frame);
+      tab = { frame }; artifactTabs.set(key, tab); created = true;
     }
-    activateScopeArtifactTab(tab);
-    return { view: tab.frame.contentWindow, created };
-  }
-
-  function activateScopeArtifactTab(tab) {
-    currentView = 'artifact'; memoryPanel.hidden = true;
-    panel.classList.add('is-artifact-view'); artifactViews.hidden = false;
-    if (chatTab) { chatTab.classList.remove('is-active'); chatTab.setAttribute('aria-pressed', 'false'); }
-    artifactTabs.forEach(entry => { const active = entry === tab; entry.frame.hidden = !active; entry.button.classList.toggle('is-active', active); entry.button.setAttribute('aria-pressed', String(active)); });
-    renderRasciCacheStatus();
+    const name = artifact.type === 'jobDescriptionScopeReview' ? 'Cakupan RASCI' : artifact.type === 'jobDescriptionGroupingReview' ? 'Pengelompokan JD' : 'Pratinjau JD';
+    const title = `${name}${artifact.jobName || artifact.target?.jobName ? ` · ${artifact.jobName || artifact.target.jobName}` : ''}${artifact.revision ? ` · r${artifact.revision}` : ''}`;
+    artifactTitle.textContent = title;
+    tab.frame.title = title;
+    let restore = () => {};
+    if (refresh && !created) {
+      const view = tab.frame.contentWindow, doc = view.document;
+      const focused = doc.activeElement;
+      if (focused && /^(TEXTAREA|INPUT)$/.test(focused.tagName)) {
+        if (!tab.pendingRefresh) focused.addEventListener('blur', () => { const latest = tab.pendingRefresh; tab.pendingRefresh = null; if (latest) tab.refresh?.(latest); }, {once:true});
+        if (!tab.pendingRefresh || jdArtifactOrder(artifact) >= jdArtifactOrder(tab.pendingRefresh)) tab.pendingRefresh = artifact;
+        return {view, created:false};
+      }
+      const scrollY = view.scrollY, openDetails = new Map([...doc.querySelectorAll('details')].map(x => [x.dataset.detailKey || x.querySelector('summary')?.textContent, x.open]));
+      doc.head.replaceChildren(); doc.body.replaceChildren(); created = true;
+      restore = () => { [...doc.querySelectorAll('details')].forEach(x => { const key = x.dataset.detailKey || x.querySelector('summary')?.textContent; if (openDetails.has(key)) x.open = openDetails.get(key); }); view.scrollTo(0, scrollY); };
+    }
+    if (!refresh && !artifactDialog.open) artifactDialog.showModal();
+    return { view: tab.frame.contentWindow, created, tab, restore };
   }
 
   function clearMemoryState() {
-    artifactTabs.forEach(tab => { tab.frame.remove(); tab.wrapper.remove(); });
-    artifactTabs.clear();
-    if (currentView === 'artifact') showChatView();
+    closeArtifactDialog();
+    jdArtifacts.clear(); jdCards.clear();
     Memory?.clearMemoryState();
     History?.clearHistory();
     conversationId = null;
@@ -646,9 +651,7 @@
       if (table.renderTarget === 'prosbis-hierarchy-viewer' || table.mode === 'prosbis_hierarchy') renderProsbisHierarchy(bubble, table);
       else renderRasciTable(bubble, table);
     });
-    if (data.artifact?.type === 'jobDescriptionPreview') renderJobDescriptionPreview(bubble, data.artifact);
-    else if (data.artifact?.type === 'jobDescriptionGroupingReview') renderJobDescriptionGroupingReview(bubble, data.artifact);
-    else if (data.artifact?.type === 'jobDescriptionScopeReview') renderJobDescriptionScopeReview(bubble, data.artifact);
+    renderJdArtifact(bubble, data.artifact);
     if (data.citations?.length) {
       const citations = document.createElement('div');
       citations.className = 'fiona-ai-citations';
@@ -695,7 +698,7 @@
     scrollToLatest();
   }
 
-  function renderJobDescriptionPreview(parent, preview) {
+  function renderJobDescriptionPreviewContent(parent, preview) {
     if (!parent || !preview) return null;
     const card = document.createElement('section');
     card.className = 'fiona-ai-jd-preview';
@@ -745,6 +748,7 @@
     (Array.isArray(preview.sections) ? preview.sections : []).forEach(section => {
       const block = document.createElement('section');
       block.className = 'fiona-ai-jd-section';
+      block.dataset.sectionId = String(section.key || section.number || section.title || 'section');
       const heading = document.createElement('h4');
       heading.textContent = `${section.number || ''}. ${section.title || ''}`.trim();
       block.appendChild(heading);
@@ -886,6 +890,172 @@
     }
   }
 
+  const jdArtifacts = new Map();
+  const jdCards = new Map();
+  function jdArtifactKey(artifact, origin) {
+    const stage = {jobDescriptionScopeReview:'scope', jobDescriptionGroupingReview:'grouping', jobDescriptionPreview:'preview'}[artifact.type];
+    const session = artifact.reviewSessionId || artifact.contextToken;
+    return JSON.stringify([origin, artifact.artifactId || (session && stage ? `jd:${session}:${stage}` : `${artifact.type}:${artifact.proposalId || ''}`)]);
+  }
+  function jdArtifactOrder(artifact) { return typeof artifact.version === 'number' && Number.isFinite(artifact.version) ? artifact.version : Number(artifact.revision) || 0; }
+  function rememberJdArtifact(artifact, origin) {
+    const key = jdArtifactKey(artifact, origin), previous = jdArtifacts.get(key);
+    if (!previous || jdArtifactOrder(artifact) >= jdArtifactOrder(previous)) {
+      if (previous && artifact.type === 'jobDescriptionPreview' && artifact.proposalId === previous.proposalId && !artifact.sections?.length) artifact = {...previous, ...artifact, sections:previous.sections};
+      jdArtifacts.set(key, artifact);
+    }
+    return jdArtifacts.get(key);
+  }
+  function latestJdArtifact(artifact, origin) { return jdArtifacts.get(jdArtifactKey(artifact, origin)) || artifact; }
+  function loadJdNotes(storage, prefix, origin, artifact) {
+    const base = `${prefix}:${origin}:${artifact.contextToken}:`;
+    const stage = {jobDescriptionScopeReview:'scope', jobDescriptionGroupingReview:'grouping', jobDescriptionPreview:'preview'}[artifact.type];
+    const session = artifact.reviewSessionId || artifact.contextToken;
+    const key = `${prefix}:${origin}:${artifact.artifactId || (stage ? `jd:${session}:${stage}` : session)}`;
+    const alias = `${prefix}:${origin}:${artifact.contextToken}`;
+    const notes = [], seen = new Set();
+    const revision = jdArtifactOrder(artifact);
+    const revisionKey = key + ':revision';
+    let previousRevision = null;
+    try {
+      const stored = storage.getItem(revisionKey);
+      if (stored != null) previousRevision = Number(stored);
+      if (previousRevision != null && revision > previousRevision) {
+        storage.setItem(key, '[]');
+        // Mark legacy entries as consumed so a new revision cannot restore them.
+        const oldKeys = [];
+        for (let i = 0; i < storage.length; i++) {
+          const oldKey = storage.key(i);
+          if (oldKey === alias || oldKey.startsWith(base)) oldKeys.push(oldKey);
+        }
+        storage.setItem(key + ':migrated', JSON.stringify(oldKeys));
+      }
+      if (previousRevision == null || revision > previousRevision) storage.setItem(revisionKey, String(revision));
+    } catch (_) {}
+    let migrated = []; try { migrated = JSON.parse(storage.getItem(key + ':migrated') || '[]'); } catch (_) {}
+    if (!Array.isArray(migrated)) migrated = [];
+    const add = note => {
+      if (!note || typeof note !== 'object') return;
+      const fingerprint = JSON.stringify([note.id, note.quote, note.text, note.segments]);
+      if (!seen.has(fingerprint)) { seen.add(fingerprint); notes.push(note); }
+    };
+    try {
+      for (let i = 0; i < storage.length; i++) {
+        const oldKey = storage.key(i);
+        if (oldKey !== key && ((oldKey !== alias && !oldKey.startsWith(base)) || migrated.includes(oldKey))) continue;
+        const value = JSON.parse(storage.getItem(oldKey) || '[]');
+        if (Array.isArray(value)) value.forEach(add);
+        else if (value && typeof value === 'object') Object.entries(value).forEach(([id, text]) => {
+          if (typeof text === 'string' && text.trim()) add({id: `legacy-${id}`, itemId:id, field:'process', quote:'', text, legacyRow:true});
+        });
+        if (oldKey !== key) migrated.push(oldKey);
+      }
+      storage.setItem(key, JSON.stringify(notes));
+      storage.setItem(key + ':migrated', JSON.stringify(migrated));
+    } catch (_) {}
+    return { key, notes };
+  }
+  async function resolveJdArtifact(artifact, origin) {
+    if (!artifact.contextToken) return latestJdArtifact(artifact, origin);
+    const token = encodeURIComponent(artifact.contextToken);
+    let path = artifact.type === 'jobDescriptionScopeReview' ? `/api/agent/jd-scope-reviews/${token}` :
+      artifact.type === 'jobDescriptionGroupingReview' ? `/api/agent/jd-groupings/${token}` :
+      `/api/agent/conversations/${encodeURIComponent(origin)}/jd-previews/${encodeURIComponent(artifact.reviewSessionId || artifact.contextToken)}/latest`;
+    try {
+      const { data } = await requestJson(path, { method: 'GET' });
+      const state = artifact.type === 'jobDescriptionPreview' ? data?.artifact : data;
+      if (!state) throw new Error('missing artifact');
+      return rememberJdArtifact({ ...artifact, readOnly: false, ...state, type: artifact.type }, origin);
+    } catch (_) {
+      return { ...latestJdArtifact(artifact, origin), readOnly: true };
+    }
+  }
+  function jdCardStatus(artifact) {
+    if (artifact.readOnly) return 'Hanya baca';
+    if (artifact.stale) return 'Perlu ditinjau ulang';
+    if (artifact.status === 'applied') return 'Tersimpan';
+    if (artifact.reviewStatus === 'needs_revision') return 'Perlu revisi';
+    if (artifact.reviewStatus === 'needs_confirmation') return 'Perlu konfirmasi';
+    return artifact.confirmed ? 'Disetujui' : 'Menunggu persetujuan';
+  }
+  function jdCardMetadata(artifact) {
+    const revision = artifact.type !== 'jobDescriptionPreview' && artifact.revision != null ? `Revisi ${artifact.revision}` : '';
+    return [artifact.jobName || artifact.target?.jobName, revision, jdCardStatus(artifact)].filter(Boolean).join(' · ');
+  }
+  async function sendJdReviewNotes(entries, origin, send, status, makeMessage) {
+    if (!entries.length) { status.textContent = 'Tambahkan komentar sebelum mengirim.'; return; }
+    if (conversationId !== origin) { status.textContent = 'Buka kembali percakapan asal sebelum mengirim catatan.'; return; }
+    if (busy) { status.textContent = 'Tunggu Fiona menyelesaikan respons saat ini.'; return; }
+    send.disabled = true;
+    try { showChatView(); await sendMessage(makeMessage(entries), false, null, null, closeArtifactDialog); }
+    catch (_) { status.textContent = 'Catatan belum terkirim. Coba lagi.'; }
+    finally { send.disabled = false; }
+  }
+  function createJdDocumentCard(parent, title, job, status, actionLabel, open) {
+    const card = document.createElement('section');
+    card.className = 'fiona-ai-jd-document-card';
+    const heading = document.createElement('h3'); heading.textContent = title;
+    const meta = document.createElement('p'); meta.className = 'fiona-ai-jd-document-meta';
+    meta.textContent = [job, status].filter(Boolean).join(' · ');
+    const link = document.createElement('a'); link.href = '#'; link.className = 'fiona-ai-jd-document-action'; link.textContent = actionLabel;
+    link.onclick = event => { event.preventDefault(); return open(); };
+    card.append(heading, meta, link); parent.appendChild(card); return card;
+  }
+
+  function renderJobDescriptionPreview(parent, preview) {
+    if (!parent || !preview) return null;
+    const origin = conversationId;
+    const title = preview.status === 'applied' ? 'Job Description tersimpan' : 'Pratinjau Job Description';
+    const status = jdCardStatus(preview);
+    return createJdDocumentCard(parent, title, preview.target?.jobName, status, 'Buka dokumen', async () => { await openPreview(false); });
+    async function openPreview(refresh, incoming) {
+      preview = incoming || await resolveJdArtifact(preview, origin);
+      const opened = openScopeArtifactTab(preview, origin, refresh);
+      if (!opened?.view || !opened.created) return;
+      const doc = opened.view.document;
+      const { add, content, send, status, sidebar, plus } = createFionaReviewDocument(doc, title);
+      if (preview.readOnly) { doc.body.classList.add('read-only'); send.disabled = true; status.textContent = 'Konteks tidak tersedia; versi tersimpan hanya dapat dibaca.'; }
+      renderJobDescriptionPreviewContent(content, preview);
+      const { key, notes } = loadJdNotes(opened.view.localStorage, 'fiona-preview-notes', origin, preview);
+      const fields = new Map();
+      content.querySelectorAll('.fiona-ai-jd-section').forEach(section => {
+        section.querySelectorAll('h4, h5, p, li, th, td').forEach((element, index) => {
+          [...element.childNodes].filter(node => node.nodeType === 3 && node.textContent.trim()).forEach((node, part) => {
+            const span = doc.createElement('span'); span.textContent = node.textContent; node.replaceWith(span);
+            const fieldKey = `preview:${section.dataset.sectionId}:${index}:${part}`;
+            fields.set(fieldKey, {element: span, text: span.textContent, key: fieldKey});
+          });
+        });
+      });
+      notes.forEach(note => { if (!note.segments?.every(segment => fields.has(segment.key))) note.unanchored = true; });
+      const persist = () => { try { opened.view.localStorage.setItem(key, JSON.stringify(notes)); } catch (_) {} };
+      attachFionaReviewComments({doc, view:opened.view, content, sidebar, plus, add, fields, notes, itemsById:new Map(), persist});
+      opened.tab.refresh = incoming => openPreview(true, incoming); opened.restore();
+      send.onclick = async () => {
+        const entries = notes.filter(note => note.text?.trim());
+        const message = `Catatan untuk pratinjau JD (konteks ${preview.contextToken || ''}):\n\n` + entries.map(note => `- Kutipan: ${note.quote}\n  Komentar: ${note.text.trim()}`).join('\n') + '\n\nTerapkan hanya perubahan yang dinyatakan pada bagian terkait.';
+        await sendJdReviewNotes(entries, origin, send, status, () => message);
+      };
+    }
+  }
+
+  function renderJdArtifact(parent, artifact) {
+    if (!artifact) return null;
+    const key = jdArtifactKey(artifact, conversationId), previous = jdArtifacts.get(key);
+    artifact = rememberJdArtifact(artifact, conversationId);
+    if (previous && artifact !== previous) {
+      artifactTabs.get(key)?.refresh?.(artifact);
+      for (const card of jdCards.get(key) || []) {
+        const meta = card.querySelector('.fiona-ai-jd-document-meta');
+        if (meta) meta.textContent = jdCardMetadata(artifact);
+      }
+    }
+    const renderers = { jobDescriptionPreview: renderJobDescriptionPreview, jobDescriptionScopeReview: renderJobDescriptionScopeReview, jobDescriptionGroupingReview: renderJobDescriptionGroupingReview };
+    const card = renderers[artifact.type]?.(parent, artifact) || null;
+    if (card) { if (!jdCards.has(key)) jdCards.set(key, new Set()); jdCards.get(key).add(card); }
+    return card;
+  }
+
   function createFionaReviewDocument(doc, title) {
     doc.title = title;
     const style = doc.createElement('style');
@@ -903,10 +1073,11 @@
       .comment textarea{display:block;width:100%;min-height:64px;padding:8px;border:1px solid #cbd5e3;border-radius:5px;resize:vertical;font:inherit;color:#172033}
       .comment .quick-decisions{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}.comment .quick-decisions button{padding:5px 8px;border:1px solid #b8c9e4;border-radius:5px;background:#f5f8ff;color:#284b82;font-size:12px}.comment .quick-decisions button[aria-pressed=true]{background:#dce9ff;border-color:#7297df}
       .comment button{background:transparent;color:#61718a;padding:6px 0 0;font-size:12px}.review-actions{position:sticky;top:0;z-index:9;display:flex;align-items:center;gap:12px;padding:5px 32px;background:#fff;border-bottom:1px solid #d5deed;box-shadow:0 2px 8px #24334d12;color:#52627a}.review-actions button{padding:5px 10px;font-size:13px}.review-actions p{font-size:12px;margin:0}.review-actions [role=status]:empty{display:none}
+      .read-only .add-comment{display:none}.read-only .comments{pointer-events:none}.read-only .comments textarea{background:#f4f6f9}
       .add-comment{position:fixed;z-index:10;border-radius:50%;width:32px;height:32px;padding:0;font-size:21px;box-shadow:0 2px 8px #888}.add-comment[hidden]{display:none}
       mark{background:#ffec9f;border-bottom:2px solid #e6ad24;cursor:pointer}.hierarchy{display:inline-block;color:#5471a9;margin-right:5px}.process-name{display:inline-block;max-width:100%}
-      .decision-attention{padding:2px 7px;border:1px solid #dca855;border-radius:4px;background:#fff2d8;color:#754000;font-weight:700}
-      .grouping-descendant{white-space:nowrap;color:#36598d}.grouping-reason-button{display:block;margin-top:8px;font-size:12px}.grouping-reason{font-size:12px;color:#34445f}.comment.unanchored{position:relative;top:auto!important;margin-top:12px}
+      .fiona-ai-jd-preview h3,.fiona-ai-jd-section h4{margin:18px 0 8px}.fiona-ai-jd-section{margin:22px 0}.fiona-ai-jd-preview table{width:100%;min-width:0}.fiona-ai-jd-preview ul{padding-left:22px}.fiona-ai-jd-muted{color:#596b85}
+      .grouping-descendant{white-space:nowrap;color:#36598d}.grouping-reason-button{display:block;margin-top:8px;font-size:12px}.grouping-reason{font-size:12px;color:#34445f}.comment.unanchored{border-style:dashed}
       @media(max-width:850px){.review-layout{display:block;padding:16px}.review-page{padding:20px;min-height:0}.comments{margin-top:24px}.comment{position:relative;top:auto!important;margin-top:12px}.review-actions{padding:5px 16px;flex-wrap:wrap}.review-actions p{flex:1 1 200px}}
     `;
     doc.head.appendChild(style);
@@ -922,14 +1093,21 @@
   }
 
   function attachFionaReviewComments({ doc, view, content, sidebar, plus, add, fields, notes, itemsById, persist, quickDecisions = false }) {
+    view.__fionaReviewDispose?.();
     let selection = null;
+    notes.forEach(note => {
+      const segments = note.segments || [];
+      if (!segments.length) { note.unanchored = true; return; }
+      const valid = segments.every(segment => { const field = fields.get(segment.key); return field && segment.end <= field.text.length && (!segment.text || field.text.slice(segment.start, segment.end) === segment.text); });
+      const excerpt = segments.map(segment => { const field = fields.get(segment.key); return field ? field.text.slice(segment.start, segment.end) : ''; }).join(segments.length > 1 ? ' · ' : '');
+      note.unanchored = !valid || (segments.length === 1 && note.quote && !segments[0].text && excerpt !== note.quote);
+    });
     function layoutComments() {
       let bottom = 38;
-      const cards = [...sidebar.querySelectorAll('.comment')];
-      cards.forEach(card => {
-        const mark = doc.getElementById(card.dataset.anchor);
-        if (!mark) return;
-        const top = Math.max(bottom, mark.getBoundingClientRect().top - sidebar.getBoundingClientRect().top);
+      const cards = [...sidebar.querySelectorAll('.comment')].map(card => ({card, anchor: doc.getElementById(card.dataset.anchor)}));
+      cards.sort((a, b) => (a.anchor?.getBoundingClientRect().top ?? Infinity) - (b.anchor?.getBoundingClientRect().top ?? Infinity));
+      cards.forEach(({card, anchor: mark}) => {
+        const top = mark ? Math.max(bottom, mark.getBoundingClientRect().top - sidebar.getBoundingClientRect().top) : bottom;
         card.style.top = `${Math.max(38, top)}px`;
         bottom = Math.max(38, top) + card.offsetHeight + 12;
       });
@@ -939,7 +1117,7 @@
       sidebar.querySelectorAll('.comment').forEach(x => x.remove());
       for (const field of fields.values()) {
         field.element.textContent = '';
-        const anchors = notes.flatMap(note => (note.segments || []).map((segment, index) => ({ note, segment, index }))).filter(({ segment }) => segment.key === field.key && Number.isInteger(segment.start) && Number.isInteger(segment.end) && segment.start >= 0 && segment.end <= field.text.length && segment.end > segment.start);
+        const anchors = notes.filter(note => !note.unanchored).flatMap(note => (note.segments || []).map((segment, index) => ({ note, segment, index }))).filter(({ segment }) => segment.key === field.key && Number.isInteger(segment.start) && Number.isInteger(segment.end) && segment.start >= 0 && segment.end <= field.text.length && segment.end > segment.start);
         const boundaries = [...new Set([0, field.text.length, ...anchors.flatMap(x => [x.segment.start, x.segment.end])])].sort((a, b) => a - b);
         for (let i = 0; i < boundaries.length - 1; i++) {
         const start = boundaries[i], end = boundaries[i + 1];
@@ -956,7 +1134,7 @@
         const card = add(sidebar, 'div'); card.className = note.unanchored ? 'comment unanchored' : 'comment'; card.id = `scope-card-${note.id}`; card.dataset.anchor = `scope-comment-${note.id}`;
         const relatedItems = (note.itemIds || []).map(id => itemsById.get(id)).filter(Boolean);
         add(card, 'div', relatedItems.length ? relatedItems.map(item => item.processCode || 'Proses').join(', ') : 'Bagian dokumen').className = 'comment-heading';
-        const excerpt = (note.segments || []).map(segment => {
+        const excerpt = note.unanchored ? String(note.quote || '') : (note.segments || []).map(segment => {
         const field = fields.get(segment.key);
         return field ? field.text.slice(segment.start, segment.end) : '';
         }).filter(Boolean).map(part => note.segments.length > 1 ? part.trim() : part).join(' · ') || String(note.quote || '').replace(/\s+/g, ' ').trim();
@@ -985,7 +1163,7 @@
       });
       layoutComments();
     }
-    doc.addEventListener('mouseup', () => {
+    const onMouseUp = () => {
       const selected = view.getSelection();
       if (!selected || selected.rangeCount === 0 || selected.isCollapsed) { plus.hidden = true; return; }
       const range = selected.getRangeAt(0);
@@ -997,13 +1175,14 @@
         let start = 0, end = field.text.length;
         if (field.element.contains(range.startContainer)) { const before = doc.createRange(); before.selectNodeContents(field.element); before.setEnd(range.startContainer, range.startOffset); start = before.toString().length; }
         if (field.element.contains(range.endContainer)) { const before = doc.createRange(); before.selectNodeContents(field.element); before.setEnd(range.endContainer, range.endOffset); end = before.toString().length; }
-        if (end > start) segments.push({ key: field.key, start, end });
+        if (end > start) segments.push({ key: field.key, start, end, text: field.text.slice(start, end) });
       }
       if (!quote.trim() || !segments.length) { plus.hidden = true; return; }
-      const itemIds = [...new Set(segments.map(segment => fields.get(segment.key)?.item?.id).filter(Boolean))];
+      const itemIds = [...new Set(segments.flatMap(segment => fields.get(segment.key)?.items?.map(item => item.id) || [fields.get(segment.key)?.item?.id]).filter(Boolean))];
       selection = { segments, itemIds, quote };
       const rect = range.getBoundingClientRect(); plus.style.left = `${Math.max(8, rect.right + 5)}px`; plus.style.top = `${Math.max(8, rect.top)}px`; plus.hidden = false;
-    });
+    };
+    doc.addEventListener('mouseup', onMouseUp);
     plus.onmousedown = event => event.preventDefault();
     plus.onclick = () => {
       if (!selection) return;
@@ -1011,61 +1190,116 @@
       notes.push(note); selection = null; plus.hidden = true; view.getSelection()?.removeAllRanges(); persist(); renderComments();
       doc.getElementById(`scope-card-${note.id}`)?.querySelector('textarea')?.focus();
     };
-    view.addEventListener('resize', layoutComments); view.addEventListener('scroll', () => { plus.hidden = true; }, { passive: true });
+    const onScroll = () => { plus.hidden = true; };
+    view.addEventListener('resize', layoutComments); view.addEventListener('scroll', onScroll, { passive: true });
+    doc.addEventListener('toggle', layoutComments, true);
+    const observer = view.ResizeObserver ? new view.ResizeObserver(layoutComments) : null;
+    observer?.observe(content);
+    view.__fionaReviewDispose = () => { doc.removeEventListener('mouseup', onMouseUp); doc.removeEventListener('toggle', layoutComments, true); view.removeEventListener('resize', layoutComments); view.removeEventListener('scroll', onScroll); observer?.disconnect(); };
     renderComments();
+  }
+
+  function groupScopeItems(items) {
+    const codes = new Set(items.map(x => String(x.processCode || '').trim()).filter(Boolean));
+    const roots = new Map();
+    for (const item of items) {
+      const code = String(item.processCode || '').trim(), parts = code.split('.').filter(Boolean);
+      let root = code || `unknown:${item.id}`;
+      for (let n = 1; n < parts.length; n++) {
+        const ancestor = parts.slice(0, n).join('.');
+        if (codes.has(ancestor)) { root = ancestor; break; }
+      }
+      if (!roots.has(root)) roots.set(root, []);
+      roots.get(root).push(item);
+    }
+    return [...roots].map(([root, members]) => {
+      const categories = new Set(members.map(item => item.humanDecision ? item.decision :
+        item.decision !== 'unresolved' ? item.decision : item.suggestion === 'generic' ? 'generic' : item.suggestion === 'main' ? 'main' : 'clarify'));
+      const signature = JSON.stringify(members.map(item => [item.id, item.decision]).sort((a,b) => String(a[0]).localeCompare(String(b[0]))));
+      const mixed = categories.size > 1;
+      const acknowledged = mixed && !categories.has('clarify') && members.every(item => item.mixedAcknowledgement === signature);
+      let category = mixed ? (acknowledged ? 'resolved' : 'clarify') : [...categories][0];
+      if (category === 'incorrect') category = 'excluded';
+      if (!['main', 'generic', 'resolved', 'excluded'].includes(category)) category = 'clarify';
+      const lead = members.find(item => item.processCode === root) || members[0];
+      return {root, members, lead, mixed, signature, category};
+    });
   }
 
   function renderJobDescriptionScopeReview(parent, artifact) {
     if (!parent || !artifact || !Array.isArray(artifact.items) || !artifact.contextToken) return null;
     const originConversation = conversationId;
-    const card = document.createElement('section');
-    card.className = 'fiona-ai-jd-scope-review';
-    card.setAttribute('aria-label', 'Dokumen tinjauan cakupan RASCI');
-    const title = document.createElement('h3'); title.textContent = 'Tinjauan cakupan RASCI';
-    const description = document.createElement('p');
-    description.textContent = `Buka dokumen di tab Fiona untuk membaca usulan dan menambahkan catatan${artifact.jobName ? ` untuk ${artifact.jobName}` : ''}.`;
-    const link = document.createElement('a'); link.href = '#'; link.textContent = 'Buka dokumen tinjauan';
-    card.append(title, description, link); parent.appendChild(card);
-    link.onclick = event => {
-      event.preventDefault();
-      const opened = openScopeArtifactTab(artifact, originConversation);
-      if (!opened?.view) { description.textContent = 'Tab dokumen tidak dapat dibuka. Coba buka kembali.'; return; }
+    const card = createJdDocumentCard(parent, 'Tinjauan cakupan RASCI', artifact.jobName, `Revisi ${artifact.revision} · ${jdCardStatus(artifact)}`, 'Buka dokumen', () => openScope());
+    async function openScope(refresh = false, incoming = null) {
+      artifact = incoming || await resolveJdArtifact(artifact, originConversation);
+      const opened = openScopeArtifactTab(artifact, originConversation, refresh);
+      if (!opened?.view) return;
       const view = opened.view;
       if (!opened.created) return;
       const doc = view.document;
       doc.title = 'Tinjauan cakupan RASCI';
       const { add, send, status, content, sidebar, plus } = createFionaReviewDocument(doc, 'Tinjauan cakupan RASCI');
+      if (artifact.readOnly) { doc.body.classList.add('read-only'); send.disabled = true; status.textContent = 'Konteks tidak tersedia; versi tersimpan hanya dapat dibaca.'; }
       const titleText = add(content, 'h1', 'Tinjauan cakupan RASCI');
       const targetText = add(content, 'p', `Jabatan: ${artifact.jobName || 'Tidak tersedia'} · Unit: ${artifact.unitName || 'Tidak tersedia'} · Revisi: ${artifact.revision}`);
-      const instructions = add(content, 'p', 'Pilih teks pada dokumen, klik tanda +, lalu pilih keputusan cepat atau tulis komentar di sisi kanan. Pilihan berlaku untuk semua proses dalam komentar. Kirim komentar ke Fiona setelah selesai. Komentar belum mengubah keputusan sampai Fiona memprosesnya.');
-      const guide = add(content, 'p', 'Tugas utama: bahan JD. Tanggung jawab umum: tidak dipilih sebagai tugas utama. Tidak sesuai: dinilai tidak cocok untuk JD. Perlu klarifikasi: belum diputuskan dan belum masuk JD. Saran Fiona bukan keputusan akhir.');
-      const scroll = add(content, 'div'); scroll.className = 'scroll';
-      const table = add(scroll, 'table'); const head = add(table, 'thead'); const heading = add(head, 'tr');
-      ['Indeks', 'Notasi', 'Proses dan komentar', 'Keputusan saat ini', 'Saran dan alasan Fiona'].forEach(x => add(heading, 'th', x));
-      const body = add(table, 'tbody');
+      const instructions = add(content, 'p', 'Pilih teks dan klik + untuk menambahkan catatan, lalu kirim ke Fiona.');
+      const guideDetails = add(content, 'details'); add(guideDetails, 'summary', 'Panduan kategori');
+      const guide = add(guideDetails, 'p', 'Tugas utama digunakan sebagai bahan JD. Tanggung jawab umum tidak dipilih sebagai tugas utama. Tidak sesuai berarti penugasan tidak cocok; perlu klarifikasi berarti belum diputuskan. Saran Fiona bukan keputusan akhir.');
+      const fields = new Map();
+      function registerField(element, key, item = null, name = key, items = null) {
+        fields.set(key, { element, text: element.textContent, item, items, name, key });
+      }
+      const groups = groupScopeItems(artifact.items);
+      const categories = [['main', 'Tugas utama'], ['generic', 'Tanggung jawab umum'], ['clarify', 'Perlu klarifikasi / tidak sesuai']];
+      const categoryForItem = new Map();
+      for (const group of groups) {
+        for (const item of group.members) {
+          const category = group.category === 'resolved'
+            ? (item.decision === 'main' || item.decision === 'generic' ? item.decision : 'clarify')
+            : (group.category === 'main' || group.category === 'generic' ? group.category : 'clarify');
+          categoryForItem.set(item.id, category);
+        }
+      }
+      const bodies = new Map();
+      const headings = [];
+      for (const [category, label] of categories) {
+        const section = add(content, 'section');
+        add(section, 'h2', label);
+        const scroll = add(section, 'div'); scroll.className = 'scroll';
+        const table = add(scroll, 'table'); const head = add(table, 'thead'); const heading = add(head, 'tr');
+        const columns = ['Indeks', 'Notasi', 'Proses dan komentar'];
+        if (category === 'clarify') columns.push('Keputusan saat ini', 'Saran dan alasan Fiona');
+        columns.forEach(x => add(heading, 'th', x));
+        headings.push(heading);
+        bodies.set(category, add(table, 'tbody'));
+      }
       const labels = { main: 'Tugas utama', generic: 'Tanggung jawab umum', incorrect: 'Tidak sesuai untuk JD ini', unresolved: 'Perlu klarifikasi' };
       const suggestions = { main: 'Siap digunakan', generic: 'Diduga tanggung jawab umum', clarify: 'Cakupan perlu diperjelas' };
-      const key = `fiona-scope-notes:${originConversation}:${artifact.contextToken}:${artifact.revision}`;
-      let saved = {}; try { saved = JSON.parse(view.localStorage.getItem(key) || '{}'); } catch (_) {}
-      const notes = Array.isArray(saved) ? saved.filter(x => x && typeof x === 'object') : [];
-      const fields = new Map();
-      function registerField(element, key, item = null, name = key) {
-        fields.set(key, { element, text: element.textContent, item, name, key });
-      }
+      const { key, notes } = loadJdNotes(view.localStorage, 'fiona-scope-notes', originConversation, artifact);
+      const saved = notes;
       [titleText, targetText, instructions, guide].forEach((element, index) => registerField(element, `document:${index}`));
-      [...heading.children].forEach((element, index) => registerField(element, `heading:${index}`));
+      headings.forEach((heading, tableIndex) => [...heading.children].forEach((element, index) => registerField(element, `heading:${tableIndex}:${index}`)));
       const itemsById = new Map(artifact.items.map(item => [item.id, item]));
       const processCodes = new Set(artifact.items.map(item => String(item.processCode || '').trim()).filter(Boolean));
       const groupColors = new Map();
+      const categoryCodes = new Map(categories.map(([category]) => [category, new Set(artifact.items.filter(item => categoryForItem.get(item.id) === category).map(item => String(item.processCode || '').trim()))]));
       const persist = () => { try { view.localStorage.setItem(key, JSON.stringify(notes)); } catch (_) {} };
       [...artifact.items].sort((a, b) => String(a.processCode || '').localeCompare(String(b.processCode || ''), undefined, { numeric: true })).forEach(item => {
-        const row = add(body, 'tr');
+        const category = categoryForItem.get(item.id);
+        const row = add(bodies.get(category), 'tr');
         const codeCell = add(row, 'td'); const notationCell = add(row, 'td');
         const process = add(row, 'td');
         const parts = String(item.processCode || '').trim().split('.').filter(Boolean);
-        const root = parts[0] || `unknown:${item.id}`;
-        if (!groupColors.has(root)) groupColors.set(root, groupColors.size % 2);
-        row.className = groupColors.get(root) ? 'hierarchy-odd' : 'hierarchy-even';
+        const codes = categoryCodes.get(category);
+        let root = parts.join('.') || `unknown:${item.id}`;
+        for (let i = 1; i < parts.length; i++) {
+          const ancestor = parts.slice(0, i).join('.');
+          if (codes.has(ancestor)) { root = ancestor; break; }
+        }
+        if (!groupColors.has(category)) groupColors.set(category, new Map());
+        const colors = groupColors.get(category);
+        if (!colors.has(root)) colors.set(root, colors.size % 2);
+        row.className = colors.get(root) ? 'hierarchy-odd' : 'hierarchy-even';
         let visibleAncestors = 0;
         for (let i = 1; i < parts.length; i++) if (processCodes.has(parts.slice(0, i).join('.'))) visibleAncestors++;
         const indentation = Math.min(visibleAncestors, 7) * 16;
@@ -1081,9 +1315,24 @@
         field(codeCell, 'code', item.processCode || '—');
         field(notationCell, 'notation', item.notation || '—');
         field(process, 'process', item.summary || 'Nama proses tidak tersedia');
-        const decisionField = field(add(row, 'td'), 'decision', labels[item.decision] || labels.unresolved);
-        if (!labels[item.decision] || item.decision === 'unresolved') decisionField.className += ' decision-attention';
-        field(add(row, 'td'), 'reason', `${suggestions[item.suggestion] || 'Perlu ditinjau'}${item.reason ? ` — ${item.reason}` : ''}${item.clarification ? ` · Klarifikasi: ${item.clarification}` : ''}`);
+        if (category === 'clarify') {
+          field(add(row, 'td'), 'decision', labels[item.decision] || labels.unresolved);
+          field(add(row, 'td'), 'reason', `${suggestions[item.suggestion] || 'Perlu ditinjau'}${item.reason ? ` - ${item.reason}` : ''}${item.clarification ? ` · Klarifikasi: ${item.clarification}` : ''}`);
+        }
+        const group = groups.find(candidate => candidate.members[0] === item);
+        if (group?.category === 'clarify' && group.mixed && group.members.every(member => member.decision !== 'unresolved' || (member.suggestion !== 'clarify' && !member.humanDecision)) && !artifact.readOnly) {
+          const acknowledge = add(row.children[4], 'button', 'Ya, kategori campuran sesuai'); acknowledge.type = 'button';
+          acknowledge.onclick = async () => {
+            acknowledge.disabled = true;
+            try {
+              const { data } = await requestJson(`/api/agent/jd-scope-reviews/${encodeURIComponent(artifact.contextToken)}`, { method: 'PUT', body: JSON.stringify({revision: artifact.revision, decisions: group.members.map(member => ({id: member.id, decision: member.decision, mixedAcknowledgement: group.signature}))}) });
+              Object.assign(artifact, data); rememberJdArtifact(artifact, originConversation);
+              await openScope(true, artifact);
+              showChatView();
+              await sendMessage(`Kategori campuran telah saya akui. Panggil continue_ready_job_description_scope dengan konteks ${artifact.contextToken} dan revisi ${artifact.revision}; lanjutkan hanya jika cakupan siap.`, false);
+            } catch (_) { status.textContent = 'Tidak dapat menyimpan; muat ulang tinjauan dan coba lagi.'; acknowledge.disabled = false; }
+          };
+        }
       });
       // Preserve notes written in the previous row-based review interface.
       if (!Array.isArray(saved) && saved && typeof saved === 'object') {
@@ -1092,6 +1341,7 @@
       }
       // Older comments used offsets relative to one table cell.
       notes.forEach(note => {
+        if (note.legacyRow) { const field = fields.get(`${note.itemId}:process`); if (field) { note.start = 0; note.end = field.text.length; note.quote = field.text; } else note.unanchored = true; delete note.legacyRow; }
         if (!Array.isArray(note.segments) && note.itemId && note.field) {
           note.segments = [{ key: `${note.itemId}:${note.field}`, start: note.start, end: note.end }];
           note.itemIds = [note.itemId];
@@ -1099,23 +1349,18 @@
       });
       attachFionaReviewComments({ doc, view, content, sidebar, plus, add, fields, notes, itemsById, persist, quickDecisions: true });
       send.onclick = async () => {
-        const entries = notes.filter(x => x.text?.trim() && x.segments?.some(segment => fields.has(segment.key)));
-        if (!entries.length) { status.textContent = 'Tambahkan sedikitnya satu catatan sebelum mengirim.'; return; }
-        if (conversationId !== originConversation) { status.textContent = 'Buka kembali percakapan asal sebelum mengirim catatan.'; return; }
-        if (busy) { status.textContent = 'Tunggu Fiona menyelesaikan respons saat ini.'; return; }
-        const message = `Catatan saya untuk tinjauan cakupan RASCI ${artifact.jobName || ''} (konteks ${artifact.contextToken}, revisi ${artifact.revision}):\n\n` + entries.map(note => { const related = (note.itemIds || []).map(id => itemsById.get(id)).filter(Boolean).map(item => `Proses ${item.processCode}, notasi ${item.notation}, ID ${item.id}`).join('; '); return `- ${related ? `${related}; ` : ''}kutipan: “${note.quote}”; komentar: ${note.text.trim()}`; }).join('\n') + '\n\nTerapkan hanya keputusan yang saya nyatakan dengan jelas; tanyakan jika ada catatan yang belum jelas. Jangan konfirmasi cakupan atau melanjutkan tanpa persetujuan saya.';
+        const entries = notes.filter(x => x.text?.trim());
+        const message = `Catatan saya untuk tinjauan cakupan RASCI ${artifact.jobName || ''} (konteks ${artifact.contextToken}, revisi ${artifact.revision}):\n\n` + entries.map(note => { const related = (note.itemIds || []).map(id => itemsById.get(id)).filter(Boolean).map(item => `Proses ${item.processCode}, notasi ${item.notation}, ID ${item.id}`).join('; '); return `- ${related ? `${related}; ` : ''}kutipan: “${note.quote}”; komentar: ${note.text.trim()}`; }).join('\n') + '\n\nPada komentar cakupan, “utama” berarti tugas utama (main), dan “umum” berarti tanggung jawab umum (generic) untuk seluruh assignment yang dipilih. Jika komentar menjawab keraguan relevansi dengan membatasi proses pada fungsi jabatan, gunakan sebagai tugas utama dengan batas tersebut sebagai klarifikasi, kecuali saya menyatakan kategori lain. Jangan perluas ke assignment yang tidak dipilih. Tanyakan hanya bila maksudnya benar-benar bertentangan atau tidak jelas. Lanjutkan otomatis jika seluruh cakupan sudah jelas, kecuali komentar saya secara eksplisit meminta berhenti.';
         const summary = { job: artifact.jobName || '', revision: artifact.revision, notes: entries.map(note => ({
           process: (note.itemIds || []).map(id => itemsById.get(id)).filter(Boolean).map(item => `Proses ${item.processCode}`).join(', '),
-          quote: (note.segments || []).map(segment => { const field = fields.get(segment.key); return field ? field.text.slice(segment.start, segment.end).trim() : ''; }).filter(Boolean).join(' · ') || note.quote,
+          quote: note.unanchored ? note.quote : (note.segments || []).map(segment => { const field = fields.get(segment.key); return field ? field.text.slice(segment.start, segment.end).trim() : ''; }).filter(Boolean).join(' · ') || note.quote,
           text: note.text.trim()
         })) };
         const messageWithSummary = message + '\n\n[FIONA_SCOPE_REVIEW_SUMMARY]' + JSON.stringify(summary);
-        send.disabled = true;
-        try { showChatView(); await sendMessage(messageWithSummary); status.textContent = 'Periksa percakapan Fiona untuk hasil pengiriman dan responsnya.'; }
-        catch (_) { status.textContent = 'Catatan belum terkirim. Coba lagi.'; }
-        finally { send.disabled = false; }
+        await sendJdReviewNotes(entries, originConversation, send, status, () => messageWithSummary);
       };
-      view.focus();
+      opened.tab.refresh = incoming => openScope(true, incoming); opened.restore();
+      if (!refresh) view.focus();
     };
     return card;
   }
@@ -1171,33 +1416,38 @@
     return true;
   }
 
-  function openGroupingMarkdownArtifact(artifact, originConversation) {
-    const opened = openScopeArtifactTab(artifact, originConversation);
+  function openGroupingMarkdownArtifact(artifact, originConversation, refresh = false) {
+    const opened = openScopeArtifactTab(artifact, originConversation, refresh);
     if (!opened?.view || !opened.created) return;
     const view = opened.view, doc = view.document;
     doc.title = 'Review Pengelompokan Job Description';
     const { add, send, status, content: page, sidebar, plus } = createFionaReviewDocument(doc, 'Review Pengelompokan Job Description');
+    if (artifact.readOnly) { doc.body.classList.add('read-only'); send.disabled = true; status.textContent = 'Konteks tidak tersedia; versi tersimpan hanya dapat dibaca.'; }
     const instructions = add(page, 'p', 'Pilih teks pada dokumen, klik tanda +, lalu tulis komentar di sisi kanan. Kirim catatan ke Fiona setelah selesai.');
     const scroll = add(page, 'div'); scroll.className = 'scroll';
     const rendered = add(scroll, 'div'); rendered.innerHTML = markdown(artifact.markdown || groupingMarkdown(artifact));
     if (!decorateGroupingMarkdownTable(doc, rendered, artifact)) status.textContent = 'Tabel tidak sesuai dengan data pengelompokan. Muat ulang artefak.';
-    const key = `fiona-grouping-notes:${originConversation}:${artifact.contextToken}:${artifact.revision}`;
-    let stored = []; try { const saved = JSON.parse(view.localStorage.getItem(key) || '[]'); if (Array.isArray(saved)) stored = saved; } catch (_) {}
-    const notes = stored.filter(note => note && typeof note === 'object');
+    const { key, notes } = loadJdNotes(view.localStorage, 'fiona-grouping-notes', originConversation, artifact);
     const fields = new Map();
     // Wrap only text nodes, so comment highlights cannot erase buttons or reason panels.
     const targets = [instructions, ...rendered.querySelectorAll('h1, thead th, tbody td')];
     targets.forEach((element, index) => {
       [...element.childNodes].filter(node => node.nodeType === 3 && node.textContent.trim()).forEach((node, part) => {
         const span = doc.createElement('span'); span.textContent = node.textContent; node.replaceWith(span);
-        const fieldKey = `grouping:${index}:${part}`;
+        const row = element.closest?.('tr');
+        const rows = [...rendered.querySelectorAll('tbody tr')];
+        const rowIndex = row ? rows.indexOf(row) : -1;
+        const codes = (artifact.groups || []).flatMap(group => group.sourceCodes || []);
+        const column = row ? [...row.children].indexOf(element) : index;
+        const fieldKey = rowIndex >= 0 ? `grouping:process:${encodeURIComponent(codes[rowIndex] || '')}:cell:${column}:${part}` : `grouping:document:${element.tagName || 'text'}:${index}:${part}`;
         fields.set(fieldKey, { element: span, text: span.textContent, key: fieldKey });
       });
     });
     // Earlier grouping comments stored only a quotation. Reattach when possible;
     // preserve unanchored notes as standalone sidebar comments.
     notes.forEach((note, index) => {
-      if (note.segments?.length) return;
+      if (note.segments?.length && note.segments.every(segment => !/^grouping:\d+:/.test(segment.key))) return;
+      note.segments = [];
       note.id ||= `legacy-${index}`;
       const field = [...fields.values()].find(x => note.quote && x.text.includes(note.quote));
       if (field) { const offset = field.text.indexOf(note.quote); note.segments = [{ key: field.key, start: offset, end: offset + note.quote.length }]; }
@@ -1207,33 +1457,18 @@
     attachFionaReviewComments({ doc, view, content: page, sidebar, plus, add, fields, notes, itemsById: new Map(), persist });
     send.onclick = async () => {
       const entries = notes.filter(note => note.text?.trim());
-      if (!entries.length) { status.textContent = 'Tambahkan komentar sebelum mengirim.'; return; }
-      if (conversationId !== originConversation) { status.textContent = 'Buka kembali percakapan asal sebelum mengirim catatan.'; return; }
-      if (busy) { status.textContent = 'Tunggu Fiona menyelesaikan respons saat ini.'; return; }
       const message = `Catatan untuk pengelompokan JD (konteks ${artifact.contextToken}, revisi ${artifact.revision}):\n\n` + entries.map(note => `- Kutipan: ${note.quote}\n  Komentar: ${note.text.trim()}`).join('\n') + '\n\nTerapkan perubahan yang saya nyatakan dan tampilkan pengelompokan terbaru. Jangan konfirmasi tanpa persetujuan saya.';
-      send.disabled = true; try { showChatView(); await sendMessage(message); status.textContent = 'Periksa respons Fiona di percakapan.'; } catch (_) { status.textContent = 'Catatan belum terkirim. Coba lagi.'; } finally { send.disabled = false; }
+      await sendJdReviewNotes(entries, originConversation, send, status, () => message);
     };
-    renderNotes(); view.focus();
+    opened.tab.refresh = incoming => openGroupingMarkdownArtifact(incoming, originConversation, true); opened.restore();
+    if (!refresh) view.focus();
   }
 
   function renderJobDescriptionGroupingReview(parent, artifact) {
     if (!parent || !artifact) return null;
-    const card = document.createElement('section');
-    card.className = 'fiona-ai-jd-grouping-review';
-    card.setAttribute('aria-label', 'Review pengelompokan Job Description');
-    const heading = document.createElement('h3');
-    heading.textContent = 'Review Pengelompokan Job Description';
-    const meta = document.createElement('p');
-    meta.className = 'fiona-ai-jd-grouping-meta';
+    const originConversation = conversationId;
     const revision = Number.isFinite(Number(artifact.revision)) ? Number(artifact.revision) : 0;
-    meta.textContent = `Revisi ${revision} · ${artifact.confirmed ? 'Disetujui' : 'Menunggu persetujuan'}`;
-    card.append(heading, meta);
-    if (artifact.contextToken && (artifact.markdown || groupingMarkdown(artifact))) {
-      const originConversation = conversationId;
-      const link = document.createElement('a'); link.href = '#'; link.textContent = 'Buka dokumen pengelompokan';
-      link.onclick = event => { event.preventDefault(); openGroupingMarkdownArtifact(artifact, originConversation); };
-      card.appendChild(link);
-    }
+    const card = createJdDocumentCard(parent, 'Review Pengelompokan Job Description', artifact.jobName, `Revisi ${revision} · ${jdCardStatus(artifact)}`, 'Buka dokumen', async () => openGroupingMarkdownArtifact(await resolveJdArtifact(artifact, originConversation), originConversation));
     if (artifact.error?.message) {
       const error = document.createElement('p');
       error.className = 'fiona-ai-jd-grouping-error';
@@ -1242,7 +1477,6 @@
       card.appendChild(error);
     }
 
-    parent.appendChild(card);
     return card;
   }
 
@@ -1385,7 +1619,7 @@
     return body;
   }
 
-  async function sendMessage(text, continuePrevious = false, requestSnapshot = null, scopeContinuation = null) {
+  async function sendMessage(text, continuePrevious = false, requestSnapshot = null, scopeContinuation = null, onSend = null) {
     if (busy) {
       if (activeController) activeController.abort();
       return;
@@ -1440,6 +1674,7 @@
 
     activeController = new AbortController();
     setChatBusy(true, true);
+    onSend?.();
 
     let liveBubble = null;
     let accumulatedText = '';
@@ -1526,9 +1761,7 @@
     add,
     renderRasciTable,
     renderProsbisHierarchy,
-    renderJobDescriptionPreview,
-    renderJobDescriptionScopeReview,
-    renderJobDescriptionGroupingReview,
+    renderJdArtifact,
     esc,
     scrollToLatest,
     startNewChat
@@ -1642,3 +1875,4 @@
   // from the user's first open/message without blocking page initialization.
   if (rasci) window.setTimeout(() => prepareRasciCache(context()), 0);
 })();
+

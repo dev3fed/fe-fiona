@@ -617,15 +617,14 @@
 
 /* Main Pane */
 .fiona-ai-main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;height:100%;background:#fff}
-.fiona-ai-work-tabs{display:flex;align-items:stretch;gap:3px;min-height:38px;padding:4px 12px 0;border-bottom:1px solid var(--fiona-border);overflow-x:auto;background:#f7f9fc;flex-shrink:0}
-.fiona-ai-work-tab-wrap{display:flex;align-items:center;flex-shrink:0;border-radius:7px 7px 0 0;background:#edf2f8}
-.fiona-ai-work-tab{border:0;border-bottom:2px solid transparent;background:transparent;padding:7px 11px;color:#52647d;font-size:12px;white-space:nowrap}
-.fiona-ai-work-tab.is-active{border-bottom-color:var(--fiona-blue);color:#14569a;font-weight:600;background:#fff}
-.fiona-ai-work-tab-close{border:0;background:transparent;color:#718096;padding:3px 8px;font-size:17px}
+.fiona-ai-artifact-dialog{width:calc(100vw - 48px);max-width:1400px;height:calc(100vh - 48px);max-height:calc(100vh - 48px);padding:0;border:0;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(15,23,42,.3)}
+.fiona-ai-artifact-dialog[open]{display:flex;flex-direction:column}
+.fiona-ai-artifact-dialog::backdrop{background:rgba(15,23,42,.55)}
+.fiona-ai-artifact-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 18px;border-bottom:1px solid var(--fiona-border)}
+.fiona-ai-artifact-header h2{margin:0;font-size:16px}
+.fiona-ai-artifact-header button{border:0;border-radius:8px;background:#f0f4f8;width:36px;height:36px;font-size:24px;cursor:pointer}
 .fiona-ai-artifact-views{flex:1;min-height:0;overflow:hidden}
-.fiona-ai-artifact-views[hidden],.fiona-ai-artifact-frame[hidden]{display:none}
 .fiona-ai-artifact-frame{display:block;width:100%;height:100%;border:0;background:#fff}
-.fiona-ai-panel.is-artifact-view :is(.fiona-ai-model-picker,.fiona-ai-memory-panel,.fiona-ai-unavailable,.fiona-ai-messages,.fiona-ai-empty-state,.fiona-ai-status,.fiona-ai-cache-status,.fiona-ai-composer-area,.fiona-ai-disclaimer){display:none!important}
 .fiona-ai-header-info{display:flex;align-items:center;gap:10px}
 .fiona-ai-toggle-sidebar{border:0;background:#f0f4f8;border-radius:8px;width:34px;height:34px;font-size:16px;color:#344054;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .fiona-ai-toggle-sidebar:hover{background:#e2e8f0}
@@ -1911,3 +1910,7 @@ ui-single-select, ui-multi-select {
 .fiona-ai-scope-summary-note blockquote,.fiona-ai-scope-summary-note details{margin:6px 0;padding-left:10px;border-left:2px solid rgba(255,255,255,.55);font-size:12px;opacity:.9}
 .fiona-ai-scope-summary-note summary{cursor:pointer}.fiona-ai-scope-summary-note summary span{text-decoration:underline}
 .fiona-ai-scope-summary-note p{margin:6px 0 0;white-space:pre-wrap}
+.fiona-ai-jd-document-card{margin:12px 0;padding:14px 16px;border:1px solid #d5deed;border-radius:8px;background:#fff;max-width:520px}
+.fiona-ai-jd-document-card h3{margin:0 0 5px;font-size:15px}
+.fiona-ai-jd-document-meta{margin:0 0 8px;color:#596b85;font-size:13px}
+.fiona-ai-jd-document-action{font-weight:600}

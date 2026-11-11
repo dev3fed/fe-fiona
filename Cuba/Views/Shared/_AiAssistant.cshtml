@@ -40,10 +40,13 @@
                 <button type="button" id="fionaAiClose" aria-label="Tutup asisten">×</button>
             </div>
         </header>
-        <nav id="fionaAiWorkTabs" class="fiona-ai-work-tabs" aria-label="Tab Fiona">
-            <button type="button" id="fionaAiChatTab" class="fiona-ai-work-tab is-active" aria-pressed="true">Obrolan</button>
-        </nav>
-        <div id="fionaAiArtifactViews" class="fiona-ai-artifact-views" hidden></div>
+        <dialog id="fionaAiArtifactDialog" class="fiona-ai-artifact-dialog" aria-labelledby="fionaAiArtifactTitle">
+            <div class="fiona-ai-artifact-header">
+                <h2 id="fionaAiArtifactTitle"></h2>
+                <button type="button" id="fionaAiArtifactClose" aria-label="Tutup dokumen" title="Tutup dokumen">×</button>
+            </div>
+            <div id="fionaAiArtifactViews" class="fiona-ai-artifact-views"></div>
+        </dialog>
         <div id="fionaAiModelPicker" class="fiona-ai-model-picker" aria-live="polite">
             <label for="fionaAiModelSelect">Model</label>
             <select id="fionaAiModelSelect" disabled aria-describedby="fionaAiModelHelp">
